@@ -104,7 +104,7 @@ syntaxToTermField syntax = case syntax of
   S.FunctionCall identifier parameters -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ]
   S.Ternary expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
   S.AnonymousFunction parameters c -> [ "parameters" .= parameters ] <> childrenFields c
-  S.Function identifier parameters c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> childrenFields c
+  S.Function identifier parameters ty c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "type" .= ty ] <> childrenFields c
   S.Assignment assignmentId value -> [ "identifier" .= assignmentId ] <> [ "value" .= value ]
   S.OperatorAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]

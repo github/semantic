@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0131ba660219d1b7eae0f2ad99f0279ddd72540a..c29d06751817f2f982dec8eb7851460250f6d4b5"
+    "shas": "65295513fb69f053f466c62e25b12d37872a7543..90d5492eca694a1db6462f9037889549357c3854"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c29d06751817f2f982dec8eb7851460250f6d4b5..5109e72d88e199a63af674bee7fe20846baaeba4"
+    "shas": "90d5492eca694a1db6462f9037889549357c3854..98ea82656603de04b6b95f411bdcfd58b63e189e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -289,7 +289,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5109e72d88e199a63af674bee7fe20846baaeba4..87c19ba0c3b77a886f4bccc9ea95bbf4ae9635b3"
+    "shas": "98ea82656603de04b6b95f411bdcfd58b63e189e..4130e7b48740376e3b3e44d8c622245374813a1f"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -434,7 +434,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "87c19ba0c3b77a886f4bccc9ea95bbf4ae9635b3..f578112fc54469eb48c28c49099b1eb5fd1257a5"
+    "shas": "4130e7b48740376e3b3e44d8c622245374813a1f..67ba411108a71a2f98e7bc597e4178dbcfac0031"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -525,7 +525,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f578112fc54469eb48c28c49099b1eb5fd1257a5..80f52e2c96696f1c167bf142b489d34ca95e2146"
+    "shas": "67ba411108a71a2f98e7bc597e4178dbcfac0031..36092fdf255e0236862c27135098a4fa4e9dbd75"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -582,5 +582,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "80f52e2c96696f1c167bf142b489d34ca95e2146..52971fb22f403256665011d8507bc03577624438"
+    "shas": "36092fdf255e0236862c27135098a4fa4e9dbd75..3f2a09bd95dfbff3712c14095a53c1f0a3855648"
 }]

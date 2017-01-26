@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca4a5e4d4271151d234a7e9ba3614078c264e779..588ee7844f65ef5ca724551c551c5a7ec26c202d"
+    "shas": "cb913819d62f34c2cc72aa293b39fabca1a0f05c..16284699449cfa8d9ebef6df6c39765b1952a1f5"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -105,7 +105,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "588ee7844f65ef5ca724551c551c5a7ec26c202d..992babbcd56420a06f4e2d423724e91029131920"
+    "shas": "16284699449cfa8d9ebef6df6c39765b1952a1f5..d72bb50ec9a41c5cad553f3a0d9dfb889749dee1"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -222,7 +222,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "992babbcd56420a06f4e2d423724e91029131920..77cdca814f0d11af407557b10dfc106fc9ec826b"
+    "shas": "d72bb50ec9a41c5cad553f3a0d9dfb889749dee1..6556fe84b67435f6c768377975c181a125a5a9f1"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -339,7 +339,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "77cdca814f0d11af407557b10dfc106fc9ec826b..6cb4a565a10bba9c871c10787158254a555cb70e"
+    "shas": "6556fe84b67435f6c768377975c181a125a5a9f1..3882dca1074e6564bc01f79a1b44f2c0db17d3e2"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -391,7 +391,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6cb4a565a10bba9c871c10787158254a555cb70e..96ee7f23cc535da64fb165e6bb55c726e02fdaf6"
+    "shas": "3882dca1074e6564bc01f79a1b44f2c0db17d3e2..51576f63dc98b44fbb1042065c9ab828a27dd5f7"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -448,5 +448,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "96ee7f23cc535da64fb165e6bb55c726e02fdaf6..84d5bd939d05dae989135d37ad4b9758a7bbc9a1"
+    "shas": "51576f63dc98b44fbb1042065c9ab828a27dd5f7..fa9acd974705290312a7cebdba09b18008dc6093"
 }]

@@ -13,7 +13,7 @@ termAssignment
   :: Source Char -- ^ The source of the term.
   -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
-  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
+  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in Maybe.
 termAssignment _ category children
   = case (category, children) of
     (ArgumentPair, [ k, v ] ) -> Just $ S.Pair k v

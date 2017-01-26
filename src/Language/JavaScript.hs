@@ -12,7 +12,7 @@ termAssignment
   :: Source Char -- ^ The source of the term.
   -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
-  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
+  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in Maybe.
 termAssignment _ category children
   = case (category, children) of
     (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value
@@ -60,7 +60,7 @@ termAssignment _ category children
       -> Just $ S.For exprs [body]
     (Function, [ body ]) -> Just $ S.AnonymousFunction [] [body]
     (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
-    (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) [body]
+    (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) Nothing [body]
     _ -> Nothing
 
 categoryForJavaScriptProductionName :: Text -> Category

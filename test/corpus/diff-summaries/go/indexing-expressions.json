@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c41bf65a465e4f7333785876f7010cd398372491..cb034ce6d5eb3a63c4baccdfe4cdb214e2a94531"
+    "shas": "0a55a88480be2cc766ee756b5b5f7bf45704376c..4f60b48123030197c6618ae645a4374972ea4c36"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -281,7 +281,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb034ce6d5eb3a63c4baccdfe4cdb214e2a94531..8941f97c84cc32a707953f80d865cc80b6cef0c0"
+    "shas": "4f60b48123030197c6618ae645a4374972ea4c36..cd7d3053acc66aa2f4d9f3971970b1d3291a7a59"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -405,7 +405,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8941f97c84cc32a707953f80d865cc80b6cef0c0..21ff9c34e0a4047676536a3e1469cd843e7a8b8e"
+    "shas": "cd7d3053acc66aa2f4d9f3971970b1d3291a7a59..c84e151f812ae561b1912638e0585fe32d854242"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -553,7 +553,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "21ff9c34e0a4047676536a3e1469cd843e7a8b8e..4e8f48a85a33f96bfc38810c9c382854d56723f0"
+    "shas": "c84e151f812ae561b1912638e0585fe32d854242..08a032f27c171ad3d26321259c510b30cf268471"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -781,7 +781,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4e8f48a85a33f96bfc38810c9c382854d56723f0..a97da61d6905b12577efc81f028d64a9a378e29e"
+    "shas": "08a032f27c171ad3d26321259c510b30cf268471..6f372cae9a7ae4a00c120150faa8316627b50f7d"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -838,5 +838,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a97da61d6905b12577efc81f028d64a9a378e29e..6b7eb1622315da9d322822b7f591814b290b8a4b"
+    "shas": "6f372cae9a7ae4a00c120150faa8316627b50f7d..39c039e08c3764d56d26a74bbc7bb32704cc398c"
 }]

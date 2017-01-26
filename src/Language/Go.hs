@@ -11,11 +11,12 @@ termAssignment
   :: Source Char -- ^ The source of the term.
   -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
-  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
+  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in Maybe.
 termAssignment source category children = case (category, children) of
   (Module, [moduleName]) -> Just $ S.Module moduleName []
   (Import, [importName]) -> Just $ S.Import importName []
-  (Function, [id, params, block]) -> Just $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
+  (Function, [id, params, block]) -> Just $ S.Function id (toList (unwrap params)) Nothing (toList (unwrap block))
+  (Function, [id, params, ty, block]) -> Just $ S.Function id (toList (unwrap params)) (Just ty) (toList (unwrap block))
   (For, [body]) | Other "block" <- Info.category (extract body) -> Just $ S.For [] (toList (unwrap body))
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> Just $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> Just $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))

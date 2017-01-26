@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2194d7d2793533da82aa5e7279cde2b5cbfa70e9..66fb4240cc732e4143662a2b62d5ddfeb27de712"
+    "shas": "f5a9b8a54a3841db93e420bf8eff96b4d2d6858a..94d93d2117a8e57a238a502919ff833d7cf671b9"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66fb4240cc732e4143662a2b62d5ddfeb27de712..f34ee7fa47df9575f9e51be89c42e666aa1c2772"
+    "shas": "94d93d2117a8e57a238a502919ff833d7cf671b9..a9aa97bd6ac93d93d8e62ca2a59b9ec861b684df"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -169,7 +169,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f34ee7fa47df9575f9e51be89c42e666aa1c2772..30ea7ed1c25c38f06f7274b5ca0793e6cb8e7f0f"
+    "shas": "a9aa97bd6ac93d93d8e62ca2a59b9ec861b684df..d0a359246dac8c80adcb1b4e7bac351462363d18"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "30ea7ed1c25c38f06f7274b5ca0793e6cb8e7f0f..217c17ebcbd80cc78ee728da0694e4ec0f2647e3"
+    "shas": "d0a359246dac8c80adcb1b4e7bac351462363d18..261a10edc770e3f40cd33d61dc0d61d0510527a5"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -285,7 +285,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "217c17ebcbd80cc78ee728da0694e4ec0f2647e3..75bacc85b0a8451954bfa270d0b01a8202c12aa8"
+    "shas": "261a10edc770e3f40cd33d61dc0d61d0510527a5..729241bd7988d5e569c4a3384c678328236ba019"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -342,5 +342,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "75bacc85b0a8451954bfa270d0b01a8202c12aa8..82c0a8349eb184a260e956992c6853e6dc73859b"
+    "shas": "729241bd7988d5e569c4a3384c678328236ba019..b704517caf7ad227154e0582b74255cd4065e091"
 }]

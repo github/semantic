@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "604fc6a52a5a33f31a45ed3be498d8b2e821dfc9..4ec49dbdf652100731b5b7c2a73cb91de91268e9"
+    "shas": "eca7c6083f4f3169ebc3bf726c3d936818a2d174..aeb74c519ca8d7d63e6d35cff856d277c571b6f7"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4ec49dbdf652100731b5b7c2a73cb91de91268e9..45a392d527c9516ed7a0617a8ad052e065d1c658"
+    "shas": "aeb74c519ca8d7d63e6d35cff856d277c571b6f7..a59ce1e7d20b1843f9b59495e1a6b3f7d8c096f4"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -205,7 +205,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "45a392d527c9516ed7a0617a8ad052e065d1c658..b9b271568b754bd08cd8ba1b03293d64ed97d39e"
+    "shas": "a59ce1e7d20b1843f9b59495e1a6b3f7d8c096f4..9c0b77724a8c467d16ad46f5f184144b65216512"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -314,7 +314,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b9b271568b754bd08cd8ba1b03293d64ed97d39e..2704ca17438d9f784bb1754098bbf53332295bc2"
+    "shas": "9c0b77724a8c467d16ad46f5f184144b65216512..a2f408b126df5e135832ae9d566dab50031792ec"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2704ca17438d9f784bb1754098bbf53332295bc2..5cd2989306561ffdbf84ef461d95ebca95cb176c"
+    "shas": "a2f408b126df5e135832ae9d566dab50031792ec..7ee0dab9d8d593cbca3c6230313f3eaeda0ada55"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -414,5 +414,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5cd2989306561ffdbf84ef461d95ebca95cb176c..c41bf65a465e4f7333785876f7010cd398372491"
+    "shas": "7ee0dab9d8d593cbca3c6230313f3eaeda0ada55..0a55a88480be2cc766ee756b5b5f7bf45704376c"
 }]

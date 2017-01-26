@@ -200,7 +200,7 @@ toTermName source term = case unwrap term of
   S.Indexed children -> maybe "branch" sconcat (nonEmpty (intersperse ", " (toTermName' <$> children)))
   Leaf leaf -> toS leaf
   S.Assignment identifier _ -> toTermName' identifier
-  S.Function identifier _ _ -> toTermName' identifier
+  S.Function identifier _ _ _ -> toTermName' identifier
   S.ParameterDecl _ _ -> termNameFromSource term
   S.FunctionCall i args -> case unwrap i of
     S.AnonymousFunction params _ ->
