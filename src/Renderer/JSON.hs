@@ -104,7 +104,7 @@ syntaxToTermField syntax = case syntax of
   S.FunctionCall identifier parameters -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ]
   S.Ternary expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
   S.AnonymousFunction parameters c -> [ "parameters" .= parameters ] <> childrenFields c
-  S.Function identifier parameters c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> childrenFields c
+  S.Function identifier parameters ty c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "type" .= ty ] <> childrenFields c
   S.Assignment assignmentId value -> [ "identifier" .= assignmentId ] <> [ "value" .= value ]
   S.OperatorAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
@@ -119,7 +119,7 @@ syntaxToTermField syntax = case syntax of
   S.Pair a b -> childrenFields [a, b]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
-  S.Error c -> childrenFields c
+  S.ParseError c -> childrenFields c
   S.For expressions body -> [ "expressions" .= expressions ] <> [ "body" .= body ]
   S.DoWhile expression body -> [ "expression" .= expression ]  <> [ "body" .= body ]
   S.While expression body -> [ "expression" .= expression ]  <> [ "body" .= body ]

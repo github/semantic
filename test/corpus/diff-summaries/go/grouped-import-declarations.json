@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,13 +53,12 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6bee120701f5e3c15b3f8a13d4ead70d225091d1..c5b7e7d94b3d71f376c335e1fef631814f11a748"
+    "shas": "126db53cee9459e0927b80ed1af574cc273f948e..6b9c8e7943b9fee465f5ae36a8e60f309fd34f53"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "grouped-import-declarations.go": [
                 {
                     "span": {
@@ -54,12 +68,46 @@
                                 1
                             ],
                             "end": [
-                                8,
-                                2
+                                4,
+                                7
                             ]
                         }
                     },
-                    "summary": "Added 'import (\n\"net/http\"\n  . \"some/dsl\"\n  alias \"some/package\"\n)' at line 4, column 1 - line 8, column 2 in the main function of the 'main' module"
+                    "summary": "Added the 'import' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"net/http\" string in the main function"
+                }
+            ]
+        },
+        "errors": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                3
+                            ],
+                            "end": [
+                                7,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added '. \"some/dsl\"\n  alias \"some/package\"' at line 6, column 3 - line 7, column 23 in the main function"
                 }
             ]
         }
@@ -85,7 +133,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c5b7e7d94b3d71f376c335e1fef631814f11a748..f7d189cc5f3c9f36ecf1a2e78f21b522b2d5f8fd"
+    "shas": "6b9c8e7943b9fee465f5ae36a8e60f309fd34f53..da13ed2e396030607a1566cd6b4aa3295a2d1221"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-replacement-test",
@@ -117,7 +165,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"net/http\" string with the \"net/socket\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"net/http\" string with the \"net/socket\" string in the main function"
                 },
                 {
                     "span": {
@@ -144,7 +192,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the main function"
                 },
                 {
                     "span": {
@@ -171,7 +219,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some/package\" string with the \"awesome/package\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"some/package\" string with the \"awesome/package\" string in the main function"
                 }
             ]
         },
@@ -199,7 +247,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f7d189cc5f3c9f36ecf1a2e78f21b522b2d5f8fd..998dec80a305b10415e56b3ee3b87e5204450f83"
+    "shas": "da13ed2e396030607a1566cd6b4aa3295a2d1221..d10a69e54f224c4a48b4ab0489e435f86ac84de1"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-replacement-test",
@@ -231,7 +279,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"net/socket\" string with the \"net/http\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"net/socket\" string with the \"net/http\" string in the main function"
                 },
                 {
                     "span": {
@@ -258,7 +306,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the main function"
                 },
                 {
                     "span": {
@@ -285,7 +333,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"awesome/package\" string with the \"some/package\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"awesome/package\" string with the \"some/package\" string in the main function"
                 }
             ]
         },
@@ -313,13 +361,12 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "998dec80a305b10415e56b3ee3b87e5204450f83..de107f343c5ef74a0ffff791e8b1f0a277065bd1"
+    "shas": "d10a69e54f224c4a48b4ab0489e435f86ac84de1..6a25d985a312ed1935f33359735bfc3fad514a37"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "grouped-import-declarations.go": [
                 {
                     "span": {
@@ -329,12 +376,46 @@
                                 1
                             ],
                             "end": [
-                                8,
-                                2
+                                4,
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted 'import (\n\"net/http\"\n  . \"some/dsl\"\n  alias \"some/package\"\n)' at line 4, column 1 - line 8, column 2 in the main function of the 'main' module"
+                    "summary": "Deleted the 'import' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"net/http\" string in the main function"
+                }
+            ]
+        },
+        "errors": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                3
+                            ],
+                            "end": [
+                                7,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '. \"some/dsl\"\n  alias \"some/package\"' at line 6, column 3 - line 7, column 23 in the main function"
                 }
             ]
         }
@@ -360,7 +441,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "de107f343c5ef74a0ffff791e8b1f0a277065bd1..81ec082bb841b347028b400c179a10de3b443f10"
+    "shas": "6a25d985a312ed1935f33359735bfc3fad514a37..0b75622a824ba8367f3f6dee95cfdccbfcc4eb8f"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-teardown-test",
@@ -375,12 +456,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -402,5 +498,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "81ec082bb841b347028b400c179a10de3b443f10..35a378ca062939544c7a2fbd82b9ed4962db60d0"
+    "shas": "0b75622a824ba8367f3f6dee95cfdccbfcc4eb8f..d4d30589c4945d693f9b6b7e327ddbcd45e70321"
 }]

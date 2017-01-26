@@ -11,8 +11,8 @@
                                 1
                             ],
                             "end": [
-                                3,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0b52228e533b01beb1e33054e72003307726533c..f03dd1370b43b8725f7d9827112fd522bc66b6f3"
+    "shas": "663f0278d8c41aca54ae0d1849efc76213f9ba1f..1e54211c4612f5a3f6fddae7d3c3eae18327a9cd"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -55,7 +55,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' var assignment in the main module"
+                    "summary": "Added the 'a' var assignment"
                 },
                 {
                     "span": {
@@ -70,7 +70,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' var assignment in the main module"
+                    "summary": "Added the 'b' var assignment"
                 },
                 {
                     "span": {
@@ -85,7 +85,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' var assignment in the main module"
+                    "summary": "Added the 'c' var assignment"
                 },
                 {
                     "span": {
@@ -100,7 +100,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'd' var assignment in the main module"
+                    "summary": "Added the 'd' var assignment"
                 },
                 {
                     "span": {
@@ -115,59 +115,18 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'e' var assignment in the main module"
-                },
+                    "summary": "Added the 'e' var assignment"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 8,
                                 3
-                            ],
-                            "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                7
-                            ],
-                            "end": [
-                                8,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''⌘' error in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                9
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'jjjj' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                13
                             ],
                             "end": [
                                 9,
@@ -175,11 +134,10 @@
                             ]
                         }
                     },
-                    "summary": "Added the ''\n' error in the main module"
+                    "summary": "Added 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "rune-literals.go"
@@ -202,7 +160,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f03dd1370b43b8725f7d9827112fd522bc66b6f3..e6e1d68cbaa666c2681a25a27113902d8f1ee84c"
+    "shas": "1e54211c4612f5a3f6fddae7d3c3eae18327a9cd..7946dc95b2a2eaa4a44da409ed54a82a54ed188a"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -234,7 +192,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''δ'' rune literal with the ''©'' rune literal in the a var assignment of the 'main' module"
+                    "summary": "Replaced the ''δ'' rune literal with the ''©'' rune literal in the a var assignment"
                 },
                 {
                     "span": {
@@ -261,7 +219,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the b var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the b var assignment"
                 },
                 {
                     "span": {
@@ -288,7 +246,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the c var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the c var assignment"
                 },
                 {
                     "span": {
@@ -315,7 +273,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the d var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the d var assignment"
                 },
                 {
                     "span": {
@@ -342,7 +300,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the e var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the e var assignment"
                 },
                 {
                     "span": {
@@ -357,8 +315,12 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f' var assignment in the main module"
-                },
+                    "summary": "Added the 'f' var assignment"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -367,61 +329,15 @@
                                 3
                             ],
                             "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                7
-                            ],
-                            "end": [
-                                8,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ''⌘' error in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                9
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'jjjj' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                13
-                            ],
-                            "end": [
                                 9,
                                 1
                             ]
                         }
                     },
-                    "summary": "Deleted the ''\n' error in the main module"
+                    "summary": "Deleted 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "rune-literals.go"
@@ -449,7 +365,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e6e1d68cbaa666c2681a25a27113902d8f1ee84c..07b515ef93f8ca7f6d5fd5760d06502b3726fe6f"
+    "shas": "7946dc95b2a2eaa4a44da409ed54a82a54ed188a..9846819cac6a3814f8fc03011b6e0c38af042214"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -481,7 +397,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune literal with the ''δ'' rune literal in the a var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''δ'' rune literal in the a var assignment"
                 },
                 {
                     "span": {
@@ -508,7 +424,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the b var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the b var assignment"
                 },
                 {
                     "span": {
@@ -535,7 +451,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the c var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the c var assignment"
                 },
                 {
                     "span": {
@@ -562,7 +478,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the d var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the d var assignment"
                 },
                 {
                     "span": {
@@ -589,67 +505,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the e var assignment of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                7
-                            ],
-                            "end": [
-                                8,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''⌘' error in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                9
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'jjjj' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                13
-                            ],
-                            "end": [
-                                9,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''\n' error in the main module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the e var assignment"
                 },
                 {
                     "span": {
@@ -664,11 +520,29 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f' var assignment in the main module"
+                    "summary": "Deleted the 'f' var assignment"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                3
+                            ],
+                            "end": [
+                                9,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
@@ -696,7 +570,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "07b515ef93f8ca7f6d5fd5760d06502b3726fe6f..29397c86faaf45a301de097d6e051502954906c7"
+    "shas": "9846819cac6a3814f8fc03011b6e0c38af042214..cc35d6332ea1c0dc789bfa7f461eba04824cf783"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -716,7 +590,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' var assignment in the main module"
+                    "summary": "Deleted the 'a' var assignment"
                 },
                 {
                     "span": {
@@ -731,7 +605,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' var assignment in the main module"
+                    "summary": "Deleted the 'b' var assignment"
                 },
                 {
                     "span": {
@@ -746,7 +620,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' var assignment in the main module"
+                    "summary": "Deleted the 'c' var assignment"
                 },
                 {
                     "span": {
@@ -761,7 +635,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' var assignment in the main module"
+                    "summary": "Deleted the 'd' var assignment"
                 },
                 {
                     "span": {
@@ -776,59 +650,18 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e' var assignment in the main module"
-                },
+                    "summary": "Deleted the 'e' var assignment"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 8,
                                 3
-                            ],
-                            "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                7
-                            ],
-                            "end": [
-                                8,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ''⌘' error in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                9
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'jjjj' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                13
                             ],
                             "end": [
                                 9,
@@ -836,11 +669,10 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the ''\n' error in the main module"
+                    "summary": "Deleted 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "rune-literals.go"
@@ -863,7 +695,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "29397c86faaf45a301de097d6e051502954906c7..7c099f8699e7c7742ad383be5ba07326fb3e6087"
+    "shas": "cc35d6332ea1c0dc789bfa7f461eba04824cf783..1cc444aa94d7784497f5d15ca15b1569b467732d"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -878,8 +710,8 @@
                                 1
                             ],
                             "end": [
-                                3,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
@@ -902,5 +734,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7c099f8699e7c7742ad383be5ba07326fb3e6087..3a475c2e781c97178d1986bf754545dbb051440c"
+    "shas": "1cc444aa94d7784497f5d15ca15b1569b467732d..fd41bb91afdd6087f0c3e6c54566857b7105df8c"
 }]

@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/this-expression.js b/this-expression.js",
-        "index e69de29..b251f26 100644",
+        "index e69de29b..b251f26b 100644",
         "--- a/this-expression.js",
         "+++ b/this-expression.js",
         "@@ -0,0 +1 @@",
         "+this;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5180fa74c7ae39b3c2cb94b9b5498307af385e5c..98e4bf8c567fd1203aa3d1c3b9e9dc58d5733e11"
+    "shas": "62c20bfb9474af540a2ab5d5be1a93530bd21eb8..66ca3b368527df8388bd77d1cb4e5e9a299f54b6"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/this-expression.js b/this-expression.js",
-        "index b251f26..5804743 100644",
+        "index b251f26b..58047437 100644",
         "--- a/this-expression.js",
         "+++ b/this-expression.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " this;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "98e4bf8c567fd1203aa3d1c3b9e9dc58d5733e11..9dd112b28d5a97a59a847018e58f3926ccf46e56"
+    "shas": "66ca3b368527df8388bd77d1cb4e5e9a299f54b6..de28d1ace4687f9b41b4a08f04128d64f0ae0c99"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-insert-test",
@@ -135,7 +135,7 @@
     ],
     "patch": [
         "diff --git a/this-expression.js b/this-expression.js",
-        "index 5804743..3c82a23 100644",
+        "index 58047437..3c82a23c 100644",
         "--- a/this-expression.js",
         "+++ b/this-expression.js",
         "@@ -1,3 +1,3 @@",
@@ -145,7 +145,7 @@
         " this;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9dd112b28d5a97a59a847018e58f3926ccf46e56..d1b36cdc475a6f7ea16558b4269f3e3c18758dfa"
+    "shas": "de28d1ace4687f9b41b4a08f04128d64f0ae0c99..f76ef95549e8ec4477ab6caf90dd759cf159abb7"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-replacement-test",
@@ -191,7 +191,7 @@
     ],
     "patch": [
         "diff --git a/this-expression.js b/this-expression.js",
-        "index 3c82a23..5804743 100644",
+        "index 3c82a23c..58047437 100644",
         "--- a/this-expression.js",
         "+++ b/this-expression.js",
         "@@ -1,3 +1,3 @@",
@@ -201,7 +201,7 @@
         " this;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d1b36cdc475a6f7ea16558b4269f3e3c18758dfa..efc36cfae7c31ef3d4f2052a0c79fe592ab2aa58"
+    "shas": "f76ef95549e8ec4477ab6caf90dd759cf159abb7..bea9b6c56f0741d236b23a7bacba139f80bc197e"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-replacement-test",
@@ -262,7 +262,7 @@
     ],
     "patch": [
         "diff --git a/this-expression.js b/this-expression.js",
-        "index 5804743..81aca89 100644",
+        "index 58047437..81aca892 100644",
         "--- a/this-expression.js",
         "+++ b/this-expression.js",
         "@@ -1,3 +1,2 @@",
@@ -272,7 +272,7 @@
         "+return this;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "efc36cfae7c31ef3d4f2052a0c79fe592ab2aa58..531a5b86388175804b734a10ace1c7645169154b"
+    "shas": "bea9b6c56f0741d236b23a7bacba139f80bc197e..238bbfa9cb9a73ac6f0095dd2ec9e541ba829a80"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-test",
@@ -303,7 +303,7 @@
     ],
     "patch": [
         "diff --git a/this-expression.js b/this-expression.js",
-        "index 81aca89..45c3231 100644",
+        "index 81aca892..45c3231b 100644",
         "--- a/this-expression.js",
         "+++ b/this-expression.js",
         "@@ -1,2 +1 @@",
@@ -311,7 +311,7 @@
         " return this;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "531a5b86388175804b734a10ace1c7645169154b..dfa50df5733740923a1d747f988102b19e9ce7e0"
+    "shas": "238bbfa9cb9a73ac6f0095dd2ec9e541ba829a80..4493a43c8cfab7b560393189918ac5233e131700"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-rest-test",
@@ -342,12 +342,12 @@
     ],
     "patch": [
         "diff --git a/this-expression.js b/this-expression.js",
-        "index 45c3231..e69de29 100644",
+        "index 45c3231b..e69de29b 100644",
         "--- a/this-expression.js",
         "+++ b/this-expression.js",
         "@@ -1 +0,0 @@",
         "-return this;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "dfa50df5733740923a1d747f988102b19e9ce7e0..655d7887b70794042aa3e0f4d6ea174c1b32af1c"
+    "shas": "4493a43c8cfab7b560393189918ac5233e131700..da816fd1d09e1ffe56fc188b498a7f2312d7d0f2"
 }]

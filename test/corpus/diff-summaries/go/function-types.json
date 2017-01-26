@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d16d600ec49ecf889ed54e257ff4891e281a3dab..e174b9832330316dd904f215a57a895a427b7baa"
+    "shas": "190f44e86419bb122daf395748920e3c5779b66b..1815f5ac7ccb734cfb2c19bc68c7577305301768"
 }
 ,{
     "testCaseDescription": "go-function-types-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'a' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'b' type declaration in the main function"
                 }
             ]
         },
@@ -99,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e174b9832330316dd904f215a57a895a427b7baa..d3bc3ecfa6fbe86d502f08349e94afba0bb7b3b0"
+    "shas": "1815f5ac7ccb734cfb2c19bc68c7577305301768..3606d9bc10b8730dea35f76b1aa221b078bbadfe"
 }
 ,{
     "testCaseDescription": "go-function-types-replacement-test",
@@ -313,7 +328,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d3bc3ecfa6fbe86d502f08349e94afba0bb7b3b0..4ae6ba4c2226fc206e7bd0616d386ce563e5940f"
+    "shas": "3606d9bc10b8730dea35f76b1aa221b078bbadfe..58b1cdcdee55c272dae229c1c5118cc6a830596c"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-replacement-test",
@@ -527,7 +542,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4ae6ba4c2226fc206e7bd0616d386ce563e5940f..b0ad7154c547ccfb91b146dfd87c5df80287b982"
+    "shas": "58b1cdcdee55c272dae229c1c5118cc6a830596c..f17fbf867be99922b4ceae5821169d4c80acbd6b"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-insert-test",
@@ -547,7 +562,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -562,7 +577,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' type declaration in the main function"
                 }
             ]
         },
@@ -588,7 +603,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b0ad7154c547ccfb91b146dfd87c5df80287b982..ff109d3edbe7834f2da3f35579a99c1d06f81a03"
+    "shas": "f17fbf867be99922b4ceae5821169d4c80acbd6b..0426718d4af0fec65a3ffdf23db55358449ba5a2"
 }
 ,{
     "testCaseDescription": "go-function-types-teardown-test",
@@ -603,12 +618,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -630,5 +660,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ff109d3edbe7834f2da3f35579a99c1d06f81a03..df3298de1cff4cc80875946fc6abeec7bf257f39"
+    "shas": "0426718d4af0fec65a3ffdf23db55358449ba5a2..57bf5ffc56480fbb108aa9d683b4dfd5324acbbf"
 }]

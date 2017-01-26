@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/while-statement.js b/while-statement.js",
-        "index e69de29..1ea2800 100644",
+        "index e69de29b..1ea2800e 100644",
         "--- a/while-statement.js",
         "+++ b/while-statement.js",
         "@@ -0,0 +1 @@",
         "+while (a) { b(); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0b1a50d075cdb5202c523f929502c24a9fce63ce..db921ea9f999f72cb6399c64092e4b0904628ff8"
+    "shas": "0494efa588d0a283d42c62a35bcee1f439b6a16d..54ac72510f6e996e2b2b090f61e248ba73a5c2c5"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/while-statement.js b/while-statement.js",
-        "index 1ea2800..c322323 100644",
+        "index 1ea2800e..c322323d 100644",
         "--- a/while-statement.js",
         "+++ b/while-statement.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " while (a) { b(); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "db921ea9f999f72cb6399c64092e4b0904628ff8..daa66677bfa5359e0679879da34e3ee1bed674a6"
+    "shas": "54ac72510f6e996e2b2b090f61e248ba73a5c2c5..800861d8d89a0e71e9b3001ad7153e0e601ab022"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-insert-test",
@@ -159,7 +159,7 @@
     ],
     "patch": [
         "diff --git a/while-statement.js b/while-statement.js",
-        "index c322323..ea96716 100644",
+        "index c322323d..ea967164 100644",
         "--- a/while-statement.js",
         "+++ b/while-statement.js",
         "@@ -1,3 +1,3 @@",
@@ -169,7 +169,7 @@
         " while (a) { b(); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "daa66677bfa5359e0679879da34e3ee1bed674a6..24da8276225fa14bdffd90de951fc90cd18759ed"
+    "shas": "800861d8d89a0e71e9b3001ad7153e0e601ab022..e7d35e42f6fbcff10962e9f3706b4c2d364fbb45"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-replacement-test",
@@ -239,7 +239,7 @@
     ],
     "patch": [
         "diff --git a/while-statement.js b/while-statement.js",
-        "index ea96716..c322323 100644",
+        "index ea967164..c322323d 100644",
         "--- a/while-statement.js",
         "+++ b/while-statement.js",
         "@@ -1,3 +1,3 @@",
@@ -249,7 +249,7 @@
         " while (a) { b(); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "24da8276225fa14bdffd90de951fc90cd18759ed..cae263f93a9ddcbed5411b06251f41d4da9c07d4"
+    "shas": "e7d35e42f6fbcff10962e9f3706b4c2d364fbb45..c85f24d68fd3b3b390439f71aa7974964a6a3ede"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-replacement-test",
@@ -310,7 +310,7 @@
     ],
     "patch": [
         "diff --git a/while-statement.js b/while-statement.js",
-        "index c322323..28f4b21 100644",
+        "index c322323d..28f4b210 100644",
         "--- a/while-statement.js",
         "+++ b/while-statement.js",
         "@@ -1,3 +1,2 @@",
@@ -320,7 +320,7 @@
         "+while (b) { a(); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cae263f93a9ddcbed5411b06251f41d4da9c07d4..09f8c3d79b360939277158f185f0e13ecbecdd11"
+    "shas": "c85f24d68fd3b3b390439f71aa7974964a6a3ede..b68df7e7afa74cc4ad640cbf6cae14983242c61d"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-test",
@@ -351,7 +351,7 @@
     ],
     "patch": [
         "diff --git a/while-statement.js b/while-statement.js",
-        "index 28f4b21..e185b25 100644",
+        "index 28f4b210..e185b25d 100644",
         "--- a/while-statement.js",
         "+++ b/while-statement.js",
         "@@ -1,2 +1 @@",
@@ -359,7 +359,7 @@
         " while (b) { a(); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "09f8c3d79b360939277158f185f0e13ecbecdd11..11144cc015f5698c8473a6efd76c3129422cf2a2"
+    "shas": "b68df7e7afa74cc4ad640cbf6cae14983242c61d..cf930c906150e222d831b17a0c6f28f7d5879167"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-rest-test",
@@ -390,12 +390,12 @@
     ],
     "patch": [
         "diff --git a/while-statement.js b/while-statement.js",
-        "index e185b25..e69de29 100644",
+        "index e185b25d..e69de29b 100644",
         "--- a/while-statement.js",
         "+++ b/while-statement.js",
         "@@ -1 +0,0 @@",
         "-while (b) { a(); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "11144cc015f5698c8473a6efd76c3129422cf2a2..cd322134775da8db98f5a151ec8e2f5d9eddd3cf"
+    "shas": "cf930c906150e222d831b17a0c6f28f7d5879167..34742f99e05bf8c6402929d23886b55c725e282e"
 }]

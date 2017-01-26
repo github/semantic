@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "784a2032a8b3f1926b4874446b0dc9672ace15be..23198d8d7b54c07e1f3ebcb5cca172d62d75e934"
+    "shas": "3dba2a559a0cc46933a2663e7b9cdcd4a92808d9..24b5a7da7f83d445e406076f4e5cd0eb29b81187"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'zero' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'one' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'one' var assignment in the main function"
                 }
             ]
         },
@@ -99,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "23198d8d7b54c07e1f3ebcb5cca172d62d75e934..1fdf3278a33b044ce8f71f7c081767f244b6ac04"
+    "shas": "24b5a7da7f83d445e406076f4e5cd0eb29b81187..47a9982c7ce46ecab0a4eea473b1e0e63686a8fd"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1fdf3278a33b044ce8f71f7c081767f244b6ac04..b4aed6bf12bb1f171ed58e6b082645e4cd0aeae9"
+    "shas": "47a9982c7ce46ecab0a4eea473b1e0e63686a8fd..e12f033c84f4d6f59ae1e0542ed68873634f85ff"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +284,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4aed6bf12bb1f171ed58e6b082645e4cd0aeae9..9a29fa861e06cb7e02d16e7ab8fcd66de3c2f825"
+    "shas": "e12f033c84f4d6f59ae1e0542ed68873634f85ff..0df3b93f76d7331db5126eb444c15d5ef2829485"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -289,7 +304,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'zero' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -304,7 +319,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'one' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'one' var assignment in the main function"
                 }
             ]
         },
@@ -330,7 +345,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9a29fa861e06cb7e02d16e7ab8fcd66de3c2f825..ace9280be87d31336c3425f6e703c009840e7cfc"
+    "shas": "0df3b93f76d7331db5126eb444c15d5ef2829485..c681a4b6c5b308af84285b1b48b80d02adb0dba3"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -345,12 +360,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -372,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ace9280be87d31336c3425f6e703c009840e7cfc..f5fe5786c0b546d3a5a224d7b5875f31f57db459"
+    "shas": "c681a4b6c5b308af84285b1b48b80d02adb0dba3..08c2e3dcd4ce51ddc9fd673ef182af5f0748761d"
 }]

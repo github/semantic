@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "15dbaf1c2f3cba362af5abba2a6aa9d2f1a92990..1cfb73a77cdd0f33c8083b2ba398b88a5768962e"
+    "shas": "7ebca2c2e26873ec2ec3d92c6922446eb95bb61f..cfc5ed7d21deace3c8eabd9d394e916da7e41a46"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-insert-test",
@@ -50,21 +65,6 @@
                         "insert": {
                             "start": [
                                 4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f1()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
                                 13
                             ],
                             "end": [
@@ -73,22 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2()' function call in the main function of the 'main' module"
+                    "summary": "Added the 'a()' function call in the main function"
                 },
                 {
                     "span": {
@@ -103,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call in the main function of the 'main' module"
+                    "summary": "Added the 'a()' function call in the main function"
                 },
                 {
                     "span": {
@@ -118,22 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f3()' function call in the main function of the 'main' module"
+                    "summary": "Added the 'b()' function call in the main function"
                 },
                 {
                     "span": {
@@ -148,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call in the main function of the 'main' module"
+                    "summary": "Added the 'a()' function call in the main function"
                 },
                 {
                     "span": {
@@ -163,11 +133,59 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call in the main function of the 'main' module"
+                    "summary": "Added the 'b()' function call in the main function"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added 'func f1()' at line 4, column 1 - line 4, column 10 in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added 'func f2()' at line 5, column 1 - line 5, column 10 in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added 'func f3()' at line 6, column 1 - line 6, column 10 in the main function"
+                }
+            ]
+        }
     },
     "filePaths": [
         "single-line-function-declarations.go"
@@ -188,7 +206,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1cfb73a77cdd0f33c8083b2ba398b88a5768962e..45325d9bb638e3f0ec912829e4655bb3c55d36b7"
+    "shas": "cfc5ed7d21deace3c8eabd9d394e916da7e41a46..978bbef12122d7954da3d7f7dfa67cfea28a84f9"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-replacement-test",
@@ -224,36 +242,6 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g2()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -281,7 +269,40 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added 'func g2()' at line 5, column 1 - line 5, column 10 in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'func f2()' at line 5, column 1 - line 5, column 10 in the main function"
+                }
+            ]
+        }
     },
     "filePaths": [
         "single-line-function-declarations.go"
@@ -304,7 +325,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "45325d9bb638e3f0ec912829e4655bb3c55d36b7..32b04cc1d447c547bd0d358059bb56f72907f26f"
+    "shas": "978bbef12122d7954da3d7f7dfa67cfea28a84f9..2896a28ff80236db618c50ceb2b9d9469a4ea425"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-replacement-test",
@@ -340,36 +361,6 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g2()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -397,7 +388,40 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added 'func f2()' at line 5, column 1 - line 5, column 10 in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'func g2()' at line 5, column 1 - line 5, column 10 in the main function"
+                }
+            ]
+        }
     },
     "filePaths": [
         "single-line-function-declarations.go"
@@ -420,7 +444,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "32b04cc1d447c547bd0d358059bb56f72907f26f..d4acd503a8b68f01b4010e16c820e37477878eb7"
+    "shas": "2896a28ff80236db618c50ceb2b9d9469a4ea425..94b20a0aaf7aef755357df422b0f96413e3532f9"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-insert-test",
@@ -432,21 +456,6 @@
                         "delete": {
                             "start": [
                                 4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f1()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
                                 13
                             ],
                             "end": [
@@ -455,22 +464,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2()' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'a()' function call in the main function"
                 },
                 {
                     "span": {
@@ -485,7 +479,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a()' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'a()' function call in the main function"
                 },
                 {
                     "span": {
@@ -500,22 +494,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3()' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'b()' function call in the main function"
                 },
                 {
                     "span": {
@@ -530,7 +509,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a()' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'a()' function call in the main function"
                 },
                 {
                     "span": {
@@ -545,11 +524,59 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'b()' function call in the main function"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'func f1()' at line 4, column 1 - line 4, column 10 in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'func f2()' at line 5, column 1 - line 5, column 10 in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'func f3()' at line 6, column 1 - line 6, column 10 in the main function"
+                }
+            ]
+        }
     },
     "filePaths": [
         "single-line-function-declarations.go"
@@ -570,7 +597,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d4acd503a8b68f01b4010e16c820e37477878eb7..c91e71f353ff1bb9b14a92330b79cc0f725f8a36"
+    "shas": "94b20a0aaf7aef755357df422b0f96413e3532f9..911d3b87f28310cf84bd22c59757753c61dca6c4"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-teardown-test",
@@ -585,12 +612,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -612,5 +654,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c91e71f353ff1bb9b14a92330b79cc0f725f8a36..38625d07b620985fecbe285c34631bd03093d3f1"
+    "shas": "911d3b87f28310cf84bd22c59757753c61dca6c4..aa75d831de9909c8ed71c01ca49d0b4ef4e4b7e8"
 }]

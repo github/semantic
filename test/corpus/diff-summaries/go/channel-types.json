@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0ba70ac16df68cc3eb0b6318c3b784d701f4b216..7fe54090245afabf60eb382f4d8bc77c74f42fd4"
+    "shas": "8ae798e3c9773e3d5b6af35228d06445dd50426f..6fe1a8a05f8eeab5c979450824cdceb0e994abc8"
 }
 ,{
     "testCaseDescription": "go-channel-types-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c1' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'c1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c2' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'c2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c3' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'c3' type declaration in the main function"
                 }
             ]
         },
@@ -115,7 +130,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7fe54090245afabf60eb382f4d8bc77c74f42fd4..f6cd7d55c597210ce2a1acabe04cfd69c89ced1c"
+    "shas": "6fe1a8a05f8eeab5c979450824cdceb0e994abc8..61f2e4717656268758d47a3c63c366ab6478f195"
 }
 ,{
     "testCaseDescription": "go-channel-types-replacement-test",
@@ -135,7 +150,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c2' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'c2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -150,7 +165,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c3' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'c3' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -219,7 +234,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c2' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'c2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -234,7 +249,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c3' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'c3' type declaration in the main function"
                 }
             ]
         },
@@ -262,7 +277,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f6cd7d55c597210ce2a1acabe04cfd69c89ced1c..9b13e8ebe672fa8877fc1aee5ad42213d7543071"
+    "shas": "61f2e4717656268758d47a3c63c366ab6478f195..911fb96ddd154bd39c0c4434674776d5c08202f2"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-replacement-test",
@@ -282,7 +297,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c1' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'c1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -351,7 +366,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c4' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'c4' type declaration in the main function"
                 }
             ]
         },
@@ -379,7 +394,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b13e8ebe672fa8877fc1aee5ad42213d7543071..27c6d31f84167070386d9afcacf0f4cf4fa0c94a"
+    "shas": "911fb96ddd154bd39c0c4434674776d5c08202f2..d31e3bb2f6b29b37edbb1c325a5511c763a405d1"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-insert-test",
@@ -399,7 +414,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c1' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'c1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -414,7 +429,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c2' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'c2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -429,7 +444,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c3' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'c3' type declaration in the main function"
                 }
             ]
         },
@@ -456,7 +471,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "27c6d31f84167070386d9afcacf0f4cf4fa0c94a..1c77393f0b11aa6f61d05d68e5b06e9bdcc8ba10"
+    "shas": "d31e3bb2f6b29b37edbb1c325a5511c763a405d1..e9f2625fc7ae3bb80505b2f21de51da17d92d883"
 }
 ,{
     "testCaseDescription": "go-channel-types-teardown-test",
@@ -471,12 +486,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -498,5 +528,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1c77393f0b11aa6f61d05d68e5b06e9bdcc8ba10..d16d600ec49ecf889ed54e257ff4891e281a3dab"
+    "shas": "e9f2625fc7ae3bb80505b2f21de51da17d92d883..190f44e86419bb122daf395748920e3c5779b66b"
 }]

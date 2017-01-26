@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e4c6a9b9a1f1cbf3dd7a4ce717333fb847b7fbac..494715cafe3834303fecb34caa2592d77712ab31"
+    "shas": "39c039e08c3764d56d26a74bbc7bb32704cc398c..bf275213eb7f0252ea00d4c4d512d7c1ad3a841c"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x.(z.Person)' type assertion statement in the main function of the 'main' module"
+                    "summary": "Added the 'x.(z.Person)' type assertion statement in the main function"
                 }
             ]
         },
@@ -81,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "494715cafe3834303fecb34caa2592d77712ab31..57a6ec4effeb9f05a122238d323ce7dcd69df07f"
+    "shas": "bf275213eb7f0252ea00d4c4d512d7c1ad3a841c..90dd626922974beae3ac02734b6a9040c20f8844"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -113,7 +128,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -140,7 +155,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z.Person' qualified identifier with the 'c.Dog' qualified identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'z.Person' qualified identifier with the 'c.Dog' qualified identifier in the main function"
                 }
             ]
         },
@@ -163,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "57a6ec4effeb9f05a122238d323ce7dcd69df07f..0316d3acd42da2101c8d933617d7eeb30eee52d5"
+    "shas": "90dd626922974beae3ac02734b6a9040c20f8844..8c6d06fdf10722bafb109c5c8b03922b16b2e4b2"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -195,7 +210,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'x' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'x' identifier in the main function"
                 },
                 {
                     "span": {
@@ -222,7 +237,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c.Dog' qualified identifier with the 'z.Person' qualified identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'c.Dog' qualified identifier with the 'z.Person' qualified identifier in the main function"
                 }
             ]
         },
@@ -245,7 +260,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0316d3acd42da2101c8d933617d7eeb30eee52d5..f7e6434ce30a5b34a67cfe802722b1a51fd24052"
+    "shas": "8c6d06fdf10722bafb109c5c8b03922b16b2e4b2..428e63d779c812b38a047f0ce6a7c94681735c64"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -265,7 +280,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.(z.Person)' type assertion statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'x.(z.Person)' type assertion statement in the main function"
                 }
             ]
         },
@@ -288,7 +303,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f7e6434ce30a5b34a67cfe802722b1a51fd24052..b4e4fd587390ce7fd5b4b6c95ac01261eb97c17c"
+    "shas": "428e63d779c812b38a047f0ce6a7c94681735c64..3c31becef538d5dc5a68400e14ceff9b10ccca37"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-teardown-test",
@@ -303,12 +318,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -330,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4e4fd587390ce7fd5b4b6c95ac01261eb97c17c..d47123e6fd9c69b12607e0236be45289b764ce8b"
+    "shas": "3c31becef538d5dc5a68400e14ceff9b10ccca37..7b340405bd9a9ab47d50717b924a791be7df4e4c"
 }]

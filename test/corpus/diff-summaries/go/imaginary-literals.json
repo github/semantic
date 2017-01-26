@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3a475c2e781c97178d1986bf754545dbb051440c..60f0ccdaef54bc0e05404d360648e0588d257a91"
+    "shas": "fd41bb91afdd6087f0c3e6c54566857b7105df8c..5712b1395e13d1c0fa00cffacbf8bc0951053d35"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'a' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'b' var assignment in the main function"
                 }
             ]
         },
@@ -99,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "60f0ccdaef54bc0e05404d360648e0588d257a91..58218e7b9abee0cf80f6a9e0b2e2f2a98f94e492"
+    "shas": "5712b1395e13d1c0fa00cffacbf8bc0951053d35..22932b78378effd2b941d482834bf0a72286edec"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-test",
@@ -184,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "58218e7b9abee0cf80f6a9e0b2e2f2a98f94e492..704fd72c32fffccaecb8ff6ca11b809782f39ba0"
+    "shas": "22932b78378effd2b941d482834bf0a72286edec..9f5d0bbee0d79018b1b0187ba73c28d0f9d72c78"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
@@ -269,7 +284,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "704fd72c32fffccaecb8ff6ca11b809782f39ba0..af8ba14e709eb94413834b2e03a1dd5508cff999"
+    "shas": "9f5d0bbee0d79018b1b0187ba73c28d0f9d72c78..30a750a5c56e53a8f94fcc56d10cca85093b2286"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-insert-test",
@@ -289,7 +304,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -304,7 +319,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' var assignment in the main function"
                 }
             ]
         },
@@ -330,7 +345,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "af8ba14e709eb94413834b2e03a1dd5508cff999..3d14efd12e0c51ea5f90f6237364665c745de057"
+    "shas": "30a750a5c56e53a8f94fcc56d10cca85093b2286..9b4c1d9f9789b88f196087dafbad93a21508c9c2"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-teardown-test",
@@ -345,12 +360,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -372,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3d14efd12e0c51ea5f90f6237364665c745de057..29b7d780794e2ee8d37771310cebb2000b677aec"
+    "shas": "9b4c1d9f9789b88f196087dafbad93a21508c9c2..d39cc6bcd81255864bc210bd0ab92a71c0a80cc2"
 }]

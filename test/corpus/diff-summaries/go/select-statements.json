@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5ef8bc0eb6c5afcf5b71c3773b50aacebffe32d5..fc27fba6f9c1e19251a29214c0bc8599c48a93dc"
+    "shas": "cb913819d62f34c2cc72aa293b39fabca1a0f05c..16284699449cfa8d9ebef6df6c39765b1952a1f5"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added a select statement in the main function of the 'main' module"
+                    "summary": "Added a select statement in the main function"
                 }
             ]
         },
@@ -90,7 +105,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fc27fba6f9c1e19251a29214c0bc8599c48a93dc..5b3000889bd5f6fed85f762e41c07c37d058fce5"
+    "shas": "16284699449cfa8d9ebef6df6c39765b1952a1f5..d72bb50ec9a41c5cad553f3a0d9dfb889749dee1"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -122,7 +137,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the main function"
                 },
                 {
                     "span": {
@@ -149,7 +164,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -207,7 +222,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b3000889bd5f6fed85f762e41c07c37d058fce5..cfad5a03e0e5e2b92b80d8013221c57bb8b54dbb"
+    "shas": "d72bb50ec9a41c5cad553f3a0d9dfb889749dee1..6556fe84b67435f6c768377975c181a125a5a9f1"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -239,7 +254,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the main function"
                 },
                 {
                     "span": {
@@ -266,7 +281,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the main function"
                 },
                 {
                     "span": {
@@ -324,7 +339,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cfad5a03e0e5e2b92b80d8013221c57bb8b54dbb..ef37033c96b063deb172c7ceb9cbc6c659cb6f70"
+    "shas": "6556fe84b67435f6c768377975c181a125a5a9f1..3882dca1074e6564bc01f79a1b44f2c0db17d3e2"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -344,7 +359,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted a select statement in the main function of the 'main' module"
+                    "summary": "Deleted a select statement in the main function"
                 }
             ]
         },
@@ -376,7 +391,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ef37033c96b063deb172c7ceb9cbc6c659cb6f70..b4c5ae05e9993d2a8f9abcfa1b1a5e1ff4677aed"
+    "shas": "3882dca1074e6564bc01f79a1b44f2c0db17d3e2..51576f63dc98b44fbb1042065c9ab828a27dd5f7"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -391,12 +406,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -418,5 +448,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4c5ae05e9993d2a8f9abcfa1b1a5e1ff4677aed..c14d55dd062dc340dde5986bd08c8b6aa1173023"
+    "shas": "51576f63dc98b44fbb1042065c9ab828a27dd5f7..fa9acd974705290312a7cebdba09b18008dc6093"
 }]

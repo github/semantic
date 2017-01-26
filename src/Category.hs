@@ -13,7 +13,7 @@ data Category
   -- | The top-level branch node.
   = Program
   -- | A node indicating syntax errors.
-  | Error
+  | ParseError
   -- | A boolean expression.
   | Boolean
   -- | A bitwise operator.
@@ -240,7 +240,7 @@ instance (StringConv Category Text) where
 instance Listable Category where
   tiers
     =  cons0 Program
-    \/ cons0 Error
+    \/ cons0 ParseError
     \/ cons0 Boolean
     \/ cons0 BooleanOperator
     \/ cons0 MathOperator

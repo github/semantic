@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "67b21ca4a0eade527376ad1395eb7fd5fc5bea97..44348782059614a329e455e4c93a15380953b35d"
+    "shas": "3f2a09bd95dfbff3712c14095a53c1f0a3855648..003b74b612db2ce7c8b3cafa4767e2d93c80857b"
 }
 ,{
     "testCaseDescription": "go-if-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' if statement in the main function of the 'main' module"
+                    "summary": "Added the 'a()' if statement in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a := b(); c' if statement in the main function of the 'main' module"
+                    "summary": "Added the 'a := b()' if statement in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' if statement in the main function of the 'main' module"
+                    "summary": "Added the 'a()' if statement in the main function"
                 }
             ]
         },
@@ -121,7 +136,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44348782059614a329e455e4c93a15380953b35d..15dfc6156abddf36067e347cc9960195349a924a"
+    "shas": "003b74b612db2ce7c8b3cafa4767e2d93c80857b..90a41d97fa0420b82f8d8d7b550dd92171663b0f"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-test",
@@ -180,7 +195,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'y' identifier in the y var assignment of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'y' identifier in the 'y := b()' if statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -240,7 +255,7 @@
         " c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "15dfc6156abddf36067e347cc9960195349a924a..63f6cb996de5cab0b4c0b6c6d69d26ce44e595df"
+    "shas": "90a41d97fa0420b82f8d8d7b550dd92171663b0f..5b8d17f1bd7bf95dece870548aa1a2dc603ae25c"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-replacement-test",
@@ -299,7 +314,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'a' identifier in the a var assignment of the 'main' function"
+                    "summary": "Replaced the 'y' identifier with the 'a' identifier in the 'a := b()' if statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -359,7 +374,7 @@
         " c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "63f6cb996de5cab0b4c0b6c6d69d26ce44e595df..1a40ce7a1e45f7ef87ccf0a8a59eaeffaa51a1a5"
+    "shas": "5b8d17f1bd7bf95dece870548aa1a2dc603ae25c..2c0ac08501ad5b8bc5e1383946ac2adc645a1102"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-insert-test",
@@ -379,7 +394,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a()' if statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'a()' if statement in the main function"
                 },
                 {
                     "span": {
@@ -394,7 +409,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a := b(); c' if statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'a := b()' if statement in the main function"
                 },
                 {
                     "span": {
@@ -409,7 +424,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a()' if statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'a()' if statement in the main function"
                 }
             ]
         },
@@ -442,7 +457,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a40ce7a1e45f7ef87ccf0a8a59eaeffaa51a1a5..d4ef05cad7067ddfd19a4b4fc0576226d9adaa5d"
+    "shas": "2c0ac08501ad5b8bc5e1383946ac2adc645a1102..ca18125942a9a260c9187e56d003f1b21e71002f"
 }
 ,{
     "testCaseDescription": "go-if-statements-teardown-test",
@@ -457,12 +472,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -484,5 +514,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d4ef05cad7067ddfd19a4b4fc0576226d9adaa5d..6ccea258bd2125cbbe34266069b39fc47fe5d4e3"
+    "shas": "ca18125942a9a260c9187e56d003f1b21e71002f..e3c2411f013b063d1c440d3a295be6485170c63d"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f519cce92d26f6a9c43d21d062dc065afef2bbb..b6beb80d930a2bc6ae6c0d5df76200c507250209"
+    "shas": "6ea06aa1e8431651d63087d1f623f409947a25f1..a03d106f4668e2d39bf52c3e278b68cf682165b1"
 }
 ,{
     "testCaseDescription": "go-float-literals-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f1' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f1' assignment in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f2' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f2' assignment in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f3' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f3' assignment in the main function"
                 },
                 {
                     "span": {
@@ -103,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f4' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f4' assignment in the main function"
                 },
                 {
                     "span": {
@@ -118,7 +133,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f5' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f5' assignment in the main function"
                 }
             ]
         },
@@ -145,7 +160,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b6beb80d930a2bc6ae6c0d5df76200c507250209..fea5991ebfc78f18039f803e422e7d6dce4f9201"
+    "shas": "a03d106f4668e2d39bf52c3e278b68cf682165b1..841ab7a1e0173f62bcb428551152d9d47f123025"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-test",
@@ -154,138 +169,153 @@
             "float-literals.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    9
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '1.5' float with the '2.6' float in the f1 var assignment of the 'main' function"
+                    "summary": "Added the 'f1' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '1.5e100' float with the '2.6e211' float in the f2 var assignment of the 'main' function"
+                    "summary": "Added the 'f2' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    6
-                                ],
-                                "end": [
-                                    6,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    6
-                                ],
-                                "end": [
-                                    6,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '1.5e+50' float with the '2.6e+60' float in the f3 var assignment of the 'main' function"
+                    "summary": "Added the 'f3' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    6
-                                ],
-                                "end": [
-                                    7,
-                                    12
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    6
-                                ],
-                                "end": [
-                                    7,
-                                    12
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '1.5e-5' float with the '2.6e-7' float in the f4 var assignment of the 'main' function"
+                    "summary": "Added the 'f4' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    6
-                                ],
-                                "end": [
-                                    8,
-                                    12
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    6
-                                ],
-                                "end": [
-                                    8,
-                                    12
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '.5e-50' float with the '.6e-60' float in the f5 var assignment of the 'main' function"
+                    "summary": "Added the 'f5' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f3' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f4' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f5' assignment in the main function"
                 }
             ]
         },
@@ -316,7 +346,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fea5991ebfc78f18039f803e422e7d6dce4f9201..3b4830ed00129bac691be2171faa828b86110889"
+    "shas": "841ab7a1e0173f62bcb428551152d9d47f123025..5e8653295137112c6645a93a98308e0c690247b7"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-replacement-test",
@@ -325,138 +355,153 @@
             "float-literals.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    9
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '2.6' float with the '1.5' float in the f1 var assignment of the 'main' function"
+                    "summary": "Added the 'f1' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '2.6e211' float with the '1.5e100' float in the f2 var assignment of the 'main' function"
+                    "summary": "Added the 'f2' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    6
-                                ],
-                                "end": [
-                                    6,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    6
-                                ],
-                                "end": [
-                                    6,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '2.6e+60' float with the '1.5e+50' float in the f3 var assignment of the 'main' function"
+                    "summary": "Added the 'f3' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    6
-                                ],
-                                "end": [
-                                    7,
-                                    12
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    6
-                                ],
-                                "end": [
-                                    7,
-                                    12
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '2.6e-7' float with the '1.5e-5' float in the f4 var assignment of the 'main' function"
+                    "summary": "Added the 'f4' assignment in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    6
-                                ],
-                                "end": [
-                                    8,
-                                    12
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    6
-                                ],
-                                "end": [
-                                    8,
-                                    12
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '.6e-60' float with the '.5e-50' float in the f5 var assignment of the 'main' function"
+                    "summary": "Added the 'f5' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f3' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f4' assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f5' assignment in the main function"
                 }
             ]
         },
@@ -487,7 +532,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3b4830ed00129bac691be2171faa828b86110889..64c465ac26aef821ef49295f5582cc212f1f1eea"
+    "shas": "5e8653295137112c6645a93a98308e0c690247b7..371f187f2f1bf7fb9a1feff41ea8d1d6c4d3e25e"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-insert-test",
@@ -507,7 +552,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f1' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f1' assignment in the main function"
                 },
                 {
                     "span": {
@@ -522,7 +567,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f2' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f2' assignment in the main function"
                 },
                 {
                     "span": {
@@ -537,7 +582,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f3' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f3' assignment in the main function"
                 },
                 {
                     "span": {
@@ -552,7 +597,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f4' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f4' assignment in the main function"
                 },
                 {
                     "span": {
@@ -567,7 +612,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f5' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f5' assignment in the main function"
                 }
             ]
         },
@@ -594,7 +639,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "64c465ac26aef821ef49295f5582cc212f1f1eea..6b76359426eb9a1c5af1ae948688f187f919c9b0"
+    "shas": "371f187f2f1bf7fb9a1feff41ea8d1d6c4d3e25e..e1f25ce6d6735b3b0590d3cf21f59bb32675ff2d"
 }
 ,{
     "testCaseDescription": "go-float-literals-teardown-test",
@@ -609,12 +654,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -636,5 +696,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6b76359426eb9a1c5af1ae948688f187f919c9b0..0b52228e533b01beb1e33054e72003307726533c"
+    "shas": "e1f25ce6d6735b3b0590d3cf21f59bb32675ff2d..663f0278d8c41aca54ae0d1849efc76213f9ba1f"
 }]

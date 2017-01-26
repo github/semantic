@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier' assignment"
+                    "summary": "Added the 'x, y, z' assignment"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f6e95f576fdbe837a5fa09bd74b0d87bcca7c856..190bd5e0997a27ffbdff88940136908640908c38"
+    "shas": "e18520c2388cc6132fcda418cd6e62396bb5efe3..255236fc9f81ac3fae7d989dcc91e54d07bfc6fb"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier' assignment"
+                    "summary": "Added the 'x, y' assignment"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier' assignment"
+                    "summary": "Added the 'x, y, z' assignment"
                 }
             ]
         },
@@ -89,7 +89,7 @@
         " x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "190bd5e0997a27ffbdff88940136908640908c38..da6c69115623e17dc7c8eb1304e0cc8e4964f069"
+    "shas": "255236fc9f81ac3fae7d989dcc91e54d07bfc6fb..5e9ddd7a6b85f6c1dc2bd7841fb1db3de7b59e84"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-insert-test",
@@ -109,7 +109,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' identifier in an assignment to identifier"
+                    "summary": "Added the 'y' identifier in an assignment to x, y, z"
                 },
                 {
                     "span": {
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'z' identifier in an assignment to identifier"
+                    "summary": "Added the 'z' identifier in an assignment to x, y, z"
                 },
                 {
                     "span": {
@@ -139,7 +139,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' identifier in an assignment to identifier"
+                    "summary": "Deleted the 'y' identifier in an assignment to x, y, z"
                 }
             ]
         },
@@ -160,7 +160,7 @@
         " x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "da6c69115623e17dc7c8eb1304e0cc8e4964f069..b6afa3cdd73a6c210b364f036298e68565586e64"
+    "shas": "5e9ddd7a6b85f6c1dc2bd7841fb1db3de7b59e84..14e2a6b8224693360fb84cda66df6a7d6d7d15cf"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-test",
@@ -180,7 +180,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' identifier in an assignment to identifier"
+                    "summary": "Added the 'y' identifier in an assignment to x, y"
                 },
                 {
                     "span": {
@@ -195,7 +195,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' identifier in an assignment to identifier"
+                    "summary": "Deleted the 'y' identifier in an assignment to x, y"
                 },
                 {
                     "span": {
@@ -210,7 +210,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' identifier in an assignment to identifier"
+                    "summary": "Deleted the 'z' identifier in an assignment to x, y"
                 }
             ]
         },
@@ -231,7 +231,7 @@
         " x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b6afa3cdd73a6c210b364f036298e68565586e64..227d94a55c4f5767d2acf64611ec8f7b43b1684b"
+    "shas": "14e2a6b8224693360fb84cda66df6a7d6d7d15cf..7d1e77bf88d20e8f53cf1c549983ba8d99ff5a85"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-replacement-test",
@@ -251,7 +251,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier' assignment"
+                    "summary": "Deleted the 'x, y' assignment"
                 },
                 {
                     "span": {
@@ -266,7 +266,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier' assignment"
+                    "summary": "Deleted the 'x, y, z' assignment"
                 },
                 {
                     "span": {
@@ -281,7 +281,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier' assignment"
+                    "summary": "Added the 'x, y' assignment"
                 }
             ]
         },
@@ -302,7 +302,7 @@
         "+x, *y = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "227d94a55c4f5767d2acf64611ec8f7b43b1684b..653a9966391e154a4118d956be4fbd034c2a6282"
+    "shas": "7d1e77bf88d20e8f53cf1c549983ba8d99ff5a85..5bfe819275a3c67fa4b7a9fcdd0eac050a3de8aa"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-test",
@@ -322,7 +322,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier' assignment"
+                    "summary": "Deleted the 'x, y, z' assignment"
                 }
             ]
         },
@@ -341,7 +341,7 @@
         " x, *y = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "653a9966391e154a4118d956be4fbd034c2a6282..1d61feafbd0c4da519a3e742e8a47d99baa7f596"
+    "shas": "5bfe819275a3c67fa4b7a9fcdd0eac050a3de8aa..c9093f1da853ac7a129b950ed0c5f8a22233621b"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-rest-test",
@@ -361,7 +361,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier' assignment"
+                    "summary": "Deleted the 'x, y' assignment"
                 }
             ]
         },
@@ -379,5 +379,5 @@
         "-x, *y = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1d61feafbd0c4da519a3e742e8a47d99baa7f596..c38d6e0fc468af7f3198dd33bc2163af92c8a859"
+    "shas": "c9093f1da853ac7a129b950ed0c5f8a22233621b..d92b06aee0d1f67da39bcc34fd6d9920da89f089"
 }]

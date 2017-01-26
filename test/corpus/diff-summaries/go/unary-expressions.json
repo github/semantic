@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "17539bd3043b11a2ee479a191c1a1b3c10116161..95d724a0a09fadc48ea2890dee7d75ac5b9aa7af"
+    "shas": "62e181eaec5ef85a5d7816331750f05ed4be5ed3..ad7c2d4b1b3af4d629262b596d4d76591b0f2939"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '!<-a' operator in the main function of the 'main' module"
+                    "summary": "Added the '!<-a' operator in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '*foo()' operator in the main function of the 'main' module"
+                    "summary": "Added the '*foo()' operator in the main function"
                 }
             ]
         },
@@ -97,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95d724a0a09fadc48ea2890dee7d75ac5b9aa7af..a1314a7b82e8afb936c41bc2b1f8f7f6dea61f0a"
+    "shas": "ad7c2d4b1b3af4d629262b596d4d76591b0f2939..857884599a5b10f98e339f72e7e0ef5dff6ea432"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -129,7 +144,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -181,7 +196,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a1314a7b82e8afb936c41bc2b1f8f7f6dea61f0a..fc3fe7fe5250957e38223499d73968baa410b221"
+    "shas": "857884599a5b10f98e339f72e7e0ef5dff6ea432..dacb9cd739035ebe3919a96f7f90cd75e48b832e"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -213,7 +228,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the main function"
                 },
                 {
                     "span": {
@@ -265,7 +280,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fc3fe7fe5250957e38223499d73968baa410b221..8432ee8db9ae0dc6e5b596495e564e1ead822991"
+    "shas": "dacb9cd739035ebe3919a96f7f90cd75e48b832e..5ef7adc637975b15415197ba4e8ce354e69789fd"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -285,7 +300,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '!<-a' operator in the main function of the 'main' module"
+                    "summary": "Deleted the '!<-a' operator in the main function"
                 },
                 {
                     "span": {
@@ -300,7 +315,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '*foo()' operator in the main function of the 'main' module"
+                    "summary": "Deleted the '*foo()' operator in the main function"
                 }
             ]
         },
@@ -324,7 +339,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8432ee8db9ae0dc6e5b596495e564e1ead822991..22c7306ff2ebc9176ca41b89ca4020751157e748"
+    "shas": "5ef7adc637975b15415197ba4e8ce354e69789fd..30d627648cb775a76037cf8a7ab0f03c8588727b"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-teardown-test",
@@ -339,12 +354,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -366,5 +396,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "22c7306ff2ebc9176ca41b89ca4020751157e748..2f519cce92d26f6a9c43d21d062dc065afef2bbb"
+    "shas": "30d627648cb775a76037cf8a7ab0f03c8588727b..6ea06aa1e8431651d63087d1f623f409947a25f1"
 }]

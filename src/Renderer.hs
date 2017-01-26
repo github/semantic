@@ -17,10 +17,10 @@ data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath 
  deriving (Show)
 
 -- | The available types of diff rendering.
-data Format = Split | Patch | JSON | Summary | SExpression
+data Format = Split | Patch | JSON | Summary | SExpression | TOC
   deriving (Show)
 
-data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value])) | SExpressionOutput Text
+data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value])) | SExpressionOutput Text | TOCOutput (Map Text (Map Text [Value]))
   deriving (Show)
 
 -- Returns a key representing the filename. If the filenames are different,
@@ -49,6 +49,7 @@ concatOutputs list | isSummary list = toS . encodingToLazyByteString . toEncodin
   where
     concatSummaries :: [Output] -> Map Text (Map Text [Value])
     concatSummaries (SummaryOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
+    concatSummaries (TOCOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
     concatSummaries _ = mempty
 concatOutputs list | isText list = T.intercalate "\n" (toText <$> list)
 concatOutputs _ = mempty
@@ -59,6 +60,7 @@ isJSON _ = False
 
 isSummary :: [Output] -> Bool
 isSummary (SummaryOutput _ : _) = True
+isSummary (TOCOutput _ : _) = True
 isSummary _ = False
 
 isText :: [Output] -> Bool

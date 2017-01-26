@@ -25,7 +25,7 @@ data Syntax a f
   -- | An anonymous function has a list of expressions and params.
   | AnonymousFunction { params :: [f], expressions :: [f] }
   -- | A function has a list of expressions.
-  | Function { id :: f, params :: [f], expressions :: [f] }
+  | Function { id :: f, params :: [f], ty :: (Maybe f), expressions :: [f] }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
   -- | An operator assignment represents expressions with operators like math (e.g x += 1) or conditional (e.g. x ||= 1) assignment.
@@ -45,7 +45,7 @@ data Syntax a f
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
-  | Switch { switchExpr :: (Maybe f), cases :: [f] }
+  | Switch { switchExpr :: [f], cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
   -- | A default case in a switch statement.
   | DefaultCase [f]
@@ -57,7 +57,7 @@ data Syntax a f
   | Comment a
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
-  | Error [f]
+  | ParseError [f]
   -- | A for statement has a list of expressions to setup the iteration and then a list of expressions in the body.
   | For [f] [f]
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
@@ -101,7 +101,7 @@ data Syntax a f
   -- | A field declaration with an optional type, and an optional tag.
   | FieldDecl f (Maybe f) (Maybe f)
   -- | A type.
-  | Ty f
+  | Ty [f]
   -- | A send statement has a channel and an expression in Go.
   | Send f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
@@ -117,7 +117,7 @@ instance Listable2 Syntax where
     \/ liftCons2 recur (liftTiers recur) FunctionCall
     \/ liftCons2 recur (liftTiers recur) Ternary
     \/ liftCons2 (liftTiers recur) (liftTiers recur) AnonymousFunction
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Function
+    \/ liftCons4 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Function
     \/ liftCons2 recur recur Assignment
     \/ liftCons2 recur recur OperatorAssignment
     \/ liftCons2 recur recur MemberAccess
@@ -133,7 +133,7 @@ instance Listable2 Syntax where
     \/ liftCons2 recur recur Pair
     \/ liftCons1 leaf Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
-    \/ liftCons1 (liftTiers recur) Syntax.Error
+    \/ liftCons1 (liftTiers recur) Syntax.ParseError
     \/ liftCons2 (liftTiers recur) (liftTiers recur) For
     \/ liftCons2 recur recur DoWhile
     \/ liftCons2 recur (liftTiers recur) While
@@ -161,7 +161,7 @@ instance Listable2 Syntax where
     \/ liftCons2 (liftTiers recur) recur ParameterDecl
     \/ liftCons2 recur recur TypeDecl
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FieldDecl
-    \/ liftCons1 recur Ty
+    \/ liftCons1 (liftTiers recur) Ty
     \/ liftCons2 recur recur Send
     \/ liftCons1 (liftTiers recur) DefaultCase
 

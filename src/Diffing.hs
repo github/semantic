@@ -18,6 +18,7 @@ import Renderer.Patch
 import Renderer.Split
 import Renderer.Summary
 import Renderer.SExpression
+import Renderer.TOC
 import Source
 import Syntax
 import System.Directory
@@ -78,6 +79,7 @@ textDiff parser arguments = diffFiles parser $ case format arguments of
   SExpression -> sExpression
   JSON -> json
   Summary -> summary
+  TOC -> toc
 
 -- | Returns a truncated diff given diff arguments and two source blobs.
 truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Output
@@ -87,6 +89,7 @@ truncatedDiff arguments sources = pure $ case format arguments of
   SExpression -> SExpressionOutput mempty
   JSON -> JSONOutput mempty
   Summary -> SummaryOutput mempty
+  TOC -> TOCOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
 printDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
@@ -99,6 +102,7 @@ printDiff parser arguments sources = do
       SExpressionOutput text -> text
       JSONOutput series -> encodingToText (toJSON series)
       SummaryOutput summaries -> encodingToText (toJSON summaries)
+      TOCOutput summaries -> encodingToText (toJSON summaries)
   where
     -- TODO: Don't go from Value to Text?
     encodingToText = toS . encodingToLazyByteString . toEncoding

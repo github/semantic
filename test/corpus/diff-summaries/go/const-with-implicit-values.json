@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "358b31625272f975d35624a18f8337974c7a142d..e107a76ae19047adbef4f2592b27bbaa0763e858"
+    "shas": "8b23ffed2230fe0c2e75c1a02c179c9ff1726d8f..937443c336d969595e6a83ebc8db77307b5961da"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'zero' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'one' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'one' identifier in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'two' identifier in the main function"
                 }
             ]
         },
@@ -115,7 +130,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e107a76ae19047adbef4f2592b27bbaa0763e858..5927bf13ce0779493a7306cdab8a1e613616de7a"
+    "shas": "937443c336d969595e6a83ebc8db77307b5961da..389c40207cfccd6a33e8ade86a25334277f5c378"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -174,7 +189,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -201,7 +216,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the main function"
                 }
             ]
         },
@@ -229,7 +244,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5927bf13ce0779493a7306cdab8a1e613616de7a..181005c8bc218381c82e9554c9b7802f493a2781"
+    "shas": "389c40207cfccd6a33e8ade86a25334277f5c378..efbb02340a4f156d3ca28e917ddb684999f88c29"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -288,7 +303,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the main function"
                 },
                 {
                     "span": {
@@ -315,7 +330,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the main function"
                 }
             ]
         },
@@ -343,7 +358,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "181005c8bc218381c82e9554c9b7802f493a2781..991bc37844c90993f716c7496c5778ec3ef7f612"
+    "shas": "efbb02340a4f156d3ca28e917ddb684999f88c29..eec730b7debfaa8297c9b4563171986277737960"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -363,7 +378,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'zero' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -378,7 +393,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'one' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'one' identifier in the main function"
                 },
                 {
                     "span": {
@@ -393,7 +408,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'two' identifier in the main function"
                 }
             ]
         },
@@ -420,7 +435,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "991bc37844c90993f716c7496c5778ec3ef7f612..2cc4ccb68ae849d4332a1e8c89a17225522db446"
+    "shas": "eec730b7debfaa8297c9b4563171986277737960..4e2c650c7a3af1c7b5e5a22da3548d002c9ad050"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-teardown-test",
@@ -435,12 +450,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -462,5 +492,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2cc4ccb68ae849d4332a1e8c89a17225522db446..d857a5e809451235a1566b3bd2e315a9cdf9213f"
+    "shas": "4e2c650c7a3af1c7b5e5a22da3548d002c9ad050..024afce27e9882ceae4b057bb8bfb8586761a13f"
 }]

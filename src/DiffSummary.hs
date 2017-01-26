@@ -16,6 +16,7 @@ import Category as C
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
+import Data.List.NonEmpty (nonEmpty)
 import qualified Data.Text as Text
 import Data.Text.Listable
 import Data.Record
@@ -196,10 +197,10 @@ toTermName source term = case unwrap term of
   S.Defer expr -> toTermName' expr
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Fixed children -> termNameFromChildren term children
-  S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.Indexed children -> maybe "branch" sconcat (nonEmpty (intersperse ", " (toTermName' <$> children)))
   Leaf leaf -> toS leaf
   S.Assignment identifier _ -> toTermName' identifier
-  S.Function identifier _ _ -> toTermName' identifier
+  S.Function identifier _ _ _ -> toTermName' identifier
   S.ParameterDecl _ _ -> termNameFromSource term
   S.FunctionCall i args -> case unwrap i of
     S.AnonymousFunction params _ ->
@@ -231,7 +232,7 @@ toTermName source term = case unwrap term of
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   S.Case expr _ -> termNameFromSource expr
-  S.Switch expr _ -> maybe "" toTermName' expr
+  S.Switch exprs _ -> maybe "" toTermName' (fmap snd (unsnoc exprs))
   S.Ternary expr _ -> toTermName' expr
   S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
@@ -239,7 +240,7 @@ toTermName source term = case unwrap term of
   S.Pair k v -> toKeyName k <> toArgName v
   S.Return children -> Text.intercalate ", " (termNameFromSource <$> children)
   S.Yield children -> Text.intercalate ", " (termNameFromSource <$> children)
-  S.Error _ -> termNameFromSource term
+  S.ParseError _ -> termNameFromSource term
   S.If expr _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
@@ -266,7 +267,7 @@ toTermName source term = case unwrap term of
   S.Continue expr -> maybe "" toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
   S.DefaultCase children -> termNameFromChildren term children
-  S.FieldDecl id expr tag -> termNameFromSource id <> (maybe "" (\expr' -> " " <> termNameFromSource expr') expr) <> (maybe "" ((" " <>) . termNameFromSource) tag)
+  S.FieldDecl id expr tag -> termNameFromSource id <> maybe "" (\expr' -> " " <> termNameFromSource expr') expr <> maybe "" ((" " <>) . termNameFromSource) tag
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -328,7 +329,7 @@ termToDiffInfo blob term = case unwrap term of
   S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction (toTermName' term) (getField $ extract term)
   S.Comment _ -> HideInfo
   S.Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (category $ extract term) BCommented
-  S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
+  S.ParseError _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   _ -> toLeafInfo term
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
@@ -372,7 +373,7 @@ instance HasCategory Category where
     Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
     C.Comment -> "comment"
-    C.Error -> "error"
+    C.ParseError -> "error"
     ExpressionStatements -> "expression statements"
     C.Assignment -> "assignment"
     C.Function -> "function"

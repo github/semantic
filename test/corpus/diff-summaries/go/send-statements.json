@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c6c8175bf350bd238c29e1300d79724e6acf5d8f..e9256862e31c38270d1bec9360c4dc47c10838ca"
+    "shas": "1d4f678537c1a2636fd9eba370de9e81de874c72..9ff735e947d0cc8440903c7acee54ccd8de2cbc1"
 }
 ,{
     "testCaseDescription": "go-send-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo <- 5' send statement in the main function of the 'main' module"
+                    "summary": "Added the 'foo <- 5' send statement in the main function"
                 }
             ]
         },
@@ -81,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e9256862e31c38270d1bec9360c4dc47c10838ca..4b8e19ec7308259990ef6868862ae26f9517c905"
+    "shas": "9ff735e947d0cc8440903c7acee54ccd8de2cbc1..8fc0429afe1c5062f256e0423bf7f7dae8e0b1e2"
 }
 ,{
     "testCaseDescription": "go-send-statements-replacement-test",
@@ -113,7 +128,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the main function"
                 },
                 {
                     "span": {
@@ -140,7 +155,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '6' in the main function of the 'main' module"
+                    "summary": "Replaced '5' with '6' in the main function"
                 }
             ]
         },
@@ -163,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4b8e19ec7308259990ef6868862ae26f9517c905..71f509fd773bfe971497f7dab87fbb8d5f286c14"
+    "shas": "8fc0429afe1c5062f256e0423bf7f7dae8e0b1e2..54cd41da0c7bb8d56aa5e7cd6f0903908c8e321b"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-replacement-test",
@@ -195,7 +210,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the main function"
                 },
                 {
                     "span": {
@@ -222,7 +237,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '5' in the main function of the 'main' module"
+                    "summary": "Replaced '6' with '5' in the main function"
                 }
             ]
         },
@@ -245,7 +260,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "71f509fd773bfe971497f7dab87fbb8d5f286c14..289dff55b2757ee11a20854ec6325e34f53dcb91"
+    "shas": "54cd41da0c7bb8d56aa5e7cd6f0903908c8e321b..3a2b37c02821a9daa3416c419f1efbad8ecb1ce4"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-insert-test",
@@ -265,7 +280,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo <- 5' send statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'foo <- 5' send statement in the main function"
                 }
             ]
         },
@@ -288,7 +303,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "289dff55b2757ee11a20854ec6325e34f53dcb91..d2e4520caddff99d3bc5ba1e63f495a53a6e84d4"
+    "shas": "3a2b37c02821a9daa3416c419f1efbad8ecb1ce4..4be86e6bc27ab2ed64363e832a3291202eecc707"
 }
 ,{
     "testCaseDescription": "go-send-statements-teardown-test",
@@ -303,12 +318,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -330,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d2e4520caddff99d3bc5ba1e63f495a53a6e84d4..7f8d4e43555f3b5d3f723b58c0fbf874612c614f"
+    "shas": "4be86e6bc27ab2ed64363e832a3291202eecc707..bb4ba3185a52b92f422411ad6cae97a82e2b2657"
 }]

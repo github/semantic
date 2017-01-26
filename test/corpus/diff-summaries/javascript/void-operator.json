@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/void-operator.js b/void-operator.js",
-        "index e69de29..02aa750 100644",
+        "index e69de29b..02aa7503 100644",
         "--- a/void-operator.js",
         "+++ b/void-operator.js",
         "@@ -0,0 +1 @@",
         "+void b()"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "56f88d5286e94da2b11b7f6d0a35aa836d4f5921..090251ad4b6d167fb4a8ada452c235f6ef453446"
+    "shas": "f90555ef6eea69038b7aa16bd074797419738b0a..1f8b21c36e0802112f4265ea647dd2d5d362a272"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/void-operator.js b/void-operator.js",
-        "index 02aa750..c493dc5 100644",
+        "index 02aa7503..c493dc5b 100644",
         "--- a/void-operator.js",
         "+++ b/void-operator.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " void b()"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "090251ad4b6d167fb4a8ada452c235f6ef453446..bf6411aac8dfb3eeb0f991114c7f48b390b61430"
+    "shas": "1f8b21c36e0802112f4265ea647dd2d5d362a272..2f15c4cedbca086328f2f92442f67263fbcd29bc"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/void-operator.js b/void-operator.js",
-        "index c493dc5..aae2f63 100644",
+        "index c493dc5b..aae2f633 100644",
         "--- a/void-operator.js",
         "+++ b/void-operator.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " void b()"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "bf6411aac8dfb3eeb0f991114c7f48b390b61430..d00f222abddf5191477b57afc4101cf73ee16ec5"
+    "shas": "2f15c4cedbca086328f2f92442f67263fbcd29bc..d645696290851ecc05cc5dc535d1ac1816accd63"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/void-operator.js b/void-operator.js",
-        "index aae2f63..c493dc5 100644",
+        "index aae2f633..c493dc5b 100644",
         "--- a/void-operator.js",
         "+++ b/void-operator.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " void b()"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d00f222abddf5191477b57afc4101cf73ee16ec5..36271b63277a1739ae109605f2f520baf14525b4"
+    "shas": "d645696290851ecc05cc5dc535d1ac1816accd63..7e7a2bdaab6bcab70474468916bab238da5974b5"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/void-operator.js b/void-operator.js",
-        "index c493dc5..738c34a 100644",
+        "index c493dc5b..738c34a4 100644",
         "--- a/void-operator.js",
         "+++ b/void-operator.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+void c()"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "36271b63277a1739ae109605f2f520baf14525b4..350bf156c704fb4f26d0ada86678e654d40d70cc"
+    "shas": "7e7a2bdaab6bcab70474468916bab238da5974b5..8835bba7c5048d609d2eb5e67b0680423893ab3d"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/void-operator.js b/void-operator.js",
-        "index 738c34a..8e9ceba 100644",
+        "index 738c34a4..8e9ceba2 100644",
         "--- a/void-operator.js",
         "+++ b/void-operator.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " void c()"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "350bf156c704fb4f26d0ada86678e654d40d70cc..684600d4371b29448fa610da1a5e4d2d7710c3aa"
+    "shas": "8835bba7c5048d609d2eb5e67b0680423893ab3d..b67f11bb5940973edc50e68a156cae2f15578324"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/void-operator.js b/void-operator.js",
-        "index 8e9ceba..e69de29 100644",
+        "index 8e9ceba2..e69de29b 100644",
         "--- a/void-operator.js",
         "+++ b/void-operator.js",
         "@@ -1 +0,0 @@",
         "-void c()"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "684600d4371b29448fa610da1a5e4d2d7710c3aa..5da04c6d20aa6fdedbc205bf855829ccd10687f3"
+    "shas": "b67f11bb5940973edc50e68a156cae2f15578324..37c35686cb5d7f4301f701d97d4050125dffa916"
 }]

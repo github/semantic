@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/return-statement.js b/return-statement.js",
-        "index e69de29..6315029 100644",
+        "index e69de29b..63150293 100644",
         "--- a/return-statement.js",
         "+++ b/return-statement.js",
         "@@ -0,0 +1 @@",
         "+return 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2795ba48a13af4b2c6f240761fd880dc6cd10c2b..65e3958e72f9b522fb419169e1dc79619e10fb0e"
+    "shas": "cfb33c769bbc24766b17e262f1c1eb05b0face8f..0aa153a74399560d168cd2de8143750bc9d2b7f4"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/return-statement.js b/return-statement.js",
-        "index 6315029..22dde95 100644",
+        "index 63150293..22dde951 100644",
         "--- a/return-statement.js",
         "+++ b/return-statement.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " return 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "65e3958e72f9b522fb419169e1dc79619e10fb0e..908a90ee504807c1ddcb0e7484d59bb97281136b"
+    "shas": "0aa153a74399560d168cd2de8143750bc9d2b7f4..0bc4edeb490e8a26916cdea48411d59a2dcbe9ea"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-insert-test",
@@ -120,7 +120,7 @@
     ],
     "patch": [
         "diff --git a/return-statement.js b/return-statement.js",
-        "index 22dde95..522349c 100644",
+        "index 22dde951..522349cd 100644",
         "--- a/return-statement.js",
         "+++ b/return-statement.js",
         "@@ -1,3 +1,3 @@",
@@ -130,7 +130,7 @@
         " return 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "908a90ee504807c1ddcb0e7484d59bb97281136b..20240a05b2905df70c1ee93e3e6b9c931f2959cf"
+    "shas": "0bc4edeb490e8a26916cdea48411d59a2dcbe9ea..fbebc9a0fc19ad18e07eae7056ffc87f55c723ae"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-test",
@@ -161,7 +161,7 @@
     ],
     "patch": [
         "diff --git a/return-statement.js b/return-statement.js",
-        "index 522349c..22dde95 100644",
+        "index 522349cd..22dde951 100644",
         "--- a/return-statement.js",
         "+++ b/return-statement.js",
         "@@ -1,3 +1,3 @@",
@@ -171,7 +171,7 @@
         " return 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "20240a05b2905df70c1ee93e3e6b9c931f2959cf..13392621e30661ca237d268f3ef50e3c7012ae05"
+    "shas": "fbebc9a0fc19ad18e07eae7056ffc87f55c723ae..c6d4228f0de495dc97232ad34fbb898106b26588"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-replacement-test",
@@ -232,7 +232,7 @@
     ],
     "patch": [
         "diff --git a/return-statement.js b/return-statement.js",
-        "index 22dde95..4d44d6a 100644",
+        "index 22dde951..4d44d6ac 100644",
         "--- a/return-statement.js",
         "+++ b/return-statement.js",
         "@@ -1,3 +1,2 @@",
@@ -242,7 +242,7 @@
         "+return;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "13392621e30661ca237d268f3ef50e3c7012ae05..fba0fb892c46997d3c955a13380af9805300ca83"
+    "shas": "c6d4228f0de495dc97232ad34fbb898106b26588..1083a5e11717877aa91a52745bf70643c0cf0e09"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-test",
@@ -273,7 +273,7 @@
     ],
     "patch": [
         "diff --git a/return-statement.js b/return-statement.js",
-        "index 4d44d6a..f312410 100644",
+        "index 4d44d6ac..f312410b 100644",
         "--- a/return-statement.js",
         "+++ b/return-statement.js",
         "@@ -1,2 +1 @@",
@@ -281,7 +281,7 @@
         " return;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "fba0fb892c46997d3c955a13380af9805300ca83..81f231c35cf307c855a8fead87315cb8828c2371"
+    "shas": "1083a5e11717877aa91a52745bf70643c0cf0e09..08812679efc223693ed79c510e94be4370547f06"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-rest-test",
@@ -312,12 +312,12 @@
     ],
     "patch": [
         "diff --git a/return-statement.js b/return-statement.js",
-        "index f312410..e69de29 100644",
+        "index f312410b..e69de29b 100644",
         "--- a/return-statement.js",
         "+++ b/return-statement.js",
         "@@ -1 +0,0 @@",
         "-return;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "81f231c35cf307c855a8fead87315cb8828c2371..5d2db352ed0e33bb51a7f2330066274984490127"
+    "shas": "08812679efc223693ed79c510e94be4370547f06..c90fef2277e371c606b2a159aee629c8a43edec2"
 }]

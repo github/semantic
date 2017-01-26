@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,28 +53,13 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "af763902e530bed278bc8bd2365c849366e38e1e..33684cfbcbf7f857d0cf6372e81358ed343475b6"
+    "shas": "6de9ab15bd1a30f31bd2fdd3fefaef8985e7de52..7fefb122c064688a8968f969eac26609be94d94f"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-insert-test",
     "expectedResult": {
         "changes": {
             "single-import-declarations.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'import' identifier in the main function of the 'main' module"
-                },
                 {
                     "span": {
                         "insert": {
@@ -73,22 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"net/http\" string in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'import' identifier in the main function of the 'main' module"
+                    "summary": "Added the \"net/http\" string in the main function"
                 },
                 {
                     "span": {
@@ -103,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"some/dsl\" string in the main function of the 'main' module"
+                    "summary": "Added the \"some/dsl\" string in the main function"
                 },
                 {
                     "span": {
@@ -118,7 +103,41 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'import' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'import' identifier in the main function"
+                }
+            ]
+        },
+        "errors": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added 'import' at line 4, column 1 - line 4, column 7 in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added 'import .' at line 5, column 1 - line 5, column 9 in the main function"
                 },
                 {
                     "span": {
@@ -129,30 +148,14 @@
                             ],
                             "end": [
                                 6,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'alias' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                14
-                            ],
-                            "end": [
-                                6,
                                 28
                             ]
                         }
                     },
-                    "summary": "Added the \"some/package\" string in the main function of the 'main' module"
+                    "summary": "Added 'alias \"some/package\"' at line 6, column 8 - line 6, column 28 in the main function"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "single-import-declarations.go"
@@ -173,7 +176,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "33684cfbcbf7f857d0cf6372e81358ed343475b6..82413533e0a6e87a167fc5e1e8d954b9ad174170"
+    "shas": "7fefb122c064688a8968f969eac26609be94d94f..6dae7ceccb9cb8e85281d1a4c1d8c5d8c661255c"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-replacement-test",
@@ -205,7 +208,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the main function"
                 },
                 {
                     "span": {
@@ -232,7 +235,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the main function"
                 },
                 {
                     "span": {
@@ -259,7 +262,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some/package\" string with the \"awesome/packages\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"some/package\" string with the \"awesome/packages\" string in the main function"
                 }
             ]
         },
@@ -286,7 +289,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "82413533e0a6e87a167fc5e1e8d954b9ad174170..5cb40d42444d6e9c304a9f5197b39bdf0d2df990"
+    "shas": "6dae7ceccb9cb8e85281d1a4c1d8c5d8c661255c..ae5e4f4a6a921e1170a9b85ae3b090f15172be85"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-replacement-test",
@@ -318,7 +321,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the main function"
                 },
                 {
                     "span": {
@@ -345,7 +348,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the main function"
                 },
                 {
                     "span": {
@@ -372,7 +375,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"awesome/packages\" string with the \"some/package\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"awesome/packages\" string with the \"some/package\" string in the main function"
                 }
             ]
         },
@@ -399,28 +402,13 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5cb40d42444d6e9c304a9f5197b39bdf0d2df990..9da104e0d0cd486bb3cbabe632ae91311e49d86f"
+    "shas": "ae5e4f4a6a921e1170a9b85ae3b090f15172be85..be9944b647c93dcdb02ce3d892d04a35c1bd7f52"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-insert-test",
     "expectedResult": {
         "changes": {
             "single-import-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'import' identifier in the main function of the 'main' module"
-                },
                 {
                     "span": {
                         "delete": {
@@ -434,22 +422,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"net/http\" string in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'import' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the \"net/http\" string in the main function"
                 },
                 {
                     "span": {
@@ -464,7 +437,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"some/dsl\" string in the main function of the 'main' module"
+                    "summary": "Deleted the \"some/dsl\" string in the main function"
                 },
                 {
                     "span": {
@@ -479,7 +452,41 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'import' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'import' identifier in the main function"
+                }
+            ]
+        },
+        "errors": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'import' at line 4, column 1 - line 4, column 7 in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'import .' at line 5, column 1 - line 5, column 9 in the main function"
                 },
                 {
                     "span": {
@@ -490,30 +497,14 @@
                             ],
                             "end": [
                                 6,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'alias' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                14
-                            ],
-                            "end": [
-                                6,
                                 28
                             ]
                         }
                     },
-                    "summary": "Deleted the \"some/package\" string in the main function of the 'main' module"
+                    "summary": "Deleted 'alias \"some/package\"' at line 6, column 8 - line 6, column 28 in the main function"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "single-import-declarations.go"
@@ -534,7 +525,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9da104e0d0cd486bb3cbabe632ae91311e49d86f..7f99e097d059b403e991c7649ce9bac1b8925333"
+    "shas": "be9944b647c93dcdb02ce3d892d04a35c1bd7f52..d091a3255b8271e218572299738095d3efe19115"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-teardown-test",
@@ -549,12 +540,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -576,5 +582,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7f99e097d059b403e991c7649ce9bac1b8925333..6bee120701f5e3c15b3f8a13d4ead70d225091d1"
+    "shas": "d091a3255b8271e218572299738095d3efe19115..126db53cee9459e0927b80ed1af574cc273f948e"
 }]

@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/false.js b/false.js",
-        "index e69de29..8a63946 100644",
+        "index e69de29b..8a639462 100644",
         "--- a/false.js",
         "+++ b/false.js",
         "@@ -0,0 +1 @@",
         "+false;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a56c14e19dec2910d36460e4fca6496da46f6240..6b1a30d6be2d43907c3a1faf581db6c9fe6cc88a"
+    "shas": "d7a5c35ea0a826299a22c96d0b992f92bc85bb91..c0b7401ea04f1b37426f7bc4773e77fdf8c0f3c1"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/false.js b/false.js",
-        "index 8a63946..86574b1 100644",
+        "index 8a639462..86574b16 100644",
         "--- a/false.js",
         "+++ b/false.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " false;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6b1a30d6be2d43907c3a1faf581db6c9fe6cc88a..122e0fae24e99d4f534bb461d9d5fa2900c70e55"
+    "shas": "c0b7401ea04f1b37426f7bc4773e77fdf8c0f3c1..2e31f217aa32ada1925fb2ec1cc0411d0edcd1b0"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-insert-test",
@@ -135,7 +135,7 @@
     ],
     "patch": [
         "diff --git a/false.js b/false.js",
-        "index 86574b1..7bae7c5 100644",
+        "index 86574b16..7bae7c53 100644",
         "--- a/false.js",
         "+++ b/false.js",
         "@@ -1,3 +1,3 @@",
@@ -145,7 +145,7 @@
         " false;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "122e0fae24e99d4f534bb461d9d5fa2900c70e55..6d5ec0ada3f32284c9922934304c708333da7e1f"
+    "shas": "2e31f217aa32ada1925fb2ec1cc0411d0edcd1b0..53d6e0873afb002215a77619b6e3f4604bc27453"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-test",
@@ -191,7 +191,7 @@
     ],
     "patch": [
         "diff --git a/false.js b/false.js",
-        "index 7bae7c5..86574b1 100644",
+        "index 7bae7c53..86574b16 100644",
         "--- a/false.js",
         "+++ b/false.js",
         "@@ -1,3 +1,3 @@",
@@ -201,7 +201,7 @@
         " false;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6d5ec0ada3f32284c9922934304c708333da7e1f..7291f772ca242bae0a92ab87c1ab6ec2be28d4c1"
+    "shas": "53d6e0873afb002215a77619b6e3f4604bc27453..c2ef01b79b9b22e6e6f49923770ba63b149870a8"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-replacement-test",
@@ -262,7 +262,7 @@
     ],
     "patch": [
         "diff --git a/false.js b/false.js",
-        "index 86574b1..85b5be9 100644",
+        "index 86574b16..85b5be91 100644",
         "--- a/false.js",
         "+++ b/false.js",
         "@@ -1,3 +1,2 @@",
@@ -272,7 +272,7 @@
         "+return false;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7291f772ca242bae0a92ab87c1ab6ec2be28d4c1..018e3b49010dd5359d8071f4a856b6ccef409645"
+    "shas": "c2ef01b79b9b22e6e6f49923770ba63b149870a8..428cba3e1b4d7186ecced8004ddc6b1e82df3f0e"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-test",
@@ -303,7 +303,7 @@
     ],
     "patch": [
         "diff --git a/false.js b/false.js",
-        "index 85b5be9..1f328b3 100644",
+        "index 85b5be91..1f328b3b 100644",
         "--- a/false.js",
         "+++ b/false.js",
         "@@ -1,2 +1 @@",
@@ -311,7 +311,7 @@
         " return false;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "018e3b49010dd5359d8071f4a856b6ccef409645..bda912eec94150ac764d032b1243ec8dba01f3f0"
+    "shas": "428cba3e1b4d7186ecced8004ddc6b1e82df3f0e..6338763787e51da57da095e9e8e91e4d56873327"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-rest-test",
@@ -342,12 +342,12 @@
     ],
     "patch": [
         "diff --git a/false.js b/false.js",
-        "index 1f328b3..e69de29 100644",
+        "index 1f328b3b..e69de29b 100644",
         "--- a/false.js",
         "+++ b/false.js",
         "@@ -1 +0,0 @@",
         "-return false;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "bda912eec94150ac764d032b1243ec8dba01f3f0..f6dfeb42af9db740677fd60341ea39da711f7c81"
+    "shas": "6338763787e51da57da095e9e8e91e4d56873327..d9d6e19c015a3f2dbb9d04d3867b13889dd798ac"
 }]

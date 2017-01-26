@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e8a0a2912cf6fee72c6e0cc0d96c5babf1cd4df1..9ae64fc2be083d6a80c7a2a870ebdb98edc623dd"
+    "shas": "030876029c6aa56a60b06740ec65bec788ad8715..e273179f5e9abd6bc426d0dabf1d847d9fc3e4f6"
 }
 ,{
     "testCaseDescription": "go-for-statements-insert-test",
@@ -49,16 +64,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                2
+                                5,
+                                1
                             ],
                             "end": [
-                                7,
-                                2
+                                5,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'for {\na()\ngoto loop\n}' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'a()' function call in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'loop' identifier in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i := 0; i < 5; i++' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'i := 0; i < 5; i++' for statement in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i < 10; i++' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'i < 10; i++' for statement in the main function"
                 },
                 {
                     "span": {
@@ -103,7 +133,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'for ;; {\na()\ncontinue\n}' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'for ;; {\na()\ncontinue\n}' for statement in the main function"
                 },
                 {
                     "span": {
@@ -118,7 +148,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x := range y' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'x := range y' for statement in the main function"
                 }
             ]
         },
@@ -160,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ae64fc2be083d6a80c7a2a870ebdb98edc623dd..d2d67882694cf618b4b0236fc2d4c1429d5c76da"
+    "shas": "e273179f5e9abd6bc426d0dabf1d847d9fc3e4f6..f25b62b1979ac923c37947e26b12ab7b07772a65"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -171,6 +201,21 @@
                     "span": {
                         "insert": {
                             "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for ;; {\na()\ngoto loop\n}' for statement in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
                                 8,
                                 1
                             ],
@@ -180,7 +225,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x := range y' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'x := range y' for statement in the main function"
                 },
                 {
                     "span": {
@@ -195,7 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement in the main function"
                 },
                 {
                     "span": {
@@ -210,22 +255,52 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i < 10; i++' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'i < 10; i++' for statement in the main function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                20,
-                                1
+                                21,
+                                3
                             ],
                             "end": [
-                                23,
-                                2
+                                21,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'for  {\na(x)\nbreak\n}' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'x' identifier in the a(x) function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added a break statement in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'loop' identifier in the main function"
                 },
                 {
                     "span": {
@@ -240,7 +315,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement in the main function"
                 },
                 {
                     "span": {
@@ -255,7 +330,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i < 10; i++' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'i < 10; i++' for statement in the main function"
                 },
                 {
                     "span": {
@@ -270,7 +345,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement in the main function"
                 },
                 {
                     "span": {
@@ -285,7 +360,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x := range y' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'x := range y' for statement in the main function"
                 }
             ]
         },
@@ -330,13 +405,43 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d2d67882694cf618b4b0236fc2d4c1429d5c76da..3cd84da69fc85aa2b54fffcadd31b818a13593cf"
+    "shas": "f25b62b1979ac923c37947e26b12ab7b07772a65..1d87bb5117646fb05a6eb77fab4add841c79e49c"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "for-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'loop' identifier in the main function"
+                },
                 {
                     "span": {
                         "insert": {
@@ -350,7 +455,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i := 0; i < 5; i++' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'i := 0; i < 5; i++' for statement in the main function"
                 },
                 {
                     "span": {
@@ -365,22 +470,34 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i < 10; i++' for statement in the main function of the 'main' module"
+                    "summary": "Added the 'i < 10; i++' for statement in the main function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                19,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    16,
+                                    1
+                                ],
+                                "end": [
+                                    19,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'for ;; {\na()\ncontinue\n}' for statement in the main function of the 'main' module"
+                    "summary": "Replaced the 'for ;; {\na()\ngoto loop\n}' for statement with the 'for ;; {\na()\ncontinue\n}' for statement in the main function"
                 },
                 {
                     "span": {
@@ -410,7 +527,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'loop' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'loop' identifier in the main function"
                 },
                 {
                     "span": {
@@ -425,7 +542,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'for ;; {\na()\ncontinue loop2\n}' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue loop2\n}' for statement in the main function"
                 },
                 {
                     "span": {
@@ -440,22 +557,37 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i < 10; i++' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'i < 10; i++' for statement in the main function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                20,
+                                21,
                                 1
                             ],
                             "end": [
-                                23,
-                                2
+                                21,
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'for  {\na(x)\nbreak\n}' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'a(x)' function call in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a break statement in the main function"
                 }
             ]
         },
@@ -500,7 +632,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3cd84da69fc85aa2b54fffcadd31b818a13593cf..fa8ef6297ac3ba4df986080f0beee427c3e5faaa"
+    "shas": "1d87bb5117646fb05a6eb77fab4add841c79e49c..1743b5d6f9c95bb0d7dbec59c2e254d7d444ca0f"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -511,16 +643,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                2
+                                5,
+                                1
                             ],
                             "end": [
-                                7,
-                                2
+                                5,
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'for {\na()\ngoto loop\n}' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'a()' function call in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'loop' identifier in the main function"
                 },
                 {
                     "span": {
@@ -535,7 +682,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement in the main function"
                 },
                 {
                     "span": {
@@ -550,7 +697,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i < 10; i++' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'i < 10; i++' for statement in the main function"
                 },
                 {
                     "span": {
@@ -565,7 +712,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement in the main function"
                 },
                 {
                     "span": {
@@ -580,7 +727,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x := range y' for statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'x := range y' for statement in the main function"
                 }
             ]
         },
@@ -622,7 +769,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fa8ef6297ac3ba4df986080f0beee427c3e5faaa..ccc25ba06c31afa638442976a2a83284dd02efa3"
+    "shas": "1743b5d6f9c95bb0d7dbec59c2e254d7d444ca0f..59eb24ea939ad8ac2cf5e8e16edce93aac3981fd"
 }
 ,{
     "testCaseDescription": "go-for-statements-teardown-test",
@@ -637,12 +784,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -664,5 +826,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ccc25ba06c31afa638442976a2a83284dd02efa3..6cbe8d53838858e6ff83e2890cd6d51da63e06dd"
+    "shas": "59eb24ea939ad8ac2cf5e8e16edce93aac3981fd..b9e8cbc963d70681826124d682474977bcef4d33"
 }]
