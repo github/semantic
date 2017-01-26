@@ -170,7 +170,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier"
+                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier in the fb function"
                 },
                 {
                     "span": {
@@ -197,7 +197,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier"
+                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier in the fc function"
                 },
                 {
                     "span": {
@@ -224,7 +224,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier"
+                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier in the fd function"
                 }
             ]
         },
@@ -312,7 +312,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier"
+                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier in the f2 function"
                 },
                 {
                     "span": {
@@ -339,7 +339,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier"
+                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier in the f2 function"
                 },
                 {
                     "span": {
@@ -366,7 +366,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier"
+                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier in the f2 function"
                 }
             ]
         },
