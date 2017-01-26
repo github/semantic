@@ -1,5 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Renderer.TOC where
+module Renderer.TOC (toc) where
 
 import Category as C
 import Data.Aeson
