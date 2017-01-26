@@ -63,7 +63,9 @@ toc blobs diff = TOCOutput $ Map.fromList [
     summaries = diffTOC blobs diff
 
 diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
-diffTOC blobs diff = toJSONSummaries =<< removeDupes (diffToTOCSummaries (source <$> blobs) diff)
+diffTOC blobs diff = do
+  noDupes <- removeDupes (diffToTOCSummaries (source <$> blobs) diff)
+  toJSONSummaries noDupes
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
     removeDupes [] = []
@@ -82,16 +84,26 @@ diffTOC blobs diff = toJSONSummaries =<< removeDupes (diffToTOCSummaries (source
 -- Mark which leaves are summarizable.
 toTOCSummaries :: Patch DiffInfo -> [TOCSummary DiffInfo]
 toTOCSummaries patch = case afterOrBefore patch of
-  Just diffInfo -> toTOCSummaries' diffInfo
+  Just diffInfo -> toTOCSummaries' patch diffInfo
   Nothing -> panic "No diff"
   where
-    toTOCSummaries' = \case
-      ErrorInfo{..} -> pure $ TOCSummary patch NotSummarizable
-      BranchInfo{..} -> branches >>= toTOCSummaries'
-      LeafInfo{..} -> pure . TOCSummary patch $ case leafCategory of
-        C.Function -> Summarizable leafCategory termName leafSourceSpan (patchType patch)
-        C.Method -> Summarizable leafCategory termName leafSourceSpan (patchType patch)
+    toTOCSummaries' patch' diffInfo = case diffInfo of
+      ErrorInfo{..} -> pure $ TOCSummary patch' NotSummarizable
+      BranchInfo{..} -> join $ zipWith toTOCSummaries' (flattenPatch patch') branches
+      LeafInfo{..} -> pure . TOCSummary patch' $ case leafCategory of
+        C.Function -> Summarizable leafCategory termName leafSourceSpan (patchType patch')
+        C.Method -> Summarizable leafCategory termName leafSourceSpan (patchType patch')
         _ -> NotSummarizable
+
+flattenPatch :: Patch DiffInfo -> [Patch DiffInfo]
+flattenPatch = \case
+  Replace i1 i2 -> zipWith Replace (toLeafInfos' i1) (toLeafInfos' i2)
+  Insert info -> Insert <$> toLeafInfos' info
+  Delete info -> Delete <$> toLeafInfos' info
+
+toLeafInfos' :: DiffInfo -> [DiffInfo]
+toLeafInfos' BranchInfo{..} = branches >>= toLeafInfos'
+toLeafInfos' leaf = [leaf]
 
 mapToInSummarizable :: DefaultFields fields => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
 mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm diff) of
