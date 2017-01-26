@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e18c5b5c1ca8b1a73b3c2e745671fc99a77f14af..25fba0aed3ea4c1773ec3549eaff40d913c079d1"
+    "shas": "024afce27e9882ceae4b057bb8bfb8586761a13f..6fc6c8edcc929af03c8663dc5e5aa3ee5370202c"
 }
 ,{
     "testCaseDescription": "go-constructors-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(chan<- int)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'make(chan<- int)' function call in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(chan<- int, …)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'make(chan<- int, …)' function call in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(chan<- int, 5, 10)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'make(chan<- int, 5, 10)' function call in the main function"
                 },
                 {
                     "span": {
@@ -103,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'new(…)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'new(…)' function call in the main function"
                 }
             ]
         },
@@ -129,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "25fba0aed3ea4c1773ec3549eaff40d913c079d1..e63a03ba5fd522be40676c7ab9df3fa580a42ce1"
+    "shas": "6fc6c8edcc929af03c8663dc5e5aa3ee5370202c..e4b0010eb1c1c21136301481d464e9c4b3c114ae"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -352,7 +367,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e63a03ba5fd522be40676c7ab9df3fa580a42ce1..663d1012955d9772510ea5a37c0e4875dca5ae3b"
+    "shas": "e4b0010eb1c1c21136301481d464e9c4b3c114ae..56b8228e835ad78277d22d4148192e2ad4111abd"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
@@ -575,7 +590,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "663d1012955d9772510ea5a37c0e4875dca5ae3b..a87fbe18288708a89f31aea5f2dfbe4469bd6440"
+    "shas": "56b8228e835ad78277d22d4148192e2ad4111abd..ace430b5760091e3c1bb339eb0452bc93a155e10"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
@@ -595,7 +610,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(chan<- int)' function call in the main function"
                 },
                 {
                     "span": {
@@ -610,7 +625,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int, …)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(chan<- int, …)' function call in the main function"
                 },
                 {
                     "span": {
@@ -625,7 +640,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int, 5, 10)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(chan<- int, 5, 10)' function call in the main function"
                 },
                 {
                     "span": {
@@ -640,7 +655,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new(…)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'new(…)' function call in the main function"
                 }
             ]
         },
@@ -666,7 +681,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a87fbe18288708a89f31aea5f2dfbe4469bd6440..234571e05897ca34177bb1df91bb9beee6be2258"
+    "shas": "ace430b5760091e3c1bb339eb0452bc93a155e10..a5327fc1a6f44c26f33075bb2f294b406574c8a3"
 }
 ,{
     "testCaseDescription": "go-constructors-teardown-test",
@@ -681,12 +696,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -708,5 +738,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "234571e05897ca34177bb1df91bb9beee6be2258..92abc0a7c86e4fde9374babdb2efcd398d27f6ac"
+    "shas": "a5327fc1a6f44c26f33075bb2f294b406574c8a3..eca7c6083f4f3169ebc3bf726c3d936818a2d174"
 }]

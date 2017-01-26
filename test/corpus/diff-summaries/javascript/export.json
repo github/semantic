@@ -177,7 +177,7 @@
     ],
     "patch": [
         "diff --git a/export.js b/export.js",
-        "index e69de29..dcd9320 100644",
+        "index e69de29b..dcd9320b 100644",
         "--- a/export.js",
         "+++ b/export.js",
         "@@ -0,0 +1,11 @@",
@@ -194,7 +194,7 @@
         "+export { import1 as name1, import2 as name2, nameN } from 'bar';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0eb14098d9cfc48fe7ffb44e37c71cb6cb58c878..5e2e89a442ac0f099046b72d57acaa03dc011ed9"
+    "shas": "b56108ab09b88f198a0ec68e4f7a87ad1b2c06b6..37689b6855efcf22edc9a397b6116b5141ab642b"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-insert-test",
@@ -540,7 +540,7 @@
     ],
     "patch": [
         "diff --git a/export.js b/export.js",
-        "index dcd9320..c8b53ff 100644",
+        "index dcd9320b..c8b53ff3 100644",
         "--- a/export.js",
         "+++ b/export.js",
         "@@ -1,3 +1,25 @@",
@@ -571,7 +571,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5e2e89a442ac0f099046b72d57acaa03dc011ed9..9e81bf04d8f7a930fb0a612fc5230af600c7c5d2"
+    "shas": "37689b6855efcf22edc9a397b6116b5141ab642b..a587e998ca80b72452fa08e9dc0a82842607673b"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-insert-test",
@@ -1304,7 +1304,7 @@
     ],
     "patch": [
         "diff --git a/export.js b/export.js",
-        "index c8b53ff..ad3f21a 100644",
+        "index c8b53ff3..ad3f21a7 100644",
         "--- a/export.js",
         "+++ b/export.js",
         "@@ -1,14 +1,14 @@",
@@ -1335,7 +1335,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9e81bf04d8f7a930fb0a612fc5230af600c7c5d2..d1bc421a42e531d555179f1135e64e9f19d57095"
+    "shas": "a587e998ca80b72452fa08e9dc0a82842607673b..4032a29478ba2412695dbcc4b7bb948eb09b1f8f"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-test",
@@ -1759,7 +1759,7 @@
     ],
     "patch": [
         "diff --git a/export.js b/export.js",
-        "index ad3f21a..c8b53ff 100644",
+        "index ad3f21a7..c8b53ff3 100644",
         "--- a/export.js",
         "+++ b/export.js",
         "@@ -1,14 +1,14 @@",
@@ -1790,7 +1790,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d1bc421a42e531d555179f1135e64e9f19d57095..61d845cfdc6aaaba0c4fa01fb8ca41f79556ac37"
+    "shas": "4032a29478ba2412695dbcc4b7bb948eb09b1f8f..4cacea87233cddf0243da69dc293f7c8e6c7a574"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-replacement-test",
@@ -2301,7 +2301,7 @@
     ],
     "patch": [
         "diff --git a/export.js b/export.js",
-        "index c8b53ff..281c672 100644",
+        "index c8b53ff3..281c6726 100644",
         "--- a/export.js",
         "+++ b/export.js",
         "@@ -1,25 +1,3 @@",
@@ -2347,7 +2347,7 @@
         "+export { import6 as name6, import7 as name7, nameB } from 'fizz';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "61d845cfdc6aaaba0c4fa01fb8ca41f79556ac37..06bbce70f8962416f84a41ea00019bfb28b73bf9"
+    "shas": "4cacea87233cddf0243da69dc293f7c8e6c7a574..cdd6691ff292adf83a7de1c4cc4994521b56e9c6"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-test",
@@ -2528,7 +2528,7 @@
     ],
     "patch": [
         "diff --git a/export.js b/export.js",
-        "index 281c672..e105ba7 100644",
+        "index 281c6726..e105ba78 100644",
         "--- a/export.js",
         "+++ b/export.js",
         "@@ -1,14 +1,3 @@",
@@ -2548,7 +2548,7 @@
         " export let name3, name4, nameT;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "06bbce70f8962416f84a41ea00019bfb28b73bf9..d1daa5ccf312ddb7b243f8adf15955fac3df1d63"
+    "shas": "cdd6691ff292adf83a7de1c4cc4994521b56e9c6..bc81d61fb61d4658531fb10edde19e87253de887"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-rest-test",
@@ -2729,7 +2729,7 @@
     ],
     "patch": [
         "diff --git a/export.js b/export.js",
-        "index e105ba7..e69de29 100644",
+        "index e105ba78..e69de29b 100644",
         "--- a/export.js",
         "+++ b/export.js",
         "@@ -1,11 +0,0 @@",
@@ -2746,5 +2746,5 @@
         "-export { import6 as name6, import7 as name7, nameB } from 'fizz';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d1daa5ccf312ddb7b243f8adf15955fac3df1d63..925b73e9fde76236d0b037d687edcc925a5cef9a"
+    "shas": "bc81d61fb61d4658531fb10edde19e87253de887..7b8267eabe246347b009d08c9100f36a568a81a6"
 }]

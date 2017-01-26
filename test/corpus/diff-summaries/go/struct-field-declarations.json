@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "965eb67a3019ef8aea91e5f5a3975bd6c27ddbd5..9ee5a9f77efee88839be792650cb42006c9944db"
+    "shas": "65bbc171b8f70b289f47abe480d261056b5ea251..2d2f04046fa3f3d412aa2637b4291e67833048c7"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-insert-test",
@@ -83,7 +98,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ee5a9f77efee88839be792650cb42006c9944db..dc61e6a712517a5a39433d0e53b63273a01d6fbb"
+    "shas": "2d2f04046fa3f3d412aa2637b4291e67833048c7..fff65061ac778ebd7eea2950833f8a0a715ef39f"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-replacement-test",
@@ -110,12 +125,12 @@
                                 ],
                                 "end": [
                                     5,
-                                    11
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g int' field declaration with the 'h, i int' field declaration in the struct {\n  h, i int\n} struct type of the 'main' function"
+                    "summary": "Replaced the 'g int' field declaration with the 'h' identifier in the struct {\n  h, i int\n} struct type of the 'main' function"
                 }
             ]
         },
@@ -139,7 +154,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc61e6a712517a5a39433d0e53b63273a01d6fbb..50cb546cb19607f9c8a093b477ac5d44274dff8d"
+    "shas": "fff65061ac778ebd7eea2950833f8a0a715ef39f..68b3cf1b72905aa30e13bcc35e0c6f644e90898a"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-replacement-test",
@@ -156,7 +171,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    11
+                                    4
                                 ]
                             },
                             {
@@ -171,7 +186,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h, i int' field declaration with the 'g int' field declaration in the struct {\n  g int\n} struct type of the 'main' function"
+                    "summary": "Replaced the 'h' identifier with the 'g int' field declaration in the struct {\n  g int\n} struct type of the 'main' function"
                 }
             ]
         },
@@ -195,7 +210,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "50cb546cb19607f9c8a093b477ac5d44274dff8d..9c7b8ddb39b33db0564ba9e22a6e6802e14ad008"
+    "shas": "68b3cf1b72905aa30e13bcc35e0c6f644e90898a..278c27a97dbee140d6467c09af4c6c835c6eca6e"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-insert-test",
@@ -240,7 +255,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c7b8ddb39b33db0564ba9e22a6e6802e14ad008..38cf3544fbd1e1cfb3b4aa39964fce74939ef046"
+    "shas": "278c27a97dbee140d6467c09af4c6c835c6eca6e..e8d2d6f98417cadd0f0706b362a004e24387f31a"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-teardown-test",
@@ -255,12 +270,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -282,5 +312,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38cf3544fbd1e1cfb3b4aa39964fce74939ef046..d6bf5b852da48acbbdc8d627de9e645d28d7f38d"
+    "shas": "e8d2d6f98417cadd0f0706b362a004e24387f31a..67d576bfc545aeab08b6970a41866b4643831ec5"
 }]

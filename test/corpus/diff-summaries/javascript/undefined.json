@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/undefined.js b/undefined.js",
-        "index e69de29..c2ca02c 100644",
+        "index e69de29b..c2ca02c0 100644",
         "--- a/undefined.js",
         "+++ b/undefined.js",
         "@@ -0,0 +1 @@",
         "+undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9f36bd70533d2f145bb9661791f0ea760bf949d5..5ea4083212daf3e2a900de3b68508a604ade8596"
+    "shas": "2f535d692705ba01866febca83c7f3cb4af53987..9de3a467dad18d25a0078562813cd594d58045ce"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/undefined.js b/undefined.js",
-        "index c2ca02c..a4352cc 100644",
+        "index c2ca02c0..a4352cc6 100644",
         "--- a/undefined.js",
         "+++ b/undefined.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5ea4083212daf3e2a900de3b68508a604ade8596..d6cc7e90bce713f04bcfee5d53e1a112b1bfad0a"
+    "shas": "9de3a467dad18d25a0078562813cd594d58045ce..17b5b8536a51cabab8246dc59dc9201c0003313d"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-insert-test",
@@ -135,7 +135,7 @@
     ],
     "patch": [
         "diff --git a/undefined.js b/undefined.js",
-        "index a4352cc..52ea257 100644",
+        "index a4352cc6..52ea2570 100644",
         "--- a/undefined.js",
         "+++ b/undefined.js",
         "@@ -1,3 +1,3 @@",
@@ -145,7 +145,7 @@
         " undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d6cc7e90bce713f04bcfee5d53e1a112b1bfad0a..718b0c7d530a5e063201c119f59091b97d0e90d3"
+    "shas": "17b5b8536a51cabab8246dc59dc9201c0003313d..10e4daeebb1d2b7786f7a7e5fae43a385069c4f0"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-test",
@@ -191,7 +191,7 @@
     ],
     "patch": [
         "diff --git a/undefined.js b/undefined.js",
-        "index 52ea257..a4352cc 100644",
+        "index 52ea2570..a4352cc6 100644",
         "--- a/undefined.js",
         "+++ b/undefined.js",
         "@@ -1,3 +1,3 @@",
@@ -201,7 +201,7 @@
         " undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "718b0c7d530a5e063201c119f59091b97d0e90d3..829fc4f00b66a91b67b0d0d41023f3d48fb34aa8"
+    "shas": "10e4daeebb1d2b7786f7a7e5fae43a385069c4f0..2fae14567b855fb189bc24a23969bfb106e2c8cd"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-replacement-test",
@@ -262,7 +262,7 @@
     ],
     "patch": [
         "diff --git a/undefined.js b/undefined.js",
-        "index a4352cc..a16e747 100644",
+        "index a4352cc6..a16e7474 100644",
         "--- a/undefined.js",
         "+++ b/undefined.js",
         "@@ -1,3 +1,2 @@",
@@ -272,7 +272,7 @@
         "+return undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "829fc4f00b66a91b67b0d0d41023f3d48fb34aa8..ca6a3d94c002135dcd0d1096f808eadb016c1adf"
+    "shas": "2fae14567b855fb189bc24a23969bfb106e2c8cd..3f9e6ae65c8c8e3767f7b6a3eb497cea9274b8d7"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-test",
@@ -303,7 +303,7 @@
     ],
     "patch": [
         "diff --git a/undefined.js b/undefined.js",
-        "index a16e747..fb505bb 100644",
+        "index a16e7474..fb505bb3 100644",
         "--- a/undefined.js",
         "+++ b/undefined.js",
         "@@ -1,2 +1 @@",
@@ -311,7 +311,7 @@
         " return undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ca6a3d94c002135dcd0d1096f808eadb016c1adf..2952f11c8fb57194cae4acde26f39231327790b0"
+    "shas": "3f9e6ae65c8c8e3767f7b6a3eb497cea9274b8d7..1d4739ce9a7c85726b2aa04a115b6eec5be43bd5"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-rest-test",
@@ -342,12 +342,12 @@
     ],
     "patch": [
         "diff --git a/undefined.js b/undefined.js",
-        "index fb505bb..e69de29 100644",
+        "index fb505bb3..e69de29b 100644",
         "--- a/undefined.js",
         "+++ b/undefined.js",
         "@@ -1 +0,0 @@",
         "-return undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2952f11c8fb57194cae4acde26f39231327790b0..bc804312603351b07d0e242d9b3675d646934512"
+    "shas": "1d4739ce9a7c85726b2aa04a115b6eec5be43bd5..a392bcd691680203eae2c96e73b145e2140a6097"
 }]

@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/import.js b/import.js",
-        "index e69de29..491cb15 100644",
+        "index e69de29b..491cb15d 100644",
         "--- a/import.js",
         "+++ b/import.js",
         "@@ -0,0 +1,8 @@",
@@ -146,7 +146,7 @@
         "+import \"arctic-tern\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "94d7e0ef831c81697b130d8e7c032b876c270e33..bddd7205c75f938fdef876cad00d2a3130c8a056"
+    "shas": "22c469fbc95477137ad10d239a4f6a3c8ecd8aae..2d6475d95b8005bbedde47f63064877d878d1c4f"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -402,7 +402,7 @@
     ],
     "patch": [
         "diff --git a/import.js b/import.js",
-        "index 491cb15..045c536 100644",
+        "index 491cb15d..045c536e 100644",
         "--- a/import.js",
         "+++ b/import.js",
         "@@ -1,3 +1,19 @@",
@@ -427,7 +427,7 @@
         " import { member } from \"ant\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "bddd7205c75f938fdef876cad00d2a3130c8a056..2f4516215b92d79082b1f806ec0ac74a2e18726c"
+    "shas": "2d6475d95b8005bbedde47f63064877d878d1c4f..1f40c3ca7170b24dd16bbb7fb042ce1221c48356"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
@@ -701,7 +701,7 @@
     ],
     "patch": [
         "diff --git a/import.js b/import.js",
-        "index 045c536..cbad5a4 100644",
+        "index 045c536e..cbad5a42 100644",
         "--- a/import.js",
         "+++ b/import.js",
         "@@ -1,11 +1,11 @@",
@@ -726,7 +726,7 @@
         " import { member } from \"ant\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2f4516215b92d79082b1f806ec0ac74a2e18726c..f6b32da510dd536120c67a2e13e3c5f17ca08a62"
+    "shas": "1f40c3ca7170b24dd16bbb7fb042ce1221c48356..06d730698c701308d886cc5ff2c45a30e421c469"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
@@ -1000,7 +1000,7 @@
     ],
     "patch": [
         "diff --git a/import.js b/import.js",
-        "index cbad5a4..045c536 100644",
+        "index cbad5a42..045c536e 100644",
         "--- a/import.js",
         "+++ b/import.js",
         "@@ -1,11 +1,11 @@",
@@ -1025,7 +1025,7 @@
         " import { member } from \"ant\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f6b32da510dd536120c67a2e13e3c5f17ca08a62..9d51ffb2d1950579de47c825eca14557ae9cefc8"
+    "shas": "06d730698c701308d886cc5ff2c45a30e421c469..920c660960691d88401f9399250f54e0453cb453"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -1401,7 +1401,7 @@
     ],
     "patch": [
         "diff --git a/import.js b/import.js",
-        "index 045c536..873ff75 100644",
+        "index 045c536e..873ff752 100644",
         "--- a/import.js",
         "+++ b/import.js",
         "@@ -1,19 +1,3 @@",
@@ -1438,7 +1438,7 @@
         "+import \"basilisk\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9d51ffb2d1950579de47c825eca14557ae9cefc8..d8a44ed18d0fd2d59c8bfff2e97409d01face666"
+    "shas": "920c660960691d88401f9399250f54e0453cb453..627c6339717747333ab4223f2f9a660c1f9c22e7"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -1574,7 +1574,7 @@
     ],
     "patch": [
         "diff --git a/import.js b/import.js",
-        "index 873ff75..db72339 100644",
+        "index 873ff752..db723392 100644",
         "--- a/import.js",
         "+++ b/import.js",
         "@@ -1,11 +1,3 @@",
@@ -1591,7 +1591,7 @@
         " import { element } from \"badger\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d8a44ed18d0fd2d59c8bfff2e97409d01face666..b5659554207c6b66f77467f2277c99b1686f8e02"
+    "shas": "627c6339717747333ab4223f2f9a660c1f9c22e7..7bf1e557d349101c8fe5544145db4836a629b057"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -1727,7 +1727,7 @@
     ],
     "patch": [
         "diff --git a/import.js b/import.js",
-        "index db72339..e69de29 100644",
+        "index db723392..e69de29b 100644",
         "--- a/import.js",
         "+++ b/import.js",
         "@@ -1,8 +0,0 @@",
@@ -1741,5 +1741,5 @@
         "-import \"basilisk\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b5659554207c6b66f77467f2277c99b1686f8e02..0eb14098d9cfc48fe7ffb44e37c71cb6cb58c878"
+    "shas": "7bf1e557d349101c8fe5544145db4836a629b057..b56108ab09b88f198a0ec68e4f7a87ad1b2c06b6"
 }]

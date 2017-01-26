@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e7ced9b59ed0acd00138211528dda1ac5c7c084a..b52397c136bdd9b41868a929f0d416ee1c6abf97"
+    "shas": "57665a31ef098c76a33d7fb8dc14586054888e70..3660aaf9358df40375f73cb4bfb377a1382b7d3e"
 }
 ,{
     "testCaseDescription": "go-struct-types-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's1' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 's1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's2' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 's2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's3' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 's3' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -103,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's4' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 's4' type declaration in the main function"
                 }
             ]
         },
@@ -134,7 +149,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b52397c136bdd9b41868a929f0d416ee1c6abf97..3ec9ffbcf213c0e967d076756419ac146619b5cd"
+    "shas": "3660aaf9358df40375f73cb4bfb377a1382b7d3e..396230fe3c660ac63e571cbce1e3432349fb42c7"
 }
 ,{
     "testCaseDescription": "go-struct-types-replacement-test",
@@ -280,7 +295,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3ec9ffbcf213c0e967d076756419ac146619b5cd..895c808dc6465df7bf6059e4e773bb901b678834"
+    "shas": "396230fe3c660ac63e571cbce1e3432349fb42c7..44f4a72ca5904799754ac659baa3fd1191c5ae35"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-replacement-test",
@@ -426,7 +441,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "895c808dc6465df7bf6059e4e773bb901b678834..8794ab0649ceafe5f2b499a7313b43a94ece3a30"
+    "shas": "44f4a72ca5904799754ac659baa3fd1191c5ae35..3e3f6aef1912a00d1f54c15a2c9603db93e32783"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-insert-test",
@@ -446,7 +461,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's1' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 's1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -461,7 +476,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's2' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 's2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -476,7 +491,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's3' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 's3' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -491,7 +506,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's4' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 's4' type declaration in the main function"
                 }
             ]
         },
@@ -522,7 +537,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8794ab0649ceafe5f2b499a7313b43a94ece3a30..604abe90628f68bfb8810ae9d7e6ea0d76547972"
+    "shas": "3e3f6aef1912a00d1f54c15a2c9603db93e32783..a77aaacc58bfdd55c6797f8f3d1fff0b15a8f1d5"
 }
 ,{
     "testCaseDescription": "go-struct-types-teardown-test",
@@ -537,12 +552,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -564,5 +594,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "604abe90628f68bfb8810ae9d7e6ea0d76547972..80f368e3e339a6f6cd13071fff11a504b589ebaa"
+    "shas": "a77aaacc58bfdd55c6797f8f3d1fff0b15a8f1d5..d27aeb5e58d624d463c84b7a506673945bee82fd"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d294ce5018da872a8921d3401c507217daf06328..c54949d55a43937b2ac33296ac3b5cecb50d6382"
+    "shas": "840ffcc3fb49c5769944cce7b4fc8f444c2b1aed..30e5ee71dd288a98026159bc4762ba813caf1e5a"
 }
 ,{
     "testCaseDescription": "go-case-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added a switch statement in the main function of the 'main' module"
+                    "summary": "Added a switch statement in the main function"
                 }
             ]
         },
@@ -81,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c54949d55a43937b2ac33296ac3b5cecb50d6382..c215ea9b6a3b10e2eaa8ae424350795e9f093004"
+    "shas": "30e5ee71dd288a98026159bc4762ba813caf1e5a..a7af99836429ee5953956b39612d30c98099952d"
 }
 ,{
     "testCaseDescription": "go-case-statements-replacement-test",
@@ -93,15 +108,15 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                10
                             ],
                             "end": [
                                 4,
-                                26
+                                24
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement in a switch statement of the 'main' function"
+                    "summary": "Added the 'case foo' case statement in a switch statement of the 'main' function"
                 }
             ]
         },
@@ -124,7 +139,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c215ea9b6a3b10e2eaa8ae424350795e9f093004..7d12abcf1f4702639d6e7363776cfdf6598491b7"
+    "shas": "a7af99836429ee5953956b39612d30c98099952d..ce974189409e1cc2547615421f390b953e234699"
 }
 ,{
     "testCaseDescription": "go-case-statements-delete-replacement-test",
@@ -136,15 +151,15 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                10
                             ],
                             "end": [
                                 4,
-                                26
+                                24
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement in a switch statement of the 'main' function"
+                    "summary": "Deleted the 'case foo' case statement in a switch statement of the 'main' function"
                 }
             ]
         },
@@ -167,7 +182,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d12abcf1f4702639d6e7363776cfdf6598491b7..e7a7b4af3503fe63d5a954f7b5576a09d2185778"
+    "shas": "ce974189409e1cc2547615421f390b953e234699..84d84920f7bcdff865c2a05d49e6d3d98e633866"
 }
 ,{
     "testCaseDescription": "go-case-statements-delete-insert-test",
@@ -187,7 +202,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted a switch statement in the main function of the 'main' module"
+                    "summary": "Deleted a switch statement in the main function"
                 }
             ]
         },
@@ -210,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e7a7b4af3503fe63d5a954f7b5576a09d2185778..4fc08573a3964379df9d9213e239adc5b9048eb5"
+    "shas": "84d84920f7bcdff865c2a05d49e6d3d98e633866..c455ac8dfc52ad0fcd50455429971b6e5814a066"
 }
 ,{
     "testCaseDescription": "go-case-statements-teardown-test",
@@ -225,12 +240,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -252,5 +282,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4fc08573a3964379df9d9213e239adc5b9048eb5..965eb67a3019ef8aea91e5f5a3975bd6c27ddbd5"
+    "shas": "c455ac8dfc52ad0fcd50455429971b6e5814a066..65bbc171b8f70b289f47abe480d261056b5ea251"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "adb2401da7e74b66c885cf959788358c7ba5c3ee..59dcf1fcc48c84b1a9938e79d788af6b13a328a8"
+    "shas": "bb4ba3185a52b92f422411ad6cae97a82e2b2657..16dda00e283e0850677a63b7e489cf83d5c5a5b6"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i++' increment statement in the main function of the 'main' module"
+                    "summary": "Added the 'i++' increment statement in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'j--' decrement statement in the main function of the 'main' module"
+                    "summary": "Added the 'j--' decrement statement in the main function"
                 }
             ]
         },
@@ -97,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "59dcf1fcc48c84b1a9938e79d788af6b13a328a8..b2a71db8b841f85ec6d62c4ee5cb758a502bfcb3"
+    "shas": "16dda00e283e0850677a63b7e489cf83d5c5a5b6..741d8660e0bf62db6265e192fd6b90e50b9eef4f"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-replacement-test",
@@ -129,7 +144,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i++' increment statement with the 'foo++' increment statement in the main function of the 'main' module"
+                    "summary": "Replaced the 'i++' increment statement with the 'foo++' increment statement in the main function"
                 },
                 {
                     "span": {
@@ -144,7 +159,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x++' increment statement in the main function of the 'main' module"
+                    "summary": "Added the 'x++' increment statement in the main function"
                 },
                 {
                     "span": {
@@ -159,7 +174,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'j--' decrement statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'j--' decrement statement in the main function"
                 }
             ]
         },
@@ -184,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b2a71db8b841f85ec6d62c4ee5cb758a502bfcb3..6b16aefff065ed5a41e6891dd94ad040e85f312b"
+    "shas": "741d8660e0bf62db6265e192fd6b90e50b9eef4f..a0c075e89018b1d3e99ed50b0462c9c6fe12e267"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-replacement-test",
@@ -216,7 +231,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo++' increment statement with the 'i++' increment statement in the main function of the 'main' module"
+                    "summary": "Replaced the 'foo++' increment statement with the 'i++' increment statement in the main function"
                 },
                 {
                     "span": {
@@ -231,7 +246,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'j--' decrement statement in the main function of the 'main' module"
+                    "summary": "Added the 'j--' decrement statement in the main function"
                 },
                 {
                     "span": {
@@ -246,7 +261,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x++' increment statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'x++' increment statement in the main function"
                 }
             ]
         },
@@ -271,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6b16aefff065ed5a41e6891dd94ad040e85f312b..cceed70a20fed7d8cd1d84eb6800ca37ea02bc01"
+    "shas": "a0c075e89018b1d3e99ed50b0462c9c6fe12e267..251078b70b5dafb8b9a682ec094530dfb8c39572"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
@@ -291,7 +306,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i++' increment statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'i++' increment statement in the main function"
                 },
                 {
                     "span": {
@@ -306,7 +321,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'j--' decrement statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'j--' decrement statement in the main function"
                 }
             ]
         },
@@ -330,7 +345,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cceed70a20fed7d8cd1d84eb6800ca37ea02bc01..f82a411f0daeb75a2800293d5651522df8f1bbd6"
+    "shas": "251078b70b5dafb8b9a682ec094530dfb8c39572..759e0718fcbd72afbcc54da11715a66d338f9696"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-teardown-test",
@@ -345,12 +360,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -372,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f82a411f0daeb75a2800293d5651522df8f1bbd6..9b6482e7bca1a74c6ecdc400cf0ed146ebb6a29a"
+    "shas": "759e0718fcbd72afbcc54da11715a66d338f9696..e86ae4b80ecf2b01260ea4afc56327253ab59646"
 }]

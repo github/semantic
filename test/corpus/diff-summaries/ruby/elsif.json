@@ -36,7 +36,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c121edce8d75129944087d6c723ebd4b3b34f658..a5047ae38624d3b39b10226f45423f58a5421ed8"
+    "shas": "344aedc27d9ad2c6c85480611c65dd5f2064182a..13a4de5cf3b88bd49a772dc3e407cb9197bdc7c7"
 }
 ,{
     "testCaseDescription": "ruby-elsif-insert-test",
@@ -77,7 +77,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a5047ae38624d3b39b10226f45423f58a5421ed8..c99e2d50d89f60222355fc2904878dd670dc8570"
+    "shas": "13a4de5cf3b88bd49a772dc3e407cb9197bdc7c7..625d646514ff742c57df563a5a870ac890721f6f"
 }
 ,{
     "testCaseDescription": "ruby-elsif-replacement-test",
@@ -119,7 +119,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c99e2d50d89f60222355fc2904878dd670dc8570..e810202d3b43983fdb819bc5f1d0ac066c410385"
+    "shas": "625d646514ff742c57df563a5a870ac890721f6f..18104348f88798bc2a2268ac35436b23b8d7e7b0"
 }
 ,{
     "testCaseDescription": "ruby-elsif-delete-replacement-test",
@@ -161,7 +161,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e810202d3b43983fdb819bc5f1d0ac066c410385..81e19a920356775dad5ded10adb1d55f34500ae8"
+    "shas": "18104348f88798bc2a2268ac35436b23b8d7e7b0..c40ca04b72564f16777de075acf977a0167561d9"
 }
 ,{
     "testCaseDescription": "ruby-elsif-delete-insert-test",
@@ -202,7 +202,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "81e19a920356775dad5ded10adb1d55f34500ae8..5dc564a05b96ac7545ffac4596a20ec4531aae91"
+    "shas": "c40ca04b72564f16777de075acf977a0167561d9..62847ae0f08b9683adf1eb6d1f4bafa544e14a40"
 }
 ,{
     "testCaseDescription": "ruby-elsif-teardown-test",
@@ -242,5 +242,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5dc564a05b96ac7545ffac4596a20ec4531aae91..9e37beebab6d54d13e727fa92c3950fbe8b6bc37"
+    "shas": "62847ae0f08b9683adf1eb6d1f4bafa544e14a40..52a995458e208bd0e1b31154f64e58ebb3048054"
 }]

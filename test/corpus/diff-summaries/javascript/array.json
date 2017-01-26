@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/array.js b/array.js",
-        "index e69de29..3335582 100644",
+        "index e69de29b..33355825 100644",
         "--- a/array.js",
         "+++ b/array.js",
         "@@ -0,0 +1 @@",
         "+[ \"item1\" ];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "654a538b26c9b4c8637e6c2e4cd497c93e690310..cbf013688399920af101ea056e9fba5ecba0601d"
+    "shas": "89b3d4cd2ef38999c223c69de3011646b1f43c24..82c5ec73355d6296c1bc8e6fbcd9606635930f42"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/array.js b/array.js",
-        "index 3335582..cf37d7c 100644",
+        "index 33355825..cf37d7c1 100644",
         "--- a/array.js",
         "+++ b/array.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " [ \"item1\" ];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cbf013688399920af101ea056e9fba5ecba0601d..87e3b9ed3c5f26c596ad2b5da90359174c84f53c"
+    "shas": "82c5ec73355d6296c1bc8e6fbcd9606635930f42..2c0dab888be8bb07c850408ff7f3c918c9b2f679"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-insert-test",
@@ -120,7 +120,7 @@
     ],
     "patch": [
         "diff --git a/array.js b/array.js",
-        "index cf37d7c..c2cb17f 100644",
+        "index cf37d7c1..c2cb17fa 100644",
         "--- a/array.js",
         "+++ b/array.js",
         "@@ -1,3 +1,3 @@",
@@ -130,7 +130,7 @@
         " [ \"item1\" ];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "87e3b9ed3c5f26c596ad2b5da90359174c84f53c..ea49177e8ff82b772f7347682975cb1fa5e7b012"
+    "shas": "2c0dab888be8bb07c850408ff7f3c918c9b2f679..2836ffcd06212158191d83c6d23a76b86cd06aa6"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-test",
@@ -161,7 +161,7 @@
     ],
     "patch": [
         "diff --git a/array.js b/array.js",
-        "index c2cb17f..cf37d7c 100644",
+        "index c2cb17fa..cf37d7c1 100644",
         "--- a/array.js",
         "+++ b/array.js",
         "@@ -1,3 +1,3 @@",
@@ -171,7 +171,7 @@
         " [ \"item1\" ];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ea49177e8ff82b772f7347682975cb1fa5e7b012..1e28fd793a6ab61ed59b28d8ee56b55be7ad79ec"
+    "shas": "2836ffcd06212158191d83c6d23a76b86cd06aa6..6c43843105004658edd13b116c23d3feffc3efb7"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-replacement-test",
@@ -232,7 +232,7 @@
     ],
     "patch": [
         "diff --git a/array.js b/array.js",
-        "index cf37d7c..a4d92b8 100644",
+        "index cf37d7c1..a4d92b81 100644",
         "--- a/array.js",
         "+++ b/array.js",
         "@@ -1,3 +1,2 @@",
@@ -242,7 +242,7 @@
         "+[ \"item1\", \"item2\" ];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1e28fd793a6ab61ed59b28d8ee56b55be7ad79ec..fdc62b5a013932e082ba61a576b8fb54cd1d0791"
+    "shas": "6c43843105004658edd13b116c23d3feffc3efb7..379a870647ba9da2b5faf25da3bd60c6d3983e47"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-test",
@@ -273,7 +273,7 @@
     ],
     "patch": [
         "diff --git a/array.js b/array.js",
-        "index a4d92b8..7f2f50e 100644",
+        "index a4d92b81..7f2f50e6 100644",
         "--- a/array.js",
         "+++ b/array.js",
         "@@ -1,2 +1 @@",
@@ -281,7 +281,7 @@
         " [ \"item1\", \"item2\" ];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "fdc62b5a013932e082ba61a576b8fb54cd1d0791..9e91959fe3d3ec022474f242a8456b900fdfd8d2"
+    "shas": "379a870647ba9da2b5faf25da3bd60c6d3983e47..ca784abe43a28e84e087f70495667e2d0cc5ed77"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-rest-test",
@@ -312,12 +312,12 @@
     ],
     "patch": [
         "diff --git a/array.js b/array.js",
-        "index 7f2f50e..e69de29 100644",
+        "index 7f2f50e6..e69de29b 100644",
         "--- a/array.js",
         "+++ b/array.js",
         "@@ -1 +0,0 @@",
         "-[ \"item1\", \"item2\" ];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9e91959fe3d3ec022474f242a8456b900fdfd8d2..0bdf412036a9a6aea51108a20404c37541fffcfb"
+    "shas": "ca784abe43a28e84e087f70495667e2d0cc5ed77..6a98861e426cf72452392e143d875b8ccd968a2c"
 }]

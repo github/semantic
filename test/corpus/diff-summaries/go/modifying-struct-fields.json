@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ab3e3926dc779249680c1d053599892d614e1cbf..7ece7fde5d7183a337db7501da3cfd85b9cf1ff2"
+    "shas": "f5a9b8a54a3841db93e420bf8eff96b4d2d6858a..94d93d2117a8e57a238a502919ff833d7cf671b9"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -53,12 +68,27 @@
                                 1
                             ],
                             "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'ctx' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
                                 6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'ctx' var assignment in the main function of the 'main' module"
+                    "summary": "Added the '&uploadContext{\n   Remote: remote\n}' operator in the main function"
                 }
             ]
         },
@@ -83,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7ece7fde5d7183a337db7501da3cfd85b9cf1ff2..fe6d2e1a264c84287b55eaf223fd9c43c0de0b6a"
+    "shas": "94d93d2117a8e57a238a502919ff833d7cf671b9..a9aa97bd6ac93d93d8e62ca2a59b9ec861b684df"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -115,7 +145,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Remote: remote' pair with the 'trackedLocksMu: new(sync.Mutex)' pair in the ctx var assignment of the 'main' function"
+                    "summary": "Replaced the 'Remote: remote' pair with the 'trackedLocksMu: new(sync.Mutex)' pair in the main function"
                 }
             ]
         },
@@ -139,7 +169,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fe6d2e1a264c84287b55eaf223fd9c43c0de0b6a..9d128deb722f6b1cc8daec493627470571d6aa22"
+    "shas": "a9aa97bd6ac93d93d8e62ca2a59b9ec861b684df..d0a359246dac8c80adcb1b4e7bac351462363d18"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -171,7 +201,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'trackedLocksMu: new(sync.Mutex)' pair with the 'Remote: remote' pair in the ctx var assignment of the 'main' function"
+                    "summary": "Replaced the 'trackedLocksMu: new(sync.Mutex)' pair with the 'Remote: remote' pair in the main function"
                 }
             ]
         },
@@ -195,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9d128deb722f6b1cc8daec493627470571d6aa22..aae84499c2f50275110bf5576621b7d40d40f5fc"
+    "shas": "d0a359246dac8c80adcb1b4e7bac351462363d18..261a10edc770e3f40cd33d61dc0d61d0510527a5"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -210,12 +240,27 @@
                                 1
                             ],
                             "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'ctx' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
                                 6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'ctx' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the '&uploadContext{\n   Remote: remote\n}' operator in the main function"
                 }
             ]
         },
@@ -240,7 +285,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aae84499c2f50275110bf5576621b7d40d40f5fc..785536c2045d588c9ac110cb6b5f084eba52ce59"
+    "shas": "261a10edc770e3f40cd33d61dc0d61d0510527a5..729241bd7988d5e569c4a3384c678328236ba019"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -255,12 +300,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -282,5 +342,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "785536c2045d588c9ac110cb6b5f084eba52ce59..13e9de620f0e981a263aa8306692c8e3b7bae8a9"
+    "shas": "729241bd7988d5e569c4a3384c678328236ba019..b704517caf7ad227154e0582b74255cd4065e091"
 }]

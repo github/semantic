@@ -1,5 +1,8 @@
 {-# LANGUAGE DataKinds #-}
-module TreeSitter (treeSitterParser) where
+module TreeSitter
+( treeSitterParser
+, defaultTermAssignment
+) where
 
 import Prologue hiding (Constructor)
 import Category
@@ -15,6 +18,8 @@ import Source
 import qualified Syntax
 import Foreign
 import Foreign.C.String
+import qualified Syntax as S
+import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 import SourceSpan
@@ -56,23 +61,73 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- Without it, we may not evaluate the value until after we’ve exited
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
-          range `seq` sourceSpan `seq` termConstructor source sourceSpan (categoryForLanguageProductionName language (toS name)) range children allChildren
+          range `seq` sourceSpan `seq` assignTerm language (slice range source) (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
         getUnnamedChild node n out = ts_node_p_child node n out >> toTerm out
         {-# INLINE getUnnamedChild #-}
-        termConstructor = case language of
-          JavaScript -> JS.termConstructor
-          C -> C.termConstructor
-          Language.Go -> Go.termConstructor
-          Ruby -> Ruby.termConstructor
-          _ -> Language.termConstructor
         isNonEmpty child = category (extract child) /= Empty
 
+assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
+assignTerm language source annotation children allChildren =
+  cofree . (annotation :<) <$> case assignTermByLanguage language source (category annotation) children of
+    Just a -> pure a
+    _ -> defaultTermAssignment source (category annotation) children allChildren
+  where assignTermByLanguage :: Language -> Source Char -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
+        assignTermByLanguage = \case
+          JavaScript -> JS.termAssignment
+          C -> C.termAssignment
+          Language.Go -> Go.termAssignment
+          Ruby -> Ruby.termAssignment
+          _ -> \ _ _ _ -> Nothing
+
+defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
+defaultTermAssignment source category children allChildren
+  | category `elem` operatorCategories = S.Operator <$> allChildren
+  | otherwise = pure $! case (category, children) of
+    (ParseError, children) -> S.ParseError children
+
+    (Comment, _) -> S.Comment (toText source)
+
+    (Pair, [key, value]) -> S.Pair key value
+
+    -- Control flow statements
+    (If, condition : body) -> S.If condition body
+    (Switch, _) -> uncurry S.Switch (Prologue.break ((== Case) . Info.category . extract) children)
+    (Case, expr : body) -> S.Case expr body
+    (While, expr : rest) -> S.While expr rest
+
+    -- Statements
+    (Return, _) -> S.Return children
+    (Yield, _) -> S.Yield children
+    (Throw, [expr]) -> S.Throw expr
+    (Break, [label]) -> S.Break (Just label)
+    (Break, []) -> S.Break Nothing
+    (Continue, [label]) -> S.Continue (Just label)
+    (Continue, []) -> S.Continue Nothing
+
+    (_, []) -> S.Leaf (toText source)
+    (_, children) -> S.Indexed children
+  where operatorCategories =
+          [ Operator
+          , Binary
+          , Unary
+          , RangeExpression
+          , ScopeOperator
+          , BooleanOperator
+          , MathOperator
+          , RelationalOperator
+          , BitwiseOperator
+          ]
+
+
 categoryForLanguageProductionName :: Language -> Text -> Category
-categoryForLanguageProductionName = \case
+categoryForLanguageProductionName = withDefaults . \case
   JavaScript -> JS.categoryForJavaScriptProductionName
   C -> C.categoryForCProductionName
   Ruby -> Ruby.categoryForRubyName
   Language.Go -> Go.categoryForGoName
   _ -> Other
+  where withDefaults productionMap = \case
+          "ERROR" -> ParseError
+          s -> productionMap s

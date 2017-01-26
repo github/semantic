@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d2b5df75d8f6fa05372019f64a86177f47d3e2f6..9731904c92acb4d04b65d34e08b9d71071dcdc9a"
+    "shas": "4d24e891d2eff92e45db37ab2270eef8294e9145..116be4b3120f1f63486563e681291568543040a1"
 }
 ,{
     "testCaseDescription": "go-pointer-types-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'p1' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'p1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'p2' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'p2' type declaration in the main function"
                 }
             ]
         },
@@ -99,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9731904c92acb4d04b65d34e08b9d71071dcdc9a..ed7d7ffc0969e8a9322c568c4b5691192fa53e29"
+    "shas": "116be4b3120f1f63486563e681291568543040a1..1d02b1285be95d48289fc2211acb0fa125211c7f"
 }
 ,{
     "testCaseDescription": "go-pointer-types-replacement-test",
@@ -184,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ed7d7ffc0969e8a9322c568c4b5691192fa53e29..9c67261772de0af3f1d3a1daf03e9f2366d893c9"
+    "shas": "1d02b1285be95d48289fc2211acb0fa125211c7f..770917a4a293b42b5174083c47c9ff1fe396d74a"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-replacement-test",
@@ -269,7 +284,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c67261772de0af3f1d3a1daf03e9f2366d893c9..144a9aa0c6060fe481a5fd96f5bcdecfa3e3a4f1"
+    "shas": "770917a4a293b42b5174083c47c9ff1fe396d74a..44240e8fb91d10af8d97d7680ae5e314f1b9488b"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-insert-test",
@@ -289,7 +304,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p1' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'p1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -304,7 +319,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p2' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'p2' type declaration in the main function"
                 }
             ]
         },
@@ -330,7 +345,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "144a9aa0c6060fe481a5fd96f5bcdecfa3e3a4f1..4070351f018be548cadfc29137148e78bcab00d9"
+    "shas": "44240e8fb91d10af8d97d7680ae5e314f1b9488b..5d1dc64c31a4ecafee88706bb1cdda5eb1656f76"
 }
 ,{
     "testCaseDescription": "go-pointer-types-teardown-test",
@@ -345,12 +360,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -372,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4070351f018be548cadfc29137148e78bcab00d9..ffe628ad363e676d5234caa95a87cf6b7f3626f8"
+    "shas": "5d1dc64c31a4ecafee88706bb1cdda5eb1656f76..8ae798e3c9773e3d5b6af35228d06445dd50426f"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d7c7c21bb12a3b1d9bc3d7ac212a3bdada677d71..a5335e2199db7d1bb83520b275684bccb917d0ec"
+    "shas": "9c509bdfabb537255c810cd09cf45b53bf65628f..6241b8182026cf5a9a5ebb20894a2066ad61d7fa"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'zero' var assignment in the main function"
                 }
             ]
         },
@@ -81,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5335e2199db7d1bb83520b275684bccb917d0ec..433d75dc1cf7583ffafeaddfe1742fe6c5024680"
+    "shas": "6241b8182026cf5a9a5ebb20894a2066ad61d7fa..4381dbdfbfc360ed15534ae1563ca7f307ba6fa3"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-replacement-test",
@@ -113,7 +128,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one var assignment of the 'main' function"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one, two var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' identifier in the one, two var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -140,14 +170,14 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the one var assignment of the 'main' function"
+                    "summary": "Replaced '0' with '1' in the one, two var assignment of the 'main' function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                5
+                                19
                             ],
                             "end": [
                                 4,
@@ -155,7 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' var assignment in the main function of the 'main' module"
+                    "summary": "Added '2' in the one, two var assignment of the 'main' function"
                 }
             ]
         },
@@ -178,7 +208,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "433d75dc1cf7583ffafeaddfe1742fe6c5024680..ff82d77c3bc0e5e12d28e5f0f9c19ff110e613f9"
+    "shas": "4381dbdfbfc360ed15534ae1563ca7f307ba6fa3..9e0bc36d4a23fcf88bbe39573c3060fb6c63a244"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-replacement-test",
@@ -214,6 +244,21 @@
                 },
                 {
                     "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' identifier in the zero var assignment of the 'main' function"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -244,7 +289,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                5
+                                19
                             ],
                             "end": [
                                 4,
@@ -252,7 +297,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted '2' in the zero var assignment of the 'main' function"
                 }
             ]
         },
@@ -275,7 +320,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ff82d77c3bc0e5e12d28e5f0f9c19ff110e613f9..8eea9984326d8bd0bda50b717d44cab9f6ff80cc"
+    "shas": "9e0bc36d4a23fcf88bbe39573c3060fb6c63a244..4d38dbeeb84c79bab4cd292803c2a9d6a8d2174a"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-insert-test",
@@ -295,7 +340,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'zero' var assignment in the main function"
                 }
             ]
         },
@@ -318,7 +363,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8eea9984326d8bd0bda50b717d44cab9f6ff80cc..87768b01d903d82a18843fe351755f1eaae28448"
+    "shas": "4d38dbeeb84c79bab4cd292803c2a9d6a8d2174a..b53811b73269e4466e33c70b3ce6619faee5a414"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-teardown-test",
@@ -333,12 +378,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -360,5 +420,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "87768b01d903d82a18843fe351755f1eaae28448..166ab1d1dfa2b18943f9d328cc47a34b4e4288fa"
+    "shas": "b53811b73269e4466e33c70b3ce6619faee5a414..e314d296ac8ddd2fee51a4cf45b812637d285244"
 }]

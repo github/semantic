@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "802da3fcac3bb5bd8d87025c78e2dd27694ea5c4..ec2a7031fea2ff0233a9e1c9fe24a97d924abfea"
+    "shas": "bda742d270e92cc83a8a8f229714661cfae58fee..8fae5b68a9e2dc9d3f96f39c86521f932addd607"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'zero' var assignment in the main function"
                 }
             ]
         },
@@ -81,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ec2a7031fea2ff0233a9e1c9fe24a97d924abfea..4214dd04363c5d7668acb7f4468a4cdb8da3a931"
+    "shas": "8fae5b68a9e2dc9d3f96f39c86521f932addd607..136dc284d185b35d4482cd64e0c82e1ae86df6d5"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-replacement-test",
@@ -113,7 +128,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one var assignment of the 'main' function"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one, two var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' identifier in the one, two var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -140,14 +170,14 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the one var assignment of the 'main' function"
+                    "summary": "Replaced '0' with '1' in the one, two var assignment of the 'main' function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                7
+                                21
                             ],
                             "end": [
                                 4,
@@ -155,7 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' var assignment in the main function of the 'main' module"
+                    "summary": "Added '2' in the one, two var assignment of the 'main' function"
                 }
             ]
         },
@@ -178,7 +208,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4214dd04363c5d7668acb7f4468a4cdb8da3a931..4ea74b4fbd9a5a19f10019dcd75e772aad148469"
+    "shas": "136dc284d185b35d4482cd64e0c82e1ae86df6d5..a5bc508cdc3816266f5896654a06d90c8372a929"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-replacement-test",
@@ -214,6 +244,21 @@
                 },
                 {
                     "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' identifier in the zero var assignment of the 'main' function"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -244,7 +289,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                7
+                                21
                             ],
                             "end": [
                                 4,
@@ -252,7 +297,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted '2' in the zero var assignment of the 'main' function"
                 }
             ]
         },
@@ -275,7 +320,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4ea74b4fbd9a5a19f10019dcd75e772aad148469..ad9ba646f6304dddedc688f25eb07527ada8874a"
+    "shas": "a5bc508cdc3816266f5896654a06d90c8372a929..eeec9538fdf788ff7220f7c45e18723c8f8c6213"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-insert-test",
@@ -295,7 +340,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'zero' var assignment in the main function"
                 }
             ]
         },
@@ -318,7 +363,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad9ba646f6304dddedc688f25eb07527ada8874a..cc7080fad53918620542bcf3106f75416db8009c"
+    "shas": "eeec9538fdf788ff7220f7c45e18723c8f8c6213..cb36960674fd5af8ce3bb29a4050ad30c517af4a"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-teardown-test",
@@ -333,12 +378,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -360,5 +420,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cc7080fad53918620542bcf3106f75416db8009c..49e6e021a47203dec0d5eef92e0afd35f24628a1"
+    "shas": "cb36960674fd5af8ce3bb29a4050ad30c517af4a..4a6aceb384ae2a8fd0779a62812d50a760f55bda"
 }]

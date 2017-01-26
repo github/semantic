@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/null.js b/null.js",
-        "index e69de29..ff464d1 100644",
+        "index e69de29b..ff464d15 100644",
         "--- a/null.js",
         "+++ b/null.js",
         "@@ -0,0 +1 @@",
         "+null;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "655d7887b70794042aa3e0f4d6ea174c1b32af1c..f25bb82f823a669a0b6a9c19160ba03ab21d318b"
+    "shas": "da816fd1d09e1ffe56fc188b498a7f2312d7d0f2..e7d88f955c1b6a0f33229a754bc110dd810fc8ad"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/null.js b/null.js",
-        "index ff464d1..2d3c3e0 100644",
+        "index ff464d15..2d3c3e03 100644",
         "--- a/null.js",
         "+++ b/null.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " null;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f25bb82f823a669a0b6a9c19160ba03ab21d318b..4669bb697216411b02390ac038c699f1db9d76ee"
+    "shas": "e7d88f955c1b6a0f33229a754bc110dd810fc8ad..c7f7e60754dec8e129b67699cd44585db218eece"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-insert-test",
@@ -135,7 +135,7 @@
     ],
     "patch": [
         "diff --git a/null.js b/null.js",
-        "index 2d3c3e0..3122897 100644",
+        "index 2d3c3e03..3122897c 100644",
         "--- a/null.js",
         "+++ b/null.js",
         "@@ -1,3 +1,3 @@",
@@ -145,7 +145,7 @@
         " null;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4669bb697216411b02390ac038c699f1db9d76ee..ff3a8cc7449b04b7a15a6ab31ea1f5e78283db3e"
+    "shas": "c7f7e60754dec8e129b67699cd44585db218eece..7a6700d2dd991b93c9f3f0c50edc6e3938217310"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-test",
@@ -191,7 +191,7 @@
     ],
     "patch": [
         "diff --git a/null.js b/null.js",
-        "index 3122897..2d3c3e0 100644",
+        "index 3122897c..2d3c3e03 100644",
         "--- a/null.js",
         "+++ b/null.js",
         "@@ -1,3 +1,3 @@",
@@ -201,7 +201,7 @@
         " null;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ff3a8cc7449b04b7a15a6ab31ea1f5e78283db3e..0e96cfb0a6c4746ef4911d99134eebcac36edbd8"
+    "shas": "7a6700d2dd991b93c9f3f0c50edc6e3938217310..dd8895a31f17991ca681b4335900962830f53bbc"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-replacement-test",
@@ -262,7 +262,7 @@
     ],
     "patch": [
         "diff --git a/null.js b/null.js",
-        "index 2d3c3e0..0eb99c8 100644",
+        "index 2d3c3e03..0eb99c86 100644",
         "--- a/null.js",
         "+++ b/null.js",
         "@@ -1,3 +1,2 @@",
@@ -272,7 +272,7 @@
         "+return null;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0e96cfb0a6c4746ef4911d99134eebcac36edbd8..88958970d3cca5d0413e83a7ff37f1092d0d9299"
+    "shas": "dd8895a31f17991ca681b4335900962830f53bbc..699d55578394b6001c5993580ab915f359c8857e"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-test",
@@ -303,7 +303,7 @@
     ],
     "patch": [
         "diff --git a/null.js b/null.js",
-        "index 0eb99c8..76137ff 100644",
+        "index 0eb99c86..76137ff0 100644",
         "--- a/null.js",
         "+++ b/null.js",
         "@@ -1,2 +1 @@",
@@ -311,7 +311,7 @@
         " return null;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "88958970d3cca5d0413e83a7ff37f1092d0d9299..b5db27b021a3c11c985a28653aca15041f140fec"
+    "shas": "699d55578394b6001c5993580ab915f359c8857e..5630d055d7d52c192e8506561f1e126ce014c6eb"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-rest-test",
@@ -342,12 +342,12 @@
     ],
     "patch": [
         "diff --git a/null.js b/null.js",
-        "index 76137ff..e69de29 100644",
+        "index 76137ff0..e69de29b 100644",
         "--- a/null.js",
         "+++ b/null.js",
         "@@ -1 +0,0 @@",
         "-return null;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b5db27b021a3c11c985a28653aca15041f140fec..9f36bd70533d2f145bb9661791f0ea760bf949d5"
+    "shas": "5630d055d7d52c192e8506561f1e126ce014c6eb..2f535d692705ba01866febca83c7f3cb4af53987"
 }]

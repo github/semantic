@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2e4178577ebab07e2229a6846523de7a1a01d863..4236b968718153403eb7474c665ec2564c45d4af"
+    "shas": "a8adfaba3e02d1f9416a61ff929abbed0bc123d4..ae946e153675d03124e44ed3b708c539b9a137d7"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'Equals(…, …)' method in the main module"
+                    "summary": "Added the 'Equals(…, …)' method"
                 }
             ]
         },
@@ -80,7 +95,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4236b968718153403eb7474c665ec2564c45d4af..1be9a817b553812d204fbf84bdcdceeb09eda9aa"
+    "shas": "ae946e153675d03124e44ed3b708c539b9a137d7..f425e8a6f57e66d892e1f41ef0dbb8eead4b2df0"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -112,7 +127,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the 'Equals(…, …)' method of the 'main' module"
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the 'Equals(…, …)' method"
                 },
                 {
                     "span": {
@@ -139,7 +154,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the 'Equals(…, …)' method of the 'main' module"
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the 'Equals(…, …)' method"
                 }
             ]
         },
@@ -161,7 +176,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1be9a817b553812d204fbf84bdcdceeb09eda9aa..09e86485c7afef0d482a0f495713487f6af20df9"
+    "shas": "f425e8a6f57e66d892e1f41ef0dbb8eead4b2df0..8a314273a9e0b9e328c88a98232a005930d054e9"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -193,7 +208,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the 'Equals(…, …)' method of the 'main' module"
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the 'Equals(…, …)' method"
                 },
                 {
                     "span": {
@@ -220,7 +235,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the 'Equals(…, …)' method of the 'main' module"
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the 'Equals(…, …)' method"
                 }
             ]
         },
@@ -242,7 +257,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "09e86485c7afef0d482a0f495713487f6af20df9..4c2bf0fb4d489fa2924346c61f289cc66a591413"
+    "shas": "8a314273a9e0b9e328c88a98232a005930d054e9..65cf1134e9a92c0d5a1b4d6a160fcaf411f99806"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -262,7 +277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Equals(…, …)' method in the main module"
+                    "summary": "Deleted the 'Equals(…, …)' method"
                 }
             ]
         },
@@ -284,7 +299,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4c2bf0fb4d489fa2924346c61f289cc66a591413..7e9cc3775968f27c92b41ed9f4c8494fbcd30edc"
+    "shas": "65cf1134e9a92c0d5a1b4d6a160fcaf411f99806..516ad90702a68100aa6a68fc772bc05ef9d21161"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -299,12 +314,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -326,5 +356,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7e9cc3775968f27c92b41ed9f4c8494fbcd30edc..7193c3cab8046a6b2b57792ecbef7f2ad5f318b7"
+    "shas": "516ad90702a68100aa6a68fc772bc05ef9d21161..407e4c1852d95bd8c9a3494899d65731e2bbb43f"
 }]
