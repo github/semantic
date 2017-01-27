@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e19566138ee59686d9a6a3a8be09f265c6bb1ab5..4216fb2d4e3d2177a6c1e78d234f8af8e57d4894"
+    "shas": "762e27f1c73b1622011755e561be1ab34543909e..8bc9cbccd6b985f7842dfd4f7ba666754ef09048"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -111,7 +111,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4216fb2d4e3d2177a6c1e78d234f8af8e57d4894..6c3231202f1d2e916ba66357ec09b58f7231cb04"
+    "shas": "8bc9cbccd6b985f7842dfd4f7ba666754ef09048..623ef42947c9d9a930769d6f9a1e4a7946f82215"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -253,7 +253,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6c3231202f1d2e916ba66357ec09b58f7231cb04..c6b4e0859eba66015f9db9f578e9f6e1d6f41e16"
+    "shas": "623ef42947c9d9a930769d6f9a1e4a7946f82215..eb79fac46abf495acd18373c43e643e974af8e98"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -395,7 +395,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c6b4e0859eba66015f9db9f578e9f6e1d6f41e16..67c24932dbc4b3964ffce573e42a39ab1439f9a0"
+    "shas": "eb79fac46abf495acd18373c43e643e974af8e98..0ea11c8424750ebe1c6b1184845b4f490d55b972"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -453,7 +453,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "67c24932dbc4b3964ffce573e42a39ab1439f9a0..360786904e65b742983046288fa63768751ea999"
+    "shas": "0ea11c8424750ebe1c6b1184845b4f490d55b972..ae48f776771c4bc97a2c6f487bc389cbd86a0161"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -510,5 +510,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "360786904e65b742983046288fa63768751ea999..4c46a0909caa9f66741397ee9c1ebfbbca8c7f7b"
+    "shas": "ae48f776771c4bc97a2c6f487bc389cbd86a0161..f51ed0d4fce2633a73f3c536e9f5c1d3e36ebbbd"
 }]

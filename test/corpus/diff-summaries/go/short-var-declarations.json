@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9fbfb20580d4af361aed8a988cf81c3cd4f1c18c..7488d74d8f397d218d10266d93dbc5709c5bf308"
+    "shas": "52de97fe13f7845045da38169d173661d5e5d72b..b94e761847023af01134e6126251b772bca42d50"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -141,7 +141,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7488d74d8f397d218d10266d93dbc5709c5bf308..b44fb15d414aea177565aa8707f9a1e861ca2ee5"
+    "shas": "b94e761847023af01134e6126251b772bca42d50..341d4aadadd8c2dca766654a212c7ec98089f5f8"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -277,7 +277,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b44fb15d414aea177565aa8707f9a1e861ca2ee5..66aa647fc7b2cf024948d74477d1e1406d117795"
+    "shas": "341d4aadadd8c2dca766654a212c7ec98089f5f8..0fb273afde57f1c5440a09995267cbd33a8cd3ef"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -413,7 +413,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66aa647fc7b2cf024948d74477d1e1406d117795..6a8016c70d6ebbdc653533d1340205c4dc3aa944"
+    "shas": "0fb273afde57f1c5440a09995267cbd33a8cd3ef..c9c99e40c59a617d3a55b09502b801fa16c86c09"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -501,7 +501,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6a8016c70d6ebbdc653533d1340205c4dc3aa944..2854232507f1aaf63fe1ee31ec0d137fa026aaec"
+    "shas": "c9c99e40c59a617d3a55b09502b801fa16c86c09..7217276a026ab6f8412d832fad1621afdc99ec94"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -558,5 +558,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2854232507f1aaf63fe1ee31ec0d137fa026aaec..1671d497a0127fd549abc7b3685ae872c77076b6"
+    "shas": "7217276a026ab6f8412d832fad1621afdc99ec94..ee88af7a97ecdeadce4a789a3c52f441a7fb604b"
 }]

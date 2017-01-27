@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "61f70f78e8768c3fcb270af9d5402be8ede27560..8220293ea6c23e48e34ebe33fba9c98cefb42777"
+    "shas": "7166ead5b4c31f5ebb21d7aa50e4c70abb0e60e2..ab160709c410583b25a95e6b6441a4f8ef06857c"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -116,11 +116,7 @@
                         }
                     },
                     "summary": "Added the 'e' var assignment"
-                }
-            ]
-        },
-        "errors": {
-            "rune-literals.go": [
+                },
                 {
                     "span": {
                         "insert": {
@@ -129,22 +125,23 @@
                                 3
                             ],
                             "end": [
-                                9,
-                                1
+                                8,
+                                10
                             ]
                         }
                     },
-                    "summary": "Added 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
+                    "summary": "Added the 'f' var assignment"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "rune-literals.go"
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index c9ecbf5e..7d2b6610 100644",
+        "index c9ecbf5e..e97de4c1 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,2 +1,9 @@",
@@ -156,11 +153,11 @@
         "+  c = '⌘'",
         "+  d = '⌘'",
         "+  e = '⌘'",
-        "+  f = '⌘jjjj'",
+        "+  f = '⌘'",
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8220293ea6c23e48e34ebe33fba9c98cefb42777..92d5ed40d7f7370f3d9cfc636d3475b942d94655"
+    "shas": "ab160709c410583b25a95e6b6441a4f8ef06857c..3eece515da86524dfc51fd98f642f3b7ce7a6c48"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -304,47 +301,41 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    7
+                                ],
+                                "end": [
+                                    8,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    7
+                                ],
+                                "end": [
+                                    8,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f' var assignment"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the f var assignment"
                 }
             ]
         },
-        "errors": {
-            "rune-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                9,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "rune-literals.go"
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 7d2b6610..346d5d96 100644",
+        "index e97de4c1..346d5d96 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,9 +1,9 @@",
@@ -355,7 +346,7 @@
         "-  c = '⌘'",
         "-  d = '⌘'",
         "-  e = '⌘'",
-        "-  f = '⌘jjjj'",
+        "-  f = '⌘'",
         "+  a = '©'",
         "+  b = '©'",
         "+  c = '©'",
@@ -365,7 +356,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "92d5ed40d7f7370f3d9cfc636d3475b942d94655..2429995934742cd7e761f102867b7eb205faa5cb"
+    "shas": "3eece515da86524dfc51fd98f642f3b7ce7a6c48..b9b23c59da5368174ce6527df59f128798b44e0a"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -509,47 +500,41 @@
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    7
+                                ],
+                                "end": [
+                                    8,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    7
+                                ],
+                                "end": [
+                                    8,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'f' var assignment"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the f var assignment"
                 }
             ]
         },
-        "errors": {
-            "rune-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                9,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "rune-literals.go"
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 346d5d96..7d2b6610 100644",
+        "index 346d5d96..e97de4c1 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,9 +1,9 @@",
@@ -566,11 +551,11 @@
         "+  c = '⌘'",
         "+  d = '⌘'",
         "+  e = '⌘'",
-        "+  f = '⌘jjjj'",
+        "+  f = '⌘'",
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2429995934742cd7e761f102867b7eb205faa5cb..0c178e856ea3b8dd214e85c6ffbf7ece701ad9d8"
+    "shas": "b9b23c59da5368174ce6527df59f128798b44e0a..d11ebaebb4079b812a6d85f7847af3f671ebce04"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -651,11 +636,7 @@
                         }
                     },
                     "summary": "Deleted the 'e' var assignment"
-                }
-            ]
-        },
-        "errors": {
-            "rune-literals.go": [
+                },
                 {
                     "span": {
                         "delete": {
@@ -664,22 +645,23 @@
                                 3
                             ],
                             "end": [
-                                9,
-                                1
+                                8,
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted 'f = '⌘jjjj'\n' at line 8, column 3 - line 9, column 1"
+                    "summary": "Deleted the 'f' var assignment"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "rune-literals.go"
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 7d2b6610..c9ecbf5e 100644",
+        "index e97de4c1..c9ecbf5e 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,9 +1,2 @@",
@@ -690,12 +672,12 @@
         "-  c = '⌘'",
         "-  d = '⌘'",
         "-  e = '⌘'",
-        "-  f = '⌘jjjj'",
+        "-  f = '⌘'",
         "-)",
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c178e856ea3b8dd214e85c6ffbf7ece701ad9d8..78645f3686859331e82310a93ce62dd059d1314d"
+    "shas": "d11ebaebb4079b812a6d85f7847af3f671ebce04..0d1fc442aa52d492c825631b13dd406f460f149c"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -734,5 +716,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "78645f3686859331e82310a93ce62dd059d1314d..ff5be8e660b41ecd13e8e909619854aab88ca2fe"
+    "shas": "0d1fc442aa52d492c825631b13dd406f460f149c..440e36c354b208b5ee1267491cb42c2e04df631a"
 }]

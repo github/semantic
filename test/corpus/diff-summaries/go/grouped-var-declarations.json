@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4564296c1b012bdd0e6d8ff4b73d0c21efa620cb..7645adc3e6ac88a88492608ee04a32ce6a63efa4"
+    "shas": "3cbe726d90a8159820455aa36c18291a99c6e77a..1c15fc91262b6d9d8d56d518c0ab513c2b69956b"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -114,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7645adc3e6ac88a88492608ee04a32ce6a63efa4..a725268abcdbc192aa9abf9537f63f91eb250c3c"
+    "shas": "1c15fc91262b6d9d8d56d518c0ab513c2b69956b..ae5230257c3b415596712c754da75694147861ce"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -199,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a725268abcdbc192aa9abf9537f63f91eb250c3c..401498f39e6dcf630af8238aefbc5e3019f9217a"
+    "shas": "ae5230257c3b415596712c754da75694147861ce..531f5f0d359c11ab8a9f39a6ae04be45df9e8783"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -284,7 +284,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "401498f39e6dcf630af8238aefbc5e3019f9217a..7a8d4dbb82067d5b4a4708d98cead2001a865ec2"
+    "shas": "531f5f0d359c11ab8a9f39a6ae04be45df9e8783..eaba15469e5ed5c9c06ada2598d7aa4f8779dccb"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -345,7 +345,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a8d4dbb82067d5b4a4708d98cead2001a865ec2..37da2a8126db114e4ac03b92622fcb08315848c5"
+    "shas": "eaba15469e5ed5c9c06ada2598d7aa4f8779dccb..c62bafd0ec4a9324199668b5bc25ea3f15d6b1c8"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -402,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "37da2a8126db114e4ac03b92622fcb08315848c5..c2682ed91f98a452e1212cbdcf8c2d5ea4d4f51a"
+    "shas": "c62bafd0ec4a9324199668b5bc25ea3f15d6b1c8..f47b47e335909b60b18242974324c8259d9b5a52"
 }]

@@ -5,33 +5,18 @@
             "function-literals.go": [
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                1,
-                                1
+                                4,
+                                7
                             ],
                             "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'main' function"
+                    "summary": "Deleted the 's1' var assignment in the main function"
                 }
             ]
         },
@@ -42,18 +27,21 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index e69de29b..79058077 100644",
+        "index 7b034662..79058077 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
-        "@@ -0,0 +1,5 @@",
-        "+package main",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const s1 = func(b int) (string, string) {",
+        "-return 1, 2",
+        "-}",
         "+",
-        "+func main() {",
-        "+",
-        "+}"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "958e8f93312d2eacc0720b5c6be815ece0123d5c..decdd4c919d12c9d7379cab2e9d6c7f86b5e7b8c"
+    "shas": "6a003b50cd8759b90d32381e02e5925253b88c44..d2e02b04e736057281a2d906a22386b0ff78bd74"
 }
 ,{
     "testCaseDescription": "go-function-literals-insert-test",
@@ -98,7 +86,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "decdd4c919d12c9d7379cab2e9d6c7f86b5e7b8c..09dfa317e0594abe58e1169348626260c404c97a"
+    "shas": "d2e02b04e736057281a2d906a22386b0ff78bd74..2f60961be6fe40e853af2b2e3d2534719c0ab7e9"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
@@ -182,7 +170,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "09dfa317e0594abe58e1169348626260c404c97a..2585e7a038cadd31f89371d7ef613cfe21cd15f5"
+    "shas": "2f60961be6fe40e853af2b2e3d2534719c0ab7e9..c265799ff570a3a9648894486739c8051c1c8c7e"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-replacement-test",
@@ -266,7 +254,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2585e7a038cadd31f89371d7ef613cfe21cd15f5..740019633c7aa21afd2be234152b5fc6f546748e"
+    "shas": "c265799ff570a3a9648894486739c8051c1c8c7e..08aa87985588007fc9590d368a6fdf20e371204e"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-insert-test",
@@ -311,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "740019633c7aa21afd2be234152b5fc6f546748e..3c207a453e389a6841ffc47fa66688ae62ea6b35"
+    "shas": "08aa87985588007fc9590d368a6fdf20e371204e..eb061b36da4fd7677bed1103bfdf14881bb127e7"
 }
 ,{
     "testCaseDescription": "go-function-literals-teardown-test",
@@ -368,5 +356,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c207a453e389a6841ffc47fa66688ae62ea6b35..c6ecd98beb3dc68bcad3b96e920a40ae97bf486b"
+    "shas": "eb061b36da4fd7677bed1103bfdf14881bb127e7..a662787d348eccfd4982546a4efb2abc330d8bc6"
 }]

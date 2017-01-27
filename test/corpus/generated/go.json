@@ -205,7 +205,7 @@
       {
         "template": "package main\n{0}",
         "syntax": "rune-literals",
-        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘jjjj'\n)",
+        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘'\n)",
         "replacement": "const (\n  a = '©'\n  b = '©'\n  c = '©'\n  d = '©'\n  e = '©'\n  f = '©'\n)"
       },
       {

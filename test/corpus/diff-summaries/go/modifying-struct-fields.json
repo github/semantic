@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0d88303f6ed4598b165bebc07b6a41412c4230d1..6d9131b2424d0afe343184b69fb10bb59538840b"
+    "shas": "7feb3c6b4cbc95a3ebdffe1629381dbb501f355a..07b2d4369c0efd6a2f0413a6b0407c1ce6551998"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6d9131b2424d0afe343184b69fb10bb59538840b..0e4e6205a18c3982482c5148136efd89a53157a9"
+    "shas": "07b2d4369c0efd6a2f0413a6b0407c1ce6551998..9b490aa4342aa9f477b2fd78876a368fffe4043a"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -169,7 +169,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0e4e6205a18c3982482c5148136efd89a53157a9..a0f1eea7f4f36d0d08345fc67704c15e9ea39f3a"
+    "shas": "9b490aa4342aa9f477b2fd78876a368fffe4043a..52dcb6e785c70ab0c2d06946bdfb4814a88d9001"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a0f1eea7f4f36d0d08345fc67704c15e9ea39f3a..54d5d81a3fc80c5ae524d3486f85cc9b9a48bbc3"
+    "shas": "52dcb6e785c70ab0c2d06946bdfb4814a88d9001..709bd82200ec01417ee27b20f12a7ce770da4d36"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -285,7 +285,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "54d5d81a3fc80c5ae524d3486f85cc9b9a48bbc3..1b24d3ac4ad8afca079a6d0fc849d13f75b1cb61"
+    "shas": "709bd82200ec01417ee27b20f12a7ce770da4d36..3bcf27e36adc27026a1932963318fdced26cc229"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -342,5 +342,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1b24d3ac4ad8afca079a6d0fc849d13f75b1cb61..e8e79ec3b15967a7fa0aa1c65578a87b6e0cfda8"
+    "shas": "3bcf27e36adc27026a1932963318fdced26cc229..68cfe38bf7122347a26b51327021502ce8692d9a"
 }]

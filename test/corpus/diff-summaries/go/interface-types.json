@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "13974ab05d1b8507aa95a57fbf9840e11a827240..66dc6742eb8fd1141a7e05abbdb0830fa4819d31"
+    "shas": "b1c2079b43e155b112c39ca0e59d7d4f0abfbdfb..0ca97fbfa10e412b5936beea27da988c79ebe77a"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -132,7 +132,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66dc6742eb8fd1141a7e05abbdb0830fa4819d31..7e06e9b3a00333ec890ac529d95441c8961aa402"
+    "shas": "0ca97fbfa10e412b5936beea27da988c79ebe77a..90329dbba6eba0786e6d67dfc820e5611c6b7c6a"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -247,7 +247,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7e06e9b3a00333ec890ac529d95441c8961aa402..abea4914d86641eda599af23780df9366cf15f9a"
+    "shas": "90329dbba6eba0786e6d67dfc820e5611c6b7c6a..8a0b43ed7e12ba93f061744a3739165825ec4213"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -362,7 +362,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "abea4914d86641eda599af23780df9366cf15f9a..4370bdcc979cc21a9bc19ea14afa6da6aa3dc34b"
+    "shas": "8a0b43ed7e12ba93f061744a3739165825ec4213..3b70db6694ac6f8a429e6d8a0ffc5b821360f801"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -441,7 +441,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4370bdcc979cc21a9bc19ea14afa6da6aa3dc34b..df0870a918dc8360c7c27c2879757daea85dfbed"
+    "shas": "3b70db6694ac6f8a429e6d8a0ffc5b821360f801..9ae8b048dadcb8d6731795b8cdfb0644e8767122"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -498,5 +498,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "df0870a918dc8360c7c27c2879757daea85dfbed..0b9ded878cb833ba813d919acd46e1aeb9be69c4"
+    "shas": "9ae8b048dadcb8d6731795b8cdfb0644e8767122..198e499fedaac589ea80e6d0d81bb0e29e68f417"
 }]
