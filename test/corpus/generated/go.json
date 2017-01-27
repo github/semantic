@@ -138,7 +138,7 @@
       },
       {
         "syntax": "variadic-function-declarations",
-        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "template": "package main\n\nfunc main() {\n\n}\n{0}",
         "insert": "func f1(a ...*int) {}\nfunc f2(...int) {}\nfunc f3(a, ...bool) {}",
         "replacement": "func g1(a ...*int) {}\nfunc g2(...int) {}\nfunc g3(a, ...bool) {}"
       },

@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "65295513fb69f053f466c62e25b12d37872a7543..90d5492eca694a1db6462f9037889549357c3854"
+    "shas": "caf6084cf50197e6322b2998f8edb0aa05bd5f50..dbddea7832bc751a8b09ccbb6ad9117d1a70e708"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "90d5492eca694a1db6462f9037889549357c3854..98ea82656603de04b6b95f411bdcfd58b63e189e"
+    "shas": "dbddea7832bc751a8b09ccbb6ad9117d1a70e708..2a2a5d5f60eb8eff3954d04a9c0e1128c16e075e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -289,7 +289,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "98ea82656603de04b6b95f411bdcfd58b63e189e..4130e7b48740376e3b3e44d8c622245374813a1f"
+    "shas": "2a2a5d5f60eb8eff3954d04a9c0e1128c16e075e..6dc2577329142cc8a416581b1a37832610e3e5f9"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -434,7 +434,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4130e7b48740376e3b3e44d8c622245374813a1f..67ba411108a71a2f98e7bc597e4178dbcfac0031"
+    "shas": "6dc2577329142cc8a416581b1a37832610e3e5f9..0d5626bae4785694d3e05b22049fbaf548d4fa31"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -525,7 +525,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "67ba411108a71a2f98e7bc597e4178dbcfac0031..36092fdf255e0236862c27135098a4fa4e9dbd75"
+    "shas": "0d5626bae4785694d3e05b22049fbaf548d4fa31..51d4293a89d456e2e0f0c5fc59bb3454fcff3e0f"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -582,5 +582,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "36092fdf255e0236862c27135098a4fa4e9dbd75..3f2a09bd95dfbff3712c14095a53c1f0a3855648"
+    "shas": "51d4293a89d456e2e0f0c5fc59bb3454fcff3e0f..29b7cdb90264cb8641641dbcb344d71bdb11aa7c"
 }]

@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb913819d62f34c2cc72aa293b39fabca1a0f05c..16284699449cfa8d9ebef6df6c39765b1952a1f5"
+    "shas": "dc788b7700869081d4712b04db659080416feeee..4081cb519a1444891fc0ea44795820e73529f9ed"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -105,7 +105,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "16284699449cfa8d9ebef6df6c39765b1952a1f5..d72bb50ec9a41c5cad553f3a0d9dfb889749dee1"
+    "shas": "4081cb519a1444891fc0ea44795820e73529f9ed..7e7f1e8d5a48e489414427807c5e5312f94bed0f"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -222,7 +222,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d72bb50ec9a41c5cad553f3a0d9dfb889749dee1..6556fe84b67435f6c768377975c181a125a5a9f1"
+    "shas": "7e7f1e8d5a48e489414427807c5e5312f94bed0f..900e3daf9b3fe9ed85b16e4318e4a1c87f3b0628"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -339,7 +339,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6556fe84b67435f6c768377975c181a125a5a9f1..3882dca1074e6564bc01f79a1b44f2c0db17d3e2"
+    "shas": "900e3daf9b3fe9ed85b16e4318e4a1c87f3b0628..ad5909dc3298239e9421377256470e89c933cd05"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -391,7 +391,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3882dca1074e6564bc01f79a1b44f2c0db17d3e2..51576f63dc98b44fbb1042065c9ab828a27dd5f7"
+    "shas": "ad5909dc3298239e9421377256470e89c933cd05..fac5a7f6e76a0b56c13f7cdbaf3d178e05613edd"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -448,5 +448,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "51576f63dc98b44fbb1042065c9ab828a27dd5f7..fa9acd974705290312a7cebdba09b18008dc6093"
+    "shas": "fac5a7f6e76a0b56c13f7cdbaf3d178e05613edd..5a0d3cb13d857c53235686846bb1b521d387980d"
 }]

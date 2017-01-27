@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eca7c6083f4f3169ebc3bf726c3d936818a2d174..aeb74c519ca8d7d63e6d35cff856d277c571b6f7"
+    "shas": "c19f3920b64f0f3bc5d76ac1d05e35e382185972..abfe8b1aff981e8b17a3b43b5fca0e371be5d7d5"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aeb74c519ca8d7d63e6d35cff856d277c571b6f7..a59ce1e7d20b1843f9b59495e1a6b3f7d8c096f4"
+    "shas": "abfe8b1aff981e8b17a3b43b5fca0e371be5d7d5..92ca0e7c920fb0e251ada588ec8d67d4d5f098f5"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -205,7 +205,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a59ce1e7d20b1843f9b59495e1a6b3f7d8c096f4..9c0b77724a8c467d16ad46f5f184144b65216512"
+    "shas": "92ca0e7c920fb0e251ada588ec8d67d4d5f098f5..38ab4f9eadab91f155698c967b0d6dc70daca704"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -314,7 +314,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c0b77724a8c467d16ad46f5f184144b65216512..a2f408b126df5e135832ae9d566dab50031792ec"
+    "shas": "38ab4f9eadab91f155698c967b0d6dc70daca704..720976906feb38fe5e4031967bf23fdc7dcdadc9"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2f408b126df5e135832ae9d566dab50031792ec..7ee0dab9d8d593cbca3c6230313f3eaeda0ada55"
+    "shas": "720976906feb38fe5e4031967bf23fdc7dcdadc9..8ad184116129759b064af73398771101586df24b"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -414,5 +414,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7ee0dab9d8d593cbca3c6230313f3eaeda0ada55..0a55a88480be2cc766ee756b5b5f7bf45704376c"
+    "shas": "8ad184116129759b064af73398771101586df24b..fe97d46d9d0267900904919e324b8fd8a9f709e9"
 }]

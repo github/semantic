@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d27aeb5e58d624d463c84b7a506673945bee82fd..6457603d8983b1317a9b928ea207eb6edd64f594"
+    "shas": "27e14b0c45085499566ffbc336e83ffccf50926a..20fd3c70aa844703915c05342138ecd839089c20"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -132,7 +132,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6457603d8983b1317a9b928ea207eb6edd64f594..56cfa1522cfdcdac970e3fafdd705c56945226cf"
+    "shas": "20fd3c70aa844703915c05342138ecd839089c20..082a8667ccd32d546569a8318420da3a3752dfa9"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -247,7 +247,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "56cfa1522cfdcdac970e3fafdd705c56945226cf..a0b32c300b7848b5de8c996337254fba410a49ff"
+    "shas": "082a8667ccd32d546569a8318420da3a3752dfa9..d628db07ba8b011b1de3ed24c4525e2145c815a3"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -362,7 +362,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a0b32c300b7848b5de8c996337254fba410a49ff..e7baf12e7fdd8b0ae0849f70632a5b7730771d40"
+    "shas": "d628db07ba8b011b1de3ed24c4525e2145c815a3..19e7fea005ca734190220e8c1c48c8fbbf0890e2"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -441,7 +441,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e7baf12e7fdd8b0ae0849f70632a5b7730771d40..b3a1c76dfcde365828f3aca43ca12cc93ba6fed7"
+    "shas": "19e7fea005ca734190220e8c1c48c8fbbf0890e2..ec557d020050737778480056b4552bc56add9e35"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -498,5 +498,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b3a1c76dfcde365828f3aca43ca12cc93ba6fed7..749bfb72d276ee57a9c014001d350bb1f642f2a9"
+    "shas": "ec557d020050737778480056b4552bc56add9e35..00841bba3203d006e24fedde6677a378f368408e"
 }]
