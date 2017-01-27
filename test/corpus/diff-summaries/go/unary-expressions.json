@@ -5,33 +5,33 @@
             "unary-expressions.go": [
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                4,
+                                1,
                                 1
                             ],
                             "end": [
-                                4,
-                                5
+                                1,
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the '!<-a' operator in the main function"
+                    "summary": "Added the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
                                 5,
-                                7
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the '*foo()' operator in the main function"
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -42,20 +42,18 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index bdf9ccc5..79058077 100644",
+        "index e69de29b..79058077 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
-        "@@ -1,6 +1,5 @@",
-        " package main",
-        " ",
-        " func main() {",
-        "-!<-a",
-        "-*foo()",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
         "+",
-        " }"
+        "+func main() {",
+        "+",
+        "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b21261eb9c166d591340f40e64a876912e228ab9..13351667c8bfcf15c72be21e1c2a59b0718ea4ef"
+    "shas": "f40e804fbe86b32962852d0aa798d89bf2a2f4db..ff0c481b2a5ecfe876eb71323d0756e4229c6bce"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-insert-test",
@@ -114,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "13351667c8bfcf15c72be21e1c2a59b0718ea4ef..f583536a2fb0cc78c0b35e99daed8f44c29051d2"
+    "shas": "ff0c481b2a5ecfe876eb71323d0756e4229c6bce..9f0e4739d5a60ccea9e4dbab0168e8281a09b4dd"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -198,7 +196,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f583536a2fb0cc78c0b35e99daed8f44c29051d2..e1b3430f96a02aea4b08769fe12b18c9219cf704"
+    "shas": "9f0e4739d5a60ccea9e4dbab0168e8281a09b4dd..26afd61f3b621f17b2473bb296649c2d4a8c0eb5"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -282,7 +280,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e1b3430f96a02aea4b08769fe12b18c9219cf704..0199954679160df296b1245c874d41495a907864"
+    "shas": "26afd61f3b621f17b2473bb296649c2d4a8c0eb5..59725e0dd539c7bc818b77282c752d86880a1bd5"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -341,7 +339,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0199954679160df296b1245c874d41495a907864..62b19e87a9e91b35fe23bbc6c57fadbb3eebb889"
+    "shas": "59725e0dd539c7bc818b77282c752d86880a1bd5..8b89d66591f85148e5e3b7e63449b8cf08939265"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-teardown-test",
@@ -398,5 +396,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "62b19e87a9e91b35fe23bbc6c57fadbb3eebb889..508ed70fb4ade77ed80b19cab13ea0fd4769b532"
+    "shas": "8b89d66591f85148e5e3b7e63449b8cf08939265..9201a1dcfdc61bb2ce9deb678d385b27ac5d0b3b"
 }]

@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "caf6084cf50197e6322b2998f8edb0aa05bd5f50..dbddea7832bc751a8b09ccbb6ad9117d1a70e708"
+    "shas": "6e8e0e6dbc5be7ff05e977dd7ed046196afbc666..901e939da714cc05b9d2bcae00353a7cc73c878b"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dbddea7832bc751a8b09ccbb6ad9117d1a70e708..2a2a5d5f60eb8eff3954d04a9c0e1128c16e075e"
+    "shas": "901e939da714cc05b9d2bcae00353a7cc73c878b..0050da7d81aa4b62c798996bb7796a80e4c6f91f"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -289,7 +289,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2a2a5d5f60eb8eff3954d04a9c0e1128c16e075e..6dc2577329142cc8a416581b1a37832610e3e5f9"
+    "shas": "0050da7d81aa4b62c798996bb7796a80e4c6f91f..786b3aab3190a8cf4f5166dd2cc81486b6ca45ff"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -434,7 +434,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6dc2577329142cc8a416581b1a37832610e3e5f9..0d5626bae4785694d3e05b22049fbaf548d4fa31"
+    "shas": "786b3aab3190a8cf4f5166dd2cc81486b6ca45ff..996cd441417052dcc987c22bb65bd45fedc0c9f3"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -525,7 +525,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0d5626bae4785694d3e05b22049fbaf548d4fa31..51d4293a89d456e2e0f0c5fc59bb3454fcff3e0f"
+    "shas": "996cd441417052dcc987c22bb65bd45fedc0c9f3..755849d385333066602e929df4ff5ed816f3b43f"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -582,5 +582,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "51d4293a89d456e2e0f0c5fc59bb3454fcff3e0f..29b7cdb90264cb8641641dbcb344d71bdb11aa7c"
+    "shas": "755849d385333066602e929df4ff5ed816f3b43f..4a96efc0ec67906bb2f5d29fed97f44557822953"
 }]

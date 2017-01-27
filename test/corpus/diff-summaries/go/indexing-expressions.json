@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fe97d46d9d0267900904919e324b8fd8a9f709e9..08438abc5c71054721158ea2fba5ce15eee7ee75"
+    "shas": "facd3d628ae0d4ecdad5480fd75d18cdc1476c23..3cdc1e178ae2bcc82af1f58d516b9cfda96debe0"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -281,7 +281,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "08438abc5c71054721158ea2fba5ce15eee7ee75..a860be3956a0f9d7d48fc6c5427740aa047f3d79"
+    "shas": "3cdc1e178ae2bcc82af1f58d516b9cfda96debe0..1542807116a50abb5786a245f17cce67c31e6f31"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -405,7 +405,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a860be3956a0f9d7d48fc6c5427740aa047f3d79..14fa02df2e1fcd01bf8092296c2388293b616e8d"
+    "shas": "1542807116a50abb5786a245f17cce67c31e6f31..6ad9b56a488eaca4315421aacac40dba5a6e0671"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -553,7 +553,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "14fa02df2e1fcd01bf8092296c2388293b616e8d..0ef70b45f6d113b81e372d7231acf810f815b4ff"
+    "shas": "6ad9b56a488eaca4315421aacac40dba5a6e0671..b0d0701e7d7d7cd2e361fe14905c8ae1362f7da0"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -781,7 +781,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0ef70b45f6d113b81e372d7231acf810f815b4ff..897e285f363517dcb81f892730742071c421c02b"
+    "shas": "b0d0701e7d7d7cd2e361fe14905c8ae1362f7da0..ac64e26e931c6c81225c5e97bd9d3e06625a278c"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -838,5 +838,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "897e285f363517dcb81f892730742071c421c02b..f4aa3bd0594fde18348b4cf4ef92fca6cdd59d56"
+    "shas": "ac64e26e931c6c81225c5e97bd9d3e06625a278c..77eddda849afceb2d712dfa08bd7703ee754e437"
 }]

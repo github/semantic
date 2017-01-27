@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5a0d3cb13d857c53235686846bb1b521d387980d..8eb6d22bf27bf051da6394e705562a6dfdd36e2a"
+    "shas": "11de671c8c505d6183ef48c129d5a1b1d19fb9cd..f1bb0343d2016476dfb9e978dc8ac61ae72af36b"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8eb6d22bf27bf051da6394e705562a6dfdd36e2a..851797e10d36d3e2231352add162d129de83a668"
+    "shas": "f1bb0343d2016476dfb9e978dc8ac61ae72af36b..bedc08a0ecccbf1f388f274e67e719e4aa0167d7"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -250,7 +250,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "851797e10d36d3e2231352add162d129de83a668..26238b61d55c3a4f0cf6c01e5a50ee346137cef6"
+    "shas": "bedc08a0ecccbf1f388f274e67e719e4aa0167d7..d64ce5f2d902d207422a25335626103916366233"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -388,7 +388,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "26238b61d55c3a4f0cf6c01e5a50ee346137cef6..c1fec436c3c3c131761cc2b73dbe71dbb9045a31"
+    "shas": "d64ce5f2d902d207422a25335626103916366233..3740537816b7de8c81ece1136529413f5f2f1fe9"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -447,7 +447,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c1fec436c3c3c131761cc2b73dbe71dbb9045a31..fd98626088ce2ec030b500c9c5e06373187d0b7c"
+    "shas": "3740537816b7de8c81ece1136529413f5f2f1fe9..7051b4aa4b31bf3fc001e83c22e82e67f90e1c10"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -504,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fd98626088ce2ec030b500c9c5e06373187d0b7c..670a55c92c0d8960e27751a031c2c4451cba0c0e"
+    "shas": "7051b4aa4b31bf3fc001e83c22e82e67f90e1c10..ab814e753edaa5bad1fb2638421a9228295df6a8"
 }]

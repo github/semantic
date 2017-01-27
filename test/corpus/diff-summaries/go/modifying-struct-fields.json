@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aa5b071595e84d228a1d16aaae7a0d2ee00cc3ef..e956e1e96cc0499d2de790032d20801dc8833a71"
+    "shas": "0d88303f6ed4598b165bebc07b6a41412c4230d1..6d9131b2424d0afe343184b69fb10bb59538840b"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e956e1e96cc0499d2de790032d20801dc8833a71..d302acf1be70086a84de5feaa76a3b8232dd72ab"
+    "shas": "6d9131b2424d0afe343184b69fb10bb59538840b..0e4e6205a18c3982482c5148136efd89a53157a9"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -169,7 +169,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d302acf1be70086a84de5feaa76a3b8232dd72ab..42e51e4deda43231f469ea09270ec2b7c5bd32be"
+    "shas": "0e4e6205a18c3982482c5148136efd89a53157a9..a0f1eea7f4f36d0d08345fc67704c15e9ea39f3a"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "42e51e4deda43231f469ea09270ec2b7c5bd32be..b386decdcdc5064f97bf5588518e39d5e74b8e01"
+    "shas": "a0f1eea7f4f36d0d08345fc67704c15e9ea39f3a..54d5d81a3fc80c5ae524d3486f85cc9b9a48bbc3"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -285,7 +285,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b386decdcdc5064f97bf5588518e39d5e74b8e01..0e646c4d0df55d4e64461187ed4bd4dd039fef77"
+    "shas": "54d5d81a3fc80c5ae524d3486f85cc9b9a48bbc3..1b24d3ac4ad8afca079a6d0fc849d13f75b1cb61"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -342,5 +342,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0e646c4d0df55d4e64461187ed4bd4dd039fef77..83058f1ae388ab39dee65b5ef95db623f574e3ac"
+    "shas": "1b24d3ac4ad8afca079a6d0fc849d13f75b1cb61..e8e79ec3b15967a7fa0aa1c65578a87b6e0cfda8"
 }]

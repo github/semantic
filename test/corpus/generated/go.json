@@ -131,7 +131,7 @@
         "replacement": "func fa() {}\nfunc fb(a int, b, c, d string) int {}\nfunc fc() (int, error) {}\nfunc fd() (result int, err error) {}"
       },
       {
-        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "template": "package main\n\nfunc main() {\n\n}\n\n{0}",
         "syntax": "single-line-function-declarations",
         "insert": "func f1() { a() }\nfunc f2() { a(); b() }\nfunc f3() { a(); b(); }",
         "replacement": "func g1() { a() }\nfunc g2() { a(); b() }\nfunc g3() { a(); b(); }"

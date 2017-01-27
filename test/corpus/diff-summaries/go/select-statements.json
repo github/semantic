@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc788b7700869081d4712b04db659080416feeee..4081cb519a1444891fc0ea44795820e73529f9ed"
+    "shas": "ae568257538d87601b7680ac6523e61bf26b42c7..7d493e24b641af7187d2743324abb087acc14361"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -105,7 +105,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4081cb519a1444891fc0ea44795820e73529f9ed..7e7f1e8d5a48e489414427807c5e5312f94bed0f"
+    "shas": "7d493e24b641af7187d2743324abb087acc14361..5008d41964997b2170185a61d0ebb129e0fbf5c8"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -222,7 +222,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7e7f1e8d5a48e489414427807c5e5312f94bed0f..900e3daf9b3fe9ed85b16e4318e4a1c87f3b0628"
+    "shas": "5008d41964997b2170185a61d0ebb129e0fbf5c8..b646bcff3d695ab569d16a3040ebaeedac130d44"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -339,7 +339,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "900e3daf9b3fe9ed85b16e4318e4a1c87f3b0628..ad5909dc3298239e9421377256470e89c933cd05"
+    "shas": "b646bcff3d695ab569d16a3040ebaeedac130d44..87eb928fb52147fa8525c84c266ff48a462d7b7f"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -391,7 +391,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad5909dc3298239e9421377256470e89c933cd05..fac5a7f6e76a0b56c13f7cdbaf3d178e05613edd"
+    "shas": "87eb928fb52147fa8525c84c266ff48a462d7b7f..743775935c846f77473f25f1e0d1081713bb7e62"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -448,5 +448,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fac5a7f6e76a0b56c13f7cdbaf3d178e05613edd..5a0d3cb13d857c53235686846bb1b521d387980d"
+    "shas": "743775935c846f77473f25f1e0d1081713bb7e62..11de671c8c505d6183ef48c129d5a1b1d19fb9cd"
 }]
