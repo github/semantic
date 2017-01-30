@@ -1,6 +1,3 @@
-[submodule "vendor/tree-sitter-parsers"]
-	path = vendor/tree-sitter-parsers
-	url = git@github.com:github/tree-sitter-parsers.git
 [submodule "vendor/text-icu"]
 	path = vendor/text-icu
 	url = https://github.com/joshvera/text-icu
