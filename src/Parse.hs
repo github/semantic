@@ -21,10 +21,13 @@ import Syntax
 import System.FilePath
 import Term
 import TreeSitter
-import Text.Parser.TreeSitter.Language
 import Renderer
 import Renderer.JSON()
 import Renderer.SExpression
+import Text.Parser.TreeSitter.C
+import Text.Parser.TreeSitter.Go
+import Text.Parser.TreeSitter.JavaScript
+import Text.Parser.TreeSitter.Ruby
 
 data ParseJSON = ParseJSON
   { category :: Text
