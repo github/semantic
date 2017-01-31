@@ -1,8 +1,0 @@
-#!/bin/bash
-
-(
-# build tree-sitter's libruntime.a
-cd "$(dirname $0)/../vendor/tree-sitter"
-script/configure.sh
-make runtime
-)

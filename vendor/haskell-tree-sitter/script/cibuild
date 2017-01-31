@@ -1,7 +1,0 @@
-#!/bin/bash
-
-export LC_CTYPE=en_US.UTF-8
-
-"$(dirname $0)/bootstrap" 2> /dev/null
-
-stack test :tree-sitter-parsers-test

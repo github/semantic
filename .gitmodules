@@ -40,6 +40,3 @@
 [submodule "languages/javascript/vendor/tree-sitter-javascript"]
 	path = languages/javascript/vendor/tree-sitter-javascript
 	url = https://github.com/tree-sitter/tree-sitter-javascript.git
-[submodule "vendor/haskell-tree-sitter"]
-	path = vendor/haskell-tree-sitter
-	url = https://github.com/tree-sitter/haskell-tree-sitter.git
