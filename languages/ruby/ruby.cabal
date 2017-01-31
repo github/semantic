@@ -18,6 +18,7 @@ library
                      , haskell-tree-sitter
   default-language:    Haskell2010
   c-sources:           vendor/tree-sitter-ruby/src/parser.c
+  extra-libraries:     scanner
 
 source-repository head
   type:     git
