@@ -5,6 +5,7 @@ import Distribution.Simple.Utils
 import Distribution.Simple.LocalBuildInfo
 import Data.Maybe
 import System.Directory
+import Distribution.System
 import System.FilePath.Posix
 
 main = defaultMainWithHooks simpleUserHooks {
@@ -17,7 +18,8 @@ makeScannerLib :: Args -> ConfigFlags -> IO HookedBuildInfo
 makeScannerLib _ flags = do
   let verbosity = fromFlag $ configVerbosity flags
   rawSystemExit verbosity "env" ["mkdir", "-p", "lib"]
-  rawSystemExit verbosity "env" ["gcc", "-Ivendor/tree-sitter-ruby/src/", "-fPIC", "vendor/tree-sitter-ruby/src/scanner.cc", "-c", "-o", "lib/scanner.o"]
+  let flag =  if builOS == OSX then "-std=c++11" else "-std=c++0x"
+  rawSystemExit verbosity "env" ["gcc", flag, "-Ivendor/tree-sitter-ruby/src/", "-fPIC", "vendor/tree-sitter-ruby/src/scanner.cc", "-c", "-o", "lib/scanner.o"]
   rawSystemExit verbosity "env" ["ar", "rcvs", "lib/libscanner.a", "lib/scanner.o"]
   pure emptyHookedBuildInfo
 
