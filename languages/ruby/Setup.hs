@@ -50,6 +50,6 @@ copyScannerLib _ flags pkg_descr lbi = do
 
 cleanScannerLib :: Args -> CleanFlags -> PackageDescription -> () -> IO ()
 cleanScannerLib _ flags _ _ = do
-  dir <- getCurrentDirectory
   let verbosity = fromFlag $ cleanVerbosity flags
+  dir <- getCurrentDirectory
   rawSystemExit verbosity "env" ["rm", "-rf", dir </> "lib"]
