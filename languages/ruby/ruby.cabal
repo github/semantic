@@ -7,7 +7,7 @@ author:              semantic-code
 maintainer:          tclem@github.com
 copyright:           2017 GitHub
 category:            Web
-build-type:          Simple
+build-type:          Custom
 -- extra-source-files:
 cabal-version:       >=1.10
 
@@ -18,6 +18,7 @@ library
                      , haskell-tree-sitter
   default-language:    Haskell2010
   c-sources:           vendor/tree-sitter-ruby/src/parser.c
+  extra-libraries:     scanner, stdc++
 
 source-repository head
   type:     git

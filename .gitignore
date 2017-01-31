@@ -27,3 +27,5 @@ vendor/icu/common/
 vendor/icu/bin/
 vendor/icu/Makefile
 bin/
+
+languages/ruby/lib
