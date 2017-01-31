@@ -69,16 +69,16 @@ rws compare as bs
 
   where
     minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
-    sesDiffs = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
+    sesDiffs = SES.ses replaceIfEqual cost as bs
 
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
       foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
-        Pure (Right (Delete term)) ->
+        Pure (Delete term) ->
           (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
-        Pure (Right (Insert term)) ->
+        Pure (Insert term) ->
           (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
-        syntax -> let diff' = free syntax >>= either identity pure in
-          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
+        _ ->
+          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff), allDiffs <> pure (Index counterA))
       ) ([], [], 0, 0, [], []) sesDiffs
 
     findNearestNeighbourToDiff :: TermOrIndexOrNone (UnmappedTerm f fields)
@@ -154,13 +154,6 @@ rws compare as bs
       | otherwise = Nothing
 
     cost = iter (const 0) . (1 <$)
-
-    eitherCutoff :: Integer
-                 -> Diff f (Record fields)
-                 -> Free (TermF f (Both (Record fields)))
-                         (Either (Diff f (Record fields)) (Patch (Term f (Record fields))))
-    eitherCutoff n diff | n <= 0 = pure (Left diff)
-    eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
 
     kdas = KdTree.build (elems . feature) featurizedAs
     kdbs = KdTree.build (elems . feature) featurizedBs
