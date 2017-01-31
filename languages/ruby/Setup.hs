@@ -11,6 +11,7 @@ import System.FilePath.Posix
 main = defaultMainWithHooks simpleUserHooks {
   preConf = makeScannerLib,
   confHook = \a f -> confHook simpleUserHooks a f >>= updateExtraLibDirs,
+  postCopy = copyScannerLib,
   postClean = cleanScannerLib
 }
 
@@ -38,6 +39,14 @@ updateExtraLibDirs localBuildInfo = do
       }
     }
   }
+
+copyScannerLib :: Args -> CopyFlags -> PackageDescription -> LocalBuildInfo -> IO ()
+copyScannerLib _ flags pkg_descr lbi = do
+    let libPref = libdir . absoluteInstallDirs pkg_descr lbi
+                . fromFlag . copyDest
+                $ flags
+    let verbosity = fromFlag $ copyVerbosity flags
+    rawSystemExit verbosity "cp" ["lib/libscanner.a", libPref]
 
 cleanScannerLib :: Args -> CleanFlags -> PackageDescription -> () -> IO ()
 cleanScannerLib _ flags _ _ = do
