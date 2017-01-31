@@ -75,11 +75,11 @@ parserWithSource path blob = decorateTerm (termSourceDecorator (source blob)) <$
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
 parserForType mediaType = case languageForType mediaType of
-  Just C -> treeSitterParser C ts_language_c
-  Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  Just C -> treeSitterParser C tree_sitter_c
+  Just JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
   Just Markdown -> cmarkParser
-  Just Ruby -> treeSitterParser Ruby ts_language_ruby
-  Just Language.Go -> treeSitterParser Language.Go ts_language_go
+  Just Ruby -> treeSitterParser Ruby tree_sitter_ruby
+  Just Language.Go -> treeSitterParser Language.Go tree_sitter_go
   _ -> lineByLineParser
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.

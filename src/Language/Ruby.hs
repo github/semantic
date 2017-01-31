@@ -117,7 +117,9 @@ categoryForRubyName = \case
   "false" -> Boolean
   "float" -> NumberLiteral
   "for" -> For
-  "formal_parameters" -> Params
+  "method_parameters" -> Params
+  "lambda_parameters" -> Params
+  "block_parameters" -> Params
   "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
