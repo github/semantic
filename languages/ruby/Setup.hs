@@ -18,8 +18,7 @@ makeScannerLib :: Args -> ConfigFlags -> IO HookedBuildInfo
 makeScannerLib _ flags = do
   let verbosity = fromFlag $ configVerbosity flags
   rawSystemExit verbosity "env" ["mkdir", "-p", "lib"]
-  let flag =  if buildOS == OSX then "-std=c++11" else "-std=c++0x"
-  rawSystemExit verbosity "env" ["gcc", flag, "-Ivendor/tree-sitter-ruby/src/", "-fPIC", "vendor/tree-sitter-ruby/src/scanner.cc", "-c", "-o", "lib/scanner.o"]
+  rawSystemExit verbosity "env" ["gcc", "-Ivendor/tree-sitter-ruby/src/", "-fPIC", "vendor/tree-sitter-ruby/src/scanner.cc", "-c", "-o", "lib/scanner.o"]
   rawSystemExit verbosity "env" ["ar", "rcvs", "lib/libscanner.a", "lib/scanner.o"]
   pure emptyHookedBuildInfo
 
