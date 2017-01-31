@@ -2,7 +2,15 @@ import Distribution.Simple
 import Distribution.PackageDescription
 import Distribution.Simple.Setup
 import Distribution.Simple.Utils
-main = defaultMainWithHooks simpleUserHooks { preConf = makeScannerLib }
+import Distribution.Simple.LocalBuildInfo
+import Data.Maybe
+import System.Directory
+import System.FilePath.Posix
+
+main = defaultMainWithHooks simpleUserHooks {
+    preConf = makeScannerLib,
+    confHook = \a f -> confHook simpleUserHooks a f >>= updateExtraLibDirs
+}
 
 makeScannerLib :: Args -> ConfigFlags -> IO HookedBuildInfo
 makeScannerLib _ flags = do
@@ -11,3 +19,19 @@ makeScannerLib _ flags = do
     rawSystemExit verbosity "env" ["gcc", "-std=c++11", "-Ivendor/tree-sitter-ruby/src/", "-fPIC", "vendor/tree-sitter-ruby/src/scanner.cc", "-c", "-o", "lib/scanner.o"]
     rawSystemExit verbosity "env" ["ar", "rcvs", "lib/libscanner.a", "lib/scanner.o"]
     pure emptyHookedBuildInfo
+
+updateExtraLibDirs :: LocalBuildInfo -> IO LocalBuildInfo
+updateExtraLibDirs localBuildInfo = do
+    let packageDescription = localPkgDescr localBuildInfo
+        lib = fromJust $ library packageDescription
+        libBuild = libBuildInfo lib
+    dir <- getCurrentDirectory
+    return localBuildInfo {
+        localPkgDescr = packageDescription {
+            library = Just $ lib {
+                libBuildInfo = libBuild {
+                    extraLibDirs = (dir </> "lib") : extraLibDirs libBuild
+                }
+            }
+        }
+    }
