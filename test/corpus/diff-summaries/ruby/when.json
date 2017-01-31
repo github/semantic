@@ -44,18 +44,7 @@
             "when.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
+                          "insert": {
                                 "start": [
                                     1,
                                     1
@@ -65,9 +54,8 @@
                                     4
                                 ]
                             }
-                        ]
                     },
-                    "summary": "Replaced 'case foo\nend\n' at line 1, column 1 - line 3, column 1 with the 'foo' case statement"
+                    "summary": "Added the 'foo' case statement"
                 }
             ]
         },
@@ -178,30 +166,18 @@
             "when.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    4
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                              "start": [
+                                  1,
+                                  1
+                              ],
+                              "end": [
+                                  3,
+                                  4
+                              ]
+                          }
                     },
-                    "summary": "Replaced the 'foo' case statement with 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
+                    "summary": "Deleted the 'foo' case statement"
                 }
             ]
         },
