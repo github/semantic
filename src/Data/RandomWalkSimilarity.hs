@@ -277,7 +277,7 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> Vector.Vector Double
-unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
+unitVector d hash = normalize ((`evalRand` mkQCGen hash) (Vector.fromList . take d <$> getRandoms))
   where
     normalize vec = fmap (/ vmagnitude vec) vec
     vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
