@@ -5,7 +5,7 @@
             "number.rb": [
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -16,11 +16,11 @@
                             ]
                         }
                     },
-                    "summary": "Added '1234'"
+                    "summary": "Deleted '1235'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 2,
                                 1
@@ -31,11 +31,11 @@
                             ]
                         }
                     },
-                    "summary": "Added '1_234'"
+                    "summary": "Deleted '1_235'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 3,
                                 1
@@ -46,11 +46,11 @@
                             ]
                         }
                     },
-                    "summary": "Added '0d1_234'"
+                    "summary": "Deleted '0d1_235'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 4,
                                 1
@@ -61,11 +61,11 @@
                             ]
                         }
                     },
-                    "summary": "Added '0xa_bcd_ef0_123_456_789'"
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_788'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 5,
                                 1
@@ -76,11 +76,11 @@
                             ]
                         }
                     },
-                    "summary": "Added '0o1234567'"
+                    "summary": "Deleted '0o1234576'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 6,
                                 1
@@ -91,11 +91,11 @@
                             ]
                         }
                     },
-                    "summary": "Added '0b1_0'"
+                    "summary": "Deleted '0b1_1'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 7,
                                 1
@@ -106,7 +106,112 @@
                             ]
                         }
                     },
-                    "summary": "Added '1.234_5e678_90'"
+                    "summary": "Deleted '1.234_5e678_91'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0d1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0o1234567'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0b1_0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1.234_5e678_90'"
                 }
             ]
         },
@@ -117,21 +222,32 @@
     ],
     "patch": [
         "diff --git a/number.rb b/number.rb",
-        "index e69de29..1a73a0e 100644",
+        "index ed36c77..1a73a0e 100644",
         "--- a/number.rb",
         "+++ b/number.rb",
-        "@@ -0,0 +1,8 @@",
-        "+1234",
-        "+1_234",
-        "+0d1_234",
-        "+0xa_bcd_ef0_123_456_789",
-        "+0o1234567",
-        "+0b1_0",
-        "+1.234_5e678_90",
-        "+"
+        "@@ -1,19 +1,3 @@",
+        "-1235",
+        "-1_235",
+        "-0d1_235",
+        "-0xa_bcd_ef0_123_456_788",
+        "-0o1234576",
+        "-0b1_1",
+        "-1.234_5e678_91",
+        "-",
+        "-1234",
+        "-1_234",
+        "-0d1_234",
+        "-0xa_bcd_ef0_123_456_789",
+        "-0o1234567",
+        "-0b1_0",
+        "-1.234_5e678_90",
+        "-",
+        " 1234",
+        " 1_234",
+        " 0d1_234"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3345b250a3b074d0b3725cfa9ada030ac0733c03..b35c0ae4461db11b6bc1c00ce53aced00ee35f9f"
+    "shas": "bf43f06516c04aef2a1ce9e432bf0df8958101ed..50a7bb73b3463e2544743eb5dcf5179f6fee7291"
 }
 ,{
     "testCaseDescription": "ruby-number-replacement-insert-test",
@@ -247,7 +363,7 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                9,
                                 1
                             ],
                             "end": [
@@ -256,7 +372,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '\n1234'"
+                    "summary": "Added '1234'"
                 },
                 {
                     "span": {
@@ -290,30 +406,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    12,
-                                    1
-                                ],
-                                "end": [
-                                    12,
-                                    24
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                24
+                            ]
+                        }
                     },
-                    "summary": "Replaced '1234' with '0xa_bcd_ef0_123_456_789'"
+                    "summary": "Added '0xa_bcd_ef0_123_456_789'"
                 },
                 {
                     "span": {
@@ -359,21 +463,6 @@
                         }
                     },
                     "summary": "Added '1.234_5e678_90'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '\n1234'"
                 }
             ]
         },
@@ -409,7 +498,7 @@
         " 0d1_234"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b35c0ae4461db11b6bc1c00ce53aced00ee35f9f..722327896e7ef9a21676eca5e8eb6715e7401aa2"
+    "shas": "50a7bb73b3463e2544743eb5dcf5179f6fee7291..aca5d08d02f79729a800d0b9c4e0c2663ae7ed87"
 }
 ,{
     "testCaseDescription": "ruby-number-delete-insert-test",
@@ -658,7 +747,7 @@
         " 1_234"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "722327896e7ef9a21676eca5e8eb6715e7401aa2..d544881fc9626b821f44434f08e418475cf152de"
+    "shas": "aca5d08d02f79729a800d0b9c4e0c2663ae7ed87..5675d08708803436bed00ddfa1d2893260e3e2c8"
 }
 ,{
     "testCaseDescription": "ruby-number-replacement-test",
@@ -907,28 +996,13 @@
         " 1_234"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d544881fc9626b821f44434f08e418475cf152de..67a6d066a1c1934842185072f8b4d14bed470dcd"
+    "shas": "5675d08708803436bed00ddfa1d2893260e3e2c8..c007b52ad8b5f53a08d98dd3ed2921189030e735"
 }
 ,{
     "testCaseDescription": "ruby-number-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "number.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1234'"
-                },
                 {
                     "span": {
                         "delete": {
@@ -1038,7 +1112,7 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                9,
                                 1
                             ],
                             "end": [
@@ -1047,7 +1121,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '\n1234'"
+                    "summary": "Deleted '1234'"
                 },
                 {
                     "span": {
@@ -1141,24 +1215,9 @@
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '\n1234'"
-                },
-                {
-                    "span": {
                         "insert": {
                             "start": [
-                                8,
+                                9,
                                 1
                             ],
                             "end": [
@@ -1167,7 +1226,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '\n1235'"
+                    "summary": "Added '1235'"
                 },
                 {
                     "span": {
@@ -1304,28 +1363,13 @@
         " "
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "67a6d066a1c1934842185072f8b4d14bed470dcd..c4ebf6bf580826410bf6f43b1cddb603f489e60f"
+    "shas": "c007b52ad8b5f53a08d98dd3ed2921189030e735..4620a50dba65807c26a68f11001e74bf9cfa3560"
 }
 ,{
     "testCaseDescription": "ruby-number-delete-test",
     "expectedResult": {
         "changes": {
             "number.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1235'"
-                },
                 {
                     "span": {
                         "delete": {
@@ -1430,21 +1474,6 @@
                         }
                     },
                     "summary": "Deleted '1.234_5e678_90'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '\n1235'"
                 }
             ]
         },
@@ -1472,7 +1501,7 @@
         " 0d1_235"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c4ebf6bf580826410bf6f43b1cddb603f489e60f..2ff54d83dfd80eba661e8a5c4c7ed2b61d289e87"
+    "shas": "4620a50dba65807c26a68f11001e74bf9cfa3560..e3453a3021a93a610510d6200f1e41600e7c1e45"
 }
 ,{
     "testCaseDescription": "ruby-number-delete-rest-test",
@@ -1607,5 +1636,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2ff54d83dfd80eba661e8a5c4c7ed2b61d289e87..5063a6e97353e552c8a9a38f3cf69ef68790c3ab"
+    "shas": "e3453a3021a93a610510d6200f1e41600e7c1e45..89c097f9e80701ff5aadf5bc16bccefb1a2dd88f"
 }]

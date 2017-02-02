@@ -93,9 +93,13 @@ library
                      , text >= 1.2.1.3
                      , text-icu
                      , these
-                     , tree-sitter-parsers
+                     , haskell-tree-sitter
                      , vector
                      , wl-pprint-text
+                     , c
+                     , go
+                     , ruby
+                     , javascript
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase, StrictData
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -fprof-auto -j
