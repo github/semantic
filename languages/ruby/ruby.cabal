@@ -7,7 +7,7 @@ author:              semantic-code
 maintainer:          tclem@github.com
 copyright:           2017 GitHub
 category:            Web
-build-type:          Custom
+build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
