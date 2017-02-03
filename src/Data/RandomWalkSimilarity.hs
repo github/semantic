@@ -16,7 +16,7 @@ module Data.RandomWalkSimilarity
 ) where
 
 import Control.Applicative
-import Control.Monad.Random.Strict
+import Control.Monad.Random
 import Control.Monad.State
 import Data.Align.Generic
 import Data.Array
