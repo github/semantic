@@ -166,7 +166,7 @@ rws compare getLabel as bs
     kdbs = KdTree.build (Vector.toList . feature) featurizedBs
 
     featurize :: Int -> Term f (Record fields) -> UnmappedTerm f fields
-    featurize index term = UnmappedTerm index (getField . extract $ defaultFeatureVectorDecorator getLabel term) term
+    featurize index term = UnmappedTerm index (rhead . extract $ defaultFeatureVectorDecorator getLabel term) term
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
