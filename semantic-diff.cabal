@@ -88,7 +88,6 @@ library
                      , optparse-applicative
                      , pointed
                      , protolude
-                     , QuickCheck >= 2.8.1
                      , recursion-schemes
                      , regex-compat
                      , semigroups
