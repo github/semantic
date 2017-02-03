@@ -250,10 +250,10 @@ featureVectorDecorator getLabel p q d
   . pqGramDecorator getLabel p q
   where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
         addSubtermVector :: FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
-        addSubtermVector = flip $ azipWith (+) . rhead . headF . runCofree
+        addSubtermVector = flip $ addVectors . rhead . headF . runCofree
 
-        azipWith :: (a -> b -> c) -> Array Int a -> Array Int b -> Array Int c
-        azipWith f as bs = listArray (0, d - 1) (fmap (\ i -> f (as ! i) (bs ! i)) [0..(d - 1)])
+        addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
+        addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
