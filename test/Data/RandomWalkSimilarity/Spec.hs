@@ -49,5 +49,5 @@ spec = parallel $ do
                     | otherwise = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
         copying :: Functor f => Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
         copying = cata wrap . fmap pure
-        decorate :: SyntaxTerm leaf '[Category] -> SyntaxTerm leaf '[Vector.Vector Double, Category]
+        decorate :: SyntaxTerm leaf '[Category] -> SyntaxTerm leaf '[FeatureVector, Category]
         decorate = defaultFeatureVectorDecorator (category . headF)
