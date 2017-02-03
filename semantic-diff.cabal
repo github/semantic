@@ -173,7 +173,8 @@ test-suite test
                      , Source.Spec
                      , TermSpec
                      , Test.Hspec.LeanCheck
-  build-depends:       base
+  build-depends:       array
+                     , base
                      , bifunctors
                      , deepseq
                      , filepath
