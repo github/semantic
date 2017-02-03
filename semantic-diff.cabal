@@ -82,6 +82,7 @@ library
                      , hashable
                      , kdt
                      , leancheck
+                     , mersenne-random-pure64
                      , MonadRandom
                      , mtl
                      , optparse-applicative

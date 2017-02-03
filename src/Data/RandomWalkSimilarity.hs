@@ -33,8 +33,8 @@ import Info
 import Patch
 import Prologue as P
 import qualified SES
+import System.Random.Mersenne.Pure64
 import Term (termSize, zipTerms, Term, TermF)
-import Test.QuickCheck.Random (mkQCGen)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
@@ -286,8 +286,9 @@ pqGramDecorator getLabel p q = cata algebra
 unitVector :: Int -> Int -> FeatureVector
 unitVector d hash = fmap (/ magnitude) uniform
   where
-    uniform = evalRand (listArray (0, d - 1) . take d <$> getRandoms) (mkQCGen hash)
+    uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
     magnitude = sqrtDouble (sum (fmap (** 2) uniform))
+    components = sequenceA (replicate d (liftRand randomDouble))
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
