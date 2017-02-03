@@ -219,7 +219,7 @@ defaultM = 10
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
     termIndex :: Int -- ^ The index of the term within its root term.
-  , feature   :: Vector.Vector Double -- ^ Feature vector
+  , feature   :: FeatureVector -- ^ Feature vector
   , term      :: Term f (Record fields) -- ^ The unmapped term
 }
 
@@ -228,6 +228,8 @@ data TermOrIndexOrNone term = Term term | Index Int | None
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
+
+type FeatureVector = Vector.Vector Double
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -238,11 +240,11 @@ defaultFeatureVectorDecorator
   :: (Hashable label, Traversable f)
   => Label f fields label
   -> Term f (Record fields)
-  -> Term f (Record (Vector.Vector Double ': fields))
+  -> Term f (Record (FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
 featureVectorDecorator getLabel p q d
   = cata (\ ((gram :. rest) :< functor) ->
       cofree ((foldl' (flip (Vector.zipWith (+) . rhead . extract)) (unitVector d (hash gram)) functor :. rest) :< functor))
@@ -276,7 +278,7 @@ pqGramDecorator getLabel p q = cata algebra
     padToSize n list = take n (list <> repeat empty)
 
 -- | Computes a unit vector of the specified dimension from a hash.
-unitVector :: Int -> Int -> Vector.Vector Double
+unitVector :: Int -> Int -> FeatureVector
 unitVector d hash = normalize ((`evalRand` mkQCGen hash) (Vector.fromList . take d <$> getRandoms))
   where
     normalize vec = fmap (/ vmagnitude vec) vec
