@@ -27,7 +27,7 @@ import qualified Data.KdTree.Static as KdTree
 import Data.Record
 import Data.Semigroup (Min(..), Option(..))
 import Data.These
-import qualified Data.Vector as Vector
+import qualified Data.Vector.Unboxed as Vector
 import Diff
 import Info
 import Patch
@@ -279,8 +279,8 @@ pqGramDecorator getLabel p q = cata algebra
 unitVector :: Int -> Int -> Vector.Vector Double
 unitVector d hash = normalize ((`evalRand` mkQCGen hash) (Vector.fromList . take d <$> getRandoms))
   where
-    normalize vec = fmap (/ vmagnitude vec) vec
-    vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
+    normalize vec = Vector.map (/ vmagnitude vec) vec
+    vmagnitude = sqrtDouble . Vector.sum . Vector.map (** 2)
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
