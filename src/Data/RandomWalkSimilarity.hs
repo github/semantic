@@ -13,6 +13,7 @@ module Data.RandomWalkSimilarity
 , stripTerm
 , Gram(..)
 , Label
+, FeatureVector
 ) where
 
 import Control.Applicative
