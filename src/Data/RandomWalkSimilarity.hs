@@ -245,7 +245,7 @@ defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel default
 featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = cata (\ ((gram :. rest) :< functor) ->
-      cofree ((foldr (Vector.zipWith (+) . rhead . extract) (unitVector d (hash gram)) functor :. rest) :< functor))
+      cofree ((foldl' (flip (Vector.zipWith (+) . rhead . extract)) (unitVector d (hash gram)) functor :. rest) :< functor))
   . pqGramDecorator getLabel p q
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
