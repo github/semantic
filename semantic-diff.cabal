@@ -108,7 +108,7 @@ library
 executable semantic-diff
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j -O2 -pgml=script/g++
+  ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O2 -pgml=script/g++
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
