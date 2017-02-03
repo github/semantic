@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "39c039e08c3764d56d26a74bbc7bb32704cc398c..bf275213eb7f0252ea00d4c4d512d7c1ad3a841c"
+    "shas": "771be04c5840c88023ff57d9984a37f5f81dedcd..3f158b510a9df10b8de9690dcbdfad6a426552e0"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bf275213eb7f0252ea00d4c4d512d7c1ad3a841c..90dd626922974beae3ac02734b6a9040c20f8844"
+    "shas": "3f158b510a9df10b8de9690dcbdfad6a426552e0..c2bf397ef8bf28d86f9e2fc89a6118d698c27890"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -178,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "90dd626922974beae3ac02734b6a9040c20f8844..8c6d06fdf10722bafb109c5c8b03922b16b2e4b2"
+    "shas": "c2bf397ef8bf28d86f9e2fc89a6118d698c27890..2ed7a40d451c97b1d1769c5091e5e71de96b2861"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -260,7 +260,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c6d06fdf10722bafb109c5c8b03922b16b2e4b2..428e63d779c812b38a047f0ce6a7c94681735c64"
+    "shas": "2ed7a40d451c97b1d1769c5091e5e71de96b2861..f825200c6081b8d111543ef82f0e23313955a777"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -303,7 +303,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "428e63d779c812b38a047f0ce6a7c94681735c64..3c31becef538d5dc5a68400e14ceff9b10ccca37"
+    "shas": "f825200c6081b8d111543ef82f0e23313955a777..195b5f5df7d917ac59d9e0b7d4e91f6286b52061"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-teardown-test",
@@ -360,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c31becef538d5dc5a68400e14ceff9b10ccca37..7b340405bd9a9ab47d50717b924a791be7df4e4c"
+    "shas": "195b5f5df7d917ac59d9e0b7d4e91f6286b52061..bba6f1716759c8316031780dd34e79b2053fd192"
 }]

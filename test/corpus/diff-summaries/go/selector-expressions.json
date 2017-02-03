@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eca7c6083f4f3169ebc3bf726c3d936818a2d174..aeb74c519ca8d7d63e6d35cff856d277c571b6f7"
+    "shas": "93e825289c30fdcea0facce06493e39682f6a7ba..cd64f432773757aa5fa6ff0476f27aad8d595ec7"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aeb74c519ca8d7d63e6d35cff856d277c571b6f7..a59ce1e7d20b1843f9b59495e1a6b3f7d8c096f4"
+    "shas": "cd64f432773757aa5fa6ff0476f27aad8d595ec7..b25137d17bd5e7bea464ce2920d9afe90ae02ab0"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -205,7 +205,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a59ce1e7d20b1843f9b59495e1a6b3f7d8c096f4..9c0b77724a8c467d16ad46f5f184144b65216512"
+    "shas": "b25137d17bd5e7bea464ce2920d9afe90ae02ab0..c7a732961ba33b2465bd9637e1067ed555c4cb17"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -314,7 +314,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c0b77724a8c467d16ad46f5f184144b65216512..a2f408b126df5e135832ae9d566dab50031792ec"
+    "shas": "c7a732961ba33b2465bd9637e1067ed555c4cb17..e815974dca0d230658d64ecf79738c8e1dc9db5f"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2f408b126df5e135832ae9d566dab50031792ec..7ee0dab9d8d593cbca3c6230313f3eaeda0ada55"
+    "shas": "e815974dca0d230658d64ecf79738c8e1dc9db5f..ba4f9675b711432266992877d092e51d6fca9246"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -414,5 +414,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7ee0dab9d8d593cbca3c6230313f3eaeda0ada55..0a55a88480be2cc766ee756b5b5f7bf45704376c"
+    "shas": "ba4f9675b711432266992877d092e51d6fca9246..973be6967857faed6793099995d1f692245fbe79"
 }]
