@@ -13,12 +13,14 @@ module Data.RandomWalkSimilarity
 , stripTerm
 , Gram(..)
 , Label
+, FeatureVector
 ) where
 
 import Control.Applicative
 import Control.Monad.Random
 import Control.Monad.State
 import Data.Align.Generic
+import Data.Array
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Listable
 import Data.Hashable
@@ -27,14 +29,13 @@ import qualified Data.KdTree.Static as KdTree
 import Data.Record
 import Data.Semigroup (Min(..), Option(..))
 import Data.These
-import qualified Data.Vector as Vector
 import Diff
 import Info
 import Patch
 import Prologue as P
 import qualified SES
+import System.Random.Mersenne.Pure64
 import Term (termSize, zipTerms, Term, TermF)
-import Test.QuickCheck.Random (mkQCGen)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
@@ -162,11 +163,11 @@ rws compare getLabel as bs
     eitherCutoff n diff | n <= 0 = pure (Left diff)
     eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
 
-    kdas = KdTree.build (Vector.toList . feature) featurizedAs
-    kdbs = KdTree.build (Vector.toList . feature) featurizedBs
+    kdas = KdTree.build (elems . feature) featurizedAs
+    kdbs = KdTree.build (elems . feature) featurizedBs
 
     featurize :: Int -> Term f (Record fields) -> UnmappedTerm f fields
-    featurize index term = UnmappedTerm index (getField . extract $ defaultFeatureVectorDecorator getLabel term) term
+    featurize index term = UnmappedTerm index (rhead . extract $ defaultFeatureVectorDecorator getLabel term) term
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
@@ -219,7 +220,7 @@ defaultM = 10
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
     termIndex :: Int -- ^ The index of the term within its root term.
-  , feature   :: Vector.Vector Double -- ^ Feature vector
+  , feature   :: FeatureVector -- ^ Feature vector
   , term      :: Term f (Record fields) -- ^ The unmapped term
 }
 
@@ -228,6 +229,8 @@ data TermOrIndexOrNone term = Term term | Index Int | None
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
+
+type FeatureVector = Array Int Double
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -238,15 +241,20 @@ defaultFeatureVectorDecorator
   :: (Hashable label, Traversable f)
   => Label f fields label
   -> Term f (Record fields)
-  -> Term f (Record (Vector.Vector Double ': fields))
+  -> Term f (Record (FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
 featureVectorDecorator getLabel p q d
-  = cata (\ ((gram :. rest) :< functor) ->
-      cofree ((foldr (Vector.zipWith (+) . rhead . extract) (unitVector d (hash gram)) functor :. rest) :< functor))
+  = cata collect
   . pqGramDecorator getLabel p q
+  where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
+        addSubtermVector :: FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
+        addSubtermVector = flip $ addVectors . rhead . headF . runCofree
+
+        addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
+        addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
@@ -276,11 +284,12 @@ pqGramDecorator getLabel p q = cata algebra
     padToSize n list = take n (list <> repeat empty)
 
 -- | Computes a unit vector of the specified dimension from a hash.
-unitVector :: Int -> Int -> Vector.Vector Double
-unitVector d hash = normalize ((`evalRand` mkQCGen hash) (Vector.fromList . take d <$> getRandoms))
+unitVector :: Int -> Int -> FeatureVector
+unitVector d hash = fmap (/ magnitude) uniform
   where
-    normalize vec = fmap (/ vmagnitude vec) vec
-    vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
+    uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
+    magnitude = sqrtDouble (sum (fmap (** 2) uniform))
+    components = sequenceA (replicate d (liftRand randomDouble))
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)

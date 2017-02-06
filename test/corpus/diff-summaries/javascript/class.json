@@ -34,7 +34,7 @@
         "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d9d6e19c015a3f2dbb9d04d3867b13889dd798ac..05fc0916c3ad9408a0e1b0fd90bb83d43628e892"
+    "shas": "5d563ac383acc3c789fbd552c697d625c0f424fc..f27889edbbb5640de4565ccc6d3dda2c6ca4ff7b"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-insert-test",
@@ -89,7 +89,7 @@
         " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "05fc0916c3ad9408a0e1b0fd90bb83d43628e892..4204d9bb3c5c1cfab6dc2b6af925b0666d015cb0"
+    "shas": "f27889edbbb5640de4565ccc6d3dda2c6ca4ff7b..6363c59704fdb865549eb385ba38810a1c53f5f9"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-insert-test",
@@ -125,63 +125,57 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'two(b)' method in the Foo class"
+                    "summary": "Replaced the 'bar' identifier with the 'two' identifier in the 'two(b)' method of the 'Foo' class"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                85
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'three(c)' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar(b)' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                83
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'baz(c)' method in the Foo class"
+                    "summary": "Replaced the 'baz' identifier with the 'three' identifier in the 'three(c)' method of the 'Foo' class"
                 }
             ]
         },
@@ -202,7 +196,7 @@
         " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4204d9bb3c5c1cfab6dc2b6af925b0666d015cb0..18b9de02fda94811dad14657d61160c8943b6576"
+    "shas": "6363c59704fdb865549eb385ba38810a1c53f5f9..0193a7dc4d1a24b5344dd31b252d5624bc36e843"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-test",
@@ -238,63 +232,57 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'bar(b)' method in the Foo class"
+                    "summary": "Replaced the 'two' identifier with the 'bar' identifier in the 'bar(b)' method of the 'Foo' class"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                83
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'baz(c)' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two(b)' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                85
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'three(c)' method in the Foo class"
+                    "summary": "Replaced the 'three' identifier with the 'baz' identifier in the 'baz(c)' method of the 'Foo' class"
                 }
             ]
         },
@@ -315,7 +303,7 @@
         " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "18b9de02fda94811dad14657d61160c8943b6576..c4c35843b5c7aa3d018d196d8fb86f2495b7881c"
+    "shas": "0193a7dc4d1a24b5344dd31b252d5624bc36e843..da671e1fcebbc3420fa30b56cb64b32ce271a004"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-replacement-test",
@@ -386,7 +374,7 @@
         "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c4c35843b5c7aa3d018d196d8fb86f2495b7881c..af0a7a4e55d3b67109f4455766d91410a6113c76"
+    "shas": "da671e1fcebbc3420fa30b56cb64b32ce271a004..08d69ec53c3b1ea4afe6ffab3084d626bf375015"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-test",
@@ -425,7 +413,7 @@
         " class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "af0a7a4e55d3b67109f4455766d91410a6113c76..417e7b1dc2606c4235a0fecf05b8d1c3c170f661"
+    "shas": "08d69ec53c3b1ea4afe6ffab3084d626bf375015..b5988452546dcdfce01968a70b4fc10fa86804a9"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-rest-test",
@@ -463,5 +451,5 @@
         "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "417e7b1dc2606c4235a0fecf05b8d1c3c170f661..89b3d4cd2ef38999c223c69de3011646b1f43c24"
+    "shas": "b5988452546dcdfce01968a70b4fc10fa86804a9..2bd27e99860858d0a524b5a307b97f412b4cc0c8"
 }]

@@ -34,7 +34,7 @@
         "+i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6c2a6d2038e58ffec3265d64973449c3c258d5ad..5cc9b010912a3ee08aaf18f3beafedd31740b011"
+    "shas": "0418e8cf18ec4ace51cecc0070ed205313e92ac2..e931b75067441dea85e8d8cc511914b06963c019"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-insert-test",
@@ -89,7 +89,7 @@
         " i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5cc9b010912a3ee08aaf18f3beafedd31740b011..3da1355235d8d4fec9a54cefcf11f9536cfad9fe"
+    "shas": "e931b75067441dea85e8d8cc511914b06963c019..41aadd5ed24ead1d8cfed0f50c9b94bf53fd46d6"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-insert-test",
@@ -169,7 +169,7 @@
         " i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3da1355235d8d4fec9a54cefcf11f9536cfad9fe..566c62a4a59091e26052615274a13a04d2b00401"
+    "shas": "41aadd5ed24ead1d8cfed0f50c9b94bf53fd46d6..df7ea23068df1b6b1cf2f08fad16caaf5d46fefc"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-test",
@@ -249,7 +249,7 @@
         " i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "566c62a4a59091e26052615274a13a04d2b00401..e44f1851599323aed0e6c491558936211b2815fc"
+    "shas": "df7ea23068df1b6b1cf2f08fad16caaf5d46fefc..9d073a688fa23ea66f4468ed28a10bfa165dd9b1"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+i + j * 2 - j % 4;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e44f1851599323aed0e6c491558936211b2815fc..1a7ef2981311a4aed0e0591a526b8ef78ee190f7"
+    "shas": "9d073a688fa23ea66f4468ed28a10bfa165dd9b1..9e5f2045b4f95e3bc8348c1748d638d4e38960ea"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-test",
@@ -359,7 +359,7 @@
         " i + j * 2 - j % 4;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1a7ef2981311a4aed0e0591a526b8ef78ee190f7..544ee219892710050b020798ca49e15208a7c028"
+    "shas": "9e5f2045b4f95e3bc8348c1748d638d4e38960ea..1c13b3a5d6e0787ed69116e4cebb1115366a8f21"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-rest-test",
@@ -397,5 +397,5 @@
         "-i + j * 2 - j % 4;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "544ee219892710050b020798ca49e15208a7c028..68249c6faa764e8f289c3ae7afb4c98267e953d8"
+    "shas": "1c13b3a5d6e0787ed69116e4cebb1115366a8f21..60e56ee717443319fd06b7b25a02393835ad25e4"
 }]

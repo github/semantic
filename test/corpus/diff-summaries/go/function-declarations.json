@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b9e8cbc963d70681826124d682474977bcef4d33..75b2b30297a1bb14866f352c5291cae0ad1711b6"
+    "shas": "c6f67bb8cd7d913aef92b7064167389be8aba005..31b25d7f0916847e14a275928dfe547ecfe5f8b2"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -111,7 +111,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "75b2b30297a1bb14866f352c5291cae0ad1711b6..aced7850a95b463c3083658d0a6b2a9e25021b74"
+    "shas": "31b25d7f0916847e14a275928dfe547ecfe5f8b2..cec2b6e42b2004d94cff3f4bb3e4fb865c3802c5"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -253,7 +253,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aced7850a95b463c3083658d0a6b2a9e25021b74..d0160ccee51c30218f5ca3f776ca8c21cf6ccfd2"
+    "shas": "cec2b6e42b2004d94cff3f4bb3e4fb865c3802c5..8b6a0102815a843f15f22cb1decfb2475cce12f7"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -395,7 +395,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0160ccee51c30218f5ca3f776ca8c21cf6ccfd2..5e7095ac8137e91c12215c45438bbd29c382290e"
+    "shas": "8b6a0102815a843f15f22cb1decfb2475cce12f7..b4ca15a5b0135979388101b65bcd51e392704815"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -453,7 +453,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5e7095ac8137e91c12215c45438bbd29c382290e..432d945a039effe38996415a0be25ec7a92dc22f"
+    "shas": "b4ca15a5b0135979388101b65bcd51e392704815..2986b4c0c04f9583d0c901ee2e4218d7f2a3f7ec"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -510,5 +510,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "432d945a039effe38996415a0be25ec7a92dc22f..7ebca2c2e26873ec2ec3d92c6922446eb95bb61f"
+    "shas": "2986b4c0c04f9583d0c901ee2e4218d7f2a3f7ec..47904bad825de948224fb80e0c17cd04f54a0411"
 }]

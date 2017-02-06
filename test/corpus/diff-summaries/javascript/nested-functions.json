@@ -34,7 +34,7 @@
         "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "03a1b4a15f149e9715aa37bf2334cb4f05f0e8ff..4ce42b8934b35777d212723ca9a88cbee7535b48"
+    "shas": "d03236f8517c53c78b398fe3778c8170b54e36ea..1662b1dfc6d38616da1fff5ad7e6ee911a77e534"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
@@ -89,7 +89,7 @@
         " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4ce42b8934b35777d212723ca9a88cbee7535b48..d4b753c9830ac2dd22f16d0ec57c93b3214d7d57"
+    "shas": "1662b1dfc6d38616da1fff5ad7e6ee911a77e534..89e96daa71a3e9aeae51bf3d823785ae65027678"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-insert-test",
@@ -169,7 +169,7 @@
         " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d4b753c9830ac2dd22f16d0ec57c93b3214d7d57..27d1213c9b03406885e69e99e21581bdc0d57a90"
+    "shas": "89e96daa71a3e9aeae51bf3d823785ae65027678..c3d4bd3343b7ebd88669f53728aa459003a0dbe2"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-test",
@@ -249,7 +249,7 @@
         " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "27d1213c9b03406885e69e99e21581bdc0d57a90..b4cc03a33f7f1b03461ad9089715eba1f44ede40"
+    "shas": "c3d4bd3343b7ebd88669f53728aa459003a0dbe2..767e6169749beb378d262e0c0c5995dd4d3750de"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b4cc03a33f7f1b03461ad9089715eba1f44ede40..dc0c846188cd94a7a6c54e6ffeb8a2df5954cf20"
+    "shas": "767e6169749beb378d262e0c0c5995dd4d3750de..18cd0d93c09a6f185e1f8f5b7ad1aa23e6b067bc"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-test",
@@ -359,7 +359,7 @@
         " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "dc0c846188cd94a7a6c54e6ffeb8a2df5954cf20..7d1d6d109a4c86188cdfb9df514d7f3bf1009ae8"
+    "shas": "18cd0d93c09a6f185e1f8f5b7ad1aa23e6b067bc..2380a4af99f945cf851c2a6ffc333adae28ec1a9"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-rest-test",
@@ -397,5 +397,5 @@
         "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7d1d6d109a4c86188cdfb9df514d7f3bf1009ae8..d15a8f422c2a2393c71f113fdb716151dc5a3840"
+    "shas": "2380a4af99f945cf851c2a6ffc333adae28ec1a9..0f9353e629ed1d4b50861305cd28aa9667f15b4a"
 }]

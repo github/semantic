@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fd41bb91afdd6087f0c3e6c54566857b7105df8c..5712b1395e13d1c0fa00cffacbf8bc0951053d35"
+    "shas": "801a4b4a7d2bdf5c1e952907c397458e5bd92927..536af6b2934ccea4929b7deef5254fa73559af9e"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-insert-test",
@@ -114,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5712b1395e13d1c0fa00cffacbf8bc0951053d35..22932b78378effd2b941d482834bf0a72286edec"
+    "shas": "536af6b2934ccea4929b7deef5254fa73559af9e..a518f85a2b88e915d504bd865647b0584f3c7c68"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-test",
@@ -199,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "22932b78378effd2b941d482834bf0a72286edec..9f5d0bbee0d79018b1b0187ba73c28d0f9d72c78"
+    "shas": "a518f85a2b88e915d504bd865647b0584f3c7c68..2a1fda1e92733a5ff9e89fe51af004f43bcbb91a"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
@@ -284,7 +284,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9f5d0bbee0d79018b1b0187ba73c28d0f9d72c78..30a750a5c56e53a8f94fcc56d10cca85093b2286"
+    "shas": "2a1fda1e92733a5ff9e89fe51af004f43bcbb91a..10f54c865050421c5806bba76c55aed8511c4298"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-insert-test",
@@ -345,7 +345,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "30a750a5c56e53a8f94fcc56d10cca85093b2286..9b4c1d9f9789b88f196087dafbad93a21508c9c2"
+    "shas": "10f54c865050421c5806bba76c55aed8511c4298..3358296dd4d8feb1d97691fd30bf617a37d19fb4"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-teardown-test",
@@ -402,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b4c1d9f9789b88f196087dafbad93a21508c9c2..d39cc6bcd81255864bc210bd0ab92a71c0a80cc2"
+    "shas": "3358296dd4d8feb1d97691fd30bf617a37d19fb4..845e2019d345a8a5ab4801dc77607dccc4be32be"
 }]

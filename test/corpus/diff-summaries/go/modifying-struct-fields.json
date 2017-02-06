@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f5a9b8a54a3841db93e420bf8eff96b4d2d6858a..94d93d2117a8e57a238a502919ff833d7cf671b9"
+    "shas": "1db9797ad5dba80a8c983c5b7c08bc5c3a618c2f..a1e06993873f1df0fa0abcf30c4890e3e3a15747"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "94d93d2117a8e57a238a502919ff833d7cf671b9..a9aa97bd6ac93d93d8e62ca2a59b9ec861b684df"
+    "shas": "a1e06993873f1df0fa0abcf30c4890e3e3a15747..8425f9af7af93dfbbcaafd9a49869890fdd613b3"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -169,7 +169,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a9aa97bd6ac93d93d8e62ca2a59b9ec861b684df..d0a359246dac8c80adcb1b4e7bac351462363d18"
+    "shas": "8425f9af7af93dfbbcaafd9a49869890fdd613b3..866358e0c15738b5beb120acddeaa1780b52ea24"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0a359246dac8c80adcb1b4e7bac351462363d18..261a10edc770e3f40cd33d61dc0d61d0510527a5"
+    "shas": "866358e0c15738b5beb120acddeaa1780b52ea24..2ba57b7429946786400117dcedbddfd98022d253"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -285,7 +285,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "261a10edc770e3f40cd33d61dc0d61d0510527a5..729241bd7988d5e569c4a3384c678328236ba019"
+    "shas": "2ba57b7429946786400117dcedbddfd98022d253..a13612abc86f5d955b0172f185bee4f804da3ca2"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -342,5 +342,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "729241bd7988d5e569c4a3384c678328236ba019..b704517caf7ad227154e0582b74255cd4065e091"
+    "shas": "a13612abc86f5d955b0172f185bee4f804da3ca2..b6b453e993e43495a495d7860d50e479516bab43"
 }]

@@ -2,6 +2,7 @@
 module InterpreterSpec where
 
 import Category
+import Data.Array
 import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
@@ -40,5 +41,5 @@ spec = parallel $ do
 
     it "produces unbiased insertions within branches" $
       let term s = decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf s) ]))
-          root = cofree . ((pure 0 :. Program :. Nil) :<) . Indexed in
+          root = cofree . ((listArray (0, 0) [0] :. Program :. Nil) :<) . Indexed in
       stripDiff (diffTerms wrap compare diffCost getLabel (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program :. Nil) :< Indexed [ inserting (stripTerm (term "a")), cata wrap (fmap pure (stripTerm (term "b"))) ])

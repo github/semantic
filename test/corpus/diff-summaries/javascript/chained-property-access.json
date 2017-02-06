@@ -34,7 +34,7 @@
         "+return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c0d1f59dbc88b8a161e9dfa867107276f10b2898..b8c22790764e8661eb7f8d764e9b0af1b93cdd89"
+    "shas": "2ceb4d28a0554634451ed82eacdbb44d64ce6d54..04d4c1c2fc7bdc609a5e62f5392deeb2b8c9ab9a"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
@@ -89,7 +89,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b8c22790764e8661eb7f8d764e9b0af1b93cdd89..63a6ea11f36663237346e70a138fd62524b9aef6"
+    "shas": "04d4c1c2fc7bdc609a5e62f5392deeb2b8c9ab9a..6a9f25a73a687fa568e6d8c0729891567ce577d9"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
@@ -169,7 +169,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "63a6ea11f36663237346e70a138fd62524b9aef6..1bbcdcf73d6865d9695b99b229ac793f118439a4"
+    "shas": "6a9f25a73a687fa568e6d8c0729891567ce577d9..f28a31996062be9efdb0201fdb9c31713fb1863c"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-test",
@@ -249,7 +249,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1bbcdcf73d6865d9695b99b229ac793f118439a4..6b89d7a2b0d652938ed2c5f638d5091c6d8555d2"
+    "shas": "f28a31996062be9efdb0201fdb9c31713fb1863c..46c033b24c360e511ef758b6b789094a7fdf0a71"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6b89d7a2b0d652938ed2c5f638d5091c6d8555d2..99c802ed801ddf5a24e177c5a08fc18f2658c6ce"
+    "shas": "46c033b24c360e511ef758b6b789094a7fdf0a71..68a9119e612fa94131420134a900676aa832b51c"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-test",
@@ -359,7 +359,7 @@
         " return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "99c802ed801ddf5a24e177c5a08fc18f2658c6ce..6b0b1796a40ecd246a53b69ffa84e15966547ff9"
+    "shas": "68a9119e612fa94131420134a900676aa832b51c..4df47be97cc54a916abb21134f5d8b761e34752a"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
@@ -397,5 +397,5 @@
         "-return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6b0b1796a40ecd246a53b69ffa84e15966547ff9..e97f568708cabfc40035c206b04bf5b6abf6e5bd"
+    "shas": "4df47be97cc54a916abb21134f5d8b761e34752a..9d8e6a9365dd210f6592bfbb25de8eb159ea7499"
 }]

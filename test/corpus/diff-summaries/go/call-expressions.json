@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5f8f49ab00e91cf9cf8a71dd94c14b3fa29aad8..0f348f4e761af93c4036be91a81c370254edab79"
+    "shas": "f0b34c346192cc12d9b46d9704fad3c9ccf83f32..248fb54de2d8f176be609f56c29f052fad37cb11"
 }
 ,{
     "testCaseDescription": "go-call-expressions-insert-test",
@@ -128,7 +128,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f348f4e761af93c4036be91a81c370254edab79..8032ef9f0136e422475ec94f40416071beacb1b3"
+    "shas": "248fb54de2d8f176be609f56c29f052fad37cb11..00c967e4eced2e6a904ac2f820abfa636b9628d7"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-test",
@@ -152,18 +152,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'b(b, c)' function call in the main function"
+                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the b(b, c) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -179,21 +191,6 @@
                         }
                     },
                     "summary": "Added the 'c(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x(b, c)' function call in the main function"
                 },
                 {
                     "span": {
@@ -250,7 +247,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8032ef9f0136e422475ec94f40416071beacb1b3..8dda64263242afa2d8deb5d25140852ebfb07b71"
+    "shas": "00c967e4eced2e6a904ac2f820abfa636b9628d7..568dc9207237702e76ed90be6ca5d7e61ad3409f"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-replacement-test",
@@ -274,18 +271,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'y(b, c)' function call in the main function"
+                    "summary": "Replaced the 'a' identifier with the 'y' identifier in the y(b, c) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -301,21 +310,6 @@
                         }
                     },
                     "summary": "Added the 'z(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a(b, c)' function call in the main function"
                 },
                 {
                     "span": {
@@ -372,7 +366,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8dda64263242afa2d8deb5d25140852ebfb07b71..dd71d5503cc5e5b1f7e85ccabd36d64c891e48d2"
+    "shas": "568dc9207237702e76ed90be6ca5d7e61ad3409f..6add1da7fe5389afcf0ff4693257b80cf70105bc"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-insert-test",
@@ -447,7 +441,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dd71d5503cc5e5b1f7e85ccabd36d64c891e48d2..a9a077abbee74593f4f64c4491602102a47e0f0d"
+    "shas": "6add1da7fe5389afcf0ff4693257b80cf70105bc..58a6ab21d996af50176d7aeaf8f3c8300d483984"
 }
 ,{
     "testCaseDescription": "go-call-expressions-teardown-test",
@@ -504,5 +498,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a9a077abbee74593f4f64c4491602102a47e0f0d..cbd953ad26bc63e3ddd57f753a0d7bf09ed21706"
+    "shas": "58a6ab21d996af50176d7aeaf8f3c8300d483984..8d9e47a8daa5778ca7449e4af9b31f9b2374dde7"
 }]
