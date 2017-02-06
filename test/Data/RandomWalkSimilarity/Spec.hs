@@ -7,7 +7,6 @@ import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
-import qualified Data.Vector as Vector
 import Diff
 import Info
 import Patch
