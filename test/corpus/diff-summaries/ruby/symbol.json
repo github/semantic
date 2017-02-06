@@ -66,7 +66,7 @@
         "+:\"foo\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5063a6e97353e552c8a9a38f3cf69ef68790c3ab..e420b9e6d9f4c570e7ab4a005d6d445b311ead38"
+    "shas": "06e0c82cc4de92677af4b24443f616a6b3ddf682..4cddc55a2cfa1451ea4b9f3299687fb6f2d17b57"
 }
 ,{
     "testCaseDescription": "ruby-symbol-replacement-insert-test",
@@ -187,7 +187,7 @@
         " :\"foo\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e420b9e6d9f4c570e7ab4a005d6d445b311ead38..0fef26f562072aea7fb0f874d7552324daff2f4f"
+    "shas": "4cddc55a2cfa1451ea4b9f3299687fb6f2d17b57..625405ef92bc13ff70876edc14fe7746e685d52c"
 }
 ,{
     "testCaseDescription": "ruby-symbol-delete-insert-test",
@@ -196,6 +196,36 @@
             "symbol.rb": [
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':foo' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':'foo'' symbol"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -209,71 +239,47 @@
                             },
                             {
                                 "start": [
-                                    1,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    5
+                                    3,
+                                    7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the ':bar' symbol with the ':foo' symbol"
+                    "summary": "Replaced the ':bar' symbol with the ':\"foo\"' symbol"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ':'bar'' symbol with the ':'foo'' symbol"
+                    "summary": "Deleted the ':'bar'' symbol"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ':\"bar\"' symbol with the ':\"foo\"' symbol"
+                    "summary": "Deleted the ':\"bar\"' symbol"
                 }
             ]
         },
@@ -299,7 +305,7 @@
         " :\"foo\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0fef26f562072aea7fb0f874d7552324daff2f4f..b6740a1b1e5dcaf4f5401b301bfd5a2b11638b67"
+    "shas": "625405ef92bc13ff70876edc14fe7746e685d52c..561a21dfe82a3f3e8fe6bd0b9ef5ec4d34b330bf"
 }
 ,{
     "testCaseDescription": "ruby-symbol-replacement-test",
@@ -308,6 +314,21 @@
             "symbol.rb": [
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':bar' symbol"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -321,17 +342,17 @@
                             },
                             {
                                 "start": [
-                                    1,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    5
+                                    2,
+                                    7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the ':foo' symbol with the ':bar' symbol"
+                    "summary": "Replaced the ':foo' symbol with the ':'bar'' symbol"
                 },
                 {
                     "span": {
@@ -348,44 +369,32 @@
                             },
                             {
                                 "start": [
-                                    2,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    2,
+                                    3,
                                     7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the ':'foo'' symbol with the ':'bar'' symbol"
+                    "summary": "Replaced the ':'foo'' symbol with the ':\"bar\"' symbol"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ':\"foo\"' symbol with the ':\"bar\"' symbol"
+                    "summary": "Deleted the ':\"foo\"' symbol"
                 }
             ]
         },
@@ -411,7 +420,7 @@
         " :\"foo\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b6740a1b1e5dcaf4f5401b301bfd5a2b11638b67..82e24cd9a151e25fc034c9e58d5737ac2f306a21"
+    "shas": "561a21dfe82a3f3e8fe6bd0b9ef5ec4d34b330bf..7fd1800d1245cf683b63e6f929bdbf5ee774bfcc"
 }
 ,{
     "testCaseDescription": "ruby-symbol-delete-replacement-test",
@@ -580,7 +589,7 @@
         "+:\"bar\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "82e24cd9a151e25fc034c9e58d5737ac2f306a21..f29d1cd33117f62aa71f4b04b2c065e42c7e0a9f"
+    "shas": "7fd1800d1245cf683b63e6f929bdbf5ee774bfcc..e3c79211bca97f8397bc1e2bac9cb90ba883c614"
 }
 ,{
     "testCaseDescription": "ruby-symbol-delete-test",
@@ -653,7 +662,7 @@
         " :\"bar\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f29d1cd33117f62aa71f4b04b2c065e42c7e0a9f..7c8b899f33252e7a9207a2d200e41b48a1d6e823"
+    "shas": "e3c79211bca97f8397bc1e2bac9cb90ba883c614..4b9ccaf76a8124b962bdff28dd27c92245936873"
 }
 ,{
     "testCaseDescription": "ruby-symbol-delete-rest-test",
@@ -723,5 +732,5 @@
         "-:\"bar\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7c8b899f33252e7a9207a2d200e41b48a1d6e823..7882bb5b3e1cea5c33c4c86cf4a7935c534cf40c"
+    "shas": "4b9ccaf76a8124b962bdff28dd27c92245936873..a95a833cbc8cde4e219dbcc1ea4abfcbe688c968"
 }]

@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e3c2411f013b063d1c440d3a295be6485170c63d..3f76dd06eb1d09789402bf6941a8d177785db15d"
+    "shas": "af475569269f35a36a9d234672a350cdee8a7b9c..c17ea278ae1a8fa74269ef08b597da1aca3be3f5"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -141,7 +141,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3f76dd06eb1d09789402bf6941a8d177785db15d..187c1b52a8ed9334d34195fc341535c8d021c0d4"
+    "shas": "c17ea278ae1a8fa74269ef08b597da1aca3be3f5..6291db265b7bb7d6ac7d3df4f155a9c7c9058012"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -277,7 +277,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "187c1b52a8ed9334d34195fc341535c8d021c0d4..cb1ef5208e3c762f6d149a56bea8c42e448e8ef0"
+    "shas": "6291db265b7bb7d6ac7d3df4f155a9c7c9058012..77ea26a67ada7a829fe739f5ad8ea450f94db499"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -413,7 +413,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb1ef5208e3c762f6d149a56bea8c42e448e8ef0..d7c2a9a102abb7226275c4d464907a4154b782c3"
+    "shas": "77ea26a67ada7a829fe739f5ad8ea450f94db499..dad180b70c5fdfb011470cd97996d23fd01175dc"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -501,7 +501,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d7c2a9a102abb7226275c4d464907a4154b782c3..716f05adcb3b0c9c3fcd7166f770fe32c639d348"
+    "shas": "dad180b70c5fdfb011470cd97996d23fd01175dc..1c437eba401fefa034cfc81d0dbe3e1d88fd4c78"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -558,5 +558,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "716f05adcb3b0c9c3fcd7166f770fe32c639d348..d5f8f49ab00e91cf9cf8a71dd94c14b3fa29aad8"
+    "shas": "1c437eba401fefa034cfc81d0dbe3e1d88fd4c78..f0b34c346192cc12d9b46d9704fad3c9ccf83f32"
 }]

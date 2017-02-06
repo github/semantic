@@ -35,7 +35,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "01b13564c812c309867f8f8201bbbebe8f878f4d..b7dd051c8d7021a24eef603c87d14027d19ba043"
+    "shas": "4c7e74e0e3b6057ae87e1d79fbe2a42782e1fac5..cd93653bcdce3f9cbd94dbfc97274325eb986496"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-insert-test",
@@ -75,7 +75,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b7dd051c8d7021a24eef603c87d14027d19ba043..75a68dbeeb7a428a3f86b783db24c1cf5e3c4fc1"
+    "shas": "cd93653bcdce3f9cbd94dbfc97274325eb986496..5340b8aab442949dd69d9b2f46a212ef2b3a4990"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-replacement-test",
@@ -130,7 +130,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "75a68dbeeb7a428a3f86b783db24c1cf5e3c4fc1..77bd11b3d718b733c4aa6b58fe27bd5ca8074e49"
+    "shas": "5340b8aab442949dd69d9b2f46a212ef2b3a4990..dd8490463ad615c53ebe1c9890d03e570bbc84d0"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-replacement-test",
@@ -185,7 +185,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "77bd11b3d718b733c4aa6b58fe27bd5ca8074e49..ecf42398fcfb1b45807c155dcf231429ce55d335"
+    "shas": "dd8490463ad615c53ebe1c9890d03e570bbc84d0..5828f299d5da302e1c47919559e2acc1f4cfb63e"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-insert-test",
@@ -225,7 +225,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ecf42398fcfb1b45807c155dcf231429ce55d335..6289c01f7f9b0dead7f8b63f9e86498811e843a1"
+    "shas": "5828f299d5da302e1c47919559e2acc1f4cfb63e..e4b60e166759fa958acd2e1028643a207da24231"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-teardown-test",
@@ -264,5 +264,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6289c01f7f9b0dead7f8b63f9e86498811e843a1..5458878541d4dbd326730893f8986cee3285d576"
+    "shas": "e4b60e166759fa958acd2e1028643a207da24231..980ea856c1bac9ba15ee84733b51821229105ba7"
 }]

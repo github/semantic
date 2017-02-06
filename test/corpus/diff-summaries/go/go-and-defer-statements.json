@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fa9acd974705290312a7cebdba09b18008dc6093..d00a7d7d9b0063f84a7033c6182913c365412974"
+    "shas": "70d17350ea16f4d4d0cfc2d2884ffa2d16673d76..b5500c1114c110c94e2a0bf00ee8d266fb9dcb78"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d00a7d7d9b0063f84a7033c6182913c365412974..eafca6f1008f09b4b1a1c39a58d69aa84ac352b6"
+    "shas": "b5500c1114c110c94e2a0bf00ee8d266fb9dcb78..ed5d2562fde56c9ab47b28c78cec6378fa687f3c"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -250,7 +250,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eafca6f1008f09b4b1a1c39a58d69aa84ac352b6..949b06caae4bd83cfbfd6a4a2af62754e5426afc"
+    "shas": "ed5d2562fde56c9ab47b28c78cec6378fa687f3c..8439dbebfbc084625381e3ed0c7ccf750225ee6c"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -388,7 +388,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "949b06caae4bd83cfbfd6a4a2af62754e5426afc..6a0c93da8aace8b01e5dcd171ecb9482ec200cb9"
+    "shas": "8439dbebfbc084625381e3ed0c7ccf750225ee6c..fb0c724a6423a7cc190a9f4a3a04fcf927576d23"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -447,7 +447,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6a0c93da8aace8b01e5dcd171ecb9482ec200cb9..8b9931aef1a3b18f61b2dee680cdc1d159cb4f36"
+    "shas": "fb0c724a6423a7cc190a9f4a3a04fcf927576d23..20c6933a74e838ea3fc37e46529869564f2366fd"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -504,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8b9931aef1a3b18f61b2dee680cdc1d159cb4f36..43ac69d0304e8f5a93bb985e3f4e05d9dff5d2b6"
+    "shas": "20c6933a74e838ea3fc37e46529869564f2366fd..e23825ba20a9911899a12cc29fecfc4811eca175"
 }]

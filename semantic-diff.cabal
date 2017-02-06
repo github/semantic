@@ -63,6 +63,7 @@ library
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , aeson-pretty
+                     , array
                      , async-pool
                      , bifunctors
                      , blaze-html
@@ -81,12 +82,12 @@ library
                      , hashable
                      , kdt
                      , leancheck
+                     , mersenne-random-pure64
                      , MonadRandom
                      , mtl
                      , optparse-applicative
                      , pointed
                      , protolude
-                     , QuickCheck >= 2.8.1
                      , recursion-schemes
                      , regex-compat
                      , semigroups
@@ -172,7 +173,8 @@ test-suite test
                      , Source.Spec
                      , TermSpec
                      , Test.Hspec.LeanCheck
-  build-depends:       base
+  build-depends:       array
+                     , base
                      , bifunctors
                      , deepseq
                      , filepath
