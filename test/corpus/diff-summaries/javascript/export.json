@@ -194,7 +194,7 @@
         "+export { import1 as name1, import2 as name2, nameN } from 'bar';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b56108ab09b88f198a0ec68e4f7a87ad1b2c06b6..37689b6855efcf22edc9a397b6116b5141ab642b"
+    "shas": "be1bd2dff0107fc60e25707f2c27edec41f646ff..94fbe62beb0b9d5bd87916b16626ade5757be77c"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-insert-test",
@@ -571,7 +571,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "37689b6855efcf22edc9a397b6116b5141ab642b..a587e998ca80b72452fa08e9dc0a82842607673b"
+    "shas": "94fbe62beb0b9d5bd87916b16626ade5757be77c..33315fb792d3dd55c8dad8aec745f479637b74d8"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-insert-test",
@@ -688,408 +688,63 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    10
-                                ],
-                                "end": [
-                                    2,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    10
-                                ],
-                                "end": [
-                                    2,
-                                    19
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'variable2' identifier with the 'variable1' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
+                    "summary": "Added the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    23
-                                ],
-                                "end": [
-                                    2,
-                                    28
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    23
-                                ],
-                                "end": [
-                                    2,
-                                    28
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'name2' identifier with the 'name1' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
+                    "summary": "Added the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    30
-                                ],
-                                "end": [
-                                    2,
-                                    39
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    30
-                                ],
-                                "end": [
-                                    2,
-                                    39
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'variable3' identifier with the 'variable2' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
+                    "summary": "Added the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    43
-                                ],
-                                "end": [
-                                    2,
-                                    48
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    43
-                                ],
-                                "end": [
-                                    2,
-                                    48
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'name3' identifier with the 'name2' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    50
-                                ],
-                                "end": [
-                                    2,
-                                    55
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    50
-                                ],
-                                "end": [
-                                    2,
-                                    55
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'nameY' identifier with the 'nameN' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    12
-                                ],
-                                "end": [
-                                    3,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    12
-                                ],
-                                "end": [
-                                    3,
-                                    17
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'name3' identifier with the 'name1' identifier in the { name1, name2, nameN } export statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    19
-                                ],
-                                "end": [
-                                    3,
-                                    24
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    19
-                                ],
-                                "end": [
-                                    3,
-                                    24
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'name4' identifier with the 'name2' identifier in the { name1, name2, nameN } export statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    26
-                                ],
-                                "end": [
-                                    3,
-                                    31
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    26
-                                ],
-                                "end": [
-                                    3,
-                                    31
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'nameT' identifier with the 'nameN' identifier in the { name1, name2, nameN } export statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    12
-                                ],
-                                "end": [
-                                    4,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    12
-                                ],
-                                "end": [
-                                    4,
-                                    17
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'name2' identifier with the 'name1' identifier in the name1 var assignment"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    20
-                                ],
-                                "end": [
-                                    4,
-                                    26
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    20
-                                ],
-                                "end": [
-                                    4,
-                                    26
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'value2' identifier with the 'value1' identifier in the name1 var assignment"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    28
-                                ],
-                                "end": [
-                                    4,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    28
-                                ],
-                                "end": [
-                                    4,
-                                    33
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'name3' identifier with the 'name2' identifier in the name2 var assignment"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    36
-                                ],
-                                "end": [
-                                    4,
-                                    42
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    36
-                                ],
-                                "end": [
-                                    4,
-                                    42
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'value3' identifier with the 'value2' identifier in the name2 var assignment"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    44
-                                ],
-                                "end": [
-                                    4,
-                                    49
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    44
-                                ],
-                                "end": [
-                                    4,
-                                    49
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'name4' identifier with the 'name3' identifier in the { name1 = value1, name2 = value2, name3, nameN } export statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    51
-                                ],
-                                "end": [
-                                    4,
-                                    56
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    51
-                                ],
-                                "end": [
-                                    4,
-                                    56
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'nameO' identifier with the 'nameN' identifier in the { name1 = value1, name2 = value2, name3, nameN } export statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    16
-                                ],
-                                "end": [
-                                    5,
-                                    34
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    16
-                                ],
-                                "end": [
-                                    5,
-                                    29
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'otherNamedFunction' identifier with the 'namedFunction' identifier in the { namedFunction } export statement"
+                    "summary": "Added the { namedFunction } export statement"
                 },
                 {
                     "span": {
@@ -1108,57 +763,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    25
-                                ],
-                                "end": [
-                                    6,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    25
-                                ],
-                                "end": [
-                                    7,
-                                    30
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'newName1' identifier with the 'name1' identifier in the name1 function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    36
-                                ],
-                                "end": [
-                                    6,
-                                    38
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    33
-                                ],
-                                "end": [
-                                    7,
-                                    36
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '{}' expression statements with the '{ }' expression statements in the name1 function"
+                    "summary": "Added the { name1 } export statement"
                 },
                 {
                     "span": {
@@ -1195,15 +811,126 @@
                         "insert": {
                             "start": [
                                 10,
-                                1
+                                37
                             ],
                             "end": [
                                 10,
-                                43
+                                42
                             ]
                         }
                     },
-                    "summary": "Added the { name1, name2, nameN } from 'foo' export statement"
+                    "summary": "Added the 'foo' string in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    10
+                                ],
+                                "end": [
+                                    10,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable2' identifier with the 'name1' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                23
+                            ],
+                            "end": [
+                                2,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name2' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    30
+                                ],
+                                "end": [
+                                    2,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    17
+                                ],
+                                "end": [
+                                    10,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable3' identifier with the 'name2' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                43
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name3' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    50
+                                ],
+                                "end": [
+                                    2,
+                                    55
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    24
+                                ],
+                                "end": [
+                                    10,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameY' identifier with the 'nameN' identifier in the { name1, name2, nameN } from 'foo' export statement"
                 },
                 {
                     "span": {
@@ -1219,6 +946,66 @@
                         }
                     },
                     "summary": "Added the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name3, name4, nameT } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name2 = value2, name3 = value3, name4, nameO } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { otherNamedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { newName1 } export statement"
                 },
                 {
                     "span": {
@@ -1335,7 +1122,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a587e998ca80b72452fa08e9dc0a82842607673b..4032a29478ba2412695dbcc4b7bb948eb09b1f8f"
+    "shas": "33315fb792d3dd55c8dad8aec745f479637b74d8..bcd26f8508f792d9e92d3e85da588b043958be7f"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-test",
@@ -1575,15 +1362,126 @@
                         "insert": {
                             "start": [
                                 10,
-                                1
+                                37
                             ],
                             "end": [
                                 10,
-                                44
+                                43
                             ]
                         }
                     },
-                    "summary": "Added the { name7, name8, nameP } from 'buzz' export statement"
+                    "summary": "Added the 'buzz' string in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    10
+                                ],
+                                "end": [
+                                    10,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable1' identifier with the 'name7' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                23
+                            ],
+                            "end": [
+                                2,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name1' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    30
+                                ],
+                                "end": [
+                                    2,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    17
+                                ],
+                                "end": [
+                                    10,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable2' identifier with the 'name8' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                43
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name2' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    50
+                                ],
+                                "end": [
+                                    2,
+                                    55
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    24
+                                ],
+                                "end": [
+                                    10,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameN' identifier with the 'nameP' identifier in the { name7, name8, nameP } from 'buzz' export statement"
                 },
                 {
                     "span": {
@@ -1599,21 +1497,6 @@
                         }
                     },
                     "summary": "Added the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                58
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1790,7 +1673,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4032a29478ba2412695dbcc4b7bb948eb09b1f8f..4cacea87233cddf0243da69dc293f7c8e6c7a574"
+    "shas": "bcd26f8508f792d9e92d3e85da588b043958be7f..2b9bf50a05887a7a162d095a2abfeca055308bc8"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-replacement-test",
@@ -2347,7 +2230,7 @@
         "+export { import6 as name6, import7 as name7, nameB } from 'fizz';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4cacea87233cddf0243da69dc293f7c8e6c7a574..cdd6691ff292adf83a7de1c4cc4994521b56e9c6"
+    "shas": "2b9bf50a05887a7a162d095a2abfeca055308bc8..34e4cddde5d1b60cd8f711bb1c58b9ee16d36001"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-test",
@@ -2548,7 +2431,7 @@
         " export let name3, name4, nameT;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cdd6691ff292adf83a7de1c4cc4994521b56e9c6..bc81d61fb61d4658531fb10edde19e87253de887"
+    "shas": "34e4cddde5d1b60cd8f711bb1c58b9ee16d36001..4a053ca50921f795644922f2ed23f98974d7d5bc"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-rest-test",
@@ -2746,5 +2629,5 @@
         "-export { import6 as name6, import7 as name7, nameB } from 'fizz';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "bc81d61fb61d4658531fb10edde19e87253de887..7b8267eabe246347b009d08c9100f36a568a81a6"
+    "shas": "4a053ca50921f795644922f2ed23f98974d7d5bc..689c75b2c901c257422d3759b780fc15b9819a0d"
 }]

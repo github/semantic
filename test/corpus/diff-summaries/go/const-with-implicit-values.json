@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7502e2c296106363d7be0bb9ea547d5c45d488b5..a16a257cc4ee293f1273e35f5a55147f239b363a"
+    "shas": "a55f311469ac90cd46ed69c684024899b64c933d..9736c9f06da8a42cd50c932e42e92b7f2e38d14e"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-insert-test",
@@ -130,7 +130,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a16a257cc4ee293f1273e35f5a55147f239b363a..7510e4a3d9572446823d7f18aa20f5f85daaedd5"
+    "shas": "9736c9f06da8a42cd50c932e42e92b7f2e38d14e..ad19143640d21273828dd5630b0736cc7eff7cb8"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -244,7 +244,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7510e4a3d9572446823d7f18aa20f5f85daaedd5..1a627df6376a259726d2ed35d09e305b519f443e"
+    "shas": "ad19143640d21273828dd5630b0736cc7eff7cb8..1953316bdda33033561b14cba35d75ede86c8d42"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -358,7 +358,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a627df6376a259726d2ed35d09e305b519f443e..e2ada0578d1f39b10e8223099de69801a8c04b9c"
+    "shas": "1953316bdda33033561b14cba35d75ede86c8d42..bff30c8f9069c1ae9df2f11690240f7afb2455ec"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -435,7 +435,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e2ada0578d1f39b10e8223099de69801a8c04b9c..12119c75b210fd037125a65e8933cbb1686acd3e"
+    "shas": "bff30c8f9069c1ae9df2f11690240f7afb2455ec..a3c640c4c064615f887b5b3c30c7b26cfeb44e23"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-teardown-test",
@@ -492,5 +492,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "12119c75b210fd037125a65e8933cbb1686acd3e..4e1c7922b6c5ef793060fce60c9922565c7a3444"
+    "shas": "a3c640c4c064615f887b5b3c30c7b26cfeb44e23..faa9fbbc723f20dd1c278ced316f35e0782f0234"
 }]

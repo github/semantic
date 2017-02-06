@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "771be04c5840c88023ff57d9984a37f5f81dedcd..3f158b510a9df10b8de9690dcbdfad6a426552e0"
+    "shas": "3681e2ba1687d62d60977cfffa50d6a35afffa30..020f14344f29b9139450103cc6b8896b4bed18a2"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3f158b510a9df10b8de9690dcbdfad6a426552e0..c2bf397ef8bf28d86f9e2fc89a6118d698c27890"
+    "shas": "020f14344f29b9139450103cc6b8896b4bed18a2..dc4a5b2e9d7229f3336dd410f1b75eb21faccd5e"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -178,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c2bf397ef8bf28d86f9e2fc89a6118d698c27890..2ed7a40d451c97b1d1769c5091e5e71de96b2861"
+    "shas": "dc4a5b2e9d7229f3336dd410f1b75eb21faccd5e..bf28b19ba0ee7ccafdbeab2f23356e81e01e3746"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -260,7 +260,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2ed7a40d451c97b1d1769c5091e5e71de96b2861..f825200c6081b8d111543ef82f0e23313955a777"
+    "shas": "bf28b19ba0ee7ccafdbeab2f23356e81e01e3746..8c6df5aefb6b3c7b6eced1b3bcc9c8d0cdf169e9"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -303,7 +303,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f825200c6081b8d111543ef82f0e23313955a777..195b5f5df7d917ac59d9e0b7d4e91f6286b52061"
+    "shas": "8c6df5aefb6b3c7b6eced1b3bcc9c8d0cdf169e9..443247e9d646c0febd8ab26828e3a1a97bd7e313"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-teardown-test",
@@ -360,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "195b5f5df7d917ac59d9e0b7d4e91f6286b52061..bba6f1716759c8316031780dd34e79b2053fd192"
+    "shas": "443247e9d646c0febd8ab26828e3a1a97bd7e313..3704fa0c9503801363df94202a323cee196b7560"
 }]

@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "355894e4ad27e01132c001a0ec6628a68699a98a..dee4726cc2355867234df5eb768a1833d12fb545"
+    "shas": "1280c367144e2f5a06b037aaaa892d01830e1d06..58858748c85d3fed7051f3021f8596e7e510fb7b"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dee4726cc2355867234df5eb768a1833d12fb545..130b0a5e98d5cb84a5f8fdd40a206c617ed5457d"
+    "shas": "58858748c85d3fed7051f3021f8596e7e510fb7b..c0d4d9e3a583cf8d83a483bbe55474efe1040ede"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -234,33 +234,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'h' assignment in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e' assignment in the main function"
+                    "summary": "Replaced the 'e' identifier with the 'h' identifier in an assignment to h of the 'main' function"
                 }
             ]
         },
@@ -289,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "130b0a5e98d5cb84a5f8fdd40a206c617ed5457d..200c99db1973054a8b08399acb934a04f7e5d400"
+    "shas": "c0d4d9e3a583cf8d83a483bbe55474efe1040ede..36a733d761e12748f715394f8725921a65784ee4"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -379,33 +376,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'e' assignment in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' assignment in the main function"
+                    "summary": "Replaced the 'h' identifier with the 'e' identifier in an assignment to e of the 'main' function"
                 }
             ]
         },
@@ -434,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "200c99db1973054a8b08399acb934a04f7e5d400..0cb78cdf1584f9b8ba5cd6338d6611fd62489ce5"
+    "shas": "36a733d761e12748f715394f8725921a65784ee4..201cac6453136e7f12cb2c3b6b0c48c1182061d7"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -525,7 +519,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0cb78cdf1584f9b8ba5cd6338d6611fd62489ce5..ef617e9c737846a93d7b3784e94a3503b657e345"
+    "shas": "201cac6453136e7f12cb2c3b6b0c48c1182061d7..2dc00c222886c1e2e204d1bd0e4151357c0262b9"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -582,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ef617e9c737846a93d7b3784e94a3503b657e345..ab0c9d4b9fa55d59bab945f9e19cb5a992a55f0a"
+    "shas": "2dc00c222886c1e2e204d1bd0e4151357c0262b9..31960cf05d074957b6b96ec77755161a003fb604"
 }]

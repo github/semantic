@@ -114,7 +114,7 @@
         "+%Q<a<b>c>"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2564df555031825f37b8416fa96fa790ced587f1..d07c343452363ce1f7730e321999d6b41d6b8043"
+    "shas": "370c0a6d0e774ad3b0d66bf1c3a960572964e039..f981ad9b7b08c03ccb3e55b8599b6c9b6c650a9e"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-replacement-insert-test",
@@ -331,7 +331,7 @@
         " %#a#"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d07c343452363ce1f7730e321999d6b41d6b8043..5d60a37207eb9efef4d348bd12ec0371a67057fd"
+    "shas": "f981ad9b7b08c03ccb3e55b8599b6c9b6c650a9e..d8a2dfbbac91bce79fb46fe9a198f814aac20937"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-insert-test",
@@ -340,30 +340,18 @@
             "delimiter.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the %q/b/ string with the %q#a# string"
+                    "summary": "Added the %q#a# string"
                 },
                 {
                     "span": {
@@ -397,18 +385,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the %Q#a# string"
+                    "summary": "Replaced the %q/b/ string with the %Q#a# string"
                 },
                 {
                     "span": {
@@ -427,33 +427,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the %Q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q{d{e}f} string"
+                    "summary": "Replaced the %q{d{e}f} string with the %Q<a<b>c> string"
                 },
                 {
                     "span": {
@@ -545,7 +542,7 @@
         " %#a#"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5d60a37207eb9efef4d348bd12ec0371a67057fd..63d1d9592f30d6216bccdb7a7e6db6b8782db7bb"
+    "shas": "d8a2dfbbac91bce79fb46fe9a198f814aac20937..fff394caa4305cd7ae0fa12009f544d29b4412e8"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-replacement-test",
@@ -554,30 +551,18 @@
             "delimiter.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the %q#a# string with the %q/b/ string"
+                    "summary": "Added the %q/b/ string"
                 },
                 {
                     "span": {
@@ -596,45 +581,45 @@
                 },
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the %/b/ string"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    2,
-                                    10
+                                    1,
+                                    6
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    3,
-                                    5
+                                    4,
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the %q<a<b>c> string with the %/b/ string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q/b/ string"
+                    "summary": "Replaced the %q#a# string with the %Q/b/ string"
                 },
                 {
                     "span": {
@@ -653,30 +638,48 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    10
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
                     },
-                    "summary": "Replaced the %#a# string with the %Q{d{e}f} string"
+                    "summary": "Added the %Q{d{e}f} string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the %q<a<b>c> string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the %#a# string"
                 },
                 {
                     "span": {
@@ -753,7 +756,7 @@
         " %#a#"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "63d1d9592f30d6216bccdb7a7e6db6b8782db7bb..5cb84aeb41a7fa70d00fc74f40c0d91ed04d5b28"
+    "shas": "fff394caa4305cd7ae0fa12009f544d29b4412e8..19b745482dc2432e84a2950ccfabcbb100965df1"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-replacement-test",
@@ -1069,7 +1072,7 @@
         "+%Q{d{e}f}"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5cb84aeb41a7fa70d00fc74f40c0d91ed04d5b28..a034187d033ad8eaeacf7ee5a0238e3884035369"
+    "shas": "19b745482dc2432e84a2950ccfabcbb100965df1..7aa017c6cf47c36a10d7c113d839cdc920fc04e5"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-test",
@@ -1190,7 +1193,7 @@
         " %/b/"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a034187d033ad8eaeacf7ee5a0238e3884035369..eedc50ad446aaba08e132a359dee922b92729245"
+    "shas": "7aa017c6cf47c36a10d7c113d839cdc920fc04e5..8143f610d5ad0f1a7ba62bc8c7232030cddbc416"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-rest-test",
@@ -1308,5 +1311,5 @@
         "-%Q{d{e}f}"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "eedc50ad446aaba08e132a359dee922b92729245..40ddeab1794ffd56578b63bcea8a678e08f5ece8"
+    "shas": "8143f610d5ad0f1a7ba62bc8c7232030cddbc416..6f7fda4304f4cd5dfe0e528d2d6bdb800b773821"
 }]

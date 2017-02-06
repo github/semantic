@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d38aa7d50cdcbbbdef851721acccf6c2fb50fd60..0a33d1a0ce2a2d251b41a480b3a98cc7d8cb565a"
+    "shas": "47904bad825de948224fb80e0c17cd04f54a0411..f4725b65cfc4bbc62405bdc003e2586903c89060"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-insert-test",
@@ -206,7 +206,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0a33d1a0ce2a2d251b41a480b3a98cc7d8cb565a..e8349cf56bebb999444224d4ed957d46e807c783"
+    "shas": "f4725b65cfc4bbc62405bdc003e2586903c89060..881be8bcf9a349a98d50baca663e2960e1d5619d"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-replacement-test",
@@ -218,27 +218,27 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1() function call of the 'main' function"
+                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2() function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -275,31 +275,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                4,
                                 1
                             ],
                             "end": [
-                                5,
+                                4,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added 'func g2()' at line 5, column 1 - line 5, column 10 in the main function"
+                    "summary": "Added 'func g1()' at line 4, column 1 - line 4, column 10 in the main function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                4,
                                 1
                             ],
                             "end": [
-                                5,
+                                4,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted 'func f2()' at line 5, column 1 - line 5, column 10 in the main function"
+                    "summary": "Deleted 'func f1()' at line 4, column 1 - line 4, column 10 in the main function"
                 }
             ]
         }
@@ -325,7 +325,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e8349cf56bebb999444224d4ed957d46e807c783..82dfd2245fbfbe15c2e969effef1cbefd30f44aa"
+    "shas": "881be8bcf9a349a98d50baca663e2960e1d5619d..73c695f61d2c560596e14b014336221584db915e"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-replacement-test",
@@ -337,27 +337,27 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1() function call of the 'main' function"
+                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2() function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -394,31 +394,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                4,
                                 1
                             ],
                             "end": [
-                                5,
+                                4,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added 'func f2()' at line 5, column 1 - line 5, column 10 in the main function"
+                    "summary": "Added 'func f1()' at line 4, column 1 - line 4, column 10 in the main function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                4,
                                 1
                             ],
                             "end": [
-                                5,
+                                4,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted 'func g2()' at line 5, column 1 - line 5, column 10 in the main function"
+                    "summary": "Deleted 'func g1()' at line 4, column 1 - line 4, column 10 in the main function"
                 }
             ]
         }
@@ -444,7 +444,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "82dfd2245fbfbe15c2e969effef1cbefd30f44aa..45a3816eb85c3955639f6e53503cdc13fec6241b"
+    "shas": "73c695f61d2c560596e14b014336221584db915e..de5047084131f1a7870f4daefb49cd675bd40f94"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-insert-test",
@@ -597,7 +597,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "45a3816eb85c3955639f6e53503cdc13fec6241b..53e5365b01a5b00369f870154566717cb997b87b"
+    "shas": "de5047084131f1a7870f4daefb49cd675bd40f94..bdd71222eec4dc23376073d2a1a877e9e5704113"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-teardown-test",
@@ -654,5 +654,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53e5365b01a5b00369f870154566717cb997b87b..31e0505698bb7664d7d9299b8dc7c9a5b64e76b9"
+    "shas": "bdd71222eec4dc23376073d2a1a877e9e5704113..c847aea88cfc50a5afb31b734db7a5487895469d"
 }]

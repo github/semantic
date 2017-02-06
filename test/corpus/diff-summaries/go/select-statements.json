@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "20f466757d37fc58398325488b5ec0de333ad42b..42849681c80cfb9cbbeb5853ea921a5205073aae"
+    "shas": "8975afb3caf4b410dd0191b28d41b472e6192b27..c43cfccdd1b03cbf67808b47dec668f7ad244c21"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -105,7 +105,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "42849681c80cfb9cbbeb5853ea921a5205073aae..b6a47b0d212a5a157cc935014594780fcf8fff94"
+    "shas": "c43cfccdd1b03cbf67808b47dec668f7ad244c21..126790db766e79909d8379b19703ed52addce808"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -222,7 +222,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b6a47b0d212a5a157cc935014594780fcf8fff94..fc31211e632fce81de37402c5aafcaa8bc3a0ca3"
+    "shas": "126790db766e79909d8379b19703ed52addce808..cd4fc646c6d3390897cd2f1bc0f7016b34ce6433"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -339,7 +339,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fc31211e632fce81de37402c5aafcaa8bc3a0ca3..8fff443fbac17d27430ccf90040530dc0725ccf0"
+    "shas": "cd4fc646c6d3390897cd2f1bc0f7016b34ce6433..16dda5d0203ddddf34d9ba57cd7463f0d3334327"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -391,7 +391,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8fff443fbac17d27430ccf90040530dc0725ccf0..73638105f19a7d8fffd4fa8cb5b93c7c9b2d0ebc"
+    "shas": "16dda5d0203ddddf34d9ba57cd7463f0d3334327..80d1772a3914848c3693eb725cbd0324ce54470e"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -448,5 +448,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "73638105f19a7d8fffd4fa8cb5b93c7c9b2d0ebc..282f35af1f53ad092799e62fac5f2728f81c7766"
+    "shas": "80d1772a3914848c3693eb725cbd0324ce54470e..70d17350ea16f4d4d0cfc2d2884ffa2d16673d76"
 }]
