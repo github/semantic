@@ -170,7 +170,10 @@ rws compare as bs
 
     eraseFeatureVector :: Term f (Record fields) -> Term f (Record fields)
     eraseFeatureVector term = let record :< functor = runCofree term in
-      cofree (setField record (Nothing :: Maybe FeatureVector) :< functor)
+      cofree (setFeatureVector record Nothing :< functor)
+
+    setFeatureVector :: Record fields -> Maybe FeatureVector -> Record fields
+    setFeatureVector = setField
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
