@@ -46,14 +46,13 @@ type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Ma
 -- which completes in log-linear time.
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields label.
-       (GAlign f, Traversable f, Eq (f (Term f Category)), Hashable label, HasField fields Category)
+rws :: forall f fields.
+       (GAlign f, Traversable f, Eq (f (Term f Category)), HasField fields Category, HasField fields (Maybe FeatureVector))
     => DiffTerms f fields -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-    -> Label f fields label
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
     -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
-rws compare getLabel as bs
+rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
@@ -167,7 +166,7 @@ rws compare getLabel as bs
     kdbs = KdTree.build (elems . feature) featurizedBs
 
     featurize :: Int -> Term f (Record fields) -> UnmappedTerm f fields
-    featurize index term = UnmappedTerm index (rhead . extract $ defaultFeatureVectorDecorator getLabel term) term
+    featurize index term = UnmappedTerm index (let Just v = getField (extract term) in v) term
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
@@ -241,17 +240,19 @@ defaultFeatureVectorDecorator
   :: (Hashable label, Traversable f)
   => Label f fields label
   -> Term f (Record fields)
-  -> Term f (Record (FeatureVector ': fields))
+  -> Term f (Record (Maybe FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Maybe FeatureVector ': fields))
 featureVectorDecorator getLabel p q d
   = cata collect
   . pqGramDecorator getLabel p q
-  where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
-        addSubtermVector :: FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
-        addSubtermVector = flip $ addVectors . rhead . headF . runCofree
+  where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (Just (unitVector d (hash gram))) functor :. rest) :< functor)
+        addSubtermVector :: Functor f => Maybe FeatureVector -> Term f (Record (Maybe FeatureVector ': fields)) -> Maybe FeatureVector
+        addSubtermVector v term = addVectors <$> v <*> termVector
+                              <|> termVector
+          where termVector = rhead (extract term)
 
         addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
         addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
