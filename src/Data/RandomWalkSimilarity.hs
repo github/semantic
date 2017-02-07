@@ -110,7 +110,7 @@ rws compare as bs
         compared <- compare a b
         pure $! do
           put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-          pure (These i j, compared)
+          pure (These i j, mapAnnotations (`setFeatureVector` Nothing) compared)
 
     -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
     -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
