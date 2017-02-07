@@ -166,7 +166,11 @@ rws compare as bs
     kdbs = KdTree.build (elems . feature) featurizedBs
 
     featurize :: Int -> Term f (Record fields) -> UnmappedTerm f fields
-    featurize index term = UnmappedTerm index (let Just v = getField (extract term) in v) (fmap (`setField` (Nothing :: Maybe FeatureVector)) term)
+    featurize index term = UnmappedTerm index (let Just v = getField (extract term) in v) (eraseFeatureVector term)
+
+    eraseFeatureVector :: Term f (Record fields) -> Term f (Record fields)
+    eraseFeatureVector term = let record :< functor = runCofree term in
+      cofree (setField record (Nothing :: Maybe FeatureVector) :< functor)
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
