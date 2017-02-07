@@ -21,7 +21,6 @@ import Control.Monad.Random
 import Control.Monad.State
 import Data.Align.Generic
 import Data.Array
-import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Listable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
