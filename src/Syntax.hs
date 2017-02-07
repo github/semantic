@@ -71,8 +71,8 @@ data Syntax a f
   | Array (Maybe f) [f]
   -- | A class with an identifier, superclass, and a list of definitions.
   | Class f (Maybe f) [f]
-  -- | A method definition with an identifier, optional return type, params, and a list of expressions.
-  | Method f (Maybe f) [f] [f]
+  -- | A method definition with an identifier, optional receiver, optional return type, params, and a list of expressions.
+  | Method f (Maybe f) (Maybe f) [f] [f]
   -- | An if statement with an expression and maybe more expression clauses.
   | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
@@ -143,7 +143,7 @@ instance Listable2 Syntax where
     \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
-    \/ liftCons4 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
+    \/ liftCons5 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
     \/ liftCons2 recur (liftTiers recur) Module
     \/ liftCons2 recur (liftTiers recur) Import

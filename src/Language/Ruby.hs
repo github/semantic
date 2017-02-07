@@ -68,15 +68,15 @@ termAssignment _ category children
     (Method, expr : methodName : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
-      -> Just $ S.Method (withRecord (setCategory (extract expr) MemberAccess) (S.MemberAccess expr methodName)) Nothing (toList (unwrap params)) body
+      -> Just $ S.Method methodName (Just expr) Nothing (toList (unwrap params)) body
       | Identifier <- Info.category (extract methodName)
-      -> Just $ S.Method (withRecord (setCategory (extract expr) MemberAccess) (S.MemberAccess expr methodName)) Nothing [] rest
+      -> Just $ S.Method methodName (Just expr) Nothing [] rest
     (Method, identifier : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
-      -> Just $ S.Method identifier Nothing (toList (unwrap params)) body
+      -> Just $ S.Method identifier Nothing Nothing (toList (unwrap params)) body
       | otherwise
-      -> Just $ S.Method identifier Nothing [] rest
+      -> Just $ S.Method identifier Nothing Nothing [] rest
     (Module, constant : body ) -> Just $ S.Module constant body
     (Modifier Rescue, [lhs, rhs] ) -> Just $ S.Rescue [lhs] [rhs]
     (Rescue, exceptions : exceptionVar : rest)

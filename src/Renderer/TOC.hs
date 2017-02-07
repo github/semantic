@@ -152,8 +152,9 @@ termToDiffInfo blob term = case unwrap term of
 toTermName :: forall leaf fields. DefaultFields fields => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
-  S.Method identifier _ _ _ -> toTermName' identifier
-  S.MemberAccess base property -> toTermName' base <> "." <> toTermName' property
+  S.Method identifier Nothing _ _ _ -> toTermName' identifier
+  S.Method identifier (Just receiver) _ _ _ -> toTermName' receiver <> "." <> toTermName' identifier
+  -- S.MemberAccess base property -> toTermName' base <> "." <> toTermName' property
   _ -> termNameFromSource term
   where
     toTermName' = toTermName source
