@@ -23,29 +23,27 @@ type Comparable f annotation = Term f annotation -> Term f annotation -> Bool
 type DiffConstructor f annotation = TermF f (Both annotation) (Diff f annotation) -> Diff f annotation
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: (Eq leaf, HasField fields Category, Hashable label)
+diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
   => DiffConstructor (Syntax leaf) (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
   -> SES.Cost (SyntaxDiff leaf fields) -- ^ A function to compute the cost of a given diff node.
-  -> RWS.Label (Syntax leaf) fields label
   -> SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms construct comparable cost getLabel a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost getLabel a b
+diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
 -- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
-diffComparableTerms :: (Eq leaf, HasField fields Category, Hashable label)
+diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
                     => DiffConstructor (Syntax leaf) (Record fields)
                     -> Comparable (Syntax leaf) (Record fields)
                     -> SES.Cost (SyntaxDiff leaf fields)
-                    -> RWS.Label (Syntax leaf) fields label
                     -> SyntaxTerm leaf fields
                     -> SyntaxTerm leaf fields
                     -> Maybe (SyntaxDiff leaf fields)
-diffComparableTerms construct comparable cost getLabel = recur
+diffComparableTerms construct comparable cost = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
-          | comparable a b = runAlgorithm construct recur cost getLabel (Just <$> algorithmWithTerms construct a b)
+          | comparable a b = runAlgorithm construct recur cost (Just <$> algorithmWithTerms construct a b)
           | otherwise = Nothing
 
 -- | Construct an algorithm to diff a pair of terms.
@@ -100,16 +98,15 @@ algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $
       (Nothing, Nothing) -> Nothing
 
 -- | Run an algorithm, given functions characterizing the evaluation.
-runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)), Traversable f, Hashable label)
+runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)), Traversable f, HasField fields (Maybe FeatureVector))
   => (CofreeF f (Both (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
   -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
-  -> RWS.Label f fields label
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
-runAlgorithm construct recur cost getLabel = iterAp $ \case
+runAlgorithm construct recur cost = iterAp $ \case
   Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
     traverse (these (Just . deleting) (Just . inserting) recur) aligned)
   ByIndex as bs f -> f (ses recur cost as bs)
-  BySimilarity as bs f -> f (rws recur getLabel as bs)
+  BySimilarity as bs f -> f (rws recur as bs)
