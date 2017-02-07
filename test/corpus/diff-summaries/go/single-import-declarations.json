@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d056bd7e2e275b74562a7b0e716fc8ba87006c83..f5e76539f93364599d8d89fadea3e2b0b170b498"
+    "shas": "e99d953fe89c051fc6ddd94acdb17fbbe4fd60ff..64b452d739eb84b670362434274cbd98792eb957"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-insert-test",
@@ -176,7 +176,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f5e76539f93364599d8d89fadea3e2b0b170b498..41e04826ca0ac4cddb1b85eeb07ff91703d2e075"
+    "shas": "64b452d739eb84b670362434274cbd98792eb957..9ece1e7c2f5678dc31fd153ac454222d929f4143"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-replacement-test",
@@ -289,7 +289,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "41e04826ca0ac4cddb1b85eeb07ff91703d2e075..d2141e3cc154883343b89e2738d193c55af96119"
+    "shas": "9ece1e7c2f5678dc31fd153ac454222d929f4143..1b550d979eeb4488916a19aeb6486b8d97dddde5"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-replacement-test",
@@ -402,7 +402,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d2141e3cc154883343b89e2738d193c55af96119..76d29414233cb3c91506836053cafeeef192e14a"
+    "shas": "1b550d979eeb4488916a19aeb6486b8d97dddde5..6ee950fe0e956a5453217e29f28a88f657835a5c"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-insert-test",
@@ -525,7 +525,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "76d29414233cb3c91506836053cafeeef192e14a..99ba58f016f25e369967739c82b14a36ce50a711"
+    "shas": "6ee950fe0e956a5453217e29f28a88f657835a5c..219e74492fbc41999128954070a9907d4eae5d8c"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-teardown-test",
@@ -582,5 +582,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "99ba58f016f25e369967739c82b14a36ce50a711..f7a9e7e73d3b831c92a42fcc37502ee2b71c5ff0"
+    "shas": "219e74492fbc41999128954070a9907d4eae5d8c..12035f69827bc37748c981b2b49d8642aaa48689"
 }]

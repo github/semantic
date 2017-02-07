@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2b55c496d1e126be5aa0c5fab79e005f97b83056..eba3db91b96c060a2e4225901f1fec29f82b58db"
+    "shas": "e569ad4f2564b872ede19dff450315ba540c3076..66684e941dfc86595981306872ef4c33a9fce21a"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-insert-test",
@@ -126,7 +126,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eba3db91b96c060a2e4225901f1fec29f82b58db..cfda4f3630bdf8433034bcc57d98765f7147edef"
+    "shas": "66684e941dfc86595981306872ef4c33a9fce21a..42b30d03e59093b632266908655473fd65f5f2eb"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-replacement-test",
@@ -265,7 +265,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cfda4f3630bdf8433034bcc57d98765f7147edef..329deaf77df5274a79baef2a947664668587b7a9"
+    "shas": "42b30d03e59093b632266908655473fd65f5f2eb..22edff1148e1572a99d19f30e690a3f64b662f4f"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-replacement-test",
@@ -404,7 +404,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "329deaf77df5274a79baef2a947664668587b7a9..5163d1e0c011c25c939e91e67f4feaf0044c1b8e"
+    "shas": "22edff1148e1572a99d19f30e690a3f64b662f4f..fd5e7578b399409eefac5e83a4a5189c0da7c1f0"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-insert-test",
@@ -477,7 +477,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5163d1e0c011c25c939e91e67f4feaf0044c1b8e..9b08e9b28cdbcf1c3d41c0f0bb378d5a135655fc"
+    "shas": "fd5e7578b399409eefac5e83a4a5189c0da7c1f0..007d654f99ed0a26e9857d991a181da97005bcb2"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-teardown-test",
@@ -534,5 +534,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b08e9b28cdbcf1c3d41c0f0bb378d5a135655fc..035c7d7ba9fd54000f726b530456c8c1f790b3bb"
+    "shas": "007d654f99ed0a26e9857d991a181da97005bcb2..acb9e5e1c505bf2f3ccd977641fe0084ff8d7d58"
 }]

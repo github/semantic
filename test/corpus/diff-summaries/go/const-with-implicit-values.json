@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a55f311469ac90cd46ed69c684024899b64c933d..9736c9f06da8a42cd50c932e42e92b7f2e38d14e"
+    "shas": "5caeef873494edf9110ed67e273e7c4df49d588e..c207b3578afc46787bbc1fc463c375e65284dbb3"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-insert-test",
@@ -130,7 +130,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9736c9f06da8a42cd50c932e42e92b7f2e38d14e..ad19143640d21273828dd5630b0736cc7eff7cb8"
+    "shas": "c207b3578afc46787bbc1fc463c375e65284dbb3..50cb43c50d503af99684dd1b21a32bd20dabf536"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -244,7 +244,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad19143640d21273828dd5630b0736cc7eff7cb8..1953316bdda33033561b14cba35d75ede86c8d42"
+    "shas": "50cb43c50d503af99684dd1b21a32bd20dabf536..a9979d0ec9379382e44de670b4f20350ddb595e2"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -358,7 +358,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1953316bdda33033561b14cba35d75ede86c8d42..bff30c8f9069c1ae9df2f11690240f7afb2455ec"
+    "shas": "a9979d0ec9379382e44de670b4f20350ddb595e2..7093865216c3ed298ad93ff34ace3f1679fb22f3"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -435,7 +435,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bff30c8f9069c1ae9df2f11690240f7afb2455ec..a3c640c4c064615f887b5b3c30c7b26cfeb44e23"
+    "shas": "7093865216c3ed298ad93ff34ace3f1679fb22f3..c549422d0ddad2f5d06f04b223fa72b7c1dfce8d"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-teardown-test",
@@ -492,5 +492,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a3c640c4c064615f887b5b3c30c7b26cfeb44e23..faa9fbbc723f20dd1c278ced316f35e0782f0234"
+    "shas": "c549422d0ddad2f5d06f04b223fa72b7c1dfce8d..c505aaaa18999293830a998c55e78edfeed5c138"
 }]

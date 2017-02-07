@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d33ba005ba738ddaa321a9de3a070f2e647dfd8b..53da27b37bc6d83adfffbb65a5e58c8b5bf3d682"
+    "shas": "da87539e91454e018a1ba3c704f8fceb37fc9f2b..f132a69a71e31122d4506b52fd27fa1d5b367289"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -281,7 +281,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53da27b37bc6d83adfffbb65a5e58c8b5bf3d682..73fe563d6fb50d0c9003bf5824d9ba763400e3cc"
+    "shas": "f132a69a71e31122d4506b52fd27fa1d5b367289..958b85f05779da81cf8949f9de3ed3e244f77fec"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -405,7 +405,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "73fe563d6fb50d0c9003bf5824d9ba763400e3cc..68b888f596b321c7518de931643f99da84ca7467"
+    "shas": "958b85f05779da81cf8949f9de3ed3e244f77fec..8e2c38aa8f9dda4962cdcb4c16ac10152f00a4b5"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -553,7 +553,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68b888f596b321c7518de931643f99da84ca7467..432ad1801fe2c96c4124e27252a6fac20f4d8fb2"
+    "shas": "8e2c38aa8f9dda4962cdcb4c16ac10152f00a4b5..e95df8ac4c46f9edf98ea3352f8318e02621e5e4"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -781,7 +781,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "432ad1801fe2c96c4124e27252a6fac20f4d8fb2..8c411e9adb6a7516e9b40c7b36ad647a431b3e85"
+    "shas": "e95df8ac4c46f9edf98ea3352f8318e02621e5e4..3ee7d179d6043f9db5b58bf1dd4b8756999b34f2"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -838,5 +838,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c411e9adb6a7516e9b40c7b36ad647a431b3e85..3681e2ba1687d62d60977cfffa50d6a35afffa30"
+    "shas": "3ee7d179d6043f9db5b58bf1dd4b8756999b34f2..16a71383b1105b6ba32fa5b1498ab5294acea29b"
 }]

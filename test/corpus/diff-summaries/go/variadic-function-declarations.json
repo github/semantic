@@ -42,18 +42,19 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29b..b97dec38 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
-        "@@ -0,0 +1,5 @@",
+        "@@ -0,0 +1,6 @@",
         "+package main",
         "+",
         "+func main() {",
         "+",
-        "+}"
+        "+}",
+        "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c847aea88cfc50a5afb31b734db7a5487895469d..619033ccfdd0208c47e94327b0541ddf415dbdc1"
+    "shas": "ba5ad24cc5920db43a2b1942f11e4737fe450953..15a77f6125a6c4dab3cb92fdca8bd43ffb7a095c"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-insert-test",
@@ -64,74 +65,70 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                20
+                                6,
+                                1
                             ],
                             "end": [
-                                4,
+                                6,
                                 22
                             ]
                         }
                     },
-                    "summary": "Added the '{}' expression statements in the main function"
-                }
-            ]
-        },
-        "errors": {
-            "variadic-function-declarations.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function"
+                    "summary": "Added the 'f1' function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                7,
                                 1
                             ],
                             "end": [
                                 7,
-                                1
+                                19
                             ]
                         }
                     },
-                    "summary": "Added 'func f2(...int) {}\nfunc f3(a, ...bool) {}\n' at line 5, column 1 - line 7, column 1 in the main function"
+                    "summary": "Added the 'f2' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f3' function"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "variadic-function-declarations.go"
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 79058077..7447883f 100644",
+        "index b97dec38..6bdb4e0a 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
-        "@@ -1,5 +1,7 @@",
-        " package main",
-        " ",
+        "@@ -3,4 +3,6 @@ package main",
         " func main() {",
+        " ",
+        " }",
         "-",
         "+func f1(a ...*int) {}",
         "+func f2(...int) {}",
-        "+func f3(a, ...bool) {}",
-        " }"
+        "+func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "619033ccfdd0208c47e94327b0541ddf415dbdc1..9219aa0de37e450a7cdad23a21345edfa37a4d2c"
+    "shas": "15a77f6125a6c4dab3cb92fdca8bd43ffb7a095c..2795525acc11b3b4d3bb239efb44e4dbeeb3eb80"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -143,81 +140,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    6,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    6,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the main function"
+                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    7,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    7,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    7,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    7,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the main function"
+                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    8,
                                     6
                                 ],
                                 "end": [
-                                    6,
+                                    8,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    8,
                                     6
                                 ],
                                 "end": [
-                                    6,
+                                    8,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function of the 'main' function"
+                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function"
                 }
             ]
         },
@@ -228,23 +225,22 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 7447883f..42ee7381 100644",
+        "index 6bdb4e0a..ecc181af 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
-        "@@ -1,7 +1,7 @@",
-        " package main",
-        " ",
+        "@@ -3,6 +3,6 @@ package main",
         " func main() {",
+        " ",
+        " }",
         "-func f1(a ...*int) {}",
         "-func f2(...int) {}",
         "-func f3(a, ...bool) {}",
         "+func g1(a ...*int) {}",
         "+func g2(...int) {}",
-        "+func g3(a, ...bool) {}",
-        " }"
+        "+func g3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9219aa0de37e450a7cdad23a21345edfa37a4d2c..53877515206d8c5b290dfa981234605bba4d5f97"
+    "shas": "2795525acc11b3b4d3bb239efb44e4dbeeb3eb80..12f649346665ffb181bde064b58e5ac1d9d97860"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -256,81 +252,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    6,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    6,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the main function"
+                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    7,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    7,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    7,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    7,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the main function"
+                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    8,
                                     6
                                 ],
                                 "end": [
-                                    6,
+                                    8,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    8,
                                     6
                                 ],
                                 "end": [
-                                    6,
+                                    8,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function of the 'main' function"
+                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function"
                 }
             ]
         },
@@ -341,23 +337,22 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 42ee7381..7447883f 100644",
+        "index ecc181af..6bdb4e0a 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
-        "@@ -1,7 +1,7 @@",
-        " package main",
-        " ",
+        "@@ -3,6 +3,6 @@ package main",
         " func main() {",
+        " ",
+        " }",
         "-func g1(a ...*int) {}",
         "-func g2(...int) {}",
         "-func g3(a, ...bool) {}",
         "+func f1(a ...*int) {}",
         "+func f2(...int) {}",
-        "+func f3(a, ...bool) {}",
-        " }"
+        "+func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53877515206d8c5b290dfa981234605bba4d5f97..7d5b97b7058354387ba15b51a390a83007a89c32"
+    "shas": "12f649346665ffb181bde064b58e5ac1d9d97860..ef93bbef3117c5583f11f22bd06558ddfad0784b"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -368,74 +363,70 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                20
+                                6,
+                                1
                             ],
                             "end": [
-                                4,
+                                6,
                                 22
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' expression statements in the main function"
-                }
-            ]
-        },
-        "errors": {
-            "variadic-function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function"
+                    "summary": "Deleted the 'f1' function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                7,
                                 1
                             ],
                             "end": [
                                 7,
-                                1
+                                19
                             ]
                         }
                     },
-                    "summary": "Deleted 'func f2(...int) {}\nfunc f3(a, ...bool) {}\n' at line 5, column 1 - line 7, column 1 in the main function"
+                    "summary": "Deleted the 'f2' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f3' function"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "variadic-function-declarations.go"
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 7447883f..79058077 100644",
+        "index 6bdb4e0a..b97dec38 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
-        "@@ -1,7 +1,5 @@",
-        " package main",
-        " ",
+        "@@ -3,6 +3,4 @@ package main",
         " func main() {",
+        " ",
+        " }",
         "-func f1(a ...*int) {}",
         "-func f2(...int) {}",
         "-func f3(a, ...bool) {}",
-        "+",
-        " }"
+        "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d5b97b7058354387ba15b51a390a83007a89c32..c95a4dbe31496fd704a9cb3a9bad160e077e1ba4"
+    "shas": "ef93bbef3117c5583f11f22bd06558ddfad0784b..2f16adfed9c6ae862992be30903bb8e0e3f1e344"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-teardown-test",
@@ -481,16 +472,17 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 79058077..e69de29b 100644",
+        "index b97dec38..e69de29b 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
-        "@@ -1,5 +0,0 @@",
+        "@@ -1,6 +0,0 @@",
         "-package main",
         "-",
         "-func main() {",
         "-",
-        "-}"
+        "-}",
+        "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c95a4dbe31496fd704a9cb3a9bad160e077e1ba4..c72be177265cdd423f8e02052f551c3f72773c43"
+    "shas": "2f16adfed9c6ae862992be30903bb8e0e3f1e344..d6222a7346773adfd0929112bedb22129a3519ea"
 }]

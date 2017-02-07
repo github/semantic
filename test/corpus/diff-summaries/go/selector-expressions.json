@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "94bc6c0af023bccf8cd7c512076c1042bde6e921..5b7216ec7afc15bb746ec4c299aef6be3a96da4a"
+    "shas": "39da12378f56efc6f5a7d91aa4cfd6dd9b410d0d..fd9b31c4cd54e4c44d98269cce2faff0c3da907b"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b7216ec7afc15bb746ec4c299aef6be3a96da4a..124ca82c8016ac2b23c5511cde802436621f025b"
+    "shas": "fd9b31c4cd54e4c44d98269cce2faff0c3da907b..cb44fc99de5de15b963742ff38de9b05f6cf5759"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -205,7 +205,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "124ca82c8016ac2b23c5511cde802436621f025b..6624c56ff9bde33ecf1c5c2488bdd549f3437d30"
+    "shas": "cb44fc99de5de15b963742ff38de9b05f6cf5759..d34c5acd304d3d054b62cdcd2e32e4e2e1535dcd"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -314,7 +314,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6624c56ff9bde33ecf1c5c2488bdd549f3437d30..ede81aed32c4c8461c414fea66eb27494e689375"
+    "shas": "d34c5acd304d3d054b62cdcd2e32e4e2e1535dcd..683e206087e8d3c5235e9521999ee08b7c069913"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ede81aed32c4c8461c414fea66eb27494e689375..5e87be67f5de91b70f44810df052f6ca9f94fcc7"
+    "shas": "683e206087e8d3c5235e9521999ee08b7c069913..f2164e8ee879b26e7c0ac1b5ffa21fccf8a9bbac"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -414,5 +414,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5e87be67f5de91b70f44810df052f6ca9f94fcc7..d33ba005ba738ddaa321a9de3a070f2e647dfd8b"
+    "shas": "f2164e8ee879b26e7c0ac1b5ffa21fccf8a9bbac..da87539e91454e018a1ba3c704f8fceb37fc9f2b"
 }]

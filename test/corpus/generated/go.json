@@ -131,14 +131,14 @@
         "replacement": "func fa() {}\nfunc fb(a int, b, c, d string) int {}\nfunc fc() (int, error) {}\nfunc fd() (result int, err error) {}"
       },
       {
-        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "template": "package main\n\nfunc main() {\n\n}\n\n{0}",
         "syntax": "single-line-function-declarations",
         "insert": "func f1() { a() }\nfunc f2() { a(); b() }\nfunc f3() { a(); b(); }",
         "replacement": "func g1() { a() }\nfunc g2() { a(); b() }\nfunc g3() { a(); b(); }"
       },
       {
         "syntax": "variadic-function-declarations",
-        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "template": "package main\n\nfunc main() {\n\n}\n{0}",
         "insert": "func f1(a ...*int) {}\nfunc f2(...int) {}\nfunc f3(a, ...bool) {}",
         "replacement": "func g1(a ...*int) {}\nfunc g2(...int) {}\nfunc g3(a, ...bool) {}"
       },
@@ -205,7 +205,7 @@
       {
         "template": "package main\n{0}",
         "syntax": "rune-literals",
-        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘jjjj'\n)",
+        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘'\n)",
         "replacement": "const (\n  a = '©'\n  b = '©'\n  c = '©'\n  d = '©'\n  e = '©'\n  f = '©'\n)"
       },
       {
