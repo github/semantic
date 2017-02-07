@@ -43,5 +43,6 @@ afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 afterTerm = mergeMaybe after Both.snd
 
 
+-- | Map a function over the annotations in a diff, whether in diff or term nodes.
 mapAnnotations :: Functor f => (annotation -> annotation') -> Diff f annotation -> Diff f annotation'
 mapAnnotations f = iter (\ (h :< functor) -> wrap (fmap f h :< functor)) . fmap (pure . fmap (fmap f))
