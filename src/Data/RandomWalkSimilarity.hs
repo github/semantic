@@ -308,7 +308,7 @@ stripDiff
   :: (Functor f, Functor g)
   => Free (TermF f (g (Record (h ': t)))) (Patch (Term f (Record (h ': t))))
   -> Free (TermF f (g (Record t)))        (Patch (Term f (Record t)))
-stripDiff = iter (\ (h :< f) -> wrap (fmap rtail h :< f)) . fmap (pure . fmap stripTerm)
+stripDiff = mapAnnotations rtail
 
 
 -- Instances
