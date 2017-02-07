@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "52de97fe13f7845045da38169d173661d5e5d72b..b94e761847023af01134e6126251b772bca42d50"
+    "shas": "191ac681ab93827f81837efbd71580e5c3458338..e98e9187e07e3707791c7244bb126dc85f81008c"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -141,7 +141,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b94e761847023af01134e6126251b772bca42d50..341d4aadadd8c2dca766654a212c7ec98089f5f8"
+    "shas": "e98e9187e07e3707791c7244bb126dc85f81008c..06b193c2e046e6b3381071c51a0bc29442bf4ea0"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -277,7 +277,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "341d4aadadd8c2dca766654a212c7ec98089f5f8..0fb273afde57f1c5440a09995267cbd33a8cd3ef"
+    "shas": "06b193c2e046e6b3381071c51a0bc29442bf4ea0..744129e1284c9d06f11aff320222d28ce4dafd91"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -413,7 +413,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0fb273afde57f1c5440a09995267cbd33a8cd3ef..c9c99e40c59a617d3a55b09502b801fa16c86c09"
+    "shas": "744129e1284c9d06f11aff320222d28ce4dafd91..bbdf12fd81e4ea05eb068154e1cf75e58b0270d0"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -501,7 +501,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c9c99e40c59a617d3a55b09502b801fa16c86c09..7217276a026ab6f8412d832fad1621afdc99ec94"
+    "shas": "bbdf12fd81e4ea05eb068154e1cf75e58b0270d0..4c18bbff932ed6c0ac765f27e2ca14bee5afb01f"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -558,5 +558,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7217276a026ab6f8412d832fad1621afdc99ec94..ee88af7a97ecdeadce4a789a3c52f441a7fb604b"
+    "shas": "4c18bbff932ed6c0ac765f27e2ca14bee5afb01f..7e0f9dd5fa5420c61c8fff7cc5794bc367fc399a"
 }]

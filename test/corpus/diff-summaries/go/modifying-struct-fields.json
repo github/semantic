@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7feb3c6b4cbc95a3ebdffe1629381dbb501f355a..07b2d4369c0efd6a2f0413a6b0407c1ce6551998"
+    "shas": "6edef90abfbd1ec966dd2af7de2a6f6b68f13c3f..ac992cdca75ff25b15e4432553427e51c822b1e4"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "07b2d4369c0efd6a2f0413a6b0407c1ce6551998..9b490aa4342aa9f477b2fd78876a368fffe4043a"
+    "shas": "ac992cdca75ff25b15e4432553427e51c822b1e4..69981a5a85eb90d7923efc507cf28542573d2ca5"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -169,7 +169,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b490aa4342aa9f477b2fd78876a368fffe4043a..52dcb6e785c70ab0c2d06946bdfb4814a88d9001"
+    "shas": "69981a5a85eb90d7923efc507cf28542573d2ca5..537e6596932152f2ab522eecfd216e15a30d810a"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "52dcb6e785c70ab0c2d06946bdfb4814a88d9001..709bd82200ec01417ee27b20f12a7ce770da4d36"
+    "shas": "537e6596932152f2ab522eecfd216e15a30d810a..2addcbb605be75128e5b823da1d37f7c4a0b07d0"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -285,7 +285,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "709bd82200ec01417ee27b20f12a7ce770da4d36..3bcf27e36adc27026a1932963318fdced26cc229"
+    "shas": "2addcbb605be75128e5b823da1d37f7c4a0b07d0..50e42fbbb244c5b1ab6b14b65028db8afc5bbf74"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -342,5 +342,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3bcf27e36adc27026a1932963318fdced26cc229..68cfe38bf7122347a26b51327021502ce8692d9a"
+    "shas": "50e42fbbb244c5b1ab6b14b65028db8afc5bbf74..0a1f04e40ae39042b1440ab1b3f5001fa0ac0dfc"
 }]

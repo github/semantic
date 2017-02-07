@@ -53,7 +53,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ef941b25fe83cd6987bde292d828568594e3172c..767991ea9d6e73c313fdd30b2708b96c8a05bfa0"
+    "shas": "0c352ebb4f2d9899aa86cedcaf17a837c2125b6a..66ebeb8244aefc8d9975dd1a292001d2fe4a379d"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -95,7 +95,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "767991ea9d6e73c313fdd30b2708b96c8a05bfa0..631c2a24093afd888f7ee77e71a01bc931ba25df"
+    "shas": "66ebeb8244aefc8d9975dd1a292001d2fe4a379d..3a69f663d58860f5b4802bd4023f09004c7967ad"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -176,7 +176,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "631c2a24093afd888f7ee77e71a01bc931ba25df..6464ef52609c21507b883b9303faf2598d2f642b"
+    "shas": "3a69f663d58860f5b4802bd4023f09004c7967ad..c131eb4638d459c7de24e52fe869b1d8e7fe2799"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -257,7 +257,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6464ef52609c21507b883b9303faf2598d2f642b..04a2a3690cd952548cc1d79a4443241798143abf"
+    "shas": "c131eb4638d459c7de24e52fe869b1d8e7fe2799..a9e4c07c8d91a1010fd2445c33e57b1493a761cc"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -299,7 +299,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "04a2a3690cd952548cc1d79a4443241798143abf..23f02231ac9ce2d6ecf019968a22ad111604f93b"
+    "shas": "a9e4c07c8d91a1010fd2445c33e57b1493a761cc..c2af3bdaf4c96c7e6e5f72686ade321f1797b97c"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -356,5 +356,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "23f02231ac9ce2d6ecf019968a22ad111604f93b..ae7d3bf5bc56ecf787f6417bd56cf286f6bdf3ac"
+    "shas": "c2af3bdaf4c96c7e6e5f72686ade321f1797b97c..2e88763187ae0ce03e5199460a9a9fd5d6fadd06"
 }]

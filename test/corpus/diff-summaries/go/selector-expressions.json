@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "58f0b543da05cf871ae276159189b567a9f1fbc3..92e1f7ad9222b1c54379675394e1f3cf5865a0e0"
+    "shas": "e002d077df73ef77746435ffaa5ce884b02b66f6..44b8e38ddf5b7013b08f2a7067e7751b0e5abc4a"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "92e1f7ad9222b1c54379675394e1f3cf5865a0e0..86dcca9cba3587504a899137e3187e980119a5ba"
+    "shas": "44b8e38ddf5b7013b08f2a7067e7751b0e5abc4a..ee6107a3494f9f08cadd81f2afebe521d2483db3"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -205,7 +205,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "86dcca9cba3587504a899137e3187e980119a5ba..7d4328f4567a9573735944cfa84ef143342d62ff"
+    "shas": "ee6107a3494f9f08cadd81f2afebe521d2483db3..13a7588a044ecc8c2102201116f4cb0d989e8868"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -314,7 +314,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d4328f4567a9573735944cfa84ef143342d62ff..947a1020828f0a0a838d9c44b4257a276b18f0ff"
+    "shas": "13a7588a044ecc8c2102201116f4cb0d989e8868..53638c2f2a8f77172b433def67f47d96c4eba965"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "947a1020828f0a0a838d9c44b4257a276b18f0ff..c63a3ca32cdd7c2419fce6acca3ca40645af0f7e"
+    "shas": "53638c2f2a8f77172b433def67f47d96c4eba965..d76fe9ac99bd3d094215244a3c7cb0f23fd11bec"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -414,5 +414,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c63a3ca32cdd7c2419fce6acca3ca40645af0f7e..768e7906f0967ac77aaf6f638e0f23f770d759e7"
+    "shas": "d76fe9ac99bd3d094215244a3c7cb0f23fd11bec..ab971d00023f677b6e12dc2e9f7778125dda588e"
 }]

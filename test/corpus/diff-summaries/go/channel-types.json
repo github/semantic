@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "745df08332a340349cf12aad08e127a9e91d4029..9235e37acbefff0eda68df1e6896b833f0cf7816"
+    "shas": "f4c1762fc218c0eccb54e7143f53a60967a91636..b1565212a1c5e429fdf9e0bc80e42298506d6f46"
 }
 ,{
     "testCaseDescription": "go-channel-types-insert-test",
@@ -130,7 +130,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9235e37acbefff0eda68df1e6896b833f0cf7816..e47873dd9c27d42050a7447d7872d681a1ddc54f"
+    "shas": "b1565212a1c5e429fdf9e0bc80e42298506d6f46..358c0325a5dce654e06fb3a93e0034e4fb1d3a86"
 }
 ,{
     "testCaseDescription": "go-channel-types-replacement-test",
@@ -169,57 +169,33 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    3
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                24
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'c1' identifier with the 'c4' identifier in the 'c4' type declaration of the 'main' function"
+                    "summary": "Added the 'c4' type declaration in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    16
-                                ],
-                                "end": [
-                                    5,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    18
-                                ],
-                                "end": [
-                                    7,
-                                    24
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                19
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the <-chan string channel type of the 'main' function"
+                    "summary": "Deleted the 'c1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -277,7 +253,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e47873dd9c27d42050a7447d7872d681a1ddc54f..b828ee393a59a2655cbb39646b22a401233e0e12"
+    "shas": "358c0325a5dce654e06fb3a93e0034e4fb1d3a86..55afd5b2c814428afc1fe3e768dbe2cac562b49b"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-replacement-test",
@@ -394,7 +370,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b828ee393a59a2655cbb39646b22a401233e0e12..e592cc95d3f274a53b874025db1514766a14dfe8"
+    "shas": "55afd5b2c814428afc1fe3e768dbe2cac562b49b..52b3c4f53e311b22c98c45878c26b21a48b18be0"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-insert-test",
@@ -471,7 +447,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e592cc95d3f274a53b874025db1514766a14dfe8..43d10e31e2d11bfaf0040d1615c76828882c20d9"
+    "shas": "52b3c4f53e311b22c98c45878c26b21a48b18be0..3e287dec325cfe93d12195dc1b8245023dbc5611"
 }
 ,{
     "testCaseDescription": "go-channel-types-teardown-test",
@@ -528,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "43d10e31e2d11bfaf0040d1615c76828882c20d9..cdee29111dc346ae63a16c8827b7c50adf2e3fb1"
+    "shas": "3e287dec325cfe93d12195dc1b8245023dbc5611..fc6b648398efaefaf009dcc5c6e1e85e302750c7"
 }]

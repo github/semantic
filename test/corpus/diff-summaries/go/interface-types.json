@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1c2079b43e155b112c39ca0e59d7d4f0abfbdfb..0ca97fbfa10e412b5936beea27da988c79ebe77a"
+    "shas": "1ea23baea6cf57632c07e8f0aeb56791c30d5772..bb7b48a1b087393581bb7c22754581e315af7b66"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -132,7 +132,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0ca97fbfa10e412b5936beea27da988c79ebe77a..90329dbba6eba0786e6d67dfc820e5611c6b7c6a"
+    "shas": "bb7b48a1b087393581bb7c22754581e315af7b66..a140b812aeddfc58f46f1b0d036f18555657e7a4"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -247,7 +247,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "90329dbba6eba0786e6d67dfc820e5611c6b7c6a..8a0b43ed7e12ba93f061744a3739165825ec4213"
+    "shas": "a140b812aeddfc58f46f1b0d036f18555657e7a4..840547fce498d167d3f35b46bc31059f69a93ce1"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -362,7 +362,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8a0b43ed7e12ba93f061744a3739165825ec4213..3b70db6694ac6f8a429e6d8a0ffc5b821360f801"
+    "shas": "840547fce498d167d3f35b46bc31059f69a93ce1..47470ba3ee0a16c61f9b9005c3c0c8a919c68897"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -441,7 +441,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3b70db6694ac6f8a429e6d8a0ffc5b821360f801..9ae8b048dadcb8d6731795b8cdfb0644e8767122"
+    "shas": "47470ba3ee0a16c61f9b9005c3c0c8a919c68897..3f7a01ef7c7b81976b0de863d1ce92dddef8f1e9"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -498,5 +498,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ae8b048dadcb8d6731795b8cdfb0644e8767122..198e499fedaac589ea80e6d0d81bb0e29e68f417"
+    "shas": "3f7a01ef7c7b81976b0de863d1ce92dddef8f1e9..66a8d29742118aa0b7341cb7976bc1a702d37842"
 }]

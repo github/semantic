@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3cbe726d90a8159820455aa36c18291a99c6e77a..1c15fc91262b6d9d8d56d518c0ab513c2b69956b"
+    "shas": "2667754353ce5d2f54f7214ab8846870074f5170..41cf3e59e3176e2e001dbfc2a6dd96fa215d61a4"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -114,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1c15fc91262b6d9d8d56d518c0ab513c2b69956b..ae5230257c3b415596712c754da75694147861ce"
+    "shas": "41cf3e59e3176e2e001dbfc2a6dd96fa215d61a4..be2a04933c334f2aad2394b529c6fec3ae4eeecb"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -199,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ae5230257c3b415596712c754da75694147861ce..531f5f0d359c11ab8a9f39a6ae04be45df9e8783"
+    "shas": "be2a04933c334f2aad2394b529c6fec3ae4eeecb..21424d37c706ae1dcf7ee27b79114f8154ee642d"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -284,7 +284,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "531f5f0d359c11ab8a9f39a6ae04be45df9e8783..eaba15469e5ed5c9c06ada2598d7aa4f8779dccb"
+    "shas": "21424d37c706ae1dcf7ee27b79114f8154ee642d..ef974d3dfbc698be583ed30eb4271e92825eb493"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -345,7 +345,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eaba15469e5ed5c9c06ada2598d7aa4f8779dccb..c62bafd0ec4a9324199668b5bc25ea3f15d6b1c8"
+    "shas": "ef974d3dfbc698be583ed30eb4271e92825eb493..3b956cf11c12c6c8a0151928d2e147d1e84bfc95"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -402,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c62bafd0ec4a9324199668b5bc25ea3f15d6b1c8..f47b47e335909b60b18242974324c8259d9b5a52"
+    "shas": "3b956cf11c12c6c8a0151928d2e147d1e84bfc95..79dec366c936d01cdcc0d536163d492bc2788284"
 }]

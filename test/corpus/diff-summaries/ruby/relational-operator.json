@@ -66,7 +66,7 @@
         "+x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6c27e99fb23d5f85525e0885c8e8a54cbfc8717a..e0a04c14d081fc4af4d0be4e9bf605b0f7d6a7a7"
+    "shas": "546a8ae29d4964d2d9e5fc7e22788161d4a41040..6d1a956314d61dfef3164462a8b1d10eac037f44"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-replacement-insert-test",
@@ -187,13 +187,28 @@
         " x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e0a04c14d081fc4af4d0be4e9bf605b0f7d6a7a7..5501c6d757aa15bc44b996da2f7feda03d982c9a"
+    "shas": "6d1a956314d61dfef3164462a8b1d10eac037f44..7256be43ac2f9e0c6705959925ba6f0f395f17f7"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
             "relational-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x == y' binary statement"
+                },
                 {
                     "span": {
                         "replace": [
@@ -209,17 +224,17 @@
                             },
                             {
                                 "start": [
-                                    1,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    2,
                                     7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x <=> y' binary statement with the 'x == y' binary statement"
+                    "summary": "Replaced the 'x <=> y' binary statement with the 'x != y' binary statement"
                 },
                 {
                     "span": {
@@ -236,32 +251,17 @@
                             },
                             {
                                 "start": [
-                                    2,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    2,
-                                    7
+                                    3,
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x =~ y' binary statement with the 'x != y' binary statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x === y' binary statement"
+                    "summary": "Replaced the 'x =~ y' binary statement with the 'x === y' binary statement"
                 },
                 {
                     "span": {
@@ -302,7 +302,7 @@
         " x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5501c6d757aa15bc44b996da2f7feda03d982c9a..bc3940d03248483f5a5ded1154da28bafdd61e6d"
+    "shas": "7256be43ac2f9e0c6705959925ba6f0f395f17f7..fca757242c65d9e9dca28cc5cd135bff4de1057e"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-replacement-test",
@@ -311,41 +311,29 @@
             "relational-operator.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'x == y' binary statement with the 'x <=> y' binary statement"
+                    "summary": "Added the 'x <=> y' binary statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    2,
+                                    1,
                                     7
                                 ]
                             },
@@ -361,7 +349,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x != y' binary statement with the 'x =~ y' binary statement"
+                    "summary": "Replaced the 'x == y' binary statement with the 'x =~ y' binary statement"
                 },
                 {
                     "span": {
@@ -377,6 +365,21 @@
                         }
                     },
                     "summary": "Added the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x != y' binary statement"
                 },
                 {
                     "span": {
@@ -417,7 +420,7 @@
         " x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bc3940d03248483f5a5ded1154da28bafdd61e6d..845f97666626d2b7096a0f24436fba8256aaedb2"
+    "shas": "fca757242c65d9e9dca28cc5cd135bff4de1057e..54de4f4a977f330f23f05091b9056d7d3518ea53"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-replacement-test",
@@ -586,7 +589,7 @@
         "+x =! y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "845f97666626d2b7096a0f24436fba8256aaedb2..50883312aabe25d9afc9c4c50aa9d65ad3f7bc21"
+    "shas": "54de4f4a977f330f23f05091b9056d7d3518ea53..4e3bb08535cb9130465f27dee1d65ccaefca2bb0"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-test",
@@ -659,7 +662,7 @@
         " x =! y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "50883312aabe25d9afc9c4c50aa9d65ad3f7bc21..4390aecfa9191d7b213eec2c3e32890670f4742b"
+    "shas": "4e3bb08535cb9130465f27dee1d65ccaefca2bb0..4d80456dea201180a54994f8210223aef501cde9"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-rest-test",
@@ -729,5 +732,5 @@
         "-x =! y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4390aecfa9191d7b213eec2c3e32890670f4742b..1b803e056a1487ac155e74204ddaa92b7fd30c5b"
+    "shas": "4d80456dea201180a54994f8210223aef501cde9..cef9371cb4d1a05f91067637d7e9256fdc8b846c"
 }]

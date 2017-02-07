@@ -35,7 +35,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d7c0d9f3779b10092fd36936b786ecb673cc2cc8..17d779ef2c6c972d6d85d3b14a002d1745be325f"
+    "shas": "b616a75a1894341c88be0147f3d99ca16d223394..f9bea87667a8ec91e3c34de65d5b65ba5c63a57e"
 }
 ,{
     "testCaseDescription": "ruby-when-insert-test",
@@ -44,22 +44,40 @@
             "when.rb": [
                 {
                     "span": {
-                          "insert": {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    4
-                                ]
-                            }
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
                     },
                     "summary": "Added the 'foo' case statement"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "when.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
+                }
+            ]
+        }
     },
     "filePaths": [
         "when.rb"
@@ -75,7 +93,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "17d779ef2c6c972d6d85d3b14a002d1745be325f..9faadfa38973ac62c9d4c02737edffb50c212858"
+    "shas": "f9bea87667a8ec91e3c34de65d5b65ba5c63a57e..23fe86c51ddffc6f48e6466ff80bf55cfa7f9950"
 }
 ,{
     "testCaseDescription": "ruby-when-replacement-test",
@@ -116,7 +134,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9faadfa38973ac62c9d4c02737edffb50c212858..b2ba6648a26c6bcd7eaa19626f1215a2189632ab"
+    "shas": "23fe86c51ddffc6f48e6466ff80bf55cfa7f9950..a7e74f5bb4d08cc500503009907944d048013aa1"
 }
 ,{
     "testCaseDescription": "ruby-when-delete-replacement-test",
@@ -157,7 +175,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b2ba6648a26c6bcd7eaa19626f1215a2189632ab..de6d8774c6d563047bfbf1d2814b49a5f378123e"
+    "shas": "a7e74f5bb4d08cc500503009907944d048013aa1..3a7ae1a603a12a75857442cfe9f57f07830b260a"
 }
 ,{
     "testCaseDescription": "ruby-when-delete-insert-test",
@@ -167,21 +185,39 @@
                 {
                     "span": {
                         "delete": {
-                              "start": [
-                                  1,
-                                  1
-                              ],
-                              "end": [
-                                  3,
-                                  4
-                              ]
-                          }
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
                     },
                     "summary": "Deleted the 'foo' case statement"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "when.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
+                }
+            ]
+        }
     },
     "filePaths": [
         "when.rb"
@@ -197,7 +233,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "de6d8774c6d563047bfbf1d2814b49a5f378123e..ee477cb5e59568e80a3ad5c389a907f7216bd78f"
+    "shas": "3a7ae1a603a12a75857442cfe9f57f07830b260a..253f6a600cd1e4a83701e6d776d937f562eb867c"
 }
 ,{
     "testCaseDescription": "ruby-when-teardown-test",
@@ -236,5 +272,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ee477cb5e59568e80a3ad5c389a907f7216bd78f..ab2392769172febef7b317850a4e30bb8ee02326"
+    "shas": "253f6a600cd1e4a83701e6d776d937f562eb867c..cf6833ca26f4455afe60e15692ddae7fd4ff5e0c"
 }]

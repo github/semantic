@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0e40b73ed960545297d28869bd8ef8b29d2718e1..f9dcfe4ec83abc2875bfffcb31f41cce62290532"
+    "shas": "dbbd7d354d20a91ee4b6164e2d775b4b028bd7c8..e13c5ea64b792407c6791ab0428f4ab4643a488c"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f9dcfe4ec83abc2875bfffcb31f41cce62290532..7a6591234d5e55a7198d75b0552eb586589a4cd6"
+    "shas": "e13c5ea64b792407c6791ab0428f4ab4643a488c..a7221c0a91d2583775a7095725aee3fb506c1d84"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -250,7 +250,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a6591234d5e55a7198d75b0552eb586589a4cd6..70c79e0e6114a3b9fdf6ad29077039a139f1555f"
+    "shas": "a7221c0a91d2583775a7095725aee3fb506c1d84..85ab0113d801a61a21edd7039f026e18ef4f1337"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -388,7 +388,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "70c79e0e6114a3b9fdf6ad29077039a139f1555f..422370664d86e8c0846732c0b19db715ddc39455"
+    "shas": "85ab0113d801a61a21edd7039f026e18ef4f1337..651a06553877ec1e5456c3addad7964609218d1d"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -447,7 +447,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "422370664d86e8c0846732c0b19db715ddc39455..3d8a438a67c286aa1d30aa2fe6a23f5455ab3bc1"
+    "shas": "651a06553877ec1e5456c3addad7964609218d1d..db27d3fb7f7a21f65cbe858a093f996442c00bda"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -504,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3d8a438a67c286aa1d30aa2fe6a23f5455ab3bc1..1ab595847b90f49ca6ee0936aad429ca807fe56c"
+    "shas": "db27d3fb7f7a21f65cbe858a093f996442c00bda..a6e0c0d92000a524748ee070775f1f11884f031e"
 }]
