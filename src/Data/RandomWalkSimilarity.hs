@@ -149,7 +149,7 @@ rws compare as bs
     -- Possibly replace terms in a diff.
     replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
     replaceIfEqual a b
-      | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
+      | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms (eraseFeatureVector a) (eraseFeatureVector b)
       | otherwise = Nothing
 
     cost = iter (const 0) . (1 <$)
