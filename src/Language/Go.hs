@@ -65,12 +65,14 @@ termAssignment source category children = case (category, children) of
   (Send, [channel, expr]) -> Just $ S.Send channel expr
   (Operator, _) -> Just $ S.Operator children
   (FunctionTy, _) -> Just $ S.Ty children
-  (IncrementStatement, _) -> Just $ S.Leaf $ toText source
-  (DecrementStatement, _) -> Just $ S.Leaf $ toText source
-  (QualifiedIdentifier, _) -> Just $ S.Leaf $ toText source
-  (Method, [params, name, fun]) -> Just (S.Method name Nothing (toList (unwrap params)) (toList (unwrap fun)))
-  (Method, [params, name, outParams, fun]) -> Just (S.Method name Nothing (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
-  (Method, [params, name, outParams, ty, fun]) -> Just (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
+  (IncrementStatement, _) -> Just $ S.Leaf (toText source)
+  (DecrementStatement, _) -> Just $ S.Leaf (toText source)
+  (QualifiedIdentifier, _) -> Just $ S.Leaf (toText source)
+  (Method, [params, name, fun]) -> Just (S.Method name Nothing Nothing (toList (unwrap params)) (toList (unwrap fun)))
+  (Method, [params, name, outParams, fun])
+    -> Just (S.Method name (Just outParams) Nothing (toList (unwrap params)) (toList (unwrap fun)))
+  (Method, [params, name, outParams, ty, fun])
+    -> Just (S.Method name (Just outParams) (Just ty) (toList (unwrap params)) (toList (unwrap fun)))
   _ -> Nothing
 
 categoryForGoName :: Text -> Category

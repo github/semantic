@@ -251,7 +251,8 @@ toTermName source term = case unwrap term of
   S.Select clauses -> termNameFromChildren term clauses
   S.Array ty _ -> maybe (termNameFromSource term) termNameFromSource ty
   S.Class identifier _ _ -> toTermName' identifier
-  S.Method identifier _ args _ -> toTermName' identifier <> paramsToArgNames args
+  S.Method identifier (Just receiver) _ args _ -> termNameFromSource receiver <> "." <> toTermName' identifier <> paramsToArgNames args
+  S.Method identifier Nothing _ args _ -> toTermName' identifier <> paramsToArgNames args
   S.Comment a -> toS a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
