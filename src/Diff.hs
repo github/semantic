@@ -41,3 +41,7 @@ beforeTerm = mergeMaybe before Both.fst
 -- | Recover the after state of a diff.
 afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 afterTerm = mergeMaybe after Both.snd
+
+
+mapAnnotations :: Functor f => (annotation -> annotation') -> Diff f annotation -> Diff f annotation'
+mapAnnotations f = iter (\ (h :< functor) -> wrap (fmap f h :< functor)) . fmap (pure . fmap (fmap f))
