@@ -1,0 +1,426 @@
+[{
+    "testCaseDescription": "ruby-singleton-method-declaration-insert-test",
+    "expectedResult": {
+        "changes": {
+            "singleton-method-declaration.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self.foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "singleton-method-declaration.rb"
+    ],
+    "patch": [
+        "diff --git a/singleton-method-declaration.rb b/singleton-method-declaration.rb",
+        "index e69de29..caaf49d 100644",
+        "--- a/singleton-method-declaration.rb",
+        "+++ b/singleton-method-declaration.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def self.foo",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "dc8f828fb183ed9f9c1e6bc2225fc072ba04d16b..7ec5ddaad7ca5c2617b47286e6dd01154f0864ea"
+}
+,{
+    "testCaseDescription": "ruby-singleton-method-declaration-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "singleton-method-declaration.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self.bar(a)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self.foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "singleton-method-declaration.rb"
+    ],
+    "patch": [
+        "diff --git a/singleton-method-declaration.rb b/singleton-method-declaration.rb",
+        "index caaf49d..2393b4c 100644",
+        "--- a/singleton-method-declaration.rb",
+        "+++ b/singleton-method-declaration.rb",
+        "@@ -1,2 +1,7 @@",
+        "+def self.bar(a)",
+        "+  baz",
+        "+end",
+        "+def self.foo",
+        "+end",
+        " def self.foo",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "7ec5ddaad7ca5c2617b47286e6dd01154f0864ea..d5dd261daf5f486d25bfdc4be255aad96bcff349"
+}
+,{
+    "testCaseDescription": "ruby-singleton-method-declaration-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "singleton-method-declaration.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'self.foo()' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                14
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier in the 'self.foo()' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' identifier in the 'self.foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "singleton-method-declaration.rb"
+    ],
+    "patch": [
+        "diff --git a/singleton-method-declaration.rb b/singleton-method-declaration.rb",
+        "index 2393b4c..44b0e0c 100644",
+        "--- a/singleton-method-declaration.rb",
+        "+++ b/singleton-method-declaration.rb",
+        "@@ -1,5 +1,4 @@",
+        "-def self.bar(a)",
+        "-  baz",
+        "+def self.foo",
+        " end",
+        " def self.foo",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d5dd261daf5f486d25bfdc4be255aad96bcff349..9be301df5bd043c27ece14f9ea370518be524a3b"
+}
+,{
+    "testCaseDescription": "ruby-singleton-method-declaration-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "singleton-method-declaration.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'self.bar(a)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                14
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier in the 'self.bar(a)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz' identifier in the 'self.bar(a)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "singleton-method-declaration.rb"
+    ],
+    "patch": [
+        "diff --git a/singleton-method-declaration.rb b/singleton-method-declaration.rb",
+        "index 44b0e0c..2393b4c 100644",
+        "--- a/singleton-method-declaration.rb",
+        "+++ b/singleton-method-declaration.rb",
+        "@@ -1,4 +1,5 @@",
+        "-def self.foo",
+        "+def self.bar(a)",
+        "+  baz",
+        " end",
+        " def self.foo",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9be301df5bd043c27ece14f9ea370518be524a3b..ec0380330945735057c42d735389cd3e3e19645c"
+}
+,{
+    "testCaseDescription": "ruby-singleton-method-declaration-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "singleton-method-declaration.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self.bar(a)' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self.foo()' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self.bar(a)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "singleton-method-declaration.rb"
+    ],
+    "patch": [
+        "diff --git a/singleton-method-declaration.rb b/singleton-method-declaration.rb",
+        "index 2393b4c..84f3a03 100644",
+        "--- a/singleton-method-declaration.rb",
+        "+++ b/singleton-method-declaration.rb",
+        "@@ -1,7 +1,5 @@",
+        "-def self.bar(a)",
+        "-  baz",
+        "-end",
+        " def self.foo",
+        " end",
+        "-def self.foo",
+        "+def self.bar(a)",
+        "+  baz",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ec0380330945735057c42d735389cd3e3e19645c..9caba032307eb93717d1c08d5e01ddb3571efcf0"
+}
+,{
+    "testCaseDescription": "ruby-singleton-method-declaration-delete-test",
+    "expectedResult": {
+        "changes": {
+            "singleton-method-declaration.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self.foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "singleton-method-declaration.rb"
+    ],
+    "patch": [
+        "diff --git a/singleton-method-declaration.rb b/singleton-method-declaration.rb",
+        "index 84f3a03..8649965 100644",
+        "--- a/singleton-method-declaration.rb",
+        "+++ b/singleton-method-declaration.rb",
+        "@@ -1,5 +1,3 @@",
+        "-def self.foo",
+        "-end",
+        " def self.bar(a)",
+        "   baz",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9caba032307eb93717d1c08d5e01ddb3571efcf0..0e43ebdc7453b47a1114fb4c95038938ab9fb544"
+}
+,{
+    "testCaseDescription": "ruby-singleton-method-declaration-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "singleton-method-declaration.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self.bar(a)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "singleton-method-declaration.rb"
+    ],
+    "patch": [
+        "diff --git a/singleton-method-declaration.rb b/singleton-method-declaration.rb",
+        "index 8649965..e69de29 100644",
+        "--- a/singleton-method-declaration.rb",
+        "+++ b/singleton-method-declaration.rb",
+        "@@ -1,3 +0,0 @@",
+        "-def self.bar(a)",
+        "-  baz",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0e43ebdc7453b47a1114fb4c95038938ab9fb544..bdea1962c3afcde91a03aede5401db0e943ab608"
+}]
