@@ -1,0 +1,14 @@
+[
+  {
+    "language": "ruby",
+    "fileExt": ".rb",
+    "repoUrl": "https://github.com/diff-fixtures/ruby.git",
+    "syntaxes": [
+      {
+        "syntax": "singleton-method-declaration",
+        "insert": "def self.foo\nend",
+        "replacement": "def self.bar(a)\n  baz\nend"
+      }
+    ]
+  }
+]

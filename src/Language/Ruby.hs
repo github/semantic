@@ -65,6 +65,12 @@ termAssignment _ category children
     (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest
     (OperatorAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
+    (Method, expr : methodName : rest)
+      | params : body <- rest
+      , Params <- Info.category (extract params)
+      -> Just $ S.Method (withRecord (setCategory (extract expr) MemberAccess) (S.MemberAccess expr methodName)) Nothing (toList (unwrap params)) body
+      | Identifier <- Info.category (extract methodName)
+      -> Just $ S.Method (withRecord (setCategory (extract expr) MemberAccess) (S.MemberAccess expr methodName)) Nothing [] rest
     (Method, identifier : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)

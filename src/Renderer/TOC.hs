@@ -153,6 +153,7 @@ toTermName :: forall leaf fields. DefaultFields fields => Source Char -> SyntaxT
 toTermName source term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
   S.Method identifier _ _ _ -> toTermName' identifier
+  S.MemberAccess base property -> toTermName' base <> "." <> toTermName' property
   _ -> termNameFromSource term
   where
     toTermName' = toTermName source
