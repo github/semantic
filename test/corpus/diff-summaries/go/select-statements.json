@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c554880bc382e11fd0a8cb71a869908b47d8bc15..50157439d7ddc7eb2f12efb614129e185f619a40"
+    "shas": "4966b945ba5393d1f1e64efadf0af83c41425f11..b490190f8902330d676348583217eee062b8bb76"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -105,7 +105,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "50157439d7ddc7eb2f12efb614129e185f619a40..e7a5c6d31f3469fb15091a61498d688c73448975"
+    "shas": "b490190f8902330d676348583217eee062b8bb76..f981714e374e7edd602f4b2e423d2d3651534f65"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -222,7 +222,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e7a5c6d31f3469fb15091a61498d688c73448975..e170b89afa80c82fec53253295e640917fc942ed"
+    "shas": "f981714e374e7edd602f4b2e423d2d3651534f65..3b29e2cdce6c5e5e3c3c1e88104fd7593eeada08"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -339,7 +339,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e170b89afa80c82fec53253295e640917fc942ed..c988a8929a5bb07a1c576e1f394f0a08b6626a15"
+    "shas": "3b29e2cdce6c5e5e3c3c1e88104fd7593eeada08..0958411ec5eb18df1fb4d5897509d0d5476e4151"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -391,7 +391,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c988a8929a5bb07a1c576e1f394f0a08b6626a15..9b8ab8517c889c00f02089ee91f5851c69c27394"
+    "shas": "0958411ec5eb18df1fb4d5897509d0d5476e4151..f5e07ec87b0833ce3f9549a3e91e013115c7327d"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -448,5 +448,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b8ab8517c889c00f02089ee91f5851c69c27394..dbbd7d354d20a91ee4b6164e2d775b4b028bd7c8"
+    "shas": "f5e07ec87b0833ce3f9549a3e91e013115c7327d..3ae31b84db1d8419897111182e8fdc9cad60fbbc"
 }]

@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dbbd7d354d20a91ee4b6164e2d775b4b028bd7c8..e13c5ea64b792407c6791ab0428f4ab4643a488c"
+    "shas": "3ae31b84db1d8419897111182e8fdc9cad60fbbc..6ed2edc3b4005b0719c48ab5feb3ea1b6b3daa9e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e13c5ea64b792407c6791ab0428f4ab4643a488c..a7221c0a91d2583775a7095725aee3fb506c1d84"
+    "shas": "6ed2edc3b4005b0719c48ab5feb3ea1b6b3daa9e..a38b696b502320ca19a328372be89961fb958841"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -250,7 +250,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a7221c0a91d2583775a7095725aee3fb506c1d84..85ab0113d801a61a21edd7039f026e18ef4f1337"
+    "shas": "a38b696b502320ca19a328372be89961fb958841..740493f5b68581152933f89ec89f7e31859ad26e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -388,7 +388,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "85ab0113d801a61a21edd7039f026e18ef4f1337..651a06553877ec1e5456c3addad7964609218d1d"
+    "shas": "740493f5b68581152933f89ec89f7e31859ad26e..5f8b90d561badd65eac8ae43d7dfb57aa81c060f"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -447,7 +447,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "651a06553877ec1e5456c3addad7964609218d1d..db27d3fb7f7a21f65cbe858a093f996442c00bda"
+    "shas": "5f8b90d561badd65eac8ae43d7dfb57aa81c060f..4db2085bcd5be639e82d878fd9ac0090e2c13caf"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -504,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "db27d3fb7f7a21f65cbe858a093f996442c00bda..a6e0c0d92000a524748ee070775f1f11884f031e"
+    "shas": "4db2085bcd5be639e82d878fd9ac0090e2c13caf..3b8c04146e306d10e05370f01c662eccc49a57d3"
 }]

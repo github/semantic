@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6edef90abfbd1ec966dd2af7de2a6f6b68f13c3f..ac992cdca75ff25b15e4432553427e51c822b1e4"
+    "shas": "8566e6b82b82cdb946f31050cd67e81c7a70a4f8..4c6ba0cec79bc7bc4f19f23ec290129743c33ab0"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac992cdca75ff25b15e4432553427e51c822b1e4..69981a5a85eb90d7923efc507cf28542573d2ca5"
+    "shas": "4c6ba0cec79bc7bc4f19f23ec290129743c33ab0..ce4c1df86303fc418b251ee6c3cdb8a5e19c1ddc"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -169,7 +169,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "69981a5a85eb90d7923efc507cf28542573d2ca5..537e6596932152f2ab522eecfd216e15a30d810a"
+    "shas": "ce4c1df86303fc418b251ee6c3cdb8a5e19c1ddc..914f29c058eacd9c592d304947d46feaa25e7b33"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "537e6596932152f2ab522eecfd216e15a30d810a..2addcbb605be75128e5b823da1d37f7c4a0b07d0"
+    "shas": "914f29c058eacd9c592d304947d46feaa25e7b33..697657a456eb527a797dcae7f135a1e6d37a3df6"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -285,7 +285,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2addcbb605be75128e5b823da1d37f7c4a0b07d0..50e42fbbb244c5b1ab6b14b65028db8afc5bbf74"
+    "shas": "697657a456eb527a797dcae7f135a1e6d37a3df6..46a167a5893ffbcd888ea7adedf5cd4f9411280a"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -342,5 +342,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "50e42fbbb244c5b1ab6b14b65028db8afc5bbf74..0a1f04e40ae39042b1440ab1b3f5001fa0ac0dfc"
+    "shas": "46a167a5893ffbcd888ea7adedf5cd4f9411280a..177fb35939c02b4bc6067142eab57a6cc2237513"
 }]

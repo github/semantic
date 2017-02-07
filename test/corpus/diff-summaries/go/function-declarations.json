@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "67505136f185d3093753d4cb0b1c44e2d11dccfc..7338265ff430be2d2480d9207eae5d8b756a9cd2"
+    "shas": "f93b93e3865f62d4b7782f4ee60f9029b851186a..d7355a26f3f9a780f8a246c80682e9bd61da1590"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -111,7 +111,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7338265ff430be2d2480d9207eae5d8b756a9cd2..b4f794b5e923ad1022fa5ca414b9c1923a8ac083"
+    "shas": "d7355a26f3f9a780f8a246c80682e9bd61da1590..13e067d2cca396e5cd315f8e43f62ba9893540b5"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -253,7 +253,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4f794b5e923ad1022fa5ca414b9c1923a8ac083..cf6db137caefa6e31d46ff9129dbd46400426208"
+    "shas": "13e067d2cca396e5cd315f8e43f62ba9893540b5..29c9d800fcfa597bdccf3057bb4827c1ebfe7148"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -395,7 +395,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cf6db137caefa6e31d46ff9129dbd46400426208..10d33eaa2939ba78c9cf13cdc081a09c0195be1a"
+    "shas": "29c9d800fcfa597bdccf3057bb4827c1ebfe7148..1e348e167bda850a7b4e0b13d9273364852e6a78"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -453,7 +453,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "10d33eaa2939ba78c9cf13cdc081a09c0195be1a..827b7df682da16b59b729c1e4f86a809c66c4c41"
+    "shas": "1e348e167bda850a7b4e0b13d9273364852e6a78..0f0e6a61a99794f159dc3dd2b347670d2c2c1fca"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -510,5 +510,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "827b7df682da16b59b729c1e4f86a809c66c4c41..7aca9c79d13a2447f8a2438892947c7d3b00b01e"
+    "shas": "0f0e6a61a99794f159dc3dd2b347670d2c2c1fca..a2dfb03fc1f7dc5419ac9aa570a15071f5eeeeea"
 }]

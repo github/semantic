@@ -54,7 +54,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e394836076e0a72e35ee1005762b7d944e804335..d300342bf9c2cc857cadd1177802ebc713a9e5f2"
+    "shas": "ba5ad24cc5920db43a2b1942f11e4737fe450953..15a77f6125a6c4dab3cb92fdca8bd43ffb7a095c"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-insert-test",
@@ -128,7 +128,7 @@
         "+func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d300342bf9c2cc857cadd1177802ebc713a9e5f2..d9667f6d36b7f40964eb0683eb878d02ef2d9726"
+    "shas": "15a77f6125a6c4dab3cb92fdca8bd43ffb7a095c..2795525acc11b3b4d3bb239efb44e4dbeeb3eb80"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -240,7 +240,7 @@
         "+func g3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d9667f6d36b7f40964eb0683eb878d02ef2d9726..e6f9b1b8179d111be801318dd43b0be4b3801e90"
+    "shas": "2795525acc11b3b4d3bb239efb44e4dbeeb3eb80..12f649346665ffb181bde064b58e5ac1d9d97860"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -352,7 +352,7 @@
         "+func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e6f9b1b8179d111be801318dd43b0be4b3801e90..b88d14aabef9c8883f59729034b52269436d14dd"
+    "shas": "12f649346665ffb181bde064b58e5ac1d9d97860..ef93bbef3117c5583f11f22bd06558ddfad0784b"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b88d14aabef9c8883f59729034b52269436d14dd..ac8b2855d61735c038cf18e80db2338e4314aebf"
+    "shas": "ef93bbef3117c5583f11f22bd06558ddfad0784b..2f16adfed9c6ae862992be30903bb8e0e3f1e344"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-teardown-test",
@@ -484,5 +484,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac8b2855d61735c038cf18e80db2338e4314aebf..0c352ebb4f2d9899aa86cedcaf17a837c2125b6a"
+    "shas": "2f16adfed9c6ae862992be30903bb8e0e3f1e344..d6222a7346773adfd0929112bedb22129a3519ea"
 }]

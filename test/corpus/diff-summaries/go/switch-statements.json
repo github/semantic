@@ -5,33 +5,18 @@
             "switch-statements.go": [
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                5,
+                                7,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'main' function"
+                    "summary": "Deleted a switch statement in the main function"
                 }
             ]
         },
@@ -42,18 +27,22 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index e69de29b..79058077 100644",
+        "index 5cdd438b..79058077 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
-        "@@ -0,0 +1,5 @@",
-        "+package main",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-switch { case x < y: f1()",
+        "-case x < z: g()",
+        "-case x == 4: h()",
+        "-}",
         "+",
-        "+func main() {",
-        "+",
-        "+}"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "79dec366c936d01cdcc0d536163d492bc2788284..2950c5c1c800659b70c837714f4aeada1ee003d9"
+    "shas": "4b10b6ade6ce2758e1727d4e03710722cb374ec6..31e99cd5c6a71a2d9d6abcef071b3061447da30f"
 }
 ,{
     "testCaseDescription": "go-switch-statements-insert-test",
@@ -99,7 +88,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2950c5c1c800659b70c837714f4aeada1ee003d9..d3e086a3bcb461284f864ea3e80830c2a5cad9dc"
+    "shas": "31e99cd5c6a71a2d9d6abcef071b3061447da30f..7bde0e45b5072c0754139ae007b5f7dcee5c7069"
 }
 ,{
     "testCaseDescription": "go-switch-statements-replacement-test",
@@ -294,7 +283,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d3e086a3bcb461284f864ea3e80830c2a5cad9dc..83b0c9a23a6f854e47d613c9202d0893090f3521"
+    "shas": "7bde0e45b5072c0754139ae007b5f7dcee5c7069..d533c76ca97482b211aae89d5dc7317c2da9ed08"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-replacement-test",
@@ -489,7 +478,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "83b0c9a23a6f854e47d613c9202d0893090f3521..e32d68fe39c2be5a1be3c7cd56fbd409d925301a"
+    "shas": "d533c76ca97482b211aae89d5dc7317c2da9ed08..53db9755dfc81f3e1c701ff964a502d60bd070a0"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-insert-test",
@@ -535,7 +524,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e32d68fe39c2be5a1be3c7cd56fbd409d925301a..813ae6824b6ce084bb28b10b34bcc6fafb774999"
+    "shas": "53db9755dfc81f3e1c701ff964a502d60bd070a0..fadee35ca8a0bdc037adc0ba40b48a0e3d83d1a0"
 }
 ,{
     "testCaseDescription": "go-switch-statements-teardown-test",
@@ -592,5 +581,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "813ae6824b6ce084bb28b10b34bcc6fafb774999..f78b13760c067a06383d1e448dcb9b2430e1c90f"
+    "shas": "fadee35ca8a0bdc037adc0ba40b48a0e3d83d1a0..331d50d25e2927f7ec24d69b4f21552787a91ed6"
 }]
