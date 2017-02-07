@@ -44,6 +44,8 @@ afterTerm = mergeMaybe after Both.snd
 
 
 -- | Map a function over the annotations in a diff, whether in diff or term nodes.
+--
+--   Typed using Free so as to accommodate Free structures derived from diffs that don’t fit into the Diff type synonym (e.g. because the leaves aren’t in Patch).
 mapAnnotations :: (Functor f, Functor g)
                => (annotation -> annotation')
                -> Free (TermF f (g annotation))  (Patch (Term f annotation))
