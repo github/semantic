@@ -65,12 +65,18 @@ termAssignment _ category children
     (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest
     (OperatorAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
+    (Method, expr : methodName : rest)
+      | params : body <- rest
+      , Params <- Info.category (extract params)
+      -> Just $ S.Method methodName (Just expr) Nothing (toList (unwrap params)) body
+      | Identifier <- Info.category (extract methodName)
+      -> Just $ S.Method methodName (Just expr) Nothing [] rest
     (Method, identifier : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
-      -> Just $ S.Method identifier Nothing (toList (unwrap params)) body
+      -> Just $ S.Method identifier Nothing Nothing (toList (unwrap params)) body
       | otherwise
-      -> Just $ S.Method identifier Nothing [] rest
+      -> Just $ S.Method identifier Nothing Nothing [] rest
     (Module, constant : body ) -> Just $ S.Module constant body
     (Modifier Rescue, [lhs, rhs] ) -> Just $ S.Rescue [lhs] [rhs]
     (Rescue, exceptions : exceptionVar : rest)
@@ -93,6 +99,7 @@ termAssignment _ category children
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
   "argument_list" -> Args
+  "argument_list_with_parens" -> Args
   "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
@@ -100,6 +107,7 @@ categoryForRubyName = \case
   "begin" -> Begin
   "binary" -> Binary
   "block_parameter" -> BlockParameter
+  "block_parameters" -> Params
   "boolean" -> Boolean
   "call" -> MemberAccess
   "case" -> Case
@@ -110,6 +118,7 @@ categoryForRubyName = \case
   "element_reference" -> SubscriptAccess
   "else" -> Else
   "elsif" -> Elsif
+  "empty_statement" -> Empty
   "end_block" -> EndBlock
   "ensure" -> Ensure
   "exception_variable" -> RescuedException
@@ -117,9 +126,6 @@ categoryForRubyName = \case
   "false" -> Boolean
   "float" -> NumberLiteral
   "for" -> For
-  "method_parameters" -> Params
-  "lambda_parameters" -> Params
-  "block_parameters" -> Params
   "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
@@ -129,7 +135,9 @@ categoryForRubyName = \case
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
+  "lambda_parameters" -> Params
   "method_call" -> MethodCall
+  "method_parameters" -> Params
   "method" -> Method
   "module"  -> Module
   "nil" -> Identifier
