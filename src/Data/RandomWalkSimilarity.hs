@@ -121,7 +121,7 @@ rws compare as bs
                           (These Int Int, Diff f (Record fields))
     insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
       put (previous, unmappedA, IntMap.delete j unmappedB)
-      pure (That j, inserting ((`setFeatureVector` Nothing) <$> b))
+      pure (That j, inserting b)
 
     -- | Finds the most-similar unmapped term to the passed-in term, if any.
     --
@@ -144,7 +144,7 @@ rws compare as bs
     deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
         insertDiff (This i, deletion) into)
       diffs
-      ((termIndex &&& deleting . fmap (`setFeatureVector` Nothing) . term) <$> unmappedA)
+      ((termIndex &&& deleting . term) <$> unmappedA)
 
     -- Possibly replace terms in a diff.
     replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
