@@ -53,8 +53,8 @@ rws :: forall f fields.
     -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
 rws compare as bs
   | null as, null bs = []
-  | null as = inserting <$> bs
-  | null bs = deleting <$> as
+  | null as = inserting . eraseFeatureVector <$> bs
+  | null bs = deleting . eraseFeatureVector <$> as
   | otherwise =
     -- Construct a State who's final value is a list of (Int, Diff leaf (Record fields))
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
