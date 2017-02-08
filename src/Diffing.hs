@@ -113,7 +113,11 @@ writeToOutput output text =
   case output of
     Nothing -> do
       lang <- lookupEnv "LANG"
-      if isNothing lang then IO.hSetEncoding IO.stdout IO.utf8 else pure ()
+      case lang of
+	-- If LANG is set and isn't the empty string, leave the encoding.
+	Just x | x /= "" -> pure ()
+	-- Otherwise default to utf8.
+	_ -> IO.hSetEncoding IO.stdout IO.utf8
       TextIO.hPutStrLn IO.stdout text
     Just path -> do
       isDir <- doesDirectoryExist path
