@@ -53,7 +53,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "177fb35939c02b4bc6067142eab57a6cc2237513..2f023a586a3c306c01e1fbf646c7bffc5a6428b3"
+    "shas": "852d29d2b9a695875dd0e15454330bbf7c5e49ff..8dbfd03f829f633e03994c029050d4c04facf13a"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '(other Person).Equals(…)' method"
+                    "summary": "Added the '(self Person).Equals(…)' method"
                 }
             ]
         },
@@ -95,40 +95,13 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f023a586a3c306c01e1fbf646c7bffc5a6428b3..d79d8d6400fbf0ee98ec1c1de105b35653bc6abf"
+    "shas": "8dbfd03f829f633e03994c029050d4c04facf13a..0c19c3d818bc2c0bac5168d3e77f4e54e382a2d3"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
     "expectedResult": {
         "changes": {
             "method-declarations.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    33
-                                ],
-                                "end": [
-                                    5,
-                                    39
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    30
-                                ],
-                                "end": [
-                                    5,
-                                    33
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the '(other Num).Equals(…)' method"
-                },
                 {
                     "span": {
                         "replace": [
@@ -154,7 +127,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the '(other Num).Equals(…)' method"
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the '(self Num).Equals(…)' method"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    33
+                                ],
+                                "end": [
+                                    5,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    30
+                                ],
+                                "end": [
+                                    5,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the '(self Num).Equals(…)' method"
                 }
             ]
         },
@@ -176,40 +176,13 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d79d8d6400fbf0ee98ec1c1de105b35653bc6abf..4984840b9c1f873e4f0283f9aa56578524bc318a"
+    "shas": "0c19c3d818bc2c0bac5168d3e77f4e54e382a2d3..973f19351649422c552bebc3caa6b543f7edde31"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "method-declarations.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    30
-                                ],
-                                "end": [
-                                    5,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    33
-                                ],
-                                "end": [
-                                    5,
-                                    39
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the '(other Person).Equals(…)' method"
-                },
                 {
                     "span": {
                         "replace": [
@@ -235,7 +208,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the '(other Person).Equals(…)' method"
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the '(self Person).Equals(…)' method"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    30
+                                ],
+                                "end": [
+                                    5,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    33
+                                ],
+                                "end": [
+                                    5,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the '(self Person).Equals(…)' method"
                 }
             ]
         },
@@ -257,7 +257,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4984840b9c1f873e4f0283f9aa56578524bc318a..5d97f8471206dc97ee31629ea3a5513e44182603"
+    "shas": "973f19351649422c552bebc3caa6b543f7edde31..322c0af27ab61337490585a423787b8dd90cdb4d"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -277,7 +277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '(other Person).Equals(…)' method"
+                    "summary": "Deleted the '(self Person).Equals(…)' method"
                 }
             ]
         },
@@ -299,7 +299,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5d97f8471206dc97ee31629ea3a5513e44182603..e3c6f620532caea3d241a47bbaa17701dba91928"
+    "shas": "322c0af27ab61337490585a423787b8dd90cdb4d..02fce651f253788ced60704a9f32342bbae010a8"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -356,5 +356,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e3c6f620532caea3d241a47bbaa17701dba91928..852d29d2b9a695875dd0e15454330bbf7c5e49ff"
+    "shas": "02fce651f253788ced60704a9f32342bbae010a8..7edc6135ad00c9c21d6159bf897deac80d7f7b99"
 }]
