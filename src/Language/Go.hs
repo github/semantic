@@ -68,11 +68,11 @@ termAssignment source category children = case (category, children) of
   (IncrementStatement, _) -> Just $ S.Leaf (toText source)
   (DecrementStatement, _) -> Just $ S.Leaf (toText source)
   (QualifiedIdentifier, _) -> Just $ S.Leaf (toText source)
-  (Method, [params, name, fun]) -> Just (S.Method name Nothing Nothing (toList (unwrap params)) (toList (unwrap fun)))
-  (Method, [params, name, outParams, fun])
-    -> Just (S.Method name (Just outParams) Nothing (toList (unwrap params)) (toList (unwrap fun)))
-  (Method, [params, name, outParams, ty, fun])
-    -> Just (S.Method name (Just outParams) (Just ty) (toList (unwrap params)) (toList (unwrap fun)))
+  (Method, [receiverParams, name, body]) -> Just (S.Method name (Just receiverParams) Nothing [] (toList (unwrap body)))
+  (Method, [receiverParams, name, params, body])
+    -> Just (S.Method name (Just receiverParams) Nothing (toList (unwrap params)) (toList (unwrap body)))
+  (Method, [receiverParams, name, params, ty, body])
+    -> Just (S.Method name (Just receiverParams) (Just ty) (toList (unwrap params)) (toList (unwrap body)))
   _ -> Nothing
 
 categoryForGoName :: Text -> Category
