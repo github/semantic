@@ -249,8 +249,7 @@ featureVectorDecorator getLabel p q d
   . pqGramDecorator getLabel p q
   where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (Just (unitVector d (hash gram))) functor :. rest) :< functor)
         addSubtermVector :: Functor f => Maybe FeatureVector -> Term f (Record (Maybe FeatureVector ': fields)) -> Maybe FeatureVector
-        addSubtermVector v term = addVectors <$> v <*> termVector
-          where termVector = rhead (extract term)
+        addSubtermVector v term = addVectors <$> v <*> rhead (extract term)
 
         addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
         addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
