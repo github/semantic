@@ -53,6 +53,7 @@ mapAnnotations :: (Functor f, Functor g)
 mapAnnotations f = iter (\ (h :< functor) -> wrap (fmap f h :< functor)) . fmap (pure . fmap (fmap f))
 
 
+-- | Map a function over the annotations of a single diff node, if it is in Free.
 modifyAnnotations :: (Functor f, Functor g) => (annotation -> annotation) -> Free (TermF f (g annotation)) a -> Free (TermF f (g annotation)) a
 modifyAnnotations f r = case runFree r of
   Free (ga :< functor) -> wrap (fmap f ga :< functor)
