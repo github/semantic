@@ -153,9 +153,14 @@ toTermName :: forall leaf fields. DefaultFields fields => Source Char -> SyntaxT
 toTermName source term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
   S.Method identifier Nothing _ _ _ -> toTermName' identifier
-  S.Method identifier (Just receiver) _ _ _ -> toTermName' receiver <> "." <> toTermName' identifier
+  S.Method identifier (Just receiver) _ _ _ -> case unwrap receiver of
+    S.Indexed [receiverParams] -> case unwrap receiverParams of
+      S.ParameterDecl (Just ty) _ -> "(" <> toTermName' ty <> ") " <> toTermName' identifier
+      _ -> toMethodNameWithReceiver receiver identifier
+    _ -> toMethodNameWithReceiver receiver identifier
   _ -> termNameFromSource term
   where
+    toMethodNameWithReceiver receiver name = toTermName' receiver <> "." <> toTermName' name
     toTermName' = toTermName source
     termNameFromSource term = termNameFromRange (range term)
     termNameFromRange range = toText $ Source.slice range source
