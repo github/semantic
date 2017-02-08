@@ -51,3 +51,9 @@ mapAnnotations :: (Functor f, Functor g)
                -> Free (TermF f (g annotation))  (Patch (Term f annotation))
                -> Free (TermF f (g annotation')) (Patch (Term f annotation'))
 mapAnnotations f = iter (\ (h :< functor) -> wrap (fmap f h :< functor)) . fmap (pure . fmap (fmap f))
+
+
+modifyAnnotations :: (Functor f, Functor g) => (annotation -> annotation) -> Free (TermF f (g annotation)) a -> Free (TermF f (g annotation)) a
+modifyAnnotations f r = case runFree r of
+  Free (ga :< functor) -> wrap (fmap f ga :< functor)
+  _ -> r
