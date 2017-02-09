@@ -49,7 +49,7 @@ diffFiles parse render sourceBlobs = do
         (_, _) ->
           runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts getLabel) terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
-    hasNullOid blob = oid blob == nullOid || null (source blob)
+    hasNullOid blob = oid blob == nullOid || Source.null (source blob)
     construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
     sumCost = fmap getSum . foldMap (fmap Sum . getCost)
     getCost diff = case runFree diff of

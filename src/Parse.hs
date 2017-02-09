@@ -104,10 +104,11 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines source
-    root children = (Range 0 (length source) :. Program :. rangeToSourceSpan source (Range 0 (length source)) :. Nil) :< Indexed children
+    root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
+    sourceRange = Source.totalRange source
     leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
-      (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
+      (accum <> [ leaf charIndex (toText line) ] , charIndex + Source.length line)
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.

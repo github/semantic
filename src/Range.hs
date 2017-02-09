@@ -21,8 +21,8 @@ rangeLength :: Range -> Int
 rangeLength range = end range - start range
 
 -- | Return a range that covers the entire text.
-totalRange :: Foldable f => f a -> Range
-totalRange t = Range 0 $ length t
+-- totalRange :: Foldable f => f a -> Range
+-- totalRange t = Range 0 $ length t
 
 -- | Break a string down into words and sequences of punctuation. Return a list
 -- | strings with ranges, assuming that the first character in the string is

@@ -4,7 +4,7 @@ module Language.Ruby where
 import Data.List (partition)
 import Info
 import Prologue
-import Source
+import Source hiding (null)
 import Language
 import qualified Syntax as S
 import Term

@@ -12,11 +12,12 @@ spec :: Spec
 spec = parallel $ do
   describe "actualLineRanges" $ do
     prop "produces 1 more range than there are newlines" $
-      \ s -> length (actualLineRanges (totalRange s) (fromList s)) `shouldBe` succ (length (filter (== '\n') s))
+      \ s -> let source = fromList s in
+        Prologue.length (actualLineRanges (totalRange source) source) `shouldBe` succ (Prologue.length (filter (== '\n') s))
 
     prop "produces exhaustive ranges" $
       \ s -> let source = fromList s in
-        foldMap (`slice` source) (actualLineRanges (totalRange s) source) `shouldBe` source
+        foldMap (`slice` source) (actualLineRanges (totalRange source) source) `shouldBe` source
 
   describe "sourceSpanToRange" $ do
     prop "computes single-line ranges" $
@@ -41,7 +42,7 @@ spec = parallel $ do
       \ n -> totalSpan (fromList (intersperse '\n' (replicate n '*'))) `shouldBe` SourceSpan (SourcePos 0 0) (SourcePos (max 0 (pred n)) (if n > 0 then 1 else 0))
 
 totalSpan :: Source Char -> SourceSpan
-totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
+totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (Prologue.length ranges)) (end lastRange - start lastRange))
   where ranges = actualLineRanges (totalRange source) source
         lastRange = Prelude.last ranges
 

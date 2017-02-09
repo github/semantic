@@ -12,7 +12,7 @@ import Prologue
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Renderer
-import Source
+import Source hiding (null)
 import Syntax as S
 import Term
 import Patch

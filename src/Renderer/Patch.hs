@@ -18,7 +18,8 @@ import Patch
 import Prologue hiding (fst, snd)
 import Range
 import Renderer
-import Source hiding (break)
+import qualified Source
+import Source hiding (break, length, null)
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
@@ -100,7 +101,7 @@ header blobs = intercalate "\n" ([filepathHeader, fileModeHeader] <> maybeFilepa
         modeHeader ty maybeMode path = case maybeMode of
            Just _ -> ty <> "/" <> path
            Nothing -> "/dev/null"
-        maybeFilepaths = if (nullOid == oidA && null (snd sources)) || (nullOid == oidB && null (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
+        maybeFilepaths = if (nullOid == oidA && Source.null (snd sources)) || (nullOid == oidB && Source.null (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
         beforeFilepath = "--- " <> modeHeader "a" modeA pathA
         afterFilepath = "+++ " <> modeHeader "b" modeB pathB
         sources = source <$> blobs
@@ -119,7 +120,7 @@ emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 hunks :: HasField fields Range => SyntaxDiff leaf fields -> Both SourceBlob -> [Hunk (SplitSyntaxDiff leaf fields)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
-              , sourcesNull <- runBothWith (&&) (null <$> sources)
+              , sourcesNull <- runBothWith (&&) (Source.null <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
 hunks diff blobs = hunksInRows (pure 1) $ alignDiff (source <$> blobs) diff

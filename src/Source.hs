@@ -15,7 +15,7 @@ data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: Fil
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
 newtype Source a = Source { getVector :: Text  }
-  deriving (Eq, Show, Foldable, Functor, Traversable)
+  deriving (Eq, Show, Functor)
 
 -- | The kind of a blob, along with it's file mode.
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
@@ -60,7 +60,7 @@ slice range = Source . Text.take (rangeLength range) . Text.drop (start range) .
 
 -- | Return a String with the contents of the Source.
 toString :: Source Char -> String
-toString = toList
+toString = Text.unpack . getVector
 
 -- | Return a text with the contents of the Source.
 toText :: Source Char -> Text
@@ -80,7 +80,7 @@ break predicate (Source vector) = let (start, remainder) = Text.break predicate 
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source Char -> [Source Char]
-actualLines source | null source = [ source ]
+actualLines source | Text.null (getVector source) = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
@@ -89,24 +89,32 @@ actualLines source = case Source.break (== '\n') source of
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + length string
+  where toRange previous string = Range (end previous) $ end previous + Text.length (getVector string)
 
 -- | Compute the character range given a Source and a SourceSpan.
 sourceSpanToRange :: Source Char -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sumLengths leadingRanges + column spanStart
         end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
-        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
+        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (Source.totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
+
+totalRange :: Source Char -> Range
+totalRange = Range 0 . Text.length . getVector
 
 rangeToSourceSpan :: Source Char -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
   where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
-        endPos = toEndPos (length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
+        endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
         lineRanges = actualLineRanges range source
         toStartPos line range = SourcePos line (start range)
         toEndPos line range = SourcePos line (end range)
 
+length :: Source Char -> Int
+length = Text.length . getVector
+
+null :: Source Char -> Bool
+null = Text.null . getVector
 
 instance Semigroup (Source Char) where
   Source a <> Source b = Source (a <> b)
