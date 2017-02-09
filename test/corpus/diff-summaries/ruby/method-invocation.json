@@ -486,6 +486,93 @@
             "method-invocation.rb": [
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                  5,
+                                  1
+                                ],
+                                "end": [
+                                  5,
+                                  6
+                                ]
+                            },
+                            {
+                                "start": [
+                                  3,
+                                  1
+                                ],
+                                "end": [
+                                  3,
+                                  4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'print' identifier with the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
                         "delete": {
                             "start": [
                                 8,

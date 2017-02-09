@@ -120,6 +120,21 @@
                 },
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                23
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '5' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -134,33 +149,6 @@
                             {
                                 "start": [
                                     4,
-                                    23
-                                ],
-                                "end": [
-                                    4,
-                                    24
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '5' in the [...]int composite_literal of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    24
-                                ],
-                                "end": [
-                                    4,
-                                    25
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
                                     25
                                 ],
                                 "end": [
@@ -170,7 +158,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '6' in the [...]int composite_literal of the 'main' function"
+                    "summary": "Replaced '1' with '6' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {

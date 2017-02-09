@@ -436,6 +436,21 @@
                 },
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -449,32 +464,17 @@
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     1
                                 ],
                                 "end": [
-                                    4,
-                                    24
+                                    5,
+                                    10
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1235' with '0xa_bcd_ef0_123_456_789'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '0o1234567'"
+                    "summary": "Replaced '1235' with '0o1234567'"
                 },
                 {
                     "span": {
@@ -649,30 +649,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced '1234' with '1_235'"
+                    "summary": "Added '1_235'"
                 },
                 {
                     "span": {
@@ -691,45 +679,45 @@
                 },
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '0xa_bcd_ef0_123_456_788'"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    2,
-                                    6
+                                    1,
+                                    5
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     1
                                 ],
                                 "end": [
-                                    4,
-                                    24
+                                    5,
+                                    10
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1_234' with '0xa_bcd_ef0_123_456_788'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '0o1234576'"
+                    "summary": "Replaced '1234' with '0o1234576'"
                 },
                 {
                     "span": {
@@ -760,6 +748,21 @@
                         }
                     },
                     "summary": "Added '1.234_5e678_91'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_234'"
                 },
                 {
                     "span": {
