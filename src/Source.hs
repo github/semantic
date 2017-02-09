@@ -3,9 +3,8 @@
 module Source where
 
 import Prologue hiding (uncons)
-import Data.Text (unpack, pack)
+import qualified Data.Text as Text
 import Data.String
-import qualified Data.Vector as Vector
 import Numeric
 import Range
 import SourceSpan
@@ -15,7 +14,7 @@ data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: Fil
   deriving (Show, Eq)
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
-newtype Source a = Source { getVector :: Vector.Vector a  }
+newtype Source a = Source { getVector :: Text  }
   deriving (Eq, Show, Foldable, Functor, Traversable)
 
 -- | The kind of a blob, along with it's file mode.
@@ -48,16 +47,16 @@ nullOid :: String
 nullOid = "0000000000000000000000000000000000000000"
 
 -- | Return a Source from a list of items.
-fromList :: [a] -> Source a
-fromList = Source . Vector.fromList
+fromList :: [Char] -> Source Char
+fromList = Source . Text.pack
 
 -- | Return a Source of Chars from a Text.
 fromText :: Text -> Source Char
-fromText = Source . Vector.fromList . unpack
+fromText = Source
 
 -- | Return a Source that contains a slice of the given Source.
-slice :: Range -> Source a -> Source a
-slice range = Source . Vector.slice (start range) (rangeLength range) . getVector
+slice :: Range -> Source Char -> Source Char
+slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . getVector
 
 -- | Return a String with the contents of the Source.
 toString :: Source Char -> String
@@ -65,19 +64,19 @@ toString = toList
 
 -- | Return a text with the contents of the Source.
 toText :: Source Char -> Text
-toText = pack . toList
+toText = getVector
 
 -- | Return the item at the given  index.
-at :: Source a -> Int -> a
-at = (Vector.!) . getVector
+at :: Source Char -> Int -> Char
+at = Text.index . getVector
 
 -- | Remove the first item and return it with the rest of the source.
-uncons :: Source a -> Maybe (a, Source a)
-uncons (Source vector) = if null vector then Nothing else Just (Vector.head vector, Source $ Vector.tail vector)
+uncons :: Source Char -> Maybe (Char, Source Char)
+uncons (Source vector) = if Text.null vector then Nothing else Just (Text.head vector, Source $ Text.tail vector)
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-break :: (a -> Bool) -> Source a -> (Source a, Source a)
-break predicate (Source vector) = let (start, remainder) = Vector.break predicate vector in (Source start, Source remainder)
+break :: (Char -> Bool) -> Source Char -> (Source Char, Source Char)
+break predicate (Source vector) = let (start, remainder) = Text.break predicate vector in (Source start, Source remainder)
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source Char -> [Source Char]
@@ -109,9 +108,9 @@ rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
         toEndPos line range = SourcePos line (end range)
 
 
-instance Semigroup (Source a) where
-  Source a <> Source b = Source (a Vector.++ b)
+instance Semigroup (Source Char) where
+  Source a <> Source b = Source (a <> b)
 
-instance Monoid (Source a) where
+instance Monoid (Source Char) where
   mempty = fromList []
   mappend = (<>)
