@@ -9,6 +9,7 @@ import Data.Record
 import Diff
 import Info
 import Prologue
+import Range
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Renderer
@@ -164,5 +165,6 @@ toTermName source term = case unwrap term of
   _ -> toText source
   where
     toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
+    toTermName' subterm = toTermName (Source.slice (range' subterm) source) subterm
+    range' subterm = subtractRange (range subterm) (start (range term))
     range = characterRange . extract

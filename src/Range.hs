@@ -20,6 +20,10 @@ rangeAt a = Range a a
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
 
+-- | Subtract an offset from a Range.
+subtractRange :: Range -> Int -> Range
+subtractRange a b = Range (start a - b) (end a - b)
+
 -- | Return a range that covers the entire text.
 -- totalRange :: Foldable f => f a -> Range
 -- totalRange t = Range 0 $ length t
