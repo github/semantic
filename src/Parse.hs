@@ -5,7 +5,7 @@ import Arguments
 import Category
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty
-import qualified Data.ByteString.Char8 as B1
+import qualified Data.ByteString as B1
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Data.Record
