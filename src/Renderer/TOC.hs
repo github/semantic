@@ -105,18 +105,22 @@ toLeafInfos' :: DiffInfo -> [DiffInfo]
 toLeafInfos' BranchInfo{..} = branches >>= toLeafInfos'
 toLeafInfos' leaf = [leaf]
 
-mapToInSummarizable :: DefaultFields fields => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
+mapToInSummarizable :: forall leaf fields. DefaultFields fields => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
 mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm diff) of
   (_, Just diff') -> mapToInSummarizable' (Both.snd sources) diff' <$> children
   (Just diff', _) -> mapToInSummarizable' (Both.fst sources) diff' <$> children
   (Nothing, Nothing) -> []
   where
-    mapToInSummarizable' :: DefaultFields fields => Source Char -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
+    mapToInSummarizable' :: Source Char -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
     mapToInSummarizable' source term summary =
       case (parentInfo summary, summarizable term) of
         (NotSummarizable, SummarizableTerm _) ->
-          summary { parentInfo = InSummarizable (category (extract term)) (toTermName source term) (Info.sourceSpan (extract term)) }
+          summary { parentInfo = InSummarizable (category (extract term)) (toTermName' term) (Info.sourceSpan (extract term)) }
         (_, _) -> summary
+      where
+        toTermName' :: SyntaxTerm leaf fields -> Text
+        toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
+        range = characterRange . extract
 
 summarizable :: ComonadCofree (Syntax t) w => w a -> SummarizableTerm (w a)
 summarizable term = go (unwrap term) term
@@ -137,7 +141,7 @@ toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
         NotSummarizable -> []
         _ -> pure $ JSONSummary parentInfo
 
-termToDiffInfo :: (StringConv leaf Text, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
@@ -145,18 +149,20 @@ termToDiffInfo blob term = case unwrap term of
   S.Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (category $ extract term)
   S.ParseError _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   _ -> toLeafInfo term
-  where toTermName' = toTermName blob
-        termToDiffInfo' = termToDiffInfo blob
-        toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
+  where
+    toTermName' :: SyntaxTerm leaf fields -> Text
+    toTermName' subterm = toTermName (Source.slice (range subterm) blob) subterm
+    range = characterRange . extract
+    termToDiffInfo' = termToDiffInfo blob
+    toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
 toTermName :: forall leaf fields. DefaultFields fields => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
   S.Method identifier Nothing _ _ _ -> toTermName' identifier
   S.Method identifier (Just receiver) _ _ _ -> toTermName' receiver <> "." <> toTermName' identifier
-  _ -> termNameFromSource term
+  _ -> toText source
   where
-    toTermName' = toTermName source
-    termNameFromSource term = termNameFromRange (range term)
-    termNameFromRange range = toText $ Source.slice range source
+    toTermName' :: SyntaxTerm leaf fields -> Text
+    toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
     range = characterRange . extract
