@@ -72,11 +72,11 @@ at = Text.index . unSource
 
 -- | Remove the first item and return it with the rest of the source.
 uncons :: Source -> Maybe (Char, Source)
-uncons (Source vector) = if Text.null vector then Nothing else Just (Text.head vector, Source $ Text.tail vector)
+uncons (Source text) = if Text.null text then Nothing else Just (Text.head text, Source $ Text.tail text)
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
 break :: (Char -> Bool) -> Source -> (Source, Source)
-break predicate (Source vector) = let (start, remainder) = Text.break predicate vector in (Source start, Source remainder)
+break predicate (Source text) = let (start, remainder) = Text.break predicate text in (Source start, Source remainder)
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source -> [Source]
