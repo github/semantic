@@ -137,21 +137,6 @@
             "call-expressions.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -160,6 +145,33 @@
                                 ],
                                 "end": [
                                     4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a(b, c) function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
                                     2
                                 ]
                             },
@@ -175,52 +187,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the b(b, c) function call of the 'main' function"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b(b, c) function call of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'c(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z(b, c)' function call in the main function"
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the c(b, c) function call of the 'main' function"
                 }
             ]
         },
@@ -256,21 +250,6 @@
             "call-expressions.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -279,6 +258,33 @@
                                 ],
                                 "end": [
                                     4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x(b, c) function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
                                     2
                                 ]
                             },
@@ -294,52 +300,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'y' identifier in the y(b, c) function call of the 'main' function"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y(b, c) function call of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'z(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b(b, c)' function call in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c(b, c)' function call in the main function"
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the z(b, c) function call of the 'main' function"
                 }
             ]
         },

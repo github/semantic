@@ -140,18 +140,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                33
-                            ],
-                            "end": [
-                                1,
-                                48
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    26
+                                ],
+                                "end": [
+                                    1,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    48
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the '\"key3\": false' pair"
+                    "summary": "Replaced the 'key2: 2' pair with the '\"key3\": false' pair"
                 },
                 {
                     "span": {
@@ -167,21 +179,6 @@
                         }
                     },
                     "summary": "Added the ':\"symbol_key\" => 10' pair"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                26
-                            ],
-                            "end": [
-                                1,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'key2: 2' pair"
                 },
                 {
                     "span": {

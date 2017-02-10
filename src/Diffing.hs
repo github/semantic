@@ -4,6 +4,7 @@ module Diffing where
 import Prologue hiding (fst, snd)
 import Category
 import Data.Functor.Both
+import Data.RandomWalkSimilarity (defaultFeatureVectorDecorator, stripDiff)
 import Data.Record
 import qualified Data.Text.IO as TextIO
 import Data.These
@@ -39,15 +40,15 @@ diffFiles :: (HasField fields Category, HasField fields Cost)
           -> Both SourceBlob
           -> IO Output
 diffFiles parse render sourceBlobs = do
-  terms <- traverse parse sourceBlobs
-  pure $! render sourceBlobs (diffTerms' terms)
+  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parse) sourceBlobs
+  pure $! render sourceBlobs (stripDiff (diffTerms' terms))
 
   where
     diffTerms' terms = case runBothWith areNullOids sourceBlobs of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) ->
-          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts getLabel) terms
+          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
     hasNullOid blob = oid blob == nullOid || Source.null (source blob)
     construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))

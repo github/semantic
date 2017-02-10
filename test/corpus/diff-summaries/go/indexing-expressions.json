@@ -429,21 +429,6 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier in the main function"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -452,49 +437,37 @@
                                 ],
                                 "end": [
                                     4,
-                                    2
+                                    6
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    5,
                                     2
                                 ],
                                 "end": [
-                                    6,
+                                    5,
                                     3
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the c[1] slice literal of the 'main' function"
+                    "summary": "Replaced the 'z[2]' slice literal with the 'b' identifier in the main function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    4
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    4
-                                ],
-                                "end": [
-                                    6,
-                                    5
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced '2' with '1' in the c[1] slice literal of the 'main' function"
+                    "summary": "Added the 'c[1]' slice literal in the main function"
                 },
                 {
                     "span": {
