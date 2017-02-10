@@ -43,8 +43,8 @@ treeSitterParser language grammar blob = do
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
 documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
   ts_document_root_node_p document root
-  toTerm root (totalRange source) source
-  where toTerm node range source = do
+  toTerm root source
+  where toTerm node source = do
           name <- ts_node_p_name node document
           name <- peekCString name
           count <- ts_node_p_named_child_count node
@@ -61,11 +61,11 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- Without it, we may not evaluate the value until after we’ve exited
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
-          range `seq` sourceSpan `seq` assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
+          sourceRange source `seq` sourceSpan `seq` assignTerm language source (sourceRange source :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
           where getChild getter node n out = do
                   _ <- getter node n out
                   let childRange = nodeRange node
-                  toTerm out childRange (slice childRange source)
+                  toTerm out (slice childRange source)
                 {-# INLINE getChild #-}
         isNonEmpty child = category (extract child) /= Empty
 
