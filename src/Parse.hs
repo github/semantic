@@ -94,7 +94,7 @@ termCostDecorator :: (Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
 -- | Term decorator extracting the source text for a term.
-termSourceDecorator :: (HasField fields Range) => Source Char -> TermDecorator f fields SourceText
+termSourceDecorator :: (HasField fields Range) => Source -> TermDecorator f fields SourceText
 termSourceDecorator source c = SourceText . toText $ Source.slice range' source
  where range' = characterRange $ headF c
 
@@ -116,13 +116,13 @@ parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Cat
 parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Read the file and convert it to Unicode.
-readAndTranscodeFile :: FilePath -> IO (Source Char)
+readAndTranscodeFile :: FilePath -> IO Source
 readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
 -- | Transcode a file to a unicode source.
-transcode :: B1.ByteString -> IO (Source Char)
+transcode :: B1.ByteString -> IO Source
 transcode text = fromText <$> do
   match <- Detect.detectCharset text
   converter <- Convert.open match Nothing

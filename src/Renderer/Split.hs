@@ -192,13 +192,13 @@ split blobs diff = SplitOutput . TL.toStrict . renderHtml
 data Cell a = Cell !Bool !Int !a
 
 -- | Something that can be rendered as markup with reference to some source.
-data Renderable a = Renderable !(Source Char) !a
+data Renderable a = Renderable !Source !a
 
-contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
+contentElements :: (Foldable t, ToMarkup f) => Source -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
   text (toText (slice (Range (start range) (max next (start range))) source)) : elements
 
-markupForContextAndChild :: ToMarkup f => Source Char -> (f, Range) -> ([Markup], Int) -> ([Markup], Int)
+markupForContextAndChild :: ToMarkup f => Source -> (f, Range) -> ([Markup], Int) -> ([Markup], Int)
 markupForContextAndChild source (child, range) (rows, next) = (toMarkup child : text (toText (slice (Range (end range) next) source)) : rows, start range)
 
 wrapIn :: (Markup -> Markup) -> Markup -> Markup

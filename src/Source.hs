@@ -10,12 +10,12 @@ import Range
 import SourceSpan
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
-data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
+data SourceBlob = SourceBlob { source :: Source, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
-newtype Source a = Source { unSource :: Text  }
-  deriving (Eq, Show, Functor)
+newtype Source = Source { unSource :: Text  }
+  deriving (Eq, Show)
 
 -- | The kind of a blob, along with it's file mode.
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
@@ -34,7 +34,7 @@ defaultPlainBlob = PlainBlob 0o100644
 emptySourceBlob :: FilePath -> SourceBlob
 emptySourceBlob filepath = SourceBlob (Source.fromList "")  Source.nullOid filepath Nothing
 
-sourceBlob :: Source Char -> FilePath -> SourceBlob
+sourceBlob :: Source -> FilePath -> SourceBlob
 sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
 
 -- | Map blobs with Nothing blobKind to empty blobs.
@@ -47,39 +47,39 @@ nullOid :: String
 nullOid = "0000000000000000000000000000000000000000"
 
 -- | Return a Source from a list of items.
-fromList :: [Char] -> Source Char
+fromList :: [Char] -> Source
 fromList = Source . Text.pack
 
 -- | Return a Source of Chars from a Text.
-fromText :: Text -> Source Char
+fromText :: Text -> Source
 fromText = Source
 
 -- | Return a Source that contains a slice of the given Source.
-slice :: Range -> Source Char -> Source Char
+slice :: Range -> Source -> Source
 slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . unSource
 
 -- | Return a String with the contents of the Source.
-toString :: Source Char -> String
+toString :: Source -> String
 toString = Text.unpack . unSource
 
 -- | Return a text with the contents of the Source.
-toText :: Source Char -> Text
+toText :: Source -> Text
 toText = unSource
 
 -- | Return the item at the given  index.
-at :: Source Char -> Int -> Char
+at :: Source -> Int -> Char
 at = Text.index . unSource
 
 -- | Remove the first item and return it with the rest of the source.
-uncons :: Source Char -> Maybe (Char, Source Char)
+uncons :: Source -> Maybe (Char, Source)
 uncons (Source vector) = if Text.null vector then Nothing else Just (Text.head vector, Source $ Text.tail vector)
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-break :: (Char -> Bool) -> Source Char -> (Source Char, Source Char)
+break :: (Char -> Bool) -> Source -> (Source, Source)
 break predicate (Source vector) = let (start, remainder) = Text.break predicate vector in (Source start, Source remainder)
 
 -- | Split the contents of the source after newlines.
-actualLines :: Source Char -> [Source Char]
+actualLines :: Source -> [Source]
 actualLines source | Text.null (unSource source) = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
@@ -87,12 +87,12 @@ actualLines source = case Source.break (== '\n') source of
     Just (_, lines') -> (l <> fromList "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> Source Char -> [Range]
+actualLineRanges :: Range -> Source -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + Text.length (unSource string)
 
 -- | Compute the character range given a Source and a SourceSpan.
-sourceSpanToRange :: Source Char -> SourceSpan -> Range
+sourceSpanToRange :: Source -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sumLengths leadingRanges + column spanStart
         end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
@@ -100,10 +100,10 @@ sourceSpanToRange source SourceSpan{..} = Range start end
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
 -- | Return a range that covers the entire text.
-totalRange :: Source Char -> Range
+totalRange :: Source -> Range
 totalRange = Range 0 . Text.length . unSource
 
-rangeToSourceSpan :: Source Char -> Range -> SourceSpan
+rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
   where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
         endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
@@ -111,15 +111,15 @@ rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
         toStartPos line range = SourcePos line (start range)
         toEndPos line range = SourcePos line (end range)
 
-length :: Source Char -> Int
+length :: Source -> Int
 length = Text.length . unSource
 
-null :: Source Char -> Bool
+null :: Source -> Bool
 null = Text.null . unSource
 
-instance Semigroup (Source Char) where
+instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
 
-instance Monoid (Source Char) where
+instance Monoid Source where
   mempty = fromList []
   mappend = (<>)

@@ -67,18 +67,18 @@ showHunk blobs hunk = maybeOffsetHeader <>
         (offsetA, offsetB) = runJoin . fmap (show . getSum) $ offset hunk
 
 -- | Given the before and after sources, render a change to a string.
-showChange :: Functor f => HasField fields Range => Both (Source Char) -> Change (SplitDiff f (Record fields)) -> String
+showChange :: Functor f => HasField fields Range => Both Source -> Change (SplitDiff f (Record fields)) -> String
 showChange sources change = showLines (snd sources) ' ' (maybeSnd . runJoin <$> context change) <> deleted <> inserted
   where (deleted, inserted) = runJoin $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (fromThese Nothing Nothing . runJoin . fmap Just <$> contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
-showLines :: Functor f => HasField fields Range => Source Char -> Char -> [Maybe (SplitDiff f (Record fields))] -> String
+showLines :: Functor f => HasField fields Range => Source -> Char -> [Maybe (SplitDiff f (Record fields))] -> String
 showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine source <$> lines
   where prepend "" = ""
         prepend source = prefix : source
 
 -- | Given a source, render a line to a string.
-showLine :: Functor f => HasField fields Range => Source Char -> Maybe (SplitDiff f (Record fields)) -> Maybe String
+showLine :: Functor f => HasField fields Range => Source -> Maybe (SplitDiff f (Record fields)) -> Maybe String
 showLine source line | Just line <- line = Just . toString . (`slice` source) $ getRange line
                      | otherwise = Nothing
 

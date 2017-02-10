@@ -206,7 +206,7 @@ branchElementKey :: BranchElement -> Maybe Text
 branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
-toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [Join These (Text, Range)], Both [Range])
+toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source), [Join These (Text, Range)], Both [Range])
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . traverse go $ elements, ranges)
   where go :: BranchElement -> State (Both Int) [Join These (Text, Range)]
         go child@(Child key _) = do
@@ -257,16 +257,16 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
-align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term (Syntax Text) (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
+align :: Both (Source.Source) -> ConstructibleFree (Patch (Term (Syntax Text) (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
 align sources = PrettyDiff sources . fmap (fmap (getRange . Text.unpack &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
 info start end = Range start end :. Nil
 
-prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term (Syntax Text) (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
+prettyDiff :: Both (Source.Source) -> [Join These (ConstructibleFree (SplitPatch (Term (Syntax Text) (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange . Text.unpack &&& identity) . deconstruct))
 
-data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
+data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source), unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
 
 instance Show (PrettyDiff a) where

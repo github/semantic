@@ -86,7 +86,7 @@ testDiff renderer paths diff matcher = do
       matcher actual (Just expected)
   where diffFiles' sources parser = diffFiles parser renderer (sourceBlobs sources paths)
         parser = parserWithCost <$> runBothWith (<|>) paths
-        sourceBlobs :: Both (Maybe (S.Source Char)) -> Both (Maybe FilePath) -> Both S.SourceBlob
+        sourceBlobs :: Both (Maybe (S.Source)) -> Both (Maybe FilePath) -> Both S.SourceBlob
         sourceBlobs sources paths = case runJoin paths of
           (Nothing, Nothing) -> Join (S.emptySourceBlob "", S.emptySourceBlob "")
           (Nothing, Just filepath) -> Join (S.emptySourceBlob "", S.sourceBlob (unsafeFromJust $ snd sources) filepath)

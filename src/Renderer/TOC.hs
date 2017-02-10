@@ -72,7 +72,7 @@ diffTOC blobs diff = do
     removeDupes [] = []
     removeDupes xs = (fmap unsafeHead . List.groupBy (\a b -> parentInfo a == parentInfo b)) xs
 
-    diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
+    diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
       let
         diff' = free (Prologue.fst <$> diff)
@@ -106,13 +106,13 @@ toLeafInfos' :: DiffInfo -> [DiffInfo]
 toLeafInfos' BranchInfo{..} = branches >>= toLeafInfos'
 toLeafInfos' leaf = [leaf]
 
-mapToInSummarizable :: forall leaf fields. DefaultFields fields => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
+mapToInSummarizable :: forall leaf fields. DefaultFields fields => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
 mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm diff) of
   (_, Just diff') -> mapToInSummarizable' (Both.snd sources) diff' <$> children
   (Just diff', _) -> mapToInSummarizable' (Both.fst sources) diff' <$> children
   (Nothing, Nothing) -> []
   where
-    mapToInSummarizable' :: Source Char -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
+    mapToInSummarizable' :: Source -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
     mapToInSummarizable' source term summary =
       case (parentInfo summary, summarizable term) of
         (NotSummarizable, SummarizableTerm _) ->
@@ -142,7 +142,7 @@ toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
         NotSummarizable -> []
         _ -> pure $ JSONSummary parentInfo
 
-termToDiffInfo :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
@@ -157,7 +157,7 @@ termToDiffInfo blob term = case unwrap term of
     termToDiffInfo' = termToDiffInfo blob
     toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
-toTermName :: forall leaf fields. DefaultFields fields => Source Char -> SyntaxTerm leaf fields -> Text
+toTermName :: forall leaf fields. DefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
   S.Method identifier Nothing _ _ _ -> toTermName' identifier
