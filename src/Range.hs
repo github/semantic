@@ -24,10 +24,6 @@ rangeLength range = end range - start range
 subtractRange :: Range -> Int -> Range
 subtractRange a b = Range (start a - b) (end a - b)
 
--- | Return a range that covers the entire text.
--- totalRange :: Foldable f => f a -> Range
--- totalRange t = Range 0 $ length t
-
 -- | Break a string down into words and sequences of punctuation. Return a list
 -- | strings with ranges, assuming that the first character in the string is
 -- | at the given index.
