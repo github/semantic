@@ -128,33 +128,30 @@
             "var-declaration.js": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'x' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' variable"
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
                 },
                 {
                     "span": {
@@ -214,21 +211,6 @@
             "var-declaration.js": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' variable"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -243,16 +225,31 @@
                             {
                                 "start": [
                                     1,
-                                    8
+                                    5
                                 ],
                                 "end": [
                                     1,
-                                    14
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' var assignment with the 'y' var assignment"
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' variable"
                 },
                 {
                     "span": {

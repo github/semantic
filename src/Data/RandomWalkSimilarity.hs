@@ -21,7 +21,6 @@ import Control.Monad.Random
 import Control.Monad.State
 import Data.Align.Generic
 import Data.Array
-import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Listable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
@@ -46,17 +45,16 @@ type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Ma
 -- which completes in log-linear time.
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields label.
-       (GAlign f, Traversable f, Eq (f (Term f Category)), Hashable label, HasField fields Category)
+rws :: forall f fields.
+       (GAlign f, Traversable f, Eq (f (Term f Category)), HasField fields Category, HasField fields (Maybe FeatureVector))
     => DiffTerms f fields -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-    -> Label f fields label
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
     -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
-rws compare getLabel as bs
+rws compare as bs
   | null as, null bs = []
-  | null as = inserting <$> bs
-  | null bs = deleting <$> as
+  | null as = inserting . eraseFeatureVector <$> bs
+  | null bs = deleting . eraseFeatureVector <$> as
   | otherwise =
     -- Construct a State who's final value is a list of (Int, Diff leaf (Record fields))
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
@@ -70,16 +68,16 @@ rws compare getLabel as bs
 
   where
     minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
-    sesDiffs = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
+    sesDiffs = SES.ses replaceIfEqual cost as bs
 
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
       foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
-        Pure (Right (Delete term)) ->
+        Pure (Delete term) ->
           (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
-        Pure (Right (Insert term)) ->
+        Pure (Insert term) ->
           (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
-        syntax -> let diff' = free syntax >>= either identity pure in
-          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
+        _ ->
+          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff), allDiffs <> pure (Index counterA))
       ) ([], [], 0, 0, [], []) sesDiffs
 
     findNearestNeighbourToDiff :: TermOrIndexOrNone (UnmappedTerm f fields)
@@ -151,23 +149,23 @@ rws compare getLabel as bs
     -- Possibly replace terms in a diff.
     replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
     replaceIfEqual a b
-      | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
+      | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms (eraseFeatureVector a) (eraseFeatureVector b)
       | otherwise = Nothing
 
     cost = iter (const 0) . (1 <$)
-
-    eitherCutoff :: Integer
-                 -> Diff f (Record fields)
-                 -> Free (TermF f (Both (Record fields)))
-                         (Either (Diff f (Record fields)) (Patch (Term f (Record fields))))
-    eitherCutoff n diff | n <= 0 = pure (Left diff)
-    eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
 
     kdas = KdTree.build (elems . feature) featurizedAs
     kdbs = KdTree.build (elems . feature) featurizedBs
 
     featurize :: Int -> Term f (Record fields) -> UnmappedTerm f fields
-    featurize index term = UnmappedTerm index (rhead . extract $ defaultFeatureVectorDecorator getLabel term) term
+    featurize index term = UnmappedTerm index (let Just v = getField (extract term) in v) (eraseFeatureVector term)
+
+    eraseFeatureVector :: Term f (Record fields) -> Term f (Record fields)
+    eraseFeatureVector term = let record :< functor = runCofree term in
+      cofree (setFeatureVector record Nothing :< functor)
+
+    setFeatureVector :: Record fields -> Maybe FeatureVector -> Record fields
+    setFeatureVector = setField
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
@@ -241,17 +239,17 @@ defaultFeatureVectorDecorator
   :: (Hashable label, Traversable f)
   => Label f fields label
   -> Term f (Record fields)
-  -> Term f (Record (FeatureVector ': fields))
+  -> Term f (Record (Maybe FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Maybe FeatureVector ': fields))
 featureVectorDecorator getLabel p q d
   = cata collect
   . pqGramDecorator getLabel p q
-  where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
-        addSubtermVector :: FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
-        addSubtermVector = flip $ addVectors . rhead . headF . runCofree
+  where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (Just (unitVector d (hash gram))) functor :. rest) :< functor)
+        addSubtermVector :: Functor f => Maybe FeatureVector -> Term f (Record (Maybe FeatureVector ': fields)) -> Maybe FeatureVector
+        addSubtermVector v term = addVectors <$> v <*> rhead (extract term)
 
         addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
         addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
@@ -300,7 +298,7 @@ stripDiff
   :: (Functor f, Functor g)
   => Free (TermF f (g (Record (h ': t)))) (Patch (Term f (Record (h ': t))))
   -> Free (TermF f (g (Record t)))        (Patch (Term f (Record t)))
-stripDiff = iter (\ (h :< f) -> wrap (fmap rtail h :< f)) . fmap (pure . fmap stripTerm)
+stripDiff = mapAnnotations rtail
 
 
 -- Instances

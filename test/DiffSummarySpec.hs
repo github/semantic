@@ -21,7 +21,6 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Data.These
-import Diffing (getLabel)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
@@ -47,12 +46,12 @@ blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob))
 spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
-    it "outputs a diff summary" $ do
+    it "outputs a diff summary" $
       diffSummaries blobs testDiff `shouldBe` [ JSONSummary "Added the \"a\" string" (SourceSpans . That $ sourceSpanBetween (1, 2) (1, 4)) ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (unListableF a :: SyntaxTerm String '[Category, Range, SourceSpan]) in
-        diffSummaries blobs (diffTerms wrap (==) diffCost getLabel term term) `shouldBe` []
+        diffSummaries blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
