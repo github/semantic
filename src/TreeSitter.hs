@@ -17,7 +17,8 @@ import Range
 import Source
 import qualified Syntax
 import Foreign
-import Foreign.C.String
+import Foreign.C.String as FString (peekCString, withCStringLen)
+import Data.Text.Foreign as Foreign
 import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
@@ -30,12 +31,15 @@ treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (
 treeSitterParser language grammar blob = do
   document <- ts_document_new
   ts_document_set_language document grammar
-  withCString (toString $ source blob) (\source -> do
-    ts_document_set_input_string document source
-    ts_document_parse document
-    term <- documentToTerm language document blob
-    ts_document_free document
-    pure term)
+  let termWithCString (source, len) = do
+        ts_document_set_input_string2 document source len
+        ts_document_parse document
+        term <- documentToTerm language document blob
+        ts_document_free document
+        pure term
+  if Source.null (source blob)
+    then FString.withCStringLen "" termWithCString
+    else Foreign.withCStringLen (toText $ source blob) termWithCString
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
