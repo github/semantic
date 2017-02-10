@@ -14,7 +14,7 @@ data SourceBlob = SourceBlob { source :: Source, oid :: String, path :: FilePath
   deriving (Show, Eq)
 
 -- | The contents of a source file, represented as Text.
-newtype Source = Source { unSource :: Text  }
+newtype Source = Source { sourceText :: Text }
   deriving (Eq, Show)
 
 -- | The kind of a blob, along with it's file mode.
@@ -56,19 +56,19 @@ fromText = Source
 
 -- | Return a Source that contains a slice of the given Source.
 slice :: Range -> Source -> Source
-slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . unSource
+slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . sourceText
 
 -- | Return a String with the contents of the Source.
 toString :: Source -> String
-toString = Text.unpack . unSource
+toString = Text.unpack . sourceText
 
 -- | Return a text with the contents of the Source.
 toText :: Source -> Text
-toText = unSource
+toText = sourceText
 
 -- | Return the item at the given  index.
 at :: Source -> Int -> Char
-at = Text.index . unSource
+at = Text.index . sourceText
 
 -- | Remove the first item and return it with the rest of the source.
 uncons :: Source -> Maybe (Char, Source)
@@ -80,7 +80,7 @@ break predicate (Source text) = let (start, remainder) = Text.break predicate te
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source -> [Source]
-actualLines source | Text.null (unSource source) = [ source ]
+actualLines source | Text.null (sourceText source) = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
@@ -89,7 +89,7 @@ actualLines source = case Source.break (== '\n') source of
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + Text.length (unSource string)
+  where toRange previous string = Range (end previous) $ end previous + Text.length (sourceText string)
 
 -- | Compute the character range given a Source and a SourceSpan.
 sourceSpanToRange :: Source -> SourceSpan -> Range
@@ -101,7 +101,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
 
 -- | Return a range that covers the entire text.
 totalRange :: Source -> Range
-totalRange = Range 0 . Text.length . unSource
+totalRange = Range 0 . Text.length . sourceText
 
 rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
@@ -112,10 +112,10 @@ rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
         toEndPos line range = SourcePos line (end range)
 
 length :: Source -> Int
-length = Text.length . unSource
+length = Text.length . sourceText
 
 null :: Source -> Bool
-null = Text.null . unSource
+null = Text.null . sourceText
 
 instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
