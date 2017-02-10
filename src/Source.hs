@@ -103,7 +103,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
 
 -- | Return a range that covers the entire text.
 totalRange :: Source -> Range
-totalRange = Range 0 . Text.length . sourceText
+totalRange = sourceRange
 
 rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
