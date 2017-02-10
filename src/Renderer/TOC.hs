@@ -9,6 +9,7 @@ import Data.Record
 import Diff
 import Info
 import Prologue
+import Range
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Renderer
@@ -151,9 +152,10 @@ termToDiffInfo source term = case unwrap term of
   _ -> toLeafInfo term
   where
     toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
+    toTermName' subterm = toTermName (Source.slice (subtermRange subterm) source) subterm
     range = characterRange . extract
-    termToDiffInfo' subterm = termToDiffInfo (Source.slice (range subterm) source) subterm
+    subtermRange subterm = offsetRange (range subterm) (negate (start (range term)))
+    termToDiffInfo' subterm = termToDiffInfo (Source.slice (subtermRange subterm) source) subterm
     toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
 toTermName :: forall leaf fields. DefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
@@ -164,5 +166,6 @@ toTermName source term = case unwrap term of
   _ -> toText source
   where
     toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
+    toTermName' subterm = toTermName (Source.slice (range' subterm) source) subterm
+    range' subterm = offsetRange (range subterm) (negate (start (range term)))
     range = characterRange . extract
