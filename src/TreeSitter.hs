@@ -17,7 +17,7 @@ import Range
 import Source
 import qualified Syntax
 import Foreign
-import Foreign.C.String as FString (peekCString, withCStringLen)
+import Foreign.C.String as FString (peekCString)
 import Data.Text.Foreign as Foreign
 import qualified Syntax as S
 import Term
