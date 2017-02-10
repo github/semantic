@@ -355,18 +355,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the %q<a<b>c> string"
+                    "summary": "Replaced the %q/b/ string with the %q<a<b>c> string"
                 },
                 {
                     "span": {
@@ -388,12 +400,12 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    6
+                                    2,
+                                    10
                                 ]
                             },
                             {
@@ -408,7 +420,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the %q/b/ string with the %Q#a# string"
+                    "summary": "Replaced the %q{d{e}f} string with the %Q#a# string"
                 },
                 {
                     "span": {
@@ -427,30 +439,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    10
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
                     },
-                    "summary": "Replaced the %q{d{e}f} string with the %Q<a<b>c> string"
+                    "summary": "Added the %Q<a<b>c> string"
                 },
                 {
                     "span": {
@@ -581,21 +581,6 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the %/b/ string"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -609,17 +594,32 @@
                             },
                             {
                                 "start": [
-                                    4,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    4,
-                                    6
+                                    3,
+                                    5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the %q#a# string with the %Q/b/ string"
+                    "summary": "Replaced the %q#a# string with the %/b/ string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the %Q/b/ string"
                 },
                 {
                     "span": {

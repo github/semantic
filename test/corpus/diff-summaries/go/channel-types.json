@@ -139,93 +139,138 @@
             "channel-types.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                22
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'c2' type declaration in the main function"
+                    "summary": "Replaced the 'c1' identifier with the 'c2' identifier in the 'c2' type declaration of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                26
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    16
+                                ],
+                                "end": [
+                                    5,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    16
+                                ],
+                                "end": [
+                                    5,
+                                    22
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'c3' type declaration in the main function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the chan string channel type of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                24
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'c4' type declaration in the main function"
+                    "summary": "Replaced the 'c2' identifier with the 'c3' identifier in the 'c3' type declaration of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                19
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'c1' type declaration in the main function"
+                    "summary": "Replaced the 'c3' identifier with the 'c4' identifier in the 'c4' type declaration of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                26
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    18
+                                ],
+                                "end": [
+                                    7,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    18
+                                ],
+                                "end": [
+                                    7,
+                                    24
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'c2' type declaration in the main function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c3' type declaration in the main function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the <-chan string channel type of the 'main' function"
                 }
             ]
         },
@@ -262,18 +307,30 @@
             "channel-types.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                19
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'c1' type declaration in the main function"
+                    "summary": "Replaced the 'c2' identifier with the 'c1' identifier in the 'c1' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -281,7 +338,7 @@
                             {
                                 "start": [
                                     5,
-                                    11
+                                    16
                                 ],
                                 "end": [
                                     5,
@@ -290,17 +347,17 @@
                             },
                             {
                                 "start": [
-                                    6,
-                                    11
+                                    5,
+                                    16
                                 ],
                                 "end": [
-                                    6,
-                                    26
+                                    5,
+                                    19
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'chan string' channel type with the 'chan<- struct{}' channel type in the chan<- chan<- struct{} channel type of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the chan int channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -308,17 +365,71 @@
                             {
                                 "start": [
                                     6,
-                                    11
+                                    1
                                 ],
                                 "end": [
                                     6,
-                                    26
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c3' identifier with the 'c2' identifier in the 'c2' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    3
                                 ]
                             },
                             {
                                 "start": [
                                     7,
-                                    11
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c4' identifier with the 'c3' identifier in the 'c3' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    18
+                                ],
+                                "end": [
+                                    7,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    18
                                 ],
                                 "end": [
                                     7,
@@ -327,22 +438,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'chan<- struct{}' channel type with the '<-chan int' channel type in the chan<- <-chan int channel type of the 'main' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c4' type declaration in the main function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the <-chan int channel type of the 'main' function"
                 }
             ]
         },

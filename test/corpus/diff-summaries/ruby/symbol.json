@@ -211,21 +211,6 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ':'foo'' symbol"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -235,6 +220,33 @@
                                 "end": [
                                     1,
                                     5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':bar' symbol with the ':'foo'' symbol"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
                                 ]
                             },
                             {
@@ -249,22 +261,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ':bar' symbol with the ':\"foo\"' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':'bar'' symbol"
+                    "summary": "Replaced the ':'bar'' symbol with the ':\"foo\"' symbol"
                 },
                 {
                     "span": {
