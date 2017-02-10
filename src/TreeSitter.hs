@@ -50,7 +50,7 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           count <- ts_node_p_named_child_count node
           children <- filter isNonEmpty <$> traverse (alloca . getChild node) (take (fromIntegral count) [0..])
 
-          let range = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+          let range = nodeRange node
 
           let startPos = SourcePos (1 + (fromIntegral $! ts_node_p_start_point_row node)) (1 + (fromIntegral $! ts_node_p_start_point_column node))
           let endPos = SourcePos (1 + (fromIntegral $! ts_node_p_end_point_row node)) (1 + (fromIntegral $! ts_node_p_end_point_column node))
@@ -69,6 +69,8 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
         getUnnamedChild node n out = ts_node_p_child node n out >> toTerm out
         {-# INLINE getUnnamedChild #-}
         isNonEmpty child = category (extract child) /= Empty
+
+        nodeRange node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
 assignTerm :: Language -> Source -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren =
