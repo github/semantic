@@ -62,11 +62,11 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
           range `seq` sourceSpan `seq` assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
-        getChild getter start node n out = do
-          _ <- getter node n out
-          let childRange = nodeRange node
-          toTerm out childRange (slice (offsetRange childRange (negate start)) source)
-        {-# INLINE getChild #-}
+          where getChild getter node n out = do
+                  _ <- getter node n out
+                  let childRange = nodeRange node
+                  toTerm out childRange (slice childRange source)
+                {-# INLINE getChild #-}
         isNonEmpty child = category (extract child) /= Empty
 
         nodeRange node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
