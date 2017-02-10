@@ -31,15 +31,13 @@ treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (
 treeSitterParser language grammar blob = do
   document <- ts_document_new
   ts_document_set_language document grammar
-  let termWithCString (source, len) = do
-        ts_document_set_input_string2 document source len
-        ts_document_parse document
-        term <- documentToTerm language document blob
-        ts_document_free document
-        pure term
-  if Source.null (source blob)
-    then FString.withCStringLen "" termWithCString
-    else Foreign.withCStringLen (toText $ source blob) termWithCString
+  Foreign.withCStringLen (toText $ source blob) $ \ (source, len)
+    ts_document_set_input_string_with_length document source len
+    ts_document_parse document
+    term <- documentToTerm language document blob
+    ts_document_free document
+    pure term
+
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
