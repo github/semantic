@@ -56,7 +56,9 @@ fromText = Source
 
 -- | Return a Source that contains a slice of the given Source.
 slice :: Range -> Source -> Source
-slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . sourceText
+slice range = Source . take . drop . sourceText
+  where drop = Text.drop (start range)
+        take = Text.take (rangeLength range)
 
 -- | Return a String with the contents of the Source.
 toString :: Source -> String
