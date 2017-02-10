@@ -152,9 +152,10 @@ termToDiffInfo source term = case unwrap term of
   _ -> toLeafInfo term
   where
     toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
+    toTermName' subterm = toTermName (Source.slice (subtermRange subterm) source) subterm
     range = characterRange . extract
-    termToDiffInfo' = termToDiffInfo source
+    subtermRange subterm = offsetRange (range subterm) (negate (start (range term)))
+    termToDiffInfo' subterm = termToDiffInfo (Source.slice (subtermRange subterm) source) subterm
     toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
 toTermName :: forall leaf fields. DefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
