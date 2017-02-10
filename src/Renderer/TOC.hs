@@ -166,5 +166,5 @@ toTermName source term = case unwrap term of
   where
     toTermName' :: SyntaxTerm leaf fields -> Text
     toTermName' subterm = toTermName (Source.slice (range' subterm) source) subterm
-    range' subterm = subtractRange (range subterm) (start (range term))
+    range' subterm = offsetRange (range subterm) (negate (start (range term)))
     range = characterRange . extract

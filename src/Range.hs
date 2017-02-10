@@ -20,9 +20,9 @@ rangeAt a = Range a a
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
 
--- | Subtract an offset from a Range.
-subtractRange :: Range -> Int -> Range
-subtractRange a b = Range (start a - b) (end a - b)
+-- | Offset a range by a constant delta.
+offsetRange :: Range -> Int -> Range
+offsetRange a b = Range (start a + b) (end a + b)
 
 -- | Break a string down into words and sequences of punctuation. Return a list
 -- | strings with ranges, assuming that the first character in the string is
