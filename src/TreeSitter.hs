@@ -31,7 +31,7 @@ treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (
 treeSitterParser language grammar blob = do
   document <- ts_document_new
   ts_document_set_language document grammar
-  Foreign.withCStringLen (toText $ source blob) $ \ (source, len)
+  Foreign.withCStringLen (toText $ source blob) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
     ts_document_parse document
     term <- documentToTerm language document blob
