@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
@@ -14,7 +13,7 @@ data SourceBlob = SourceBlob { source :: Source, oid :: String, path :: FilePath
   deriving (Show, Eq)
 
 -- | The contents of a source file, represented as Text.
-newtype Source = Source { sourceText :: Text }
+data Source = Source { sourceText :: Text, sourceRange :: Range }
   deriving (Eq, Show)
 
 -- | The kind of a blob, along with it's file mode.
@@ -46,17 +45,18 @@ idOrEmptySourceBlob blob = if isNothing (blobKind blob)
 nullOid :: String
 nullOid = "0000000000000000000000000000000000000000"
 
--- | Return a Source from a list of items.
+-- | Return a Source from a finite string.
 fromList :: [Char] -> Source
-fromList = Source . Text.pack
+fromList = fromText . Text.pack
 
 -- | Return a Source of Chars from a Text.
 fromText :: Text -> Source
-fromText = Source
+fromText sourceText = Source sourceText sourceRange
+  where sourceRange = Range 0 (Text.length sourceText)
 
 -- | Return a Source that contains a slice of the given Source.
 slice :: Range -> Source -> Source
-slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . sourceText
+slice range Source{..} = Source (Text.take (rangeLength range) (Text.drop (start range - start sourceRange) sourceText)) range
 
 -- | Return a String with the contents of the Source.
 toString :: Source -> String
@@ -72,11 +72,13 @@ at = Text.index . sourceText
 
 -- | Remove the first item and return it with the rest of the source.
 uncons :: Source -> Maybe (Char, Source)
-uncons (Source text) = if Text.null text then Nothing else Just (Text.head text, Source $ Text.tail text)
+uncons Source{..} = if Text.null sourceText then Nothing else Just (Text.head sourceText, Source (Text.tail sourceText) (snd (divideRange sourceRange (start sourceRange + 1))))
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
 break :: (Char -> Bool) -> Source -> (Source, Source)
-break predicate (Source text) = let (start, remainder) = Text.break predicate text in (Source start, Source remainder)
+break predicate Source{..} = (Source initial initialRange, Source remainder remainderRange)
+  where (initial, remainder) = Text.break predicate sourceText
+        (initialRange, remainderRange) = divideRange sourceRange (start sourceRange + Text.length initial)
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source -> [Source]
@@ -118,7 +120,7 @@ null :: Source -> Bool
 null = Text.null . sourceText
 
 instance Semigroup Source where
-  Source a <> Source b = Source (a <> b)
+  Source a ar <> Source b br = Source (a <> b) (ar <> br)
 
 instance Monoid Source where
   mempty = fromList []
