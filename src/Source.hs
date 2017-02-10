@@ -13,7 +13,7 @@ import SourceSpan
 data SourceBlob = SourceBlob { source :: Source, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
--- | The contents of a source file, backed by a vector for efficient slicing.
+-- | The contents of a source file, represented as Text.
 newtype Source = Source { unSource :: Text  }
   deriving (Eq, Show)
 
