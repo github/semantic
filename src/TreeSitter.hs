@@ -43,12 +43,11 @@ treeSitterParser language grammar blob = do
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
 documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
   ts_document_root_node_p document root
-  toTerm root source
-  where toTerm node source = do
+  toTerm root (totalRange source) source
+  where toTerm node range source = do
           name <- ts_node_p_name node document
           name <- peekCString name
           count <- ts_node_p_named_child_count node
-          let range = nodeRange node
           children <- filter isNonEmpty <$> traverse (alloca . getChild (start range) node) (take (fromIntegral count) [0..])
 
           let startPos = SourcePos (1 + (fromIntegral $! ts_node_p_start_point_row node)) (1 + (fromIntegral $! ts_node_p_start_point_column node))
@@ -63,9 +62,15 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
           range `seq` sourceSpan `seq` assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
-        getChild start node n out = ts_node_p_named_child node n out >> toTerm out (slice (offsetRange (nodeRange node) (negate start)) source)
+        getChild start node n out = do
+          _ <- ts_node_p_named_child node n out
+          let childRange = nodeRange node
+          toTerm out childRange (slice (offsetRange childRange (negate start)) source)
         {-# INLINE getChild #-}
-        getUnnamedChild start node n out = ts_node_p_child node n out >> toTerm out (slice (offsetRange (nodeRange node) (negate start)) source)
+        getUnnamedChild start node n out = do
+          _ <- ts_node_p_child node n out
+          let childRange = nodeRange node
+          toTerm out childRange (slice (offsetRange childRange (negate start)) source)
         {-# INLINE getUnnamedChild #-}
         isNonEmpty child = category (extract child) /= Empty
 
