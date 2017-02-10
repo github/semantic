@@ -14,7 +14,7 @@ data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: Fil
   deriving (Show, Eq)
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
-newtype Source a = Source { getVector :: Text  }
+newtype Source a = Source { unSource :: Text  }
   deriving (Eq, Show, Functor)
 
 -- | The kind of a blob, along with it's file mode.
@@ -56,19 +56,19 @@ fromText = Source
 
 -- | Return a Source that contains a slice of the given Source.
 slice :: Range -> Source Char -> Source Char
-slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . getVector
+slice range = Source . Text.take (rangeLength range) . Text.drop (start range) . unSource
 
 -- | Return a String with the contents of the Source.
 toString :: Source Char -> String
-toString = Text.unpack . getVector
+toString = Text.unpack . unSource
 
 -- | Return a text with the contents of the Source.
 toText :: Source Char -> Text
-toText = getVector
+toText = unSource
 
 -- | Return the item at the given  index.
 at :: Source Char -> Int -> Char
-at = Text.index . getVector
+at = Text.index . unSource
 
 -- | Remove the first item and return it with the rest of the source.
 uncons :: Source Char -> Maybe (Char, Source Char)
@@ -80,7 +80,7 @@ break predicate (Source vector) = let (start, remainder) = Text.break predicate 
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source Char -> [Source Char]
-actualLines source | Text.null (getVector source) = [ source ]
+actualLines source | Text.null (unSource source) = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
@@ -89,7 +89,7 @@ actualLines source = case Source.break (== '\n') source of
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + Text.length (getVector string)
+  where toRange previous string = Range (end previous) $ end previous + Text.length (unSource string)
 
 -- | Compute the character range given a Source and a SourceSpan.
 sourceSpanToRange :: Source Char -> SourceSpan -> Range
@@ -101,7 +101,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
 
 -- | Return a range that covers the entire text.
 totalRange :: Source Char -> Range
-totalRange = Range 0 . Text.length . getVector
+totalRange = Range 0 . Text.length . unSource
 
 rangeToSourceSpan :: Source Char -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
@@ -112,10 +112,10 @@ rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
         toEndPos line range = SourcePos line (end range)
 
 length :: Source Char -> Int
-length = Text.length . getVector
+length = Text.length . unSource
 
 null :: Source Char -> Bool
-null = Text.null . getVector
+null = Text.null . unSource
 
 instance Semigroup (Source Char) where
   Source a <> Source b = Source (a <> b)
