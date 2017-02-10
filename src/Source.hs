@@ -91,7 +91,7 @@ actualLines source = case Source.break (== '\n') source of
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous source = Range (end previous) $ end previous + Source.length source
+  where toRange previous string = Range (end previous) $ end previous + Text.length (sourceText string)
 
 -- | Compute the character range given a Source and a SourceSpan.
 sourceSpanToRange :: Source -> SourceSpan -> Range
