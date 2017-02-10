@@ -13,7 +13,7 @@ data SourceBlob = SourceBlob { source :: Source, oid :: String, path :: FilePath
   deriving (Show, Eq)
 
 -- | The contents of a source file, represented as Text.
-data Source = Source { sourceText :: !Text, sourceRange :: !Range }
+data Source = Source { sourceText :: Text, sourceRange :: Range }
   deriving (Eq, Show)
 
 -- | The kind of a blob, along with it's file mode.
