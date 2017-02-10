@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-subscript-access-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-assignment.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y[\"x\"]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-assignment.js"
+    ],
+    "patch": [
+        "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
+        "index e69de29b..6b6d48d2 100644",
+        "--- a/subscript-access-assignment.js",
+        "+++ b/subscript-access-assignment.js",
+        "@@ -0,0 +1 @@",
+        "+y[\"x\"] = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c19769fba6e7c7042d1ab1915c3f9bb20d569e22..0cc920fcb9a611b8c6e75c061f71bba36f375f9a"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-assignment.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y[\"x\"]' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y[\"x\"]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-assignment.js"
+    ],
+    "patch": [
+        "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
+        "index 6b6d48d2..17d3ff48 100644",
+        "--- a/subscript-access-assignment.js",
+        "+++ b/subscript-access-assignment.js",
+        "@@ -1 +1,3 @@",
+        "+y[\"x\"] = 1;",
+        "+y[\"x\"] = 0;",
+        " y[\"x\"] = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0cc920fcb9a611b8c6e75c061f71bba36f375f9a..cb74cdb2c35a8d40907b018505d8f1769379b9ca"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-assignment.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in an assignment to y[\"x\"]"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-assignment.js"
+    ],
+    "patch": [
+        "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
+        "index 17d3ff48..d856ac0d 100644",
+        "--- a/subscript-access-assignment.js",
+        "+++ b/subscript-access-assignment.js",
+        "@@ -1,3 +1,3 @@",
+        "-y[\"x\"] = 1;",
+        "+y[\"x\"] = 0;",
+        " y[\"x\"] = 0;",
+        " y[\"x\"] = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "cb74cdb2c35a8d40907b018505d8f1769379b9ca..ce47993610b84c23c5956f7a598d1cc3218bdcb3"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-assignment.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in an assignment to y[\"x\"]"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-assignment.js"
+    ],
+    "patch": [
+        "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
+        "index d856ac0d..17d3ff48 100644",
+        "--- a/subscript-access-assignment.js",
+        "+++ b/subscript-access-assignment.js",
+        "@@ -1,3 +1,3 @@",
+        "-y[\"x\"] = 0;",
+        "+y[\"x\"] = 1;",
+        " y[\"x\"] = 0;",
+        " y[\"x\"] = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "ce47993610b84c23c5956f7a598d1cc3218bdcb3..7edc956052d054a4e5d4474baedbfdccc90ffa26"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-assignment.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y[\"x\"]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-assignment.js"
+    ],
+    "patch": [
+        "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
+        "index 17d3ff48..cdcb426e 100644",
+        "--- a/subscript-access-assignment.js",
+        "+++ b/subscript-access-assignment.js",
+        "@@ -1,3 +1,2 @@",
+        "-y[\"x\"] = 1;",
+        "-y[\"x\"] = 0;",
+        " y[\"x\"] = 0;",
+        "+y[\"x\"] = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "7edc956052d054a4e5d4474baedbfdccc90ffa26..3447577471d7e4fa2ed142ecbdac76674cce1df3"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-assignment.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-assignment.js"
+    ],
+    "patch": [
+        "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
+        "index cdcb426e..0407c3a1 100644",
+        "--- a/subscript-access-assignment.js",
+        "+++ b/subscript-access-assignment.js",
+        "@@ -1,2 +1 @@",
+        "-y[\"x\"] = 0;",
+        " y[\"x\"] = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3447577471d7e4fa2ed142ecbdac76674cce1df3..93d69fa6cf639f25112e6b738b5fa55f977c2232"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-assignment.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-assignment.js"
+    ],
+    "patch": [
+        "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
+        "index 0407c3a1..e69de29b 100644",
+        "--- a/subscript-access-assignment.js",
+        "+++ b/subscript-access-assignment.js",
+        "@@ -1 +0,0 @@",
+        "-y[\"x\"] = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "93d69fa6cf639f25112e6b738b5fa55f977c2232..e49b80d7752e9f991ddcb2ff2a8c5f714d9bafa3"
+}]

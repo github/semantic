@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-delete-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing['prop']' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "patch": [
+        "diff --git a/delete-operator.js b/delete-operator.js",
+        "index e69de29b..c83346db 100644",
+        "--- a/delete-operator.js",
+        "+++ b/delete-operator.js",
+        "@@ -0,0 +1 @@",
+        "+delete thing['prop'];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b3e70bdf3077d7e2f3dee952ec37081e57641fbf..3ac61d3244121c909b60b90f70722dc6e44ed140"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing.prop' operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing['prop']' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "patch": [
+        "diff --git a/delete-operator.js b/delete-operator.js",
+        "index c83346db..7c8b9908 100644",
+        "--- a/delete-operator.js",
+        "+++ b/delete-operator.js",
+        "@@ -1 +1,3 @@",
+        "+delete thing.prop",
+        "+delete thing['prop'];",
+        " delete thing['prop'];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3ac61d3244121c909b60b90f70722dc6e44ed140..42fbb679ec755bf5bd07495de1e9138e01d8f767"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'delete thing.prop' operator with the 'delete thing['prop']' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "patch": [
+        "diff --git a/delete-operator.js b/delete-operator.js",
+        "index 7c8b9908..f506e360 100644",
+        "--- a/delete-operator.js",
+        "+++ b/delete-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-delete thing.prop",
+        "+delete thing['prop'];",
+        " delete thing['prop'];",
+        " delete thing['prop'];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "42fbb679ec755bf5bd07495de1e9138e01d8f767..2a9fed1fcaf42fc6fbc8e41621263d780fa28415"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'delete thing['prop']' operator with the 'delete thing.prop' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "patch": [
+        "diff --git a/delete-operator.js b/delete-operator.js",
+        "index f506e360..7c8b9908 100644",
+        "--- a/delete-operator.js",
+        "+++ b/delete-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-delete thing['prop'];",
+        "+delete thing.prop",
+        " delete thing['prop'];",
+        " delete thing['prop'];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2a9fed1fcaf42fc6fbc8e41621263d780fa28415..5ae979fee6cf8bb9f63ffaf750398f67d9db2b2c"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing.prop' operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing['prop']' operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing.prop' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "patch": [
+        "diff --git a/delete-operator.js b/delete-operator.js",
+        "index 7c8b9908..2dfe0799 100644",
+        "--- a/delete-operator.js",
+        "+++ b/delete-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-delete thing.prop",
+        "-delete thing['prop'];",
+        " delete thing['prop'];",
+        "+delete thing.prop"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5ae979fee6cf8bb9f63ffaf750398f67d9db2b2c..b563e9bd5c771bd02bd66d3db152e29883767d9c"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing['prop']' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "patch": [
+        "diff --git a/delete-operator.js b/delete-operator.js",
+        "index 2dfe0799..9d68dfb8 100644",
+        "--- a/delete-operator.js",
+        "+++ b/delete-operator.js",
+        "@@ -1,2 +1 @@",
+        "-delete thing['prop'];",
+        " delete thing.prop"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b563e9bd5c771bd02bd66d3db152e29883767d9c..ea2c8ed9e6afaa82f892e6f33652e8bcaf55bf5d"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing.prop' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "patch": [
+        "diff --git a/delete-operator.js b/delete-operator.js",
+        "index 9d68dfb8..e69de29b 100644",
+        "--- a/delete-operator.js",
+        "+++ b/delete-operator.js",
+        "@@ -1 +0,0 @@",
+        "-delete thing.prop"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "ea2c8ed9e6afaa82f892e6f33652e8bcaf55bf5d..788020560a8fdb300dff202c696815f281416456"
+}]

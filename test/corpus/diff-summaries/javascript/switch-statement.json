@@ -1,0 +1,401 @@
+[{
+    "testCaseDescription": "javascript-switch-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "patch": [
+        "diff --git a/switch-statement.js b/switch-statement.js",
+        "index e69de29b..5481c49f 100644",
+        "--- a/switch-statement.js",
+        "+++ b/switch-statement.js",
+        "@@ -0,0 +1 @@",
+        "+switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "98e620d7e739bab2841281450b4d879405585f38..dca11528b714e0e28922043c278b3b4628089786"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '2' switch statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "patch": [
+        "diff --git a/switch-statement.js b/switch-statement.js",
+        "index 5481c49f..ffd4a32a 100644",
+        "--- a/switch-statement.js",
+        "+++ b/switch-statement.js",
+        "@@ -1 +1,3 @@",
+        "+switch (2) { case 1: 1; case 2: 2; case 3: 3; };",
+        "+switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "dca11528b714e0e28922043c278b3b4628089786..d54fa5ad0bd0b1629be149303f501364ce459d39"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the '1' switch statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the '1' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "patch": [
+        "diff --git a/switch-statement.js b/switch-statement.js",
+        "index ffd4a32a..302fb8bc 100644",
+        "--- a/switch-statement.js",
+        "+++ b/switch-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-switch (2) { case 1: 1; case 2: 2; case 3: 3; };",
+        "+switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        " switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d54fa5ad0bd0b1629be149303f501364ce459d39..25472c0239ffc946df79545a6d89193906c749e3"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the '2' switch statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the '2' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "patch": [
+        "diff --git a/switch-statement.js b/switch-statement.js",
+        "index 302fb8bc..ffd4a32a 100644",
+        "--- a/switch-statement.js",
+        "+++ b/switch-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        "+switch (2) { case 1: 1; case 2: 2; case 3: 3; };",
+        " switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "25472c0239ffc946df79545a6d89193906c749e3..30a9228a01816745bb3482059382bb8d8a958691"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2' switch statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1' switch statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '2' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "patch": [
+        "diff --git a/switch-statement.js b/switch-statement.js",
+        "index ffd4a32a..9b605791 100644",
+        "--- a/switch-statement.js",
+        "+++ b/switch-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-switch (2) { case 1: 1; case 2: 2; case 3: 3; };",
+        "-switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        " switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        "+switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "30a9228a01816745bb3482059382bb8d8a958691..3107c424ae4915648b7dd8b8453ae467b7995385"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "patch": [
+        "diff --git a/switch-statement.js b/switch-statement.js",
+        "index 9b605791..374091f2 100644",
+        "--- a/switch-statement.js",
+        "+++ b/switch-statement.js",
+        "@@ -1,2 +1 @@",
+        "-switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        " switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3107c424ae4915648b7dd8b8453ae467b7995385..724cc2045ea55f544c52a15b3845b17ad71e8248"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "patch": [
+        "diff --git a/switch-statement.js b/switch-statement.js",
+        "index 374091f2..e69de29b 100644",
+        "--- a/switch-statement.js",
+        "+++ b/switch-statement.js",
+        "@@ -1 +0,0 @@",
+        "-switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "724cc2045ea55f544c52a15b3845b17ad71e8248..ceabf504bd808117c5723ab62977a38ed153f0ec"
+}]

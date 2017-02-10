@@ -1,0 +1,323 @@
+[{
+    "testCaseDescription": "javascript-return-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index e69de29b..63150293 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -0,0 +1 @@",
+        "+return 5;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "ee66417eb88b151832b600af9c2b381b2e52880e..aa418fc5f074d8c3bb6bbb729d2c8d1eceb1875c"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added a return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 63150293..22dde951 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1 +1,3 @@",
+        "+return;",
+        "+return 5;",
+        " return 5;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "aa418fc5f074d8c3bb6bbb729d2c8d1eceb1875c..2afaee871a0c64ba9c55f647027d98991976c10f"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '5'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 22dde951..522349cd 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-return;",
+        "+return 5;",
+        " return 5;",
+        " return 5;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2afaee871a0c64ba9c55f647027d98991976c10f..de7c548b96662f8ae90dcea647f158ae616b9eec"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '5'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 522349cd..22dde951 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-return 5;",
+        "+return;",
+        " return 5;",
+        " return 5;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "de7c548b96662f8ae90dcea647f158ae616b9eec..9765bd3a9c9400c89a35c43cf69edfb1ac1457b4"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added a return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 22dde951..4d44d6ac 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-return;",
+        "-return 5;",
+        " return 5;",
+        "+return;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "9765bd3a9c9400c89a35c43cf69edfb1ac1457b4..4e8eba1e08dd23e884d13dce01a6f7e4c8d00534"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 4d44d6ac..f312410b 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,2 +1 @@",
+        "-return 5;",
+        " return;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "4e8eba1e08dd23e884d13dce01a6f7e4c8d00534..7f8ecfe4b7989470ce44c39f8b788196e5c88e94"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index f312410b..e69de29b 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1 +0,0 @@",
+        "-return;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "7f8ecfe4b7989470ce44c39f8b788196e5c88e94..074b11388910f403aab4a975e06626792b23aca4"
+}]

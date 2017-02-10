@@ -1,0 +1,490 @@
+[{
+    "testCaseDescription": "go-call-expressions-setup-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index e69de29b..79058077 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "373c46bee0b8179cf5d2f00412173597e503cdd3..3647e58e37fefb500235f7b03c45bf4fdf4fd353"
+}
+,{
+    "testCaseDescription": "go-call-expressions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x(b, c)' function call in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y(b, c)' function call in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z(b, c)' function call in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index 79058077..72918e59 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+x(b, c...)",
+        "+y(b, c,)",
+        "+z(b,c...,)",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3647e58e37fefb500235f7b03c45bf4fdf4fd353..fdf200e5448db3d0c33a098158f58cc50a96bf92"
+}
+,{
+    "testCaseDescription": "go-call-expressions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a(b, c) function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b(b, c) function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the c(b, c) function call of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index 72918e59..2d5e765c 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-x(b, c...)",
+        "-y(b, c,)",
+        "-z(b,c...,)",
+        "+a(b, c...)",
+        "+b(b, c,)",
+        "+c(b,c...,)",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "fdf200e5448db3d0c33a098158f58cc50a96bf92..fd62f603e7f0fbcd87c5d3e9259b56af869c8df9"
+}
+,{
+    "testCaseDescription": "go-call-expressions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x(b, c) function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y(b, c) function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the z(b, c) function call of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index 2d5e765c..72918e59 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-a(b, c...)",
+        "-b(b, c,)",
+        "-c(b,c...,)",
+        "+x(b, c...)",
+        "+y(b, c,)",
+        "+z(b,c...,)",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "fd62f603e7f0fbcd87c5d3e9259b56af869c8df9..c0baf110edbc43a5181ed54a0275ec81f704845a"
+}
+,{
+    "testCaseDescription": "go-call-expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x(b, c)' function call in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y(b, c)' function call in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z(b, c)' function call in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index 72918e59..79058077 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-x(b, c...)",
+        "-y(b, c,)",
+        "-z(b,c...,)",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "c0baf110edbc43a5181ed54a0275ec81f704845a..4877e00f14f3b561922b7e0cc5388fee41ed8c13"
+}
+,{
+    "testCaseDescription": "go-call-expressions-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "4877e00f14f3b561922b7e0cc5388fee41ed8c13..0bd1a3a45c722927b5d7c0c96d296bc01c1b333c"
+}]

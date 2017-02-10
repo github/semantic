@@ -1,0 +1,1684 @@
+[{
+    "testCaseDescription": "javascript-array-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                13,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        13,
+                        13
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "array.js",
+            "array.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "333558251d9d75b2f92ea2e7b4fde10635ea326e"
+        ]
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index e69de29..3335582 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -0,0 +1 @@",
+        "+[ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f24de0d24746d9f2408eda661698733705bd8a14..cc01ed254daa10d4e01b67e7d04ba5432020ca79"
+}
+,{
+    "testCaseDescription": "javascript-array-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        11,
+                                                        18
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        24,
+                                                        31
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                33
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        22,
+                                        34
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        22,
+                        35
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        37,
+                                                        44
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                46
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        35,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                35,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        35,
+                        48
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                13,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        13,
+                        13
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                48,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        48,
+                        48
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "array.js",
+            "array.js"
+        ],
+        "oids": [
+            "333558251d9d75b2f92ea2e7b4fde10635ea326e",
+            "cf37d7c11b4cd430324ccafe51e2437d6aefcd16"
+        ]
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index 3335582..cf37d7c 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1 +1,3 @@",
+        "+[ \"item1\", \"item2\" ];",
+        "+[ \"item1\" ];",
+        " [ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "cc01ed254daa10d4e01b67e7d04ba5432020ca79..c32c125fbf94e5f446da6b4bcc71ab83790e3eb8"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "delete",
+                                                    "range": [
+                                                        11,
+                                                        18
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        24,
+                                                        31
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                33
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        22,
+                                        34
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        35
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        15,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                24
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        13,
+                                        25
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                26
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        13,
+                        26
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        37,
+                                                        44
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                46
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        35,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                35,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        35,
+                        48
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        28,
+                                                        35
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                26,
+                                                37
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        26,
+                                        38
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                26,
+                                39
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        26,
+                        39
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                48,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        48,
+                        48
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                39,
+                                39
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        39,
+                        39
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "array.js",
+            "array.js"
+        ],
+        "oids": [
+            "cf37d7c11b4cd430324ccafe51e2437d6aefcd16",
+            "c2cb17facc693eda29753be3fc0ba8df902d61a7"
+        ]
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index cf37d7c..c2cb17f 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,3 +1,3 @@",
+        "-[ \"item1\", \"item2\" ];",
+        "+[ \"item1\" ];",
+        " [ \"item1\" ];",
+        " [ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c32c125fbf94e5f446da6b4bcc71ab83790e3eb8..439bb224c0c4fe667a42c61bc319ca7891a035df"
+}
+,{
+    "testCaseDescription": "javascript-array-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "insert",
+                                                    "range": [
+                                                        11,
+                                                        18
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        15,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                24
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        13,
+                                        25
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                26
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        13,
+                        26
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        24,
+                                                        31
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                33
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        22,
+                                        34
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        35
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        28,
+                                                        35
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                26,
+                                                37
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        26,
+                                        38
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                26,
+                                39
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        26,
+                        39
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        37,
+                                                        44
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                46
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        35,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                35,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        35,
+                        48
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                39,
+                                39
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        39,
+                        39
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                48,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        48,
+                        48
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "array.js",
+            "array.js"
+        ],
+        "oids": [
+            "c2cb17facc693eda29753be3fc0ba8df902d61a7",
+            "cf37d7c11b4cd430324ccafe51e2437d6aefcd16"
+        ]
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index c2cb17f..cf37d7c 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,3 +1,3 @@",
+        "-[ \"item1\" ];",
+        "+[ \"item1\", \"item2\" ];",
+        " [ \"item1\" ];",
+        " [ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "439bb224c0c4fe667a42c61bc319ca7891a035df..d19df2f2b147510e83c6f72fc96759a8fc316015"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        11,
+                                                        18
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        24,
+                                                        31
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                33
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        22,
+                                        34
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        22,
+                        35
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        37,
+                                                        44
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                46
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        35,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                35,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        35,
+                        48
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        15,
+                                                        22
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        24,
+                                                        31
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                33
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        13,
+                                        34
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        13,
+                        35
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                48,
+                                48
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        48,
+                        48
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                35,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        35,
+                        35
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "array.js",
+            "array.js"
+        ],
+        "oids": [
+            "cf37d7c11b4cd430324ccafe51e2437d6aefcd16",
+            "a4d92b81400cceb07a65847680515a0990b0f7d9"
+        ]
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index cf37d7c..a4d92b8 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,3 +1,2 @@",
+        "-[ \"item1\", \"item2\" ];",
+        "-[ \"item1\" ];",
+        " [ \"item1\" ];",
+        "+[ \"item1\", \"item2\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d19df2f2b147510e83c6f72fc96759a8fc316015..8f07abcf89121cd177cd3d238c1ffe36321da00b"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        15,
+                                                        22
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        24,
+                                                        31
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                33
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        13,
+                                        34
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        13,
+                        35
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        11,
+                                                        18
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                35,
+                                35
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        35,
+                        35
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "array.js",
+            "array.js"
+        ],
+        "oids": [
+            "a4d92b81400cceb07a65847680515a0990b0f7d9",
+            "7f2f50e64a7063f8d786726568e38e7ea72accc7"
+        ]
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index a4d92b8..7f2f50e 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,2 +1 @@",
+        "-[ \"item1\" ];",
+        " [ \"item1\", \"item2\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8f07abcf89121cd177cd3d238c1ffe36321da00b..9bfceef09e8693663faf7ed767e2526379aa7d28"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "ArrayLiteral",
+                                            "children": [
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        11,
+                                                        18
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "array.js",
+            "array.js"
+        ],
+        "oids": [
+            "7f2f50e64a7063f8d786726568e38e7ea72accc7",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index 7f2f50e..e69de29 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1 +0,0 @@",
+        "-[ \"item1\", \"item2\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "9bfceef09e8693663faf7ed767e2526379aa7d28..47efa692005800aae87fccdba3a089c87d9c46f1"
+}]

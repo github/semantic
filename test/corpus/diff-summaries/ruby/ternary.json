@@ -1,0 +1,455 @@
+[{
+    "testCaseDescription": "ruby-ternary-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index e69de29..cc46e6d 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -0,0 +1 @@",
+        "+foo ? case1 : case2"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "61d726641b460d2461b15149863a3c17583ca600..442884cd090a0d529cd409e905d3b7193921ab4f"
+}
+,{
+    "testCaseDescription": "ruby-ternary-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index cc46e6d..44ee69e 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1 +1,3 @@",
+        "+bar ? a : b",
+        "+foo ? case1 : case2",
+        " foo ? case1 : case2"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "442884cd090a0d529cd409e905d3b7193921ab4f..e2ee2433f89ef81a05b6bc88f5842c622dd345d9"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'foo' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'case1' identifier in the 'foo' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'case2' identifier in the 'foo' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 44ee69e..86614c8 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,3 +1,3 @@",
+        "-bar ? a : b",
+        "+foo ? case1 : case2",
+        " foo ? case1 : case2",
+        " foo ? case1 : case2"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e2ee2433f89ef81a05b6bc88f5842c622dd345d9..263afe3ce7c242e15454c99c5ef210cf1a5b3a3d"
+}
+,{
+    "testCaseDescription": "ruby-ternary-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'case1' identifier with the 'a' identifier in the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'case2' identifier with the 'b' identifier in the 'bar' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 86614c8..44ee69e 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo ? case1 : case2",
+        "+bar ? a : b",
+        " foo ? case1 : case2",
+        " foo ? case1 : case2"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "263afe3ce7c242e15454c99c5ef210cf1a5b3a3d..b6f8541f45333a924f4cfa88141afa8c6ef7acfe"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' ternary expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 44ee69e..1ce4e51 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,3 +1,2 @@",
+        "-bar ? a : b",
+        "-foo ? case1 : case2",
+        " foo ? case1 : case2",
+        "+bar ? a : b"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "b6f8541f45333a924f4cfa88141afa8c6ef7acfe..fb79871ad23f8531bb98c961c1c8389d462ab1ee"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 1ce4e51..7f42328 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,2 +1 @@",
+        "-foo ? case1 : case2",
+        " bar ? a : b"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "fb79871ad23f8531bb98c961c1c8389d462ab1ee..b91b7da512d2f66ec043106a4c83d77b209b51f5"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 7f42328..e69de29 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1 +0,0 @@",
+        "-bar ? a : b"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "b91b7da512d2f66ec043106a4c83d77b209b51f5..c77901de054ed5c45b40b241fc96524cc738a471"
+}]

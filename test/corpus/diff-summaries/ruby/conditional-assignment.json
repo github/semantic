@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "ruby-conditional-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' operator assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index e69de29..f8f538b 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -0,0 +1 @@",
+        "+x ||= 5"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "80da23eff17f9285f3cb5f9ceb16f8bf50f4d722..530c1e3e8fdef88bab2c68a74b5885f90118920d"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' operator assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' operator assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index f8f538b..6c10ae5 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1 +1,3 @@",
+        "+x &&= 7",
+        "+x ||= 5",
+        " x ||= 5"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "530c1e3e8fdef88bab2c68a74b5885f90118920d..11ca938ae3f5d9c8a7e63c0843c6131f5da9b5dc"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '7' with '5' in the x operator assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index 6c10ae5..a333810 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x &&= 7",
+        "+x ||= 5",
+        " x ||= 5",
+        " x ||= 5"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "11ca938ae3f5d9c8a7e63c0843c6131f5da9b5dc..52c0db7943309198a5f11bdc5a7e6a70c72b801f"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '7' in the x operator assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index a333810..6c10ae5 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x ||= 5",
+        "+x &&= 7",
+        " x ||= 5",
+        " x ||= 5"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "52c0db7943309198a5f11bdc5a7e6a70c72b801f..4283472329b817d55f29a45ea756e6971c86a7d3"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' operator assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' operator assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' operator assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index 6c10ae5..a56ffee 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,3 +1,2 @@",
+        "-x &&= 7",
+        "-x ||= 5",
+        " x ||= 5",
+        "+x &&= 7"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "4283472329b817d55f29a45ea756e6971c86a7d3..cc576f5286416a8fa5aa7109a7961a1a14f59104"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' operator assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index a56ffee..1abca02 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,2 +1 @@",
+        "-x ||= 5",
+        " x &&= 7"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "cc576f5286416a8fa5aa7109a7961a1a14f59104..ce68f255dfe40712360aa04dec6bc7844f1a003b"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' operator assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index 1abca02..e69de29 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1 +0,0 @@",
+        "-x &&= 7"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ce68f255dfe40712360aa04dec6bc7844f1a003b..9ee3b98240d86d88fb36b4434854030701b21d2d"
+}]

@@ -1,0 +1,346 @@
+[{
+    "testCaseDescription": "ruby-module-insert-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "patch": [
+        "diff --git a/module.rb b/module.rb",
+        "index e69de29..85026ed 100644",
+        "--- a/module.rb",
+        "+++ b/module.rb",
+        "@@ -0,0 +1,2 @@",
+        "+module Foo",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "df1a78de0a4748fd622579937f1b94b6af7a7a22..ec5481357ecc29b12d456ba8892d9b39e0fce1fa"
+}
+,{
+    "testCaseDescription": "ruby-module-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "patch": [
+        "diff --git a/module.rb b/module.rb",
+        "index 85026ed..351dcd2 100644",
+        "--- a/module.rb",
+        "+++ b/module.rb",
+        "@@ -1,2 +1,8 @@",
+        " module Foo",
+        "+  def bar",
+        "+  end",
+        "+end",
+        "+module Foo",
+        "+end",
+        "+module Foo",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ec5481357ecc29b12d456ba8892d9b39e0fce1fa..354390805ccb1c89a8213a05ebe399f2dddd6879"
+}
+,{
+    "testCaseDescription": "ruby-module-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar()' method in the Foo module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "patch": [
+        "diff --git a/module.rb b/module.rb",
+        "index 351dcd2..5900129 100644",
+        "--- a/module.rb",
+        "+++ b/module.rb",
+        "@@ -1,6 +1,4 @@",
+        " module Foo",
+        "-  def bar",
+        "-  end",
+        " end",
+        " module Foo",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "354390805ccb1c89a8213a05ebe399f2dddd6879..229c6b75a24a81bdc4b3450f1afeaa0fc28e7c0f"
+}
+,{
+    "testCaseDescription": "ruby-module-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar()' method in the Foo module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "patch": [
+        "diff --git a/module.rb b/module.rb",
+        "index 5900129..351dcd2 100644",
+        "--- a/module.rb",
+        "+++ b/module.rb",
+        "@@ -1,4 +1,6 @@",
+        " module Foo",
+        "+  def bar",
+        "+  end",
+        " end",
+        " module Foo",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "229c6b75a24a81bdc4b3450f1afeaa0fc28e7c0f..9e42c9f69147f3433a9e21da018b55360ca962c4"
+}
+,{
+    "testCaseDescription": "ruby-module-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "patch": [
+        "diff --git a/module.rb b/module.rb",
+        "index 351dcd2..66871d0 100644",
+        "--- a/module.rb",
+        "+++ b/module.rb",
+        "@@ -1,8 +1,6 @@",
+        " module Foo",
+        "-  def bar",
+        "-  end",
+        "-end",
+        "-module Foo",
+        " end",
+        " module Foo",
+        "+  def bar",
+        "+  end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9e42c9f69147f3433a9e21da018b55360ca962c4..2e010b8298517ef7b74cfda78566e10a89fca5be"
+}
+,{
+    "testCaseDescription": "ruby-module-delete-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "patch": [
+        "diff --git a/module.rb b/module.rb",
+        "index 66871d0..56f77bb 100644",
+        "--- a/module.rb",
+        "+++ b/module.rb",
+        "@@ -1,6 +1,4 @@",
+        " module Foo",
+        "-end",
+        "-module Foo",
+        "   def bar",
+        "   end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "2e010b8298517ef7b74cfda78566e10a89fca5be..9d65a1206954104bc1dec550589864e6c9106eda"
+}
+,{
+    "testCaseDescription": "ruby-module-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "patch": [
+        "diff --git a/module.rb b/module.rb",
+        "index 56f77bb..e69de29 100644",
+        "--- a/module.rb",
+        "+++ b/module.rb",
+        "@@ -1,4 +0,0 @@",
+        "-module Foo",
+        "-  def bar",
+        "-  end",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9d65a1206954104bc1dec550589864e6c9106eda..8eea35a3e05ea4b7a30d4998298c7b1a6b87698c"
+}]

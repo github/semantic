@@ -1,0 +1,664 @@
+[{
+    "testCaseDescription": "go-function-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index e69de29b..79058077 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "4c1430949679a459f5530eccab8efc8046a3abc7..44bcc1bef35e52f11a6dcc5dc12eecdfd3a93835"
+}
+,{
+    "testCaseDescription": "go-function-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' type declaration in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' type declaration in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index 79058077..eebe42e8 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+type (",
+        "+a func(int) int",
+        "+b func(int, string) (bool, error)",
+        "+)",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "44bcc1bef35e52f11a6dcc5dc12eecdfd3a93835..683f9831d02133c7f3f525ebf76a30bdc840d653"
+}
+,{
+    "testCaseDescription": "go-function-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the 'x' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the func(string) string function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    13
+                                ],
+                                "end": [
+                                    5,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    16
+                                ],
+                                "end": [
+                                    5,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the func(string) string function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the 'y' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier in the func(string, int) (chan, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                16
+                            ],
+                            "end": [
+                                6,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier in the func(string, int) (chan, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                22
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'chan, error' parameter declaration in the func(string, int) (chan, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                22
+                            ],
+                            "end": [
+                                6,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier in the func(string, int) (chan, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier in the func(string, int) (chan, error) function type of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index eebe42e8..2ae1953b 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
+        " type (",
+        "-a func(int) int",
+        "-b func(int, string) (bool, error)",
+        "+x func(string) string",
+        "+y func(string, int) (chan, error)",
+        " )",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "683f9831d02133c7f3f525ebf76a30bdc840d653..153f9a956d3f1b0c8003db879adc015402b483f2"
+}
+,{
+    "testCaseDescription": "go-function-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the 'a' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the func(int) int function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    16
+                                ],
+                                "end": [
+                                    5,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    13
+                                ],
+                                "end": [
+                                    5,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the func(int) int function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the 'b' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier in the func(int, string) (bool, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                13
+                            ],
+                            "end": [
+                                6,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier in the func(int, string) (bool, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                22
+                            ],
+                            "end": [
+                                6,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bool' identifier in the func(int, string) (bool, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier in the func(int, string) (bool, error) function type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                22
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'chan, error' parameter declaration in the func(int, string) (bool, error) function type of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index 2ae1953b..eebe42e8 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
+        " type (",
+        "-x func(string) string",
+        "-y func(string, int) (chan, error)",
+        "+a func(int) int",
+        "+b func(int, string) (bool, error)",
+        " )",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "153f9a956d3f1b0c8003db879adc015402b483f2..a3517d72e1f9ebf404d3b3dca5c70f64e70da7ca"
+}
+,{
+    "testCaseDescription": "go-function-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' type declaration in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' type declaration in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index eebe42e8..79058077 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-type (",
+        "-a func(int) int",
+        "-b func(int, string) (bool, error)",
+        "-)",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a3517d72e1f9ebf404d3b3dca5c70f64e70da7ca..89769cc54aeef8364ec696d7b360e3f03355eb07"
+}
+,{
+    "testCaseDescription": "go-function-types-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "89769cc54aeef8364ec696d7b360e3f03355eb07..f9b33be201f4f793e957567b70eebec7be3a69a2"
+}]

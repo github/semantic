@@ -1,0 +1,401 @@
+[{
+    "testCaseDescription": "javascript-do-while-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'true' do/while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/do-while-statement.js b/do-while-statement.js",
+        "index e69de29b..d1ec804b 100644",
+        "--- a/do-while-statement.js",
+        "+++ b/do-while-statement.js",
+        "@@ -0,0 +1 @@",
+        "+do { console.log(insert); } while (true);"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "48d3ef87f99a7129141975782e612cef84f46829..47fdb7dae90deae8f5a1ddaade3a4da8aed3bddb"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' do/while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'true' do/while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/do-while-statement.js b/do-while-statement.js",
+        "index d1ec804b..d9a410d6 100644",
+        "--- a/do-while-statement.js",
+        "+++ b/do-while-statement.js",
+        "@@ -1 +1,3 @@",
+        "+do { console.log(replacement); } while (false);",
+        "+do { console.log(insert); } while (true);",
+        " do { console.log(insert); } while (true);"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "47fdb7dae90deae8f5a1ddaade3a4da8aed3bddb..8dfe4bfffb91e763a57bb7437a643317f95005cc"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'replacement' identifier with the 'insert' identifier in the console.log(insert) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "end": [
+                                    1,
+                                    46
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'false' with 'true' in the true do/while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/do-while-statement.js b/do-while-statement.js",
+        "index d9a410d6..41978359 100644",
+        "--- a/do-while-statement.js",
+        "+++ b/do-while-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-do { console.log(replacement); } while (false);",
+        "+do { console.log(insert); } while (true);",
+        " do { console.log(insert); } while (true);",
+        " do { console.log(insert); } while (true);"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8dfe4bfffb91e763a57bb7437a643317f95005cc..f74da794cf0726b10bba95453d13d695c8a3c790"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'insert' identifier with the 'replacement' identifier in the console.log(replacement) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "end": [
+                                    1,
+                                    46
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'true' with 'false' in the false do/while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/do-while-statement.js b/do-while-statement.js",
+        "index 41978359..d9a410d6 100644",
+        "--- a/do-while-statement.js",
+        "+++ b/do-while-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-do { console.log(insert); } while (true);",
+        "+do { console.log(replacement); } while (false);",
+        " do { console.log(insert); } while (true);",
+        " do { console.log(insert); } while (true);"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f74da794cf0726b10bba95453d13d695c8a3c790..61870a9079d930bcda72b7244ce914736f439ce5"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' do/while statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'true' do/while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' do/while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/do-while-statement.js b/do-while-statement.js",
+        "index d9a410d6..c5291b47 100644",
+        "--- a/do-while-statement.js",
+        "+++ b/do-while-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-do { console.log(replacement); } while (false);",
+        "-do { console.log(insert); } while (true);",
+        " do { console.log(insert); } while (true);",
+        "+do { console.log(replacement); } while (false);"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "61870a9079d930bcda72b7244ce914736f439ce5..d9996cc8fc0b486253a2f78ceb1b772fd716e850"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'true' do/while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/do-while-statement.js b/do-while-statement.js",
+        "index c5291b47..6085cb11 100644",
+        "--- a/do-while-statement.js",
+        "+++ b/do-while-statement.js",
+        "@@ -1,2 +1 @@",
+        "-do { console.log(insert); } while (true);",
+        " do { console.log(replacement); } while (false);"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d9996cc8fc0b486253a2f78ceb1b772fd716e850..3f3112ede154d004a4fef1e6b2d710503dade46a"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' do/while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/do-while-statement.js b/do-while-statement.js",
+        "index 6085cb11..e69de29b 100644",
+        "--- a/do-while-statement.js",
+        "+++ b/do-while-statement.js",
+        "@@ -1 +0,0 @@",
+        "-do { console.log(replacement); } while (false);"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3f3112ede154d004a4fef1e6b2d710503dade46a..ee66417eb88b151832b600af9c2b381b2e52880e"
+}]

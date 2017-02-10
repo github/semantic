@@ -1,0 +1,454 @@
+[{
+    "testCaseDescription": "go-var-declarations-with-no-expressions-setup-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-no-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-no-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index e69de29b..79058077 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8afcad6b71675b14fc6f8cf8a6bdf31462499d18..d9aa6f47e2d54a07a7cd2d7742cf60c6195d2ea4"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-no-expressions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-no-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' var assignment in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'one, two' var assignment in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-no-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index 79058077..fcdc3127 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,5 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+var zero int",
+        "+var one, two uint64",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d9aa6f47e2d54a07a7cd2d7742cf60c6195d2ea4..2b3f87acc87f9ea6e34dc3a65e022c5d98dfdd14"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-no-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b, c var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the b, c var assignment of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-no-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index fcdc3127..8aab74f1 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-var zero int",
+        "-var one, two uint64",
+        "+var a int",
+        "+var b, c uint64",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "2b3f87acc87f9ea6e34dc3a65e022c5d98dfdd14..f03cb525fb9db922c45267821903120ce3c320e9"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-no-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one, two var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the one, two var assignment of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-no-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index 8aab74f1..fcdc3127 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-var a int",
+        "-var b, c uint64",
+        "+var zero int",
+        "+var one, two uint64",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f03cb525fb9db922c45267821903120ce3c320e9..8ee55fbc49a9dd1ba0088d23eaa9a7fb90b9b06f"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-no-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' var assignment in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'one, two' var assignment in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-no-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index fcdc3127..79058077 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,6 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-var zero int",
+        "-var one, two uint64",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8ee55fbc49a9dd1ba0088d23eaa9a7fb90b9b06f..1a01ce143bdf8ac8f7dbaf51de294eef00d16be6"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-no-expressions-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-no-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-no-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1a01ce143bdf8ac8f7dbaf51de294eef00d16be6..2962e40e4009fc06a09468b0ecd4187635094a76"
+}]

@@ -1,0 +1,455 @@
+[{
+    "testCaseDescription": "javascript-class-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index e69de29b..8f6ae64d 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -0,0 +1 @@",
+        "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5d563ac383acc3c789fbd552c697d625c0f424fc..f27889edbbb5640de4565ccc6d3dda2c6ca4ff7b"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index 8f6ae64d..b509437f 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1 +1,3 @@",
+        "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f27889edbbb5640de4565ccc6d3dda2c6ca4ff7b..6363c59704fdb865549eb385ba38810a1c53f5f9"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'one' identifier in the 'one(a)' method of the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'two' identifier in the 'two(b)' method of the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'baz' identifier with the 'three' identifier in the 'three(c)' method of the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index b509437f..c4f5c91c 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,3 +1,3 @@",
+        "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "6363c59704fdb865549eb385ba38810a1c53f5f9..0193a7dc4d1a24b5344dd31b252d5624bc36e843"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'foo' identifier in the 'foo(a)' method of the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'two' identifier with the 'bar' identifier in the 'bar(b)' method of the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'three' identifier with the 'baz' identifier in the 'baz(c)' method of the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index c4f5c91c..b509437f 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,3 +1,3 @@",
+        "-class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0193a7dc4d1a24b5344dd31b252d5624bc36e843..da671e1fcebbc3420fa30b56cb64b32ce271a004"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index b509437f..b1ef404f 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,3 +1,2 @@",
+        "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        "-class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "da671e1fcebbc3420fa30b56cb64b32ce271a004..08d69ec53c3b1ea4afe6ffab3084d626bf375015"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index b1ef404f..2c17f72f 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,2 +1 @@",
+        "-class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "08d69ec53c3b1ea4afe6ffab3084d626bf375015..b5988452546dcdfce01968a70b4fc10fa86804a9"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index 2c17f72f..e69de29b 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1 +0,0 @@",
+        "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b5988452546dcdfce01968a70b4fc10fa86804a9..2bd27e99860858d0a524b5a307b97f412b4cc0c8"
+}]

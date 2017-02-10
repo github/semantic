@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-template-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`one line`' template string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index e69de29b..01f859b1 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -0,0 +1 @@",
+        "+`one line`"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "64dfefbc50b4a2c3c30e706f470afe7dac6fd8b2..2e98d223a00054b95e621ab004bd3633a1dcb43b"
+}
+,{
+    "testCaseDescription": "javascript-template-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`multi line`' template string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`one line`' template string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 01f859b1..777fde68 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1 +1,3 @@",
+        "+`multi line`",
+        "+`one line`",
+        " `one line`"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2e98d223a00054b95e621ab004bd3633a1dcb43b..d742b14e9de2e202b35c442d7c15191ee3d39c2a"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '`multi line`' template string with the '`one line`' template string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 777fde68..657129fc 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,3 +1,3 @@",
+        "-`multi line`",
+        "+`one line`",
+        " `one line`",
+        " `one line`"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d742b14e9de2e202b35c442d7c15191ee3d39c2a..a467b085be4f17f46b0ae2f24ce6b3007b9ced8f"
+}
+,{
+    "testCaseDescription": "javascript-template-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '`one line`' template string with the '`multi line`' template string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 657129fc..777fde68 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,3 +1,3 @@",
+        "-`one line`",
+        "+`multi line`",
+        " `one line`",
+        " `one line`"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a467b085be4f17f46b0ae2f24ce6b3007b9ced8f..14df5165b08071bd9445f3ab04855d5d19e6f401"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`multi line`' template string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`one line`' template string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`multi line`' template string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 777fde68..2b8c0dde 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,3 +1,2 @@",
+        "-`multi line`",
+        "-`one line`",
+        " `one line`",
+        "+`multi line`"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "14df5165b08071bd9445f3ab04855d5d19e6f401..3d67dd065db26d02ede23e3d94574b24d2a454df"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`one line`' template string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 2b8c0dde..399f1173 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,2 +1 @@",
+        "-`one line`",
+        " `multi line`"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3d67dd065db26d02ede23e3d94574b24d2a454df..34315d91dc0fdd1328530c63251a9fea7fad7ce8"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`multi line`' template string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 399f1173..e69de29b 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1 +0,0 @@",
+        "-`multi line`"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "34315d91dc0fdd1328530c63251a9fea7fad7ce8..58aa7b1cb85df06bb4b647466c43f5c4862c695f"
+}]

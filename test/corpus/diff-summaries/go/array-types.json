@@ -1,0 +1,418 @@
+[{
+    "testCaseDescription": "go-array-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "array-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-types.go"
+    ],
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index e69de29b..79058077 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "dd275c4f09cc46a085621fe3f9d293f9e0c3427d..6bdff60b57b35cfcfb1c877f120c146637db874d"
+}
+,{
+    "testCaseDescription": "go-array-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' type declaration in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-types.go"
+    ],
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 79058077..3f73aea0 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+type a [2+2]x",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "6bdff60b57b35cfcfb1c877f120c146637db874d..65b3b04b9eb8c1efb4abed1d1f5cd18b0cf211c7"
+}
+,{
+    "testCaseDescription": "go-array-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the 'a' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    11
+                                ],
+                                "end": [
+                                    4,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    11
+                                ],
+                                "end": [
+                                    4,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the 'a' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'y' identifier in the 'a' type declaration of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-types.go"
+    ],
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 3f73aea0..49783126 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-type a [2+2]x",
+        "+type a [1+1]y",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "65b3b04b9eb8c1efb4abed1d1f5cd18b0cf211c7..e41a22e39e6be090a894ae3ca6727e0c2fb499a8"
+}
+,{
+    "testCaseDescription": "go-array-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the 'a' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    11
+                                ],
+                                "end": [
+                                    4,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    11
+                                ],
+                                "end": [
+                                    4,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the 'a' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'x' identifier in the 'a' type declaration of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-types.go"
+    ],
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 49783126..3f73aea0 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-type a [1+1]y",
+        "+type a [2+2]x",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e41a22e39e6be090a894ae3ca6727e0c2fb499a8..8526d819400848c08871bbc571369d972db212ce"
+}
+,{
+    "testCaseDescription": "go-array-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' type declaration in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-types.go"
+    ],
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 3f73aea0..79058077 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-type a [2+2]x",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8526d819400848c08871bbc571369d972db212ce..d63b29265993d9c65e5d3d45180e9179c3155919"
+}
+,{
+    "testCaseDescription": "go-array-types-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "array-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-types.go"
+    ],
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d63b29265993d9c65e5d3d45180e9179c3155919..9ff6020ed6d316a29f1c88377d7c240617263a9f"
+}]

@@ -1,0 +1,1745 @@
+[{
+    "testCaseDescription": "javascript-import-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember from \"foo\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the * as name from \"aardvark\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member } from \"ant\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, { member1, member2 as alias2 } from \"anaconda\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, * as name from \"alligator\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"arctic-tern\" import statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index e69de29b..491cb15d 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -0,0 +1,8 @@",
+        "+import defaultMember from \"foo\";",
+        "+import * as name from \"aardvark\";",
+        "+import { member } from \"ant\";",
+        "+import { member1 , member2 } from \"antelope\";",
+        "+import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "+import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "+import defaultMember, * as name from \"alligator\";",
+        "+import \"arctic-tern\";"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0c5669ab3e40b0ec94a4b0b5eb1047853c0d51b0..c353ee5864b49a77a5d1952aa1539056122a5b77"
+}
+,{
+    "testCaseDescription": "javascript-import-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember from \"babirusa\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element } from \"badger\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, { element1, element2 as elementAlias2 } from \"banteng\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, * as element from \"barbet\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"basilisk\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember from \"foo\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the * as name from \"aardvark\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member } from \"ant\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, { member1, member2 as alias2 } from \"anaconda\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, * as name from \"alligator\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"arctic-tern\" import statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 491cb15d..045c536e 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,3 +1,19 @@",
+        "+import defaultMember from \"babirusa\";",
+        "+import * as otherName from \"baboon\";",
+        "+import { element } from \"badger\";",
+        "+import { element1 , element2 } from \"bald-eagle\";",
+        "+import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "+import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "+import defaultMember, * as element from \"barbet\";",
+        "+import \"basilisk\";",
+        "+import defaultMember from \"foo\";",
+        "+import * as name from \"aardvark\";",
+        "+import { member } from \"ant\";",
+        "+import { member1 , member2 } from \"antelope\";",
+        "+import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "+import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "+import defaultMember, * as name from \"alligator\";",
+        "+import \"arctic-tern\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c353ee5864b49a77a5d1952aa1539056122a5b77..b76f818a0f17ba7cd7e18dacb818766c2f964c21"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"babirusa\" string with the \"foo\" string in the defaultMember from \"foo\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    28
+                                ],
+                                "end": [
+                                    2,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "end": [
+                                    2,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"baboon\" string with the \"aardvark\" string in the * as name from \"aardvark\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'otherName' identifier with the 'name' identifier in the * as name from \"aardvark\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member } from \"ant\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, { member1, member2 as alias2 } from \"anaconda\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    50
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the { element } from \"badger\" import statement with the defaultMember, * as name from \"alligator\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"arctic-tern\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, { element1, element2 as elementAlias2 } from \"banteng\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, * as element from \"barbet\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"basilisk\" import statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 045c536e..cbad5a42 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,11 +1,11 @@",
+        "-import defaultMember from \"babirusa\";",
+        "-import * as otherName from \"baboon\";",
+        "-import { element } from \"badger\";",
+        "-import { element1 , element2 } from \"bald-eagle\";",
+        "-import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "-import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "-import defaultMember, * as element from \"barbet\";",
+        "-import \"basilisk\";",
+        "+import defaultMember from \"foo\";",
+        "+import * as name from \"aardvark\";",
+        "+import { member } from \"ant\";",
+        "+import { member1 , member2 } from \"antelope\";",
+        "+import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "+import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "+import defaultMember, * as name from \"alligator\";",
+        "+import \"arctic-tern\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b76f818a0f17ba7cd7e18dacb818766c2f964c21..104f40889acb3987c562129b366e4a966b210853"
+}
+,{
+    "testCaseDescription": "javascript-import-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"foo\" string with the \"babirusa\" string in the defaultMember from \"babirusa\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "end": [
+                                    2,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    28
+                                ],
+                                "end": [
+                                    2,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"aardvark\" string with the \"baboon\" string in the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name' identifier with the 'otherName' identifier in the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element } from \"badger\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, { element1, element2 as elementAlias2 } from \"banteng\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    30
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    50
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the { member } from \"ant\" import statement with the defaultMember, * as element from \"barbet\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"basilisk\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, { member1, member2 as alias2 } from \"anaconda\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, * as name from \"alligator\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"arctic-tern\" import statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index cbad5a42..045c536e 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,11 +1,11 @@",
+        "-import defaultMember from \"foo\";",
+        "-import * as name from \"aardvark\";",
+        "-import { member } from \"ant\";",
+        "-import { member1 , member2 } from \"antelope\";",
+        "-import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "-import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "-import defaultMember, * as name from \"alligator\";",
+        "-import \"arctic-tern\";",
+        "+import defaultMember from \"babirusa\";",
+        "+import * as otherName from \"baboon\";",
+        "+import { element } from \"badger\";",
+        "+import { element1 , element2 } from \"bald-eagle\";",
+        "+import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "+import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "+import defaultMember, * as element from \"barbet\";",
+        "+import \"basilisk\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "104f40889acb3987c562129b366e4a966b210853..f93cac22cc89b74398857072a9a7fc8dfc14fba2"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember from \"babirusa\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element } from \"badger\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, { element1, element2 as elementAlias2 } from \"banteng\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, * as element from \"barbet\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"basilisk\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember from \"foo\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the * as name from \"aardvark\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member } from \"ant\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, { member1, member2 as alias2 } from \"anaconda\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, * as name from \"alligator\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"arctic-tern\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember from \"babirusa\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element } from \"badger\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, { element1, element2 as elementAlias2 } from \"banteng\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember, * as element from \"barbet\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"basilisk\" import statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 045c536e..873ff752 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,19 +1,3 @@",
+        "-import defaultMember from \"babirusa\";",
+        "-import * as otherName from \"baboon\";",
+        "-import { element } from \"badger\";",
+        "-import { element1 , element2 } from \"bald-eagle\";",
+        "-import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "-import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "-import defaultMember, * as element from \"barbet\";",
+        "-import \"basilisk\";",
+        "-import defaultMember from \"foo\";",
+        "-import * as name from \"aardvark\";",
+        "-import { member } from \"ant\";",
+        "-import { member1 , member2 } from \"antelope\";",
+        "-import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "-import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "-import defaultMember, * as name from \"alligator\";",
+        "-import \"arctic-tern\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";",
+        "@@ -22,3 +6,11 @@ import { member1 , member2 as alias2 } from \"ant-eater\";",
+        " import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        " import defaultMember, * as name from \"alligator\";",
+        " import \"arctic-tern\";",
+        "+import defaultMember from \"babirusa\";",
+        "+import * as otherName from \"baboon\";",
+        "+import { element } from \"badger\";",
+        "+import { element1 , element2 } from \"bald-eagle\";",
+        "+import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "+import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "+import defaultMember, * as element from \"barbet\";",
+        "+import \"basilisk\";"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f93cac22cc89b74398857072a9a7fc8dfc14fba2..51369eded60c5198cd53026e12b5228fd321f44f"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember from \"foo\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the * as name from \"aardvark\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member } from \"ant\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, { member1, member2 as alias2 } from \"anaconda\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, * as name from \"alligator\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"arctic-tern\" import statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 873ff752..db723392 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,11 +1,3 @@",
+        "-import defaultMember from \"foo\";",
+        "-import * as name from \"aardvark\";",
+        "-import { member } from \"ant\";",
+        "-import { member1 , member2 } from \"antelope\";",
+        "-import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "-import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "-import defaultMember, * as name from \"alligator\";",
+        "-import \"arctic-tern\";",
+        " import defaultMember from \"babirusa\";",
+        " import * as otherName from \"baboon\";",
+        " import { element } from \"badger\";"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "51369eded60c5198cd53026e12b5228fd321f44f..b63c105d0396476af4f92991effdd80b3bf9724b"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember from \"babirusa\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element } from \"badger\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, { element1, element2 as elementAlias2 } from \"banteng\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the defaultMember, * as element from \"barbet\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"basilisk\" import statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index db723392..e69de29b 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,8 +0,0 @@",
+        "-import defaultMember from \"babirusa\";",
+        "-import * as otherName from \"baboon\";",
+        "-import { element } from \"badger\";",
+        "-import { element1 , element2 } from \"bald-eagle\";",
+        "-import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "-import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "-import defaultMember, * as element from \"barbet\";",
+        "-import \"basilisk\";"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b63c105d0396476af4f92991effdd80b3bf9724b..be1bd2dff0107fc60e25707f2c27edec41f646ff"
+}]

@@ -1,0 +1,353 @@
+[{
+    "testCaseDescription": "javascript-undefined-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index e69de29b..c2ca02c0 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -0,0 +1 @@",
+        "+undefined;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "96b0b5fed694b8dcfb0566309faee71cfdf4dd60..6ab47400bd7d58aef3bf7780d6835556997006e1"
+}
+,{
+    "testCaseDescription": "javascript-undefined-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index c2ca02c0..a4352cc6 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1 +1,3 @@",
+        "+return undefined;",
+        "+undefined;",
+        " undefined;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "6ab47400bd7d58aef3bf7780d6835556997006e1..e4b1802fe047f8a75e0bc46cd4da315efdf60560"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index a4352cc6..52ea2570 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,3 +1,3 @@",
+        "-return undefined;",
+        "+undefined;",
+        " undefined;",
+        " undefined;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e4b1802fe047f8a75e0bc46cd4da315efdf60560..4bb9b8d216bafac43c6307eebd5cfe51b4769e39"
+}
+,{
+    "testCaseDescription": "javascript-undefined-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index 52ea2570..a4352cc6 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,3 +1,3 @@",
+        "-undefined;",
+        "+return undefined;",
+        " undefined;",
+        " undefined;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "4bb9b8d216bafac43c6307eebd5cfe51b4769e39..6d4c04c9c6972c06d65ba9c83095a168f51e3f95"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index a4352cc6..a16e7474 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,3 +1,2 @@",
+        "-return undefined;",
+        "-undefined;",
+        " undefined;",
+        "+return undefined;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "6d4c04c9c6972c06d65ba9c83095a168f51e3f95..11403be2f96636e2cc2cf75b2fe20435a65fe3da"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index a16e7474..fb505bb3 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,2 +1 @@",
+        "-undefined;",
+        " return undefined;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "11403be2f96636e2cc2cf75b2fe20435a65fe3da..f58ac582dcfbebc2199f32e97efbd82e4711f00f"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index fb505bb3..e69de29b 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1 +0,0 @@",
+        "-return undefined;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f58ac582dcfbebc2199f32e97efbd82e4711f00f..519ad14821c401c1cca201f2a2b02cb503bbfd83"
+}]

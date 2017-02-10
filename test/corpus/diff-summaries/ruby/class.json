@@ -1,0 +1,345 @@
+[{
+    "testCaseDescription": "ruby-class-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index e69de29..81b916c 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -0,0 +1,3 @@",
+        "+class Foo < Super",
+        "+  def test; end",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "a4bb88876d23a00075e16a8d8ea040a69755a759..3b90bc86408911a7ad03bf80959f0575b5fbf100"
+}
+,{
+    "testCaseDescription": "ruby-class-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index 81b916c..e67922c 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,3 +1,9 @@",
+        "+class Foo",
+        "+  def test; end",
+        "+end",
+        "+class Foo < Super",
+        "+  def test; end",
+        "+end",
+        " class Foo < Super",
+        "   def test; end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "3b90bc86408911a7ad03bf80959f0575b5fbf100..23cebb2dfc58cb01e4f219705196a0c07f09fe34"
+}
+,{
+    "testCaseDescription": "ruby-class-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                13
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Super' identifier in the Foo class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index e67922c..c371fd8 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,4 +1,4 @@",
+        "-class Foo",
+        "+class Foo < Super",
+        "   def test; end",
+        " end",
+        " class Foo < Super"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "23cebb2dfc58cb01e4f219705196a0c07f09fe34..86ea4b9cd4d28a2451b90c515e43f8598d0b6524"
+}
+,{
+    "testCaseDescription": "ruby-class-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                13
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Super' identifier in the Foo class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index c371fd8..e67922c 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,4 +1,4 @@",
+        "-class Foo < Super",
+        "+class Foo",
+        "   def test; end",
+        " end",
+        " class Foo < Super"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "86ea4b9cd4d28a2451b90c515e43f8598d0b6524..919796ae245a447dfa2f5cf0d5927d84a3995f3c"
+}
+,{
+    "testCaseDescription": "ruby-class-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index e67922c..818d26a 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,9 +1,6 @@",
+        "-class Foo",
+        "-  def test; end",
+        "-end",
+        " class Foo < Super",
+        "   def test; end",
+        " end",
+        "-class Foo < Super",
+        "+class Foo",
+        "   def test; end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "919796ae245a447dfa2f5cf0d5927d84a3995f3c..d9ddfcec10a47ea7718918b71f27820e6c59691c"
+}
+,{
+    "testCaseDescription": "ruby-class-delete-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index 818d26a..bab2e9f 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,6 +1,3 @@",
+        "-class Foo < Super",
+        "-  def test; end",
+        "-end",
+        " class Foo",
+        "   def test; end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d9ddfcec10a47ea7718918b71f27820e6c59691c..9907e82b34c3b065eb0d1933adfca48b99016685"
+}
+,{
+    "testCaseDescription": "ruby-class-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index bab2e9f..e69de29 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,3 +0,0 @@",
+        "-class Foo",
+        "-  def test; end",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9907e82b34c3b065eb0d1933adfca48b99016685..df1a78de0a4748fd622579937f1b94b6af7a7a22"
+}]

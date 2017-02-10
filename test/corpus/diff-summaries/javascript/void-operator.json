@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-void-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void b()' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "patch": [
+        "diff --git a/void-operator.js b/void-operator.js",
+        "index e69de29b..02aa7503 100644",
+        "--- a/void-operator.js",
+        "+++ b/void-operator.js",
+        "@@ -0,0 +1 @@",
+        "+void b()"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "788020560a8fdb300dff202c696815f281416456..dc92b964674c0dc509386941bd2d45bf1f91dc94"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void c()' operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void b()' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "patch": [
+        "diff --git a/void-operator.js b/void-operator.js",
+        "index 02aa7503..c493dc5b 100644",
+        "--- a/void-operator.js",
+        "+++ b/void-operator.js",
+        "@@ -1 +1,3 @@",
+        "+void c()",
+        "+void b()",
+        " void b()"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "dc92b964674c0dc509386941bd2d45bf1f91dc94..832e094bb5fed9529d10252fb117c51b09953266"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the b() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "patch": [
+        "diff --git a/void-operator.js b/void-operator.js",
+        "index c493dc5b..aae2f633 100644",
+        "--- a/void-operator.js",
+        "+++ b/void-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-void c()",
+        "+void b()",
+        " void b()",
+        " void b()"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "832e094bb5fed9529d10252fb117c51b09953266..1b85cc3f2c1a8d8f0c70d58ac71f8a73bef4f1cc"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the c() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "patch": [
+        "diff --git a/void-operator.js b/void-operator.js",
+        "index aae2f633..c493dc5b 100644",
+        "--- a/void-operator.js",
+        "+++ b/void-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-void b()",
+        "+void c()",
+        " void b()",
+        " void b()"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "1b85cc3f2c1a8d8f0c70d58ac71f8a73bef4f1cc..ef13ba3f92b4fc71daefbe42bb5a183e86462df1"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void c()' operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void b()' operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void c()' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "patch": [
+        "diff --git a/void-operator.js b/void-operator.js",
+        "index c493dc5b..738c34a4 100644",
+        "--- a/void-operator.js",
+        "+++ b/void-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-void c()",
+        "-void b()",
+        " void b()",
+        "+void c()"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "ef13ba3f92b4fc71daefbe42bb5a183e86462df1..eb8362cf1113ee2a6f38f316ef99c21be01d3998"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void b()' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "patch": [
+        "diff --git a/void-operator.js b/void-operator.js",
+        "index 738c34a4..8e9ceba2 100644",
+        "--- a/void-operator.js",
+        "+++ b/void-operator.js",
+        "@@ -1,2 +1 @@",
+        "-void b()",
+        " void c()"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "eb8362cf1113ee2a6f38f316ef99c21be01d3998..90bb7ed797c75beba669a426a3c6276023b92b83"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void c()' operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "patch": [
+        "diff --git a/void-operator.js b/void-operator.js",
+        "index 8e9ceba2..e69de29b 100644",
+        "--- a/void-operator.js",
+        "+++ b/void-operator.js",
+        "@@ -1 +0,0 @@",
+        "-void c()"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "90bb7ed797c75beba669a426a3c6276023b92b83..e063f0fd0c7f4b192b39469a0e1641349a596147"
+}]

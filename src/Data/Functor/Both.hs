@@ -1,53 +1,33 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Data.Functor.Both where
+{-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
+module Data.Functor.Both (Both,both, runBothWith, fst, snd, module X) where
 
-import Data.Align
-import Data.Bifunctor
-import Data.Bifunctor.These
-import Data.Maybe
-import Prelude hiding (zipWith, fst, snd)
-import qualified Prelude
+import Data.Bifunctor.Join as X
+import Prologue hiding (fst, snd)
+import qualified Prologue
 
 -- | A computation over both sides of a pair.
-newtype Both a = Both { runBoth :: (a, a) }
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+type Both a = Join (,) a
 
 -- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
 both :: a -> a -> Both a
-both = curry Both
-
--- | Construct Both with These values & defaults.
-bothOfThese :: Both a -> These a a -> Both a
-bothOfThese a = these (`both` snd a) (both (fst a)) both
-
--- | Construct Both (Maybe) with These values, defaulting to Nothing.
-maybeBothOfThese :: These a a -> Both (Maybe a)
-maybeBothOfThese = bothOfThese (pure Nothing) . bimap Just Just
+both = curry Join
 
 -- | Apply a function to `Both` sides of a computation.
 runBothWith :: (a -> a -> b) -> Both a -> b
-runBothWith f = uncurry f . runBoth
+runBothWith f = uncurry f . runJoin
 
 -- | Runs the left side of a `Both`.
 fst :: Both a -> a
-fst = Prelude.fst . runBoth
+fst = Prologue.fst . runJoin
 
 -- | Runs the right side of a `Both`.
 snd :: Both a -> a
-snd = Prelude.snd . runBoth
+snd = Prologue.snd . runJoin
 
-unzip :: [Both a] -> Both [a]
-unzip = foldr pair (pure [])
-  where pair (Both (a, b)) (Both (as, bs)) = Both (a : as, b : bs)
-
-instance Applicative Both where
-  pure a = Both (a, a)
-  Both (f, g) <*> Both (a, b) = Both (f a, g b)
-
-instance Monoid a => Monoid (Both a) where
+instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
   mempty = pure mempty
-  mappend a b = mappend <$> a <*> b
+  mappend = (<>)
 
 
-instance TotalCrosswalk Both where
-  tsequenceL d = runBothWith (alignWith (\ these -> fromMaybe <$> d <*> maybeBothOfThese these))
+instance (Semigroup a) => Semigroup (Join (,) a) where
+  a <> b = Join $ runJoin a <> runJoin b

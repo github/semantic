@@ -1,0 +1,2633 @@
+[{
+    "testCaseDescription": "javascript-export-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the { variable1 as name1, variable2 as name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1, name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 = value1, name2 = value2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the { namedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 as default } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the { 'foo' } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Added the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index e69de29b..dcd9320b 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -0,0 +1,11 @@",
+        "+export { name1, name2, name3, nameN };",
+        "+export { variable1 as name1, variable2 as name2, nameN };",
+        "+export let name1, name2, nameN;",
+        "+export let name1 = value1, name2 = value2, name3, nameN;",
+        "+export default namedFunction;",
+        "+export default function () { };",
+        "+export default function name1() { };",
+        "+export { name1 as default };",
+        "+export * from 'foo';",
+        "+export { name1, name2, nameN } from 'foo';",
+        "+export { import1 as name1, import2 as name2, nameN } from 'bar';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "be1bd2dff0107fc60e25707f2c27edec41f646ff..94fbe62beb0b9d5bd87916b16626ade5757be77c"
+}
+,{
+    "testCaseDescription": "javascript-export-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the { variable2 as name2, variable3 as name3, nameY } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name3, name4, nameT } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name2 = value2, name3 = value3, name4, nameO } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the { otherNamedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the { newName1 } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name2 as statement } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the { 'baz' } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the { variable1 as name1, variable2 as name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1, name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 = value1, name2 = value2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the { namedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 as default } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                20,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the { 'foo' } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "end": [
+                                21,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Added the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index dcd9320b..c8b53ff3 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,3 +1,25 @@",
+        "+export { name4, name5, name6, nameZ };",
+        "+export { variable2 as name2, variable3 as name3, nameY };",
+        "+export let name3, name4, nameT;",
+        "+export let name2 = value2, name3 = value3, name4, nameO;",
+        "+export default otherNamedFunction;",
+        "+export default function newName1() {};",
+        "+export default function () {};",
+        "+export { name2 as statement };",
+        "+export * from 'baz';",
+        "+export { name7, name8, nameP } from 'buzz';",
+        "+export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        "+export { name1, name2, name3, nameN };",
+        "+export { variable1 as name1, variable2 as name2, nameN };",
+        "+export let name1, name2, nameN;",
+        "+export let name1 = value1, name2 = value2, name3, nameN;",
+        "+export default namedFunction;",
+        "+export default function () { };",
+        "+export default function name1() { };",
+        "+export { name1 as default };",
+        "+export * from 'foo';",
+        "+export { name1, name2, nameN } from 'foo';",
+        "+export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "94fbe62beb0b9d5bd87916b16626ade5757be77c..33315fb792d3dd55c8dad8aec745f479637b74d8"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name4' identifier with the 'name1' identifier in the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name5' identifier with the 'name2' identifier in the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name6' identifier with the 'name3' identifier in the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameZ' identifier with the 'nameN' identifier in the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the { variable1 as name1, variable2 as name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1, name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 = value1, name2 = value2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the { namedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name1 as default } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the { 'foo' } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                37
+                            ],
+                            "end": [
+                                10,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' string in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    10
+                                ],
+                                "end": [
+                                    10,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable2' identifier with the 'name1' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                23
+                            ],
+                            "end": [
+                                2,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name2' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    30
+                                ],
+                                "end": [
+                                    2,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    17
+                                ],
+                                "end": [
+                                    10,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable3' identifier with the 'name2' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                43
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name3' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    50
+                                ],
+                                "end": [
+                                    2,
+                                    55
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    24
+                                ],
+                                "end": [
+                                    10,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameY' identifier with the 'nameN' identifier in the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Added the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name3, name4, nameT } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name2 = value2, name3 = value3, name4, nameO } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { otherNamedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { newName1 } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name2 as statement } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { 'baz' } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index c8b53ff3..ad3f21a7 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,14 +1,14 @@",
+        "-export { name4, name5, name6, nameZ };",
+        "-export { variable2 as name2, variable3 as name3, nameY };",
+        "-export let name3, name4, nameT;",
+        "-export let name2 = value2, name3 = value3, name4, nameO;",
+        "-export default otherNamedFunction;",
+        "-export default function newName1() {};",
+        "-export default function () {};",
+        "-export { name2 as statement };",
+        "-export * from 'baz';",
+        "-export { name7, name8, nameP } from 'buzz';",
+        "-export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        "+export { name1, name2, name3, nameN };",
+        "+export { variable1 as name1, variable2 as name2, nameN };",
+        "+export let name1, name2, nameN;",
+        "+export let name1 = value1, name2 = value2, name3, nameN;",
+        "+export default namedFunction;",
+        "+export default function () { };",
+        "+export default function name1() { };",
+        "+export { name1 as default };",
+        "+export * from 'foo';",
+        "+export { name1, name2, nameN } from 'foo';",
+        "+export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "33315fb792d3dd55c8dad8aec745f479637b74d8..bcd26f8508f792d9e92d3e85da588b043958be7f"
+}
+,{
+    "testCaseDescription": "javascript-export-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name1' identifier with the 'name4' identifier in the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name2' identifier with the 'name5' identifier in the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name3' identifier with the 'name6' identifier in the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameN' identifier with the 'nameZ' identifier in the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the { variable2 as name2, variable3 as name3, nameY } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name3, name4, nameT } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name2 = value2, name3 = value3, name4, nameO } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the { otherNamedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the { newName1 } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name2 as statement } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the { 'baz' } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                37
+                            ],
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'buzz' string in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    10
+                                ],
+                                "end": [
+                                    10,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable1' identifier with the 'name7' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                23
+                            ],
+                            "end": [
+                                2,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name1' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    30
+                                ],
+                                "end": [
+                                    2,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    17
+                                ],
+                                "end": [
+                                    10,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable2' identifier with the 'name8' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                43
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name2' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    50
+                                ],
+                                "end": [
+                                    2,
+                                    55
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    24
+                                ],
+                                "end": [
+                                    10,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameN' identifier with the 'nameP' identifier in the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 = value1, name2 = value2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { namedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 as default } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { 'foo' } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index ad3f21a7..c8b53ff3 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,14 +1,14 @@",
+        "-export { name1, name2, name3, nameN };",
+        "-export { variable1 as name1, variable2 as name2, nameN };",
+        "-export let name1, name2, nameN;",
+        "-export let name1 = value1, name2 = value2, name3, nameN;",
+        "-export default namedFunction;",
+        "-export default function () { };",
+        "-export default function name1() { };",
+        "-export { name1 as default };",
+        "-export * from 'foo';",
+        "-export { name1, name2, nameN } from 'foo';",
+        "-export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        "+export { name4, name5, name6, nameZ };",
+        "+export { variable2 as name2, variable3 as name3, nameY };",
+        "+export let name3, name4, nameT;",
+        "+export let name2 = value2, name3 = value3, name4, nameO;",
+        "+export default otherNamedFunction;",
+        "+export default function newName1() {};",
+        "+export default function () {};",
+        "+export { name2 as statement };",
+        "+export * from 'baz';",
+        "+export { name7, name8, nameP } from 'buzz';",
+        "+export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "bcd26f8508f792d9e92d3e85da588b043958be7f..2b9bf50a05887a7a162d095a2abfeca055308bc8"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { variable2 as name2, variable3 as name3, nameY } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name3, name4, nameT } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name2 = value2, name3 = value3, name4, nameO } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { otherNamedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { newName1 } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name2 as statement } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { 'baz' } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { variable1 as name1, variable2 as name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 = value1, name2 = value2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { namedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 as default } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                20,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { 'foo' } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "end": [
+                                21,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the { variable2 as name2, variable3 as name3, nameY } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name3, name4, nameT } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name2 = value2, name3 = value3, name4, nameO } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the { otherNamedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the { newName1 } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name2 as statement } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                20,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the { 'baz' } export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "end": [
+                                21,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Added the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index c8b53ff3..281c6726 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,25 +1,3 @@",
+        "-export { name4, name5, name6, nameZ };",
+        "-export { variable2 as name2, variable3 as name3, nameY };",
+        "-export let name3, name4, nameT;",
+        "-export let name2 = value2, name3 = value3, name4, nameO;",
+        "-export default otherNamedFunction;",
+        "-export default function newName1() {};",
+        "-export default function () {};",
+        "-export { name2 as statement };",
+        "-export * from 'baz';",
+        "-export { name7, name8, nameP } from 'buzz';",
+        "-export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        "-export { name1, name2, name3, nameN };",
+        "-export { variable1 as name1, variable2 as name2, nameN };",
+        "-export let name1, name2, nameN;",
+        "-export let name1 = value1, name2 = value2, name3, nameN;",
+        "-export default namedFunction;",
+        "-export default function () { };",
+        "-export default function name1() { };",
+        "-export { name1 as default };",
+        "-export * from 'foo';",
+        "-export { name1, name2, nameN } from 'foo';",
+        "-export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;",
+        "@@ -31,3 +9,14 @@ export { name1 as default };",
+        " export * from 'foo';",
+        " export { name1, name2, nameN } from 'foo';",
+        " export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        "+export { name4, name5, name6, nameZ };",
+        "+export { variable2 as name2, variable3 as name3, nameY };",
+        "+export let name3, name4, nameT;",
+        "+export let name2 = value2, name3 = value3, name4, nameO;",
+        "+export default otherNamedFunction;",
+        "+export default function newName1() {};",
+        "+export default function () {};",
+        "+export { name2 as statement };",
+        "+export * from 'baz';",
+        "+export { name7, name8, nameP } from 'buzz';",
+        "+export { import6 as name6, import7 as name7, nameB } from 'fizz';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2b9bf50a05887a7a162d095a2abfeca055308bc8..34e4cddde5d1b60cd8f711bb1c58b9ee16d36001"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { variable1 as name1, variable2 as name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 = value1, name2 = value2, name3, nameN } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { namedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1 as default } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { 'foo' } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name1, name2, nameN } from 'foo' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index 281c6726..e105ba78 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,14 +1,3 @@",
+        "-export { name1, name2, name3, nameN };",
+        "-export { variable1 as name1, variable2 as name2, nameN };",
+        "-export let name1, name2, nameN;",
+        "-export let name1 = value1, name2 = value2, name3, nameN;",
+        "-export default namedFunction;",
+        "-export default function () { };",
+        "-export default function name1() { };",
+        "-export { name1 as default };",
+        "-export * from 'foo';",
+        "-export { name1, name2, nameN } from 'foo';",
+        "-export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name4, name5, name6, nameZ };",
+        " export { variable2 as name2, variable3 as name3, nameY };",
+        " export let name3, name4, nameT;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "34e4cddde5d1b60cd8f711bb1c58b9ee16d36001..4a053ca50921f795644922f2ed23f98974d7d5bc"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name4, name5, name6, nameZ } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { variable2 as name2, variable3 as name3, nameY } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name3, name4, nameT } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name2 = value2, name3 = value3, name4, nameO } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { otherNamedFunction } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { newName1 } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { anonymous() } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name2 as statement } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { 'baz' } export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { name7, name8, nameP } from 'buzz' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index e105ba78..e69de29b 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,11 +0,0 @@",
+        "-export { name4, name5, name6, nameZ };",
+        "-export { variable2 as name2, variable3 as name3, nameY };",
+        "-export let name3, name4, nameT;",
+        "-export let name2 = value2, name3 = value3, name4, nameO;",
+        "-export default otherNamedFunction;",
+        "-export default function newName1() {};",
+        "-export default function () {};",
+        "-export { name2 as statement };",
+        "-export * from 'baz';",
+        "-export { name7, name8, nameP } from 'buzz';",
+        "-export { import6 as name6, import7 as name7, nameB } from 'fizz';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "4a053ca50921f795644922f2ed23f98974d7d5bc..689c75b2c901c257422d3759b780fc15b9819a0d"
+}]

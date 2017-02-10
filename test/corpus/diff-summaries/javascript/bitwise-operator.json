@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-bitwise-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i >> j' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "patch": [
+        "diff --git a/bitwise-operator.js b/bitwise-operator.js",
+        "index e69de29b..021cf6ad 100644",
+        "--- a/bitwise-operator.js",
+        "+++ b/bitwise-operator.js",
+        "@@ -0,0 +1 @@",
+        "+i >> j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8eb05a7fac3721888570615043a58da2a28e278e..e14d15bff391dc532b49157ab968f48fc0086b54"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i >> k' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i >> j' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "patch": [
+        "diff --git a/bitwise-operator.js b/bitwise-operator.js",
+        "index 021cf6ad..3e0b6c17 100644",
+        "--- a/bitwise-operator.js",
+        "+++ b/bitwise-operator.js",
+        "@@ -1 +1,3 @@",
+        "+i >> k;",
+        "+i >> j;",
+        " i >> j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e14d15bff391dc532b49157ab968f48fc0086b54..34fdb106b5c1bb73196a1ee8ecd1c817825cb2f8"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'k' identifier with the 'j' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "patch": [
+        "diff --git a/bitwise-operator.js b/bitwise-operator.js",
+        "index 3e0b6c17..18853d16 100644",
+        "--- a/bitwise-operator.js",
+        "+++ b/bitwise-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i >> k;",
+        "+i >> j;",
+        " i >> j;",
+        " i >> j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "34fdb106b5c1bb73196a1ee8ecd1c817825cb2f8..eea256d8297ce7d2bdf17205c8f929819c7c56ec"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'j' identifier with the 'k' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "patch": [
+        "diff --git a/bitwise-operator.js b/bitwise-operator.js",
+        "index 18853d16..3e0b6c17 100644",
+        "--- a/bitwise-operator.js",
+        "+++ b/bitwise-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i >> j;",
+        "+i >> k;",
+        " i >> j;",
+        " i >> j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "eea256d8297ce7d2bdf17205c8f929819c7c56ec..722c71a678e72e79281ce2c0847a09b4a9e5b52c"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i >> k' bitwise operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i >> j' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i >> k' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "patch": [
+        "diff --git a/bitwise-operator.js b/bitwise-operator.js",
+        "index 3e0b6c17..ee7d8dec 100644",
+        "--- a/bitwise-operator.js",
+        "+++ b/bitwise-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-i >> k;",
+        "-i >> j;",
+        " i >> j;",
+        "+i >> k;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "722c71a678e72e79281ce2c0847a09b4a9e5b52c..2dbfa9bdf49e3112341bad6e9fbb2845a70d5a6d"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i >> j' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "patch": [
+        "diff --git a/bitwise-operator.js b/bitwise-operator.js",
+        "index ee7d8dec..2800c8c8 100644",
+        "--- a/bitwise-operator.js",
+        "+++ b/bitwise-operator.js",
+        "@@ -1,2 +1 @@",
+        "-i >> j;",
+        " i >> k;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2dbfa9bdf49e3112341bad6e9fbb2845a70d5a6d..5246a10f3ea2f174a908f8976aaf13cb6a454dc0"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i >> k' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "patch": [
+        "diff --git a/bitwise-operator.js b/bitwise-operator.js",
+        "index 2800c8c8..e69de29b 100644",
+        "--- a/bitwise-operator.js",
+        "+++ b/bitwise-operator.js",
+        "@@ -1 +0,0 @@",
+        "-i >> k;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5246a10f3ea2f174a908f8976aaf13cb6a454dc0..ef8d4296ee2dfe27245e4697b092bcf81f14acce"
+}]

@@ -1,0 +1,406 @@
+[{
+    "testCaseDescription": "go-pointer-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "pointer-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pointer-types.go"
+    ],
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index e69de29b..79058077 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a1c5e30a9f0396b299eca4b60affb5c0e1ba1e98..38caa16942d0a4ecb8e98061b6dd973729a8754d"
+}
+,{
+    "testCaseDescription": "go-pointer-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "pointer-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'p1' type declaration in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'p2' type declaration in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pointer-types.go"
+    ],
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 79058077..98e7b8a9 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+type (",
+        "+p1 *string",
+        "+p2 **p1",
+        "+)",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "38caa16942d0a4ecb8e98061b6dd973729a8754d..785321c8694252386cb4203639d091b2476044c7"
+}
+,{
+    "testCaseDescription": "go-pointer-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "pointer-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the *int pointer type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'p1' identifier with the 'p3' identifier in the *p3 pointer type of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pointer-types.go"
+    ],
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 98e7b8a9..36eb5ffb 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
+        " type (",
+        "-p1 *string",
+        "-p2 **p1",
+        "+p1 *int",
+        "+p2 **p3",
+        " )",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "785321c8694252386cb4203639d091b2476044c7..d100c7776455e0c6822fe0de1ab0440ee491aa1a"
+}
+,{
+    "testCaseDescription": "go-pointer-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "pointer-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the *string pointer type of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'p3' identifier with the 'p1' identifier in the *p1 pointer type of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pointer-types.go"
+    ],
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 36eb5ffb..98e7b8a9 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
+        " type (",
+        "-p1 *int",
+        "-p2 **p3",
+        "+p1 *string",
+        "+p2 **p1",
+        " )",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d100c7776455e0c6822fe0de1ab0440ee491aa1a..1c96162ce730ef41ab63d53e451b78417b26550d"
+}
+,{
+    "testCaseDescription": "go-pointer-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "pointer-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'p1' type declaration in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'p2' type declaration in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pointer-types.go"
+    ],
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 98e7b8a9..79058077 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-type (",
+        "-p1 *string",
+        "-p2 **p1",
+        "-)",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1c96162ce730ef41ab63d53e451b78417b26550d..ad649dd982f31edda625f2d3a6a36ebe14f1b656"
+}
+,{
+    "testCaseDescription": "go-pointer-types-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "pointer-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pointer-types.go"
+    ],
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "ad649dd982f31edda625f2d3a6a36ebe14f1b656..a85665c66f8582bcde0abe05f4203f3696378040"
+}]

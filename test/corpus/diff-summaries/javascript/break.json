@@ -1,0 +1,292 @@
+[{
+    "testCaseDescription": "javascript-break-setup-test",
+    "expectedResult": {
+        "changes": {
+            "break.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0; i < 10; i++' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "break.js"
+    ],
+    "patch": [
+        "diff --git a/break.js b/break.js",
+        "index e69de29b..3f583e3d 100644",
+        "--- a/break.js",
+        "+++ b/break.js",
+        "@@ -0,0 +1 @@",
+        "+for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "689c75b2c901c257422d3759b780fc15b9819a0d..5eb3b30f1a301d6f29f72a5918e0e67dc0bd4e6e"
+}
+,{
+    "testCaseDescription": "javascript-break-insert-test",
+    "expectedResult": {
+        "changes": {
+            "break.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                43
+                            ],
+                            "end": [
+                                1,
+                                49
+                            ]
+                        }
+                    },
+                    "summary": "Added a break statement in the 'i === 4' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                41
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{  }' object in the 'i === 4' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "break.js"
+    ],
+    "patch": [
+        "diff --git a/break.js b/break.js",
+        "index 3f583e3d..629dfa91 100644",
+        "--- a/break.js",
+        "+++ b/break.js",
+        "@@ -1 +1 @@",
+        "-for (i = 0; i < 10; i++) { if (i === 4) {  }; i }",
+        "+for (i = 0; i < 10; i++) { if (i === 4) { break; }; i }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5eb3b30f1a301d6f29f72a5918e0e67dc0bd4e6e..eb63e35e2ba221a54f60193d95864c6019cb3f85"
+}
+,{
+    "testCaseDescription": "javascript-break-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "break.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                43
+                            ],
+                            "end": [
+                                1,
+                                52
+                            ]
+                        }
+                    },
+                    "summary": "Added a continue statement in the 'i === 4' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                43
+                            ],
+                            "end": [
+                                1,
+                                49
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a break statement in the 'i === 4' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "break.js"
+    ],
+    "patch": [
+        "diff --git a/break.js b/break.js",
+        "index 629dfa91..16ebcc57 100644",
+        "--- a/break.js",
+        "+++ b/break.js",
+        "@@ -1 +1 @@",
+        "-for (i = 0; i < 10; i++) { if (i === 4) { break; }; i }",
+        "+for (i = 0; i < 10; i++) { if (i === 4) { continue; }; i }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "eb63e35e2ba221a54f60193d95864c6019cb3f85..ac199cd2633184c5938b67c680406fc9ef4dbae0"
+}
+,{
+    "testCaseDescription": "javascript-break-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "break.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                43
+                            ],
+                            "end": [
+                                1,
+                                49
+                            ]
+                        }
+                    },
+                    "summary": "Added a break statement in the 'i === 4' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                43
+                            ],
+                            "end": [
+                                1,
+                                52
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a continue statement in the 'i === 4' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "break.js"
+    ],
+    "patch": [
+        "diff --git a/break.js b/break.js",
+        "index 16ebcc57..629dfa91 100644",
+        "--- a/break.js",
+        "+++ b/break.js",
+        "@@ -1 +1 @@",
+        "-for (i = 0; i < 10; i++) { if (i === 4) { continue; }; i }",
+        "+for (i = 0; i < 10; i++) { if (i === 4) { break; }; i }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "ac199cd2633184c5938b67c680406fc9ef4dbae0..046f6130859081f355b85af2a949770a034c2001"
+}
+,{
+    "testCaseDescription": "javascript-break-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "break.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                41
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{  }' object in the 'i === 4' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                43
+                            ],
+                            "end": [
+                                1,
+                                49
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a break statement in the 'i === 4' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "break.js"
+    ],
+    "patch": [
+        "diff --git a/break.js b/break.js",
+        "index 629dfa91..3f583e3d 100644",
+        "--- a/break.js",
+        "+++ b/break.js",
+        "@@ -1 +1 @@",
+        "-for (i = 0; i < 10; i++) { if (i === 4) { break; }; i }",
+        "+for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "046f6130859081f355b85af2a949770a034c2001..1e56e3767e24a60a8d9516ddf57a4a8d5b291989"
+}
+,{
+    "testCaseDescription": "javascript-break-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "break.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0; i < 10; i++' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "break.js"
+    ],
+    "patch": [
+        "diff --git a/break.js b/break.js",
+        "index 3f583e3d..e69de29b 100644",
+        "--- a/break.js",
+        "+++ b/break.js",
+        "@@ -1 +0,0 @@",
+        "-for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "1e56e3767e24a60a8d9516ddf57a4a8d5b291989..a6c03f4fe5985c8424ed595bd7d50ecc6098dc8a"
+}]

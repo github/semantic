@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-generator-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateStuff' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "patch": [
+        "diff --git a/generator-function.js b/generator-function.js",
+        "index e69de29b..04e8a59b 100644",
+        "--- a/generator-function.js",
+        "+++ b/generator-function.js",
+        "@@ -0,0 +1 @@",
+        "+function *generateStuff(arg1, arg2) { yield; yield arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "39852cdd4b70a1926580629f96ee4221841afb76..f14e45177bf87d972dd094d434afebf6ab7bd2e7"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateNewStuff' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateStuff' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "patch": [
+        "diff --git a/generator-function.js b/generator-function.js",
+        "index 04e8a59b..ed5c0370 100644",
+        "--- a/generator-function.js",
+        "+++ b/generator-function.js",
+        "@@ -1 +1,3 @@",
+        "+function *generateNewStuff(arg1, arg2) { yield; yield arg2; };",
+        "+function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        " function *generateStuff(arg1, arg2) { yield; yield arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f14e45177bf87d972dd094d434afebf6ab7bd2e7..f7e60bdec026c0669a9c5740f86204b27f7351f8"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'generateNewStuff' identifier with the 'generateStuff' identifier in the generateStuff function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "patch": [
+        "diff --git a/generator-function.js b/generator-function.js",
+        "index ed5c0370..0895c3fd 100644",
+        "--- a/generator-function.js",
+        "+++ b/generator-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function *generateNewStuff(arg1, arg2) { yield; yield arg2; };",
+        "+function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        " function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        " function *generateStuff(arg1, arg2) { yield; yield arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f7e60bdec026c0669a9c5740f86204b27f7351f8..0d59204851c1defc1f7b39faa5dfa1ce3cf8e77d"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'generateStuff' identifier with the 'generateNewStuff' identifier in the generateNewStuff function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "patch": [
+        "diff --git a/generator-function.js b/generator-function.js",
+        "index 0895c3fd..ed5c0370 100644",
+        "--- a/generator-function.js",
+        "+++ b/generator-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        "+function *generateNewStuff(arg1, arg2) { yield; yield arg2; };",
+        " function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        " function *generateStuff(arg1, arg2) { yield; yield arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0d59204851c1defc1f7b39faa5dfa1ce3cf8e77d..4f673ed556db59aa5ff08ce0b91eb810dfa92480"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateNewStuff' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateStuff' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateNewStuff' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "patch": [
+        "diff --git a/generator-function.js b/generator-function.js",
+        "index ed5c0370..1dae1059 100644",
+        "--- a/generator-function.js",
+        "+++ b/generator-function.js",
+        "@@ -1,3 +1,2 @@",
+        "-function *generateNewStuff(arg1, arg2) { yield; yield arg2; };",
+        "-function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        " function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        "+function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "4f673ed556db59aa5ff08ce0b91eb810dfa92480..f125f53e66438da88bf2ec0c852bc06209d09ab2"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateStuff' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "patch": [
+        "diff --git a/generator-function.js b/generator-function.js",
+        "index 1dae1059..5846d1c0 100644",
+        "--- a/generator-function.js",
+        "+++ b/generator-function.js",
+        "@@ -1,2 +1 @@",
+        "-function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        " function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f125f53e66438da88bf2ec0c852bc06209d09ab2..463b6c8615c519be4614c47e4b212f7b8ee83c74"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateNewStuff' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "patch": [
+        "diff --git a/generator-function.js b/generator-function.js",
+        "index 5846d1c0..e69de29b 100644",
+        "--- a/generator-function.js",
+        "+++ b/generator-function.js",
+        "@@ -1 +0,0 @@",
+        "-function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "463b6c8615c519be4614c47e4b212f7b8ee83c74..15e84394f61437f6604f6255ce0c5d818ac3115f"
+}]

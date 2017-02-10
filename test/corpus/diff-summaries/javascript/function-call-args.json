@@ -1,0 +1,617 @@
+[{
+    "testCaseDescription": "javascript-function-call-args-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index e69de29b..699333de 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -0,0 +1 @@",
+        "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a1cfaadb31d0f0d28d7449d160ba2ed06ec9c6af..f765da24248e68bf31db9272cd07fd27732ce9da"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 699333de..3f4ee6ef 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1 +1,3 @@",
+        "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f765da24248e68bf31db9272cd07fd27732ce9da..5caf097567f54bba021b07365b69f238385b23d6"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"otherString\" string with the \"string\" string in the someFunction(1, \"string\", …, true) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the someFunction(1, \"string\", …, true) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    43
+                                ],
+                                "end": [
+                                    1,
+                                    44
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    60
+                                ],
+                                "end": [
+                                    1,
+                                    61
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    55
+                                ],
+                                "end": [
+                                    1,
+                                    56
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    71
+                                ],
+                                "end": [
+                                    1,
+                                    72
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    66
+                                ],
+                                "end": [
+                                    1,
+                                    67
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    77
+                                ],
+                                "end": [
+                                    1,
+                                    82
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    72
+                                ],
+                                "end": [
+                                    1,
+                                    76
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'false' with 'true' in the someFunction(1, \"string\", …, true) function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 3f4ee6ef..dc419cba 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,3 +1,3 @@",
+        "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5caf097567f54bba021b07365b69f238385b23d6..a418e2295aafa9eedc993771ad325a32d94e3cb6"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"string\" string with the \"otherString\" string in the someFunction(1, \"otherString\", …, false) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the someFunction(1, \"otherString\", …, false) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    43
+                                ],
+                                "end": [
+                                    1,
+                                    44
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    55
+                                ],
+                                "end": [
+                                    1,
+                                    56
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    60
+                                ],
+                                "end": [
+                                    1,
+                                    61
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    66
+                                ],
+                                "end": [
+                                    1,
+                                    67
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    71
+                                ],
+                                "end": [
+                                    1,
+                                    72
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    72
+                                ],
+                                "end": [
+                                    1,
+                                    76
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    77
+                                ],
+                                "end": [
+                                    1,
+                                    82
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'true' with 'false' in the someFunction(1, \"otherString\", …, false) function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index dc419cba..3f4ee6ef 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,3 +1,3 @@",
+        "-someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a418e2295aafa9eedc993771ad325a32d94e3cb6..f0f325f6ce0df4ba500ebb3845ad93dc904ba24b"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 3f4ee6ef..cae967b6 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,3 +1,2 @@",
+        "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        "-someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f0f325f6ce0df4ba500ebb3845ad93dc904ba24b..b77a2a6a266180d3d20a483bb63291ead5827012"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index cae967b6..0d19573d 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,2 +1 @@",
+        "-someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b77a2a6a266180d3d20a483bb63291ead5827012..b879b321d2517cc0edaeeb2bbf71f455415bd3a4"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 0d19573d..e69de29b 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1 +0,0 @@",
+        "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b879b321d2517cc0edaeeb2bbf71f455415bd3a4..347b15603c28f7232a36d6d312d1c335a4dd39db"
+}]

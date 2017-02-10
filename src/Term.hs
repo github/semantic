@@ -1,35 +1,47 @@
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
-import Control.Comonad.Cofree
+import Prologue
+import Data.Align.Generic
+import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
-import Data.Maybe
-import Data.OrderedMap hiding (size)
+import Data.Record
+import Data.These
 import Syntax
 
--- | An annotated node (Syntax) in an abstract syntax tree.
-type Term a annotation = Cofree (Syntax a) annotation
+-- | A Term with an abstract syntax tree and an annotation.
+type Term f = Cofree f
+type TermF = CofreeF
+
+-- | A Term with a Syntax leaf and a record of fields.
+type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
+type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
+
+-- Term has a Base functor TermF which gives it Recursive and Corecursive instances.
+type instance Base (Term f a) = TermF f a
+instance Functor f => Recursive (Term f a) where project = runCofree
+instance Functor f => Corecursive (Term f a) where embed = cofree
 
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.
-zipTerms :: Term a annotation -> Term a annotation -> Maybe (Term a (Both annotation))
-zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
-  where
-    annotate = fmap (Both (annotation1, annotation2) :<)
-    zipUnwrap (Leaf _) (Leaf b') = Just $ Leaf b'
-    zipUnwrap (Indexed a') (Indexed b') = Just . Indexed . catMaybes $ zipWith zipTerms a' b'
-    zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'
-    zipUnwrap (Keyed a') (Keyed b') | keys a' == keys b' = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a' b' <$> keys a'
-    zipUnwrap _ _ = Nothing
-    zipUnwrapMaps a' b' key = (,) key <$> zipTerms (a' ! key) (b' ! key)
+zipTerms :: (Traversable f, GAlign f) => Term f annotation -> Term f annotation -> Maybe (Term f (Both annotation))
+zipTerms t1 t2 = iter go (alignCofreeWith galign (const Nothing) both (These t1 t2))
+  where go (a :< s) = cofree . (a :<) <$> sequenceA s
 
--- | Fold a term into some other value, starting with the leaves.
-cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
-cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
-
--- | Return the number of leaves in the node.
-termSize :: Term a annotation -> Integer
+-- | Return the node count of a term.
+termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
-  size _ (Leaf _) = 1
-  size _ (Indexed i) = sum i
-  size _ (Fixed f) = sum f
-  size _ (Keyed k) = sum k
+  size (_ :< syntax) = 1 + sum syntax
+
+-- | Aligns (zips, retaining non-overlapping portions of the structure) a pair of terms.
+alignCofreeWith :: Functor f
+  => (forall a b. f a -> f b -> Maybe (f (These a b))) -- ^ A function comparing a pair of structures, returning `Just` the combined structure if they are comparable (e.g. if they have the same constructor), and `Nothing` otherwise. The 'Data.Align.Generic.galign' function is usually what you want here.
+  -> (These (Term f a) (Term f b) -> contrasted) -- ^ A function mapping a 'These' of incomparable terms into 'Pure' values in the resulting tree.
+  -> (a -> b -> combined) -- ^ A function mapping the input terms’ annotations into annotations in the 'Free' values in the resulting tree.
+  -> These (Term f a) (Term f b) -- ^ The input terms.
+  -> Free (TermF f combined) contrasted
+alignCofreeWith compare contrast combine = go
+  where go terms = fromMaybe (pure (contrast terms)) $ case terms of
+          These t1 t2 -> wrap . (combine (extract t1) (extract t2) :<) . fmap go <$> compare (unwrap t1) (unwrap t2)
+          _ -> Nothing

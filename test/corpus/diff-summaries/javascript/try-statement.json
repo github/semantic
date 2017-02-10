@@ -1,0 +1,401 @@
+[{
+    "testCaseDescription": "javascript-try-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index e69de29b..9826f7c2 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -0,0 +1 @@",
+        "+try { f; } catch { g; } finally { h; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "7868df4cf3fd89e485b2f29ce8f215068a325f5f..5ecb27a4efc41c0ba83e29c564af9c82956fca9e"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 9826f7c2..7befc1c1 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1 +1,3 @@",
+        "+try { f; } catch { h; } finally { g; };",
+        "+try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5ecb27a4efc41c0ba83e29c564af9c82956fca9e..d122a59462ad0be5a56561e7afdc6efecb3e6eae"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the { f; } try statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the { f; } try statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 7befc1c1..94fed9ce 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-try { f; } catch { h; } finally { g; };",
+        "+try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d122a59462ad0be5a56561e7afdc6efecb3e6eae..fbb14de7eb2a4e456bc39a562ffbc3f80cba7556"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the { f; } try statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the { f; } try statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 94fed9ce..7befc1c1 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-try { f; } catch { g; } finally { h; };",
+        "+try { f; } catch { h; } finally { g; };",
+        " try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "fbb14de7eb2a4e456bc39a562ffbc3f80cba7556..e95c3010e454ee6d775fc67d787959670ebdd093"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 7befc1c1..8ab70e04 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-try { f; } catch { h; } finally { g; };",
+        "-try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };",
+        "+try { f; } catch { h; } finally { g; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e95c3010e454ee6d775fc67d787959670ebdd093..61a1515e2ce6e1b47e445d3d792399c50ace173f"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 8ab70e04..024f88ab 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,2 +1 @@",
+        "-try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { h; } finally { g; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "61a1515e2ce6e1b47e445d3d792399c50ace173f..3c936e5a29f439a385c56e97af53bd5b0ca92532"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 024f88ab..e69de29b 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1 +0,0 @@",
+        "-try { f; } catch { h; } finally { g; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3c936e5a29f439a385c56e97af53bd5b0ca92532..b9d8688abe5c6af76d88562b6f621a4e9c553dee"
+}]

@@ -1,0 +1,410 @@
+[{
+    "testCaseDescription": "ruby-begin-block-insert-test",
+    "expectedResult": {
+        "changes": {
+            "begin-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added a BEGIN block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin-block.rb"
+    ],
+    "patch": [
+        "diff --git a/begin-block.rb b/begin-block.rb",
+        "index e69de29..689ee83 100644",
+        "--- a/begin-block.rb",
+        "+++ b/begin-block.rb",
+        "@@ -0,0 +1,3 @@",
+        "+BEGIN {",
+        "+ foo",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "03a751d043f1bc44ab9eae085bfde59af2495a68..f49a537446aae0dbbabb805cb2837324170ccabe"
+}
+,{
+    "testCaseDescription": "ruby-begin-block-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "begin-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added a BEGIN block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added a BEGIN block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin-block.rb"
+    ],
+    "patch": [
+        "diff --git a/begin-block.rb b/begin-block.rb",
+        "index 689ee83..6d35684 100644",
+        "--- a/begin-block.rb",
+        "+++ b/begin-block.rb",
+        "@@ -1,3 +1,10 @@",
+        "+foo",
+        "+BEGIN {",
+        "+ bar",
+        "+}",
+        "+BEGIN {",
+        "+ foo",
+        "+}",
+        " BEGIN {",
+        "  foo",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f49a537446aae0dbbabb805cb2837324170ccabe..cc282f13854c118436fbaddd0edf810bb34089ff"
+}
+,{
+    "testCaseDescription": "ruby-begin-block-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "begin-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added a BEGIN block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a BEGIN block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin-block.rb"
+    ],
+    "patch": [
+        "diff --git a/begin-block.rb b/begin-block.rb",
+        "index 6d35684..59f3ea8 100644",
+        "--- a/begin-block.rb",
+        "+++ b/begin-block.rb",
+        "@@ -1,6 +1,5 @@",
+        "-foo",
+        " BEGIN {",
+        "- bar",
+        "+ foo",
+        " }",
+        " BEGIN {",
+        "  foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "cc282f13854c118436fbaddd0edf810bb34089ff..127068078b1f33278c78727939ae44ea3bb56669"
+}
+,{
+    "testCaseDescription": "ruby-begin-block-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in a BEGIN block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin-block.rb"
+    ],
+    "patch": [
+        "diff --git a/begin-block.rb b/begin-block.rb",
+        "index 59f3ea8..6d35684 100644",
+        "--- a/begin-block.rb",
+        "+++ b/begin-block.rb",
+        "@@ -1,5 +1,6 @@",
+        "+foo",
+        " BEGIN {",
+        "- foo",
+        "+ bar",
+        " }",
+        " BEGIN {",
+        "  foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "127068078b1f33278c78727939ae44ea3bb56669..c383974184ea4cdde2f9267d5f3e349d1d9a15ea"
+}
+,{
+    "testCaseDescription": "ruby-begin-block-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin-block.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a BEGIN block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin-block.rb"
+    ],
+    "patch": [
+        "diff --git a/begin-block.rb b/begin-block.rb",
+        "index 6d35684..422d4eb 100644",
+        "--- a/begin-block.rb",
+        "+++ b/begin-block.rb",
+        "@@ -1,10 +1,7 @@",
+        "-foo",
+        "-BEGIN {",
+        "- bar",
+        "-}",
+        " BEGIN {",
+        "  foo",
+        " }",
+        "+foo",
+        " BEGIN {",
+        "- foo",
+        "+ bar",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "c383974184ea4cdde2f9267d5f3e349d1d9a15ea..0c80ecb1555e53e9840e415d79da2364c203a137"
+}
+,{
+    "testCaseDescription": "ruby-begin-block-delete-test",
+    "expectedResult": {
+        "changes": {
+            "begin-block.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a BEGIN block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin-block.rb"
+    ],
+    "patch": [
+        "diff --git a/begin-block.rb b/begin-block.rb",
+        "index 422d4eb..a936ce1 100644",
+        "--- a/begin-block.rb",
+        "+++ b/begin-block.rb",
+        "@@ -1,6 +1,3 @@",
+        "-BEGIN {",
+        "- foo",
+        "-}",
+        " foo",
+        " BEGIN {",
+        "  bar"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0c80ecb1555e53e9840e415d79da2364c203a137..105174fafe27003c0e1d9ce859589eed676626cd"
+}
+,{
+    "testCaseDescription": "ruby-begin-block-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "begin-block.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a BEGIN block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin-block.rb"
+    ],
+    "patch": [
+        "diff --git a/begin-block.rb b/begin-block.rb",
+        "index a936ce1..e69de29 100644",
+        "--- a/begin-block.rb",
+        "+++ b/begin-block.rb",
+        "@@ -1,4 +0,0 @@",
+        "-foo",
+        "-BEGIN {",
+        "- bar",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "105174fafe27003c0e1d9ce859589eed676626cd..5de93fcdb1d807e7d537ecd5843313d1d3acf001"
+}]

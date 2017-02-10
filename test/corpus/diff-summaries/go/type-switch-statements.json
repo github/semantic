@@ -1,0 +1,324 @@
+[{
+    "testCaseDescription": "go-type-switch-statements-setup-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index e69de29b..79058077 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "331d50d25e2927f7ec24d69b4f21552787a91ed6..995bee43c13c56bc924eca6b3041d00d6c275587"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e' switch statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index 79058077..fd377c7a 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,5 +1,10 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+switch e.(type) {",
+        "+  case []Person:",
+        "+    a()",
+        "+  case *Dog:",
+        "+    break",
+        "+}",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "995bee43c13c56bc924eca6b3041d00d6c275587..5ca7d93e03a0c7b1c0b4ad603e18df64472fbf88"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'b' identifier in the 'b' switch statement of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index fd377c7a..f5ef4d87 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-switch e.(type) {",
+        "+switch b.(type) {",
+        "   case []Person:",
+        "     a()",
+        "   case *Dog:"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "5ca7d93e03a0c7b1c0b4ad603e18df64472fbf88..21ab71153e357ca625b963ff3d2f3fb8de73f513"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'e' identifier in the 'e' switch statement of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index f5ef4d87..fd377c7a 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-switch b.(type) {",
+        "+switch e.(type) {",
+        "   case []Person:",
+        "     a()",
+        "   case *Dog:"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "21ab71153e357ca625b963ff3d2f3fb8de73f513..d3fac9bf77e05e48c5f25b81701c11fd2a518f21"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' switch statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index fd377c7a..79058077 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,10 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-switch e.(type) {",
+        "-  case []Person:",
+        "-    a()",
+        "-  case *Dog:",
+        "-    break",
+        "-}",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d3fac9bf77e05e48c5f25b81701c11fd2a518f21..9acb35bd5a1853e7f98df42edf337f532f725d0a"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "9acb35bd5a1853e7f98df42edf337f532f725d0a..4966b945ba5393d1f1e64efadf0af83c41425f11"
+}]

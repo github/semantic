@@ -1,0 +1,401 @@
+[{
+    "testCaseDescription": "javascript-nested-functions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index e69de29b..72531d81 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -0,0 +1 @@",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d03236f8517c53c78b398fe3778c8170b54e36ea..1662b1dfc6d38616da1fff5ad7e6ee911a77e534"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 72531d81..c960aae1 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1 +1,3 @@",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "1662b1dfc6d38616da1fff5ad7e6ee911a77e534..89e96daa71a3e9aeae51bf3d823785ae65027678"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg1' identifier with the 'arg3' identifier in the console.log(arg3) function call of the 'child' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg2' identifier with the 'arg4' identifier in the console.log(arg4) function call of the 'child' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index c960aae1..1b9b61a3 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,3 +1,3 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "89e96daa71a3e9aeae51bf3d823785ae65027678..c3d4bd3343b7ebd88669f53728aa459003a0dbe2"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg3' identifier with the 'arg1' identifier in the console.log(arg1) function call of the 'child' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg4' identifier with the 'arg2' identifier in the console.log(arg2) function call of the 'child' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 1b9b61a3..c960aae1 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,3 +1,3 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c3d4bd3343b7ebd88669f53728aa459003a0dbe2..767e6169749beb378d262e0c0c5995dd4d3750de"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index c960aae1..81522c7d 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,3 +1,2 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "767e6169749beb378d262e0c0c5995dd4d3750de..18cd0d93c09a6f185e1f8f5b7ad1aa23e6b067bc"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 81522c7d..30564800 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,2 +1 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "18cd0d93c09a6f185e1f8f5b7ad1aa23e6b067bc..2380a4af99f945cf851c2a6ffc333adae28ec1a9"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 30564800..e69de29b 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1 +0,0 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2380a4af99f945cf851c2a6ffc333adae28ec1a9..0f9353e629ed1d4b50861305cd28aa9667f15b4a"
+}]

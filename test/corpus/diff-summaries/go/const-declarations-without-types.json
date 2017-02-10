@@ -1,0 +1,424 @@
+[{
+    "testCaseDescription": "go-const-declarations-without-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index e69de29b..79058077 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d01762bbba4dab11931c77b7e92313b7e8ac8f8d..a944383d6a991e067df8eb52b10f41c69e2432d6"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' var assignment in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 79058077..7ef3805e 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+const zero = 0",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a944383d6a991e067df8eb52b10f41c69e2432d6..8b92431550b595466e765c5df24f64bf4f4be471"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one, two var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' identifier in the one, two var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    14
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    18
+                                ],
+                                "end": [
+                                    4,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in the one, two var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the one, two var assignment of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 7ef3805e..c4525e24 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const zero = 0",
+        "+const one, two = 1, 2",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8b92431550b595466e765c5df24f64bf4f4be471..27ee58022c11f97fc49c46591e48bfd1c5c86735"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' identifier in the zero var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    18
+                                ],
+                                "end": [
+                                    4,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    14
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in the zero var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the zero var assignment of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index c4525e24..7ef3805e 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const one, two = 1, 2",
+        "+const zero = 0",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "27ee58022c11f97fc49c46591e48bfd1c5c86735..0d20aa866a60c0921108d2d27f927d8c18fbdb6d"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' var assignment in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 7ef3805e..79058077 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const zero = 0",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0d20aa866a60c0921108d2d27f927d8c18fbdb6d..0eeceba36497436beca93db3731d381fe08b2bfc"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0eeceba36497436beca93db3731d381fe08b2bfc..e569ad4f2564b872ede19dff450315ba540c3076"
+}]

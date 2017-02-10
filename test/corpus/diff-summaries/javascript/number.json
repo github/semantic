@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-number-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added '101'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index e69de29b..398050c6 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -0,0 +1 @@",
+        "+101"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a721bbb02349218f8c3e5c1b8dff9b250d206fa5..e667b73ca854f58d4845ad175536c28f3da2e510"
+}
+,{
+    "testCaseDescription": "javascript-number-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added '102'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added '101'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 398050c6..16da476c 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1 +1,3 @@",
+        "+102",
+        "+101",
+        " 101"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e667b73ca854f58d4845ad175536c28f3da2e510..08aa6df3c760a024f1751290b95883fa444d3eb0"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '102' with '101'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 16da476c..252b3e84 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,3 +1,3 @@",
+        "-102",
+        "+101",
+        " 101",
+        " 101"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "08aa6df3c760a024f1751290b95883fa444d3eb0..8334896eb44c3b974205a8f46531e4e159ef1504"
+}
+,{
+    "testCaseDescription": "javascript-number-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '101' with '102'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 252b3e84..16da476c 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,3 +1,3 @@",
+        "-101",
+        "+102",
+        " 101",
+        " 101"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8334896eb44c3b974205a8f46531e4e159ef1504..04ceb913032a5f0b27fcdf436fb725891f846148"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '102'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '101'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added '102'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 16da476c..bb77dfbd 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,3 +1,2 @@",
+        "-102",
+        "-101",
+        " 101",
+        "+102"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "04ceb913032a5f0b27fcdf436fb725891f846148..377c9a2a7c7fe0296d90796cb0587e41b24c82df"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '101'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index bb77dfbd..257e5632 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,2 +1 @@",
+        "-101",
+        " 102"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "377c9a2a7c7fe0296d90796cb0587e41b24c82df..71c7b760bba28eadc1ae08039b3c40c12c65fef7"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '102'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 257e5632..e69de29b 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1 +0,0 @@",
+        "-102"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "71c7b760bba28eadc1ae08039b3c40c12c65fef7..efab78a691fb93905e88ae443c8324acedc55608"
+}]

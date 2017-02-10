@@ -1,0 +1,494 @@
+[{
+    "testCaseDescription": "ruby-hash-insert-test",
+    "expectedResult": {
+        "changes": {
+            "hash.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                71
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ :key1 => \"value\", :key2 => 1, \"key3\": false, :\"symbol_key\" => 10 }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "hash.rb"
+    ],
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index e69de29..925618f 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -0,0 +1 @@",
+        "+{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "254bef3dc300da92915a826e73d24917af88cf5d..c1fb1ba8ae5833cd27a1714477f699691c163bbc"
+}
+,{
+    "testCaseDescription": "ruby-hash-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "hash.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                47
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ key1: \"changed value\", key2: 2, key3: true }' object"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                71
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ :key1 => \"value\", :key2 => 1, \"key3\": false, :\"symbol_key\" => 10 }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "hash.rb"
+    ],
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index 925618f..a0c7d41 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1 +1,3 @@",
+        "+{ key1: \"changed value\", key2: 2, key3: true }",
+        "+{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "c1fb1ba8ae5833cd27a1714477f699691c163bbc..97fb7c7c84cb9cd6f0fdb1db8ce31b861fa1b928"
+}
+,{
+    "testCaseDescription": "ruby-hash-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "hash.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'key1: \"changed value\"' pair with the ':key1 => \"value\"' pair"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                21
+                            ],
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':key2 => 1' pair"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    26
+                                ],
+                                "end": [
+                                    1,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    48
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'key2: 2' pair with the '\"key3\": false' pair"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                50
+                            ],
+                            "end": [
+                                1,
+                                69
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':\"symbol_key\" => 10' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'key3: true' pair"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "hash.rb"
+    ],
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index a0c7d41..d4ed2ec 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,3 +1,3 @@",
+        "-{ key1: \"changed value\", key2: 2, key3: true }",
+        "+{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "97fb7c7c84cb9cd6f0fdb1db8ce31b861fa1b928..ed013b222c24601a99a76680d4de8210e84ffefd"
+}
+,{
+    "testCaseDescription": "ruby-hash-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "hash.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':key1 => \"value\"' pair with the 'key1: \"changed value\"' pair"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                26
+                            ],
+                            "end": [
+                                1,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'key2: 2' pair"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'key3: true' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                21
+                            ],
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':key2 => 1' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                33
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"key3\": false' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                50
+                            ],
+                            "end": [
+                                1,
+                                69
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"symbol_key\" => 10' pair"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "hash.rb"
+    ],
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index d4ed2ec..a0c7d41 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,3 +1,3 @@",
+        "-{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        "+{ key1: \"changed value\", key2: 2, key3: true }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ed013b222c24601a99a76680d4de8210e84ffefd..fab17632a25b79077b9fed2c6c0fb1af0f7fdca4"
+}
+,{
+    "testCaseDescription": "ruby-hash-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "hash.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                47
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ key1: \"changed value\", key2: 2, key3: true }' object"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                71
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ :key1 => \"value\", :key2 => 1, \"key3\": false, :\"symbol_key\" => 10 }' object"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                47
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ key1: \"changed value\", key2: 2, key3: true }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "hash.rb"
+    ],
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index a0c7d41..4154b7d 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,3 +1,2 @@",
+        "-{ key1: \"changed value\", key2: 2, key3: true }",
+        "-{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        "+{ key1: \"changed value\", key2: 2, key3: true }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "fab17632a25b79077b9fed2c6c0fb1af0f7fdca4..22bb2e8e2f1ce44a35dc2719f37c50720a8fd7da"
+}
+,{
+    "testCaseDescription": "ruby-hash-delete-test",
+    "expectedResult": {
+        "changes": {
+            "hash.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                71
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ :key1 => \"value\", :key2 => 1, \"key3\": false, :\"symbol_key\" => 10 }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "hash.rb"
+    ],
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index 4154b7d..4a0e8d0 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,2 +1 @@",
+        "-{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { key1: \"changed value\", key2: 2, key3: true }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "22bb2e8e2f1ce44a35dc2719f37c50720a8fd7da..308a3c73e7af4a230df5a16c8a390f622ba64cfa"
+}
+,{
+    "testCaseDescription": "ruby-hash-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "hash.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                47
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ key1: \"changed value\", key2: 2, key3: true }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "hash.rb"
+    ],
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index 4a0e8d0..e69de29 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1 +0,0 @@",
+        "-{ key1: \"changed value\", key2: 2, key3: true }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "308a3c73e7af4a230df5a16c8a390f622ba64cfa..fc62b0d430cee4f179260f256a053b4b124d6ce4"
+}]

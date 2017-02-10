@@ -1,0 +1,332 @@
+[
+  {
+    "language": "javascript",
+    "fileExt": ".js",
+    "repoUrl": "https://github.com/diff-fixtures/javascript.git",
+    "syntaxes": [
+      {
+        "syntax": "object",
+        "insert": "{ \"key1\": \"value1\" };",
+        "replacement": "{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
+      },
+      {
+        "syntax": "anonymous-function",
+        "insert": "function(a,b) { return a + b; }",
+        "replacement": "function(b,c) { return b * c; }"
+      },
+      {
+        "syntax": "anonymous-parameterless-function",
+        "insert": "function() { return 'hi'; }",
+        "replacement": "function() { return 'hello'; }"
+      },
+      {
+        "syntax": "objects-with-methods",
+        "insert": "{ add(a, b) { return a + b; } };",
+        "replacement": "{ subtract(a, b) { return a - b; } };"
+      },
+      {
+        "syntax": "string",
+        "insert": "'A string with \"double\" quotes';",
+        "replacement": "'A different string with \"double\" quotes';"
+      },
+      {
+        "syntax": "number",
+        "insert": "101",
+        "replacement": "102"
+      },
+      {
+        "syntax": "variable",
+        "insert": "theVar;",
+        "replacement": "theVar2"
+      },
+      {
+        "syntax": "identifier",
+        "insert": "theVar;",
+        "replacement": "theVar2"
+      },
+      {
+        "syntax": "this-expression",
+        "insert": "this;",
+        "replacement": "return this;"
+      },
+      {
+        "syntax": "null",
+        "insert": "null;",
+        "replacement": "return null;"
+      },
+      {
+        "syntax": "undefined",
+        "insert": "undefined;",
+        "replacement": "return undefined;"
+      },
+      {
+        "syntax": "true",
+        "insert": "true;",
+        "replacement": "return true;"
+      },
+      {
+        "syntax": "false",
+        "insert": "false;",
+        "replacement": "return false;"
+      },
+      {
+        "syntax": "class",
+        "insert": "class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        "replacement": "class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
+      },
+      {
+        "syntax": "array",
+        "insert": "[ \"item1\" ];",
+        "replacement": "[ \"item1\", \"item2\" ];"
+      },
+      {
+        "syntax": "function",
+        "insert": "function(arg1, arg2) { arg2; };",
+        "replacement": "function(arg1, arg2) { arg1; };"
+      },
+      {
+        "syntax": "arrow-function",
+        "insert": "(f, g) => { return h; };",
+        "replacement": "(f, g) => { return g; };"
+      },
+      {
+        "syntax": "generator-function",
+        "insert": "function *generateStuff(arg1, arg2) { yield; yield arg2; };",
+        "replacement": "function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
+      },
+      {
+        "syntax": "named-function",
+        "insert": "function myFunction(arg1, arg2) { arg2; };",
+        "replacement": "function anotherFunction() { return false; };"
+      },
+      {
+        "syntax": "member-access",
+        "insert": "x.someProperty;",
+        "replacement": "x.someOtherProperty"
+      },
+      {
+        "syntax": "subscript-access-variable",
+        "insert": "x[someVariable];",
+        "replacement": "x[someOtherVariable];"
+      },
+      {
+        "syntax": "subscript-access-string",
+        "insert": "x[\"some-string\"];",
+        "replacement": "x[\"some-other-string\"];"
+      },
+      {
+        "syntax": "chained-property-access",
+        "insert": "return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )",
+        "replacement": "return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
+      },
+      {
+        "syntax": "chained-callbacks",
+        "insert": "this.map(function (a) { return a.b; })",
+        "replacement": "this.reduce(function (a) { return b.a; })"
+      },
+      {
+        "syntax": "function-call",
+        "insert": "someFunction(arg1, \"arg2\");",
+        "replacement": "someFunction(arg1, \"arg3\");"
+      },
+      {
+        "syntax": "method-call",
+        "insert": "object.someMethod(arg1, \"arg2\");",
+        "replacement": "object.someMethod(arg1, \"arg3\");"
+      },
+      {
+        "syntax": "function-call-args",
+        "insert": "someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        "replacement": "someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
+      },
+      {
+        "syntax": "constructor-call",
+        "insert": "new module.Klass(1, \"two\");",
+        "replacement": "new module.Klass(1, \"three\");"
+      },
+      {
+        "syntax": "math-operator",
+        "insert": "i + j * 3 - j % 5;",
+        "replacement": "i + j * 2 - j % 4;"
+      },
+      {
+        "syntax": "boolean-operator",
+        "insert": "i || j;",
+        "replacement": "i && j;"
+      },
+      {
+        "syntax": "bitwise-operator",
+        "insert": "i >> j;",
+        "replacement": "i >> k;"
+      },
+      {
+        "syntax": "relational-operator",
+        "insert": "x < y;",
+        "replacement": "x <= y;"
+      },
+      {
+        "syntax": "for-statement",
+        "insert": "for (i = 0, init(); i < 10; i++) { log(i); }",
+        "replacement": "for (i = 0, init(); i < 100; i++) { log(i); }"
+      },
+      {
+        "syntax": "assignment",
+        "insert": "x = 0;",
+        "replacement": "x = 1;"
+      },
+      {
+        "syntax": "member-access-assignment",
+        "insert": "y.x = 0;",
+        "replacement": "y.x = 1;"
+      },
+      {
+        "syntax": "subscript-access-assignment",
+        "insert": "y[\"x\"] = 0;",
+        "replacement": "y[\"x\"] = 1;"
+      },
+      {
+        "syntax": "comma-operator",
+        "insert": "a = 1, b = 2;",
+        "replacement": "c = {d: (3, 4 + 5, 6)};"
+      },
+      {
+        "syntax": "ternary",
+        "insert": "condition ? case1 : case2;",
+        "replacement": "x.y = some.condition ? some.case : some.other.case;"
+      },
+      {
+        "syntax": "type-operator",
+        "insert": "typeof x;",
+        "replacement": "x instanceof String;"
+      },
+      {
+        "syntax": "delete-operator",
+        "insert": "delete thing['prop'];",
+        "replacement": "delete thing.prop"
+      },
+      {
+        "syntax": "void-operator",
+        "insert": "void b()",
+        "replacement": "void c()"
+      },
+      {
+        "syntax": "math-assignment-operator",
+        "insert": "x += 1;",
+        "replacement": "x += 2;"
+      },
+      {
+        "syntax": "for-loop-with-in-statement",
+        "insert": "for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        "replacement": "for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
+      },
+      {
+        "syntax": "for-of-statement",
+        "insert": "for (let item of items) { process(item); };",
+        "replacement": "for (let thing of things) { process(thing); };"
+      },
+      {
+        "syntax": "while-statement",
+        "insert": "while (a) { b(); };",
+        "replacement": "while (b) { a(); };"
+      },
+      {
+        "syntax": "do-while-statement",
+        "insert": "do { console.log(insert); } while (true);",
+        "replacement": "do { console.log(replacement); } while (false);"
+      },
+      {
+        "syntax": "return-statement",
+        "insert": "return 5;",
+        "replacement": "return;"
+      },
+      {
+        "syntax": "var-declaration",
+        "insert": "var x = 1;",
+        "replacement": "var x, y = {}, z;"
+      },
+      {
+        "syntax": "comment",
+        "insert": "// This is a property",
+        "replacement": "/*\n * This is a method\n*/"
+      },
+      {
+        "syntax": "switch-statement",
+        "insert": "switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
+        "replacement": "switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
+      },
+      {
+        "syntax": "throw-statement",
+        "insert": "throw new Error(\"uh oh\");",
+        "replacement": "throw new Error(\"oooooops\");"
+      },
+      {
+        "syntax": "try-statement",
+        "insert": "try { f; } catch { g; } finally { h; };",
+        "replacement": "try { f; } catch { h; } finally { g; };"
+      },
+      {
+        "syntax": "regex",
+        "insert": "/one/g;",
+        "replacement": "/on[^/]afe/gim;"
+      },
+      {
+        "syntax": "if",
+        "insert": "if (x) { log(y); }",
+        "replacement": "if (a.b) { log(c); d; }"
+      },
+      {
+        "syntax": "if-else",
+        "insert": "if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        "replacement": "if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
+      },
+      {
+        "syntax": "template-string",
+        "insert": "`one line`",
+        "replacement": "`multi line`"
+      },
+      {
+        "syntax": "for-in-statement",
+        "insert": "for (thing in things) { thing(); }",
+        "replacement": "for (item in items) { item(); }"
+      },
+      {
+        "syntax": "nested-functions",
+        "insert": "function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        "replacement": "function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
+      },
+      {
+        "syntax": "nested-do-while-in-function",
+        "insert": "function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        "replacement": "function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
+      },
+      {
+        "syntax": "import",
+        "insert": "import defaultMember from \"foo\";\nimport * as name from \"aardvark\";\nimport { member } from \"ant\";\nimport { member1 , member2 } from \"antelope\";\nimport { member1 , member2 as alias2 } from \"ant-eater\";\nimport defaultMember, { member1, member2 as alias2 } from \"anaconda\";\nimport defaultMember, * as name from \"alligator\";\nimport \"arctic-tern\";",
+        "replacement": "import defaultMember from \"babirusa\";\nimport * as otherName from \"baboon\";\nimport { element } from \"badger\";\nimport { element1 , element2 } from \"bald-eagle\";\nimport { element1 , element2 as elementAlias2 } from \"bandicoot\";\nimport defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";\nimport defaultMember, * as element from \"barbet\";\nimport \"basilisk\";"
+      },
+      {
+        "syntax": "export",
+        "insert": "export { name1, name2, name3, nameN };\nexport { variable1 as name1, variable2 as name2, nameN };\nexport let name1, name2, nameN;\nexport let name1 = value1, name2 = value2, name3, nameN;\nexport default namedFunction;\nexport default function () { };\nexport default function name1() { };\nexport { name1 as default };\nexport * from 'foo';\nexport { name1, name2, nameN } from 'foo';\nexport { import1 as name1, import2 as name2, nameN } from 'bar';",
+        "replacement": "export { name4, name5, name6, nameZ };\nexport { variable2 as name2, variable3 as name3, nameY };\nexport let name3, name4, nameT;\nexport let name2 = value2, name3 = value3, name4, nameO;\nexport default otherNamedFunction;\nexport default function newName1() {};\nexport default function () {};\nexport { name2 as statement };\nexport * from 'baz';\nexport { name7, name8, nameP } from 'buzz';\nexport { import6 as name6, import7 as name7, nameB } from 'fizz';"
+      },
+      {
+        "syntax": "break",
+        "insert": "break;",
+        "replacement": "continue;",
+        "template": "for (i = 0; i < 10; i++) { if (i === 4) { {0} }; i }"
+      },
+      {
+        "syntax": "continue",
+        "insert": "continue;",
+        "replacement": "break;",
+        "template": "for (i = 0; i < 10; i++) { if (i === 4) { {0} }; i }"
+      },
+      {
+        "syntax": "yield",
+        "insert": "yield i;",
+        "replacement": "yield i++;",
+        "template": "function* foo(){ var index = 0; {0} }"
+      }
+    ]
+  }
+]

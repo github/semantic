@@ -1,0 +1,484 @@
+[{
+    "testCaseDescription": "ruby-unless-insert-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index e69de29..dd4d758 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -0,0 +1,5 @@",
+        "+unless foo",
+        "+  bar",
+        "+else",
+        "+  bat",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "357b28a188fc8984427a1ae219edd194329ebebc..f6596cf98d549a1e3e2ac25a77362d482b476458"
+}
+,{
+    "testCaseDescription": "ruby-unless-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' unless statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' unless statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index dd4d758..6e36f98 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,3 +1,12 @@",
+        "+unless x",
+        "+end",
+        "+unless y then",
+        "+end",
+        "+unless foo",
+        "+  bar",
+        "+else",
+        "+  bat",
+        "+end",
+        " unless foo",
+        "   bar",
+        " else"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f6596cf98d549a1e3e2ac25a77362d482b476458..0796c4db9a02c9d509fba5bb5578579c26ca208e"
+}
+,{
+    "testCaseDescription": "ruby-unless-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the foo unless statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier in the foo unless statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bat' identifier in the foo unless statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 6e36f98..39ae1f8 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,6 +1,7 @@",
+        "-unless x",
+        "-end",
+        "-unless y then",
+        "+unless foo",
+        "+  bar",
+        "+else",
+        "+  bat",
+        " end",
+        " unless foo",
+        "   bar"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0796c4db9a02c9d509fba5bb5578579c26ca208e..8d26795e47a5c15f2ee58d7c538bab796e665cc0"
+}
+,{
+    "testCaseDescription": "ruby-unless-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the x unless statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier in the x unless statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bat' identifier in the x unless statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 39ae1f8..6e36f98 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,7 +1,6 @@",
+        "-unless foo",
+        "-  bar",
+        "-else",
+        "-  bat",
+        "+unless x",
+        "+end",
+        "+unless y then",
+        " end",
+        " unless foo",
+        "   bar"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "8d26795e47a5c15f2ee58d7c538bab796e665cc0..e01bba435089dd562c2d4d2c1df933bbf9dca394"
+}
+,{
+    "testCaseDescription": "ruby-unless-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 6e36f98..5efe10d 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,14 +1,9 @@",
+        "-unless x",
+        "-end",
+        "-unless y then",
+        "-end",
+        " unless foo",
+        "   bar",
+        " else",
+        "   bat",
+        " end",
+        "-unless foo",
+        "-  bar",
+        "-else",
+        "-  bat",
+        "+unless x",
+        "+end",
+        "+unless y then",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e01bba435089dd562c2d4d2c1df933bbf9dca394..a58cb96220ee18dec530a7fef4e48770f71fb7ad"
+}
+,{
+    "testCaseDescription": "ruby-unless-delete-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 5efe10d..a38714d 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,8 +1,3 @@",
+        "-unless foo",
+        "-  bar",
+        "-else",
+        "-  bat",
+        "-end",
+        " unless x",
+        " end",
+        " unless y then"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "a58cb96220ee18dec530a7fef4e48770f71fb7ad..1400142fb553734a8696c28d12c1bb119942d82d"
+}
+,{
+    "testCaseDescription": "ruby-unless-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' unless statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index a38714d..e69de29 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,4 +0,0 @@",
+        "-unless x",
+        "-end",
+        "-unless y then",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1400142fb553734a8696c28d12c1bb119942d82d..83f860d780243e3aae7889d9d0c3d7452d096ea9"
+}]

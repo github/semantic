@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-for-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index e69de29b..2f51258e 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -0,0 +1 @@",
+        "+for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c320f90e127c691529e4c298d3ff3969a0483c8e..119df29f1b8c4152c752d221354c7143086f0ba9"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 2f51258e..095241f1 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1 +1,3 @@",
+        "+for (i = 0, init(); i < 100; i++) { log(i); }",
+        "+for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "119df29f1b8c4152c752d221354c7143086f0ba9..d125a35865450614b4947f6e64be6d447f3d00b9"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '100' with '10'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 095241f1..9b0e26d4 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-for (i = 0, init(); i < 100; i++) { log(i); }",
+        "+for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d125a35865450614b4947f6e64be6d447f3d00b9..d6241bcabe282470e4224aad942ff060ca01eecf"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '10' with '100'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 9b0e26d4..095241f1 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-for (i = 0, init(); i < 10; i++) { log(i); }",
+        "+for (i = 0, init(); i < 100; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d6241bcabe282470e4224aad942ff060ca01eecf..a42953f4ddb4d9c4db7e33c68117f329ac6e08b9"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 095241f1..39af699a 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-for (i = 0, init(); i < 100; i++) { log(i); }",
+        "-for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }",
+        "+for (i = 0, init(); i < 100; i++) { log(i); }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a42953f4ddb4d9c4db7e33c68117f329ac6e08b9..054aae5c741bcc075e61263fab2004c700f4f681"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 39af699a..de8ae87b 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,2 +1 @@",
+        "-for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 100; i++) { log(i); }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "054aae5c741bcc075e61263fab2004c700f4f681..168c29c5108a6a63f29746df65a3886bb8489f94"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index de8ae87b..e69de29b 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1 +0,0 @@",
+        "-for (i = 0, init(); i < 100; i++) { log(i); }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "168c29c5108a6a63f29746df65a3886bb8489f94..ae3598b402258260e941e7a876918f8037bf887d"
+}]

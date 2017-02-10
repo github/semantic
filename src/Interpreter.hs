@@ -1,79 +1,113 @@
-module Interpreter (interpret, Comparable, diffTerms) where
+{-# LANGUAGE RankNTypes #-}
+module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
-import Category
-import Control.Arrow
-import Control.Comonad.Cofree
-import Control.Monad.Free
-import Data.Copointed
+import Data.Align.Generic
+import Data.Functor.Foldable
 import Data.Functor.Both
-import qualified Data.OrderedMap as Map
-import qualified Data.List as List
-import Data.List ((\\))
-import Data.Maybe
-import Data.OrderedMap ((!))
+import Data.RandomWalkSimilarity as RWS
+import Data.Record
+import Data.These
 import Diff
-import Operation
+import Info
 import Patch
-import Prelude hiding (lookup)
+import Prologue hiding (lookup)
 import SES
-import Syntax
+import Syntax as S
 import Term
 
 -- | Returns whether two terms are comparable
-type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
+type Comparable f annotation = Term f annotation -> Term f annotation -> Bool
 
--- | Diff two terms, given the default Categorizable.comparable function.
-diffTerms :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> Term a annotation -> Diff a annotation
-diffTerms = interpret comparable
+-- | Constructs a diff from the CofreeF containing its annotation and syntax. This function has the opportunity to, for example, cache properties in the annotation.
+type DiffConstructor f annotation = TermF f (Both annotation) (Diff f annotation) -> Diff f annotation
 
--- | Diff two terms, given a function that determines whether two terms can be compared.
-interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
-interpret comparable a b = fromMaybe (Pure $ Replace a b) $ constructAndRun comparable a b
+-- | Diff two terms recursively, given functions characterizing the diffing.
+diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+  => DiffConstructor (Syntax leaf) (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
+  -> Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
+  -> SES.Cost (SyntaxDiff leaf fields) -- ^ A function to compute the cost of a given diff node.
+  -> SyntaxTerm leaf fields -- ^ A term representing the old state.
+  -> SyntaxTerm leaf fields -- ^ A term representing the new state.
+  -> SyntaxDiff leaf fields
+diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
--- | A hylomorphism. Given an `a`, unfold and then refold into a `b`.
-hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
-hylo down up a = down annotation $ hylo down up <$> syntax where
-  (annotation, syntax) = up a
+-- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
+diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+                    => DiffConstructor (Syntax leaf) (Record fields)
+                    -> Comparable (Syntax leaf) (Record fields)
+                    -> SES.Cost (SyntaxDiff leaf fields)
+                    -> SyntaxTerm leaf fields
+                    -> SyntaxTerm leaf fields
+                    -> Maybe (SyntaxDiff leaf fields)
+diffComparableTerms construct comparable cost = recur
+  where recur a b
+          | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
+          | comparable a b = runAlgorithm construct recur cost (Just <$> algorithmWithTerms construct a b)
+          | otherwise = Nothing
 
--- | Constructs an algorithm and runs it
-constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun _ a b | a == b = hylo (curry $ Free . uncurry Annotated) (copoint &&& unwrap) <$> zipTerms a b where
+-- | Construct an algorithm to diff a pair of terms.
+algorithmWithTerms :: Applicative diff
+                   => (TermF (Syntax leaf) (Both a) (diff (Patch (Term (Syntax leaf) a))) -> diff (Patch (Term (Syntax leaf) a)))
+                   -> Term (Syntax leaf) a
+                   -> Term (Syntax leaf) a
+                   -> Algorithm (Term (Syntax leaf) a) (diff (Patch (Term (Syntax leaf) a))) (diff (Patch (Term (Syntax leaf) a)))
+algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
+  (Indexed a, Indexed b) ->
+    Just $ Indexed <$> bySimilarity a b
+  (S.Module idA a, S.Module idB b) ->
+    Just $ S.Module <$> recursively idA idB <*> bySimilarity a b
+  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> Just $
+    S.FunctionCall <$> recursively identifierA identifierB
+                   <*> bySimilarity argsA argsB
+  (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
+    S.Switch <$> bySimilarity exprA exprB
+             <*> bySimilarity casesA casesB
+  (S.Object tyA a, S.Object tyB b) -> Just $
+    S.Object <$> maybeRecursively tyA tyB
+             <*> bySimilarity a b
+  (Commented commentsA a, Commented commentsB b) -> Just $
+    Commented <$> bySimilarity commentsA commentsB
+              <*> maybeRecursively a b
+  (Array tyA a, Array tyB b) -> Just $
+    Array <$> maybeRecursively tyA tyB
+          <*> bySimilarity a b
+  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> Just $
+    S.Class <$> recursively identifierA identifierB
+            <*> maybeRecursively paramsA paramsB
+            <*> bySimilarity expressionsA expressionsB
+  (S.Method identifierA receiverA tyA paramsA expressionsA, S.Method identifierB receiverB tyB paramsB expressionsB) -> Just $
+    S.Method <$> recursively identifierA identifierB
+             <*> maybeRecursively receiverA receiverB
+             <*> maybeRecursively tyA tyB
+             <*> bySimilarity paramsA paramsB
+             <*> bySimilarity expressionsA expressionsB
+  (S.Function idA paramsA tyA bodyA, S.Function idB paramsB tyB bodyB) -> Just $
+    S.Function <$> recursively idA idB
+               <*> bySimilarity paramsA paramsB
+               <*> maybeRecursively tyA tyB
+               <*> bySimilarity bodyA bodyB
+  _ -> Nothing
+  where
+    annotate = construct . (both (extract t1) (extract t2) :<)
 
-constructAndRun comparable a b | not $ comparable a b = Nothing
+    maybeRecursively :: Applicative f => Maybe a -> Maybe a -> Algorithm a (f (Patch a)) (Maybe (f (Patch a)))
+    maybeRecursively a b = sequenceA $ case (a, b) of
+      (Just a, Just b) -> Just $ recursively a b
+      (Nothing, Just b) -> Just $ pure (inserting b)
+      (Just a, Nothing) -> Just $ pure (deleting a)
+      (Nothing, Nothing) -> Nothing
 
-constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
-  run comparable $ algorithm a b where
-    algorithm (Indexed a') (Indexed b') = Free $ ByIndex a' b' (annotate . Indexed)
-    algorithm (Keyed a') (Keyed b') = Free $ ByKey a' b' (annotate . Keyed)
-    algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
-    algorithm a' b' = Free $ Recursive (annotation1 :< a') (annotation2 :< b') Pure
-    annotate = Pure . Free . Annotated (Both (annotation1, annotation2))
-
--- | Runs the diff algorithm
-run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
-run _ (Pure diff) = Just diff
-
-run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run comparable . f $ recur a b where
-  recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (interpret comparable) a' b'
-  recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (interpret comparable) a' b'
-  recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys
-    where
-      bKeys = Map.keys b'
-      repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = interpret comparable (x ! key) (y ! key)
-  recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
-
-  annotate = Free . Annotated (Both (annotation1, annotation2))
-
-run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
-  byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
-  toKeyValue key | List.elem key deleted = (key, Pure . Delete $ a ! key)
-  toKeyValue key | List.elem key inserted = (key, Pure . Insert $ b ! key)
-  toKeyValue key = (key, interpret comparable (a ! key) (b ! key))
-  aKeys = Map.keys a
-  bKeys = Map.keys b
-  deleted = aKeys \\ bKeys
-  inserted = bKeys \\ aKeys
-
-run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) diffCost a b
+-- | Run an algorithm, given functions characterizing the evaluation.
+runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)), Traversable f, HasField fields (Maybe FeatureVector))
+  => (CofreeF f (Both (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to wrap up & possibly annotate every produced diff.
+  -> (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
+  -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
+  -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
+  -> a
+runAlgorithm construct recur cost = iterAp $ \case
+  Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
+    aligned <- galign (unwrap a) (unwrap b)
+    traverse (these (Just . deleting) (Just . inserting) recur) aligned)
+  ByIndex as bs f -> f (ses recur cost as bs)
+  BySimilarity as bs f -> f (rws recur as bs)

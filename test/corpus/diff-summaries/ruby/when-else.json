@@ -1,0 +1,274 @@
+[{
+    "testCaseDescription": "ruby-when-else-setup-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index e69de29..3c8eff2 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -0,0 +1,4 @@",
+        "+case foo",
+        "+when bar",
+        "+  baz",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "cf6833ca26f4455afe60e15692ddae7fd4ff5e0c..da33ffa25ccabeae85270041fcc5b4fc6a995bba"
+}
+,{
+    "testCaseDescription": "ruby-when-else-insert-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added an else block in the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index 3c8eff2..fb2be92 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -1,4 +1,5 @@",
+        " case foo",
+        " when bar",
+        "   baz",
+        "+else",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "da33ffa25ccabeae85270041fcc5b4fc6a995bba..54dbbb50ec36d384e2b7a56553eb2de63ca51fc7"
+}
+,{
+    "testCaseDescription": "ruby-when-else-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced an else block with the 'qoz' identifier in the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index fb2be92..028bb59 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -2,4 +2,5 @@ case foo",
+        " when bar",
+        "   baz",
+        " else",
+        "+  qoz",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "54dbbb50ec36d384e2b7a56553eb2de63ca51fc7..fe2530c37ccc44a2e20aad7a5ade675bc71eff5e"
+}
+,{
+    "testCaseDescription": "ruby-when-else-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'qoz' identifier with an else block in the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index 028bb59..fb2be92 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -2,5 +2,4 @@ case foo",
+        " when bar",
+        "   baz",
+        " else",
+        "-  qoz",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "fe2530c37ccc44a2e20aad7a5ade675bc71eff5e..1e98f00ead1893edd7a2d8de1780c55f36c3a30e"
+}
+,{
+    "testCaseDescription": "ruby-when-else-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an else block in the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index fb2be92..3c8eff2 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -1,5 +1,4 @@",
+        " case foo",
+        " when bar",
+        "   baz",
+        "-else",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1e98f00ead1893edd7a2d8de1780c55f36c3a30e..010837029e2d69ca5f6b2cc7f814cf276ce76880"
+}
+,{
+    "testCaseDescription": "ruby-when-else-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index 3c8eff2..e69de29 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -1,4 +0,0 @@",
+        "-case foo",
+        "-when bar",
+        "-  baz",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "010837029e2d69ca5f6b2cc7f814cf276ce76880..03a751d043f1bc44ab9eae085bfde59af2495a68"
+}]

@@ -1,0 +1,527 @@
+[{
+    "testCaseDescription": "javascript-var-declaration-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "patch": [
+        "diff --git a/var-declaration.js b/var-declaration.js",
+        "index e69de29b..b506100a 100644",
+        "--- a/var-declaration.js",
+        "+++ b/var-declaration.js",
+        "@@ -0,0 +1 @@",
+        "+var x = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "074b11388910f403aab4a975e06626792b23aca4..a702ccd30aed98e5ff899c18985dec20177ba75a"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "patch": [
+        "diff --git a/var-declaration.js b/var-declaration.js",
+        "index b506100a..b08ebfb5 100644",
+        "--- a/var-declaration.js",
+        "+++ b/var-declaration.js",
+        "@@ -1 +1,3 @@",
+        "+var x, y = {}, z;",
+        "+var x = 1;",
+        " var x = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a702ccd30aed98e5ff899c18985dec20177ba75a..dedf9eb86128863958baa2c719eee2c2365fd38f"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "patch": [
+        "diff --git a/var-declaration.js b/var-declaration.js",
+        "index b08ebfb5..adc261e0 100644",
+        "--- a/var-declaration.js",
+        "+++ b/var-declaration.js",
+        "@@ -1,3 +1,3 @@",
+        "-var x, y = {}, z;",
+        "+var x = 1;",
+        " var x = 1;",
+        " var x = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "dedf9eb86128863958baa2c719eee2c2365fd38f..3ac59a2a32659d91ac268d9fdb9128290ef16cfc"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "patch": [
+        "diff --git a/var-declaration.js b/var-declaration.js",
+        "index adc261e0..b08ebfb5 100644",
+        "--- a/var-declaration.js",
+        "+++ b/var-declaration.js",
+        "@@ -1,3 +1,3 @@",
+        "-var x = 1;",
+        "+var x, y = {}, z;",
+        " var x = 1;",
+        " var x = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3ac59a2a32659d91ac268d9fdb9128290ef16cfc..8d6a28ccf03158a8e6340a93d09c47328177d318"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "patch": [
+        "diff --git a/var-declaration.js b/var-declaration.js",
+        "index b08ebfb5..514f7c48 100644",
+        "--- a/var-declaration.js",
+        "+++ b/var-declaration.js",
+        "@@ -1,3 +1,2 @@",
+        "-var x, y = {}, z;",
+        "-var x = 1;",
+        " var x = 1;",
+        "+var x, y = {}, z;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8d6a28ccf03158a8e6340a93d09c47328177d318..898d568a47e9c92b96c697433e83aaecbfc571ee"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "patch": [
+        "diff --git a/var-declaration.js b/var-declaration.js",
+        "index 514f7c48..9fc69e2f 100644",
+        "--- a/var-declaration.js",
+        "+++ b/var-declaration.js",
+        "@@ -1,2 +1 @@",
+        "-var x = 1;",
+        " var x, y = {}, z;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "898d568a47e9c92b96c697433e83aaecbfc571ee..8e6e21fcf3109e0e23aaeadbabaa26c5b6b65970"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "patch": [
+        "diff --git a/var-declaration.js b/var-declaration.js",
+        "index 9fc69e2f..e69de29b 100644",
+        "--- a/var-declaration.js",
+        "+++ b/var-declaration.js",
+        "@@ -1 +0,0 @@",
+        "-var x, y = {}, z;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8e6e21fcf3109e0e23aaeadbabaa26c5b6b65970..b2dce4d2365759cf652927b76a86ca88c71cb3ad"
+}]

@@ -1,0 +1,467 @@
+[{
+    "testCaseDescription": "javascript-named-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'myFunction' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index e69de29b..94b19f8e 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -0,0 +1 @@",
+        "+function myFunction(arg1, arg2) { arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "15e84394f61437f6604f6255ce0c5d818ac3115f..6ea0687fb3c4a13e7c6c685859d2ef572a7cf2a4"
+}
+,{
+    "testCaseDescription": "javascript-named-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'anotherFunction' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'myFunction' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index 94b19f8e..cb766a0e 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1 +1,3 @@",
+        "+function anotherFunction() { return false; };",
+        "+function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "6ea0687fb3c4a13e7c6c685859d2ef572a7cf2a4..65845b7ccc455c2a3e7ec8c12c7c7715176e6132"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'anotherFunction' identifier with the 'myFunction' identifier in the myFunction function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                21
+                            ],
+                            "end": [
+                                1,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'arg1' identifier in the myFunction function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                27
+                            ],
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'arg2' identifier in the myFunction function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'arg2' identifier in the myFunction function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                30
+                            ],
+                            "end": [
+                                1,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' return statement in the myFunction function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index cb766a0e..c9cff077 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function anotherFunction() { return false; };",
+        "+function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "65845b7ccc455c2a3e7ec8c12c7c7715176e6132..3ce6b2ab8b35de5577106e7225b24b0cf9578f35"
+}
+,{
+    "testCaseDescription": "javascript-named-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'myFunction' identifier with the 'anotherFunction' identifier in the anotherFunction function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                21
+                            ],
+                            "end": [
+                                1,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'arg1' identifier in the anotherFunction function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                27
+                            ],
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'arg2' identifier in the anotherFunction function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                30
+                            ],
+                            "end": [
+                                1,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' return statement in the anotherFunction function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'arg2' identifier in the anotherFunction function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index c9cff077..cb766a0e 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function myFunction(arg1, arg2) { arg2; };",
+        "+function anotherFunction() { return false; };",
+        " function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3ce6b2ab8b35de5577106e7225b24b0cf9578f35..a9a7b0743ebf205eff6b6462782fb52db98f1b16"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'anotherFunction' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'myFunction' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'anotherFunction' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index cb766a0e..148bcc77 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,3 +1,2 @@",
+        "-function anotherFunction() { return false; };",
+        "-function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };",
+        "+function anotherFunction() { return false; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a9a7b0743ebf205eff6b6462782fb52db98f1b16..db026024213543071e836f01b6a09784e5d35237"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'myFunction' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index 148bcc77..80e11b02 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,2 +1 @@",
+        "-function myFunction(arg1, arg2) { arg2; };",
+        " function anotherFunction() { return false; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "db026024213543071e836f01b6a09784e5d35237..74e974f29677930c7734e2d5735cc2b42bf39214"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'anotherFunction' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index 80e11b02..e69de29b 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1 +0,0 @@",
+        "-function anotherFunction() { return false; };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "74e974f29677930c7734e2d5735cc2b42bf39214..545e1f49b6e82b725cda79df3dea34555ffa1d7c"
+}]

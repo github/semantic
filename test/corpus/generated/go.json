@@ -1,0 +1,345 @@
+[
+  {
+    "repoUrl": "https://github.com/diff-summaries/go.git",
+    "language": "go",
+    "fileExt": ".go",
+    "syntaxes": [
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "single-import-declarations",
+        "insert": "import \"net/http\"\nimport . \"some/dsl\"\nimport alias \"some/package\"",
+        "replacement": "import \"foo/bar\"\nimport . \"types/dsl\"\nimport alias \"awesome/packages\""
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "grouped-import-declarations",
+        "insert": "import (\n\"net/http\"\n  . \"some/dsl\"\n  alias \"some/package\"\n)",
+        "replacement": "import (\n\"net/socket\"\n  . \"types/dsl\"\n  alias \"awesome/package\"\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "int-literals",
+        "insert": "const (\na = 1, b = 2, c = 3\n)",
+        "replacement": "const (\na = 4, b = 5, c = 6\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "assignment-statements",
+        "insert": "a = 1\nb, c += 2, 3\nd *= 3\ne += 1",
+        "replacement": "x = 1\ny, c += 2, 3\nz *= 3\nh += 1"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "if-statements",
+        "insert": "if a() {\nb()\n}\nif a := b(); c {\nd()\n}\nif a() {\nb()\n} else {\nc()\n}",
+        "replacement": "if x() {\nb()\n}\nif y := b(); c {\nd()\n}\nif z() {\nb()\n} else {\nc()\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "short-var-declarations",
+        "insert": "a, b := 1, 2",
+        "replacement": "x, y := 3, 4"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "call-expressions",
+        "insert": "x(b, c...)\ny(b, c,)\nz(b,c...,)",
+        "replacement": "a(b, c...)\nb(b, c,)\nc(b,c...,)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "function-literals",
+        "insert": "const s1 = func(s string) (int, int) {\nreturn 1, 2\n}",
+        "replacement": "const s1 = func(b int) (string, string) {\nreturn 1, 2\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "const-declarations-without-types",
+        "insert": "const zero = 0",
+        "replacement": "const one, two = 1, 2"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "const-declarations-with-types",
+        "insert": "const zero int = 0",
+        "replacement": "const one, two uiint64 = 1, 2"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "var-declarations-without-types",
+        "insert": "var zero = 0",
+        "replacement": "var one, two = 1, 2"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "var-declarations-with-types",
+        "insert": "var zero int = 0\nvar one, two uint64 = 1, 2",
+        "replacement": "var a int = 0\n var b, c uint64 = 1, 2"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "var-declarations-with-no-expressions",
+        "insert": "var zero int\nvar one, two uint64",
+        "replacement": "var a int\nvar b, c uint64"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "grouped-var-declarations",
+        "insert": "var (\nzero = 0\none = 1\n)",
+        "replacement": "var (\na = 0\nb = 1\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "switch-statements",
+        "insert": "switch { case x < y: f1()\ncase x < z: g()\ncase x == 4: h()\n}",
+        "replacement": "switch { case a < b: f1()\ncase c < d: g()\ncase e == 4: f()\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "type-switch-statements",
+        "insert": "switch e.(type) {\n  case []Person:\n    a()\n  case *Dog:\n    break\n}",
+        "replacement": "switch b.(type) {\n  case []Person:\n    a()\n  case *Dog:\n    break\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "select-statements",
+        "insert": "select {\n  case x := <-c:\n    println(x)\n  case y <- c:\n    println(5)\n  case <-time.After(1):\n    println(6)\n  default:\n    return\n}",
+        "replacement": "select {\n  case a := <-c:\n    println(x)\n  case b <- c:\n    println(5)\n  case <-time.After(2):\n    println(6)\n  default:\n    return\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "go-and-defer-statements",
+        "insert": "defer x.y()\ngo x.y()",
+        "replacement": "defer a.b()\ngo c.d()"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "label-statements",
+        "insert": "{\n  insert_label:\n}",
+        "replacement": "{\n  replacement_label:\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "for-statements",
+        "insert": " for {\na()\ngoto loop\n}\nfor i := 0; i < 5; i++ {\na()\nbreak loop\n}\nfor ; i < 10; i++ {\na()\ncontinue loop2\n}\nfor ;; {\na()\ncontinue\n}\nfor x := range y {\na(x)\nbreak\n}",
+        "replacement": " for ;; {\na()\ngoto loop\n}\nfor x := range y {\na()\nbreak loop\n}\nfor ;; {\na()\ncontinue loop2\n}\nfor ; i < 10; i++ {\na()\ncontinue\n}\nfor  {\na(x)\nbreak\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "function-declarations",
+        "insert": "func f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}",
+        "replacement": "func fa() {}\nfunc fb(a int, b, c, d string) int {}\nfunc fc() (int, error) {}\nfunc fd() (result int, err error) {}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n\n}\n\n{0}",
+        "syntax": "single-line-function-declarations",
+        "insert": "func f1() { a() }\nfunc f2() { a(); b() }\nfunc f3() { a(); b(); }",
+        "replacement": "func g1() { a() }\nfunc g2() { a(); b() }\nfunc g3() { a(); b(); }"
+      },
+      {
+        "syntax": "variadic-function-declarations",
+        "template": "package main\n\nfunc main() {\n\n}\n{0}",
+        "insert": "func f1(a ...*int) {}\nfunc f2(...int) {}\nfunc f3(a, ...bool) {}",
+        "replacement": "func g1(a ...*int) {}\nfunc g2(...int) {}\nfunc g3(a, ...bool) {}"
+      },
+      {
+        "template": "package main\n\nfunc main() {}\n\n{0}",
+        "syntax": "method-declarations",
+        "insert": "func (self Person) Equals(other Person) bool {}",
+        "replacement": "func (self Num) Equals(other Num) bool {}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "type-declarations",
+        "insert": "type a b\ntype (\n  a b\n  c d\n)",
+        "replacement": "type x y\ntype (\n  x y\n  e f\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "const-with-implicit-values",
+        "insert": "const (\n zero = iota\n one\n two\n )",
+        "replacement": "const (\n a = iota\n b\n c\n )"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "constructors",
+        "insert": "make(chan<- int)\nmake(chan<- int, (new - old))\nmake(chan<- int, 5, 10)\n new(map[string]string)",
+        "replacement": "make(chan<- string)\nmake(chan<- string, (new - old))\nmake(chan<- string, 7, 11)\n new(map[int]int)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "selector-expressions",
+        "insert": "a.b.c()",
+        "replacement": "x.y.z()"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "indexing-expressions",
+        "insert": "a[1]\n b[:]\n c[1:]\n d[1:2]\n e[:2:3]\n f[1:2:3]",
+        "replacement": "z[:2]\n y[:1]\n x[1:]\n d[1:2]\n e[:2:3]\n f[1:2:3]"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "type-assertion-expressions",
+        "insert": "x.(z.Person)",
+        "replacement": "b.(c.Dog)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "type-conversion-expressions",
+        "insert": "[]a.b(c.d)\n ([]a.b)(c.d)\n e.f(g)\n (e.f)(g)",
+        "replacement": "[]x.y(z.e)\n ([]f.g)(h.i)\n j.k(l)\n (m.n)(o)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "unary-expressions",
+        "insert": "!<-a\n*foo()",
+        "replacement": "!<-b\n*bar()"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "float-literals",
+        "insert": "f1 = 1.5\nf2 = 1.5e100\nf3 = 1.5e+50\nf4 = 1.5e-5\nf5 = .5e-50",
+        "replacement": "f1 = 2.6\nf2 = 2.6e211\nf3 = 2.6e+60\nf4 = 2.6e-7\nf5 = .6e-60"
+      },
+      {
+        "template": "package main\n{0}",
+        "syntax": "rune-literals",
+        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘'\n)",
+        "replacement": "const (\n  a = '©'\n  b = '©'\n  c = '©'\n  d = '©'\n  e = '©'\n  f = '©'\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "imaginary-literals",
+        "insert": "const (\na = 01i\nb = 1.e+100i\n)",
+        "replacement": "const (\na = 02i\nb = 1.e+103i\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "string-literals",
+        "insert": "const (\na = \"0\"\nb = \"hello world\"\n)",
+        "replacement": "const (\na = \"2\"\nb = \"hi\"\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "slice-literals",
+        "insert": "const s1 = []string{}\nconst s2 = []string{\"hi\"}\nconst s3 = []string{\n\"hi\",\n \"hello\",\n}",
+        "replacement": "const s1 = []string{\"sup\"}\nconst s2 = []string{\"hello\"}\nconst s3 = []string{\n\"bar\",\n \"baz\",\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "array-with-implicit-length",
+        "insert": "const a1 = [...]int{1, 2, 3}",
+        "replacement": "const a1 = [...]int{4,5,6}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "map-literals",
+        "insert": "const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n}",
+        "replacement": "const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "struct-literals",
+        "insert": "const s1 = Person{\nname: \"Frank\",\nAge: \"5 months\",\n}\nconst s2 = struct{i int;}{i: 5}\nconst s3 = time.Time{}",
+        "replacement": "const s1 = Dog{\nname: \"Frank\",\nAge: \"5 months\",\n}\nconst s2 = struct{i float;}{j: 6}\nconst s3 = time.Month{}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "send-statements",
+        "insert": "foo <- 5",
+        "replacement": "bar <- 6"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "increment-decrement-statements",
+        "insert": "i++\nj--",
+        "replacement": "foo++\nx++"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "qualified-types",
+        "insert": "type a b.c",
+        "replacement": "type x y.z"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "array-types",
+        "insert": "type a [2+2]x",
+        "replacement": "type a [1+1]y"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "slice-types",
+        "insert": "type a []b\ntype c [][]d",
+        "replacement": "type a [][]p\ntype c []y"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "struct-types",
+        "insert": "type s1 struct {}\ntype s2 struct { Person }\ntype s3 struct {\nf, g int\n}\ntype s4 struct {\np.s1\n h int `json:\"h\"`\n}",
+        "replacement": "type t1 struct {}\ntype t2 struct { Person }\ntype t3 struct {\nf, g int\n}\ntype t4 struct {\np.s1\n h int `json:\"h\"`\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "interface-types",
+        "insert": "type i1 interface {}\ntype i2 interface { io.Reader }\ntype i3 interface {\ni1\nio.Reader\n SomeMethod(s string) error\n}",
+        "replacement": "type j1 interface {}\ntype j2 interface { io.Reader }\ntype j3 interface {\ni1\nio.Reader\n SomeMethod(s string) error\n}"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "map-types",
+        "insert": "type m1 map[string]error",
+        "replacement": "type m1 map[int]error"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "pointer-types",
+        "insert": "type (\np1 *string\np2 **p1\n)",
+        "replacement": "type (\np1 *int\np2 **p3\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "channel-types",
+        "insert": "type (\nc1 chan<- chan int\nc2 chan<- chan<- struct{}\nc3 chan<- <-chan int\n)",
+        "replacement": "type (\nc2 chan<- chan string\nc3 chan<- chan<- struct{}\nc4 chan<- <-chan string\n)"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "function-types",
+        "insert": "type (\na func(int) int\nb func(int, string) (bool, error)\n)",
+        "replacement": "type (\nx func(string) string\ny func(string, int) (chan, error)\n)"
+      },
+      {
+          "template": "package main\n\nfunc main() {\n}\n\n{0}",
+          "syntax": "parameter-declarations-with-types",
+          "insert": "func foo(a int, b string) {\n}",
+          "replacement": "func foo(x string, y uint64) {\n}"
+      },
+      {
+          "template": "package main\n\nfunc main() {\n{0}\n}",
+          "syntax": "case-statements",
+          "insert": "switch { }",
+          "replacement": "switch { case foo: f1() }"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n type s3 struct {{0}} \n}",
+        "syntax": "struct-field-declarations",
+        "insert": "\n  g int\n",
+        "replacement": "\n  h, i int\n"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "comment",
+        "insert": "// this is a comment",
+        "replacement": "/*\nthis is a block comment\n*/"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "modifying-struct-fields",
+        "insert": "ctx := &uploadContext{\n   Remote: remote\n}",
+        "replacement": "ctx := &uploadContext{\n   trackedLocksMu: new(sync.Mutex)\n}"
+      }
+    ]
+  }
+]

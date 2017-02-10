@@ -1,0 +1,401 @@
+[{
+    "testCaseDescription": "javascript-objects-with-methods-insert-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ add(a, b) }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index e69de29b..7421e188 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -0,0 +1 @@",
+        "+{ add(a, b) { return a + b; } };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "4dbddbfa6c4e016d944aa6ee8ef1acfb4be38af8..14c10158adabf9babb425807cc5a87091d13a4e2"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ subtract(a, b) }' object"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ add(a, b) }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 7421e188..59eb3a3d 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1 +1,3 @@",
+        "+{ subtract(a, b) { return a - b; } };",
+        "+{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "14c10158adabf9babb425807cc5a87091d13a4e2..04bc2ca976b3ca9a5e587d32ea23875d9f906d90"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the 'add(a, b)' method"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    22
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a - b' math operator with the 'a + b' math operator in the 'add(a, b)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 59eb3a3d..05689b17 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ subtract(a, b) { return a - b; } };",
+        "+{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "04bc2ca976b3ca9a5e587d32ea23875d9f906d90..66994fec008c1ea8dbacf93bcc5f9c6bcd929ce7"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the 'subtract(a, b)' method"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    22
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a + b' math operator with the 'a - b' math operator in the 'subtract(a, b)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 05689b17..59eb3a3d 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ add(a, b) { return a + b; } };",
+        "+{ subtract(a, b) { return a - b; } };",
+        " { add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "66994fec008c1ea8dbacf93bcc5f9c6bcd929ce7..8e236c7111b01c0960041bf367169f651c043c8a"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ subtract(a, b) }' object"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ add(a, b) }' object"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ subtract(a, b) }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 59eb3a3d..29d39987 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,2 @@",
+        "-{ subtract(a, b) { return a - b; } };",
+        "-{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };",
+        "+{ subtract(a, b) { return a - b; } };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8e236c7111b01c0960041bf367169f651c043c8a..3c77bf5f786cc17625ea311ab13bb5fc49256203"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ add(a, b) }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 29d39987..80ad7f08 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,2 +1 @@",
+        "-{ add(a, b) { return a + b; } };",
+        " { subtract(a, b) { return a - b; } };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "3c77bf5f786cc17625ea311ab13bb5fc49256203..0ef207c1ce4c4f71769deb282d5e2269b9ab4bae"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ subtract(a, b) }' object"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 80ad7f08..e69de29b 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1 +0,0 @@",
+        "-{ subtract(a, b) { return a - b; } };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0ef207c1ce4c4f71769deb282d5e2269b9ab4bae..36a730d16dd73b6484407e64d7262f2b1d2260d7"
+}]

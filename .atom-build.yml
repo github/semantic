@@ -1,15 +1,11 @@
 # Build configuration for https://atom.io/packages/build
-cmd: stack build semantic-diff
+cmd: stack build
 name: semantic-diff
 env:
   PATH: ~/.local/bin:~/Developer/Tools:~/Library/Haskell/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 targets:
   test:
-    cmd: stack build :semantic-diff-test
+    cmd: stack build :integration-test
     keymap: cmd-u
-  semantic-difftool:
-    cmd: stack build :semantic-difftool
-  semantic-git-diff:
-    cmd: stack build :semantic-git-diff
 errorMatch:
 - \n(?<file>/[^:]+):(?<line>\d+):((?<col>\d+):)?

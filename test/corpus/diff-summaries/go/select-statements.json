@@ -1,0 +1,452 @@
+[{
+    "testCaseDescription": "go-select-statements-setup-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "patch": [
+        "diff --git a/select-statements.go b/select-statements.go",
+        "index e69de29b..79058077 100644",
+        "--- a/select-statements.go",
+        "+++ b/select-statements.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "4966b945ba5393d1f1e64efadf0af83c41425f11..b490190f8902330d676348583217eee062b8bb76"
+}
+,{
+    "testCaseDescription": "go-select-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added a select statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "patch": [
+        "diff --git a/select-statements.go b/select-statements.go",
+        "index 79058077..6806fa67 100644",
+        "--- a/select-statements.go",
+        "+++ b/select-statements.go",
+        "@@ -1,5 +1,14 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+select {",
+        "+  case x := <-c:",
+        "+    println(x)",
+        "+  case y <- c:",
+        "+    println(5)",
+        "+  case <-time.After(1):",
+        "+    println(6)",
+        "+  default:",
+        "+    return",
+        "+}",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "b490190f8902330d676348583217eee062b8bb76..f981714e374e7edd602f4b2e423d2d3651534f65"
+}
+,{
+    "testCaseDescription": "go-select-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    8
+                                ],
+                                "end": [
+                                    7,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    8
+                                ],
+                                "end": [
+                                    7,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    9,
+                                    21
+                                ],
+                                "end": [
+                                    9,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    21
+                                ],
+                                "end": [
+                                    9,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the time[After](2) function call of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "patch": [
+        "diff --git a/select-statements.go b/select-statements.go",
+        "index 6806fa67..1ca26fb9 100644",
+        "--- a/select-statements.go",
+        "+++ b/select-statements.go",
+        "@@ -2,11 +2,11 @@ package main",
+        " ",
+        " func main() {",
+        " select {",
+        "-  case x := <-c:",
+        "+  case a := <-c:",
+        "     println(x)",
+        "-  case y <- c:",
+        "+  case b <- c:",
+        "     println(5)",
+        "-  case <-time.After(1):",
+        "+  case <-time.After(2):",
+        "     println(6)",
+        "   default:",
+        "     return"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f981714e374e7edd602f4b2e423d2d3651534f65..3b29e2cdce6c5e5e3c3c1e88104fd7593eeada08"
+}
+,{
+    "testCaseDescription": "go-select-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    8
+                                ],
+                                "end": [
+                                    7,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    8
+                                ],
+                                "end": [
+                                    7,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    9,
+                                    21
+                                ],
+                                "end": [
+                                    9,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    21
+                                ],
+                                "end": [
+                                    9,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the time[After](1) function call of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "patch": [
+        "diff --git a/select-statements.go b/select-statements.go",
+        "index 1ca26fb9..6806fa67 100644",
+        "--- a/select-statements.go",
+        "+++ b/select-statements.go",
+        "@@ -2,11 +2,11 @@ package main",
+        " ",
+        " func main() {",
+        " select {",
+        "-  case a := <-c:",
+        "+  case x := <-c:",
+        "     println(x)",
+        "-  case b <- c:",
+        "+  case y <- c:",
+        "     println(5)",
+        "-  case <-time.After(2):",
+        "+  case <-time.After(1):",
+        "     println(6)",
+        "   default:",
+        "     return"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3b29e2cdce6c5e5e3c3c1e88104fd7593eeada08..0958411ec5eb18df1fb4d5897509d0d5476e4151"
+}
+,{
+    "testCaseDescription": "go-select-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a select statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "patch": [
+        "diff --git a/select-statements.go b/select-statements.go",
+        "index 6806fa67..79058077 100644",
+        "--- a/select-statements.go",
+        "+++ b/select-statements.go",
+        "@@ -1,14 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-select {",
+        "-  case x := <-c:",
+        "-    println(x)",
+        "-  case y <- c:",
+        "-    println(5)",
+        "-  case <-time.After(1):",
+        "-    println(6)",
+        "-  default:",
+        "-    return",
+        "-}",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0958411ec5eb18df1fb4d5897509d0d5476e4151..f5e07ec87b0833ce3f9549a3e91e013115c7327d"
+}
+,{
+    "testCaseDescription": "go-select-statements-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "patch": [
+        "diff --git a/select-statements.go b/select-statements.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/select-statements.go",
+        "+++ b/select-statements.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f5e07ec87b0833ce3f9549a3e91e013115c7327d..3ae31b84db1d8419897111182e8fdc9cad60fbbc"
+}]

@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A string with \"double\" quotes' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "patch": [
+        "diff --git a/string.js b/string.js",
+        "index e69de29b..ea5bd425 100644",
+        "--- a/string.js",
+        "+++ b/string.js",
+        "@@ -0,0 +1 @@",
+        "+'A string with \"double\" quotes';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "36a730d16dd73b6484407e64d7262f2b1d2260d7..1870b80862e625d4963fcaa20734fd9e45e20b4b"
+}
+,{
+    "testCaseDescription": "javascript-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A different string with \"double\" quotes' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A string with \"double\" quotes' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "patch": [
+        "diff --git a/string.js b/string.js",
+        "index ea5bd425..5cef047e 100644",
+        "--- a/string.js",
+        "+++ b/string.js",
+        "@@ -1 +1,3 @@",
+        "+'A different string with \"double\" quotes';",
+        "+'A string with \"double\" quotes';",
+        " 'A string with \"double\" quotes';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "1870b80862e625d4963fcaa20734fd9e45e20b4b..29cc0e75eae8279de23094b6b5111fd42a20cde1"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'A different string with \"double\" quotes' string with the 'A string with \"double\" quotes' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "patch": [
+        "diff --git a/string.js b/string.js",
+        "index 5cef047e..7af39a55 100644",
+        "--- a/string.js",
+        "+++ b/string.js",
+        "@@ -1,3 +1,3 @@",
+        "-'A different string with \"double\" quotes';",
+        "+'A string with \"double\" quotes';",
+        " 'A string with \"double\" quotes';",
+        " 'A string with \"double\" quotes';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "29cc0e75eae8279de23094b6b5111fd42a20cde1..0f0c962bf6fc4d1b7110477438f0fd2e1ecec140"
+}
+,{
+    "testCaseDescription": "javascript-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'A string with \"double\" quotes' string with the 'A different string with \"double\" quotes' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "patch": [
+        "diff --git a/string.js b/string.js",
+        "index 7af39a55..5cef047e 100644",
+        "--- a/string.js",
+        "+++ b/string.js",
+        "@@ -1,3 +1,3 @@",
+        "-'A string with \"double\" quotes';",
+        "+'A different string with \"double\" quotes';",
+        " 'A string with \"double\" quotes';",
+        " 'A string with \"double\" quotes';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0f0c962bf6fc4d1b7110477438f0fd2e1ecec140..abb4de29b8899e7bd340bd31ee4d983dc9f9cc4d"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A different string with \"double\" quotes' string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A string with \"double\" quotes' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A different string with \"double\" quotes' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "patch": [
+        "diff --git a/string.js b/string.js",
+        "index 5cef047e..8dd4514f 100644",
+        "--- a/string.js",
+        "+++ b/string.js",
+        "@@ -1,3 +1,2 @@",
+        "-'A different string with \"double\" quotes';",
+        "-'A string with \"double\" quotes';",
+        " 'A string with \"double\" quotes';",
+        "+'A different string with \"double\" quotes';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "abb4de29b8899e7bd340bd31ee4d983dc9f9cc4d..84c90dfe58c7824e22891e9142af453d51539c74"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A string with \"double\" quotes' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "patch": [
+        "diff --git a/string.js b/string.js",
+        "index 8dd4514f..95fbde5d 100644",
+        "--- a/string.js",
+        "+++ b/string.js",
+        "@@ -1,2 +1 @@",
+        "-'A string with \"double\" quotes';",
+        " 'A different string with \"double\" quotes';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "84c90dfe58c7824e22891e9142af453d51539c74..8d96017389b1ffa96fed6b292a41d61654733899"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A different string with \"double\" quotes' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "patch": [
+        "diff --git a/string.js b/string.js",
+        "index 95fbde5d..e69de29b 100644",
+        "--- a/string.js",
+        "+++ b/string.js",
+        "@@ -1 +0,0 @@",
+        "-'A different string with \"double\" quotes';"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8d96017389b1ffa96fed6b292a41d61654733899..a721bbb02349218f8c3e5c1b8dff9b250d206fa5"
+}]

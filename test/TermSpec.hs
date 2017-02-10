@@ -1,25 +1,17 @@
+{-# LANGUAGE DataKinds #-}
 module TermSpec where
 
-import Test.Hspec
-import Test.Hspec.QuickCheck
-import Data.Text.Arbitrary ()
-
 import Category
-import Interpreter
-import Diff
-import ArbitraryTerm
+import Data.Functor.Listable
+import Data.String (String)
+import Prologue
+import Term
+import Test.Hspec (Spec, describe, parallel)
+import Test.Hspec.Expectations.Pretty
+import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
   describe "Term" $ do
     prop "equality is reflexive" $
-      \ a -> unTerm a == unTerm (a :: ArbitraryTerm String ())
-
-  describe "Diff" $ do
-    prop "equality is reflexive" $
-      \ a b -> let diff = interpret comparable (unTerm a) (unTerm (b :: ArbitraryTerm String CategorySet)) in
-        diff == diff
-
-    prop "equal terms produce identity diffs" $
-      \ a -> let term = unTerm (a :: ArbitraryTerm String CategorySet) in
-        diffCost (interpret comparable term term) == 0
+      \ a -> unListableF a `shouldBe` (unListableF a :: SyntaxTerm String '[Category])

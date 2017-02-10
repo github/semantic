@@ -1,0 +1,335 @@
+[{
+    "testCaseDescription": "ruby-method-declaration-required-keyword-param-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-required-keyword-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-required-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-required-keyword-param.rb b/method-declaration-required-keyword-param.rb",
+        "index e69de29..439647e 100644",
+        "--- a/method-declaration-required-keyword-param.rb",
+        "+++ b/method-declaration-required-keyword-param.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def foo()",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "980ea856c1bac9ba15ee84733b51821229105ba7..d0fb53dc518d253bcce258b72c666330c8c8ea2f"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-required-keyword-param-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-required-keyword-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(…)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-required-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-required-keyword-param.rb b/method-declaration-required-keyword-param.rb",
+        "index 439647e..27f533a 100644",
+        "--- a/method-declaration-required-keyword-param.rb",
+        "+++ b/method-declaration-required-keyword-param.rb",
+        "@@ -1,2 +1,6 @@",
+        "+def foo(name:)",
+        "+end",
+        "+def foo()",
+        "+end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d0fb53dc518d253bcce258b72c666330c8c8ea2f..aa7247746e9f0a58d87acb00f87305ed3379c0c2"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-required-keyword-param-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-required-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name' identifier in the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-required-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-required-keyword-param.rb b/method-declaration-required-keyword-param.rb",
+        "index 27f533a..e856a7a 100644",
+        "--- a/method-declaration-required-keyword-param.rb",
+        "+++ b/method-declaration-required-keyword-param.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo(name:)",
+        "+def foo()",
+        " end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "aa7247746e9f0a58d87acb00f87305ed3379c0c2..6e3ca4b1f7254a9ca3117378ba687e97d3995c4c"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-required-keyword-param-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-required-keyword-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'name' identifier in the 'foo(…)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-required-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-required-keyword-param.rb b/method-declaration-required-keyword-param.rb",
+        "index e856a7a..27f533a 100644",
+        "--- a/method-declaration-required-keyword-param.rb",
+        "+++ b/method-declaration-required-keyword-param.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo()",
+        "+def foo(name:)",
+        " end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "6e3ca4b1f7254a9ca3117378ba687e97d3995c4c..e27d1caf1aa51551a8a957cf1dc497ac9234adc7"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-required-keyword-param-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-required-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(…)' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(…)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-required-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-required-keyword-param.rb b/method-declaration-required-keyword-param.rb",
+        "index 27f533a..1cbc12f 100644",
+        "--- a/method-declaration-required-keyword-param.rb",
+        "+++ b/method-declaration-required-keyword-param.rb",
+        "@@ -1,6 +1,4 @@",
+        "-def foo(name:)",
+        "-end",
+        " def foo()",
+        " end",
+        "-def foo()",
+        "+def foo(name:)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e27d1caf1aa51551a8a957cf1dc497ac9234adc7..8704c73aaa72d1a49af29ec021d9877cf70c0dcb"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-required-keyword-param-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-required-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-required-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-required-keyword-param.rb b/method-declaration-required-keyword-param.rb",
+        "index 1cbc12f..1cbe40e 100644",
+        "--- a/method-declaration-required-keyword-param.rb",
+        "+++ b/method-declaration-required-keyword-param.rb",
+        "@@ -1,4 +1,2 @@",
+        "-def foo()",
+        "-end",
+        " def foo(name:)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "8704c73aaa72d1a49af29ec021d9877cf70c0dcb..f0ede17f71781672e1aaa9a486d5682e175f461e"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-required-keyword-param-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-required-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(…)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-required-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-required-keyword-param.rb b/method-declaration-required-keyword-param.rb",
+        "index 1cbe40e..e69de29 100644",
+        "--- a/method-declaration-required-keyword-param.rb",
+        "+++ b/method-declaration-required-keyword-param.rb",
+        "@@ -1,2 +0,0 @@",
+        "-def foo(name:)",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f0ede17f71781672e1aaa9a486d5682e175f461e..f3e88d78204efa57ab931973735fdd5123e7f8bb"
+}]

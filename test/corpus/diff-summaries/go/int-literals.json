@@ -1,0 +1,424 @@
+[{
+    "testCaseDescription": "go-int-literals-setup-test",
+    "expectedResult": {
+        "changes": {
+            "int-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literals.go"
+    ],
+    "patch": [
+        "diff --git a/int-literals.go b/int-literals.go",
+        "index e69de29b..79058077 100644",
+        "--- a/int-literals.go",
+        "+++ b/int-literals.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "c578d4a9262098e37c81793dbf2fcdb3834ed7fc..bf4c2fa143c7b8ec844770a1137017f2fb9e7d42"
+}
+,{
+    "testCaseDescription": "go-int-literals-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "int-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added 'a = 1, b = 2, c = 3' at line 5, column 1 - line 5, column 20 in the main function"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "int-literals.go"
+    ],
+    "patch": [
+        "diff --git a/int-literals.go b/int-literals.go",
+        "index 79058077..38d36eca 100644",
+        "--- a/int-literals.go",
+        "+++ b/int-literals.go",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+const (",
+        "+a = 1, b = 2, c = 3",
+        "+)",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "bf4c2fa143c7b8ec844770a1137017f2fb9e7d42..21106fed3fd8c3e31494c282edc82c5429c92869"
+}
+,{
+    "testCaseDescription": "go-int-literals-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "int-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '4' in the a var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    12
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    12
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '5' in an assignment to 5, c of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    19
+                                ],
+                                "end": [
+                                    5,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    19
+                                ],
+                                "end": [
+                                    5,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '3' with '6' in an assignment to 5, c of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literals.go"
+    ],
+    "patch": [
+        "diff --git a/int-literals.go b/int-literals.go",
+        "index 38d36eca..4f07c130 100644",
+        "--- a/int-literals.go",
+        "+++ b/int-literals.go",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
+        " const (",
+        "-a = 1, b = 2, c = 3",
+        "+a = 4, b = 5, c = 6",
+        " )",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "21106fed3fd8c3e31494c282edc82c5429c92869..cfd6ec82951166ab2361dd233a256b7913534d9f"
+}
+,{
+    "testCaseDescription": "go-int-literals-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "int-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '1' in the a var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    12
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    12
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '2' in an assignment to 2, c of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    19
+                                ],
+                                "end": [
+                                    5,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    19
+                                ],
+                                "end": [
+                                    5,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '6' with '3' in an assignment to 2, c of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literals.go"
+    ],
+    "patch": [
+        "diff --git a/int-literals.go b/int-literals.go",
+        "index 4f07c130..38d36eca 100644",
+        "--- a/int-literals.go",
+        "+++ b/int-literals.go",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
+        " const (",
+        "-a = 4, b = 5, c = 6",
+        "+a = 1, b = 2, c = 3",
+        " )",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "cfd6ec82951166ab2361dd233a256b7913534d9f..8c66b33e09eaea83addec2ac2330089768519921"
+}
+,{
+    "testCaseDescription": "go-int-literals-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "int-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'a = 1, b = 2, c = 3' at line 5, column 1 - line 5, column 20 in the main function"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "int-literals.go"
+    ],
+    "patch": [
+        "diff --git a/int-literals.go b/int-literals.go",
+        "index 38d36eca..79058077 100644",
+        "--- a/int-literals.go",
+        "+++ b/int-literals.go",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const (",
+        "-a = 1, b = 2, c = 3",
+        "-)",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8c66b33e09eaea83addec2ac2330089768519921..1d6bcf3782d0b1f80d454b369648f5e7a9dff34e"
+}
+,{
+    "testCaseDescription": "go-int-literals-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "int-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literals.go"
+    ],
+    "patch": [
+        "diff --git a/int-literals.go b/int-literals.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/int-literals.go",
+        "+++ b/int-literals.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1d6bcf3782d0b1f80d454b369648f5e7a9dff34e..e2c2101dadc49e784ab17192eba4aad3c2c5d13b"
+}]

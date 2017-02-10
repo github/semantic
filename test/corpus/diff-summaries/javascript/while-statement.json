@@ -1,0 +1,401 @@
+[{
+    "testCaseDescription": "javascript-while-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/while-statement.js b/while-statement.js",
+        "index e69de29b..1ea2800e 100644",
+        "--- a/while-statement.js",
+        "+++ b/while-statement.js",
+        "@@ -0,0 +1 @@",
+        "+while (a) { b(); };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a43b37a27c89c6d1f96f5a83f5498c56b9e45338..921c4227b76024fcaabc893c433f997961e2a269"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/while-statement.js b/while-statement.js",
+        "index 1ea2800e..c322323d 100644",
+        "--- a/while-statement.js",
+        "+++ b/while-statement.js",
+        "@@ -1 +1,3 @@",
+        "+while (b) { a(); };",
+        "+while (a) { b(); };",
+        " while (a) { b(); };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "921c4227b76024fcaabc893c433f997961e2a269..f74c514c68d3fe1b1d52f848f19f9160cc9cbbfb"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the b() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/while-statement.js b/while-statement.js",
+        "index c322323d..ea967164 100644",
+        "--- a/while-statement.js",
+        "+++ b/while-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-while (b) { a(); };",
+        "+while (a) { b(); };",
+        " while (a) { b(); };",
+        " while (a) { b(); };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f74c514c68d3fe1b1d52f848f19f9160cc9cbbfb..95f6613fea9dc54d5844d30b98ae5870cdf48573"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the a() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/while-statement.js b/while-statement.js",
+        "index ea967164..c322323d 100644",
+        "--- a/while-statement.js",
+        "+++ b/while-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-while (a) { b(); };",
+        "+while (b) { a(); };",
+        " while (a) { b(); };",
+        " while (a) { b(); };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "95f6613fea9dc54d5844d30b98ae5870cdf48573..808eca07d620aa12249b3dc5e705216e7f524fed"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' while statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/while-statement.js b/while-statement.js",
+        "index c322323d..28f4b210 100644",
+        "--- a/while-statement.js",
+        "+++ b/while-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-while (b) { a(); };",
+        "-while (a) { b(); };",
+        " while (a) { b(); };",
+        "+while (b) { a(); };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "808eca07d620aa12249b3dc5e705216e7f524fed..a7d9a5e1e7803e5841da84f1009fa272570ba6d5"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/while-statement.js b/while-statement.js",
+        "index 28f4b210..e185b25d 100644",
+        "--- a/while-statement.js",
+        "+++ b/while-statement.js",
+        "@@ -1,2 +1 @@",
+        "-while (a) { b(); };",
+        " while (b) { a(); };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a7d9a5e1e7803e5841da84f1009fa272570ba6d5..5444eb3ca4168ec227cc4c91dac971751b705304"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "patch": [
+        "diff --git a/while-statement.js b/while-statement.js",
+        "index e185b25d..e69de29b 100644",
+        "--- a/while-statement.js",
+        "+++ b/while-statement.js",
+        "@@ -1 +0,0 @@",
+        "-while (b) { a(); };"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5444eb3ca4168ec227cc4c91dac971751b705304..48d3ef87f99a7129141975782e612cef84f46829"
+}]

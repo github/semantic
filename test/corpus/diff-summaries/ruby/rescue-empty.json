@@ -1,0 +1,363 @@
+[{
+    "testCaseDescription": "ruby-rescue-empty-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-empty.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-empty.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index e69de29..5b4fe96 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -0,0 +1,4 @@",
+        "+begin",
+        "+  foo",
+        "+rescue",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9bdc443bb96ee6977eaaa39b6329f334c5a9db48..6da3684f76a2007479f377d4c79cef4521803b58"
+}
+,{
+    "testCaseDescription": "ruby-rescue-empty-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-empty.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-empty.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index 5b4fe96..d74e034 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,4 +1,13 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "+  bar",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "6da3684f76a2007479f377d4c79cef4521803b58..71968b3d5351636aa647b9600f1ddd9ccd22ab67"
+}
+,{
+    "testCaseDescription": "ruby-rescue-empty-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-empty.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier in a rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-empty.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index d74e034..afdc934 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,7 +1,6 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "-  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "71968b3d5351636aa647b9600f1ddd9ccd22ab67..e7f252589596cedefd11f71c6b466530746c334d"
+}
+,{
+    "testCaseDescription": "ruby-rescue-empty-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-empty.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier in a rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-empty.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index afdc934..d74e034 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,6 +1,7 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "+  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e7f252589596cedefd11f71c6b466530746c334d..66d3909b37271ec30200b51be63cb339ff8d0133"
+}
+,{
+    "testCaseDescription": "ruby-rescue-empty-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-empty.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-empty.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index d74e034..f8a72a7 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,13 +1,9 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "-  bar",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue",
+        " end",
+        " begin",
+        "   foo",
+        " rescue",
+        "+  bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "66d3909b37271ec30200b51be63cb339ff8d0133..d14f1280b2da935d376edc78e38c5c0766cad688"
+}
+,{
+    "testCaseDescription": "ruby-rescue-empty-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-empty.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-empty.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index f8a72a7..17dffb3 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,9 +1,5 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue",
+        "   bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d14f1280b2da935d376edc78e38c5c0766cad688..742166d0e7309f54788c3478fbf1451e36729c37"
+}
+,{
+    "testCaseDescription": "ruby-rescue-empty-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-empty.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-empty.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index 17dffb3..e69de29 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,5 +0,0 @@",
+        "-begin",
+        "-  foo",
+        "-rescue",
+        "-  bar",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "742166d0e7309f54788c3478fbf1451e36729c37..4e341502c58d4f3337b20901f290e05d92ff81ce"
+}]

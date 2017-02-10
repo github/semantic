@@ -1,0 +1,353 @@
+[{
+    "testCaseDescription": "javascript-this-expression-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "patch": [
+        "diff --git a/this-expression.js b/this-expression.js",
+        "index e69de29b..b251f26b 100644",
+        "--- a/this-expression.js",
+        "+++ b/this-expression.js",
+        "@@ -0,0 +1 @@",
+        "+this;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "11c817d08ac0cb3edac35eedef4ad8f04b290d77..946eafe6841a17df1464b56d3b30aa5f9944e2fb"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "patch": [
+        "diff --git a/this-expression.js b/this-expression.js",
+        "index b251f26b..58047437 100644",
+        "--- a/this-expression.js",
+        "+++ b/this-expression.js",
+        "@@ -1 +1,3 @@",
+        "+return this;",
+        "+this;",
+        " this;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "946eafe6841a17df1464b56d3b30aa5f9944e2fb..8c3b8b8aee5025d5a62a85f79a55c6205ad675a7"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "patch": [
+        "diff --git a/this-expression.js b/this-expression.js",
+        "index 58047437..3c82a23c 100644",
+        "--- a/this-expression.js",
+        "+++ b/this-expression.js",
+        "@@ -1,3 +1,3 @@",
+        "-return this;",
+        "+this;",
+        " this;",
+        " this;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8c3b8b8aee5025d5a62a85f79a55c6205ad675a7..5c8b79b64a6c8a13b973b23438aa04b4ee272307"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "patch": [
+        "diff --git a/this-expression.js b/this-expression.js",
+        "index 3c82a23c..58047437 100644",
+        "--- a/this-expression.js",
+        "+++ b/this-expression.js",
+        "@@ -1,3 +1,3 @@",
+        "-this;",
+        "+return this;",
+        " this;",
+        " this;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5c8b79b64a6c8a13b973b23438aa04b4ee272307..a24710509652274cdb4fa3260595ac6f5537510f"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "patch": [
+        "diff --git a/this-expression.js b/this-expression.js",
+        "index 58047437..81aca892 100644",
+        "--- a/this-expression.js",
+        "+++ b/this-expression.js",
+        "@@ -1,3 +1,2 @@",
+        "-return this;",
+        "-this;",
+        " this;",
+        "+return this;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a24710509652274cdb4fa3260595ac6f5537510f..c2aa0794e99a16952284bad9e79987ac5fb93d4f"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "patch": [
+        "diff --git a/this-expression.js b/this-expression.js",
+        "index 81aca892..45c3231b 100644",
+        "--- a/this-expression.js",
+        "+++ b/this-expression.js",
+        "@@ -1,2 +1 @@",
+        "-this;",
+        " return this;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c2aa0794e99a16952284bad9e79987ac5fb93d4f..a4ccea192771f0d5226b4c8f895318cd656e8be8"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "patch": [
+        "diff --git a/this-expression.js b/this-expression.js",
+        "index 45c3231b..e69de29b 100644",
+        "--- a/this-expression.js",
+        "+++ b/this-expression.js",
+        "@@ -1 +0,0 @@",
+        "-return this;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a4ccea192771f0d5226b4c8f895318cd656e8be8..c41b2f9fe0dffe03f83ea0599b2f5fd18a1292a7"
+}]

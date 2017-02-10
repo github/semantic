@@ -1,0 +1,364 @@
+[{
+    "testCaseDescription": "go-send-statements-setup-test",
+    "expectedResult": {
+        "changes": {
+            "send-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "send-statements.go"
+    ],
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index e69de29b..79058077 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "bd83133c1e3a033c4f1414f48bd415a48fca1973..e74984740c82a22d0ca71bfc69aacabbb4428c66"
+}
+,{
+    "testCaseDescription": "go-send-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "send-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo <- 5' send statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "send-statements.go"
+    ],
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index 79058077..5f327d16 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+foo <- 5",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e74984740c82a22d0ca71bfc69aacabbb4428c66..41889c162f171b5861141abf350934bc372e48bc"
+}
+,{
+    "testCaseDescription": "go-send-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "send-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '6' in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "send-statements.go"
+    ],
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index 5f327d16..3829478b 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-foo <- 5",
+        "+bar <- 6",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "41889c162f171b5861141abf350934bc372e48bc..1765e31ee6e69075b5ffd7e96212ca465ad10699"
+}
+,{
+    "testCaseDescription": "go-send-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "send-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '6' with '5' in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "send-statements.go"
+    ],
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index 3829478b..5f327d16 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-bar <- 6",
+        "+foo <- 5",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1765e31ee6e69075b5ffd7e96212ca465ad10699..082482dfb2533204de96eb1e9331a85e576dd14c"
+}
+,{
+    "testCaseDescription": "go-send-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "send-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo <- 5' send statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "send-statements.go"
+    ],
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index 5f327d16..79058077 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-foo <- 5",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "082482dfb2533204de96eb1e9331a85e576dd14c..5d09d4703ac53030caa3504aff8ebc9e5d63f795"
+}
+,{
+    "testCaseDescription": "go-send-statements-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "send-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "send-statements.go"
+    ],
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "5d09d4703ac53030caa3504aff8ebc9e5d63f795..759bcc1def9029c1f75c6355dc3d149aad453526"
+}]

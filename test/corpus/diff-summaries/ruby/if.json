@@ -1,0 +1,498 @@
+[{
+    "testCaseDescription": "ruby-if-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index e69de29..c4c729f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -0,0 +1,7 @@",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "895ec09c6b1830368e488d03e9bdef18e730e946..8063575d180f343235440191fad18a0bb5fb8c76"
+}
+,{
+    "testCaseDescription": "ruby-if-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index c4c729f..326833f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,3 +1,14 @@",
+        "+if x",
+        "+end",
+        "+if y then",
+        "+end",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        "+end",
+        " if foo",
+        "   bar",
+        " elsif quux"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "8063575d180f343235440191fad18a0bb5fb8c76..c3d5206979581d0afae21a0e38ff352f81810b42"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier in the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'quux' elsif block in the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 326833f..2cbbfda 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,6 +1,9 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        " end",
+        " if foo",
+        "   bar"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "c3d5206979581d0afae21a0e38ff352f81810b42..21450a8410cb551ce5db0aa969c649657493ecdb"
+}
+,{
+    "testCaseDescription": "ruby-if-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier in the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'quux' elsif block in the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 2cbbfda..326833f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,9 +1,6 @@",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "+if x",
+        "+end",
+        "+if y then",
+        " end",
+        " if foo",
+        "   bar"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "21450a8410cb551ce5db0aa969c649657493ecdb..9fb361c2df2445bf8fe6b32444438c1993a9a5c5"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 326833f..2927cc0 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,7 +1,3 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "-end",
+        " if foo",
+        "   bar",
+        " elsif quux",
+        "@@ -9,10 +5,7 @@ elsif quux",
+        " else",
+        "   bat",
+        " end",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "+if x",
+        "+end",
+        "+if y then",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9fb361c2df2445bf8fe6b32444438c1993a9a5c5..88a366ccd4c7c230da7b3f8c269db206e55d35f1"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 2927cc0..5bfb167 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,10 +1,3 @@",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "-end",
+        " if x",
+        " end",
+        " if y then"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "88a366ccd4c7c230da7b3f8c269db206e55d35f1..c2a0f4fbca1cffe775c7ac81025ab077fa1534ea"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 5bfb167..e69de29 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,4 +0,0 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "c2a0f4fbca1cffe775c7ac81025ab077fa1534ea..357b28a188fc8984427a1ae219edd194329ebebc"
+}]

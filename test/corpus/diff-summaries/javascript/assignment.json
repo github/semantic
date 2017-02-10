@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index e69de29b..6882fe5e 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -0,0 +1 @@",
+        "+x = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "ae3598b402258260e941e7a876918f8037bf887d..fd7a7b20b42d08ee2f42c5ec5e913fd5fc4c73dc"
+}
+,{
+    "testCaseDescription": "javascript-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 6882fe5e..fb4cba44 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1 +1,3 @@",
+        "+x = 1;",
+        "+x = 0;",
+        " x = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "fd7a7b20b42d08ee2f42c5ec5e913fd5fc4c73dc..8e6308ced68ef5b841fa40a6534e38dff1b2e5f9"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in an assignment to x"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index fb4cba44..42e16c61 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,3 +1,3 @@",
+        "-x = 1;",
+        "+x = 0;",
+        " x = 0;",
+        " x = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8e6308ced68ef5b841fa40a6534e38dff1b2e5f9..2696ad06b794ac91951ad0db11a60a6d9f326b9c"
+}
+,{
+    "testCaseDescription": "javascript-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in an assignment to x"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 42e16c61..fb4cba44 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,3 +1,3 @@",
+        "-x = 0;",
+        "+x = 1;",
+        " x = 0;",
+        " x = 0;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2696ad06b794ac91951ad0db11a60a6d9f326b9c..0aac1d89f0577d4e374e02b91c8daf4e3a8cb1e6"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index fb4cba44..11fe15d7 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,3 +1,2 @@",
+        "-x = 1;",
+        "-x = 0;",
+        " x = 0;",
+        "+x = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0aac1d89f0577d4e374e02b91c8daf4e3a8cb1e6..84f1974640b46de51ce2424ef0a34a5aed26a83e"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 11fe15d7..198b8f89 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,2 +1 @@",
+        "-x = 0;",
+        " x = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "84f1974640b46de51ce2424ef0a34a5aed26a83e..79dde8d0f8db201fd8c3507b2d66f862d34a8ad5"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 198b8f89..e69de29b 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1 +0,0 @@",
+        "-x = 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "79dde8d0f8db201fd8c3507b2d66f862d34a8ad5..02c7c57f6900a26076acb665ba4fc51a55fc79db"
+}]

@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-member-access-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.someProperty' member access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index e69de29b..3c837c9a 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -0,0 +1 @@",
+        "+x.someProperty;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "545e1f49b6e82b725cda79df3dea34555ffa1d7c..1d85812b95b56a1c7c862073890d7166d0238a6d"
+}
+,{
+    "testCaseDescription": "javascript-member-access-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.someOtherProperty' member access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.someProperty' member access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 3c837c9a..858131af 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1 +1,3 @@",
+        "+x.someOtherProperty",
+        "+x.someProperty;",
+        " x.someProperty;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "1d85812b95b56a1c7c862073890d7166d0238a6d..67e0cab67998526c3e57878de74f6b5e9595dcc8"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'someOtherProperty' identifier with the 'someProperty' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 858131af..5ed8a8d2 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,3 +1,3 @@",
+        "-x.someOtherProperty",
+        "+x.someProperty;",
+        " x.someProperty;",
+        " x.someProperty;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "67e0cab67998526c3e57878de74f6b5e9595dcc8..df2400e47caf131a690aee596165efd80632b006"
+}
+,{
+    "testCaseDescription": "javascript-member-access-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'someProperty' identifier with the 'someOtherProperty' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 5ed8a8d2..858131af 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,3 +1,3 @@",
+        "-x.someProperty;",
+        "+x.someOtherProperty",
+        " x.someProperty;",
+        " x.someProperty;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "df2400e47caf131a690aee596165efd80632b006..9e8022c2da048071b316908f37d16865e0e16d31"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.someOtherProperty' member access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.someProperty' member access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.someOtherProperty' member access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 858131af..81f5f468 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,3 +1,2 @@",
+        "-x.someOtherProperty",
+        "-x.someProperty;",
+        " x.someProperty;",
+        "+x.someOtherProperty"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "9e8022c2da048071b316908f37d16865e0e16d31..95a9da83b61ad889f0935ca30e4d9d9648418edb"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.someProperty' member access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 81f5f468..8329c770 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,2 +1 @@",
+        "-x.someProperty;",
+        " x.someOtherProperty"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "95a9da83b61ad889f0935ca30e4d9d9648418edb..e4a6b0b20943de7a301427a59c8df352956ccde7"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.someOtherProperty' member access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 8329c770..e69de29b 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1 +0,0 @@",
+        "-x.someOtherProperty"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e4a6b0b20943de7a301427a59c8df352956ccde7..ec6eea34d7c86b61e0a52fbb0b8041553b1d5af7"
+}]

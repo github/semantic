@@ -1,0 +1,791 @@
+[{
+    "testCaseDescription": "javascript-if-else-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "patch": [
+        "diff --git a/if-else.js b/if-else.js",
+        "index e69de29b..d81ebadd 100644",
+        "--- a/if-else.js",
+        "+++ b/if-else.js",
+        "@@ -0,0 +1 @@",
+        "+if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0aabb2672ac5aa2ce7fbeb1cad74c6c09e985a74..251f01e7d8112d3409bd0bacb65529073c9f7ad2"
+}
+,{
+    "testCaseDescription": "javascript-if-else-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "patch": [
+        "diff --git a/if-else.js b/if-else.js",
+        "index d81ebadd..6bb0eaa7 100644",
+        "--- a/if-else.js",
+        "+++ b/if-else.js",
+        "@@ -1 +1,3 @@",
+        "+if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o",
+        "+if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "251f01e7d8112d3409bd0bacb65529073c9f7ad2..f765fb5d1508d05122c61b191abc2ee22972cf41"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'x' identifier in the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'y' identifier in the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i' identifier with the 'a' identifier in the 'a' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                23
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the 'a' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                25
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j' identifier in the 'a' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    39
+                                ],
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'k' identifier with the 'c' identifier in the 'c' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'l' identifier with the 'd' identifier in the 'c' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    54
+                                ],
+                                "end": [
+                                    1,
+                                    55
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    50
+                                ],
+                                "end": [
+                                    1,
+                                    51
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'm' identifier with the 'e' identifier in the 'e' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                53
+                            ],
+                            "end": [
+                                1,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f' identifier in the 'e' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                59
+                            ],
+                            "end": [
+                                1,
+                                60
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'n' identifier in the 'e' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    69
+                                ],
+                                "end": [
+                                    1,
+                                    70
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    61
+                                ],
+                                "end": [
+                                    1,
+                                    62
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'o' identifier with the 'g' identifier in the 'e' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "patch": [
+        "diff --git a/if-else.js b/if-else.js",
+        "index 6bb0eaa7..2034be1b 100644",
+        "--- a/if-else.js",
+        "+++ b/if-else.js",
+        "@@ -1,3 +1,3 @@",
+        "-if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o",
+        "+if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f765fb5d1508d05122c61b191abc2ee22972cf41..cf304bbed29534ab382b4e4f567f00a0a26753c0"
+}
+,{
+    "testCaseDescription": "javascript-if-else-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'g' identifier in the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'h' identifier in the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'i' identifier in the 'i' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                25
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j' identifier in the 'i' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                23
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the 'i' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    39
+                                ],
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'k' identifier in the 'k' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'd' identifier with the 'l' identifier in the 'k' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    50
+                                ],
+                                "end": [
+                                    1,
+                                    51
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    54
+                                ],
+                                "end": [
+                                    1,
+                                    55
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'm' identifier in the 'm' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                59
+                            ],
+                            "end": [
+                                1,
+                                60
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'n' identifier in the 'm' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                53
+                            ],
+                            "end": [
+                                1,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f' identifier in the 'm' if statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    61
+                                ],
+                                "end": [
+                                    1,
+                                    62
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    69
+                                ],
+                                "end": [
+                                    1,
+                                    70
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'o' identifier in the 'm' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "patch": [
+        "diff --git a/if-else.js b/if-else.js",
+        "index 2034be1b..6bb0eaa7 100644",
+        "--- a/if-else.js",
+        "+++ b/if-else.js",
+        "@@ -1,3 +1,3 @@",
+        "-if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        "+if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o",
+        " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "cf304bbed29534ab382b4e4f567f00a0a26753c0..a477577ebcbc6152cb95204dbe944a8eeef763ee"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "patch": [
+        "diff --git a/if-else.js b/if-else.js",
+        "index 6bb0eaa7..e26d6c43 100644",
+        "--- a/if-else.js",
+        "+++ b/if-else.js",
+        "@@ -1,3 +1,2 @@",
+        "-if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o",
+        "-if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        "+if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "a477577ebcbc6152cb95204dbe944a8eeef763ee..5c5a9a2d4958d2216e875c57809d92ead3492f43"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "patch": [
+        "diff --git a/if-else.js b/if-else.js",
+        "index e26d6c43..1a55d0bd 100644",
+        "--- a/if-else.js",
+        "+++ b/if-else.js",
+        "@@ -1,2 +1 @@",
+        "-if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        " if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5c5a9a2d4958d2216e875c57809d92ead3492f43..d9c9db24696581dd80a3c57675bae8d1f8d1093c"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "patch": [
+        "diff --git a/if-else.js b/if-else.js",
+        "index 1a55d0bd..e69de29b 100644",
+        "--- a/if-else.js",
+        "+++ b/if-else.js",
+        "@@ -1 +0,0 @@",
+        "-if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d9c9db24696581dd80a3c57675bae8d1f8d1093c..64dfefbc50b4a2c3c30e706f470afe7dac6fd8b2"
+}]

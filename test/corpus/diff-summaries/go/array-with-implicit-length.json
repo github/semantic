@@ -1,0 +1,430 @@
+[{
+    "testCaseDescription": "go-array-with-implicit-length-setup-test",
+    "expectedResult": {
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index e69de29b..79058077 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "bcd4bf3659a22076c572c879141d7ef13cadf8ba..84303d9cea50b86ab4d8f3477ea0841911d4427c"
+}
+,{
+    "testCaseDescription": "go-array-with-implicit-length-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a1' var assignment in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index 79058077..a53dc8c5 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+const a1 = [...]int{1, 2, 3}",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "84303d9cea50b86ab4d8f3477ea0841911d4427c..6f23ae5fac8069864b3a5fe8b64198a81b97286e"
+}
+,{
+    "testCaseDescription": "go-array-with-implicit-length-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '4' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                23
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '5' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    25
+                                ],
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '6' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                27
+                            ],
+                            "end": [
+                                4,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3' in the [...]int composite_literal of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index a53dc8c5..e9e3d08f 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const a1 = [...]int{1, 2, 3}",
+        "+const a1 = [...]int{4,5,6}",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "6f23ae5fac8069864b3a5fe8b64198a81b97286e..ee620c3ebf598b4fb0f1aa4d6493bed828059de2"
+}
+,{
+    "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '1' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    24
+                                ],
+                                "end": [
+                                    4,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '2' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                27
+                            ],
+                            "end": [
+                                4,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added '3' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                23
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '5' in the [...]int composite_literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                25
+                            ],
+                            "end": [
+                                4,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '6' in the [...]int composite_literal of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index e9e3d08f..a53dc8c5 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const a1 = [...]int{4,5,6}",
+        "+const a1 = [...]int{1, 2, 3}",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "ee620c3ebf598b4fb0f1aa4d6493bed828059de2..61516e3a8c818cb0812c8d4dcccd3e51b51b552c"
+}
+,{
+    "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a1' var assignment in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index a53dc8c5..79058077 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const a1 = [...]int{1, 2, 3}",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "61516e3a8c818cb0812c8d4dcccd3e51b51b552c..2d0d3b75a1aa4688e2ee1aae6c5388cd39e396a4"
+}
+,{
+    "testCaseDescription": "go-array-with-implicit-length-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "2d0d3b75a1aa4688e2ee1aae6c5388cd39e396a4..fad96915d832ac6e13a3a067b6bc46fb5150823d"
+}]

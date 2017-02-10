@@ -1,0 +1,733 @@
+[{
+    "testCaseDescription": "ruby-symbol-insert-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':foo' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':'foo'' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':\"foo\"' symbol"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "patch": [
+        "diff --git a/symbol.rb b/symbol.rb",
+        "index e69de29..faa7b3e 100644",
+        "--- a/symbol.rb",
+        "+++ b/symbol.rb",
+        "@@ -0,0 +1,3 @@",
+        "+:foo",
+        "+:'foo'",
+        "+:\"foo\""
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "06e0c82cc4de92677af4b24443f616a6b3ddf682..4cddc55a2cfa1451ea4b9f3299687fb6f2d17b57"
+}
+,{
+    "testCaseDescription": "ruby-symbol-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':bar' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':'bar'' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':\"bar\"' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':foo' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':'foo'' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':\"foo\"' symbol"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "patch": [
+        "diff --git a/symbol.rb b/symbol.rb",
+        "index faa7b3e..c4e6184 100644",
+        "--- a/symbol.rb",
+        "+++ b/symbol.rb",
+        "@@ -1,3 +1,9 @@",
+        "+:bar",
+        "+:'bar'",
+        "+:\"bar\"",
+        "+:foo",
+        "+:'foo'",
+        "+:\"foo\"",
+        " :foo",
+        " :'foo'",
+        " :\"foo\""
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "4cddc55a2cfa1451ea4b9f3299687fb6f2d17b57..625405ef92bc13ff70876edc14fe7746e685d52c"
+}
+,{
+    "testCaseDescription": "ruby-symbol-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':foo' symbol"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':bar' symbol with the ':'foo'' symbol"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':'bar'' symbol with the ':\"foo\"' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"bar\"' symbol"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "patch": [
+        "diff --git a/symbol.rb b/symbol.rb",
+        "index c4e6184..04cec42 100644",
+        "--- a/symbol.rb",
+        "+++ b/symbol.rb",
+        "@@ -1,6 +1,6 @@",
+        "-:bar",
+        "-:'bar'",
+        "-:\"bar\"",
+        "+:foo",
+        "+:'foo'",
+        "+:\"foo\"",
+        " :foo",
+        " :'foo'",
+        " :\"foo\""
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "625405ef92bc13ff70876edc14fe7746e685d52c..561a21dfe82a3f3e8fe6bd0b9ef5ec4d34b330bf"
+}
+,{
+    "testCaseDescription": "ruby-symbol-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':bar' symbol"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':foo' symbol with the ':'bar'' symbol"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':'foo'' symbol with the ':\"bar\"' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"foo\"' symbol"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "patch": [
+        "diff --git a/symbol.rb b/symbol.rb",
+        "index 04cec42..c4e6184 100644",
+        "--- a/symbol.rb",
+        "+++ b/symbol.rb",
+        "@@ -1,6 +1,6 @@",
+        "-:foo",
+        "-:'foo'",
+        "-:\"foo\"",
+        "+:bar",
+        "+:'bar'",
+        "+:\"bar\"",
+        " :foo",
+        " :'foo'",
+        " :\"foo\""
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "561a21dfe82a3f3e8fe6bd0b9ef5ec4d34b330bf..7fd1800d1245cf683b63e6f929bdbf5ee774bfcc"
+}
+,{
+    "testCaseDescription": "ruby-symbol-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':bar' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':'bar'' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"bar\"' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':foo' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':'foo'' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"foo\"' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':bar' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':'bar'' symbol"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':\"bar\"' symbol"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "patch": [
+        "diff --git a/symbol.rb b/symbol.rb",
+        "index c4e6184..977ce1c 100644",
+        "--- a/symbol.rb",
+        "+++ b/symbol.rb",
+        "@@ -1,9 +1,6 @@",
+        "-:bar",
+        "-:'bar'",
+        "-:\"bar\"",
+        "-:foo",
+        "-:'foo'",
+        "-:\"foo\"",
+        " :foo",
+        " :'foo'",
+        " :\"foo\"",
+        "+:bar",
+        "+:'bar'",
+        "+:\"bar\""
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "7fd1800d1245cf683b63e6f929bdbf5ee774bfcc..e3c79211bca97f8397bc1e2bac9cb90ba883c614"
+}
+,{
+    "testCaseDescription": "ruby-symbol-delete-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':foo' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':'foo'' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"foo\"' symbol"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "patch": [
+        "diff --git a/symbol.rb b/symbol.rb",
+        "index 977ce1c..2109e60 100644",
+        "--- a/symbol.rb",
+        "+++ b/symbol.rb",
+        "@@ -1,6 +1,3 @@",
+        "-:foo",
+        "-:'foo'",
+        "-:\"foo\"",
+        " :bar",
+        " :'bar'",
+        " :\"bar\""
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e3c79211bca97f8397bc1e2bac9cb90ba883c614..4b9ccaf76a8124b962bdff28dd27c92245936873"
+}
+,{
+    "testCaseDescription": "ruby-symbol-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':bar' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':'bar'' symbol"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"bar\"' symbol"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "patch": [
+        "diff --git a/symbol.rb b/symbol.rb",
+        "index 2109e60..e69de29 100644",
+        "--- a/symbol.rb",
+        "+++ b/symbol.rb",
+        "@@ -1,3 +0,0 @@",
+        "-:bar",
+        "-:'bar'",
+        "-:\"bar\""
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "4b9ccaf76a8124b962bdff28dd27c92245936873..a95a833cbc8cde4e219dbcc1ea4abfcbe688c968"
+}]

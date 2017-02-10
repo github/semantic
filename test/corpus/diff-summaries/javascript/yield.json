@@ -1,0 +1,256 @@
+[{
+    "testCaseDescription": "javascript-yield-setup-test",
+    "expectedResult": {
+        "changes": {
+            "yield.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.js"
+    ],
+    "patch": [
+        "diff --git a/yield.js b/yield.js",
+        "index e69de29b..e01b17c7 100644",
+        "--- a/yield.js",
+        "+++ b/yield.js",
+        "@@ -0,0 +1 @@",
+        "+function* foo(){ var index = 0;  }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f270d7e7af308e5cacc3d7334905fd5f2308dc19..cc9412be0dd1f1f5eddca6f512aa879757063215"
+}
+,{
+    "testCaseDescription": "javascript-yield-insert-test",
+    "expectedResult": {
+        "changes": {
+            "yield.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                33
+                            ],
+                            "end": [
+                                1,
+                                41
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' yield statement in the foo function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.js"
+    ],
+    "patch": [
+        "diff --git a/yield.js b/yield.js",
+        "index e01b17c7..e2088166 100644",
+        "--- a/yield.js",
+        "+++ b/yield.js",
+        "@@ -1 +1 @@",
+        "-function* foo(){ var index = 0;  }",
+        "+function* foo(){ var index = 0; yield i; }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "cc9412be0dd1f1f5eddca6f512aa879757063215..e1ce13cacba4d820e4e0bc77a576197e3d3030b2"
+}
+,{
+    "testCaseDescription": "javascript-yield-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "yield.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    41
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i' yield statement with the 'i++' yield statement in the foo function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.js"
+    ],
+    "patch": [
+        "diff --git a/yield.js b/yield.js",
+        "index e2088166..78ab2efe 100644",
+        "--- a/yield.js",
+        "+++ b/yield.js",
+        "@@ -1 +1 @@",
+        "-function* foo(){ var index = 0; yield i; }",
+        "+function* foo(){ var index = 0; yield i++; }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e1ce13cacba4d820e4e0bc77a576197e3d3030b2..5caecd28de588770be0c79798e8d6b3a6c1b1812"
+}
+,{
+    "testCaseDescription": "javascript-yield-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "yield.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    41
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i++' yield statement with the 'i' yield statement in the foo function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.js"
+    ],
+    "patch": [
+        "diff --git a/yield.js b/yield.js",
+        "index 78ab2efe..e2088166 100644",
+        "--- a/yield.js",
+        "+++ b/yield.js",
+        "@@ -1 +1 @@",
+        "-function* foo(){ var index = 0; yield i++; }",
+        "+function* foo(){ var index = 0; yield i; }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5caecd28de588770be0c79798e8d6b3a6c1b1812..8b3f9678278a669487ab346c887d6808877845c6"
+}
+,{
+    "testCaseDescription": "javascript-yield-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "yield.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                33
+                            ],
+                            "end": [
+                                1,
+                                41
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' yield statement in the foo function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.js"
+    ],
+    "patch": [
+        "diff --git a/yield.js b/yield.js",
+        "index e2088166..e01b17c7 100644",
+        "--- a/yield.js",
+        "+++ b/yield.js",
+        "@@ -1 +1 @@",
+        "-function* foo(){ var index = 0; yield i; }",
+        "+function* foo(){ var index = 0;  }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "8b3f9678278a669487ab346c887d6808877845c6..05e952680260bc7b3b3229c13a91241e24ae7d79"
+}
+,{
+    "testCaseDescription": "javascript-yield-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "yield.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.js"
+    ],
+    "patch": [
+        "diff --git a/yield.js b/yield.js",
+        "index e01b17c7..e69de29b 100644",
+        "--- a/yield.js",
+        "+++ b/yield.js",
+        "@@ -1 +0,0 @@",
+        "-function* foo(){ var index = 0;  }"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "05e952680260bc7b3b3229c13a91241e24ae7d79..b325b0598f3778c6c970adad5ed229e1b5633f8d"
+}]

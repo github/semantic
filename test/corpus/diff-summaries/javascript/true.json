@@ -1,0 +1,353 @@
+[{
+    "testCaseDescription": "javascript-true-insert-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'true'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index e69de29b..4203d4b4 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -0,0 +1 @@",
+        "+true;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "519ad14821c401c1cca201f2a2b02cb503bbfd83..c01ba167634e4d5a7fb703acf8769be0c3626f64"
+}
+,{
+    "testCaseDescription": "javascript-true-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'true' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'true'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 4203d4b4..65b6323f 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1 +1,3 @@",
+        "+return true;",
+        "+true;",
+        " true;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c01ba167634e4d5a7fb703acf8769be0c3626f64..d167fa08021f842e0798378a5e88903abcf965ce"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'true'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'true' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 65b6323f..91e1cfc7 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,3 +1,3 @@",
+        "-return true;",
+        "+true;",
+        " true;",
+        " true;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "d167fa08021f842e0798378a5e88903abcf965ce..b34442089140e04e79424144e5383ff642833488"
+}
+,{
+    "testCaseDescription": "javascript-true-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'true' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'true'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 91e1cfc7..65b6323f 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,3 +1,3 @@",
+        "-true;",
+        "+return true;",
+        " true;",
+        " true;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b34442089140e04e79424144e5383ff642833488..cb20b615113ca3c491298499f3825342588615c3"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'true' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'true'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'true' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 65b6323f..48a44d12 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,3 +1,2 @@",
+        "-return true;",
+        "-true;",
+        " true;",
+        "+return true;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "cb20b615113ca3c491298499f3825342588615c3..e484b1e463ee4e5b2f74935ef01d15c994aee747"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'true'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 48a44d12..c1c6922d 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,2 +1 @@",
+        "-true;",
+        " return true;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e484b1e463ee4e5b2f74935ef01d15c994aee747..5091b3e63579acc77cb30365da02dbe7557c9742"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'true' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index c1c6922d..e69de29b 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1 +0,0 @@",
+        "-return true;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5091b3e63579acc77cb30365da02dbe7557c9742..3404e2f9981f841657789983a30885db1872d717"
+}]

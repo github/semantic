@@ -1,0 +1,353 @@
+[{
+    "testCaseDescription": "javascript-null-insert-test",
+    "expectedResult": {
+        "changes": {
+            "null.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "null.js"
+    ],
+    "patch": [
+        "diff --git a/null.js b/null.js",
+        "index e69de29b..ff464d15 100644",
+        "--- a/null.js",
+        "+++ b/null.js",
+        "@@ -0,0 +1 @@",
+        "+null;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c41b2f9fe0dffe03f83ea0599b2f5fd18a1292a7..18139ee9c6e54664b4d4b5cf6cf0745c941bd15b"
+}
+,{
+    "testCaseDescription": "javascript-null-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "null.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "null.js"
+    ],
+    "patch": [
+        "diff --git a/null.js b/null.js",
+        "index ff464d15..2d3c3e03 100644",
+        "--- a/null.js",
+        "+++ b/null.js",
+        "@@ -1 +1,3 @@",
+        "+return null;",
+        "+null;",
+        " null;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "18139ee9c6e54664b4d4b5cf6cf0745c941bd15b..612cb0b885b5327b4216f58881116af806208992"
+}
+,{
+    "testCaseDescription": "javascript-null-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "null.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "null.js"
+    ],
+    "patch": [
+        "diff --git a/null.js b/null.js",
+        "index 2d3c3e03..3122897c 100644",
+        "--- a/null.js",
+        "+++ b/null.js",
+        "@@ -1,3 +1,3 @@",
+        "-return null;",
+        "+null;",
+        " null;",
+        " null;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "612cb0b885b5327b4216f58881116af806208992..92332e2bee9ed58c9a9f3afcbf1f3cb794a85fe8"
+}
+,{
+    "testCaseDescription": "javascript-null-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "null.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "null.js"
+    ],
+    "patch": [
+        "diff --git a/null.js b/null.js",
+        "index 3122897c..2d3c3e03 100644",
+        "--- a/null.js",
+        "+++ b/null.js",
+        "@@ -1,3 +1,3 @@",
+        "-null;",
+        "+return null;",
+        " null;",
+        " null;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "92332e2bee9ed58c9a9f3afcbf1f3cb794a85fe8..f55eef39ebe93820de6b591648d562c2cc6576cb"
+}
+,{
+    "testCaseDescription": "javascript-null-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "null.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "null.js"
+    ],
+    "patch": [
+        "diff --git a/null.js b/null.js",
+        "index 2d3c3e03..0eb99c86 100644",
+        "--- a/null.js",
+        "+++ b/null.js",
+        "@@ -1,3 +1,2 @@",
+        "-return null;",
+        "-null;",
+        " null;",
+        "+return null;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f55eef39ebe93820de6b591648d562c2cc6576cb..40b8cea69b00672cf1932dc403a29d41bfcd77ef"
+}
+,{
+    "testCaseDescription": "javascript-null-delete-test",
+    "expectedResult": {
+        "changes": {
+            "null.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "null.js"
+    ],
+    "patch": [
+        "diff --git a/null.js b/null.js",
+        "index 0eb99c86..76137ff0 100644",
+        "--- a/null.js",
+        "+++ b/null.js",
+        "@@ -1,2 +1 @@",
+        "-null;",
+        " return null;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "40b8cea69b00672cf1932dc403a29d41bfcd77ef..7f98ec33735046c6e971f7085277629b43d91027"
+}
+,{
+    "testCaseDescription": "javascript-null-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "null.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "null.js"
+    ],
+    "patch": [
+        "diff --git a/null.js b/null.js",
+        "index 76137ff0..e69de29b 100644",
+        "--- a/null.js",
+        "+++ b/null.js",
+        "@@ -1 +0,0 @@",
+        "-return null;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "7f98ec33735046c6e971f7085277629b43d91027..96b0b5fed694b8dcfb0566309faee71cfdf4dd60"
+}]

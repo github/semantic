@@ -1,0 +1,406 @@
+[{
+    "testCaseDescription": "go-increment-decrement-statements-setup-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index e69de29b..79058077 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "759bcc1def9029c1f75c6355dc3d149aad453526..139accc79873485c0588a2cf9c5875872cd62038"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i++' increment statement in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j--' decrement statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 79058077..18bf03a2 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,5 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+i++",
+        "+j--",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "139accc79873485c0588a2cf9c5875872cd62038..8de9cb1905b2ebbc1ed26f35f80f40863b07a34a"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i++' increment statement with the 'foo++' increment statement in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x++' increment statement in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j--' decrement statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 18bf03a2..08611ad4 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-i++",
+        "-j--",
+        "+foo++",
+        "+x++",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8de9cb1905b2ebbc1ed26f35f80f40863b07a34a..cf96716d214016e3d91b7389e07e3ad195f2a70d"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo++' increment statement with the 'i++' increment statement in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j--' decrement statement in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x++' increment statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 08611ad4..18bf03a2 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-foo++",
+        "-x++",
+        "+i++",
+        "+j--",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "cf96716d214016e3d91b7389e07e3ad195f2a70d..7f8c0bda49b47fff895e40cad8f3e0ad35e71dc4"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i++' increment statement in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j--' decrement statement in the main function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 18bf03a2..79058077 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,6 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-i++",
+        "-j--",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "7f8c0bda49b47fff895e40cad8f3e0ad35e71dc4..c26c44c5f60f2dc0187f577920eb720df9fcd429"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "c26c44c5f60f2dc0187f577920eb720df9fcd429..676a4c0466e117135c3df59c9af1dbe709f9d8f6"
+}]

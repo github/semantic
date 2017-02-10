@@ -1,0 +1,323 @@
+[{
+    "testCaseDescription": "javascript-array-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\" ]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index e69de29b..33355825 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -0,0 +1 @@",
+        "+[ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "2bd27e99860858d0a524b5a307b97f412b4cc0c8..c5f2cfdf12cc04125dd63da617842503c567c5fd"
+}
+,{
+    "testCaseDescription": "javascript-array-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\" ]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index 33355825..cf37d7c1 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1 +1,3 @@",
+        "+[ \"item1\", \"item2\" ];",
+        "+[ \"item1\" ];",
+        " [ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "c5f2cfdf12cc04125dd63da617842503c567c5fd..f25bd893c412fed4c8ec5ff56c9e97336ebfa3e3"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"item2\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index cf37d7c1..c2cb17fa 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,3 +1,3 @@",
+        "-[ \"item1\", \"item2\" ];",
+        "+[ \"item1\" ];",
+        " [ \"item1\" ];",
+        " [ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "f25bd893c412fed4c8ec5ff56c9e97336ebfa3e3..e90ef017de2604896fd5252cf50abfae42a2de65"
+}
+,{
+    "testCaseDescription": "javascript-array-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"item2\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index c2cb17fa..cf37d7c1 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,3 +1,3 @@",
+        "-[ \"item1\" ];",
+        "+[ \"item1\", \"item2\" ];",
+        " [ \"item1\" ];",
+        " [ \"item1\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e90ef017de2604896fd5252cf50abfae42a2de65..12aafb64072ed2e4f9e5ed53596077e121dcb3f8"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\" ]' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index cf37d7c1..a4d92b81 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,3 +1,2 @@",
+        "-[ \"item1\", \"item2\" ];",
+        "-[ \"item1\" ];",
+        " [ \"item1\" ];",
+        "+[ \"item1\", \"item2\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "12aafb64072ed2e4f9e5ed53596077e121dcb3f8..b2226b56fac04d4cc961dd282b818e008e742836"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\" ]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index a4d92b81..7f2f50e6 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1,2 +1 @@",
+        "-[ \"item1\" ];",
+        " [ \"item1\", \"item2\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b2226b56fac04d4cc961dd282b818e008e742836..0c0547039a1aea4a4501be30ff4f29a4d02a11c7"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "patch": [
+        "diff --git a/array.js b/array.js",
+        "index 7f2f50e6..e69de29b 100644",
+        "--- a/array.js",
+        "+++ b/array.js",
+        "@@ -1 +0,0 @@",
+        "-[ \"item1\", \"item2\" ];"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0c0547039a1aea4a4501be30ff4f29a4d02a11c7..790803fdb50f5b52531a5fd1dc0573fd2b036126"
+}]

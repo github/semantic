@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-boolean-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i || j' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index e69de29b..7280a98c 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -0,0 +1 @@",
+        "+i || j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "60e56ee717443319fd06b7b25a02393835ad25e4..0fd3f94bbca77a5e4a4dea4ae5ecc4a7b2a7cf6f"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i && j' boolean operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i || j' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index 7280a98c..fe3f3064 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1 +1,3 @@",
+        "+i && j;",
+        "+i || j;",
+        " i || j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "0fd3f94bbca77a5e4a4dea4ae5ecc4a7b2a7cf6f..17f325d11dfa050a157ccf5679cbe1ed270d713e"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i && j' boolean operator with the 'i || j' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index fe3f3064..273c0ee8 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i && j;",
+        "+i || j;",
+        " i || j;",
+        " i || j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "17f325d11dfa050a157ccf5679cbe1ed270d713e..fde9a571269f580178b33b191abe2ad403e3be54"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i || j' boolean operator with the 'i && j' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index 273c0ee8..fe3f3064 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i || j;",
+        "+i && j;",
+        " i || j;",
+        " i || j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "fde9a571269f580178b33b191abe2ad403e3be54..e6ad1de0a4a9e55334402ff2aff8ececff181c12"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i && j' boolean operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i || j' boolean operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i && j' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index fe3f3064..7f4873c1 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-i && j;",
+        "-i || j;",
+        " i || j;",
+        "+i && j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e6ad1de0a4a9e55334402ff2aff8ececff181c12..5418dc49e7d40c66acafad0ae967c5c9360b8868"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i || j' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index 7f4873c1..c6921d12 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,2 +1 @@",
+        "-i || j;",
+        " i && j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "5418dc49e7d40c66acafad0ae967c5c9360b8868..cd66c224553926eca0160ddbed77db465273bec9"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i && j' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index c6921d12..e69de29b 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1 +0,0 @@",
+        "-i && j;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "cd66c224553926eca0160ddbed77db465273bec9..8eb05a7fac3721888570615043a58da2a28e278e"
+}]

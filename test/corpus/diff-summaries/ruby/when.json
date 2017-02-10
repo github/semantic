@@ -1,0 +1,276 @@
+[{
+    "testCaseDescription": "ruby-when-setup-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "when.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "when.rb"
+    ],
+    "patch": [
+        "diff --git a/when.rb b/when.rb",
+        "index e69de29..ee23477 100644",
+        "--- a/when.rb",
+        "+++ b/when.rb",
+        "@@ -0,0 +1,2 @@",
+        "+case foo",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "b616a75a1894341c88be0147f3d99ca16d223394..f9bea87667a8ec91e3c34de65d5b65ba5c63a57e"
+}
+,{
+    "testCaseDescription": "ruby-when-insert-test",
+    "expectedResult": {
+        "changes": {
+            "when.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {
+            "when.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "when.rb"
+    ],
+    "patch": [
+        "diff --git a/when.rb b/when.rb",
+        "index ee23477..92a40ca 100644",
+        "--- a/when.rb",
+        "+++ b/when.rb",
+        "@@ -1,2 +1,3 @@",
+        " case foo",
+        "+when bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f9bea87667a8ec91e3c34de65d5b65ba5c63a57e..23fe86c51ddffc6f48e6466ff80bf55cfa7f9950"
+}
+,{
+    "testCaseDescription": "ruby-when-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "when.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz' identifier in the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when.rb"
+    ],
+    "patch": [
+        "diff --git a/when.rb b/when.rb",
+        "index 92a40ca..3c8eff2 100644",
+        "--- a/when.rb",
+        "+++ b/when.rb",
+        "@@ -1,3 +1,4 @@",
+        " case foo",
+        " when bar",
+        "+  baz",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "23fe86c51ddffc6f48e6466ff80bf55cfa7f9950..a7e74f5bb4d08cc500503009907944d048013aa1"
+}
+,{
+    "testCaseDescription": "ruby-when-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "when.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' identifier in the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when.rb"
+    ],
+    "patch": [
+        "diff --git a/when.rb b/when.rb",
+        "index 3c8eff2..92a40ca 100644",
+        "--- a/when.rb",
+        "+++ b/when.rb",
+        "@@ -1,4 +1,3 @@",
+        " case foo",
+        " when bar",
+        "-  baz",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "a7e74f5bb4d08cc500503009907944d048013aa1..3a7ae1a603a12a75857442cfe9f57f07830b260a"
+}
+,{
+    "testCaseDescription": "ruby-when-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "when.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {
+            "when.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "when.rb"
+    ],
+    "patch": [
+        "diff --git a/when.rb b/when.rb",
+        "index 92a40ca..ee23477 100644",
+        "--- a/when.rb",
+        "+++ b/when.rb",
+        "@@ -1,3 +1,2 @@",
+        " case foo",
+        "-when bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "3a7ae1a603a12a75857442cfe9f57f07830b260a..253f6a600cd1e4a83701e6d776d937f562eb867c"
+}
+,{
+    "testCaseDescription": "ruby-when-teardown-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "when.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "when.rb"
+    ],
+    "patch": [
+        "diff --git a/when.rb b/when.rb",
+        "index ee23477..e69de29 100644",
+        "--- a/when.rb",
+        "+++ b/when.rb",
+        "@@ -1,2 +0,0 @@",
+        "-case foo",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "253f6a600cd1e4a83701e6d776d937f562eb867c..cf6833ca26f4455afe60e15692ddae7fd4ff5e0c"
+}]

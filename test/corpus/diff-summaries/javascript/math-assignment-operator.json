@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "javascript-math-assignment-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index e69de29b..7150d6e7 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -0,0 +1 @@",
+        "+x += 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e063f0fd0c7f4b192b39469a0e1641349a596147..59d928b4843289616856e9e8bf8d9946cdad4c7f"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 7150d6e7..0bf97e75 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1 +1,3 @@",
+        "+x += 2;",
+        "+x += 1;",
+        " x += 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "59d928b4843289616856e9e8bf8d9946cdad4c7f..b721ff6fdd741eee50a4a16c42dd5b3bdde368fe"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the x math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 0bf97e75..ad04937a 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-x += 2;",
+        "+x += 1;",
+        " x += 1;",
+        " x += 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "b721ff6fdd741eee50a4a16c42dd5b3bdde368fe..e553ba9f63a48658ad19c2fe4cda15ed3ce0fcaa"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the x math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index ad04937a..0bf97e75 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-x += 1;",
+        "+x += 2;",
+        " x += 1;",
+        " x += 1;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "e553ba9f63a48658ad19c2fe4cda15ed3ce0fcaa..acd95fd371df4275c2f26055683daed7b4673559"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 0bf97e75..71275450 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-x += 2;",
+        "-x += 1;",
+        " x += 1;",
+        "+x += 2;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "acd95fd371df4275c2f26055683daed7b4673559..7ebc730f67a3cf517e1dd456ee48c2d32a2f2174"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 71275450..94d14722 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,2 +1 @@",
+        "-x += 1;",
+        " x += 2;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "7ebc730f67a3cf517e1dd456ee48c2d32a2f2174..cd61146f65a5144b9b5d176204cc8793757b1963"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 94d14722..e69de29b 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1 +0,0 @@",
+        "-x += 2;"
+    ],
+    "gitDir": "test/corpus/repos/javascript",
+    "shas": "cd61146f65a5144b9b5d176204cc8793757b1963..f2eb239be06cc6a99d83ff77dc9852645f8a006b"
+}]
