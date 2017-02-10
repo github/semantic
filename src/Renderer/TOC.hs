@@ -143,7 +143,7 @@ toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
         _ -> pure $ JSONSummary parentInfo
 
 termToDiffInfo :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
-termToDiffInfo blob term = case unwrap term of
+termToDiffInfo source term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
   S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction (toTermName' term) (getField $ extract term)
@@ -152,9 +152,9 @@ termToDiffInfo blob term = case unwrap term of
   _ -> toLeafInfo term
   where
     toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' subterm = toTermName (Source.slice (range subterm) blob) subterm
+    toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
     range = characterRange . extract
-    termToDiffInfo' = termToDiffInfo blob
+    termToDiffInfo' = termToDiffInfo source
     toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
 toTermName :: forall leaf fields. DefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
