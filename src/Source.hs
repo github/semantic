@@ -114,7 +114,7 @@ rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
         toEndPos line range = SourcePos line (end range)
 
 length :: Source -> Int
-length = rangeLength . sourceRange
+length = Text.length . sourceText
 
 null :: Source -> Bool
 null = Text.null . sourceText
