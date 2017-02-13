@@ -1,5 +1,6 @@
 module Source.Spec where
 
+import qualified Data.Text as Text
 import qualified Prelude
 import Prologue
 import Range
@@ -12,12 +13,10 @@ spec :: Spec
 spec = parallel $ do
   describe "actualLineRanges" $ do
     prop "produces 1 more range than there are newlines" $
-      \ s -> let source = fromList s in
-        Prologue.length (actualLineRanges (totalRange source) source) `shouldBe` succ (Prologue.length (filter (== '\n') s))
+      \ source -> Prologue.length (actualLineRanges (totalRange source) source) `shouldBe` succ (Text.count "\n" (sourceText source))
 
     prop "produces exhaustive ranges" $
-      \ s -> let source = fromList s in
-        foldMap (`slice` source) (actualLineRanges (totalRange source) source) `shouldBe` source
+      \ source -> foldMap (`slice` source) (actualLineRanges (totalRange source) source) `shouldBe` source
 
   describe "sourceSpanToRange" $ do
     prop "computes single-line ranges" $
