@@ -42,7 +42,7 @@ instance Example Property where
   evaluateExample (Property prop) (Params _ bound) _ _ = do
     result <- iocounterExample bound prop
     case result of
-      Just messages -> pure $ Fail Nothing (concat messages)
+      Just messages -> pure $ Failure Nothing (Reason (concat messages))
       Nothing -> pure Success
 
 class IOTestable t where
