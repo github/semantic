@@ -11,7 +11,6 @@ import Data.Functor.Listable
 import Data.List (nub)
 import Data.Monoid hiding ((<>))
 import Data.Record
-import Data.String
 import qualified Data.Text as Text
 import Data.These
 import Patch
@@ -206,26 +205,26 @@ branchElementKey :: BranchElement -> Maybe Text
 branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
-toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source), [Join These (Text, Range)], Both [Range])
+toAlignBranchInputs :: [BranchElement] -> (Both Source.Source, [Join These (Text, Range)], Both [Range])
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . traverse go $ elements, ranges)
   where go :: BranchElement -> State (Both Int) [Join These (Text, Range)]
         go child@(Child key _) = do
           lines <- traverse (\ (Child _ contents) -> do
             prev <- get
-            let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
+            let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (Text.length <$> contents)
             put next
             pure $! modifyJoin (runBothWith bimap (const <$> (Range <$> prev <*> next))) contents) (alignBranchElement child)
           pure $! fmap ((,) key) <$> lines
         go (Margin contents) = do
           prev <- get
-          put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
+          put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (Text.length <$> contents)
           pure []
         alignBranchElement element = case element of
           Child key contents -> Child key <$> joinCrosswalk lines contents
           Margin contents -> Margin <$> joinCrosswalk lines contents
-          where lines = fmap toList . Source.actualLines . Source.fromText
+          where lines = fmap Source.sourceText . Source.actualLines . Source.fromText
         sources = foldMap Source.fromText <$> bothContents elements
-        ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
+        ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (Source.totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
         branchElementContents (Child _ contents) = contents
         branchElementContents (Margin contents) = contents
@@ -238,9 +237,9 @@ joinCrosswalk f = fmap Join . bicrosswalk f f . runJoin
 
 instance Listable BranchElement where
   tiers = oneof [ (\ key -> Child key `mapT` joinTheseOf (contents key)) `concatMapT` key
-                , Margin `mapT` joinTheseOf (pure `mapT` padding '-') ]
-    where key = pure `mapT` [['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']]
-          contents key = (wrap key . pure) `mapT` padding '*'
+                , Margin `mapT` joinTheseOf (Text.singleton `mapT` padding '-') ]
+    where key = Text.singleton `mapT` [['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']]
+          contents key = (wrap key . Text.singleton) `mapT` padding '*'
           wrap key contents = "(" <> key <> contents <> ")" :: Text
           padding :: Char -> [Tier Char]
           padding char = frequency [ (10, [[char]])
@@ -257,16 +256,16 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
-align :: Both (Source.Source) -> ConstructibleFree (Patch (Term (Syntax Text) (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
-align sources = PrettyDiff sources . fmap (fmap (getRange . Text.unpack &&& identity)) . alignDiff sources . deconstruct
+align :: Both Source.Source -> ConstructibleFree (Patch (Term (Syntax Text) (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
+align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
 info start end = Range start end :. Nil
 
-prettyDiff :: Both (Source.Source) -> [Join These (ConstructibleFree (SplitPatch (Term (Syntax Text) (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
-prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange . Text.unpack &&& identity) . deconstruct))
+prettyDiff :: Both Source.Source -> [Join These (ConstructibleFree (SplitPatch (Term (Syntax Text) (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
+prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
 
-data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source), unPrettyLines :: [Join These (Range, a)] }
+data PrettyDiff a = PrettyDiff { unPrettySources :: Both Source.Source, unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
 
 instance Show (PrettyDiff a) where
@@ -274,22 +273,22 @@ instance Show (PrettyDiff a) where
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
           showLine n line = uncurry ((<>) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
-          showDiff (range, _) = filter (/= '\n') . toList . Source.slice range
+          showDiff (range, _) = filter (/= '\n') . Text.unpack . Source.sourceText . Source.slice range
           pad n string = (<>) (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
 
-newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (CofreeF (Syntax String) annotation) patch }
+newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (CofreeF (Syntax Text) annotation) patch }
 
 
 class PatchConstructible p where
-  insert :: Term (Syntax String) (Record '[Range]) -> p
-  delete :: Term (Syntax String) (Record '[Range]) -> p
+  insert :: Term (Syntax Text) (Record '[Range]) -> p
+  delete :: Term (Syntax Text) (Record '[Range]) -> p
 
-instance PatchConstructible (Patch (Term (Syntax String) (Record '[Range]))) where
+instance PatchConstructible (Patch (Term (Syntax Text) (Record '[Range]))) where
   insert = Insert
   delete = Delete
 
-instance PatchConstructible (SplitPatch (Term (Syntax String) (Record '[Range]))) where
+instance PatchConstructible (SplitPatch (Term (Syntax Text) (Record '[Range]))) where
   insert = SplitInsert
   delete = SplitDelete
 
@@ -298,13 +297,13 @@ instance PatchConstructible patch => PatchConstructible (ConstructibleFree patch
   delete = ConstructibleFree . pure . delete
 
 class SyntaxConstructible s where
-  leaf :: annotation -> String -> s annotation
+  leaf :: annotation -> Text -> s annotation
   branch :: annotation -> [s annotation] -> s annotation
 
 instance SyntaxConstructible (ConstructibleFree patch) where
   leaf info = ConstructibleFree . free . Free . (info :<) . Leaf
   branch info = ConstructibleFree . free . Free . (info :<) . Indexed . fmap deconstruct
 
-instance SyntaxConstructible (Cofree (Syntax String)) where
+instance SyntaxConstructible (Cofree (Syntax Text)) where
   info `leaf` value = cofree $ info :< Leaf value
   info `branch` children = cofree $ info :< Indexed children
