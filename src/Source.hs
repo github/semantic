@@ -4,9 +4,11 @@ module Source where
 
 import Prologue
 import qualified Data.Text as Text
+import Data.Text.Listable
 import Numeric
 import Range
 import SourceSpan
+import Test.LeanCheck
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
 data SourceBlob = SourceBlob { source :: Source, oid :: Text, path :: FilePath, blobKind :: Maybe SourceKind }
@@ -118,3 +120,6 @@ instance Semigroup Source where
 instance Monoid Source where
   mempty = fromList []
   mappend = (<>)
+
+instance Listable Source where
+  tiers = (Source . unListableText) `mapT` tiers
