@@ -52,7 +52,7 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           let getChild getter parentNode n childNode = do
                 _ <- getter parentNode n childNode
                 let childRange = nodeRange childNode
-                toTerm childNode childRange (slice (offsetRange childRange (start range - start childRange)) source)
+                toTerm childNode childRange (slice (offsetRange childRange (negate (start range))) source)
 
           children <- filter isNonEmpty <$> traverse (alloca . getChild ts_node_p_named_child node) (take (fromIntegral count) [0..])
 
