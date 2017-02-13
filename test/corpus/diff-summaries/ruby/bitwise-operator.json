@@ -207,21 +207,6 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a >> b' binary statement"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -235,17 +220,32 @@
                             },
                             {
                                 "start": [
-                                    3,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    3,
-                                    6
+                                    2,
+                                    7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a << b' binary statement with the 'a ^ b' binary statement"
+                    "summary": "Replaced the 'a << b' binary statement with the 'a >> b' binary statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a ^ b' binary statement"
                 }
             ]
         },
@@ -306,33 +306,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'a << b' binary statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a >> b' binary statement"
+                    "summary": "Replaced the 'a >> b' binary statement with the 'a << b' binary statement"
                 },
                 {
                     "span": {

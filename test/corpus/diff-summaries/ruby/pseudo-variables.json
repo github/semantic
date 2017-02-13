@@ -244,30 +244,18 @@
             "pseudo-variables.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    4
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    4
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'NIL' identifier with the 'nil' identifier"
+                    "summary": "Added the 'nil' identifier"
                 },
                 {
                     "span": {
@@ -298,6 +286,21 @@
                         }
                     },
                     "summary": "Added 'true'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'NIL' identifier"
                 },
                 {
                     "span": {
@@ -419,31 +422,34 @@
                     "summary": "Replaced 'false' with 'TRUE'"
                 },
                 {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced 'true' with 'FALSE'"
+                      "span": {
+                          "insert": {
+                              "start": [
+                                  4,
+                                  1
+                              ],
+                              "end": [
+                                  4,
+                                  6
+                              ]
+                          }
+                      },
+                      "summary": "Added 'FALSE'"
+                },
+                {
+                      "span": {
+                          "delete": {
+                              "start": [
+                                  4,
+                                  1
+                              ],
+                              "end": [
+                                  4,
+                                  5
+                              ]
+                          }
+                      },
+                      "summary": "Deleted 'true'"
                 }
             ]
         },

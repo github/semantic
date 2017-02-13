@@ -436,33 +436,84 @@
             "import.js": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                33
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the defaultMember from \"foo\" import statement"
+                    "summary": "Replaced the \"babirusa\" string with the \"foo\" string in the defaultMember from \"foo\" import statement"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                34
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    28
+                                ],
+                                "end": [
+                                    2,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "end": [
+                                    2,
+                                    33
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the * as name from \"aardvark\" import statement"
+                    "summary": "Replaced the \"baboon\" string with the \"aardvark\" string in the * as name from \"aardvark\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'otherName' identifier with the 'name' identifier in the * as name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
@@ -526,90 +577,45 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                50
-                            ]
-                        }
-                    },
-                    "summary": "Added the defaultMember, * as name from \"alligator\" import statement"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
-                                    27
+                                    3,
+                                    1
                                 ],
                                 "end": [
-                                    1,
-                                    37
+                                    3,
+                                    34
                                 ]
                             },
                             {
                                 "start": [
-                                    8,
-                                    8
+                                    7,
+                                    1
                                 ],
                                 "end": [
-                                    8,
-                                    21
+                                    7,
+                                    50
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"babirusa\" string with the \"arctic-tern\" string in the \"arctic-tern\" import statement"
+                    "summary": "Replaced the { element } from \"badger\" import statement with the defaultMember, * as name from \"alligator\" import statement"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'defaultMember' identifier in the \"arctic-tern\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                8,
                                 1
                             ],
                             "end": [
-                                2,
-                                37
+                                8,
+                                22
                             ]
                         }
                     },
-                    "summary": "Deleted the * as otherName from \"baboon\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the { element } from \"badger\" import statement"
+                    "summary": "Added the \"arctic-tern\" import statement"
                 },
                 {
                     "span": {
@@ -729,33 +735,84 @@
             "import.js": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                38
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the defaultMember from \"babirusa\" import statement"
+                    "summary": "Replaced the \"foo\" string with the \"babirusa\" string in the defaultMember from \"babirusa\" import statement"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                37
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "end": [
+                                    2,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    28
+                                ],
+                                "end": [
+                                    2,
+                                    36
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the * as otherName from \"baboon\" import statement"
+                    "summary": "Replaced the \"aardvark\" string with the \"baboon\" string in the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name' identifier with the 'otherName' identifier in the * as otherName from \"baboon\" import statement"
                 },
                 {
                     "span": {
@@ -819,90 +876,45 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                50
-                            ]
-                        }
-                    },
-                    "summary": "Added the defaultMember, * as element from \"barbet\" import statement"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
-                                    27
+                                    3,
+                                    1
                                 ],
                                 "end": [
-                                    1,
-                                    32
+                                    3,
+                                    30
                                 ]
                             },
                             {
                                 "start": [
-                                    8,
-                                    8
+                                    7,
+                                    1
                                 ],
                                 "end": [
-                                    8,
-                                    18
+                                    7,
+                                    50
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo\" string with the \"basilisk\" string in the \"basilisk\" import statement"
+                    "summary": "Replaced the { member } from \"ant\" import statement with the defaultMember, * as element from \"barbet\" import statement"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'defaultMember' identifier in the \"basilisk\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                8,
                                 1
                             ],
                             "end": [
-                                2,
-                                34
+                                8,
+                                19
                             ]
                         }
                     },
-                    "summary": "Deleted the * as name from \"aardvark\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the { member } from \"ant\" import statement"
+                    "summary": "Added the \"basilisk\" import statement"
                 },
                 {
                     "span": {
