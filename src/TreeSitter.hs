@@ -48,6 +48,12 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           name <- ts_node_p_name node document
           name <- peekCString name
           count <- ts_node_p_named_child_count node
+
+          let getChild getter node n out = do
+                _ <- getter node n out
+                let childRange = nodeRange node
+                toTerm out childRange (slice (offsetRange childRange (start range - start childRange)) source)
+
           children <- filter isNonEmpty <$> traverse (alloca . getChild ts_node_p_named_child node) (take (fromIntegral count) [0..])
 
           let startPos = SourcePos (1 + (fromIntegral $! ts_node_p_start_point_row node)) (1 + (fromIntegral $! ts_node_p_start_point_column node))
@@ -62,11 +68,6 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
           range `seq` sourceSpan `seq` assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
-          where getChild getter node n out = do
-                  _ <- getter node n out
-                  let childRange = nodeRange node
-                  toTerm out childRange (slice (offsetRange childRange (start childRange - start range)) source)
-                {-# INLINE getChild #-}
 
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
