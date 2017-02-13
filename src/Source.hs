@@ -10,7 +10,7 @@ import Range
 import SourceSpan
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
-data SourceBlob = SourceBlob { source :: Source, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
+data SourceBlob = SourceBlob { source :: Source, oid :: Text, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
 -- | The contents of a source file, represented as Text.
@@ -21,10 +21,10 @@ newtype Source = Source { sourceText :: Text }
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
-modeToDigits :: SourceKind -> String
-modeToDigits (PlainBlob mode) = showOct mode ""
-modeToDigits (ExecutableBlob mode) = showOct mode ""
-modeToDigits (SymlinkBlob mode) = showOct mode ""
+modeToDigits :: SourceKind -> Text
+modeToDigits (PlainBlob mode) = toS $ showOct mode ""
+modeToDigits (ExecutableBlob mode) = toS $ showOct mode ""
+modeToDigits (SymlinkBlob mode) = toS $ showOct mode ""
 
 
 -- | The default plain blob mode
@@ -43,7 +43,7 @@ idOrEmptySourceBlob blob = if isNothing (blobKind blob)
                            then blob { oid = nullOid, blobKind = Nothing }
                            else blob
 
-nullOid :: String
+nullOid :: Text
 nullOid = "0000000000000000000000000000000000000000"
 
 -- | Return a Source from a list of items.

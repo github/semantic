@@ -108,8 +108,7 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
     sourceRange = Source.totalRange source
     leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
-      (accum <> [ leaf charIndex (toText line) ] , charIndex + Source.length line)
-    toText = T.pack . Source.toString
+      (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
 
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])

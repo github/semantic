@@ -213,7 +213,7 @@ wrapIn f p = f p
 
 instance (ToMarkup f, HasField fields Category, HasField fields Range) => ToMarkup (Renderable (SyntaxTermF leaf fields (f, Range))) where
   toMarkup (Renderable source (info :< syntax)) = classifyMarkup (category info) $ case syntax of
-    Leaf _ -> span . string . toString $ slice (characterRange info) source
+    Leaf _ -> span . text . toText $ slice (characterRange info) source
     _ -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (toList syntax)
 
 instance (HasField fields Category, HasField fields Range) => ToMarkup (Renderable (SyntaxTerm leaf fields)) where
