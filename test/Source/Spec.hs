@@ -6,7 +6,7 @@ import Range
 import Source
 import SourceSpan
 import Test.Hspec
-import Test.Hspec.QuickCheck
+import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
