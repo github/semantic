@@ -2,9 +2,8 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
-import Prologue hiding (uncons)
+import Prologue
 import qualified Data.Text as Text
-import Data.String
 import Numeric
 import Range
 import SourceSpan
@@ -78,11 +77,13 @@ break predicate (Source text) = let (start, remainder) = Text.break predicate te
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source -> [Source]
-actualLines source | Text.null (sourceText source) = [ source ]
-actualLines source = case Source.break (== '\n') source of
-  (l, lines') -> case uncons lines' of
-    Nothing -> [ l ]
-    Just (_, lines') -> (l <> fromList "\n") : actualLines lines'
+actualLines = fmap Source . actualLines' . sourceText
+  where actualLines' text
+          | Text.null text = [ text ]
+          | otherwise = case Text.break (== '\n') text of
+            (l, lines') -> case Text.uncons lines' of
+              Nothing -> [ l ]
+              Just (_, lines') -> (l <> Text.singleton '\n') : actualLines' lines'
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source -> [Range]
