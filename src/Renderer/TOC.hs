@@ -116,12 +116,8 @@ mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm dif
     mapToInSummarizable' source term summary =
       case (parentInfo summary, summarizable term) of
         (NotSummarizable, SummarizableTerm _) ->
-          summary { parentInfo = InSummarizable (category (extract term)) (toTermName' term) (Info.sourceSpan (extract term)) }
+          summary { parentInfo = InSummarizable (category (extract term)) (toTermName 0 source term) (Info.sourceSpan (extract term)) }
         (_, _) -> summary
-      where
-        toTermName' :: SyntaxTerm leaf fields -> Text
-        toTermName' subterm = toTermName (Source.slice (range subterm) source) subterm
-        range = characterRange . extract
 
 summarizable :: ComonadCofree (Syntax t) w => w a -> SummarizableTerm (w a)
 summarizable term = go (unwrap term) term
@@ -151,21 +147,19 @@ termToDiffInfo source term = case unwrap term of
   S.ParseError _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   _ -> toLeafInfo term
   where
-    toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' subterm = toTermName (Source.slice (subtermRange subterm) source) subterm
-    range = characterRange . extract
-    subtermRange subterm = offsetRange (range subterm) (negate (start (range term)))
+    toTermName' = toTermName 0 source
     termToDiffInfo' = termToDiffInfo source
     toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
-toTermName :: forall leaf fields. DefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
-toTermName source term = case unwrap term of
+toTermName :: forall leaf fields. DefaultFields fields => Int -> Source -> SyntaxTerm leaf fields -> Text
+toTermName parentOffset parentSource term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
   S.Method identifier Nothing _ _ _ -> toTermName' identifier
   S.Method identifier (Just receiver) _ _ _ -> toTermName' receiver <> "." <> toTermName' identifier
   _ -> toText source
   where
+    source = Source.slice (offsetRange (range term) (negate parentOffset)) parentSource
+    offset = start (range term)
     toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' subterm = toTermName (Source.slice (range' subterm) source) subterm
-    range' subterm = offsetRange (range subterm) (negate (start (range term)))
+    toTermName' = toTermName offset source
     range = characterRange . extract
