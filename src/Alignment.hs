@@ -20,7 +20,7 @@ import Diff
 import Info
 import Patch
 import Range
-import Source hiding (break, fromList, uncons)
+import Source hiding (break, fromList)
 import SplitDiff
 import Syntax
 import Term

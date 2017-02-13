@@ -67,10 +67,6 @@ toText = sourceText
 at :: Source -> Int -> Char
 at = Text.index . sourceText
 
--- | Remove the first item and return it with the rest of the source.
-uncons :: Source -> Maybe (Char, Source)
-uncons (Source text) = if Text.null text then Nothing else Just (Text.head text, Source $ Text.tail text)
-
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
 break :: (Char -> Bool) -> Source -> (Source, Source)
 break predicate (Source text) = let (start, remainder) = Text.break predicate text in (Source start, Source remainder)
