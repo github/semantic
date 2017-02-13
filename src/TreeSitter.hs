@@ -49,10 +49,10 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           name <- peekCString name
           count <- ts_node_p_named_child_count node
 
-          let getChild getter node n out = do
-                _ <- getter node n out
-                let childRange = nodeRange node
-                toTerm out childRange (slice (offsetRange childRange (start range - start childRange)) source)
+          let getChild getter parentNode n childNode = do
+                _ <- getter parentNode n childNode
+                let childRange = nodeRange childNode
+                toTerm childNode childRange (slice (offsetRange childRange (start range - start childRange)) source)
 
           children <- filter isNonEmpty <$> traverse (alloca . getChild ts_node_p_named_child node) (take (fromIntegral count) [0..])
 
