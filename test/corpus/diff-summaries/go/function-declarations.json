@@ -85,7 +85,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module with 'package main\n\nfunc main() {\nfunc f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}\n}\n' at line 1, column 1 - line 9, column 1"
+                    "summary": "Replaced the 'main' module with 'package main\n\nfunc main() {\nfunc f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}\n}' at line 1, column 1 - line 9, column 1"
                 }
             ]
         },
@@ -427,7 +427,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced 'package main\n\nfunc main() {\nfunc f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}\n}\n' at line 1, column 1 - line 9, column 1 with the 'main' module"
+                    "summary": "Replaced 'package main\n\nfunc main() {\nfunc f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}\n}' at line 1, column 1 - line 9, column 1 with the 'main' module"
                 }
             ]
         },
