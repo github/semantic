@@ -67,9 +67,12 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
                   let childRange = nodeRange node
                   toTerm out childRange (slice (offsetRange childRange (start childRange - start range)) source)
                 {-# INLINE getChild #-}
-        isNonEmpty child = category (extract child) /= Empty
 
-        nodeRange node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
+isNonEmpty = (/= Empty) . category . extract
+
+nodeRange :: Ptr Node -> Range
+nodeRange node = Range { start = fromIntegral (ts_node_p_start_char node), end = fromIntegral (ts_node_p_end_char node) }
 
 assignTerm :: Language -> Source -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren =
