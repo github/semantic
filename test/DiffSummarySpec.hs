@@ -99,4 +99,4 @@ isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo
 
 unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
-unListableDiff diff = transFreeT (first unListableF) $ fmap unListableF <$> unListableF diff
+unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff
