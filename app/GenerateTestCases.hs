@@ -28,15 +28,15 @@ data GenerateFormat =
   | GenerateJSON
   deriving (Show)
 
-data GeneratorArgs = GeneratorArgs { generateFormat :: GenerateFormat } deriving (Show)
+newtype GeneratorArgs = GeneratorArgs { generateFormat :: GenerateFormat } deriving (Show)
 
 generatorArgs :: Parser GeneratorArgs
 generatorArgs = GeneratorArgs
-  <$> (flag' GenerateSummaries (long "generate-summaries" O.<> short 's' O.<> help "Generates summary results for new JSON test cases")
-  <|> flag' GenerateJSON (long "generate-json" O.<> short 'j' O.<> help "Generate JSON output for new JSON test cases"))
+  <$> (flag' GenerateSummaries (long "generate-summaries" <> short 's' <> help "Generates summary results for new JSON test cases")
+  <|> flag' GenerateJSON (long "generate-json" <> short 'j' <> help "Generate JSON output for new JSON test cases"))
 
 options :: ParserInfo GeneratorArgs
-options = info (helper <*> generatorArgs) (fullDesc O.<> progDesc "Auto-generate JSON test cases" O.<> header "JSON Test Case Generator")
+options = info (helper <*> generatorArgs) (fullDesc <> progDesc "Auto-generate JSON test cases" <> header "JSON Test Case Generator")
 
 main :: IO ()
 main = do

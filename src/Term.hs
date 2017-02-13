@@ -4,7 +4,6 @@ module Term where
 
 import Prologue
 import Data.Align.Generic
-import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.Record
 import Data.These
@@ -17,11 +16,6 @@ type TermF = CofreeF
 -- | A Term with a Syntax leaf and a record of fields.
 type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
 type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
-
--- Term has a Base functor TermF which gives it Recursive and Corecursive instances.
-type instance Base (Term f a) = TermF f a
-instance Functor f => Recursive (Term f a) where project = runCofree
-instance Functor f => Corecursive (Term f a) where embed = cofree
 
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.

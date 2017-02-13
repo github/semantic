@@ -117,7 +117,7 @@ instance Listable1 f => Listable2 (CofreeF f) where
 instance (Listable1 f, Listable a) => Listable1 (CofreeF f a) where
   liftTiers = liftTiers2 tiers
 
-instance Listable1 f => Listable1 (Cofree f) where
+instance (Functor f, Listable1 f) => Listable1 (Cofree f) where
   liftTiers annotationTiers = go
     where go = liftCons1 (liftTiers2 annotationTiers go) cofree
 
@@ -127,7 +127,7 @@ instance Listable1 f => Listable2 (FreeF f) where
 instance (Listable1 f, Listable a) => Listable1 (FreeF f a) where
   liftTiers = liftTiers2 tiers
 
-instance Listable1 f => Listable1 (Free f) where
+instance (Functor f, Listable1 f) => Listable1 (Free f) where
   liftTiers pureTiers = go
     where go = liftCons1 (liftTiers2 pureTiers go) free
 
