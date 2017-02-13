@@ -60,10 +60,6 @@ slice range = Source . take . drop . sourceText
   where drop = Text.drop (start range)
         take = Text.take (rangeLength range)
 
--- | Return a String with the contents of the Source.
-toString :: Source -> String
-toString = Text.unpack . sourceText
-
 -- | Return a text with the contents of the Source.
 toText :: Source -> Text
 toText = sourceText
