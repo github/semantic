@@ -28,7 +28,7 @@ spec = parallel $ do
 
   describe "featureVectorDecorator" $ do
     prop "produces a vector of the specified dimension" $
-      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (unListableF term :: SyntaxTerm String '[Category]) `shouldSatisfy` all ((== positively d) . length . rhead)
+      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (unListableF term :: SyntaxTerm String '[Category]) `shouldSatisfy` all ((== positively d) . maybe 0 length . rhead)
 
   describe "rws" $ do
     prop "produces correct diffs" $
