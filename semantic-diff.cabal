@@ -159,6 +159,7 @@ test-suite test
                      , hspec >= 2.1.10
                      , hspec-core
                      , hspec-expectations-pretty-diff
+                     , HUnit
                      , leancheck
                      , mtl
                      , protolude
