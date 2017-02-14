@@ -3,25 +3,20 @@ module TOCSpec where
 
 import Category
 import Data.Functor.Both
--- import Data.Functor.Listable
--- import Data.List (partition)
 import Data.RandomWalkSimilarity
 import Data.Record
+import Data.These
 import Diff
-import Renderer.TOC
+import Diffing
 import Info
--- import Interpreter
-import Patch
+import Interpreter
+import Parse
 import Prologue hiding (fst, snd)
+import Renderer.TOC
 import Source
 import Syntax
--- import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
-import Data.These
-import Parse
-import Diffing
-import Interpreter
 
 spec :: Spec
 spec = parallel $ do
