@@ -15,7 +15,6 @@ import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Renderer
 import Source hiding (null)
-import SourceSpan
 import Syntax as S
 import Term
 import Patch
@@ -65,9 +64,7 @@ toc blobs diff = TOCOutput $ Map.fromList [
     summaries = diffTOC blobs diff
 
 diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
-diffTOC blobs diff = do
-  noDupes <- removeDupes (diffToTOCSummaries (source <$> blobs) diff)
-  toJSONSummaries noDupes
+diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
     removeDupes = foldl' (\xs x -> case (x `elem` xs, x `findSimilarSummaryIndex` xs) of
@@ -75,16 +72,15 @@ diffTOC blobs diff = do
       (False, Nothing) -> xs <> [x]
       (_, Just n) ->
         let
-          (a, _ : b) = List.splitAt n xs
-          name = case parentInfo x of
-            (Summarizable _ name _ _) -> name
-            _ -> "xx"
-          item = x { parentInfo = Summarizable C.Function name SourceSpan.emptySourceSpan "modified" }
+          (a, existingItem : b) = List.splitAt n xs
+          (Summarizable category name sourceSpan _) = parentInfo existingItem
+          replacement = x { parentInfo = Summarizable category name sourceSpan "modified" }
         in
-          a <> (item : b)
+          a <> (replacement : b)
       ) []
     findSimilarSummaryIndex summary = List.findIndex (isSimilarSummary summary)
     isSimilarSummary a b = case (parentInfo a, parentInfo b) of
+      -- TODO: Only do this for methods in the same source file?
       (Summarizable _ nameA _ _, Summarizable _ nameB _ _) -> toLower nameA == toLower nameB
       (_, _) -> False
 
