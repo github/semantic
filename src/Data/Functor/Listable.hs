@@ -20,6 +20,8 @@ module Data.Functor.Listable
 , liftCons4
 , liftCons5
 , ListableF(..)
+, addWeight
+, ofWeight
 ) where
 
 import Data.Bifunctor.Join
