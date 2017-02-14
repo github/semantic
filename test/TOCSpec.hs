@@ -11,6 +11,7 @@ import Diffing
 import Info
 import Interpreter
 import Parse
+import Patch
 import Prologue hiding (fst, snd)
 import Renderer.TOC
 import Source
