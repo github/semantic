@@ -114,7 +114,7 @@ instance Listable2 These where
   liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
 
 instance Listable1 f => Listable2 (CofreeF f) where
-  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers `addWeight` 1) (:<)
+  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<)
 
 instance (Listable1 f, Listable a) => Listable1 (CofreeF f a) where
   liftTiers = liftTiers2 tiers
@@ -124,7 +124,7 @@ instance (Functor f, Listable1 f) => Listable1 (Cofree f) where
     where go = liftCons1 (liftTiers2 annotationTiers go) cofree
 
 instance Listable1 f => Listable2 (FreeF f) where
-  liftTiers2 pureTiers recurTiers = liftCons1 pureTiers Pure \/ liftCons1 (liftTiers recurTiers `addWeight` 1) Free
+  liftTiers2 pureTiers recurTiers = liftCons1 pureTiers Pure \/ liftCons1 (liftTiers recurTiers) Free
 
 instance (Listable1 f, Listable a) => Listable1 (FreeF f a) where
   liftTiers = liftTiers2 tiers
