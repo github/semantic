@@ -95,7 +95,7 @@ instance Listable1 Maybe where
   liftTiers tiers = cons0 Nothing \/ liftCons1 tiers Just
 
 instance Listable2 (,) where
-  liftTiers2 = productWith (,)
+  liftTiers2 = (><)
 
 instance Listable2 Either where
   liftTiers2 leftTiers rightTiers = liftCons1 leftTiers Left \/ liftCons1 rightTiers Right
