@@ -284,10 +284,10 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = fmap (/ magnitude) uniform
+unitVector d hash = fmap (* invMagnitude) uniform
   where
     uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
-    magnitude = sqrtDouble (sum (fmap (** 2) uniform))
+    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) uniform))
     components = sequenceA (replicate d (liftRand randomDouble))
 
 -- | Strips the head annotation off a term annotated with non-empty records.

@@ -161,7 +161,7 @@ getSourceBlob path sha = do
     Nothing -> pure (mempty, mempty, Nothing)
     Just (BlobEntry entryOid entryKind) -> do
       blob <- lookupBlob entryOid
-      let (BlobString s) = blobContents blob
+      s <- blobToByteString blob
       let oid = renderObjOid $ blobOid blob
       pure (s, oid, Just entryKind)
   s <- liftIO $ transcode bytestring

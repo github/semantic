@@ -11,7 +11,7 @@ import Data.Functor.Listable
 import Data.List (nub)
 import Data.Monoid hiding ((<>))
 import Data.Record
-import Data.String
+import qualified Data.Text as Text
 import Data.These
 import Patch
 import Prologue hiding (fst, snd)
@@ -31,7 +31,7 @@ spec :: Spec
 spec = parallel $ do
   describe "alignBranch" $ do
     it "produces symmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff (Syntax String) (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff (Syntax Text) (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 2, []))
         , Join (These (Range 2 4, [])
@@ -39,7 +39,7 @@ spec = parallel $ do
         ]
 
     it "produces asymmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff (Syntax String) (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff (Syntax Text) (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 1, []))
         , Join (This  (Range 2 4, []))
@@ -61,13 +61,13 @@ spec = parallel $ do
 
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
-      let sources = both (Source.fromList "[ foo ]") (Source.fromList "[ foo ]") in
+      let sources = both (Source.fromText "[ foo ]") (Source.fromText "[ foo ]") in
       align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` prettyDiff sources
         [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
                       (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])) ]
 
     it "aligns identical branches spanning multiple lines" $
-      let sources = both (Source.fromList "[\nfoo\n]") (Source.fromList "[\nfoo\n]") in
+      let sources = both (Source.fromText "[\nfoo\n]") (Source.fromText "[\nfoo\n]") in
       align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` prettyDiff sources
         [ Join (These (info 0 2 `branch` [])
                       (info 0 2 `branch` []))
@@ -78,7 +78,7 @@ spec = parallel $ do
         ]
 
     it "aligns reformatted branches" $
-      let sources = both (Source.fromList "[ foo ]") (Source.fromList "[\nfoo\n]") in
+      let sources = both (Source.fromText "[ foo ]") (Source.fromText "[\nfoo\n]") in
       align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` prettyDiff sources
         [ Join (That  (info 0 2 `branch` []))
         , Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
@@ -87,7 +87,7 @@ spec = parallel $ do
         ]
 
     it "aligns nodes following reformatted branches" $
-      let sources = both (Source.fromList "[ foo ]\nbar\n") (Source.fromList "[\nfoo\n]\nbar\n") in
+      let sources = both (Source.fromText "[ foo ]\nbar\n") (Source.fromText "[\nfoo\n]\nbar\n") in
       align sources (pure (info 0 12) `branch` [ pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ], pure (info 8 11) `leaf` "bar" ]) `shouldBe` prettyDiff sources
         [ Join (That  (info 0 2 `branch` [ info 0 2 `branch` [] ]))
         , Join (These (info 0 8 `branch` [ info 0 7 `branch` [ info 2 5 `leaf` "foo" ] ])
@@ -100,12 +100,12 @@ spec = parallel $ do
         ]
 
     it "aligns identical branches with multiple children on the same line" $
-      let sources = pure (Source.fromList "[ foo, bar ]") in
+      let sources = pure (Source.fromText "[ foo, bar ]") in
       align sources (pure (info 0 12) `branch` [ pure (info 2 5) `leaf` "foo", pure (info 7 10) `leaf` "bar" ]) `shouldBe` prettyDiff sources
         [ Join (runBothWith These (pure (info 0 12 `branch` [ info 2 5 `leaf` "foo", info 7 10 `leaf` "bar" ])) ) ]
 
     it "aligns insertions" $
-      let sources = both (Source.fromList "a") (Source.fromList "a\nb") in
+      let sources = both (Source.fromText "a") (Source.fromText "a\nb") in
       align sources (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", insert (info 2 3 `leaf` "b") ]) `shouldBe` prettyDiff sources
         [ Join (These (info 0 1 `branch` [ info 0 1 `leaf` "a" ])
                       (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
@@ -113,19 +113,19 @@ spec = parallel $ do
         ]
 
     it "aligns total insertions" $
-      let sources = both (Source.fromList "") (Source.fromList "a") in
+      let sources = both (Source.fromText "") (Source.fromText "a") in
       align sources (insert (info 0 1 `leaf` "a")) `shouldBe` prettyDiff sources
         [ Join (That (insert (info 0 1 `leaf` "a"))) ]
 
     it "aligns insertions into empty branches" $
-      let sources = both (Source.fromList "[ ]") (Source.fromList "[a]") in
+      let sources = both (Source.fromText "[ ]") (Source.fromText "[a]") in
       align sources (pure (info 0 3) `branch` [ insert (info 1 2 `leaf` "a") ]) `shouldBe` prettyDiff sources
         [ Join (That  (info 0 3 `branch` [ insert (info 1 2 `leaf` "a") ]))
         , Join (This  (info 0 3 `branch` []))
         ]
 
     it "aligns symmetrically following insertions" $
-      let sources = both (Source.fromList "a\nc") (Source.fromList "a\nb\nc") in
+      let sources = both (Source.fromText "a\nc") (Source.fromText "a\nb\nc") in
       align sources (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", insert (info 2 3 `leaf` "b"), both (info 2 3) (info 4 5) `leaf` "c" ])
         `shouldBe` prettyDiff sources
         [ Join (These (info 0 2 `branch` [ info 0 1 `leaf` "a" ])
@@ -136,13 +136,13 @@ spec = parallel $ do
         ]
 
     it "symmetrical nodes force the alignment of asymmetrical nodes on both sides" $
-      let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ b, c ]") in
+      let sources = both (Source.fromText "[ a, b ]") (Source.fromText "[ b, c ]") in
       align sources (pure (info 0 8) `branch` [ delete (info 2 3 `leaf` "a"), both (info 5 6) (info 2 3) `leaf` "b", insert (info 5 6 `leaf` "c") ]) `shouldBe` prettyDiff sources
         [ Join (These (info 0 8 `branch` [ delete (info 2 3 `leaf` "a"), info 5 6 `leaf` "b" ])
                       (info 0 8 `branch` [ info 2 3 `leaf` "b", insert (info 5 6 `leaf` "c") ])) ]
 
     it "when one of two symmetrical nodes must be split, splits the latter" $
-      let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ a\n, b\n]") in
+      let sources = both (Source.fromText "[ a, b ]") (Source.fromText "[ a\n, b\n]") in
       align sources (both (info 0 8) (info 0 9) `branch` [ pure (info 2 3) `leaf` "a", both (info 5 6) (info 6 7) `leaf` "b" ]) `shouldBe` prettyDiff sources
         [ Join (These (info 0 8 `branch` [ info 2 3 `leaf` "a", info 5 6 `leaf` "b" ])
                       (info 0 4 `branch` [ info 2 3 `leaf` "a" ]))
@@ -151,14 +151,14 @@ spec = parallel $ do
         ]
 
     it "aligns deletions before insertions" $
-      let sources = both (Source.fromList "[ a ]") (Source.fromList "[ b ]") in
+      let sources = both (Source.fromText "[ a ]") (Source.fromText "[ b ]") in
       align sources (pure (info 0 5) `branch` [ delete (info 2 3 `leaf` "a"), insert (info 2 3 `leaf` "b") ]) `shouldBe` prettyDiff sources
         [ Join (This (info 0 5 `branch` [ delete (info 2 3 `leaf` "a") ]))
         , Join (That (info 0 5 `branch` [ insert (info 2 3 `leaf` "b") ]))
         ]
 
     it "aligns context-only lines symmetrically" $
-      let sources = both (Source.fromList "[\n  a\n,\n  b\n]") (Source.fromList "[\n  a, b\n\n\n]") in
+      let sources = both (Source.fromText "[\n  a\n,\n  b\n]") (Source.fromText "[\n  a, b\n\n\n]") in
       align sources (both (info 0 13) (info 0 12) `branch` [ pure (info 4 5) `leaf` "a", both (info 10 11) (info 7 8) `leaf` "b" ]) `shouldBe` prettyDiff sources
         [ Join (These (info 0 2 `branch` [])
                       (info 0 2 `branch` []))
@@ -173,7 +173,7 @@ spec = parallel $ do
         ]
 
     it "aligns asymmetrical nodes preceding their symmetrical siblings conservatively" $
-      let sources = both (Source.fromList "[ b, c ]") (Source.fromList "[ a\n, c\n]") in
+      let sources = both (Source.fromText "[ b, c ]") (Source.fromText "[ a\n, c\n]") in
       align sources (both (info 0 8) (info 0 9) `branch` [ insert (info 2 3 `leaf` "a"), delete (info 2 3 `leaf` "b"), both (info 5 6) (info 6 7) `leaf` "c" ]) `shouldBe` prettyDiff sources
         [ Join (That  (info 0 4 `branch` [ insert (info 2 3 `leaf` "a") ]))
         , Join (These (info 0 8 `branch` [ delete (info 2 3 `leaf` "b"), info 5 6 `leaf` "c" ])
@@ -182,7 +182,7 @@ spec = parallel $ do
         ]
 
     it "aligns symmetrical reformatted nodes" $
-      let sources = both (Source.fromList "a [ b ]\nc") (Source.fromList "a [\nb\n]\nc") in
+      let sources = both (Source.fromText "a [ b ]\nc") (Source.fromText "a [\nb\n]\nc") in
       align sources (pure (info 0 9) `branch` [ pure (info 0 1) `leaf` "a", pure (info 2 7) `branch` [ pure (info 4 5) `leaf` "b" ], pure (info 8 9) `leaf` "c" ]) `shouldBe` prettyDiff sources
         [ Join (These (info 0 8 `branch` [ info 0 1 `leaf` "a", info 2 7 `branch` [ info 4 5 `leaf` "b" ] ])
                       (info 0 4 `branch` [ info 0 1 `leaf` "a", info 2 4 `branch` [] ]))
@@ -197,39 +197,39 @@ spec = parallel $ do
       \ xs -> counts (numberedRows (unListableF <$> xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin . unListableF <$> xs))
 
 data BranchElement
-  = Child String (Join These String)
-  | Margin (Join These String)
+  = Child Text (Join These Text)
+  | Margin (Join These Text)
   deriving Show
 
-branchElementKey :: BranchElement -> Maybe String
+branchElementKey :: BranchElement -> Maybe Text
 branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
-toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [Join These (String, Range)], Both [Range])
+toAlignBranchInputs :: [BranchElement] -> (Both Source.Source, [Join These (Text, Range)], Both [Range])
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . traverse go $ elements, ranges)
-  where go :: BranchElement -> State (Both Int) [Join These (String, Range)]
+  where go :: BranchElement -> State (Both Int) [Join These (Text, Range)]
         go child@(Child key _) = do
           lines <- traverse (\ (Child _ contents) -> do
             prev <- get
-            let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
+            let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (Text.length <$> contents)
             put next
             pure $! modifyJoin (runBothWith bimap (const <$> (Range <$> prev <*> next))) contents) (alignBranchElement child)
           pure $! fmap ((,) key) <$> lines
         go (Margin contents) = do
           prev <- get
-          put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
+          put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (Text.length <$> contents)
           pure []
         alignBranchElement element = case element of
           Child key contents -> Child key <$> joinCrosswalk lines contents
           Margin contents -> Margin <$> joinCrosswalk lines contents
-          where lines = fmap toList . Source.actualLines . Source.fromList
-        sources = foldMap Source.fromList <$> bothContents elements
-        ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
+          where lines = fmap Source.sourceText . Source.actualLines . Source.fromText
+        sources = foldMap Source.fromText <$> bothContents elements
+        ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (Source.totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
         branchElementContents (Child _ contents) = contents
         branchElementContents (Margin contents) = contents
 
-keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
+keysOfAlignedChildren :: [Join These (Range, [(Text, Range)])] -> [Text]
 keysOfAlignedChildren lines = lines >>= these identity identity (<>) . runJoin . fmap (fmap Prologue.fst . Prologue.snd)
 
 joinCrosswalk :: Bicrosswalk p => Align f => (a -> f b) -> Join p a -> f (Join p b)
@@ -237,10 +237,10 @@ joinCrosswalk f = fmap Join . bicrosswalk f f . runJoin
 
 instance Listable BranchElement where
   tiers = oneof [ (\ key -> Child key `mapT` joinTheseOf (contents key)) `concatMapT` key
-                , Margin `mapT` joinTheseOf (pure `mapT` padding '-') ]
-    where key = pure `mapT` [['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']]
-          contents key = (wrap key . pure) `mapT` padding '*'
-          wrap key contents = "(" <> key <> contents <> ")" :: String
+                , Margin `mapT` joinTheseOf (Text.singleton `mapT` padding '-') ]
+    where key = Text.singleton `mapT` [['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']]
+          contents key = (wrap key . Text.singleton) `mapT` padding '*'
+          wrap key contents = "(" <> key <> contents <> ")" :: Text
           padding :: Char -> [Tier Char]
           padding char = frequency [ (10, [[char]])
                                    , (1, [['\n']]) ]
@@ -256,16 +256,16 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
-align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term (Syntax String) (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff (Syntax String) (Record '[Range]))
+align :: Both Source.Source -> ConstructibleFree (Patch (Term (Syntax Text) (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
 info start end = Range start end :. Nil
 
-prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term (Syntax String) (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff (Syntax String) (Record '[Range]))
+prettyDiff :: Both Source.Source -> [Join These (ConstructibleFree (SplitPatch (Term (Syntax Text) (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff (Syntax Text) (Record '[Range]))
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
 
-data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
+data PrettyDiff a = PrettyDiff { unPrettySources :: Both Source.Source, unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
 
 instance Show (PrettyDiff a) where
@@ -273,22 +273,22 @@ instance Show (PrettyDiff a) where
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
           showLine n line = uncurry ((<>) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
-          showDiff (range, _) = filter (/= '\n') . toList . Source.slice range
+          showDiff (range, _) = filter (/= '\n') . Text.unpack . Source.sourceText . Source.slice range
           pad n string = (<>) (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
 
-newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (CofreeF (Syntax String) annotation) patch }
+newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (CofreeF (Syntax Text) annotation) patch }
 
 
 class PatchConstructible p where
-  insert :: Term (Syntax String) (Record '[Range]) -> p
-  delete :: Term (Syntax String) (Record '[Range]) -> p
+  insert :: Term (Syntax Text) (Record '[Range]) -> p
+  delete :: Term (Syntax Text) (Record '[Range]) -> p
 
-instance PatchConstructible (Patch (Term (Syntax String) (Record '[Range]))) where
+instance PatchConstructible (Patch (Term (Syntax Text) (Record '[Range]))) where
   insert = Insert
   delete = Delete
 
-instance PatchConstructible (SplitPatch (Term (Syntax String) (Record '[Range]))) where
+instance PatchConstructible (SplitPatch (Term (Syntax Text) (Record '[Range]))) where
   insert = SplitInsert
   delete = SplitDelete
 
@@ -297,13 +297,13 @@ instance PatchConstructible patch => PatchConstructible (ConstructibleFree patch
   delete = ConstructibleFree . pure . delete
 
 class SyntaxConstructible s where
-  leaf :: annotation -> String -> s annotation
+  leaf :: annotation -> Text -> s annotation
   branch :: annotation -> [s annotation] -> s annotation
 
 instance SyntaxConstructible (ConstructibleFree patch) where
   leaf info = ConstructibleFree . free . Free . (info :<) . Leaf
   branch info = ConstructibleFree . free . Free . (info :<) . Indexed . fmap deconstruct
 
-instance SyntaxConstructible (Cofree (Syntax String)) where
+instance SyntaxConstructible (Cofree (Syntax Text)) where
   info `leaf` value = cofree $ info :< Leaf value
   info `branch` children = cofree $ info :< Indexed children

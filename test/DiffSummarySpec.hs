@@ -84,7 +84,7 @@ spec = parallel $ do
               let listOfLeaves = foldMap extractLeaves (join $ toList <$> branchPatches)
                   listOfDiffLeaves = foldMap extractDiffLeaves (diffPatches >>= toList)
                in
-                length listOfLeaves `shouldBe` length listOfDiffLeaves
+                Prologue.length listOfLeaves `shouldBe` Prologue.length listOfDiffLeaves
 
 isIndexedOrFixed :: Patch (Term (Syntax a) annotation) -> Bool
 isIndexedOrFixed = any (isIndexedOrFixed' . unwrap)

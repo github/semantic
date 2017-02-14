@@ -4,13 +4,13 @@ module Language.Ruby where
 import Data.List (partition)
 import Info
 import Prologue
-import Source
+import Source hiding (null)
 import Language
 import qualified Syntax as S
 import Term
 
 termAssignment
-  :: Source Char -- ^ The source of the term.
+  :: Source -- ^ The source of the term.
   -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in Maybe.
