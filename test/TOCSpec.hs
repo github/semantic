@@ -31,7 +31,7 @@ spec = parallel $ do
       diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ InSummarizable Category.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
 
     it "dedupes similar methods" $ do
-      sourceBlobs <- blobsForPaths (both "test/corpus/toc/javascript/test.A.js" "test/corpus/toc/javascript/test.B.js")
+      sourceBlobs <- blobsForPaths (both "test/corpus/toc/javascript/erroneousDupMethod.A.js" "test/corpus/toc/javascript/erroneousDupMethod.B.js")
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable Category.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
