@@ -67,7 +67,7 @@ diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> Sy
 diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-    removeDupes = foldl' (\xs x -> case (x `elem` xs, x `findSimilarSummaryIndex` xs) of
+    removeDupes = foldl' (\xs x -> case (x `anyDuplicateSummary` xs, x `findSimilarSummaryIndex` xs) of
       (True, Nothing) -> xs
       (False, Nothing) -> xs <> [x]
       (_, Just n) ->
@@ -78,10 +78,10 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
         in
           a <> (replacement : b)
       ) []
+    anyDuplicateSummary a = List.any (\b -> parentInfo a == parentInfo b)
     findSimilarSummaryIndex summary = List.findIndex (isSimilarSummary summary)
     isSimilarSummary a b = case (parentInfo a, parentInfo b) of
-      -- TODO: Only do this for methods in the same source file?
-      (Summarizable _ nameA _ _, Summarizable _ nameB _ _) -> toLower nameA == toLower nameB
+      (Summarizable catA nameA _ _, Summarizable catB nameB _ _) -> catA == catB && toLower nameA == toLower nameB
       (_, _) -> False
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
