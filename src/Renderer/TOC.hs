@@ -5,6 +5,7 @@ import Category as C
 import Data.Aeson
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
+import Data.Text (toLower)
 import Data.Record
 import Diff
 import Info
@@ -69,8 +70,16 @@ diffTOC blobs diff = do
   toJSONSummaries noDupes
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-    removeDupes [] = []
-    removeDupes xs = (fmap unsafeHead . List.groupBy (\a b -> parentInfo a == parentInfo b)) xs
+    removeDupes = foldl' (\xs x -> if x `isInSummaries` xs then xs else xs <> [x]) []
+    isInSummaries summary = List.any (\x ->
+      let
+        a = parentInfo x
+        b = parentInfo summary
+      in
+        case (a, b) of
+          (Summarizable _ nameA _ _, Summarizable _ nameB _ _) -> a == b || toLower nameA == toLower nameB
+          (_, _) -> a == b
+        )
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
