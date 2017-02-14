@@ -6,7 +6,7 @@ import Renderer
 import Data.Record
 import DiffSummary
 import Data.Map as Map hiding (null)
-import Source
+import Source hiding (null)
 import Data.Aeson
 import Data.List as List
 

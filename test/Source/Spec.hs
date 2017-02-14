@@ -1,22 +1,22 @@
 module Source.Spec where
 
+import qualified Data.Text as Text
 import qualified Prelude
 import Prologue
 import Range
 import Source
 import SourceSpan
 import Test.Hspec
-import Test.Hspec.QuickCheck
+import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
   describe "actualLineRanges" $ do
     prop "produces 1 more range than there are newlines" $
-      \ s -> length (actualLineRanges (totalRange s) (fromList s)) `shouldBe` succ (length (filter (== '\n') s))
+      \ source -> Prologue.length (actualLineRanges (totalRange source) source) `shouldBe` succ (Text.count "\n" (sourceText source))
 
     prop "produces exhaustive ranges" $
-      \ s -> let source = fromList s in
-        foldMap (`slice` source) (actualLineRanges (totalRange s) source) `shouldBe` source
+      \ source -> foldMap (`slice` source) (actualLineRanges (totalRange source) source) `shouldBe` source
 
   describe "sourceSpanToRange" $ do
     prop "computes single-line ranges" $
@@ -40,8 +40,8 @@ spec = parallel $ do
     prop "covers multiple lines" $
       \ n -> totalSpan (fromList (intersperse '\n' (replicate n '*'))) `shouldBe` SourceSpan (SourcePos 0 0) (SourcePos (max 0 (pred n)) (if n > 0 then 1 else 0))
 
-totalSpan :: Source Char -> SourceSpan
-totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
+totalSpan :: Source -> SourceSpan
+totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (Prologue.length ranges)) (end lastRange - start lastRange))
   where ranges = actualLineRanges (totalRange source) source
         lastRange = Prelude.last ranges
 
