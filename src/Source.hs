@@ -3,19 +3,19 @@
 module Source where
 
 import Prologue
-import qualified Data.Text as Text
-import Data.Text.Listable
+import qualified Data.ByteString as B
+import qualified Data.Text as T
 import Numeric
 import Range
 import SourceSpan
 import Test.LeanCheck
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
-data SourceBlob = SourceBlob { source :: Source, oid :: Text, path :: FilePath, blobKind :: Maybe SourceKind }
+data SourceBlob = SourceBlob { source :: Source, oid :: T.Text, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
--- | The contents of a source file, represented as Text.
-newtype Source = Source { sourceText :: Text }
+-- | The contents of a source file, represented as a ByteString.
+newtype Source = Source { sourceText :: B.ByteString }
   deriving (Eq, Show)
 
 -- | The kind of a blob, along with it's file mode.
@@ -33,7 +33,7 @@ defaultPlainBlob :: SourceKind
 defaultPlainBlob = PlainBlob 0o100644
 
 emptySourceBlob :: FilePath -> SourceBlob
-emptySourceBlob filepath = SourceBlob (Source.fromList "")  Source.nullOid filepath Nothing
+emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothing
 
 sourceBlob :: Source -> FilePath -> SourceBlob
 sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
@@ -44,45 +44,48 @@ idOrEmptySourceBlob blob = if isNothing (blobKind blob)
                            then blob { oid = nullOid, blobKind = Nothing }
                            else blob
 
-nullOid :: Text
+nullOid :: T.Text
 nullOid = "0000000000000000000000000000000000000000"
 
--- | Return a Source from a list of items.
-fromList :: [Char] -> Source
-fromList = Source . Text.pack
+empty :: Source
+empty = Source B.empty
 
--- | Return a Source of Chars from a Text.
-fromText :: Text -> Source
-fromText = Source
+-- | Return a Source from a list of characters.
+fromList :: [Word8] -> Source
+fromList = Source . B.pack
+
+-- | Return a Source from a ByteString.
+fromText :: T.Text -> Source
+fromText = Source . encodeUtf8
 
 -- | Return a Source that contains a slice of the given Source.
 slice :: Range -> Source -> Source
 slice range = Source . take . drop . sourceText
-  where drop = Text.drop (start range)
-        take = Text.take (rangeLength range)
+  where drop = B.drop (start range)
+        take = B.take (rangeLength range)
 
--- | Return a text with the contents of the Source.
+-- | Return the ByteString contained in the Source.
 toText :: Source -> Text
-toText = sourceText
+toText = decodeUtf8 . sourceText
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-break :: (Char -> Bool) -> Source -> (Source, Source)
-break predicate (Source text) = let (start, remainder) = Text.break predicate text in (Source start, Source remainder)
+break :: (Word8 -> Bool) -> Source -> (Source, Source)
+break predicate (Source text) = let (start, remainder) = B.break predicate text in (Source start, Source remainder)
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source -> [Source]
 actualLines = fmap Source . actualLines' . sourceText
   where actualLines' text
-          | Text.null text = [ text ]
-          | otherwise = case Text.break (== '\n') text of
-            (l, lines') -> case Text.uncons lines' of
+          | B.null text = [ text ]
+          | otherwise = case B.break (== toEnum (fromEnum '\n')) text of
+            (l, lines') -> case B.uncons lines' of
               Nothing -> [ l ]
-              Just (_, lines') -> (l <> Text.singleton '\n') : actualLines' lines'
+              Just (_, lines') -> (l <> B.singleton (toEnum (fromEnum '\n'))) : actualLines' lines'
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + Text.length (sourceText string)
+  where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
 
 -- | Compute the character range given a Source and a SourceSpan.
 sourceSpanToRange :: Source -> SourceSpan -> Range
@@ -94,7 +97,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
 
 -- | Return a range that covers the entire text.
 totalRange :: Source -> Range
-totalRange = Range 0 . Text.length . sourceText
+totalRange = Range 0 . B.length . sourceText
 
 rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
@@ -105,10 +108,10 @@ rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
         toEndPos line range = SourcePos line (end range)
 
 length :: Source -> Int
-length = Text.length . sourceText
+length = B.length . sourceText
 
 null :: Source -> Bool
-null = Text.null . sourceText
+null = B.null . sourceText
 
 instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
@@ -118,4 +121,9 @@ instance Monoid Source where
   mappend = (<>)
 
 instance Listable Source where
-  tiers = (Source . unListableText) `mapT` tiers
+  tiers = (Source . unListableByteString) `mapT` tiers
+
+newtype ListableByteString = ListableByteString { unListableByteString :: B.ByteString }
+
+instance Listable ListableByteString where
+  tiers = (ListableByteString . B.pack) `mapT` setsOf (toTiers listIntegral)
