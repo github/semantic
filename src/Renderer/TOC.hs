@@ -1,5 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Renderer.TOC (toc) where
+module Renderer.TOC (toc, diffTOC, JSONSummary(..), Summarizable(..)) where
 
 import Category as C
 import Data.Aeson
@@ -67,22 +67,21 @@ diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> Sy
 diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-    removeDupes = foldl' (\xs x -> case (x `anyDuplicateSummary` xs, x `findSimilarSummaryIndex` xs) of
-      (True, Nothing) -> xs
-      (False, Nothing) -> xs <> [x]
-      (_, Just n) ->
-        let
-          (a, existingItem : b) = List.splitAt n xs
-          (Summarizable category name sourceSpan _) = parentInfo existingItem
-          replacement = x { parentInfo = Summarizable category name sourceSpan "modified" }
-        in
-          a <> (replacement : b)
-      ) []
-    anyDuplicateSummary a = List.any (\b -> parentInfo a == parentInfo b)
-    findSimilarSummaryIndex summary = List.findIndex (isSimilarSummary summary)
-    isSimilarSummary a b = case (parentInfo a, parentInfo b) of
-      (Summarizable catA nameA _ _, Summarizable catB nameB _ _) -> catA == catB && toLower nameA == toLower nameB
-      (_, _) -> False
+    removeDupes = foldl' go []
+      where
+        go xs x | (_, _ : _) <- find exactMatch x xs = xs
+                | (front, existingItem : back) <- find similarMatch x xs =
+                   let
+                     (Summarizable category name sourceSpan _) = parentInfo existingItem
+                     replacement = x { parentInfo = Summarizable category name sourceSpan "modified" }
+                   in
+                     front <> (replacement : back)
+                | otherwise = xs <> [x]
+        find p x = List.break (p x)
+        exactMatch a b = parentInfo a == parentInfo b
+        similarMatch a b = case (parentInfo a, parentInfo b) of
+          (Summarizable catA nameA _ _, Summarizable catB nameB _ _) -> catA == catB && toLower nameA == toLower nameB
+          (_, _) -> False
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
