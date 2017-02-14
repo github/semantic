@@ -29,10 +29,15 @@ spec = parallel $ do
     it "blank if there are no methods" $
       diffTOC blobs blankDiff `shouldBe` [ ]
 
-    it "summarizes methods" $ do
-      sourceBlobs <- blobsForPaths (both "/Users/tclem/github/semantic-diff/test.A.js" "/Users/tclem/github/semantic-diff/test.B.js")
+    it "dedupes changes in same parent method" $ do
+      sourceBlobs <- blobsForPaths (both "test/corpus/toc/javascript/dupParent.A.js" "test/corpus/toc/javascript/dupParent.B.js")
       diff <- testDiff sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe` [ ]
+      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ InSummarizable Category.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
+
+    it "dedupes similar methods" $ do
+      sourceBlobs <- blobsForPaths (both "test/corpus/toc/javascript/test.A.js" "test/corpus/toc/javascript/test.B.js")
+      diff <- testDiff sourceBlobs
+      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable Category.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
