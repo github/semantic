@@ -61,28 +61,28 @@ liftCons1 tiers f = mapT f tiers `addWeight` 1
 --
 --   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons2 :: [Tier a] -> [Tier b] -> (a -> b -> c) -> [Tier c]
-liftCons2 tiers1 tiers2 f = mapT (uncurry f) (productWith (,) tiers1 tiers2) `addWeight` 1
+liftCons2 tiers1 tiers2 f = mapT (uncurry f) (liftTiers2 tiers1 tiers2) `addWeight` 1
 
 -- | Lifts a ternary constructor to a list of tiers, given lists of tiers for its arguments.
 --
 --   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons3 :: [Tier a] -> [Tier b] -> [Tier c] -> (a -> b -> c -> d) -> [Tier d]
-liftCons3 tiers1 tiers2 tiers3 f = mapT (uncurry3 f) (productWith (\ x (y, z) -> (x, y, z)) tiers1 (liftCons2 tiers2 tiers3 (,)) ) `addWeight` 1
-  where uncurry3 f (a, b, c) = f a b c
+liftCons3 tiers1 tiers2 tiers3 f = mapT (uncurry3 f) (tiers1 >< tiers2 >< tiers3) `addWeight` 1
+  where uncurry3 f (a, (b, c)) = f a b c
 
 -- | Lifts a quaternary constructor to a list of tiers, given lists of tiers for its arguments.
 --
 --   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons4 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> (a -> b -> c -> d -> e) -> [Tier e]
-liftCons4 tiers1 tiers2 tiers3 tiers4 f = mapT (uncurry4 f) (productWith (\ x (y, z, w) -> (x, y, z, w)) tiers1 (liftCons3 tiers2 tiers3 tiers4 (,,)) ) `addWeight` 1
-  where uncurry4 f (a, b, c, d) = f a b c d
+liftCons4 tiers1 tiers2 tiers3 tiers4 f = mapT (uncurry4 f) (tiers1 >< tiers2 >< tiers3 >< tiers4) `addWeight` 1
+  where uncurry4 f (a, (b, (c, d))) = f a b c d
 
 -- | Lifts a quinary constructor to a list of tiers, given lists of tiers for its arguments.
 --
 --   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons5 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> [Tier e] -> (a -> b -> c -> d -> e -> f) -> [Tier f]
-liftCons5 tiers1 tiers2 tiers3 tiers4 tiers5 f = mapT (uncurry5 f) (productWith (\ x (y, z, w, u) -> (x, y, z, w, u)) tiers1 (liftCons4 tiers2 tiers3 tiers4 tiers5 (,,,)) ) `addWeight` 1
-  where uncurry5 f (a, b, c, d, e) = f a b c d e
+liftCons5 tiers1 tiers2 tiers3 tiers4 tiers5 f = mapT (uncurry5 f) (tiers1 >< tiers2 >< tiers3 >< tiers4 >< tiers5) `addWeight` 1
+  where uncurry5 f (a, (b, (c, (d, e)))) = f a b c d e
 
 -- | Convenient wrapper for 'Listable1' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
 newtype ListableF f a = ListableF { unListableF :: f a }
