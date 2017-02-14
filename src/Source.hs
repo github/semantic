@@ -65,10 +65,6 @@ slice range = Source . take . drop . sourceText
 toText :: Source -> Text
 toText = sourceText
 
--- | Return the item at the given  index.
-at :: Source -> Int -> Char
-at = Text.index . sourceText
-
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
 break :: (Char -> Bool) -> Source -> (Source, Source)
 break predicate (Source text) = let (start, remainder) = Text.break predicate text in (Source start, Source remainder)
