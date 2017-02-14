@@ -2,30 +2,30 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
-import Prologue hiding (uncons)
-import Data.Text (unpack, pack)
-import Data.String
-import qualified Data.Vector as Vector
+import Prologue
+import qualified Data.Text as Text
+import Data.Text.Listable
 import Numeric
 import Range
 import SourceSpan
+import Test.LeanCheck
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
-data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
+data SourceBlob = SourceBlob { source :: Source, oid :: Text, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
--- | The contents of a source file, backed by a vector for efficient slicing.
-newtype Source a = Source { getVector :: Vector.Vector a  }
-  deriving (Eq, Show, Foldable, Functor, Traversable)
+-- | The contents of a source file, represented as Text.
+newtype Source = Source { sourceText :: Text }
+  deriving (Eq, Show)
 
 -- | The kind of a blob, along with it's file mode.
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
-modeToDigits :: SourceKind -> String
-modeToDigits (PlainBlob mode) = showOct mode ""
-modeToDigits (ExecutableBlob mode) = showOct mode ""
-modeToDigits (SymlinkBlob mode) = showOct mode ""
+modeToDigits :: SourceKind -> Text
+modeToDigits (PlainBlob mode) = toS $ showOct mode ""
+modeToDigits (ExecutableBlob mode) = toS $ showOct mode ""
+modeToDigits (SymlinkBlob mode) = toS $ showOct mode ""
 
 
 -- | The default plain blob mode
@@ -35,7 +35,7 @@ defaultPlainBlob = PlainBlob 0o100644
 emptySourceBlob :: FilePath -> SourceBlob
 emptySourceBlob filepath = SourceBlob (Source.fromList "")  Source.nullOid filepath Nothing
 
-sourceBlob :: Source Char -> FilePath -> SourceBlob
+sourceBlob :: Source -> FilePath -> SourceBlob
 sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
 
 -- | Map blobs with Nothing blobKind to empty blobs.
@@ -44,74 +44,82 @@ idOrEmptySourceBlob blob = if isNothing (blobKind blob)
                            then blob { oid = nullOid, blobKind = Nothing }
                            else blob
 
-nullOid :: String
+nullOid :: Text
 nullOid = "0000000000000000000000000000000000000000"
 
 -- | Return a Source from a list of items.
-fromList :: [a] -> Source a
-fromList = Source . Vector.fromList
+fromList :: [Char] -> Source
+fromList = Source . Text.pack
 
 -- | Return a Source of Chars from a Text.
-fromText :: Text -> Source Char
-fromText = Source . Vector.fromList . unpack
+fromText :: Text -> Source
+fromText = Source
 
 -- | Return a Source that contains a slice of the given Source.
-slice :: Range -> Source a -> Source a
-slice range = Source . Vector.slice (start range) (rangeLength range) . getVector
-
--- | Return a String with the contents of the Source.
-toString :: Source Char -> String
-toString = toList
+slice :: Range -> Source -> Source
+slice range = Source . take . drop . sourceText
+  where drop = Text.drop (start range)
+        take = Text.take (rangeLength range)
 
 -- | Return a text with the contents of the Source.
-toText :: Source Char -> Text
-toText = pack . toList
+toText :: Source -> Text
+toText = sourceText
 
 -- | Return the item at the given  index.
-at :: Source a -> Int -> a
-at = (Vector.!) . getVector
-
--- | Remove the first item and return it with the rest of the source.
-uncons :: Source a -> Maybe (a, Source a)
-uncons (Source vector) = if null vector then Nothing else Just (Vector.head vector, Source $ Vector.tail vector)
+at :: Source -> Int -> Char
+at = Text.index . sourceText
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-break :: (a -> Bool) -> Source a -> (Source a, Source a)
-break predicate (Source vector) = let (start, remainder) = Vector.break predicate vector in (Source start, Source remainder)
+break :: (Char -> Bool) -> Source -> (Source, Source)
+break predicate (Source text) = let (start, remainder) = Text.break predicate text in (Source start, Source remainder)
 
 -- | Split the contents of the source after newlines.
-actualLines :: Source Char -> [Source Char]
-actualLines source | null source = [ source ]
-actualLines source = case Source.break (== '\n') source of
-  (l, lines') -> case uncons lines' of
-    Nothing -> [ l ]
-    Just (_, lines') -> (l <> fromList "\n") : actualLines lines'
+actualLines :: Source -> [Source]
+actualLines = fmap Source . actualLines' . sourceText
+  where actualLines' text
+          | Text.null text = [ text ]
+          | otherwise = case Text.break (== '\n') text of
+            (l, lines') -> case Text.uncons lines' of
+              Nothing -> [ l ]
+              Just (_, lines') -> (l <> Text.singleton '\n') : actualLines' lines'
 
 -- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> Source Char -> [Range]
+actualLineRanges :: Range -> Source -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + length string
+  where toRange previous string = Range (end previous) $ end previous + Text.length (sourceText string)
 
 -- | Compute the character range given a Source and a SourceSpan.
-sourceSpanToRange :: Source Char -> SourceSpan -> Range
+sourceSpanToRange :: Source -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sumLengths leadingRanges + column spanStart
         end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
-        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
+        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (Source.totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
-rangeToSourceSpan :: Source Char -> Range -> SourceSpan
+-- | Return a range that covers the entire text.
+totalRange :: Source -> Range
+totalRange = Range 0 . Text.length . sourceText
+
+rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
   where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
-        endPos = toEndPos (length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
+        endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
         lineRanges = actualLineRanges range source
         toStartPos line range = SourcePos line (start range)
         toEndPos line range = SourcePos line (end range)
 
+length :: Source -> Int
+length = Text.length . sourceText
 
-instance Semigroup (Source a) where
-  Source a <> Source b = Source (a Vector.++ b)
+null :: Source -> Bool
+null = Text.null . sourceText
 
-instance Monoid (Source a) where
+instance Semigroup Source where
+  Source a <> Source b = Source (a <> b)
+
+instance Monoid Source where
   mempty = fromList []
   mappend = (<>)
+
+instance Listable Source where
+  tiers = (Source . unListableText) `mapT` tiers

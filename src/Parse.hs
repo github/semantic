@@ -5,7 +5,7 @@ import Arguments
 import Category
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty
-import qualified Data.ByteString.Char8 as B1
+import qualified Data.ByteString as B1
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Data.Record
@@ -94,7 +94,7 @@ termCostDecorator :: (Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
 -- | Term decorator extracting the source text for a term.
-termSourceDecorator :: (HasField fields Range) => Source Char -> TermDecorator f fields SourceText
+termSourceDecorator :: (HasField fields Range) => Source -> TermDecorator f fields SourceText
 termSourceDecorator source c = SourceText . toText $ Source.slice range' source
  where range' = characterRange $ headF c
 
@@ -104,24 +104,24 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines source
-    root children = (Range 0 (length source) :. Program :. rangeToSourceSpan source (Range 0 (length source)) :. Nil) :< Indexed children
+    root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
+    sourceRange = Source.totalRange source
     leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
-      (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
-    toText = T.pack . Source.toString
+      (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
 
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
 parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Read the file and convert it to Unicode.
-readAndTranscodeFile :: FilePath -> IO (Source Char)
+readAndTranscodeFile :: FilePath -> IO Source
 readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
 -- | Transcode a file to a unicode source.
-transcode :: B1.ByteString -> IO (Source Char)
+transcode :: B1.ByteString -> IO Source
 transcode text = fromText <$> do
   match <- Detect.detectCharset text
   converter <- Convert.open match Nothing

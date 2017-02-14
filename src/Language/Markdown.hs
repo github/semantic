@@ -7,7 +7,6 @@ import Data.Text
 import Info
 import Parser
 import Prologue
-import Range
 import Source
 import Syntax
 
