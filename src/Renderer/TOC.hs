@@ -15,10 +15,10 @@ import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Renderer
 import Source hiding (null)
+import SourceSpan
 import Syntax as S
 import Term
 import Patch
-import Unsafe (unsafeHead)
 
 data JSONSummary = JSONSummary { info :: Summarizable }
                  | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
@@ -70,16 +70,23 @@ diffTOC blobs diff = do
   toJSONSummaries noDupes
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-    removeDupes = foldl' (\xs x -> if x `isInSummaries` xs then xs else xs <> [x]) []
-    isInSummaries summary = List.any (\x ->
-      let
-        a = parentInfo x
-        b = parentInfo summary
-      in
-        case (a, b) of
-          (Summarizable _ nameA _ _, Summarizable _ nameB _ _) -> a == b || toLower nameA == toLower nameB
-          (_, _) -> a == b
-        )
+    removeDupes = foldl' (\xs x -> case (x `elem` xs, x `findSimilarSummaryIndex` xs) of
+      (True, Nothing) -> xs
+      (False, Nothing) -> xs <> [x]
+      (_, Just n) ->
+        let
+          (a, _ : b) = List.splitAt n xs
+          name = case parentInfo x of
+            (Summarizable _ name _ _) -> name
+            _ -> "xx"
+          item = x { parentInfo = Summarizable C.Function name SourceSpan.emptySourceSpan "modified" }
+        in
+          a <> (item : b)
+      ) []
+    findSimilarSummaryIndex summary = List.findIndex (isSimilarSummary summary)
+    isSimilarSummary a b = case (parentInfo a, parentInfo b) of
+      (Summarizable _ nameA _ _, Summarizable _ nameB _ _) -> toLower nameA == toLower nameB
+      (_, _) -> False
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
