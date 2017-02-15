@@ -12,6 +12,7 @@ import qualified PatchOutputSpec
 import qualified RangeSpec
 import qualified Source.Spec
 import qualified TermSpec
+import qualified TOCSpec
 import Test.Hspec
 
 main :: IO ()
@@ -27,3 +28,4 @@ main = hspec . parallel $ do
   describe "Range" RangeSpec.spec
   describe "Source" Source.Spec.spec
   describe "Term" TermSpec.spec
+  describe "TOC" TOCSpec.spec
