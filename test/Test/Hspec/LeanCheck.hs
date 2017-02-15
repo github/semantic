@@ -49,7 +49,7 @@ instance Example Property where
       Right (Just messages) -> pure $ Failure Nothing (Reason (concat messages))
       Right Nothing -> pure Success
     where addMessages messages (HUnit.HUnitFailure loc r) = HUnit.HUnitFailure loc $ case r of
-            HUnit.Reason s -> HUnit.Reason (intercalate "\n" messages ++ s)
+            HUnit.Reason s -> HUnit.Reason (intercalate "\n" messages ++ "\n" ++ s)
             HUnit.ExpectedButGot Nothing expected actual -> HUnit.ExpectedButGot (Just (concat messages)) expected actual
             HUnit.ExpectedButGot (Just preface) expected actual -> HUnit.ExpectedButGot (Just (intercalate "\n" messages ++ preface)) expected actual
 

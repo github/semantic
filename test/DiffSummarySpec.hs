@@ -93,6 +93,7 @@ isIndexedOrFixed' :: Syntax a f -> Bool
 isIndexedOrFixed' syntax = case syntax of
   (Indexed _) -> True
   (Fixed _) -> True
+  (Commented _ _) -> True
   _ -> False
 
 isBranchNode :: Patch DiffInfo -> Bool

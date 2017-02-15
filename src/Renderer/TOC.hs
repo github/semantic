@@ -1,10 +1,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Renderer.TOC (toc) where
+module Renderer.TOC (toc, diffTOC, JSONSummary(..), Summarizable(..)) where
 
 import Category as C
 import Data.Aeson
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
+import Data.Text (toLower)
 import Data.Record
 import Diff
 import Info
@@ -17,7 +18,6 @@ import Source hiding (null)
 import Syntax as S
 import Term
 import Patch
-import Unsafe (unsafeHead)
 
 data JSONSummary = JSONSummary { info :: Summarizable }
                  | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
@@ -64,13 +64,24 @@ toc blobs diff = TOCOutput $ Map.fromList [
     summaries = diffTOC blobs diff
 
 diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
-diffTOC blobs diff = do
-  noDupes <- removeDupes (diffToTOCSummaries (source <$> blobs) diff)
-  toJSONSummaries noDupes
+diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-    removeDupes [] = []
-    removeDupes xs = (fmap unsafeHead . List.groupBy (\a b -> parentInfo a == parentInfo b)) xs
+    removeDupes = foldl' go []
+      where
+        go xs x | (_, _ : _) <- find exactMatch x xs = xs
+                | (front, existingItem : back) <- find similarMatch x xs =
+                   let
+                     (Summarizable category name sourceSpan _) = parentInfo existingItem
+                     replacement = x { parentInfo = Summarizable category name sourceSpan "modified" }
+                   in
+                     front <> (replacement : back)
+                | otherwise = xs <> [x]
+        find p x = List.break (p x)
+        exactMatch a b = parentInfo a == parentInfo b
+        similarMatch a b = case (parentInfo a, parentInfo b) of
+          (Summarizable catA nameA _ _, Summarizable catB nameB _ _) -> catA == catB && toLower nameA == toLower nameB
+          (_, _) -> False
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
@@ -155,10 +166,15 @@ toTermName :: forall leaf fields. DefaultFields fields => Int -> Source -> Synta
 toTermName parentOffset parentSource term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
   S.Method identifier Nothing _ _ _ -> toTermName' identifier
-  S.Method identifier (Just receiver) _ _ _ -> toTermName' receiver <> "." <> toTermName' identifier
+  S.Method identifier (Just receiver) _ _ _ -> case unwrap receiver of
+    S.Indexed [receiverParams] -> case unwrap receiverParams of
+      S.ParameterDecl (Just ty) _ -> "(" <> toTermName' ty <> ") " <> toTermName' identifier
+      _ -> toMethodNameWithReceiver receiver identifier
+    _ -> toMethodNameWithReceiver receiver identifier
   _ -> toText source
   where
     source = Source.slice (offsetRange (range term) (negate parentOffset)) parentSource
+    toMethodNameWithReceiver receiver name = toTermName' receiver <> "." <> toTermName' name
     offset = start (range term)
     toTermName' :: SyntaxTerm leaf fields -> Text
     toTermName' = toTermName offset source
