@@ -3,7 +3,7 @@
 module SemanticDiff (main, fetchDiff, fetchDiffs) where
 
 import Arguments
-import Prologue hiding ((<>), fst, snd)
+import Prologue hiding (fst, snd)
 import Data.String
 import Data.Functor.Both
 import Data.Version (showVersion)
