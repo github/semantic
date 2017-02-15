@@ -1,11 +1,13 @@
 {-# LANGUAGE DataKinds #-}
 module TOCSpec where
 
-import Category
+import Category as C
 import Data.Functor.Both
+import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.These
+import Data.String
 import Diff
 import Diffing
 import Info
@@ -16,8 +18,10 @@ import Prologue hiding (fst, snd)
 import Renderer.TOC
 import Source
 import Syntax
+import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
+import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
@@ -25,15 +29,25 @@ spec = parallel $ do
     it "blank if there are no methods" $
       diffTOC blobs blankDiff `shouldBe` [ ]
 
-    it "dedupes changes in same parent method" $ do
-      sourceBlobs <- blobsForPaths (both "test/corpus/toc/javascript/dupParent.A.js" "test/corpus/toc/javascript/dupParent.B.js")
+    it "summarizes changed methods" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- testDiff sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ InSummarizable Category.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
+      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+                                          , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
+                                          , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
+    it "dedupes changes in same parent method" $ do
+      sourceBlobs <- blobsForPaths (both "javascript/dupParent.A.js" "javascript/dupParent.B.js")
+      diff <- testDiff sourceBlobs
+      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ InSummarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
 
     it "dedupes similar methods" $ do
-      sourceBlobs <- blobsForPaths (both "test/corpus/toc/javascript/erroneousDupMethod.A.js" "test/corpus/toc/javascript/erroneousDupMethod.B.js")
+      sourceBlobs <- blobsForPaths (both "javascript/erroneousDupMethod.A.js" "javascript/erroneousDupMethod.B.js")
       diff <- testDiff sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable Category.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
+      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
+
+    prop "equal terms produce identity diffs" $
+      \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: SyntaxTerm String '[Category, Range, SourceSpan]) in
+        diffTOC blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
@@ -55,9 +69,8 @@ testDiff sourceBlobs = do
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do
-  sources <- sequence $ readAndTranscodeFile <$> paths
+  sources <- sequence $ readAndTranscodeFile . ("test/corpus/toc/" <>) <$> paths
   pure $ SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
-
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
@@ -73,3 +86,6 @@ blankDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree
 
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
+
+unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
+unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff
