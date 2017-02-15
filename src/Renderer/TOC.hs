@@ -166,10 +166,15 @@ toTermName :: forall leaf fields. DefaultFields fields => Int -> Source -> Synta
 toTermName parentOffset parentSource term = case unwrap term of
   S.Function identifier _ _ _ -> toTermName' identifier
   S.Method identifier Nothing _ _ _ -> toTermName' identifier
-  S.Method identifier (Just receiver) _ _ _ -> toTermName' receiver <> "." <> toTermName' identifier
+  S.Method identifier (Just receiver) _ _ _ -> case unwrap receiver of
+    S.Indexed [receiverParams] -> case unwrap receiverParams of
+      S.ParameterDecl (Just ty) _ -> "(" <> toTermName' ty <> ") " <> toTermName' identifier
+      _ -> toMethodNameWithReceiver receiver identifier
+    _ -> toMethodNameWithReceiver receiver identifier
   _ -> toText source
   where
     source = Source.slice (offsetRange (range term) (negate parentOffset)) parentSource
+    toMethodNameWithReceiver receiver name = toTermName' receiver <> "." <> toTermName' name
     offset = start (range term)
     toTermName' :: SyntaxTerm leaf fields -> Text
     toTermName' = toTermName offset source
