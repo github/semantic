@@ -73,7 +73,7 @@ isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
 
 nodeRange :: Ptr Node -> Range
-nodeRange node = Range { start = fromIntegral (ts_node_p_start_char node), end = fromIntegral (ts_node_p_end_char node) }
+nodeRange node = Range { start = fromIntegral (ts_node_p_start_byte node), end = fromIntegral (ts_node_p_end_byte node) }
 
 assignTerm :: Language -> Source -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren =
