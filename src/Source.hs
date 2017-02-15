@@ -126,4 +126,7 @@ instance Listable Source where
 newtype ListableByteString = ListableByteString { unListableByteString :: B.ByteString }
 
 instance Listable ListableByteString where
-  tiers = (ListableByteString . B.pack) `mapT` setsOf (toTiers listIntegral)
+  tiers = (ListableByteString . B.pack) `mapT` setsOf (toTiers oneByte)
+    where
+      -- This sequence covers all of 7-bit ASCII (and is thus valid utf8). It’s ordered thus to test letters before numbers, printable characters before control characters, and so on.
+      oneByte = concat [[0x061..0x7a], [0x41..0x5a], [0x30..0x39], [0x20..0x2f], [0x3a..0x40], [0x5b..0x60], [0x7b..0x7e], [0x00..0x1f], [127]]
