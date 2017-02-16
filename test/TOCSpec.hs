@@ -17,7 +17,7 @@ import Patch
 import Prologue hiding (fst, snd)
 import Renderer.TOC
 import Source
-import Syntax
+import Syntax as S
 import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
@@ -66,6 +66,11 @@ spec = parallel $ do
         let diff = programWithReplace name (unListableF body)
         in numTocSummaries diff `shouldBe` 1
 
+    prop "changes inside methods and functions are summarizied" . forAll (isMeaningfulTerm `filterT` tiers) $
+      \body ->
+        let diff = programWithChange (unListableF body)
+        in numTocSummaries diff `shouldBe` 1
+
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
         diffTOC blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
@@ -75,6 +80,13 @@ type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blobs diff)
+
+programWithChange :: Term' -> Diff'
+programWithChange body = free $ Free (pure programInfo :< Indexed [ function' ])
+  where
+    function' = free $ Free (pure functionInfo :< S.Function name' [] Nothing [ free $ Pure (Insert body') ] )
+    name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    body' = body
 
 programWithInsert :: String -> Term' -> Diff'
 programWithInsert name body = programOf $ Insert (functionOf name body)
@@ -89,7 +101,9 @@ programOf :: Patch Term' -> Diff'
 programOf patch = free $ Free (pure programInfo :< Indexed [ free $ Pure patch ])
 
 functionOf :: String -> Term' -> Term'
-functionOf name body = cofree $ functionInfo :< Syntax.Function (fName name) [] Nothing [body]
+functionOf name body = cofree $ functionInfo :< S.Function name' [] Nothing [body]
+  where
+    name' = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
 
 programInfo :: Record '[Range, Category, SourceSpan]
 programInfo = Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
@@ -97,8 +111,14 @@ programInfo = Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
 functionInfo :: Record '[Range, Category, SourceSpan]
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
-fName :: String -> Term (Syntax String) (Record '[Range, Category, SourceSpan])
-fName name = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
+-- We don't produce TOC summaries unless there are meaningful changes in a method/function.
+isMeaningfulTerm :: ListableF (Term (Syntax leaf)) (Record '[Range, Category, SourceSpan]) -> Bool
+isMeaningfulTerm a = case runCofree (unListableF a) of
+  (_ :< S.Indexed _) -> False
+  (_ :< S.Fixed _) -> False
+  (_ :< S.Commented _ _) -> False
+  (_ :< S.ParseError _) -> False
+  _ -> True
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
@@ -126,14 +146,11 @@ blobsForPaths paths = do
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
-arrayInfo :: Record '[Category, Range, SourceSpan]
-arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
-
-literalInfo :: Record '[Category, Range, SourceSpan]
-literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
-
 blankDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
 blankDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
+  where
+    arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
+    literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
