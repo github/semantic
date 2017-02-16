@@ -54,7 +54,7 @@ spec = parallel $ do
           tocSummaries = filter (not . isErrorSummary) (diffTOC blobs diff)
           numPatches = sum (1 <$ diff)
         in
-          trace ("toc:" <> show tocSummaries <> " diff: " <> show diff :: String)
+          -- trace ("toc:" <> show tocSummaries <> " diff: " <> show diff :: String)
             ((isJust (beforeTerm diff) && isJust (afterTerm diff) ==> Prologue.length tocSummaries == max 1 numPatches) `shouldBe` True)
 
     prop "equal terms produce identity diffs" $
