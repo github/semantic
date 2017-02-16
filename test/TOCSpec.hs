@@ -51,31 +51,46 @@ spec = parallel $ do
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
-    prop "only methods and functions are summarized" $
-      \iden body ->
+    prop "inserts in methods and functions are summarized" $
+      \name body ->
         let
-          -- diff = functionOf (unListableDiff body) (unListableDiff <$> params) (unListableDiff <$> ty) [unListableDiff iden]
-          diff = functionOf' (unListableDiff iden) (unListableDiff body)
+          diff = programOf name (unListableF body :: SyntaxTerm')
           tocSummaries = filter (not . isErrorSummary) (diffTOC blobs diff)
-          numPatches = sum (1 <$ diff)
         in
-          -- trace ("toc:" <> show tocSummaries <> " diff: " <> show diff :: String)
-            ((isJust (beforeTerm diff) && isJust (afterTerm diff) ==> Prologue.length tocSummaries == max 1 numPatches) `shouldBe` True)
+          (isJust (beforeTerm diff) && isJust (afterTerm diff) ==> Prologue.length tocSummaries == 1) `shouldBe` True
+
+    prop "deletes in methods and functions are summarized" $
+      \name body ->
+        let
+          diff = programOf' name (unListableF body :: SyntaxTerm')
+          tocSummaries = filter (not . isErrorSummary) (diffTOC blobs diff)
+        in
+          (isJust (beforeTerm diff) && isJust (afterTerm diff) ==> Prologue.length tocSummaries == 1) `shouldBe` True
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: SyntaxTerm String '[Category, Range, SourceSpan]) in
         diffTOC blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
-type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
+type SyntaxDiff' = SyntaxDiff String '[Range, Category, SourceSpan]
+type SyntaxTerm' = SyntaxTerm String '[Range, Category, SourceSpan]
 
-programOf :: Diff' -> Diff'
-programOf child = wrap (pure (Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Indexed [ child ])
+programOf :: String -> SyntaxTerm' -> SyntaxDiff'
+programOf name body = free $ Free (pure programInfo :< Indexed [ free $ Pure (Insert (functionOf name body)) ])
 
-functionOf :: Diff' -> [Diff'] -> Maybe Diff' -> [Diff'] -> Diff'
-functionOf iden params ty body = wrap (pure (Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Syntax.Function iden params ty body)
+programOf' :: String -> SyntaxTerm' -> SyntaxDiff'
+programOf' name body = free $ Free (pure programInfo :< Indexed [ free $ Pure (Delete (functionOf name body)) ])
 
-functionOf' :: Diff' -> Diff' -> Diff'
-functionOf' iden body = wrap (pure (Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Syntax.Function iden [] Nothing [body])
+functionOf :: String -> SyntaxTerm' -> SyntaxTerm'
+functionOf name body = cofree $ functionInfo :< Syntax.Function (fName name) [] Nothing [body]
+
+programInfo :: Record '[Range, Category, SourceSpan]
+programInfo = Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
+
+functionInfo :: Record '[Range, Category, SourceSpan]
+functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
+
+fName :: String -> Term (Syntax String) (Record '[Range, Category, SourceSpan])
+fName name = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
