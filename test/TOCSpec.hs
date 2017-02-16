@@ -22,6 +22,7 @@ import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
+import Test.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
@@ -45,9 +46,31 @@ spec = parallel $ do
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
+    prop "only methods and functions are summarized" $
+      \iden body ->
+        let
+          -- diff = functionOf (unListableDiff body) (unListableDiff <$> params) (unListableDiff <$> ty) [unListableDiff iden]
+          diff = functionOf' (unListableDiff iden) (unListableDiff body)
+          tocSummaries = filter (not . isErrorSummary) (diffTOC blobs diff)
+          numPatches = sum (1 <$ diff)
+        in
+          trace ("toc:" <> show tocSummaries <> " diff: " <> show diff :: String)
+            ((isJust (beforeTerm diff) && isJust (afterTerm diff) ==> Prologue.length tocSummaries == max 1 numPatches) `shouldBe` True)
+
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: SyntaxTerm String '[Category, Range, SourceSpan]) in
         diffTOC blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
+
+type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
+
+programOf :: Diff' -> Diff'
+programOf child = wrap (pure (Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Indexed [ child ])
+
+functionOf :: Diff' -> [Diff'] -> Maybe Diff' -> [Diff'] -> Diff'
+functionOf iden params ty body = wrap (pure (Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Syntax.Function iden params ty body)
+
+functionOf' :: Diff' -> Diff' -> Diff'
+functionOf' iden body = wrap (pure (Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Syntax.Function iden [] Nothing [body])
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
