@@ -28,28 +28,33 @@ spec :: Spec
 spec = parallel $ do
   describe "tocSummaries" $ do
     it "blank if there are no methods" $
-      diffTOC blobs blankDiff `shouldBe` [ ]
+      diffTOC blankDiffBlobs blankDiff `shouldBe` [ ]
 
     it "summarizes changed methods" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- testDiff sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
-                                          , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
-                                          , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
+      diffTOC sourceBlobs diff `shouldBe`
+        [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+        , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
+        , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
+
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/dupParent.A.js" "javascript/dupParent.B.js")
       diff <- testDiff sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ InSummarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
+      diffTOC sourceBlobs diff `shouldBe`
+        [ JSONSummary $ InSummarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneousDupMethod.A.js" "javascript/erroneousDupMethod.B.js")
       diff <- testDiff sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
+      diffTOC sourceBlobs diff `shouldBe`
+        [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
       diff <- testDiff sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
+      diffTOC sourceBlobs diff `shouldBe`
+        [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
     prop "inserts of methods and functions are summarized" $
       \name body ->
@@ -78,13 +83,13 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
-        diffTOC blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
+        diffTOC blankDiffBlobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
 type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
 type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
 
 numTocSummaries :: Diff' -> Int
-numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blobs diff)
+numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
@@ -172,8 +177,8 @@ blankDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree
     arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
-blobs :: Both SourceBlob
-blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
+blankDiffBlobs :: Both SourceBlob
+blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
 
 unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
 unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff
