@@ -44,6 +44,9 @@ spec = parallel $ do
   prop "preserves characters" . forAll (toTiers (list +| [chr 0xa0..chr 0x24f])) $
     \ c -> Text.unpack (decodeUtf8 (sourceText (fromText (Text.singleton c)))) `shouldBe` [c]
 
+  prop "preserves strings" $
+    \ s -> fromText (toText s) `shouldBe` s
+
 totalSpan :: Source -> SourceSpan
 totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (Prologue.length ranges)) (end lastRange - start lastRange))
   where ranges = actualLineRanges (totalRange source) source
