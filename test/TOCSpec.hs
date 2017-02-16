@@ -71,6 +71,11 @@ spec = parallel $ do
         let diff = programWithChange (unListableF body)
         in numTocSummaries diff `shouldBe` 1
 
+    prop "other changes don't summarize" . forAll ((not . isMethodOrFunction) `filterT` tiers) $
+      \body ->
+        let diff = programWithChangeOutsideFunction (unListableF body)
+        in numTocSummaries diff `shouldBe` 0
+
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
         diffTOC blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
@@ -81,12 +86,20 @@ type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blobs diff)
 
+-- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
 programWithChange body = free $ Free (pure programInfo :< Indexed [ function' ])
   where
-    function' = free $ Free (pure functionInfo :< S.Function name' [] Nothing [ free $ Pure (Insert body') ] )
+    function' = free $ Free (pure functionInfo :< S.Function name' [] Nothing [ free $ Pure (Insert body) ] )
     name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
-    body' = body
+
+-- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
+programWithChangeOutsideFunction :: Term' -> Diff'
+programWithChangeOutsideFunction term = free $ Free (pure programInfo :< Indexed [ function', term' ])
+  where
+    function' = free $ Free (pure functionInfo :< S.Function name' [] Nothing [] )
+    name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    term' = free $ Pure (Insert term)
 
 programWithInsert :: String -> Term' -> Diff'
 programWithInsert name body = programOf $ Insert (functionOf name body)
@@ -111,7 +124,7 @@ programInfo = Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
 functionInfo :: Record '[Range, Category, SourceSpan]
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
--- We don't produce TOC summaries unless there are meaningful changes in a method/function.
+-- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
 isMeaningfulTerm :: ListableF (Term (Syntax leaf)) (Record '[Range, Category, SourceSpan]) -> Bool
 isMeaningfulTerm a = case runCofree (unListableF a) of
   (_ :< S.Indexed _) -> False
@@ -119,6 +132,13 @@ isMeaningfulTerm a = case runCofree (unListableF a) of
   (_ :< S.Commented _ _) -> False
   (_ :< S.ParseError _) -> False
   _ -> True
+
+-- Filter tiers for terms if the Syntax is a Method or a Function.
+isMethodOrFunction :: ListableF (Term (Syntax leaf)) (Record '[Range, Category, SourceSpan]) -> Bool
+isMethodOrFunction a = case runCofree (unListableF a) of
+  (_ :< S.Method{}) -> True
+  (_ :< S.Function{}) -> True
+  _ -> False
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
