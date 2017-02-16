@@ -51,36 +51,44 @@ spec = parallel $ do
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
-    prop "inserts in methods and functions are summarized" $
+    prop "inserts of methods and functions are summarized" $
       \name body ->
-        let
-          diff = programOf name (unListableF body :: SyntaxTerm')
-          tocSummaries = filter (not . isErrorSummary) (diffTOC blobs diff)
-        in
-          (isJust (beforeTerm diff) && isJust (afterTerm diff) ==> Prologue.length tocSummaries == 1) `shouldBe` True
+        let diff = programWithInsert name (unListableF body)
+        in numTocSummaries diff `shouldBe` 1
 
-    prop "deletes in methods and functions are summarized" $
+    prop "deletes of methods and functions are summarized" $
       \name body ->
-        let
-          diff = programOf' name (unListableF body :: SyntaxTerm')
-          tocSummaries = filter (not . isErrorSummary) (diffTOC blobs diff)
-        in
-          (isJust (beforeTerm diff) && isJust (afterTerm diff) ==> Prologue.length tocSummaries == 1) `shouldBe` True
+        let diff = programWithDelete name (unListableF body)
+        in numTocSummaries diff `shouldBe` 1
+
+    prop "replacements of methods and functions are summarized" $
+      \name body ->
+        let diff = programWithReplace name (unListableF body)
+        in numTocSummaries diff `shouldBe` 1
 
     prop "equal terms produce identity diffs" $
-      \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: SyntaxTerm String '[Category, Range, SourceSpan]) in
+      \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
         diffTOC blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
-type SyntaxDiff' = SyntaxDiff String '[Range, Category, SourceSpan]
-type SyntaxTerm' = SyntaxTerm String '[Range, Category, SourceSpan]
+type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
+type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
 
-programOf :: String -> SyntaxTerm' -> SyntaxDiff'
-programOf name body = free $ Free (pure programInfo :< Indexed [ free $ Pure (Insert (functionOf name body)) ])
+numTocSummaries :: Diff' -> Int
+numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blobs diff)
 
-programOf' :: String -> SyntaxTerm' -> SyntaxDiff'
-programOf' name body = free $ Free (pure programInfo :< Indexed [ free $ Pure (Delete (functionOf name body)) ])
+programWithInsert :: String -> Term' -> Diff'
+programWithInsert name body = programOf $ Insert (functionOf name body)
 
-functionOf :: String -> SyntaxTerm' -> SyntaxTerm'
+programWithDelete :: String -> Term' -> Diff'
+programWithDelete name body = programOf $ Delete (functionOf name body)
+
+programWithReplace :: String -> Term' -> Diff'
+programWithReplace name body = programOf $ Replace (functionOf name body) (functionOf (name <> "2") body)
+
+programOf :: Patch Term' -> Diff'
+programOf patch = free $ Free (pure programInfo :< Indexed [ free $ Pure patch ])
+
+functionOf :: String -> Term' -> Term'
 functionOf name body = cofree $ functionInfo :< Syntax.Function (fName name) [] Nothing [body]
 
 programInfo :: Record '[Range, Category, SourceSpan]
