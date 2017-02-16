@@ -126,15 +126,9 @@ instance Listable Source where
 newtype ListableByteString = ListableByteString { unListableByteString :: B.ByteString }
 
 instance Listable ListableByteString where
-  tiers = (ListableByteString . encodeUtf8 . T.pack) `mapT` setsOf (toTiers characters)
-    where characters
-            =  ['a'..'z']
-            +| ['A'..'Z']
-            +| ['0'..'9']
-            +| [' '..'/']
-            +| [':'..'@']
-            +| ['['..'`']
-            +| ['{'..'~']
-            +| [chr 0x00..chr 0x1f] -- Control characters.
-            +| [chr 127]
-            +| [chr 0xa0..chr 0x24f] -- Non-ASCII.
+  tiers = (ListableByteString . encodeUtf8 . T.pack) `mapT` strings
+    where strings = foldr ((\\//) . listsOf . toTiers) []
+            [ ['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']
+            , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
+            , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
+            , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.
