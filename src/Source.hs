@@ -50,10 +50,6 @@ nullOid = "0000000000000000000000000000000000000000"
 empty :: Source
 empty = Source B.empty
 
--- | Return a Source from a list of characters.
-fromList :: [Word8] -> Source
-fromList = Source . B.pack
-
 -- | Return a Source from a ByteString.
 fromText :: T.Text -> Source
 fromText = Source . encodeUtf8
