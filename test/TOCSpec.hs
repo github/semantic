@@ -46,6 +46,11 @@ spec = parallel $ do
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
+    it "handles unicode characters in file" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
+      diff <- testDiff sourceBlobs
+      diffTOC sourceBlobs diff `shouldBe` [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
+
     prop "only methods and functions are summarized" $
       \iden body ->
         let
