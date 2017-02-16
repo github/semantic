@@ -117,7 +117,7 @@ instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
 
 instance Monoid Source where
-  mempty = fromList []
+  mempty = Source.empty
   mappend = (<>)
 
 instance Listable Source where
