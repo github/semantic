@@ -178,4 +178,4 @@ toTermName parentOffset parentSource term = case unwrap term of
     offset = start (range term)
     toTermName' :: SyntaxTerm leaf fields -> Text
     toTermName' = toTermName offset source
-    range = characterRange . extract
+    range = byteRange . extract

@@ -18,7 +18,7 @@ getSplitTerm (SplitReplace a) = a
 
 -- | Get the range of a SplitDiff.
 getRange :: Functor f => HasField fields Range => SplitDiff f (Record fields) -> Range
-getRange diff = characterRange $ case runFree diff of
+getRange diff = byteRange $ case runFree diff of
   Free annotated -> headF annotated
   Pure patch -> extract (getSplitTerm patch)
 
