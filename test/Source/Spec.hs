@@ -2,7 +2,7 @@ module Source.Spec where
 
 import qualified Data.Text as Text
 import qualified Prelude
-import Prologue
+import Prologue hiding (list)
 import Range
 import Source
 import SourceSpan
@@ -40,6 +40,9 @@ spec = parallel $ do
 
     prop "covers multiple lines" $
       \ n -> totalSpan (fromText (Text.intersperse '\n' (Text.replicate n "*"))) `shouldBe` SourceSpan (SourcePos 0 0) (SourcePos (max 0 (pred n)) (if n > 0 then 1 else 0))
+
+  prop "preserves characters" . forAll (toTiers (list +| [chr 0xa0..chr 0x24f])) $
+    \ c -> Text.unpack (decodeUtf8 (sourceText (fromText (Text.singleton c)))) `shouldBe` [c]
 
 totalSpan :: Source -> SourceSpan
 totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (Prologue.length ranges)) (end lastRange - start lastRange))
