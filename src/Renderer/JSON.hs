@@ -15,7 +15,7 @@ import Data.These
 import Data.Vector as Vector hiding (toList)
 import Info
 import Renderer
-import Source hiding (fromList)
+import Source
 import SplitDiff
 import Syntax as S
 import Term
