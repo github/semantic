@@ -34,7 +34,7 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
-        [ JSONSummary $ Summarizable C.Method "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+        [ JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
         , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
         , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
 
@@ -55,6 +55,12 @@ spec = parallel $ do
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.Method "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
+
+    it "summarizes Ruby methods that start with two identifiers" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
+      diff <- testDiff sourceBlobs
+      diffTOC sourceBlobs diff `shouldBe`
+        [ JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")

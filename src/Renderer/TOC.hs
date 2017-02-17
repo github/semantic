@@ -105,6 +105,7 @@ toTOCSummaries patch = case afterOrBefore patch of
       LeafInfo{..} -> pure . TOCSummary patch' $ case leafCategory of
         C.Function -> Summarizable leafCategory termName leafSourceSpan (patchType patch')
         C.Method -> Summarizable leafCategory termName leafSourceSpan (patchType patch')
+        C.SingletonMethod -> Summarizable leafCategory termName leafSourceSpan (patchType patch')
         _ -> NotSummarizable
 
 flattenPatch :: Patch DiffInfo -> [Patch DiffInfo]

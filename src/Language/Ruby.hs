@@ -65,7 +65,7 @@ termAssignment _ category children
     (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest
     (OperatorAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
-    (Method, expr : methodName : rest)
+    (SingletonMethod, expr : methodName : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
       -> Just $ S.Method methodName (Just expr) Nothing (toList (unwrap params)) body
@@ -153,6 +153,7 @@ categoryForRubyName = \case
   "scope_resolution" -> ScopeOperator
   "self" -> Identifier
   "singleton_class"  -> SingletonClass
+  "singleton_method" -> SingletonMethod
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell
