@@ -50,6 +50,12 @@ spec = parallel $ do
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
+    it "summarizes Go methods with receivers with special formatting" $ do
+      sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
+      diff <- testDiff sourceBlobs
+      diffTOC sourceBlobs diff `shouldBe`
+        [ JSONSummary $ Summarizable C.Method "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
+
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
       diff <- testDiff sourceBlobs
