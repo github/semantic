@@ -157,7 +157,7 @@ test-suite test
                      , deepseq
                      , filepath
                      , Glob
-                     , hspec >= 2.1.10
+                     , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
                      , HUnit
@@ -184,7 +184,7 @@ test-suite integration-test
                      , bytestring
                      , containers
                      , Glob
-                     , hspec >= 2.1.10
+                     , hspec >= 2.4.1
                      , hspec-expectations-pretty-diff
                      , semantic-diff
                      , split
