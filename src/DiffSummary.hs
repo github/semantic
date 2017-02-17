@@ -293,6 +293,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.Else -> "in an" <+> catName c
       C.Elsif -> "in the" <+> squotes (termName t) <+> catName c
       C.Method -> "in the" <+> squotes (termName t) <+> catName c
+      C.SingletonMethod -> "in the" <+> squotes (termName t) <+> catName c
       C.Ternary -> "in the" <+> squotes (termName t) <+> catName c
       C.Ensure -> "in an" <+> catName c
       C.Rescue -> case t of
@@ -460,6 +461,7 @@ instance HasCategory Category where
     C.Constant -> "constant"
     C.Superclass -> "superclass"
     C.SingletonClass -> "singleton class"
+    C.SingletonMethod -> "method"
     C.RangeExpression -> "range"
     C.ScopeOperator -> "scope operator"
     C.BeginBlock -> "BEGIN block"

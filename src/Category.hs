@@ -225,6 +225,8 @@ data Category
   | RuneLiteral
   -- | A modifier version of another Category, e.g. Ruby’s trailing @if@, @while@, etc. terms, whose subterms are swapped relative to regular @if@, @while@, etc. terms.
   | Modifier Category
+  -- | A singleton method declaration, e.g. `def self.foo;end` in Ruby
+  | SingletonMethod
   deriving (Eq, Generic, Ord, Show)
 
 {-# DEPRECATED RescueModifier "Deprecated; use Modifier Rescue instead." #-}
@@ -353,4 +355,5 @@ instance Listable Category where
     , FieldDeclarations
     , RuneLiteral
     , Modifier If
+    , SingletonMethod
     ] ++ concat (mapT (Other . unListableText) tiers)

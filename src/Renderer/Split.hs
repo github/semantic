@@ -126,6 +126,7 @@ styleName category = "category-" <> case category of
   C.Constant -> "constant"
   C.Superclass -> "superclass"
   C.SingletonClass -> "singleton_class"
+  C.SingletonMethod -> "singleton_method"
   C.RangeExpression -> "range"
   C.ScopeOperator -> "scope_operator"
   C.BeginBlock -> "begin_block"
