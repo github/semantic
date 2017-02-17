@@ -1,5 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module Renderer.TOC (toc, diffTOC, JSONSummary(..), Summarizable(..)) where
+module Renderer.TOC (toc, diffTOC, JSONSummary(..), Summarizable(..), isErrorSummary) where
 
 import Category as C
 import Data.Aeson
