@@ -24,9 +24,10 @@ printDiff diff level = case runFree diff of
     Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "+}"
     Delete term -> pad (level - 1) <> "{-" <> printTerm term level <> "-}"
     Replace a b -> pad (level - 1) <> "{" <> printTerm a level <> "->" <> printTerm b level <> "}"
-  (Free (Join (_, annotation) :< syntax)) -> pad level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
+  (Free (Join (_, annotation) :< syntax)) -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
   where
-    pad n | n < 1 = ""
+    pad' n = if n < 1 then "" else pad n
+    pad n | n < 1 = "\n"
           | otherwise = "\n" <> mconcat (replicate n "  ")
 
 printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> Text
