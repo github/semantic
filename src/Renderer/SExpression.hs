@@ -27,7 +27,8 @@ printDiff diff level = case runFree diff of
   (Free (Join (_, annotation) :< syntax)) -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
   where
     pad' n = if n < 1 then "" else pad n
-    pad n | n < 1 = "\n"
+    pad n | n < 0 = ""
+          | n < 1 = "\n"
           | otherwise = "\n" <> mconcat (replicate n "  ")
 
 printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> Text
