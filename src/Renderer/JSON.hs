@@ -15,7 +15,7 @@ import Data.These
 import Data.Vector as Vector hiding (toList)
 import Info
 import Renderer
-import Source hiding (fromList)
+import Source
 import SplitDiff
 import Syntax as S
 import Term
@@ -81,7 +81,7 @@ termFields :: (ToJSON recur, KeyValue kv, HasField fields Category, HasField fie
   Record fields ->
   Syntax leaf recur ->
   [kv]
-termFields info syntax = "range" .= characterRange info : "category" .= category info : syntaxToTermField syntax
+termFields info syntax = "range" .= byteRange info : "category" .= category info : syntaxToTermField syntax
 
 patchFields :: (ToJSON (Record fields), ToJSON leaf, KeyValue kv, HasField fields Category, HasField fields Range) =>
   SplitPatch (SyntaxTerm leaf fields) ->
