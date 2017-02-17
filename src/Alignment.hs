@@ -20,7 +20,7 @@ import Diff
 import Info
 import Patch
 import Range
-import Source hiding (break, fromList)
+import Source hiding (break)
 import SplitDiff
 import Syntax
 import Term
@@ -49,7 +49,7 @@ alignPatch sources patch = case patch of
   Replace term1 term2 -> fmap (pure . SplitReplace) <$> alignWith (fmap (these identity identity const . runJoin) . Join)
     (alignSyntax' this (fst sources) term1)
     (alignSyntax' that (snd sources) term2)
-  where getRange = characterRange . extract
+  where getRange = byteRange . extract
         alignSyntax' :: (forall a. Identity a -> Join These a) -> Source -> SyntaxTerm leaf fields -> [Join These (SyntaxTerm leaf fields)]
         alignSyntax' side source term = hylo (alignSyntax side cofree getRange (Identity source)) runCofree (Identity <$> term)
         this = Join . This . runIdentity
@@ -63,7 +63,7 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = catMaybes $ 
   Fixed children -> wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
   _ -> wrapInBranch Indexed <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
-        lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
+        lineRanges = toJoinThese $ actualLineRanges <$> (byteRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (setCharacterRange info range :< constructor children)) <$> infos)
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.

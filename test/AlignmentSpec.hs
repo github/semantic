@@ -222,7 +222,7 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
         alignBranchElement element = case element of
           Child key contents -> Child key <$> joinCrosswalk lines contents
           Margin contents -> Margin <$> joinCrosswalk lines contents
-          where lines = fmap Source.sourceText . Source.actualLines . Source.fromText
+          where lines = fmap Source.toText . Source.actualLines . Source.fromText
         sources = foldMap Source.fromText <$> bothContents elements
         ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (Source.totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
@@ -273,7 +273,7 @@ instance Show (PrettyDiff a) where
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
           showLine n line = uncurry ((<>) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
-          showDiff (range, _) = filter (/= '\n') . Text.unpack . Source.sourceText . Source.slice range
+          showDiff (range, _) = filter (/= '\n') . Text.unpack . Source.toText . Source.slice range
           pad n string = (<>) (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
 

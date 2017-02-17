@@ -9,7 +9,7 @@ import Prologue
 import Diff
 import Patch
 import Term
-import Info (category, characterRange)
+import Info (category, byteRange)
 import Range
 import Syntax as S
 import Category as C
@@ -273,7 +273,7 @@ toTermName source term = case unwrap term of
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
-        range = characterRange . extract
+        range = byteRange . extract
         paramsToArgNames params = "(" <> Text.intercalate ", " (toArgName <$> params) <> ")"
         toArgName :: SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of

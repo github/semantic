@@ -55,7 +55,7 @@ run Arguments{..} = do
       (annotation :< syntax) -> ParseJSON (category' annotation) (range' annotation) (text' annotation) (toList syntax)
       where
         category' = toS . Info.category
-        range' = characterRange
+        range' = byteRange
         text' = Info.sourceText
 
     writeToOutput :: Maybe FilePath -> [Text] -> IO ()
@@ -96,7 +96,7 @@ termCostDecorator c = 1 + sum (cost <$> tailF c)
 -- | Term decorator extracting the source text for a term.
 termSourceDecorator :: (HasField fields Range) => Source -> TermDecorator f fields SourceText
 termSourceDecorator source c = SourceText . toText $ Source.slice range' source
- where range' = characterRange $ headF c
+ where range' = byteRange $ headF c
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
