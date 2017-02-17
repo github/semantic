@@ -56,6 +56,12 @@ spec = parallel $ do
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.Method "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
+    it "summarizes Ruby methods that start with two identifiers" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
+      diff <- testDiff sourceBlobs
+      diffTOC sourceBlobs diff `shouldBe`
+        [ JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) ]
+
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
       diff <- testDiff sourceBlobs
