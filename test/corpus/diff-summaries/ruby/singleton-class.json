@@ -129,7 +129,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Foo' identifier with the 'self' identifier in the self singleton class"
+                    "summary": "Replaced the 'Foo' constant with the 'self' identifier in the self singleton class"
                 },
                 {
                     "span": {
@@ -212,7 +212,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'self' identifier with the 'Foo' identifier in the Foo singleton class"
+                    "summary": "Replaced the 'self' identifier with the 'Foo' constant in the Foo singleton class"
                 },
                 {
                     "span": {

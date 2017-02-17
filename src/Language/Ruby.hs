@@ -44,7 +44,6 @@ termAssignment _ category children
     (Case, _) -> Just $ uncurry S.Switch (Prologue.break ((== When) . Info.category . extract) children)
     (When, expr : body) -> Just $ S.Case expr body
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
-    (Constant, _ ) -> Just $ S.Fixed children
     (MethodCall, fn : args)
       | MemberAccess <- Info.category (extract fn)
       , [target, method] <- toList (unwrap fn)

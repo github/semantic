@@ -117,7 +117,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'Super' identifier in the Foo class"
+                    "summary": "Added the 'Super' constant in the Foo class"
                 }
             ]
         },
@@ -159,7 +159,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Super' identifier in the Foo class"
+                    "summary": "Deleted the 'Super' constant in the Foo class"
                 }
             ]
         },
