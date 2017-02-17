@@ -34,7 +34,7 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- testDiff sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
-        [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+        [ JSONSummary $ Summarizable C.Method "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
         , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
         , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
 

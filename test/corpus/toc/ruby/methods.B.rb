@@ -1,4 +1,4 @@
-def foo(a, *)
+def self.foo(a, *)
 end
 
 def bar
