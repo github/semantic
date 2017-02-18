@@ -61,7 +61,7 @@ leafTerm :: leaf -> Cofree (Syntax leaf) (Record '[Range, Category])
 leafTerm = cofree . leafTermF
 
 indexedTermF :: [leaf] -> TermF (Syntax leaf) (Record '[Range, Category]) (Term (Syntax leaf) (Record '[Range, Category]))
-indexedTermF leaves = (Range 1 10 :. Category.MethodCall :. Nil) :< (Indexed (leafTerm <$> leaves))
+indexedTermF leaves = (Range 1 10 :. Category.MethodCall :. Nil) :< Indexed (leafTerm <$> leaves)
 
 indexedTerm :: [leaf] -> Term (Syntax leaf) (Record '[Range, Category])
 indexedTerm leaves = cofree $ indexedTermF leaves

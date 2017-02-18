@@ -269,7 +269,8 @@ pqGramDecorator getLabel p q = cata algebra
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
-    assignLabels :: label
+    assignLabels :: Functor f
+                 => label
                  -> Term f (Record (Gram label ': fields))
                  -> State [Maybe label] (Term f (Record (Gram label ': fields)))
     assignLabels label a = case runCofree a of
@@ -283,10 +284,10 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = fmap (/ magnitude) uniform
+unitVector d hash = fmap (* invMagnitude) uniform
   where
     uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
-    magnitude = sqrtDouble (sum (fmap (** 2) uniform))
+    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) uniform))
     components = sequenceA (replicate d (liftRand randomDouble))
 
 -- | Strips the head annotation off a term annotated with non-empty records.

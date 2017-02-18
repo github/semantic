@@ -2,30 +2,30 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
-import Prologue hiding (uncons)
-import Data.Text (unpack, pack)
-import Data.String
-import qualified Data.Vector as Vector
+import Prologue
+import qualified Data.ByteString as B
+import qualified Data.Text as T
 import Numeric
 import Range
 import SourceSpan
+import Test.LeanCheck
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
-data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
+data SourceBlob = SourceBlob { source :: Source, oid :: T.Text, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
--- | The contents of a source file, backed by a vector for efficient slicing.
-newtype Source a = Source { getVector :: Vector.Vector a  }
-  deriving (Eq, Show, Foldable, Functor, Traversable)
+-- | The contents of a source file, represented as a ByteString.
+newtype Source = Source { sourceText :: B.ByteString }
+  deriving (Eq, Show)
 
 -- | The kind of a blob, along with it's file mode.
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
-modeToDigits :: SourceKind -> String
-modeToDigits (PlainBlob mode) = showOct mode ""
-modeToDigits (ExecutableBlob mode) = showOct mode ""
-modeToDigits (SymlinkBlob mode) = showOct mode ""
+modeToDigits :: SourceKind -> Text
+modeToDigits (PlainBlob mode) = toS $ showOct mode ""
+modeToDigits (ExecutableBlob mode) = toS $ showOct mode ""
+modeToDigits (SymlinkBlob mode) = toS $ showOct mode ""
 
 
 -- | The default plain blob mode
@@ -33,9 +33,9 @@ defaultPlainBlob :: SourceKind
 defaultPlainBlob = PlainBlob 0o100644
 
 emptySourceBlob :: FilePath -> SourceBlob
-emptySourceBlob filepath = SourceBlob (Source.fromList "")  Source.nullOid filepath Nothing
+emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothing
 
-sourceBlob :: Source Char -> FilePath -> SourceBlob
+sourceBlob :: Source -> FilePath -> SourceBlob
 sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
 
 -- | Map blobs with Nothing blobKind to empty blobs.
@@ -44,74 +44,87 @@ idOrEmptySourceBlob blob = if isNothing (blobKind blob)
                            then blob { oid = nullOid, blobKind = Nothing }
                            else blob
 
-nullOid :: String
+nullOid :: T.Text
 nullOid = "0000000000000000000000000000000000000000"
 
--- | Return a Source from a list of items.
-fromList :: [a] -> Source a
-fromList = Source . Vector.fromList
+empty :: Source
+empty = Source B.empty
 
--- | Return a Source of Chars from a Text.
-fromText :: Text -> Source Char
-fromText = Source . Vector.fromList . unpack
+-- | Return a Source from a ByteString.
+fromText :: T.Text -> Source
+fromText = Source . encodeUtf8
 
 -- | Return a Source that contains a slice of the given Source.
-slice :: Range -> Source a -> Source a
-slice range = Source . Vector.slice (start range) (rangeLength range) . getVector
+slice :: Range -> Source -> Source
+slice range = Source . take . drop . sourceText
+  where drop = B.drop (start range)
+        take = B.take (rangeLength range)
 
--- | Return a String with the contents of the Source.
-toString :: Source Char -> String
-toString = toList
-
--- | Return a text with the contents of the Source.
-toText :: Source Char -> Text
-toText = pack . toList
-
--- | Return the item at the given  index.
-at :: Source a -> Int -> a
-at = (Vector.!) . getVector
-
--- | Remove the first item and return it with the rest of the source.
-uncons :: Source a -> Maybe (a, Source a)
-uncons (Source vector) = if null vector then Nothing else Just (Vector.head vector, Source $ Vector.tail vector)
+-- | Return the ByteString contained in the Source.
+toText :: Source -> Text
+toText = decodeUtf8 . sourceText
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-break :: (a -> Bool) -> Source a -> (Source a, Source a)
-break predicate (Source vector) = let (start, remainder) = Vector.break predicate vector in (Source start, Source remainder)
+break :: (Word8 -> Bool) -> Source -> (Source, Source)
+break predicate (Source text) = let (start, remainder) = B.break predicate text in (Source start, Source remainder)
 
 -- | Split the contents of the source after newlines.
-actualLines :: Source Char -> [Source Char]
-actualLines source | null source = [ source ]
-actualLines source = case Source.break (== '\n') source of
-  (l, lines') -> case uncons lines' of
-    Nothing -> [ l ]
-    Just (_, lines') -> (l <> fromList "\n") : actualLines lines'
+actualLines :: Source -> [Source]
+actualLines = fmap Source . actualLines' . sourceText
+  where actualLines' text
+          | B.null text = [ text ]
+          | otherwise = case B.break (== toEnum (fromEnum '\n')) text of
+            (l, lines') -> case B.uncons lines' of
+              Nothing -> [ l ]
+              Just (_, lines') -> (l <> B.singleton (toEnum (fromEnum '\n'))) : actualLines' lines'
 
 -- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> Source Char -> [Range]
+actualLineRanges :: Range -> Source -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + length string
+  where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
 
 -- | Compute the character range given a Source and a SourceSpan.
-sourceSpanToRange :: Source Char -> SourceSpan -> Range
+sourceSpanToRange :: Source -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sumLengths leadingRanges + column spanStart
         end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
-        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
+        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (Source.totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
-rangeToSourceSpan :: Source Char -> Range -> SourceSpan
+-- | Return a range that covers the entire text.
+totalRange :: Source -> Range
+totalRange = Range 0 . B.length . sourceText
+
+rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
   where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
-        endPos = toEndPos (length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
+        endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
         lineRanges = actualLineRanges range source
         toStartPos line range = SourcePos line (start range)
         toEndPos line range = SourcePos line (end range)
 
+length :: Source -> Int
+length = B.length . sourceText
 
-instance Semigroup (Source a) where
-  Source a <> Source b = Source (a Vector.++ b)
+null :: Source -> Bool
+null = B.null . sourceText
 
-instance Monoid (Source a) where
-  mempty = fromList []
+instance Semigroup Source where
+  Source a <> Source b = Source (a <> b)
+
+instance Monoid Source where
+  mempty = Source.empty
   mappend = (<>)
+
+instance Listable Source where
+  tiers = (Source . unListableByteString) `mapT` tiers
+
+newtype ListableByteString = ListableByteString { unListableByteString :: B.ByteString }
+
+instance Listable ListableByteString where
+  tiers = (ListableByteString . encodeUtf8 . T.pack) `mapT` strings
+    where strings = foldr ((\\//) . listsOf . toTiers) []
+            [ ['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']
+            , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
+            , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
+            , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.

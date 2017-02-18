@@ -20,9 +20,16 @@ rangeAt a = Range a a
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
 
--- | Return a range that covers the entire text.
-totalRange :: Foldable f => f a -> Range
-totalRange t = Range 0 $ length t
+-- | Offset a range by a constant delta.
+offsetRange :: Range -> Int -> Range
+offsetRange a b = Range (start a + b) (end a + b)
+
+-- | Divide a range in two at the given coordinate.
+--
+--   Passing a coordinate that does not lie between start and end will result in one of the ranges being empty.
+divideRange :: Range -> Int -> (Range, Range)
+divideRange Range{..} at = (Range start divider, Range divider end)
+  where divider = max (min end at) start
 
 -- | Break a string down into words and sequences of punctuation. Return a list
 -- | strings with ranges, assuming that the first character in the string is

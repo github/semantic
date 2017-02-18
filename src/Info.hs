@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
 module Info
 ( Range(..)
-, characterRange
+, byteRange
 , setCharacterRange
 , Category(..)
 , category
@@ -32,8 +32,8 @@ newtype Cost = Cost { unCost :: Int }
 newtype SourceText = SourceText { unText :: Text }
   deriving (Show, ToJSON)
 
-characterRange :: HasField fields Range => Record fields -> Range
-characterRange = getField
+byteRange :: HasField fields Range => Record fields -> Range
+byteRange = getField
 
 setCharacterRange :: HasField fields Range => Record fields -> Range -> Record fields
 setCharacterRange = setField

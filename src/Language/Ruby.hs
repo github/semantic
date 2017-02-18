@@ -4,13 +4,13 @@ module Language.Ruby where
 import Data.List (partition)
 import Info
 import Prologue
-import Source
+import Source hiding (null)
 import Language
 import qualified Syntax as S
 import Term
 
 termAssignment
-  :: Source Char -- ^ The source of the term.
+  :: Source -- ^ The source of the term.
   -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in Maybe.
@@ -65,7 +65,7 @@ termAssignment _ category children
     (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest
     (OperatorAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
-    (Method, expr : methodName : rest)
+    (SingletonMethod, expr : methodName : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
       -> Just $ S.Method methodName (Just expr) Nothing (toList (unwrap params)) body
@@ -153,6 +153,7 @@ categoryForRubyName = \case
   "scope_resolution" -> ScopeOperator
   "self" -> Identifier
   "singleton_class"  -> SingletonClass
+  "singleton_method" -> SingletonMethod
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell

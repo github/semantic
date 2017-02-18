@@ -46,8 +46,8 @@ The example below adds a new field to the `Record` fields.
 indexedTermCata :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
 indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
   where
-    algebra :: CofreeF f (Record t) (Cofree f (Record (NewField : t))) -> Cofree f (Record (NewField : t))
-    algebra term = cofree $ (NewField :. (headF term)) :< tailF term
+    algebra :: Functor f => CofreeF f (Record t) (Cofree f (Record (NewField : t))) -> Cofree f (Record (NewField : t))
+    algebra term = cofree $ (NewField :. headF term) :< tailF term
 
 {-
 Anamorphism -- construct a Term from a string

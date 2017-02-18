@@ -17,3 +17,4 @@ error "use pure" = free . Pure ==> pure
 error "use wrap" = free . Free ==> wrap
 
 error "use extract" = headF . runCofree ==> extract
+error "use unwrap" = tailF . runCofree ==> unwrap
