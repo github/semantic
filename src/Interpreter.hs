@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
@@ -52,48 +52,48 @@ algorithmWithTerms :: Applicative diff
                    -> Term (Syntax leaf) a
                    -> Term (Syntax leaf) a
                    -> Algorithm (Term (Syntax leaf) a) (diff (Patch (Term (Syntax leaf) a))) (diff (Patch (Term (Syntax leaf) a)))
-algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
+algorithmWithTerms construct t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
-    Just $ Indexed <$> bySimilarity a b
+    Just $ Indexed <$> byRWS a b
   (S.Module idA a, S.Module idB b) ->
-    Just $ S.Module <$> recursively idA idB <*> bySimilarity a b
+    Just $ S.Module <$> linearly idA idB <*> byRWS a b
   (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> Just $
-    S.FunctionCall <$> recursively identifierA identifierB
-                   <*> bySimilarity argsA argsB
+    S.FunctionCall <$> linearly identifierA identifierB
+                   <*> byRWS argsA argsB
   (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
-    S.Switch <$> bySimilarity exprA exprB
-             <*> bySimilarity casesA casesB
+    S.Switch <$> byRWS exprA exprB
+             <*> byRWS casesA casesB
   (S.Object tyA a, S.Object tyB b) -> Just $
-    S.Object <$> maybeRecursively tyA tyB
-             <*> bySimilarity a b
+    S.Object <$> maybeLinearly tyA tyB
+             <*> byRWS a b
   (Commented commentsA a, Commented commentsB b) -> Just $
-    Commented <$> bySimilarity commentsA commentsB
-              <*> maybeRecursively a b
+    Commented <$> byRWS commentsA commentsB
+              <*> maybeLinearly a b
   (Array tyA a, Array tyB b) -> Just $
-    Array <$> maybeRecursively tyA tyB
-          <*> bySimilarity a b
+    Array <$> maybeLinearly tyA tyB
+          <*> byRWS a b
   (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> Just $
-    S.Class <$> recursively identifierA identifierB
-            <*> maybeRecursively paramsA paramsB
-            <*> bySimilarity expressionsA expressionsB
+    S.Class <$> linearly identifierA identifierB
+            <*> maybeLinearly paramsA paramsB
+            <*> byRWS expressionsA expressionsB
   (S.Method identifierA receiverA tyA paramsA expressionsA, S.Method identifierB receiverB tyB paramsB expressionsB) -> Just $
-    S.Method <$> recursively identifierA identifierB
-             <*> maybeRecursively receiverA receiverB
-             <*> maybeRecursively tyA tyB
-             <*> bySimilarity paramsA paramsB
-             <*> bySimilarity expressionsA expressionsB
+    S.Method <$> linearly identifierA identifierB
+             <*> maybeLinearly receiverA receiverB
+             <*> maybeLinearly tyA tyB
+             <*> byRWS paramsA paramsB
+             <*> byRWS expressionsA expressionsB
   (S.Function idA paramsA tyA bodyA, S.Function idB paramsB tyB bodyB) -> Just $
-    S.Function <$> recursively idA idB
-               <*> bySimilarity paramsA paramsB
-               <*> maybeRecursively tyA tyB
-               <*> bySimilarity bodyA bodyB
+    S.Function <$> linearly idA idB
+               <*> byRWS paramsA paramsB
+               <*> maybeLinearly tyA tyB
+               <*> byRWS bodyA bodyB
   _ -> Nothing
   where
     annotate = construct . (both (extract t1) (extract t2) :<)
 
-    maybeRecursively :: Applicative f => Maybe a -> Maybe a -> Algorithm a (f (Patch a)) (Maybe (f (Patch a)))
-    maybeRecursively a b = sequenceA $ case (a, b) of
-      (Just a, Just b) -> Just $ recursively a b
+    maybeLinearly :: Applicative f => Maybe a -> Maybe a -> Algorithm a (f (Patch a)) (Maybe (f (Patch a)))
+    maybeLinearly a b = sequenceA $ case (a, b) of
+      (Just a, Just b) -> Just $ linearly a b
       (Nothing, Just b) -> Just $ pure (inserting b)
       (Just a, Nothing) -> Just $ pure (deleting a)
       (Nothing, Nothing) -> Nothing
@@ -105,9 +105,9 @@ runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)),
   -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
-runAlgorithm construct recur cost = iterAp $ \case
-  Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
+runAlgorithm construct recur cost = iterAp $ \ r cont -> case r of
+  Linear a b -> cont . maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
-    traverse (these (Just . deleting) (Just . inserting) recur) aligned)
-  ByIndex as bs f -> f (ses recur cost as bs)
-  BySimilarity as bs f -> f (rws recur as bs)
+    traverse (these (Just . deleting) (Just . inserting) recur) aligned
+  SES as bs -> cont (ses recur cost as bs)
+  RWS as bs -> cont (rws recur as bs)
