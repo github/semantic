@@ -10,6 +10,7 @@ class GEq1 f where
   --   The function will usually be applied to an equality function, but the more general type ensures that the implementation uses it to compare elements of the first container with elements of the second.
   gliftEq :: (a -> b -> Bool) -> f a -> f b -> Bool
 
+-- | A suitable implementation of Eq1’s liftEq for Generic1 types.
 genericLiftEq :: (Generic1 f, GEq1 (Rep1 f)) => (a -> b -> Bool) -> f a -> f b -> Bool
 genericLiftEq f a b = gliftEq f (from1 a) (from1 b)
 
