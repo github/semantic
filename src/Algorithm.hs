@@ -6,11 +6,11 @@ import Prologue hiding (Pure)
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term diff result where
-  -- | Recursively diff two terms and pass the result to the continuation.
+  -- | Diff two terms recursively, resulting in a single diff node.
   Recursive :: term -> term -> AlgorithmF term diff diff
-  -- | Diff two lists by each element’s position, and pass the resulting list of diffs to the continuation.
+  -- | Diff two lists of terms by each element’s position, resulting in a list of diffs.
   ByIndex :: [term] -> [term] -> AlgorithmF term diff [diff]
-  -- | Diff two lists by each element’s similarity and pass the resulting list of diffs to the continuation.
+  -- | Diff two lists of terms by each element’s similarity, resulting in a list of diffs.
   BySimilarity :: [term] -> [term] -> AlgorithmF term diff [diff]
 
 -- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
