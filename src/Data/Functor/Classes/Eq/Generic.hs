@@ -3,6 +3,7 @@ module Data.Functor.Classes.Eq.Generic where
 import GHC.Generics
 import Prologue
 
+-- | Generically-derivable lifting of the 'Eq' class to unary type constructors.
 class GEq1 f where
   -- | Lift an equality test through the type constructor.
   --
