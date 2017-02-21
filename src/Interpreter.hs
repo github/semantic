@@ -12,7 +12,6 @@ import Diff
 import Info
 import Patch
 import Prologue hiding (lookup)
-import SES
 import Syntax as S
 import Term
 
@@ -26,24 +25,22 @@ type DiffConstructor f annotation = TermF f (Both annotation) (Diff f annotation
 diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
   => DiffConstructor (Syntax leaf) (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
-  -> SES.Cost (SyntaxDiff leaf fields) -- ^ A function to compute the cost of a given diff node.
   -> SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
+diffTerms construct comparable a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable a b
 
 -- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
 diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
                     => DiffConstructor (Syntax leaf) (Record fields)
                     -> Comparable (Syntax leaf) (Record fields)
-                    -> SES.Cost (SyntaxDiff leaf fields)
                     -> SyntaxTerm leaf fields
                     -> SyntaxTerm leaf fields
                     -> Maybe (SyntaxDiff leaf fields)
-diffComparableTerms construct comparable cost = recur
+diffComparableTerms construct comparable = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
-          | comparable a b = runAlgorithm construct recur cost (Just <$> algorithmWithTerms construct a b)
+          | comparable a b = runAlgorithm construct recur (Just <$> algorithmWithTerms construct a b)
           | otherwise = Nothing
 
 -- | Construct an algorithm to diff a pair of terms.
@@ -102,12 +99,10 @@ algorithmWithTerms construct t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ ca
 runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)), Traversable f, HasField fields (Maybe FeatureVector))
   => (CofreeF f (Both (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
-  -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
-runAlgorithm construct recur cost = iterAp $ \ r cont -> case r of
+runAlgorithm construct recur = iterAp $ \ r cont -> case r of
   Linear a b -> cont . maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
     traverse (these (Just . deleting) (Just . inserting) recur) aligned
-  SES as bs -> cont (ses recur cost as bs)
   RWS as bs -> cont (rws recur as bs)

@@ -6,7 +6,6 @@ import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
-import Data.These
 import Data.String
 import Diff
 import Diffing
@@ -95,7 +94,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
-        diffTOC blankDiffBlobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
+        diffTOC blankDiffBlobs (diffTerms wrap (==) term term) `shouldBe` []
 
 type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
 type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
@@ -166,14 +165,9 @@ testDiff sourceBlobs = do
     diffTerms' terms blobs = case runBothWith areNullOids blobs of
       (True, False) -> pure $ Insert (snd terms)
       (False, True) -> pure $ Delete (fst terms)
-      (_, _) -> runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
+      (_, _) -> runBothWith (diffTerms wrap compareCategoryEq) terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
     hasNullOid blob = oid blob == nullOid || Source.null (source blob)
-    construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-    sumCost = fmap getSum . foldMap (fmap Sum . getCost)
-    getCost diff = case runFree diff of
-      Free (info :< _) -> cost <$> info
-      Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do

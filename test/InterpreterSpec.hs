@@ -27,18 +27,18 @@ spec = parallel $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = cofree $ (StringLiteral :. Nil) :< Leaf ("t\776" :: String)
           termB = cofree $ (StringLiteral :. Nil) :< Leaf "\7831" in
-          stripDiff (diffTerms wrap compare diffCost (decorate termA) (decorate termB)) `shouldBe` replacing termA termB
+          stripDiff (diffTerms wrap compare (decorate termA) (decorate termB)) `shouldBe` replacing termA termB
 
     prop "produces correct diffs" $
-      \ a b -> let diff = stripDiff $ diffTerms wrap compare diffCost (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
+      \ a b -> let diff = stripDiff $ diffTerms wrap compare (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
                    (beforeTerm diff, afterTerm diff) `shouldBe` (Just (unListableF a), Just (unListableF b))
 
     prop "constructs zero-cost diffs of equal terms" $
       \ a -> let term = decorate (unListableF a :: SyntaxTerm String '[Category])
-                 diff = diffTerms wrap compare diffCost term term in
+                 diff = diffTerms wrap compare term term in
                  diffCost diff `shouldBe` 0
 
     it "produces unbiased insertions within branches" $
       let term s = decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf s) ]))
           root = cofree . ((Just (listArray (0, defaultD) (repeat 0)) :. Program :. Nil) :<) . Indexed in
-      stripDiff (diffTerms wrap compare diffCost (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program :. Nil) :< Indexed [ inserting (stripTerm (term "a")), cata wrap (fmap pure (stripTerm (term "b"))) ])
+      stripDiff (diffTerms wrap compare (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program :. Nil) :< Indexed [ inserting (stripTerm (term "a")), cata wrap (fmap pure (stripTerm (term "b"))) ])
