@@ -56,7 +56,7 @@ spec = parallel $ do
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
-        diff = unListableDiff a :: SyntaxDiff String '[Category, Cost, Range, SourceSpan]
+        diff = unListableDiff a :: SyntaxDiff String '[Category, Range, SourceSpan]
         summaries = diffToDiffSummaries (source <$> blobs) diff
         patches = toList diff
         in

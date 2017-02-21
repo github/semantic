@@ -6,7 +6,6 @@ module Info
 , Category(..)
 , category
 , setCategory
-, Cost(..)
 , SourceSpan(..)
 , SourcePos(..)
 , SourceSpans(..)
@@ -16,16 +15,12 @@ module Info
 , sourceText
 ) where
 
-import Data.Functor.Listable
 import Data.Record
 import Prologue
 import Category
 import Range
 import SourceSpan
 import Data.Aeson
-
-newtype Cost = Cost { unCost :: Int }
-  deriving (Eq, Num, Ord, Show, ToJSON)
 
 newtype SourceText = SourceText { unText :: Text }
   deriving (Show, ToJSON)
@@ -50,8 +45,3 @@ sourceSpan = getField
 
 setSourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan -> Record fields
 setSourceSpan = setField
-
--- Instances
-
-instance Listable Cost where
-  tiers = cons1 Cost
