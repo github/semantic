@@ -64,9 +64,6 @@ run Arguments{..} = do
         Nothing -> for_ text putStrLn
         Just path -> for_ text (T.writeFile path)
 
--- | Return a parser that decorates with the cost of a term and its children.
-parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
-parserWithCost path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser that decorates with the source text.
 parserWithSource :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
