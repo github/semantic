@@ -40,3 +40,6 @@ instance (GEq1 f, GEq1 g) => GEq1 (f :+: g) where
     (L1 a, L1 b) -> gliftEq f a b
     (R1 a, R1 b) -> gliftEq f a b
     _ -> False
+
+instance (GEq1 f, GEq1 g) => GEq1 (f :*: g) where
+  gliftEq f (a1 :*: b1) (a2 :*: b2) = gliftEq f a1 a2 && gliftEq f b1 b2
