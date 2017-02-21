@@ -24,16 +24,16 @@ spec = parallel $ do
 
   prop "equal terms produce identity diffs" $
     \ a -> let term = decorate (unListableF a :: SyntaxTerm String '[Category]) in
-      diffCost (diffTerms wrap (==) term term) `shouldBe` 0
+      diffCost (diffTerms (==) term term) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = stripDiff $ diffTerms wrap (==) (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
+      \ a b -> let diff = stripDiff $ diffTerms (==) (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
         beforeTerm diff `shouldBe` Just (unListableF a)
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = stripDiff $ diffTerms wrap (==) (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
+      \ a b -> let diff = stripDiff $ diffTerms (==) (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
         afterTerm diff `shouldBe` Just (unListableF b)
 
 unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation

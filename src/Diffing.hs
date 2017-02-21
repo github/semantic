@@ -46,7 +46,7 @@ diffFiles parse render sourceBlobs = do
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) ->
-          runBothWith (diffTerms wrap compareCategoryEq) terms
+          runBothWith (diffTerms compareCategoryEq) terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
     hasNullOid blob = oid blob == nullOid || Source.null (source blob)
 
