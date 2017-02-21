@@ -25,14 +25,14 @@ iterAp algebra = go
 
 -- DSL
 
--- | Constructs a 'Recursive' diff of two terms.
+-- | Diff two terms linearly.
 linearly :: term -> term -> Algorithm term diff diff
 linearly a b = liftAp (Linear a b)
 
--- | Constructs a 'ByIndex' diff of two lists of terms.
+-- | Diff two terms using SES.
 bySES :: [term] -> [term] -> Algorithm term diff [diff]
 bySES a b = liftAp (SES a b)
 
--- | Constructs a 'BySimilarity' diff of two lists of terms.
+-- | Diff two terms using RWS.
 byRWS :: [term] -> [term] -> Algorithm term diff [diff]
 byRWS a b = liftAp (RWS a b)
