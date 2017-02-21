@@ -105,7 +105,7 @@ runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)),
   -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
-runAlgorithm construct recur cost = iterAp' $ \ r cont -> case r of
+runAlgorithm construct recur cost = iterAp $ \ r cont -> case r of
   Linear a b -> cont . maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
     traverse (these (Just . deleting) (Just . inserting) recur) aligned
