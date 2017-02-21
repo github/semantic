@@ -30,3 +30,6 @@ instance Eq c => GEq1 (K1 i c) where
 
 instance GEq1 f => GEq1 (Rec1 f) where
   gliftEq f (Rec1 a) (Rec1 b) = gliftEq f a b
+
+instance GEq1 f => GEq1 (M1 i c f) where
+  gliftEq f (M1 a) (M1 b) = gliftEq f a b
