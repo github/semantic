@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Data.Functor.Classes.Eq.Generic
 ( genericLiftEq
 ) where
@@ -33,3 +34,9 @@ instance GEq1 f => GEq1 (Rec1 f) where
 
 instance GEq1 f => GEq1 (M1 i c f) where
   gliftEq f (M1 a) (M1 b) = gliftEq f a b
+
+instance (GEq1 f, GEq1 g) => GEq1 (f :+: g) where
+  gliftEq f a b = case (a, b) of
+    (L1 a, L1 b) -> gliftEq f a b
+    (R1 a, R1 b) -> gliftEq f a b
+    _ -> False
