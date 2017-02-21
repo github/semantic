@@ -86,10 +86,6 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
--- | Term decorator computing the cost of an unpacked term.
-termCostDecorator :: (Foldable f, Functor f) => TermDecorator f a Cost
-termCostDecorator c = 1 + sum (cost <$> tailF c)
-
 -- | Term decorator extracting the source text for a term.
 termSourceDecorator :: (HasField fields Range) => Source -> TermDecorator f fields SourceText
 termSourceDecorator source c = SourceText . toText $ Source.slice range' source
