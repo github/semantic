@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 module Algorithm where
 
 import Control.Applicative.Free
@@ -21,6 +21,11 @@ iterAp :: Functor g => (g a -> a) -> Ap g a -> a
 iterAp algebra = go
   where go (Pure a) = a
         go (Ap underlying apply) = algebra (go . (apply <*>) . pure <$> underlying)
+
+iterAp' :: (forall x. g x -> (x -> a) -> a) -> Ap g a -> a
+iterAp' algebra = go
+  where go (Pure a) = a
+        go (Ap underlying apply) = algebra underlying (go . (apply <*>) . pure)
 
 
 -- DSL
