@@ -156,12 +156,12 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   (_ :< S.Function{}) -> True
   _ -> False
 
-testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
+testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
   terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
   pure $! stripDiff (diffTerms' terms sourceBlobs)
   where
-    parser = parserWithCost (path . fst $ sourceBlobs)
+    parser = parserForFilepath (path . fst $ sourceBlobs)
     diffTerms' terms blobs = case runBothWith areNullOids blobs of
       (True, False) -> pure $ Insert (snd terms)
       (False, True) -> pure $ Delete (fst terms)
