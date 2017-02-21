@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
