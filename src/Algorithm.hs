@@ -22,6 +22,7 @@ iterAp algebra = go
   where go (Pure a) = a
         go (Ap underlying apply) = algebra (go . (apply <*>) . pure <$> underlying)
 
+-- | Tear down an Ap by iteration, given a continuation.
 iterAp' :: (forall x. g x -> (x -> a) -> a) -> Ap g a -> a
 iterAp' algebra = go
   where go (Pure a) = a
