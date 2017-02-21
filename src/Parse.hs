@@ -111,8 +111,8 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
       (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
-parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
+parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+parserForFilepath = parserForType . toS . takeExtension
 
 -- | Read the file and convert it to Unicode.
 readAndTranscodeFile :: FilePath -> IO Source
