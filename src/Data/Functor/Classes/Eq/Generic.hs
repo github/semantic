@@ -3,6 +3,7 @@ module Data.Functor.Classes.Eq.Generic
 ( genericLiftEq
 ) where
 
+import Data.Functor.Classes
 import GHC.Generics
 import Prologue
 
@@ -16,6 +17,14 @@ class GEq1 f where
 -- | A suitable implementation of Eq1’s liftEq for Generic1 types.
 genericLiftEq :: (Generic1 f, GEq1 (Rep1 f)) => (a -> b -> Bool) -> f a -> f b -> Bool
 genericLiftEq f a b = gliftEq f (from1 a) (from1 b)
+
+
+-- Eq1 instances
+
+instance GEq1 [] where gliftEq = liftEq
+instance GEq1 Maybe where gliftEq = liftEq
+instance Eq a => GEq1 ((,) a) where gliftEq = liftEq
+instance Eq a => GEq1 (Either a) where gliftEq = liftEq
 
 
 -- Generics
