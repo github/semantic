@@ -21,3 +21,6 @@ genericLiftEq f a b = gliftEq f (from1 a) (from1 b)
 
 instance GEq1 U1 where
   gliftEq _ _ _ = True
+
+instance GEq1 Par1 where
+  gliftEq f (Par1 a) (Par1 b) = f a b
