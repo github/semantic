@@ -94,7 +94,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
-        diffTOC blankDiffBlobs (diffTerms (==) term term) `shouldBe` []
+        diffTOC blankDiffBlobs (diffTerms term term) `shouldBe` []
 
 type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
 type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
@@ -165,7 +165,7 @@ testDiff sourceBlobs = do
     diffTerms' terms blobs = case runBothWith areNullOids blobs of
       (True, False) -> pure $ Insert (snd terms)
       (False, True) -> pure $ Delete (fst terms)
-      (_, _) -> runBothWith (diffTerms compareCategoryEq) terms
+      (_, _) -> runBothWith diffTerms terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
     hasNullOid blob = oid blob == nullOid || Source.null (source blob)
 

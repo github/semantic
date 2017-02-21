@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Interpreter (Comparable, diffTerms) where
+module Interpreter (diffTerms) where
 
 import Algorithm
 import Data.Align.Generic
@@ -15,28 +15,24 @@ import Prologue hiding (lookup)
 import Syntax as S
 import Term
 
--- | Returns whether two terms are comparable
-type Comparable f annotation = Term f annotation -> Term f annotation -> Bool
-
 -- | Diff two terms recursively, given functions characterizing the diffing.
 diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-  => Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
-  -> SyntaxTerm leaf fields -- ^ A term representing the old state.
+  => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms comparable a b = fromMaybe (replacing a b) $ diffComparableTerms comparable a b
+diffTerms a b = fromMaybe (replacing a b) $ diffComparableTerms a b
 
 -- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
 diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-                    => Comparable (Syntax leaf) (Record fields)
-                    -> SyntaxTerm leaf fields
+                    => SyntaxTerm leaf fields
                     -> SyntaxTerm leaf fields
                     -> Maybe (SyntaxDiff leaf fields)
-diffComparableTerms comparable = recur
+diffComparableTerms = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
           | comparable a b = runAlgorithm recur (Just <$> algorithmWithTerms a b)
           | otherwise = Nothing
+        comparable = (==) `on` category . extract
 
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: MonadFree (TermF (Syntax leaf) (Both a)) diff

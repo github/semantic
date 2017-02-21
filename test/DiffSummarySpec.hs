@@ -51,7 +51,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (unListableF a :: SyntaxTerm String '[Category, Range, SourceSpan]) in
-        diffSummaries blobs (diffTerms (==) term term) `shouldBe` []
+        diffSummaries blobs (diffTerms term term) `shouldBe` []
 
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
