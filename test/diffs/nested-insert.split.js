@@ -10,7 +10,7 @@
 </ul></li></ul></li></ul></td>
 
 </tr><tr><td class="blob-num blob-num-empty empty-cell"></td><td class="blob-code blob-code-empty empty-cell"></td>
-<td class="blob-num blob-num-replacement">3</td><td class="blob-code blob-code-replacement"><ul class="category-program"><li><ul class="category-if_statement"><li><ul class="category-expression_statements">  <li><div class="patch insert" data="5"><ul class="category-expression_statements"><li><ul class="category-function_call"><li><span class="category-identifier">console</span></li>.<li><span class="category-identifier">log</span></li>(<li><span class="category-string">&#39;world&#39;</span></li>)</ul></li>;</ul></div></li>
+<td class="blob-num blob-num-replacement">3</td><td class="blob-code blob-code-replacement"><ul class="category-program"><li><ul class="category-if_statement"><li><ul class="category-expression_statements">  <li><div class="patch insert"><ul class="category-expression_statements"><li><ul class="category-function_call"><li><span class="category-identifier">console</span></li>.<li><span class="category-identifier">log</span></li>(<li><span class="category-string">&#39;world&#39;</span></li>)</ul></li>;</ul></div></li>
 </ul></li></ul></li></ul></td>
 
 </tr><tr><td class="blob-num">3</td><td class="blob-code"><ul class="category-program"><li><ul class="category-if_statement"><li><ul class="category-expression_statements">}</ul></li></ul></li>
