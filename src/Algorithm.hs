@@ -4,11 +4,7 @@ module Algorithm where
 import Control.Applicative.Free
 import Prologue hiding (Pure)
 
--- | A single step in a diffing algorithm.
---
--- 'term' is the type of terms.
--- 'diff' is the type of diffs.
--- 'f' represents the continuation after diffing. Often 'Algorithm'.
+-- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term diff result where
   -- | Recursively diff two terms and pass the result to the continuation.
   Recursive :: term -> term -> AlgorithmF term diff diff
