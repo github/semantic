@@ -77,7 +77,7 @@ textDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost)
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
-  SExpression -> sExpression
+  SExpression -> sExpression TreeOnly
   JSON -> json
   Summary -> summary
   TOC -> toc
