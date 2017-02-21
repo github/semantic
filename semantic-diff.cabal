@@ -150,6 +150,7 @@ test-suite test
                      , Source.Spec
                      , TermSpec
                      , TOCSpec
+                     , IntegrationSpec
                      , Test.Hspec.LeanCheck
   build-depends:       array
                      , base
