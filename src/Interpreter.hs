@@ -114,3 +114,12 @@ runAlgorithm construct recur cost = iterAp $ \ r cont -> case r of
   Delete a -> cont (deleting a)
   Insert b -> cont (inserting b)
   Replace a b -> cont (replacing a b)
+
+-- | Decompose a step of an algorithm into the next steps to perform.
+decompose :: (GAlign f, Traversable f) => AlgorithmF (Term f ann) (Diff f ann) result -> Algorithm (Term f ann) (Diff f ann) result
+decompose = \case
+  Linear t1 t2 -> case galignWith recur (unwrap t1) (unwrap t2) of
+    Just result -> annotate t1 t2 <$> sequenceA result
+    _ -> byReplacing t1 t2
+  where recur = these byDeleting byInserting byReplacing
+        annotate t1 t2 = wrap . (both (extract t1) (extract t2) :<)
