@@ -1,4 +1,6 @@
-module Data.Functor.Classes.Eq.Generic where
+module Data.Functor.Classes.Eq.Generic
+( genericLiftEq
+) where
 
 import GHC.Generics
 import Prologue
