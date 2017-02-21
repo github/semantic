@@ -8,8 +8,6 @@ import Prologue hiding (Pure)
 data AlgorithmF term diff result where
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
   Linear :: term -> term -> AlgorithmF term diff diff
-  -- | Diff two lists of terms by each element’s position in O(n³) time, resulting in a list of diffs.
-  SES :: [term] -> [term] -> AlgorithmF term diff [diff]
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
   RWS :: [term] -> [term] -> AlgorithmF term diff [diff]
   -- | Delete a term..
@@ -34,10 +32,6 @@ iterAp algebra = go
 -- | Diff two terms linearly.
 linearly :: term -> term -> Algorithm term diff diff
 linearly a b = liftAp (Linear a b)
-
--- | Diff two terms using SES.
-bySES :: [term] -> [term] -> Algorithm term diff [diff]
-bySES a b = liftAp (SES a b)
 
 -- | Diff two terms using RWS.
 byRWS :: [term] -> [term] -> Algorithm term diff [diff]

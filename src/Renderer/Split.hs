@@ -158,7 +158,7 @@ splitPatchToClassName patch = stringValue $ "patch " <> case patch of
   SplitReplace _ -> "replace"
 
 -- | Render a diff as an HTML split diff.
-split :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Renderer (Record fields)
+split :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
 split blobs diff = SplitOutput . TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
@@ -220,13 +220,11 @@ instance (ToMarkup f, HasField fields Category, HasField fields Range) => ToMark
 instance (HasField fields Category, HasField fields Range) => ToMarkup (Renderable (SyntaxTerm leaf fields)) where
   toMarkup (Renderable source term) = Prologue.fst $ cata (\ t -> (toMarkup $ Renderable source t, byteRange (headF t))) term
 
-instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (SplitSyntaxDiff leaf fields)) where
+instance (HasField fields Category, HasField fields Range) => ToMarkup (Renderable (SplitSyntaxDiff leaf fields)) where
   toMarkup (Renderable source diff) = Prologue.fst . iter (\ t -> (toMarkup $ Renderable source t, byteRange (headF t))) $ toMarkupAndRange <$> diff
     where toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
-            ((div ! patchAttribute patch `withCostAttribute` cost info) . toMarkup $ Renderable source (cofree term), byteRange info)
+            ((div ! patchAttribute patch) . toMarkup $ Renderable source (cofree term), byteRange info)
           patchAttribute patch = A.class_ (splitPatchToClassName patch)
-          withCostAttribute a (Cost c) | c > 0 = a ! A.data_ (stringValue (show c))
-                                       | otherwise = identity
 
 instance ToMarkup a => ToMarkup (Cell a) where
   toMarkup (Cell hasChanges num line)
