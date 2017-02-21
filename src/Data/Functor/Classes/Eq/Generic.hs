@@ -24,3 +24,6 @@ instance GEq1 U1 where
 
 instance GEq1 Par1 where
   gliftEq f (Par1 a) (Par1 b) = f a b
+
+instance Eq c => GEq1 (K1 i c) where
+  gliftEq _ (K1 a) (K1 b) = a == b
