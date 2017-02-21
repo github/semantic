@@ -12,6 +12,12 @@ data AlgorithmF term diff result where
   SES :: [term] -> [term] -> AlgorithmF term diff [diff]
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
   RWS :: [term] -> [term] -> AlgorithmF term diff [diff]
+  -- | Delete a term..
+  Delete :: term -> AlgorithmF term diff diff
+  -- | Insert a term.
+  Insert :: term -> AlgorithmF term diff diff
+  -- | Replace one term with another.
+  Replace :: term -> term -> AlgorithmF term diff diff
 
 -- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
 type Algorithm term diff = Ap (AlgorithmF term diff)
@@ -36,3 +42,15 @@ bySES a b = liftAp (SES a b)
 -- | Diff two terms using RWS.
 byRWS :: [term] -> [term] -> Algorithm term diff [diff]
 byRWS a b = liftAp (RWS a b)
+
+-- | Delete a term.
+byDeleting :: term -> Algorithm term diff diff
+byDeleting = liftAp . Delete
+
+-- | Insert a term.
+byInserting :: term -> Algorithm term diff diff
+byInserting = liftAp . Insert
+
+-- | Replace one term with another.
+byReplacing :: term -> term -> Algorithm term diff diff
+byReplacing = (liftAp .) . Replace

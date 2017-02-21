@@ -10,7 +10,7 @@ import Data.Record
 import Data.These
 import Diff
 import Info
-import Patch
+import Patch (Patch, inserting, deleting, replacing)
 import Prologue hiding (lookup)
 import SES
 import Syntax as S
@@ -111,3 +111,6 @@ runAlgorithm construct recur cost = iterAp $ \ r cont -> case r of
     traverse (these (Just . deleting) (Just . inserting) recur) aligned
   SES as bs -> cont (ses recur cost as bs)
   RWS as bs -> cont (rws recur as bs)
+  Delete a -> cont (deleting a)
+  Insert b -> cont (inserting b)
+  Replace a b -> cont (replacing a b)
