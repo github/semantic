@@ -7,8 +7,6 @@ module Info
 , category
 , setCategory
 , Cost(..)
-, cost
-, setCost
 , SourceSpan(..)
 , SourcePos(..)
 , SourceSpans(..)
@@ -43,12 +41,6 @@ category = getField
 
 setCategory :: HasField fields Category => Record fields -> Category -> Record fields
 setCategory = setField
-
-cost :: HasField fields Cost => Record fields -> Cost
-cost = getField
-
-setCost :: HasField fields Cost => Record fields -> Cost -> Record fields
-setCost = setField
 
 sourceText :: HasField fields SourceText => Record fields -> SourceText
 sourceText = getField
