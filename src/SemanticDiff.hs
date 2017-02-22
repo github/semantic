@@ -26,9 +26,6 @@ import qualified Control.Concurrent.Async.Pool as Async
 import GHC.Conc (numCapabilities)
 import Development.GitRev
 import Parse
-import Network.Socket
-import Network.Socket.ByteString (sendAll)
-import qualified Data.ByteString.Char8 as C
 import GitmonClient
 
 main :: IO ()
