@@ -7,8 +7,6 @@ import Data.Functor.Both
 import Data.RandomWalkSimilarity (defaultFeatureVectorDecorator, stripDiff)
 import Data.Record
 import qualified Data.Text.IO as TextIO
-import Data.These
-import Diff
 import Info
 import Interpreter
 import Patch
@@ -34,7 +32,7 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost)
+diffFiles :: HasField fields Category
           => Parser (Syntax Text) (Record fields)
           -> Renderer (Record fields)
           -> Both SourceBlob
@@ -48,14 +46,9 @@ diffFiles parse render sourceBlobs = do
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) ->
-          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
+          runBothWith diffTerms terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
     hasNullOid blob = oid blob == nullOid || Source.null (source blob)
-    construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-    sumCost = fmap getSum . foldMap (fmap Sum . getCost)
-    getCost diff = case runFree diff of
-      Free (info :< _) -> cost <$> info
-      Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
 getLabel :: HasField fields Category => CofreeF (Syntax leaf) (Record fields) b -> (Category, Maybe leaf)
 getLabel (h :< t) = (category h, case t of
@@ -66,14 +59,8 @@ getLabel (h :< t) = (category h, case t of
 compareCategoryEq :: Functor f => HasField fields Category => Term f (Record fields) -> Term f (Record fields) -> Bool
 compareCategoryEq = (==) `on` category . extract
 
--- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermCosts :: Functor f => HasField fields Cost => Diff f (Record fields) -> Int
-diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
-  Free (info :< _) -> sum (cost <$> info)
-  Pure patch -> sum (cost . extract <$> patch)
-
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff :: (ToJSON (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -93,7 +80,7 @@ truncatedDiff arguments sources = pure $ case format arguments of
   TOC -> TOCOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (ToJSON (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   writeToOutput (output arguments) $

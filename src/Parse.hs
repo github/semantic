@@ -64,9 +64,6 @@ run Arguments{..} = do
         Nothing -> for_ text putStrLn
         Just path -> for_ text (T.writeFile path)
 
--- | Return a parser that decorates with the cost of a term and its children.
-parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
-parserWithCost path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser that decorates with the source text.
 parserWithSource :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
@@ -89,10 +86,6 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
--- | Term decorator computing the cost of an unpacked term.
-termCostDecorator :: (Foldable f, Functor f) => TermDecorator f a Cost
-termCostDecorator c = 1 + sum (cost <$> tailF c)
-
 -- | Term decorator extracting the source text for a term.
 termSourceDecorator :: (HasField fields Range) => Source -> TermDecorator f fields SourceText
 termSourceDecorator source c = SourceText . toText $ Source.slice range' source
@@ -111,8 +104,8 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
       (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
-parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
+parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+parserForFilepath = parserForType . toS . takeExtension
 
 -- | Read the file and convert it to Unicode.
 readAndTranscodeFile :: FilePath -> IO Source

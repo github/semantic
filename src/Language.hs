@@ -40,6 +40,11 @@ languageForType mediaType = case mediaType of
     ".go" -> Just Language.Go
     _ -> Nothing
 
+toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
+toVarDeclOrAssignment child = case unwrap child of
+  S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment child' assignment
+  _ -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl child Nothing
+
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child Nothing
 

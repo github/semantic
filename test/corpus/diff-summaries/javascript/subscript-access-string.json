@@ -34,7 +34,7 @@
         "+x[\"some-string\"];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e8224a02e3ba0dc00add706c1568127b3ae6182b..e878b0903340b2a3a3be042f0aefa185e1c58975"
+    "shas": "1b52e8673612cc64132cdcab5cf668f2511975af..7a305d839fe590015a047ef72408fe648788dbc1"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-replacement-insert-test",
@@ -89,7 +89,7 @@
         " x[\"some-string\"];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e878b0903340b2a3a3be042f0aefa185e1c58975..756f52d1fdddba9fa5e751771af7be483b30d6a4"
+    "shas": "7a305d839fe590015a047ef72408fe648788dbc1..1504bbec751e4f2ba62dbce3dc593c2b0162c7b4"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-insert-test",
@@ -142,7 +142,7 @@
         " x[\"some-string\"];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "756f52d1fdddba9fa5e751771af7be483b30d6a4..ec75e0ed9547f53ff2d7f8cc5212df280baa113f"
+    "shas": "1504bbec751e4f2ba62dbce3dc593c2b0162c7b4..6b6fc82891c67d371a3030de1c4d7dbd01acaba7"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-replacement-test",
@@ -195,7 +195,7 @@
         " x[\"some-string\"];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ec75e0ed9547f53ff2d7f8cc5212df280baa113f..fc3172fc3532d111b67ce2c4c8a2d23c85e81ca2"
+    "shas": "6b6fc82891c67d371a3030de1c4d7dbd01acaba7..6ba28fc50c3d179cd3eaa3214ace8c4095dfeb62"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-replacement-test",
@@ -266,7 +266,7 @@
         "+x[\"some-other-string\"];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "fc3172fc3532d111b67ce2c4c8a2d23c85e81ca2..d38478e3bd000e6b61450308f1bebf319d0c1514"
+    "shas": "6ba28fc50c3d179cd3eaa3214ace8c4095dfeb62..0d43f251669f0e1669cf390f46781b6ba0351c20"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-test",
@@ -305,7 +305,7 @@
         " x[\"some-other-string\"];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d38478e3bd000e6b61450308f1bebf319d0c1514..84fa7c277121111c577e65f3f21a09363188c9c4"
+    "shas": "0d43f251669f0e1669cf390f46781b6ba0351c20..23e30b32d217898cc38fbe169611392adf1dbb7e"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-rest-test",
@@ -343,5 +343,5 @@
         "-x[\"some-other-string\"];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "84fa7c277121111c577e65f3f21a09363188c9c4..2ceb4d28a0554634451ed82eacdbb44d64ce6d54"
+    "shas": "23e30b32d217898cc38fbe169611392adf1dbb7e..789ce31e3d1a7475a43b8d90357fa2732e9e0f2a"
 }]
