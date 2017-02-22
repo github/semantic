@@ -34,7 +34,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a6c03f4fe5985c8424ed595bd7d50ecc6098dc8a..11c2248a6d114e5db88e13af8def8eaa09a09d45"
+    "shas": "beee7c2b7123a5e4c67865c63ebe928135866f4b..2c943b521ead3b54286ea1cd2aac6018c6b81433"
 }
 ,{
     "testCaseDescription": "javascript-continue-insert-test",
@@ -88,7 +88,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) { continue; }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "11c2248a6d114e5db88e13af8def8eaa09a09d45..7ed1007a324c95df70eefc8431845e8b8d52fc8a"
+    "shas": "2c943b521ead3b54286ea1cd2aac6018c6b81433..0a2a2c8ae3bad94b9401b00ff4cf14326a902d81"
 }
 ,{
     "testCaseDescription": "javascript-continue-replacement-test",
@@ -142,7 +142,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) { break; }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7ed1007a324c95df70eefc8431845e8b8d52fc8a..1e73b9b08c68b5f920a4c7e0e7afe2a12241ad63"
+    "shas": "0a2a2c8ae3bad94b9401b00ff4cf14326a902d81..64fbd27c0376c28cfc9a8d901697cb1f15cc1fe3"
 }
 ,{
     "testCaseDescription": "javascript-continue-delete-replacement-test",
@@ -196,7 +196,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) { continue; }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1e73b9b08c68b5f920a4c7e0e7afe2a12241ad63..ff56824c50998e8ccac9e604cd564e4384b817bc"
+    "shas": "64fbd27c0376c28cfc9a8d901697cb1f15cc1fe3..b564db2836439280ab94c39b826d083be444fb08"
 }
 ,{
     "testCaseDescription": "javascript-continue-delete-insert-test",
@@ -250,7 +250,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ff56824c50998e8ccac9e604cd564e4384b817bc..5935d4c1093d472de0d76b9430758ae222d7f39f"
+    "shas": "b564db2836439280ab94c39b826d083be444fb08..01f2fb8d5bd915fbc7790ddff9d40810574074b8"
 }
 ,{
     "testCaseDescription": "javascript-continue-teardown-test",
@@ -288,5 +288,5 @@
         "-for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5935d4c1093d472de0d76b9430758ae222d7f39f..f270d7e7af308e5cacc3d7334905fd5f2308dc19"
+    "shas": "01f2fb8d5bd915fbc7790ddff9d40810574074b8..65b1dacae919ef819dc69ac3d3f38b19becda862"
 }]
