@@ -1,8 +1,7 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards #-}
 module GitmonClient where
 
 import Prelude
-import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Types
 
