@@ -33,6 +33,10 @@ data CmdLineOptions = CmdLineOptions
   , extraArgs :: [ExtraArg]
   , developmentMode' :: Bool
   , runMode' :: RunMode
+  , repoName' :: Maybe String
+  , repoID' :: Maybe String
+  , userID' :: Maybe String
+  , realIP' :: Maybe String
   }
 
 -- | Arguments for the program (includes command line, environment, and defaults).
@@ -47,6 +51,10 @@ data Arguments = Arguments
   , shaRange :: Both (Maybe String)
   , filePaths :: [FilePath]
   , developmentMode :: Bool
+  , repoName :: Maybe String
+  , repoID :: Maybe String
+  , userID :: Maybe String
+  , realIP :: Maybe String
   } deriving (Show)
 
 -- | Returns Arguments for the program from parsed command line arguments.
@@ -73,6 +81,10 @@ programArguments CmdLineOptions{..} = do
     , shaRange = fetchShas extraArgs
     , filePaths = filePaths
     , developmentMode = developmentMode'
+    , repoName = repoName'
+    , repoID = repoID'
+    , userID = userID'
+    , realIP = realIP'
     }
   where
     fetchPaths :: [ExtraArg] -> [FilePath]
@@ -98,6 +110,10 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
   , developmentMode = False
+  , repoName = Nothing
+  , repoID = Nothing
+  , userID = Nothing
+  , realIP = Nothing
   }
 
 -- | 7 seconds
