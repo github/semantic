@@ -12,20 +12,20 @@ import Network.Socket.ByteString (sendAll)
 
 import Data.ByteString.Lazy (toStrict)
 
-data Stats =
-    StartStats { repoName :: String
-               , via :: String
-               , gitDir :: String
-               , program :: String
-               , realIP :: Maybe String
-               , repoID :: Maybe String
-               , userID :: Maybe String }
-  | FinishStats { cpu :: Integer
-                , diskReadBytes :: Integer
-                , diskWriteBytes :: Integer
-                , resultCode :: Integer } deriving (Generic, Show)
+data ProcessStats =
+    ProcessBeforeStats { gitDir :: String
+                       , program :: String
+                       , realIP :: Maybe String
+                       , repoID :: Maybe String
+                       , repoName :: Maybe String
+                       , userID :: Maybe String
+                       , via :: String }
+  | ProcessAfterStats { cpu :: Integer
+                      , diskReadBytes :: Integer
+                      , diskWriteBytes :: Integer
+                      , resultCode :: Integer } deriving (Generic, Show)
 
-instance ToJSON Stats where
+instance ToJSON ProcessStats where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = camelTo2 '_' }
 
 data GitmonCommand = Update
@@ -38,7 +38,7 @@ instance ToJSON GitmonCommand where
     Finish -> "finish"
     Schedule -> "schedule"
 
-data GitmonMsg = GitmonMsg { command :: GitmonCommand, stats :: Stats } deriving (Show)
+data GitmonMsg = GitmonMsg { command :: GitmonCommand, stats :: ProcessStats } deriving (Show)
 
 instance ToJSON GitmonMsg where
   toJSON GitmonMsg{..} = object [
