@@ -112,8 +112,8 @@ fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
   lift $ runReaderT (fetchDiff' args filepath) repo
 
 fetchDiff' :: Arguments -> FilePath -> ReaderT LgRepo IO R.Output
-fetchDiff' Arguments{..} filepath = do
-  sourcesAndOids <- sequence $ traverse (getSourceBlob filepath) <$> shaRange
+fetchDiff' args@Arguments{..} filepath = do
+  sourcesAndOids <- sequence $ traverse (getSourceBlob args filepath) <$> shaRange
 
   let sources = fromMaybe (Source.emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = Source.idOrEmptySourceBlob <$> sources
@@ -130,40 +130,40 @@ fetchDiff' Arguments{..} filepath = do
 
 
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
-pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
+pathsToDiff args@Arguments{..} shas = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
-  lift $ runReaderT (pathsToDiff' shas) repo
+  lift $ runReaderT (pathsToDiff' args shas) repo
 
 -- | Returns a list of relative file paths that have changed between the given commit shas.
-pathsToDiff' :: Both String -> ReaderT LgRepo IO [FilePath]
-pathsToDiff' shas = do
-  entries <- blobEntriesToDiff shas
+pathsToDiff' :: Arguments -> Both String -> ReaderT LgRepo IO [FilePath]
+pathsToDiff' args shas = do
+  entries <- blobEntriesToDiff args shas
   pure $ (\(p, _, _) -> toS p) <$> entries
 
 -- | Returns a list of blob entries that have changed between the given commits shas.
-blobEntriesToDiff :: Both String -> ReaderT LgRepo IO [(TreeFilePath, Git.BlobOid LgRepo, BlobKind)]
-blobEntriesToDiff shas = do
+blobEntriesToDiff :: Arguments -> Both String -> ReaderT LgRepo IO [(TreeFilePath, Git.BlobOid LgRepo, BlobKind)]
+blobEntriesToDiff args shas = do
   a <- blobEntries (fst shas)
   b <- blobEntries (snd shas)
   pure $ (a \\ b) <> (b \\ a)
-  where blobEntries sha = treeForCommitSha sha >>= treeBlobEntries'
-        treeBlobEntries' tree = reportGitmon "ls-tree" $ treeBlobEntries tree
+  where blobEntries sha = treeForCommitSha args sha >>= treeBlobEntries'
+        treeBlobEntries' tree = reportGitmon "ls-tree" args $ treeBlobEntries tree
 
 -- | Returns a Git.Tree for a commit sha
-treeForCommitSha :: String -> ReaderT LgRepo IO (Git.Tree LgRepo)
-treeForCommitSha sha = do
+treeForCommitSha :: Arguments -> String -> ReaderT LgRepo IO (Git.Tree LgRepo)
+treeForCommitSha args sha = do
   object <- parseObjOid (toS sha)
 
-  commit <- reportGitmon "cat-file" $ lookupCommit object
+  commit <- reportGitmon "cat-file" args $ lookupCommit object
 
-  reportGitmon "cat-file" $ lookupTree (commitTree commit)
+  reportGitmon "cat-file" args $ lookupTree (commitTree commit)
 
 -- | Returns a SourceBlob given a relative file path, and the sha to look up.
-getSourceBlob :: FilePath -> String -> ReaderT LgRepo IO Source.SourceBlob
-getSourceBlob path sha = do
-  tree <- treeForCommitSha sha
-  entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
+getSourceBlob :: Arguments -> FilePath -> String -> ReaderT LgRepo IO Source.SourceBlob
+getSourceBlob args path sha = do
+  tree <- treeForCommitSha args sha
+  entry <- reportGitmon "ls-tree" args $ treeEntry tree (toS path)
 
   (bytestring, oid, mode) <- case entry of
     Nothing -> pure (mempty, mempty, Nothing)

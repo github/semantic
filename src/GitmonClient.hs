@@ -6,6 +6,7 @@ import Prelude
 import Data.Aeson
 import Data.Aeson.Types
 import Git.Libgit2
+import Arguments
 
 import Network.Socket
 import Network.Socket.ByteString (sendAll)
@@ -49,12 +50,12 @@ instance ToJSON GitmonMsg where
 processJSON :: GitmonCommand -> ProcessStats -> ByteString
 processJSON command stats = toStrict . encode $ GitmonMsg command stats
 
-reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon program gitCommand = do
+reportGitmon :: String -> Arguments -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon program Arguments{..} gitCommand = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
   safeIO $ connect soc (SockAddrUnix "/tmp/gitstats.sock")
 
-  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = "/Users/vera/github/test-js" , via = "semantic-diff" , program = program, realIP = Just "127.0.0.1" , repoID = Just "128302" , repoName = Just "test-js" , userID = Just "120983" })
+  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
 
   !result <- gitCommand
 
