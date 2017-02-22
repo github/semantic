@@ -98,7 +98,7 @@ testParse path expectedOutput = do
   expected <- (Verbatim . stripWhitespace) <$> readFile expectedOutput
   actual `shouldBe` expected
 
-testDiff :: Renderer (Record '[Cost, Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
+testDiff :: Renderer (Record '[Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths diff = do
   sources <- sequence $ readAndTranscodeFile <$> paths
   diff' <- diffFiles parser renderer (sourceBlobs sources)
@@ -106,7 +106,7 @@ testDiff renderer paths diff = do
   expected <- (Verbatim . stripWhitespace) <$> readFile diff
   actual `shouldBe` expected
   where
-    parser = parserWithCost (fst paths)
+    parser = parserForFilepath (fst paths)
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
 
 stripWhitespace :: Text -> Text
