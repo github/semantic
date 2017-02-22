@@ -49,14 +49,14 @@ instance ToJSON GitmonMsg where
 processJSON :: GitmonCommand -> ProcessStats -> ByteString
 processJSON command stats = toStrict . encode $ GitmonMsg command stats
 
-reportGitmon :: ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon command = do
+reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon program gitCommand = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
   safeIO $ connect soc (SockAddrUnix "/tmp/gitstats.sock")
 
-  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = "/Users/vera/github/test-js" , via = "semantic-diff" , program = "fetch-tree" , realIP = Just "127.0.0.1" , repoID = Just "128302" , repoName = Just "test-js" , userID = Just "120983" })
+  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = "/Users/vera/github/test-js" , via = "semantic-diff" , program = program, realIP = Just "127.0.0.1" , repoID = Just "128302" , repoName = Just "test-js" , userID = Just "120983" })
 
-  !result <- command
+  !result <- gitCommand
 
   safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 })
 
