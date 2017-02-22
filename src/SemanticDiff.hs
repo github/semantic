@@ -112,13 +112,7 @@ fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
 
 fetchDiff' :: Arguments -> FilePath -> ReaderT LgRepo IO R.Output
 fetchDiff' Arguments{..} filepath = do
-  sock <- liftIO fetchSocket
-
-  liftIO $ reportGitmon sock "fetch sources and oids start"
   sourcesAndOids <- sequence $ traverse (getSourceBlob filepath) <$> shaRange
-  liftIO $ reportGitmon sock "fetch sources and oids end"
-
-  liftIO $ close sock
 
   let sources = fromMaybe (Source.emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = Source.idOrEmptySourceBlob <$> sources
@@ -153,40 +147,19 @@ blobEntriesToDiff shas = do
   b <- blobEntries (snd shas)
   pure $ (a \\ b) <> (b \\ a)
   where blobEntries sha = treeForCommitSha sha >>= treeBlobEntries'
-        treeBlobEntries' tree = do
-          sock <- liftIO fetchSocket
-          liftIO $ reportGitmon sock "fetch blob entries from tree start"
-          let result = treeBlobEntries tree
-          liftIO $ reportGitmon sock "fetch blob entries from tree end"
-          liftIO $ close sock
-          result
 
 -- | Returns a Git.Tree for a commit sha
 treeForCommitSha :: String -> ReaderT LgRepo IO (Git.Tree LgRepo)
 treeForCommitSha sha = do
-  sock <- liftIO fetchSocket
   object <- parseObjOid (toS sha)
 
-  liftIO $ reportGitmon sock "fetch commit start"
-  commit <- lookupCommit object
-  liftIO $ reportGitmon sock "fetch commit end"
 
-  liftIO $ reportGitmon sock "fetch commit from tree start"
-  let result = lookupTree (commitTree commit)
-  liftIO $ reportGitmon sock "fetch commit from tree end"
-  liftIO $ close sock
-  result
 
 -- | Returns a SourceBlob given a relative file path, and the sha to look up.
 getSourceBlob :: FilePath -> String -> ReaderT LgRepo IO Source.SourceBlob
 getSourceBlob path sha = do
-  sock <- liftIO fetchSocket
-
   tree <- treeForCommitSha sha
-
-  liftIO $ reportGitmon sock "fetch tree entry start"
   entry <- treeEntry tree (toS path)
-  liftIO $ reportGitmon sock "fetch tree entry end"
 
   (bytestring, oid, mode) <- case entry of
     Nothing -> pure (mempty, mempty, Nothing)
@@ -202,12 +175,3 @@ getSourceBlob path sha = do
     toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
     toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
     toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
-
-fetchSocket :: IO Socket
-fetchSocket = do
-  sock <- socket AF_UNIX Stream 0
-  connect sock (SockAddrUnix "/tmp/gitstats.sock")
-  pure sock
-
-reportGitmon :: Socket -> String -> IO ()
-reportGitmon conn gitOperation = sendAll conn $ C.pack gitOperation
