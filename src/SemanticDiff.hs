@@ -29,6 +29,7 @@ import Parse
 import Network.Socket
 import Network.Socket.ByteString (sendAll)
 import qualified Data.ByteString.Char8 as C
+import GitmonClient
 
 main :: IO ()
 main = do
