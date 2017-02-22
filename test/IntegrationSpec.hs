@@ -22,50 +22,55 @@ import Test.Hspec.Expectations.Pretty
 spec :: Spec
 spec = parallel $ do
   it "lists example fixtures" $ do
-    examples "test/corpus/sexpression/ruby/" `shouldNotReturn` []
+    examples "test/fixtures/ruby/" `shouldNotReturn` []
 
-  describe "parse and diff ruby" $ runTestsIn "test/corpus/sexpression/ruby/"
+  describe "parse and diff ruby" $ runTestsIn "test/fixtures/ruby/"
 
   where
     runTestsIn :: FilePath -> SpecWith ()
     runTestsIn directory = do
       examples <- runIO $ examples directory
       traverse_ runTest examples
-    runTest SExpressionParse{..} = it (file <> " (sexpression parse)") $ testParse file parseOutput
-    runTest SExpressionDiff{..} = it (normalizeName fileA <> " (sexpression diff)") $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
+    runTest ParseExample{..} = it (file <> " (parse)") $ testParse file parseOutput
+    runTest DiffExample{..} = it (diffOutput <> " (diff)") $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
 
-data Example = SExpressionDiff { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
-             | SExpressionParse { file :: FilePath, parseOutput :: FilePath }
+data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
+             | ParseExample { file :: FilePath, parseOutput :: FilePath }
              deriving (Eq, Show)
 
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form:
 -- |
--- | file.A.rb - The left and right hand side of the diff.
--- | file.B.rb
+-- | file.A.rb - The left hand side of the diff.
+-- | file.B.rb - The right hand side of the diff.
 -- |
--- | file.sexpression.txt - The expected sexpression output.
+-- | file.diffA-B.txt - The expected sexpression diff output for A -> B.
+-- | file.diffB-A.txt - The expected sexpression diff output for B -> A.
 -- |
--- | file.sexpressionA.txt - The expected sexpression parse tree.
--- | file.sexpressionB.txt
+-- | file.parseA.txt - The expected sexpression parse tree for file.A.rb
+-- | file.parseB.txt - The expected sexpression parse tree for file.B.rb
 examples :: FilePath -> IO [Example]
 examples directory = do
   as <- globFor "*.A.*"
   bs <- globFor "*.B.*"
-  sExpAs <- globFor "*.sexpressionA.*"
-  sExpBs <- globFor "*.sexpressionB.*"
-  sExpDiffs <- globFor "*[^AB].sexpression.*"
+  sExpAs <- globFor "*.parseA.txt"
+  sExpBs <- globFor "*.parseB.txt"
+  sExpDiffsAB <- globFor "*.diffA-B.txt"
+  sExpDiffsBA <- globFor "*.diffB-A.txt"
 
-  let sExpDiff name = SExpressionDiff (lookupNormalized name as) (lookupNormalized name bs) (lookupNormalized name sExpDiffs)
-  let sExpParseAs name = SExpressionParse (lookupNormalized name as) (lookupNormalized name sExpAs)
-  let sExpParseBs name = SExpressionParse (lookupNormalized name bs) (lookupNormalized name sExpBs)
+  let exampleDiff list name = DiffExample (lookupNormalized name as) (lookupNormalized name bs) (lookupNormalized name list)
+  let exampleDiff' list name = DiffExample (lookupNormalized name bs) (lookupNormalized name as) (lookupNormalized name list)
+  let exampleParse inputs outputs name = ParseExample (lookupNormalized name inputs) (lookupNormalized name outputs)
 
   let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
-  pure $ (sExpDiff <$> keys) <> (sExpParseAs <$> keys) <> (sExpParseBs <$> keys)
+  pure $ (exampleDiff sExpDiffsAB <$> keys)
+      <> (exampleDiff' sExpDiffsBA <$> keys)
+      <> (exampleParse as sExpAs <$> keys)
+      <> (exampleParse bs sExpBs <$> keys)
   where
     lookupNormalized :: FilePath -> [FilePath] -> FilePath
     lookupNormalized name xs = fromMaybe
-      (panic ("cannot find " <> T.pack name <> " make sure .A, .B and .sexpression.txt exist." :: Text))
+      (panic ("cannot find " <> T.pack name <> " make sure .A, .B and exist." :: Text))
       (find ((== name) . normalizeName) xs)
     globFor :: FilePath -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
