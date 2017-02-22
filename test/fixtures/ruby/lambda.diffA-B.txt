@@ -1,0 +1,9 @@
+(Program
+{ (Other "lambda"
+    (Identifier))
+->(Other "lambda"
+    (Identifier)
+    (Binary
+      (Identifier)
+      (Other "+")
+      (IntegerLiteral))) })

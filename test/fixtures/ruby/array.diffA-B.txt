@@ -1,0 +1,8 @@
+(Program
+  (ArrayLiteral
+  {+(StringLiteral)+}
+  {+(StringLiteral)+}
+  {+(StringLiteral)+}
+  {-(IntegerLiteral)-}
+  {-(IntegerLiteral)-}
+  {-(IntegerLiteral)-}))

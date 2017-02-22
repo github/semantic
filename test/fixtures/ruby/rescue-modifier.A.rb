@@ -1,0 +1,1 @@
+foo rescue nil

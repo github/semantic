@@ -1,0 +1,7 @@
+(Program
+  (Other "lambda"
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (IntegerLiteral)
+    (IntegerLiteral)))

@@ -7,11 +7,10 @@
     (Identifier)
     (Other "or")
     (Identifier)) }
-{-(Binary
-    (Identifier)
-    (Other "or")
-    (Identifier))-}
-{-(Binary
-    (Identifier)
+{+(Binary
+    (Binary
+      (Identifier)
+      (Other "or")
+      (Identifier))
     (Other "and")
-    (Identifier))-})
+    (Identifier))+})

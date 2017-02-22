@@ -1,0 +1,10 @@
+(Program
+  (Assignment
+    (Other "left_assignment_list"
+      (Identifier)
+      (Identifier)
+      (Identifier))
+    (ArrayLiteral
+      (IntegerLiteral)
+      (IntegerLiteral)
+      (IntegerLiteral))))

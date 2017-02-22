@@ -1,0 +1,4 @@
+foo
+END {
+ bar
+}

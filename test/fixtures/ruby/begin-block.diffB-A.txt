@@ -1,0 +1,6 @@
+(Program
+{+(BeginBlock
+    (Identifier))+}
+{-(Identifier)-}
+{-(BeginBlock
+    (Identifier))-})

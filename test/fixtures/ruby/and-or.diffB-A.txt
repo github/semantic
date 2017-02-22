@@ -1,15 +1,16 @@
 (Program
-{+(Binary
+{ (Binary
     (Identifier)
-    (Other "and")
-    (Identifier))+}
-  (Binary
-  { (Identifier)
-  ->(Identifier) }
     (Other "or")
-  { (Identifier)
-  ->(Identifier) })
-{+(Binary
+    (Identifier))
+->(Binary
     (Identifier)
     (Other "and")
-    (Identifier))+})
+    (Identifier)) }
+{-(Binary
+    (Binary
+      (Identifier)
+      (Other "or")
+      (Identifier))
+    (Other "and")
+    (Identifier))-})

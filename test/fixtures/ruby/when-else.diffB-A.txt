@@ -1,0 +1,10 @@
+(Program
+  (Case
+    (Identifier)
+    (When
+      (Other "pattern"
+        (Identifier))
+      (Identifier)
+    { (Else
+        (Identifier))
+    ->(Else) })))

@@ -1,0 +1,20 @@
+(Program
+{+(Identifier)+}
+{+(MemberAccess
+    (Identifier)
+    (Identifier))+}
+{+(Identifier)+}
+{-(MethodCall
+    (Identifier)
+    (StringLiteral))-}
+{-(MethodCall
+    (Identifier)
+    (Identifier))-}
+{-(MethodCall
+    (Identifier)
+    (IntegerLiteral)
+    (IntegerLiteral))-}
+{-(MethodCall
+    (Identifier)
+    (IntegerLiteral)
+    (IntegerLiteral))-})
