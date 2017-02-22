@@ -5,8 +5,8 @@ import Prelude
 import Data.Aeson
 import Data.Aeson.Types
 
-import Network.Socket hiding (send)
-import Network.Socket.ByteString (send)
+import Network.Socket
+import Network.Socket.ByteString (sendAll)
 
 import Data.ByteString.Lazy (toStrict)
 
