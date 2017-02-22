@@ -34,7 +34,7 @@
         "+if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0aabb2672ac5aa2ce7fbeb1cad74c6c09e985a74..251f01e7d8112d3409bd0bacb65529073c9f7ad2"
+    "shas": "739e312aedc0b3c10c4649da8abe80be68857cc7..38ad91a00ad86ee280fb16946c2dfd06891cbf83"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-insert-test",
@@ -89,7 +89,7 @@
         " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "251f01e7d8112d3409bd0bacb65529073c9f7ad2..f765fb5d1508d05122c61b191abc2ee22972cf41"
+    "shas": "38ad91a00ad86ee280fb16946c2dfd06891cbf83..290309d21122fbf3a398d027b8b6f1ef24a982c0"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-insert-test",
@@ -364,7 +364,7 @@
         " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f765fb5d1508d05122c61b191abc2ee22972cf41..cf304bbed29534ab382b4e4f567f00a0a26753c0"
+    "shas": "290309d21122fbf3a398d027b8b6f1ef24a982c0..c576ffcea4a2bb78386bb5dd258cc875efcace48"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-test",
@@ -639,7 +639,7 @@
         " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cf304bbed29534ab382b4e4f567f00a0a26753c0..a477577ebcbc6152cb95204dbe944a8eeef763ee"
+    "shas": "c576ffcea4a2bb78386bb5dd258cc875efcace48..9591847c49bdb3c8396e0ebe5824c547befcc8c3"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-replacement-test",
@@ -710,7 +710,7 @@
         "+if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a477577ebcbc6152cb95204dbe944a8eeef763ee..5c5a9a2d4958d2216e875c57809d92ead3492f43"
+    "shas": "9591847c49bdb3c8396e0ebe5824c547befcc8c3..e6343e67290c7316d4a1555724742b89bde06e4d"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-test",
@@ -749,7 +749,7 @@
         " if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5c5a9a2d4958d2216e875c57809d92ead3492f43..d9c9db24696581dd80a3c57675bae8d1f8d1093c"
+    "shas": "e6343e67290c7316d4a1555724742b89bde06e4d..ac8f1d4599877255a14c854a97e87f36e9ab3799"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-rest-test",
@@ -787,5 +787,5 @@
         "-if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d9c9db24696581dd80a3c57675bae8d1f8d1093c..64dfefbc50b4a2c3c30e706f470afe7dac6fd8b2"
+    "shas": "ac8f1d4599877255a14c854a97e87f36e9ab3799..6f58f7a38b1e71a630df34b8c372d48bda8e6665"
 }]

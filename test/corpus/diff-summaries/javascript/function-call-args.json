@@ -34,7 +34,7 @@
         "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a1cfaadb31d0f0d28d7449d160ba2ed06ec9c6af..f765da24248e68bf31db9272cd07fd27732ce9da"
+    "shas": "2cfa6abea58181d2312bc2637c6e77a9439e9837..b25806b69d8592aea138fab2d8e6aed81e68c0fd"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
@@ -89,7 +89,7 @@
         " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f765da24248e68bf31db9272cd07fd27732ce9da..5caf097567f54bba021b07365b69f238385b23d6"
+    "shas": "b25806b69d8592aea138fab2d8e6aed81e68c0fd..454dad45191ec0246254b49985160b68d5f8feb5"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-insert-test",
@@ -277,7 +277,7 @@
         " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5caf097567f54bba021b07365b69f238385b23d6..a418e2295aafa9eedc993771ad325a32d94e3cb6"
+    "shas": "454dad45191ec0246254b49985160b68d5f8feb5..d00d06c38168bf5b214645f44f7803fe90dda895"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-test",
@@ -465,7 +465,7 @@
         " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a418e2295aafa9eedc993771ad325a32d94e3cb6..f0f325f6ce0df4ba500ebb3845ad93dc904ba24b"
+    "shas": "d00d06c38168bf5b214645f44f7803fe90dda895..e9e62e0e4b67d9f0ecac55799f1a33cc9ef16ea0"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
@@ -536,7 +536,7 @@
         "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f0f325f6ce0df4ba500ebb3845ad93dc904ba24b..b77a2a6a266180d3d20a483bb63291ead5827012"
+    "shas": "e9e62e0e4b67d9f0ecac55799f1a33cc9ef16ea0..a240e238725efd47b07d9fdf236ff19fe5114aad"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-test",
@@ -575,7 +575,7 @@
         " someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b77a2a6a266180d3d20a483bb63291ead5827012..b879b321d2517cc0edaeeb2bbf71f455415bd3a4"
+    "shas": "a240e238725efd47b07d9fdf236ff19fe5114aad..f81e40f8941b415b268792c13ad33e32ab719aa5"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-rest-test",
@@ -613,5 +613,5 @@
         "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b879b321d2517cc0edaeeb2bbf71f455415bd3a4..347b15603c28f7232a36d6d312d1c335a4dd39db"
+    "shas": "f81e40f8941b415b268792c13ad33e32ab719aa5..5a5730856f35057e80f61192fa0b22f7f5e4436d"
 }]

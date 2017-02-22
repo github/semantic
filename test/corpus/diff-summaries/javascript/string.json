@@ -34,7 +34,7 @@
         "+'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "36a730d16dd73b6484407e64d7262f2b1d2260d7..1870b80862e625d4963fcaa20734fd9e45e20b4b"
+    "shas": "ae0f8d227595644119a674caaf992f7dac81d30d..f09cad1c9bb0b1df1a93014a88096dd8982e7db4"
 }
 ,{
     "testCaseDescription": "javascript-string-replacement-insert-test",
@@ -89,7 +89,7 @@
         " 'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1870b80862e625d4963fcaa20734fd9e45e20b4b..29cc0e75eae8279de23094b6b5111fd42a20cde1"
+    "shas": "f09cad1c9bb0b1df1a93014a88096dd8982e7db4..0f2cdc2a9d108d3843a72c2013820708f86e5b93"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-insert-test",
@@ -142,7 +142,7 @@
         " 'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "29cc0e75eae8279de23094b6b5111fd42a20cde1..0f0c962bf6fc4d1b7110477438f0fd2e1ecec140"
+    "shas": "0f2cdc2a9d108d3843a72c2013820708f86e5b93..21a8571ad98b39599ff0b668e0e84e353eaf631d"
 }
 ,{
     "testCaseDescription": "javascript-string-replacement-test",
@@ -195,7 +195,7 @@
         " 'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0f0c962bf6fc4d1b7110477438f0fd2e1ecec140..abb4de29b8899e7bd340bd31ee4d983dc9f9cc4d"
+    "shas": "21a8571ad98b39599ff0b668e0e84e353eaf631d..d84a2277aeb730ce413f098b7e0e25d64a78f94a"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-replacement-test",
@@ -266,7 +266,7 @@
         "+'A different string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "abb4de29b8899e7bd340bd31ee4d983dc9f9cc4d..84c90dfe58c7824e22891e9142af453d51539c74"
+    "shas": "d84a2277aeb730ce413f098b7e0e25d64a78f94a..a2e05e32db378de5d0ab5c74f5e9deac5b50a88b"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-test",
@@ -305,7 +305,7 @@
         " 'A different string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "84c90dfe58c7824e22891e9142af453d51539c74..8d96017389b1ffa96fed6b292a41d61654733899"
+    "shas": "a2e05e32db378de5d0ab5c74f5e9deac5b50a88b..3a0c21bdf7555deddfbc46523533f5dabc444a22"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-rest-test",
@@ -343,5 +343,5 @@
         "-'A different string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8d96017389b1ffa96fed6b292a41d61654733899..a721bbb02349218f8c3e5c1b8dff9b250d206fa5"
+    "shas": "3a0c21bdf7555deddfbc46523533f5dabc444a22..c2ecbd1675a0d6c0db584c8a841d4cc03977609f"
 }]

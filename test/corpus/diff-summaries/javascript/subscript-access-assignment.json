@@ -34,7 +34,7 @@
         "+y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c19769fba6e7c7042d1ab1915c3f9bb20d569e22..0cc920fcb9a611b8c6e75c061f71bba36f375f9a"
+    "shas": "2ede1f26182868b1410f076a7e1de9f34c8a26de..b8d5e33206e0ad1995126152ef9272a3128cf6fa"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-replacement-insert-test",
@@ -89,7 +89,7 @@
         " y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0cc920fcb9a611b8c6e75c061f71bba36f375f9a..cb74cdb2c35a8d40907b018505d8f1769379b9ca"
+    "shas": "b8d5e33206e0ad1995126152ef9272a3128cf6fa..84dd61cb40de0e5a419dad2d8280fded1833567a"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-insert-test",
@@ -142,7 +142,7 @@
         " y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cb74cdb2c35a8d40907b018505d8f1769379b9ca..ce47993610b84c23c5956f7a598d1cc3218bdcb3"
+    "shas": "84dd61cb40de0e5a419dad2d8280fded1833567a..38a876644dc08642493588bf3df2e2d09ea69463"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-replacement-test",
@@ -195,7 +195,7 @@
         " y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ce47993610b84c23c5956f7a598d1cc3218bdcb3..7edc956052d054a4e5d4474baedbfdccc90ffa26"
+    "shas": "38a876644dc08642493588bf3df2e2d09ea69463..ebd6a1075e207044309b034ecef4e19ac69e6fd1"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-replacement-test",
@@ -266,7 +266,7 @@
         "+y[\"x\"] = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7edc956052d054a4e5d4474baedbfdccc90ffa26..3447577471d7e4fa2ed142ecbdac76674cce1df3"
+    "shas": "ebd6a1075e207044309b034ecef4e19ac69e6fd1..ae099535f1ef9386bb711ad519c389d98f51ca5c"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-test",
@@ -305,7 +305,7 @@
         " y[\"x\"] = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3447577471d7e4fa2ed142ecbdac76674cce1df3..93d69fa6cf639f25112e6b738b5fa55f977c2232"
+    "shas": "ae099535f1ef9386bb711ad519c389d98f51ca5c..9b65856a65f9afb4cb5030928e29db89bc801c56"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-rest-test",
@@ -343,5 +343,5 @@
         "-y[\"x\"] = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "93d69fa6cf639f25112e6b738b5fa55f977c2232..e49b80d7752e9f991ddcb2ff2a8c5f714d9bafa3"
+    "shas": "9b65856a65f9afb4cb5030928e29db89bc801c56..a48249ef035b7c104d14f25bbd16116b52ba237b"
 }]

@@ -34,7 +34,7 @@
         "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5d563ac383acc3c789fbd552c697d625c0f424fc..f27889edbbb5640de4565ccc6d3dda2c6ca4ff7b"
+    "shas": "57f385d139c6ec8f073aa94d083af56de7dc4918..15d0f5575f3582140b69e5d67bd9828326db67c7"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-insert-test",
@@ -89,7 +89,7 @@
         " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f27889edbbb5640de4565ccc6d3dda2c6ca4ff7b..6363c59704fdb865549eb385ba38810a1c53f5f9"
+    "shas": "15d0f5575f3582140b69e5d67bd9828326db67c7..ca0af45615fce429591780c909544c66b0dd1cf9"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-insert-test",
@@ -196,7 +196,7 @@
         " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6363c59704fdb865549eb385ba38810a1c53f5f9..0193a7dc4d1a24b5344dd31b252d5624bc36e843"
+    "shas": "ca0af45615fce429591780c909544c66b0dd1cf9..260459106a8148be13e3db1ea16a359bb2149050"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-test",
@@ -303,7 +303,7 @@
         " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0193a7dc4d1a24b5344dd31b252d5624bc36e843..da671e1fcebbc3420fa30b56cb64b32ce271a004"
+    "shas": "260459106a8148be13e3db1ea16a359bb2149050..78490d24d00029c21f56c7622e5428be8b45bcd7"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-replacement-test",
@@ -374,7 +374,7 @@
         "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "da671e1fcebbc3420fa30b56cb64b32ce271a004..08d69ec53c3b1ea4afe6ffab3084d626bf375015"
+    "shas": "78490d24d00029c21f56c7622e5428be8b45bcd7..9299c36b740f2234ad9b74d580fc62d813b7087d"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-test",
@@ -413,7 +413,7 @@
         " class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "08d69ec53c3b1ea4afe6ffab3084d626bf375015..b5988452546dcdfce01968a70b4fc10fa86804a9"
+    "shas": "9299c36b740f2234ad9b74d580fc62d813b7087d..0679c7feb0620d5cc19f1298f185ac68e4957ebd"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-rest-test",
@@ -451,5 +451,5 @@
         "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b5988452546dcdfce01968a70b4fc10fa86804a9..2bd27e99860858d0a524b5a307b97f412b4cc0c8"
+    "shas": "0679c7feb0620d5cc19f1298f185ac68e4957ebd..f8da6edf80832c48f9b46bdc5dbc85475dda5bba"
 }]

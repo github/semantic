@@ -34,7 +34,7 @@
         "+function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0f9353e629ed1d4b50861305cd28aa9667f15b4a..ee19f268662c3911fec89c4454037b9f5ac4cc7c"
+    "shas": "644055ceaa98ec1527ed77571e89b338ba22cb07..036a29ffe2416f016ac31ac12211144f3951c152"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-replacement-insert-test",
@@ -89,7 +89,7 @@
         " function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ee19f268662c3911fec89c4454037b9f5ac4cc7c..ede2541397ede9a83a53a0929e7088ddbd01d8a4"
+    "shas": "036a29ffe2416f016ac31ac12211144f3951c152..fcea89e4edfc2ba76458cb0b212aa6e45ab8c31c"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-insert-test",
@@ -169,7 +169,7 @@
         " function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ede2541397ede9a83a53a0929e7088ddbd01d8a4..d8dc1f46228c9f0f48640548bb42615aa26c00e8"
+    "shas": "fcea89e4edfc2ba76458cb0b212aa6e45ab8c31c..8ba570725c02abc4e2f14f07e3eda739c53c59c0"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-replacement-test",
@@ -249,7 +249,7 @@
         " function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d8dc1f46228c9f0f48640548bb42615aa26c00e8..27b3672918c4d202ab57a62658c715a7ffe24a72"
+    "shas": "8ba570725c02abc4e2f14f07e3eda739c53c59c0..994c9c9465179781820fbb01504c1534fe60d175"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "27b3672918c4d202ab57a62658c715a7ffe24a72..a98f8cbc1a27c923c69b91a16e665661d99b278b"
+    "shas": "994c9c9465179781820fbb01504c1534fe60d175..bf6b1d7e746eba690547954a19b6c85eafdccdb2"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-test",
@@ -359,7 +359,7 @@
         " function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a98f8cbc1a27c923c69b91a16e665661d99b278b..2178857dfccf14e6705a2d50e6824cb61f69164a"
+    "shas": "bf6b1d7e746eba690547954a19b6c85eafdccdb2..6c9ef83e66e6f78713a84eb2de36bec8b4bcfdd3"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-rest-test",
@@ -397,5 +397,5 @@
         "-function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2178857dfccf14e6705a2d50e6824cb61f69164a..0c5669ab3e40b0ec94a4b0b5eb1047853c0d51b0"
+    "shas": "6c9ef83e66e6f78713a84eb2de36bec8b4bcfdd3..8eddbc07f2be259ee82be88f4004b460925ec788"
 }]

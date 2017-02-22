@@ -34,7 +34,7 @@
         "+this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9d8e6a9365dd210f6592bfbb25de8eb159ea7499..1ac143c91e550a2392ac6cb4724efe0f6c31477b"
+    "shas": "03ff85000218a39495ba6e06fceae4258723faa9..134166e37a6153bd471479290ef28d2ec9b0648b"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-insert-test",
@@ -89,7 +89,7 @@
         " this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1ac143c91e550a2392ac6cb4724efe0f6c31477b..f7ab59d2024e14a5260519faa0012ae957547395"
+    "shas": "134166e37a6153bd471479290ef28d2ec9b0648b..fd913473bc4094d3a8e5251d731a24e3acdde1d2"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-insert-test",
@@ -196,7 +196,7 @@
         " this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f7ab59d2024e14a5260519faa0012ae957547395..49320cf924ffd18ed8c5dcda326cbf6526f49030"
+    "shas": "fd913473bc4094d3a8e5251d731a24e3acdde1d2..e9a8841ed0f832d072457ce74bf4fd771f14791e"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-test",
@@ -303,7 +303,7 @@
         " this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "49320cf924ffd18ed8c5dcda326cbf6526f49030..325ca9645fc4edf757aa30d91a58bd348a5bb43c"
+    "shas": "e9a8841ed0f832d072457ce74bf4fd771f14791e..a0d1ce46686073e926eb93a20faf4bced9be809f"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-replacement-test",
@@ -374,7 +374,7 @@
         "+this.reduce(function (a) { return b.a; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "325ca9645fc4edf757aa30d91a58bd348a5bb43c..191853942041b4c49b5888ccb5fb138c2fcce147"
+    "shas": "a0d1ce46686073e926eb93a20faf4bced9be809f..79e1206ab50844fd3643f34a7be4ce19b19d67ec"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-test",
@@ -413,7 +413,7 @@
         " this.reduce(function (a) { return b.a; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "191853942041b4c49b5888ccb5fb138c2fcce147..4d93f0d28d7c311ebe367c1846ece4937efa0f80"
+    "shas": "79e1206ab50844fd3643f34a7be4ce19b19d67ec..6cff768bf618b4f3854961a4e932d82fb46d19ea"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-rest-test",
@@ -451,5 +451,5 @@
         "-this.reduce(function (a) { return b.a; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4d93f0d28d7c311ebe367c1846ece4937efa0f80..c95bd0e01ff1d7d686262b782db20ad959d3676f"
+    "shas": "6cff768bf618b4f3854961a4e932d82fb46d19ea..43726374cb2a87ea30036aad6d1f02115038d220"
 }]
