@@ -1,14 +1,3 @@
 (Program
-{+(Comment)+}
-{-(ParseError
-    (Other "right_assignment_list"
-      (Begin
-        (MethodCall
-          (Constant)
-          (MethodCall
-            (Identifier)
-            (MethodCall
-              (Identifier)
-              (Identifier))))
-        (Identifier)
-        (ParseError))))-})
+{ (Comment)
+->(Comment) })
