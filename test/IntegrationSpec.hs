@@ -9,6 +9,7 @@ import GHC.Show (Show(..))
 import Data.List (union)
 import Diffing
 import Info
+import qualified Data.Functor.Both as Both
 import Parse
 import Prologue hiding (fst, snd)
 import Renderer
@@ -25,71 +26,65 @@ spec = parallel $ do
   it "lists example fixtures" $ do
     examples "test/corpus/sexpression/ruby/" `shouldNotReturn` []
 
-  describe "should produce the correct diff" $ runTestsIn "test/corpus/sexpression/ruby/" shouldBe
+  describe "should produce the correct ruby diffs" $ runTestsIn "test/corpus/sexpression/ruby/"
 
   where
-    runTestsIn :: FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> SpecWith ()
-    runTestsIn directory matcher = do
-      paths <- runIO $ examples directory
-      let tests = correctTests =<< paths
-      traverse_ (\ (formatName, renderer, paths, output) ->
-        it (maybe "/dev/null" normalizeName (uncurry (<|>) (runJoin paths)) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
+    runTestsIn :: FilePath -> SpecWith ()
+    runTestsIn directory = do
+      examples <- runIO $ examples directory
+      let tests = testsForPaths =<< examples
+      traverse_ (\ (formatName, renderer, files, output) ->
+        it (normalizeName (Both.fst files) ++ " (" ++ formatName ++ ")") $ testDiff renderer files output) tests
 
-    correctTests paths@(_, _, Nothing) = testsForPaths paths
-    correctTests paths = filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
     testsForPaths (aPath, bPath, sexpression) = [ ("sexpression", Renderer.sExpression TreeOnly, paths, sexpression) ]
-      where paths = both aPath bPath
+        where paths = both aPath bPath
+
+data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
+             | ParseExample { file :: FilePath, parseOutput :: FilePath }
 
 -- | Return all the examples from the given directory. Examples are expected to
--- | have the form "foo.A.js", "foo.B.js", "foo.sexpression.js". Diffs are not
--- | required as the test may be verifying that the inputs don't crash.
+-- | have the form "foo.A.js", "foo.B.js", "foo.sexpression.js".
 -- |
 -- | file.A.rb
 -- | file.B.rb
--- | file.A.sexpression.rb
--- | file.B.sexpression.rb
--- | file.sexpression.rb
-examples :: FilePath -> IO [(Maybe FilePath, Maybe FilePath, Maybe FilePath)]
+-- |
+-- | file.sexpression.txt
+-- |
+-- | file.sexpressionA.txt
+-- | file.sexpressionB.txt
+
+examples :: FilePath -> IO [(FilePath, FilePath, FilePath)]
 examples directory = do
   as <- globFor "*.A.*"
   bs <- globFor "*.B.*"
-  sexpressions <- globFor "*.sexpression.*"
+  sexpressions <- globFor "*[^AB].sexpression.*"
 
   let lookupName name = (lookupNormalized name as, lookupNormalized name bs, lookupNormalized name sexpressions)
 
   let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
   pure $ lookupName <$> keys
   where
-    lookupNormalized name = find $ (== name) . normalizeName
+    lookupNormalized :: FilePath -> [FilePath] -> FilePath
+    lookupNormalized name xs = fromMaybe
+      (panic ("cannot find " <> T.pack name <> " make sure .A, .B and .sexpression.txt exist." :: Text))
+      (find ((== name) . normalizeName) xs)
     globFor :: FilePath -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
 
--- | Given a test name like "foo.A.js", return "foo.js".
+-- | Given a test name like "foo.A.js", return "foo".
 normalizeName :: FilePath -> FilePath
 normalizeName path = dropExtension $ dropExtension path
 
--- | Given file paths for A, B, and, optionally, a diff, return whether diffing
--- | the files will produce the diff. If no diff is provided, then the result
--- | is true, but the diff will still be calculated.
-testDiff :: Renderer (Record '[Cost, Range, Category, SourceSpan]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
-testDiff renderer paths diff matcher = do
-  sources <- traverse (traverse readAndTranscodeFile) paths
-  actual <- fmap (Verbatim . stripWhitespace) <$> traverse ((pure . concatOutputs . pure) <=< diffFiles' sources) parser
-  case diff of
-    Nothing -> matcher actual actual
-    Just file -> do
-      expected <- (Verbatim . stripWhitespace) <$> readFile file
-      matcher actual (Just expected)
+testDiff :: Renderer (Record '[Cost, Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
+testDiff renderer paths diff = do
+  sources <- sequence $ readAndTranscodeFile <$> paths
+  diff' <- diffFiles parser renderer (sourceBlobs sources)
+  let actual = (Verbatim . stripWhitespace. concatOutputs . pure) diff'
+  expected <- (Verbatim . stripWhitespace) <$> readFile diff
+  actual `shouldBe` expected
   where
-    diffFiles' sources parser = diffFiles parser renderer (sourceBlobs sources paths)
-    parser = parserWithCost <$> runBothWith (<|>) paths
-
-    sourceBlobs :: Both (Maybe Source) -> Both (Maybe FilePath) -> Both SourceBlob
-    sourceBlobs sources paths = case runJoin paths of
-      (Nothing, Nothing) -> Join (emptySourceBlob "", emptySourceBlob "")
-      (Nothing, Just filepath) -> Join (emptySourceBlob "", sourceBlob (unsafeFromJust $ snd sources) filepath)
-      (Just filepath, Nothing) ->  Join (sourceBlob (unsafeFromJust $ fst sources) filepath, emptySourceBlob "")
-      (Just path1, Just path2) ->  Join (sourceBlob (unsafeFromJust $ fst sources) path1, sourceBlob (unsafeFromJust $ snd sources) path2)
+    parser = parserWithCost (fst paths)
+    sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
 
     stripWhitespace :: Text -> Text
     stripWhitespace = T.foldl' go T.empty
