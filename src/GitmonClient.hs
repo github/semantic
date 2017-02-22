@@ -46,29 +46,26 @@ instance ToJSON GitmonMsg where
     "data" .= stats
     ]
 
+processJSON :: GitmonCommand -> ProcessStats -> ByteString
+processJSON command stats = toStrict . encode $ GitmonMsg command stats
+
 reportGitmon :: ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon command = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
   safeIO $ connect soc (SockAddrUnix "/tmp/gitstats.sock")
 
-  let startStats = StartStats { repoName = "test-js", via = "gitrpc", gitDir = "/Users/vera/github/test-js", program = "semantic-diff", realIP = Nothing, repoID = Nothing, userID = Nothing }
-  let startStatsJSON = toStrict . encode $ GitmonMsg Update startStats
-  safeIO $ sendAll soc startStatsJSON
+  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = "/Users/vera/github/test-js" , via = "semantic-diff" , program = "fetch-tree" , realIP = Just "127.0.0.1" , repoID = Just "128302" , repoName = Just "test-js" , userID = Just "120983" })
 
-  result <- command
-
-  let finishStats = FinishStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 }
-  let finishStatsJSON = toStrict . encode $ GitmonMsg Finish finishStats
   !result <- command
 
-  safeIO $ sendAll soc finishStatsJSON `catch` noop
+  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 })
 
-  safeIO $ close soc `catch` noop
+  safeIO $ close soc
 
   return result
 
   where safeIO :: MonadIO m => IO () -> m ()
         safeIO command = liftIO $ command `catch` noop
-        
+
         noop :: IOException -> IO ()
         noop _ = return ()
