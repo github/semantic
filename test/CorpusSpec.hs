@@ -75,7 +75,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer (Record '[Cost, Range, Category, SourceSpan]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
+testDiff :: Renderer (Record '[Range, Category, SourceSpan]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- traverse (traverse readAndTranscodeFile) paths
   actual <- fmap Verbatim <$> traverse ((pure . concatOutputs . pure) <=< diffFiles' sources) parser
@@ -85,7 +85,7 @@ testDiff renderer paths diff matcher = do
       expected <- Verbatim <$> readFile file
       matcher actual (Just expected)
   where diffFiles' sources parser = diffFiles parser renderer (sourceBlobs sources paths)
-        parser = parserWithCost <$> runBothWith (<|>) paths
+        parser = parserForFilepath <$> runBothWith (<|>) paths
         sourceBlobs :: Both (Maybe (S.Source)) -> Both (Maybe FilePath) -> Both S.SourceBlob
         sourceBlobs sources paths = case runJoin paths of
           (Nothing, Nothing) -> Join (S.emptySourceBlob "", S.emptySourceBlob "")
