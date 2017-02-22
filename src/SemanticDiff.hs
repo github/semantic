@@ -26,6 +26,9 @@ import qualified Control.Concurrent.Async.Pool as Async
 import GHC.Conc (numCapabilities)
 import Development.GitRev
 import Parse
+import Network.Socket hiding (sendAll)
+import Network.Socket.ByteString (sendAll)
+import qualified Data.ByteString.Char8 as C
 
 main :: IO ()
 main = do
@@ -98,8 +101,12 @@ fetchDiffs args@Arguments{..} = do
     ([], Join (Just a, Just b)) -> pathsToDiff args (both a b)
     (ps, _) -> pure ps
 
-  Async.withTaskGroup numCapabilities $ \p ->
-    Async.mapTasks p (fetchDiff args <$> paths)
+  sock <- fetchSocket
+  reportGitmon sock "start"
+  let result = Async.withTaskGroup numCapabilities $ \p -> Async.mapTasks p (fetchDiff args <$> paths)
+  reportGitmon sock "finished"
+  close sock
+  result
 
 fetchDiff :: Arguments -> FilePath -> IO R.Output
 fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
@@ -171,3 +178,12 @@ getSourceBlob path sha = do
     toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
     toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
     toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
+
+fetchSocket :: IO Socket
+fetchSocket = do
+  sock <- socket AF_UNIX Stream 0
+  connect sock (SockAddrUnix "/tmp/gitstats.sock")
+  pure sock
+
+reportGitmon :: Socket -> String -> IO ()
+reportGitmon conn gitOperation = sendAll conn $ C.pack gitOperation
