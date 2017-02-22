@@ -1,9 +1,11 @@
 {-# LANGUAGE RecordWildCards #-}
 module GitmonClient where
 
+import Prologue hiding (toStrict)
 import Prelude
 import Data.Aeson
 import Data.Aeson.Types
+import Git.Libgit2
 
 import Network.Socket
 import Network.Socket.ByteString (sendAll)
@@ -44,22 +46,22 @@ instance ToJSON GitmonMsg where
     "data" .= stats
     ]
 
-  soc <- socket AF_UNIX Stream defaultProtocol
-  connect soc (SockAddrUnix "/tmp/gitstats.sock")
 reportGitmon :: ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon command = do
+  soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
+  liftIO $ connect soc (SockAddrUnix "/tmp/gitstats.sock")
 
-  let startStats = StartStats { repoName = "test-js", via = "gitrpc", gitDir = "/Users/vera/github/test-js", program = "semantic-diff", realIP = Nothing, repoID = Nothing, userID = Nothing}
+  let startStats = StartStats { repoName = "test-js", via = "gitrpc", gitDir = "/Users/vera/github/test-js", program = "semantic-diff", realIP = Nothing, repoID = Nothing, userID = Nothing }
   let startStatsJSON = toStrict . encode $ GitmonMsg Update startStats
-  _ <- send soc startStatsJSON
+  liftIO $ sendAll soc startStatsJSON
 
   thing <- command
 
   let finishStats = FinishStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 }
   let finishStatsJSON = toStrict . encode $ GitmonMsg Finish finishStats
 
-  _ <- send soc finishStatsJSON
+  liftIO $ sendAll soc finishStatsJSON
 
-  close soc
+  liftIO $ close soc
 
   return thing
