@@ -33,7 +33,7 @@ printDiff diff level format = case runFree diff of
           | n < 1 = "\n"
           | otherwise = "\n" <> mconcat (replicate n "  ")
 
-printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> SExpressionFormat ->Text
+printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> SExpressionFormat -> Text
 printTerm term level format = go term level 0
   where
     pad p n | n < 1 = ""

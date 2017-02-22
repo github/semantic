@@ -9,7 +9,6 @@ import GHC.Show (Show(..))
 import Data.List (union)
 import Diffing
 import Info
-import qualified Data.Functor.Both as Both
 import Parse
 import Prologue hiding (fst, snd)
 import Renderer
@@ -19,21 +18,20 @@ import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)
 import Test.Hspec.Expectations.Pretty
-import Unsafe (unsafeFromJust)
 
 spec :: Spec
 spec = parallel $ do
   it "lists example fixtures" $ do
     examples "test/corpus/sexpression/ruby/" `shouldNotReturn` []
 
-  describe "should produce the correct ruby diffs" $ runTestsIn "test/corpus/sexpression/ruby/"
+  describe "parse and diff ruby" $ runTestsIn "test/corpus/sexpression/ruby/"
 
   where
     runTestsIn :: FilePath -> SpecWith ()
     runTestsIn directory = do
       examples <- runIO $ examples directory
       traverse_ runTest examples
-    runTest SExpressionParse{..} = it (file <> " (sexpression parse)") $ 1 `shouldBe` 1
+    runTest SExpressionParse{..} = it (file <> " (sexpression parse)") $ testParse file parseOutput
     runTest SExpressionDiff{..} = it (normalizeName fileA <> " (sexpression diff)") $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
 
 data Example = SExpressionDiff { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
@@ -41,16 +39,15 @@ data Example = SExpressionDiff { fileA :: FilePath, fileB :: FilePath, diffOutpu
              deriving (Eq, Show)
 
 -- | Return all the examples from the given directory. Examples are expected to
--- | have the form "foo.A.js", "foo.B.js", "foo.sexpression.js".
+-- | have the form:
 -- |
--- | file.A.rb
+-- | file.A.rb - The left and right hand side of the diff.
 -- | file.B.rb
 -- |
--- | file.sexpression.txt
+-- | file.sexpression.txt - The expected sexpression output.
 -- |
--- | file.sexpressionA.txt
+-- | file.sexpressionA.txt - The expected sexpression parse tree.
 -- | file.sexpressionB.txt
-
 examples :: FilePath -> IO [Example]
 examples directory = do
   as <- globFor "*.A.*"
@@ -77,6 +74,15 @@ examples directory = do
 normalizeName :: FilePath -> FilePath
 normalizeName path = dropExtension $ dropExtension path
 
+testParse :: FilePath -> FilePath -> Expectation
+testParse path expectedOutput = do
+  source <- readAndTranscodeFile path
+  let blob = sourceBlob source path
+  term <- parserWithSource path blob
+  let actual = (Verbatim . stripWhitespace) $ printTerm term 0 TreeOnly
+  expected <- (Verbatim . stripWhitespace) <$> readFile expectedOutput
+  actual `shouldBe` expected
+
 testDiff :: Renderer (Record '[Cost, Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths diff = do
   sources <- sequence $ readAndTranscodeFile <$> paths
@@ -88,11 +94,10 @@ testDiff renderer paths diff = do
     parser = parserWithCost (fst paths)
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
 
-    stripWhitespace :: Text -> Text
-    stripWhitespace = T.foldl' go T.empty
-      where go acc x | x == ' ' = acc
-                     | x == '\n' = acc
-                     | otherwise = T.snoc acc x
+stripWhitespace :: Text -> Text
+stripWhitespace = T.foldl' go T.empty
+  where go acc x | x `elem` [' ', '\t', '\n'] = acc
+                 | otherwise = T.snoc acc x
 
 -- | A wrapper around `Text` with a more readable `Show` instance.
 newtype Verbatim = Verbatim Text

@@ -42,7 +42,7 @@ run Arguments{..} = do
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
   writeToOutput output $ case format of
-    SExpression -> [foldr (\t acc -> printTerm t 0 TreeAndRanges <> acc) "" terms]
+    SExpression -> [foldr (\t acc -> printTerm t 0 TreeOnly <> acc) "" terms]
     _ -> toS . encodePretty . cata algebra <$> terms
 
   where
