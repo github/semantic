@@ -41,14 +41,14 @@ data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput ::
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form:
 -- |
--- | file.A.rb - The left hand side of the diff.
--- | file.B.rb - The right hand side of the diff.
+-- | example-name.A.rb - The left hand side of the diff.
+-- | example-name.B.rb - The right hand side of the diff.
 -- |
--- | file.diffA-B.txt - The expected sexpression diff output for A -> B.
--- | file.diffB-A.txt - The expected sexpression diff output for B -> A.
+-- | example-name.diffA-B.txt - The expected sexpression diff output for A -> B.
+-- | example-name.diffB-A.txt - The expected sexpression diff output for B -> A.
 -- |
--- | file.parseA.txt - The expected sexpression parse tree for file.A.rb
--- | file.parseB.txt - The expected sexpression parse tree for file.B.rb
+-- | example-name.parseA.txt - The expected sexpression parse tree for example-name.A.rb
+-- | example-name.parseB.txt - The expected sexpression parse tree for example-name.B.rb
 examples :: FilePath -> IO [Example]
 examples directory = do
   as <- globFor "*.A.*"
@@ -58,20 +58,30 @@ examples directory = do
   sExpDiffsAB <- globFor "*.diffA-B.txt"
   sExpDiffsBA <- globFor "*.diffB-A.txt"
 
-  let exampleDiff list name = DiffExample (lookupNormalized name as) (lookupNormalized name bs) (lookupNormalized name list)
-  let exampleDiff' list name = DiffExample (lookupNormalized name bs) (lookupNormalized name as) (lookupNormalized name list)
-  let exampleParse inputs outputs name = ParseExample (lookupNormalized name inputs) (lookupNormalized name outputs)
+  let exampleDiff out name = DiffExample (lookupNormalized name as) (lookupNormalized name bs) out
+  let exampleDiff' out name = DiffExample (lookupNormalized name bs) (lookupNormalized name as) out
+  let exampleParse files out name = ParseExample (lookupNormalized name files) out
 
   let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
-  pure $ (exampleDiff sExpDiffsAB <$> keys)
-      <> (exampleDiff' sExpDiffsBA <$> keys)
-      <> (exampleParse as sExpAs <$> keys)
-      <> (exampleParse bs sExpBs <$> keys)
+  pure $ getExamples exampleDiff sExpDiffsAB keys
+      <> getExamples exampleDiff' sExpDiffsBA keys
+      <> getExamples (exampleParse as) sExpAs keys
+      <> getExamples (exampleParse bs) sExpBs keys
   where
+    -- Only returns examples if they exist
+    getExamples f list = foldr (go f list) []
+      where go f list name acc = case lookupNormalized' name list of
+              Just out -> f out name : acc
+              Nothing -> acc
+
     lookupNormalized :: FilePath -> [FilePath] -> FilePath
     lookupNormalized name xs = fromMaybe
       (panic ("cannot find " <> T.pack name <> " make sure .A, .B and exist." :: Text))
-      (find ((== name) . normalizeName) xs)
+      (lookupNormalized' name xs)
+
+    lookupNormalized' :: FilePath -> [FilePath] -> Maybe FilePath
+    lookupNormalized' name = find ((== name) . normalizeName)
+
     globFor :: FilePath -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
 
