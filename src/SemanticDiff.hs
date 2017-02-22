@@ -147,19 +147,22 @@ blobEntriesToDiff shas = do
   b <- blobEntries (snd shas)
   pure $ (a \\ b) <> (b \\ a)
   where blobEntries sha = treeForCommitSha sha >>= treeBlobEntries'
+        treeBlobEntries' tree = reportGitmon $ treeBlobEntries tree
 
 -- | Returns a Git.Tree for a commit sha
 treeForCommitSha :: String -> ReaderT LgRepo IO (Git.Tree LgRepo)
 treeForCommitSha sha = do
   object <- parseObjOid (toS sha)
 
+  commit <- reportGitmon $ lookupCommit object
 
+  reportGitmon $ lookupTree (commitTree commit)
 
 -- | Returns a SourceBlob given a relative file path, and the sha to look up.
 getSourceBlob :: FilePath -> String -> ReaderT LgRepo IO Source.SourceBlob
 getSourceBlob path sha = do
   tree <- treeForCommitSha sha
-  entry <- treeEntry tree (toS path)
+  entry <- reportGitmon $ treeEntry tree (toS path)
 
   (bytestring, oid, mode) <- case entry of
     Nothing -> pure (mempty, mempty, Nothing)
