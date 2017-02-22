@@ -101,12 +101,7 @@ fetchDiffs args@Arguments{..} = do
     ([], Join (Just a, Just b)) -> pathsToDiff args (both a b)
     (ps, _) -> pure ps
 
-  sock <- fetchSocket
-  reportGitmon sock "start"
-  let result = Async.withTaskGroup numCapabilities $ \p -> Async.mapTasks p (fetchDiff args <$> paths)
-  reportGitmon sock "finished"
-  close sock
-  result
+  Async.withTaskGroup numCapabilities $ \p -> Async.mapTasks p (fetchDiff args <$> paths)
 
 fetchDiff :: Arguments -> FilePath -> IO R.Output
 fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
@@ -116,7 +111,13 @@ fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
 
 fetchDiff' :: Arguments -> FilePath -> ReaderT LgRepo IO R.Output
 fetchDiff' Arguments{..} filepath = do
+  sock <- liftIO fetchSocket
+
+  liftIO $ reportGitmon sock "fetch sources and oids start"
   sourcesAndOids <- sequence $ traverse (getSourceBlob filepath) <$> shaRange
+  liftIO $ reportGitmon sock "fetch sources and oids end"
+
+  liftIO $ close sock
 
   let sources = fromMaybe (Source.emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = Source.idOrEmptySourceBlob <$> sources
@@ -150,20 +151,42 @@ blobEntriesToDiff shas = do
   a <- blobEntries (fst shas)
   b <- blobEntries (snd shas)
   pure $ (a \\ b) <> (b \\ a)
-  where blobEntries sha = treeForCommitSha sha >>= treeBlobEntries
+  where blobEntries sha = treeForCommitSha sha >>= treeBlobEntries'
+        treeBlobEntries' tree = do
+          sock <- liftIO fetchSocket
+          liftIO $ reportGitmon sock "fetch blob entries from tree start"
+          let result = treeBlobEntries tree
+          liftIO $ reportGitmon sock "fetch blob entries from tree end"
+          liftIO $ close sock
+          result
 
 -- | Returns a Git.Tree for a commit sha
 treeForCommitSha :: String -> ReaderT LgRepo IO (Git.Tree LgRepo)
 treeForCommitSha sha = do
+  sock <- liftIO fetchSocket
   object <- parseObjOid (toS sha)
+
+  liftIO $ reportGitmon sock "fetch commit start"
   commit <- lookupCommit object
-  lookupTree (commitTree commit)
+  liftIO $ reportGitmon sock "fetch commit end"
+
+  liftIO $ reportGitmon sock "fetch commit from tree start"
+  let result = lookupTree (commitTree commit)
+  liftIO $ reportGitmon sock "fetch commit from tree end"
+  liftIO $ close sock
+  result
 
 -- | Returns a SourceBlob given a relative file path, and the sha to look up.
 getSourceBlob :: FilePath -> String -> ReaderT LgRepo IO Source.SourceBlob
 getSourceBlob path sha = do
+  sock <- liftIO fetchSocket
+
   tree <- treeForCommitSha sha
+
+  liftIO $ reportGitmon sock "fetch tree entry start"
   entry <- treeEntry tree (toS path)
+  liftIO $ reportGitmon sock "fetch tree entry end"
+
   (bytestring, oid, mode) <- case entry of
     Nothing -> pure (mempty, mempty, Nothing)
     Just (BlobEntry entryOid entryKind) -> do
