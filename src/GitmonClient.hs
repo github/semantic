@@ -49,19 +49,25 @@ instance ToJSON GitmonMsg where
 reportGitmon :: ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon command = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
-  liftIO $ connect soc (SockAddrUnix "/tmp/gitstats.sock")
+  safeIO $ connect soc (SockAddrUnix "/tmp/gitstats.sock")
 
   let startStats = StartStats { repoName = "test-js", via = "gitrpc", gitDir = "/Users/vera/github/test-js", program = "semantic-diff", realIP = Nothing, repoID = Nothing, userID = Nothing }
   let startStatsJSON = toStrict . encode $ GitmonMsg Update startStats
-  liftIO $ sendAll soc startStatsJSON
+  safeIO $ sendAll soc startStatsJSON
 
-  thing <- command
+  result <- command
 
   let finishStats = FinishStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 }
   let finishStatsJSON = toStrict . encode $ GitmonMsg Finish finishStats
 
-  liftIO $ sendAll soc finishStatsJSON
+  safeIO $ sendAll soc finishStatsJSON `catch` noop
 
-  liftIO $ close soc
+  safeIO $ close soc `catch` noop
 
-  return thing
+  return result
+
+  where safeIO :: MonadIO m => IO () -> m ()
+        safeIO command = liftIO $ command `catch` noop
+        
+        noop :: IOException -> IO ()
+        noop _ = return ()
