@@ -27,7 +27,6 @@ termAssignment _ category children
       -> Just $ S.MethodCall target method (toList . unwrap =<< args)
     (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
-    (VarAssignment, [ x, y ]) -> Just $ S.VarAssignment x y
     (VarDecl, _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
@@ -112,7 +111,6 @@ categoryForJavaScriptProductionName name = case name of
   "subscript_access" -> SubscriptAccess
   "regex" -> Regex
   "template_string" -> TemplateString
-  "var_assignment" -> VarAssignment
   "variable_declaration" -> VarDecl
   "trailing_variable_declaration" -> VarDecl
   "switch_statement" -> Switch
