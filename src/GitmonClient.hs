@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards, BangPatterns #-}
 module GitmonClient where
 
 import Prologue hiding (toStrict)
@@ -59,6 +59,7 @@ reportGitmon command = do
 
   let finishStats = FinishStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 }
   let finishStatsJSON = toStrict . encode $ GitmonMsg Finish finishStats
+  !result <- command
 
   safeIO $ sendAll soc finishStatsJSON `catch` noop
 
