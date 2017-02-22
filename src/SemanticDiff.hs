@@ -88,7 +88,7 @@ diffPaths :: Arguments -> Both FilePath -> IO ()
 diffPaths args@Arguments{..} paths = do
   sources <- sequence $ readAndTranscodeFile <$> paths
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
-  D.printDiff (parserWithCost (fst paths)) (diffArgs args) sourceBlobs
+  D.printDiff (parserForFilepath (fst paths)) (diffArgs args) sourceBlobs
   where
     diffArgs Arguments{..} = R.DiffArguments { format = format, output = output }
 
@@ -113,7 +113,7 @@ fetchDiff' Arguments{..} filepath = do
 
   let sources = fromMaybe (Source.emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = Source.idOrEmptySourceBlob <$> sources
-  let textDiff = D.textDiff (parserWithCost filepath) diffArguments sourceBlobs
+  let textDiff = D.textDiff (parserForFilepath filepath) diffArguments sourceBlobs
 
   text <- fetchText textDiff
   truncatedPatch <- liftIO $ D.truncatedDiff diffArguments sourceBlobs
