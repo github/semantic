@@ -100,7 +100,7 @@ testParse path expectedOutput = do
 
 testDiff :: Renderer (Record '[Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths diff = do
-  sources <- sequence $ readAndTranscodeFile <$> paths
+  sources <- mapM readAndTranscodeFile paths
   diff' <- diffFiles parser renderer (sourceBlobs sources)
   let actual = (Verbatim . stripWhitespace. concatOutputs . pure) diff'
   expected <- (Verbatim . stripWhitespace) <$> readFile diff

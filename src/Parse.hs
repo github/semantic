@@ -38,7 +38,7 @@ data ParseJSON = ParseJSON
 
 run :: Arguments -> IO ()
 run Arguments{..} = do
-  sources <- sequence $ readAndTranscodeFile <$> filePaths
+  sources <- mapM readAndTranscodeFile filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
   writeToOutput output $ case format of
