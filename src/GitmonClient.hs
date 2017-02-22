@@ -44,10 +44,10 @@ instance ToJSON GitmonMsg where
     "data" .= stats
     ]
 
-track :: IO a -> IO a
-track command = do
   soc <- socket AF_UNIX Stream defaultProtocol
   connect soc (SockAddrUnix "/tmp/gitstats.sock")
+reportGitmon :: ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon command = do
 
   let startStats = StartStats { repoName = "test-js", via = "gitrpc", gitDir = "/Users/vera/github/test-js", program = "semantic-diff", realIP = Nothing, repoID = Nothing, userID = Nothing}
   let startStatsJSON = toStrict . encode $ GitmonMsg Update startStats
