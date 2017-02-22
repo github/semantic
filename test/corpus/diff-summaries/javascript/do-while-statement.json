@@ -34,7 +34,7 @@
         "+do { console.log(insert); } while (true);"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "87091d325338702497bb7deaec966bf9baa2ca58..c5630255cb73be0b2905b9c0c8d171de90d28466"
+    "shas": "9632a8f95e9b8124c8c341c857ef8667269f18d5..0ad50c5e207e0be1c850d9d806b4a7c63e04b5ac"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-replacement-insert-test",
@@ -89,7 +89,7 @@
         " do { console.log(insert); } while (true);"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c5630255cb73be0b2905b9c0c8d171de90d28466..7b5b9515b9c82cfd039bd76a734b995d0dec8c82"
+    "shas": "0ad50c5e207e0be1c850d9d806b4a7c63e04b5ac..867c80d114f6e22d8ce379cca71162cb7dc86baf"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-insert-test",
@@ -169,7 +169,7 @@
         " do { console.log(insert); } while (true);"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7b5b9515b9c82cfd039bd76a734b995d0dec8c82..9d1e57c370ec856c263e54532be6af19e98fb56d"
+    "shas": "867c80d114f6e22d8ce379cca71162cb7dc86baf..c445c120a1310df5c5a9bc2c32526dba5acdd98b"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-replacement-test",
@@ -249,7 +249,7 @@
         " do { console.log(insert); } while (true);"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9d1e57c370ec856c263e54532be6af19e98fb56d..0e3963901828917faffb54cec015ec54a5c9e85a"
+    "shas": "c445c120a1310df5c5a9bc2c32526dba5acdd98b..980edee9075b26bf191cb4450c199a22d48676a9"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+do { console.log(replacement); } while (false);"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0e3963901828917faffb54cec015ec54a5c9e85a..c5b0652492e5719d7e546d64c291ad45999f94ad"
+    "shas": "980edee9075b26bf191cb4450c199a22d48676a9..916844f1d3a6dbf5345ba544688ada96d6f84eef"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-test",
@@ -359,7 +359,7 @@
         " do { console.log(replacement); } while (false);"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c5b0652492e5719d7e546d64c291ad45999f94ad..b31298420ec6983370014c30b62e4a25f80016b2"
+    "shas": "916844f1d3a6dbf5345ba544688ada96d6f84eef..7fb9fbe0c0da8f74a52b6e857c9f62cc84f4f36c"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-rest-test",
@@ -397,5 +397,5 @@
         "-do { console.log(replacement); } while (false);"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b31298420ec6983370014c30b62e4a25f80016b2..85c68805270701570702126bc93f696946611049"
+    "shas": "7fb9fbe0c0da8f74a52b6e857c9f62cc84f4f36c..74e038f85a6296e615673af5f418b547515cc536"
 }]

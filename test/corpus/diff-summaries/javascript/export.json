@@ -194,7 +194,7 @@
         "+export { import1 as name1, import2 as name2, nameN } from 'bar';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "49561d2afcdc5530f4ed7b5b07fce8f0881eb4b0..343bd616862b8f80e8e7ed9eecab77ba5ad91bca"
+    "shas": "93d61682f6d79a6052cbf60b15695e864b0916f2..d956a4b2dc0b7b5c0ec1a1d2bb96533fdf76249c"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-insert-test",
@@ -571,7 +571,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "343bd616862b8f80e8e7ed9eecab77ba5ad91bca..273da2c2cfcbb894f8260598a8117cc7ad278c52"
+    "shas": "d956a4b2dc0b7b5c0ec1a1d2bb96533fdf76249c..c892c06d875d18bcf05359cfff73fd9a186e4fdb"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-insert-test",
@@ -1122,7 +1122,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "273da2c2cfcbb894f8260598a8117cc7ad278c52..2fa01e010701f6c67b4004af403f53742e1a791c"
+    "shas": "c892c06d875d18bcf05359cfff73fd9a186e4fdb..40562bc46efd313b1a29f9668beb9cf5101f4c21"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-test",
@@ -1670,7 +1670,7 @@
         " export let name1, name2, nameN;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2fa01e010701f6c67b4004af403f53742e1a791c..4223fa5ccaf01ef4758cd20af518f636e0c8794f"
+    "shas": "40562bc46efd313b1a29f9668beb9cf5101f4c21..1ca60a2771c2ba2bf75dcf4bb611460177e4dd09"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-replacement-test",
@@ -2227,7 +2227,7 @@
         "+export { import6 as name6, import7 as name7, nameB } from 'fizz';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4223fa5ccaf01ef4758cd20af518f636e0c8794f..1bfa6aabfcaf7cc082f02921b06673f4b02ac3a4"
+    "shas": "1ca60a2771c2ba2bf75dcf4bb611460177e4dd09..94e431db36d07de49618f94ebb60bd1f4d5236e7"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-test",
@@ -2428,7 +2428,7 @@
         " export let name3, name4, nameT;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1bfa6aabfcaf7cc082f02921b06673f4b02ac3a4..0d1884f619fb6dc6a58685b98edef389eda0c1ee"
+    "shas": "94e431db36d07de49618f94ebb60bd1f4d5236e7..c598fa1044d2bf1978fa258fc92b7e056f1aed7f"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-rest-test",
@@ -2626,5 +2626,5 @@
         "-export { import6 as name6, import7 as name7, nameB } from 'fizz';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0d1884f619fb6dc6a58685b98edef389eda0c1ee..ed9d5014b0c0c82694bc33e6ce89b04ac794fbf0"
+    "shas": "c598fa1044d2bf1978fa258fc92b7e056f1aed7f..9ab4bb09dfbde3a5662c1756a7139a8726a32035"
 }]

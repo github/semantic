@@ -34,7 +34,7 @@
         "+function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "42ff41aa6e6f02cb15b0b8bb534776aeeb63e0f9..3f073d6e2f72685e91c3dc7266cca02b323571ce"
+    "shas": "b08e38bcc1fe2b06ba9591e2ecf24e8bbc0686b6..129d3b4c5f96c2a47285565c7d027beb8e97aa75"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
@@ -89,7 +89,7 @@
         " function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3f073d6e2f72685e91c3dc7266cca02b323571ce..e66549877cfc200768519aa70eb8999aa43afd72"
+    "shas": "129d3b4c5f96c2a47285565c7d027beb8e97aa75..7ddd8785d6e38cad56d16ed74d198fec656089b0"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
@@ -196,7 +196,7 @@
         " function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e66549877cfc200768519aa70eb8999aa43afd72..401f34ab62126329f5c020d0b02f1cb4e6d191ba"
+    "shas": "7ddd8785d6e38cad56d16ed74d198fec656089b0..4c312a59a025f5c94062fadafe07acb45f933136"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-test",
@@ -303,7 +303,7 @@
         " function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "401f34ab62126329f5c020d0b02f1cb4e6d191ba..ca654aab1bfe642af8c904346d6f6f620048fe83"
+    "shas": "4c312a59a025f5c94062fadafe07acb45f933136..c5dcab169edaa3ba486b292325a6b234760add52"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
@@ -374,7 +374,7 @@
         "+function(b,c) { return b * c; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ca654aab1bfe642af8c904346d6f6f620048fe83..f4bbc26bc9b2e9686fd69c75717dc4659b557688"
+    "shas": "c5dcab169edaa3ba486b292325a6b234760add52..92c048e16249b06d26f273d860f99d5e1e721898"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-test",
@@ -413,7 +413,7 @@
         " function(b,c) { return b * c; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f4bbc26bc9b2e9686fd69c75717dc4659b557688..b0d596cfd13b48aaf567ce44395628c45588f7cf"
+    "shas": "92c048e16249b06d26f273d860f99d5e1e721898..92aa67dcc98d7cff48630de21b2ae90e23016864"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
@@ -451,5 +451,5 @@
         "-function(b,c) { return b * c; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b0d596cfd13b48aaf567ce44395628c45588f7cf..05133997a4fe66f9a5b4a6d3e5cb429c34dd7dde"
+    "shas": "92aa67dcc98d7cff48630de21b2ae90e23016864..0e4c9734db1c092af9f580c47577a13276fd2d63"
 }]

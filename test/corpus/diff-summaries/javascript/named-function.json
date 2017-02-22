@@ -34,7 +34,7 @@
         "+function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "183853091eb682400ac543be6f91d7f04474077c..bb476360a4a868a635ae3758318041f571bcc225"
+    "shas": "e2bc5f41752affe43a52e069b9eb8b2a96177c3d..39d91ed8e9d663018f3eca928754c6817bccc7e1"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-insert-test",
@@ -89,7 +89,7 @@
         " function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "bb476360a4a868a635ae3758318041f571bcc225..323b6dd447a247da59a8e07a41437b0a8f526fc8"
+    "shas": "39d91ed8e9d663018f3eca928754c6817bccc7e1..5db9ac6e8e408333016c40634199e32b87e11743"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-insert-test",
@@ -202,7 +202,7 @@
         " function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "323b6dd447a247da59a8e07a41437b0a8f526fc8..c13e6626fd1cd50de86956f968fd1f14426baf00"
+    "shas": "5db9ac6e8e408333016c40634199e32b87e11743..a137cdf1491fd4dcd1d2d8488457b0b4268885d6"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-test",
@@ -315,7 +315,7 @@
         " function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c13e6626fd1cd50de86956f968fd1f14426baf00..b6a5c7da3487b8a85cb688aa5a1d1541aef82939"
+    "shas": "a137cdf1491fd4dcd1d2d8488457b0b4268885d6..26cbf606ef723c3d86016fdc847b01b8598ea5b8"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-replacement-test",
@@ -386,7 +386,7 @@
         "+function anotherFunction() { return false; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b6a5c7da3487b8a85cb688aa5a1d1541aef82939..35f9858b64bab743cf2fef12f310fe26fe23dff0"
+    "shas": "26cbf606ef723c3d86016fdc847b01b8598ea5b8..b7e66f951f5e353eea7c2a000d75fb1b48b1d891"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-test",
@@ -425,7 +425,7 @@
         " function anotherFunction() { return false; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "35f9858b64bab743cf2fef12f310fe26fe23dff0..9529f4595ce338168a3fca75cf06de21dfbf3bf9"
+    "shas": "b7e66f951f5e353eea7c2a000d75fb1b48b1d891..b4f70929674495233eb104375e3e72b7d49e19a9"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-rest-test",
@@ -463,5 +463,5 @@
         "-function anotherFunction() { return false; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9529f4595ce338168a3fca75cf06de21dfbf3bf9..89da9134d2329c3c56f3bff50da4922d4470014e"
+    "shas": "b4f70929674495233eb104375e3e72b7d49e19a9..3ec83ab3d4454bf8ab6eaf1766606e79e75fdf4c"
 }]

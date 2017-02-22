@@ -34,7 +34,7 @@
         "+function* foo(){ var index = 0;  }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6c4d5e8426321fd8fa630a463b6afc1d797fa580..cc4625560c5fc1c50a9cb8534ea6f01465097544"
+    "shas": "65b1dacae919ef819dc69ac3d3f38b19becda862..2fb06f7e57fda0df12b839011f11bca7d9c26de7"
 }
 ,{
     "testCaseDescription": "javascript-yield-insert-test",
@@ -73,7 +73,7 @@
         "+function* foo(){ var index = 0; yield i; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cc4625560c5fc1c50a9cb8534ea6f01465097544..c908b568e0136c6b6a8344d1637a85bafb3a8f04"
+    "shas": "2fb06f7e57fda0df12b839011f11bca7d9c26de7..6438751c25b3c720c4248c09d3fc24ee8e99a1db"
 }
 ,{
     "testCaseDescription": "javascript-yield-replacement-test",
@@ -124,7 +124,7 @@
         "+function* foo(){ var index = 0; yield i++; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c908b568e0136c6b6a8344d1637a85bafb3a8f04..e76c513564abb9cfa2e91e817f950dee511bf748"
+    "shas": "6438751c25b3c720c4248c09d3fc24ee8e99a1db..5c901405b6df5bbdcc16a2722a86055b10ba60d1"
 }
 ,{
     "testCaseDescription": "javascript-yield-delete-replacement-test",
@@ -175,7 +175,7 @@
         "+function* foo(){ var index = 0; yield i; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e76c513564abb9cfa2e91e817f950dee511bf748..e731ea234aca18b69604b36f862a662229f72f28"
+    "shas": "5c901405b6df5bbdcc16a2722a86055b10ba60d1..59336ac19aaf04bc8ec5dc3920dd1744e230cdf5"
 }
 ,{
     "testCaseDescription": "javascript-yield-delete-insert-test",
@@ -214,7 +214,7 @@
         "+function* foo(){ var index = 0;  }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e731ea234aca18b69604b36f862a662229f72f28..994db31e6670b187a9fcda79ab51f540805f782d"
+    "shas": "59336ac19aaf04bc8ec5dc3920dd1744e230cdf5..3e01d4e02b2233b56e4dd516d1a433104ca416b1"
 }
 ,{
     "testCaseDescription": "javascript-yield-teardown-test",
@@ -252,5 +252,5 @@
         "-function* foo(){ var index = 0;  }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "994db31e6670b187a9fcda79ab51f540805f782d..e8833d0514e6e3ff685de10bebcd4a6fad2d8144"
+    "shas": "3e01d4e02b2233b56e4dd516d1a433104ca416b1..10fc2ab0c56ed63837031df1a7d650ae75a13b61"
 }]

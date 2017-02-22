@@ -146,7 +146,7 @@
         "+import \"arctic-tern\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8eddbc07f2be259ee82be88f4004b460925ec788..f232506d8ee063dbfd583dc1dae2210ea119c2a9"
+    "shas": "5c937ca5ea01346dc9dd7236aa749f2f7d2df48d..5a42bcd34cbc2641b12f49bf0e39c7d2a75d5f27"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -427,7 +427,7 @@
         " import { member } from \"ant\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f232506d8ee063dbfd583dc1dae2210ea119c2a9..2f1ceb829a32ab40384c03f78aa05a0676de8ace"
+    "shas": "5a42bcd34cbc2641b12f49bf0e39c7d2a75d5f27..f872d068f8342ffa21671e26cf927b28219c404d"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
@@ -726,7 +726,7 @@
         " import { member } from \"ant\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2f1ceb829a32ab40384c03f78aa05a0676de8ace..954efe6d623453206656238facd3d979e8c6f941"
+    "shas": "f872d068f8342ffa21671e26cf927b28219c404d..2ae5447b083aace38919870ce7e2beebdc92afe2"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
@@ -1025,7 +1025,7 @@
         " import { member } from \"ant\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "954efe6d623453206656238facd3d979e8c6f941..44be36d235ff263bed49add3edc613f32d1aa166"
+    "shas": "2ae5447b083aace38919870ce7e2beebdc92afe2..3648b505d52daa9febca1054bd109c6f08619707"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -1438,7 +1438,7 @@
         "+import \"basilisk\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "44be36d235ff263bed49add3edc613f32d1aa166..7394e9b7c9f29e7d48e0f69f34f9341b7f3af8a5"
+    "shas": "3648b505d52daa9febca1054bd109c6f08619707..0e1789b4572785fdef32950edb717497968c5128"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -1591,7 +1591,7 @@
         " import { element } from \"badger\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7394e9b7c9f29e7d48e0f69f34f9341b7f3af8a5..d0db8e2fe0480ec837d7b563a19a4085f99d0818"
+    "shas": "0e1789b4572785fdef32950edb717497968c5128..adc78c37860205837302ba8e24956ad035f24ac7"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -1741,5 +1741,5 @@
         "-import \"basilisk\";"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d0db8e2fe0480ec837d7b563a19a4085f99d0818..49561d2afcdc5530f4ed7b5b07fce8f0881eb4b0"
+    "shas": "adc78c37860205837302ba8e24956ad035f24ac7..93d61682f6d79a6052cbf60b15695e864b0916f2"
 }]

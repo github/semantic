@@ -34,7 +34,7 @@
         "+for (key in something && i = 0; i < n; i++) { doSomething(); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e859463c0833cdd89d03cf1aef4ac26a61b77592..6407d3013512830f200b9f183405fd3d39aad2a4"
+    "shas": "ee2bc6eb6721a9dc9b1cf7216a7bc251e3aa9110..0faead91699f4d2b565f79ee38b667013384d8e7"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-insert-test",
@@ -89,7 +89,7 @@
         " for (key in something && i = 0; i < n; i++) { doSomething(); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6407d3013512830f200b9f183405fd3d39aad2a4..6c92e82e35ff86d01a9817255436580df34aaf82"
+    "shas": "0faead91699f4d2b565f79ee38b667013384d8e7..d16322e3777e2b8ab9b7ce319c748a6297d970cb"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-insert-test",
@@ -169,7 +169,7 @@
         " for (key in something && i = 0; i < n; i++) { doSomething(); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6c92e82e35ff86d01a9817255436580df34aaf82..92d16af92df2f3b05b999eab8e0c936f2fd280c9"
+    "shas": "d16322e3777e2b8ab9b7ce319c748a6297d970cb..32469a6acead6144620cc0db9b78e722e457dba7"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-test",
@@ -249,7 +249,7 @@
         " for (key in something && i = 0; i < n; i++) { doSomething(); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "92d16af92df2f3b05b999eab8e0c936f2fd280c9..a1788f021e2f7cc9b377c991270290fbd5b2e2e6"
+    "shas": "32469a6acead6144620cc0db9b78e722e457dba7..6447a7c1fd2a44dd374b607ce7beb56df3732dbb"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a1788f021e2f7cc9b377c991270290fbd5b2e2e6..990ea179bc474b3e11d4dd9b698d1a1079816b68"
+    "shas": "6447a7c1fd2a44dd374b607ce7beb56df3732dbb..b1938e9bb425528fbf652df004e3eda466900ec7"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-test",
@@ -359,7 +359,7 @@
         " for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "990ea179bc474b3e11d4dd9b698d1a1079816b68..39b023649c5074e9273e0688d21e083227f76a07"
+    "shas": "b1938e9bb425528fbf652df004e3eda466900ec7..6ac074e27614c7d85c196aacc19be448097c8445"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-rest-test",
@@ -397,5 +397,5 @@
         "-for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "39b023649c5074e9273e0688d21e083227f76a07..17a269edf092607c9e5807a47fb43d02568141a0"
+    "shas": "6ac074e27614c7d85c196aacc19be448097c8445..89b62eec408922c8dcad9c54e045d34c783da30f"
 }]
