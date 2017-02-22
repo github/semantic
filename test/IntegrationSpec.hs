@@ -32,15 +32,13 @@ spec = parallel $ do
     runTestsIn :: FilePath -> SpecWith ()
     runTestsIn directory = do
       examples <- runIO $ examples directory
-      let tests = testsForPaths =<< examples
-      traverse_ (\ (formatName, renderer, files, output) ->
-        it (normalizeName (Both.fst files) ++ " (" ++ formatName ++ ")") $ testDiff renderer files output) tests
+      traverse_ runTest examples
+    runTest SExpressionParse{..} = it (file <> " (sexpression parse)") $ 1 `shouldBe` 1
+    runTest SExpressionDiff{..} = it (normalizeName fileA <> " (sexpression diff)") $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
 
-    testsForPaths (aPath, bPath, sexpression) = [ ("sexpression", Renderer.sExpression TreeOnly, paths, sexpression) ]
-        where paths = both aPath bPath
-
-data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
-             | ParseExample { file :: FilePath, parseOutput :: FilePath }
+data Example = SExpressionDiff { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
+             | SExpressionParse { file :: FilePath, parseOutput :: FilePath }
+             deriving (Eq, Show)
 
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form "foo.A.js", "foo.B.js", "foo.sexpression.js".
@@ -53,16 +51,20 @@ data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput ::
 -- | file.sexpressionA.txt
 -- | file.sexpressionB.txt
 
-examples :: FilePath -> IO [(FilePath, FilePath, FilePath)]
+examples :: FilePath -> IO [Example]
 examples directory = do
   as <- globFor "*.A.*"
   bs <- globFor "*.B.*"
-  sexpressions <- globFor "*[^AB].sexpression.*"
+  sExpAs <- globFor "*.sexpressionA.*"
+  sExpBs <- globFor "*.sexpressionB.*"
+  sExpDiffs <- globFor "*[^AB].sexpression.*"
 
-  let lookupName name = (lookupNormalized name as, lookupNormalized name bs, lookupNormalized name sexpressions)
+  let sExpDiff name = SExpressionDiff (lookupNormalized name as) (lookupNormalized name bs) (lookupNormalized name sExpDiffs)
+  let sExpParseAs name = SExpressionParse (lookupNormalized name as) (lookupNormalized name sExpAs)
+  let sExpParseBs name = SExpressionParse (lookupNormalized name bs) (lookupNormalized name sExpBs)
 
   let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
-  pure $ lookupName <$> keys
+  pure $ (sExpDiff <$> keys) <> (sExpParseAs <$> keys) <> (sExpParseBs <$> keys)
   where
     lookupNormalized :: FilePath -> [FilePath] -> FilePath
     lookupNormalized name xs = fromMaybe
