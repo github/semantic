@@ -1,19 +1,19 @@
 {-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric #-}
 module GitmonClient where
 
-import Prologue hiding (toStrict)
-import Prelude
+import Arguments
 import qualified Data.Yaml as Y
 import Data.Aeson
 import Data.Aeson.Types
+import Data.ByteString.Lazy (toStrict)
+import GHC.Generics
 import Git.Libgit2
-import Arguments
-
 import Network.Socket
 import Network.Socket.ByteString (sendAll)
+import Prelude
+import Prologue hiding (toStrict)
 import System.Clock
 
-import Data.ByteString.Lazy (toStrict)
 
 data ProcIO = ProcIO {
     read_bytes :: Integer
