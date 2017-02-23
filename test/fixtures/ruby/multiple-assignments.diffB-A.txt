@@ -4,7 +4,7 @@
       (Identifier)
     {+(Identifier)+}
     {+(Identifier)+}
-    {-(Other "rest_assignment"
+    {-(SplatParameter
         (Identifier))-})
     (ArrayLiteral
       (IntegerLiteral)

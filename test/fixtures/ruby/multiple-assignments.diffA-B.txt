@@ -2,7 +2,7 @@
   (Assignment
     (Args
       (Identifier)
-    {+(Other "rest_assignment"
+    {+(SplatParameter
         (Identifier))+}
     {-(Identifier)-}
     {-(Identifier)-})

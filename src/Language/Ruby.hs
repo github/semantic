@@ -151,6 +151,7 @@ categoryForRubyName = \case
   "regex" -> Regex
   "rescue_modifier" -> Modifier Rescue
   "rescue" -> Rescue
+  "rest_assignment" -> SplatParameter
   "return" -> Return
   "scope_resolution" -> ScopeOperator
   "self" -> Identifier
