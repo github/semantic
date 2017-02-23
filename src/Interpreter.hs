@@ -33,7 +33,10 @@ diffComparableTerms = recur
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
           | comparable a b = runAlgorithm recur (Just <$> algorithmWithTerms a b)
           | otherwise = Nothing
-        comparable = (==) `on` category . extract
+
+-- | Test whether two terms are comparable.
+comparable :: (Functor f, HasField fields Category) => Term f (Record fields) -> Term f (Record fields) -> Bool
+comparable = (==) `on` category . extract
 
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: MonadFree (TermF (Syntax leaf) (Both a)) diff
