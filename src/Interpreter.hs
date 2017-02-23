@@ -31,8 +31,11 @@ diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Mayb
 diffComparableTerms = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
-          | comparable a b = runAlgorithm diffTerms (Just <$> algorithmWithTerms a b)
+          | comparable a b = runAlgorithm diffTerms' (Just <$> algorithmWithTerms a b)
           | otherwise = Nothing
+        diffTerms' (These a b) = diffTerms a b
+        diffTerms' (This a) = deleting a
+        diffTerms' (That b) = inserting b
 
 -- | Test whether two terms are comparable.
 comparable :: (Functor f, HasField fields Category) => Term f (Record fields) -> Term f (Record fields) -> Bool
@@ -91,7 +94,7 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
 
 -- | Run an algorithm, given functions characterizing the evaluation.
 runAlgorithm :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector))
-  => (Cofree f (Record fields) -> Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to diff two subterms recursively.
+  => (These (Cofree f (Record fields)) (Cofree f (Record fields)) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to diff two subterms recursively.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
 runAlgorithm recur = iterAp $ \ r cont -> case r of
@@ -102,7 +105,7 @@ runAlgorithm recur = iterAp $ \ r cont -> case r of
   Delete a -> cont (deleting a)
   Insert b -> cont (inserting b)
   Replace a b -> cont (replacing a b)
-  where maybeRecur a b = if comparable a b then Just (recur a b) else Nothing
+  where maybeRecur a b = if comparable a b then Just (recur (These a b)) else Nothing
 
 -- | Decompose a step of an algorithm into the next steps to perform.
 decompose :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector))

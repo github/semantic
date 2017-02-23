@@ -39,7 +39,7 @@ import System.Random.Mersenne.Pure64
 import Term (termSize, zipTerms, Term, TermF)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
-type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
+type DiffTerms f fields = These (Term f (Record fields)) (Term f (Record fields)) -> Diff f (Record fields)
 
 -- | Given a function comparing two terms recursively,
 -- a function to compute a Hashable label from an unpacked term, and two lists of terms,
@@ -112,7 +112,7 @@ rws compare canCompare as bs
         guard (canCompare a b)
         pure $! do
           put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-          pure (These i j, compare a b)
+          pure (These i j, compare (These a b))
 
     -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
     -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
@@ -139,7 +139,7 @@ rws compare canCompare as bs
     nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
     editDistanceIfComparable a b = if canCompare a b
-      then editDistanceUpTo defaultM (compare a b)
+      then editDistanceUpTo defaultM (compare (These a b))
       else maxBound
 
     insertMapped diffs into = foldl' (\into (i, mappedTerm) ->

@@ -7,6 +7,7 @@ import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
+import Data.These
 import Diff
 import Info
 import Patch
@@ -42,9 +43,11 @@ spec = parallel $ do
       let (a, b) = (decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf ("a" :: String)) ])), decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf "b") ]))) in
       fmap stripDiff (rws compare canCompare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, copying b ]
 
-  where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
-        compare a b | (category <$> a) == (category <$> b) = copying b
-                    | otherwise = replacing a b
+  where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => These (Term f (Record fields)) (Term f (Record fields)) -> Diff f (Record fields)
+        compare (These a b) | (category <$> a) == (category <$> b) = copying b
+                            | otherwise = replacing a b
+        compare (This a) = deleting a
+        compare (That b) = inserting b
         canCompare = (==) `on` extract
         copying :: Functor f => Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
         copying = cata wrap . fmap pure
