@@ -140,7 +140,6 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
-                     , CorpusSpec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Diff.Spec
