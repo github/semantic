@@ -1,0 +1,13 @@
+(Program
+{+(StringLiteral)+}
+{ (StringLiteral)
+->(StringLiteral) }
+{+(StringLiteral)+}
+{ (StringLiteral)
+->(StringLiteral) }
+{+(StringLiteral)+}
+{+(StringLiteral)+}
+{-(StringLiteral)-}
+{-(StringLiteral)-}
+{-(StringLiteral)-}
+{-(StringLiteral)-})

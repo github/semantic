@@ -1,0 +1,17 @@
+(Program
+{ (Binary
+    (Identifier)
+    (Other "<=")
+    (Identifier))
+->(Binary
+    (Identifier)
+    (Other "<")
+    (Identifier)) }
+{ (Binary
+    (Identifier)
+    (Other ">=")
+    (Identifier))
+->(Binary
+    (Identifier)
+    (Other ">")
+    (Identifier)) })

@@ -151,8 +151,10 @@ test-suite test
                      , Source.Spec
                      , TermSpec
                      , TOCSpec
+                     , IntegrationSpec
                      , Test.Hspec.LeanCheck
-  build-depends:       array
+  build-depends:       aeson
+                     , array
                      , base
                      , bifunctors
                      , deepseq

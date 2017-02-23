@@ -1,0 +1,4 @@
+self
+NIL
+TRUE
+FALSE

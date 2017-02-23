@@ -1,0 +1,7 @@
+(Program
+  (SymbolLiteral
+  { (Identifier)
+  ->(Identifier) })
+  (StringLiteral
+  { (Identifier)
+  ->(Identifier) }))

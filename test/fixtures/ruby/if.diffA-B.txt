@@ -1,0 +1,12 @@
+(Program
+  (If
+  { (Identifier)
+  ->(Identifier) }
+  {-(Identifier)-}
+  {-(Elsif
+      (Identifier)
+      (Identifier)
+      (Else
+        (Identifier)))-})
+{+(If
+    (Identifier))+})

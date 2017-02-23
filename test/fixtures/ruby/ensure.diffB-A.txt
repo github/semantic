@@ -1,0 +1,6 @@
+(Program
+  (Begin
+    (Identifier)
+  { (Ensure
+      (Identifier))
+  ->(Ensure) }))
