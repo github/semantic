@@ -98,6 +98,7 @@ runAlgorithm :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasFi
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
 runAlgorithm recur = iterAp $ \ r cont -> case r of
+  Diff t1 t2 -> cont (recur (These t1 t2))
   Linear a b -> cont . maybe (replacing a b) (wrap . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
     traverse (these (Just . deleting) (Just . inserting) maybeRecur) aligned
