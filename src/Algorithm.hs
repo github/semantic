@@ -2,6 +2,7 @@
 module Algorithm where
 
 import Control.Applicative.Free
+import Data.These
 import Prologue hiding (Pure)
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
@@ -34,6 +35,9 @@ iterAp algebra = go
 -- | Diff two terms without specifying the algorithm to be used.
 diff :: term -> term -> Algorithm term diff diff
 diff = (liftAp .) . Diff
+
+diffThese :: These term term -> Algorithm term diff diff
+diffThese = these byDeleting byInserting diff
 
 -- | Diff two terms linearly.
 linearly :: term -> term -> Algorithm term diff diff
