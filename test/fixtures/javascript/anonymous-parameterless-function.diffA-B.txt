@@ -1,0 +1,7 @@
+(Program
+  (ExpressionStatements
+    (Function
+      (ExpressionStatements
+        (Return
+        { (StringLiteral)
+        ->(StringLiteral) })))))

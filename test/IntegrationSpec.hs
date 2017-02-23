@@ -23,7 +23,9 @@ spec :: Spec
 spec = parallel $ do
   it "lists example fixtures" $ do
     examples "test/fixtures/ruby/" `shouldNotReturn` []
+    examples "test/fixtures/javascript/" `shouldNotReturn` []
 
+  describe "javascript" $ runTestsIn "test/fixtures/javascript/"
   describe "ruby" $ runTestsIn "test/fixtures/ruby/"
 
   where

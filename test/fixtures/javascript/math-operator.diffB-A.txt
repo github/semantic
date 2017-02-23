@@ -1,0 +1,17 @@
+(Program
+  (ExpressionStatements
+    (MathOperator
+      (MathOperator
+        (Identifier)
+        (Other "+")
+        (MathOperator
+          (Identifier)
+          (Other "*")
+        { (NumberLiteral)
+        ->(NumberLiteral) }))
+      (Other "-")
+      (MathOperator
+        (Identifier)
+        (Other "%")
+      { (NumberLiteral)
+      ->(NumberLiteral) }))))

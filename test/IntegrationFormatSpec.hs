@@ -46,13 +46,9 @@ spec maybeLanguage = parallel $ do
   summaryFormatToDoFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summaries-todo"
   summaryFormatCrasherFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summary-crashers"
 
-  jsonFormatFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/json"
-
   describe "Summary format" $ runTestsIn summaryFormatFiles Summary shouldBe
   describe "Summary format todo" $ runTestsIn summaryFormatToDoFiles Summary shouldNotBe
   describe "Summary format crashers todo" $ runTestsIn summaryFormatCrasherFiles Summary shouldBe
-
-  describe "JSON format" $ runTestsIn jsonFormatFiles JSON shouldBe
 
   where
     testCaseFiles :: Maybe String -> String -> IO [FilePath]

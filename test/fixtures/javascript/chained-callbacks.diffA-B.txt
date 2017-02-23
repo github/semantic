@@ -1,0 +1,15 @@
+(Program
+  (ExpressionStatements
+    (FunctionCall
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) }
+      (Function
+        (Identifier)
+        (ExpressionStatements
+          (Return
+            (MemberAccess
+            { (Identifier)
+            ->(Identifier) }
+            { (Identifier)
+            ->(Identifier) })))))))
