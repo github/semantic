@@ -6,6 +6,8 @@ import Prologue hiding (Pure)
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term diff result where
+  -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
+  Diff :: term -> term -> AlgorithmF term diff diff
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
   Linear :: term -> term -> AlgorithmF term diff diff
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
@@ -28,6 +30,10 @@ iterAp algebra = go
 
 
 -- DSL
+
+-- | Diff two terms without specifying the algorithm to be used.
+diff :: term -> term -> Algorithm term diff diff
+diff = (liftAp .) . Diff
 
 -- | Diff two terms linearly.
 linearly :: term -> term -> Algorithm term diff diff
