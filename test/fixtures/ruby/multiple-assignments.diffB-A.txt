@@ -1,0 +1,12 @@
+(Program
+  (Assignment
+    (Args
+      (Identifier)
+    {+(Identifier)+}
+    {+(Identifier)+}
+    {-(SplatParameter
+        (Identifier))-})
+    (ArrayLiteral
+      (IntegerLiteral)
+      (IntegerLiteral)
+      (IntegerLiteral))))

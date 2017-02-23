@@ -1,0 +1,6 @@
+(Program
+{ (MethodCall
+    (Identifier))
+->(MethodCall
+    (Identifier)
+    (Identifier)) })

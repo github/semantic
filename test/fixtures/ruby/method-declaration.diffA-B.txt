@@ -1,0 +1,6 @@
+(Program
+  (Method
+  { (Identifier)
+  ->(Identifier) }
+  {+(Identifier)+}
+  {+(Identifier)+}))

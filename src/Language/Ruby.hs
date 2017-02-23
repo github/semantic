@@ -22,6 +22,9 @@ termAssignment _ category children
     --    def foo(name:); end
     -- Let it fall through to generate an Indexed syntax.
     (OptionalParameter, [ k, v ] ) -> Just $ S.Pair k v
+    (AnonymousFunction, first : rest)
+      | null rest -> Just $ S.AnonymousFunction [] [first]
+      | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
     (ArrayLiteral, _ ) -> Just $ S.Array Nothing children
     (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value
     (Begin, _ ) -> Just $ case partition (\x -> Info.category (extract x) == Rescue) children of
@@ -50,9 +53,6 @@ termAssignment _ category children
       -> Just $ S.MethodCall target method (toList . unwrap =<< args)
       | otherwise
       -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
-    (Other "lambda", first : rest)
-      | null rest -> Just $ S.AnonymousFunction [] [first]
-      | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
     (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
@@ -97,8 +97,8 @@ termAssignment _ category children
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
-  "argument_list" -> Args
   "argument_list_with_parens" -> Args
+  "argument_list" -> Args
   "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
@@ -135,6 +135,8 @@ categoryForRubyName = \case
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
   "lambda_parameters" -> Params
+  "lambda" -> AnonymousFunction
+  "left_assignment_list" -> Args
   "method_call" -> MethodCall
   "method_parameters" -> Params
   "method" -> Method
@@ -143,11 +145,13 @@ categoryForRubyName = \case
   "operator_assignment" -> OperatorAssignment
   "optional_parameter" -> OptionalParameter
   "pair" -> Pair
+  "pattern" -> Args
   "program" -> Program
   "range" -> RangeExpression
   "regex" -> Regex
   "rescue_modifier" -> Modifier Rescue
   "rescue" -> Rescue
+  "rest_assignment" -> SplatParameter
   "return" -> Return
   "scope_resolution" -> ScopeOperator
   "self" -> Identifier

@@ -1,0 +1,5 @@
+(Program
+  (Assignment
+    (Identifier)
+  { (IntegerLiteral)
+  ->(IntegerLiteral) }))

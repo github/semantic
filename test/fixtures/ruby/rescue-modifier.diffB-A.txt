@@ -1,0 +1,7 @@
+(Program
+{ (Modifier Rescue
+    (Identifier)
+    (Boolean))
+->(Modifier Rescue
+    (Identifier)
+    (Identifier)) })

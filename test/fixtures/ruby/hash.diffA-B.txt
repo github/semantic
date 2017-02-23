@@ -1,0 +1,23 @@
+(Program
+  (Object
+  { (Pair
+      (SymbolLiteral)
+      (StringLiteral))
+  ->(Pair
+      (Identifier)
+      (StringLiteral)) }
+  {+(Pair
+      (Identifier)
+      (IntegerLiteral))+}
+  {+(Pair
+      (Identifier)
+      (Boolean))+}
+  {-(Pair
+      (SymbolLiteral)
+      (IntegerLiteral))-}
+  {-(Pair
+      (StringLiteral)
+      (Boolean))-}
+  {-(Pair
+      (SymbolLiteral)
+      (IntegerLiteral))-}))

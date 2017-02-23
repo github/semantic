@@ -1,0 +1,8 @@
+(Program
+  (Begin
+    (MethodCall
+      (Identifier))
+  { (Else)
+  ->(Else
+      (MethodCall
+        (Identifier))) }))

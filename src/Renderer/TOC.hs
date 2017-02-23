@@ -184,5 +184,5 @@ toTermName parentOffset parentSource term = case unwrap term of
 -- The user-facing category name
 toCategoryName :: Category -> Text
 toCategoryName = \case
-  C.SingletonMethod -> "method"
+  C.SingletonMethod -> "Method"
   c -> show c

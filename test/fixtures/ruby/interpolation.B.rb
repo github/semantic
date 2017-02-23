@@ -1,0 +1,2 @@
+:"bar #{foo}"
+"bar #{foo}"
