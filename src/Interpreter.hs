@@ -113,8 +113,7 @@ decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
           => AlgorithmF (Term (Syntax leaf) (Record fields)) (Diff (Syntax leaf) (Record fields)) result -- ^ The step in an algorithm to decompose into its next steps.
           -> Algorithm (Term (Syntax leaf) (Record fields)) (Diff (Syntax leaf) (Record fields)) result -- ^ The sequence of next steps to undertake to continue the algorithm.
 decompose = \case
-  Diff t1 t2 -> case (unwrap t1, unwrap t2) of
-    _ -> byReplacing t1 t2
+  Diff t1 t2 -> algorithmWithTerms t1 t2
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
     Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
     _ -> byReplacing t1 t2
