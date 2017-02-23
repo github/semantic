@@ -86,7 +86,7 @@ diffCommits args@Arguments{..} = do
 -- | Compare two paths on the filesystem (compariable to git diff --no-index).
 diffPaths :: Arguments -> Both FilePath -> IO ()
 diffPaths args@Arguments{..} paths = do
-  sources <- mapM readAndTranscodeFile paths
+  sources <- traverse readAndTranscodeFile paths
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
   D.printDiff (parserForFilepath (fst paths)) (diffArgs args) sourceBlobs
   where

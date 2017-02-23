@@ -195,7 +195,7 @@ testDiff sourceBlobs = do
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do
-  sources <- mapM (readAndTranscodeFile . ("test/fixtures/toc/" <>)) paths
+  sources <- traverse (readAndTranscodeFile . ("test/fixtures/toc/" <>)) paths
   pure $ SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
