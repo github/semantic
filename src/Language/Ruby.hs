@@ -22,6 +22,9 @@ termAssignment _ category children
     --    def foo(name:); end
     -- Let it fall through to generate an Indexed syntax.
     (OptionalParameter, [ k, v ] ) -> Just $ S.Pair k v
+    (AnonymousFunction, first : rest)
+      | null rest -> Just $ S.AnonymousFunction [] [first]
+      | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
     (ArrayLiteral, _ ) -> Just $ S.Array Nothing children
     (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value
     (Begin, _ ) -> Just $ case partition (\x -> Info.category (extract x) == Rescue) children of
@@ -50,9 +53,6 @@ termAssignment _ category children
       -> Just $ S.MethodCall target method (toList . unwrap =<< args)
       | otherwise
       -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
-    (Other "lambda", first : rest)
-      | null rest -> Just $ S.AnonymousFunction [] [first]
-      | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
     (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
@@ -134,6 +134,7 @@ categoryForRubyName = \case
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
+  "lambda" -> AnonymousFunction
   "lambda_parameters" -> Params
   "method_call" -> MethodCall
   "method_parameters" -> Params

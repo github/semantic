@@ -1,9 +1,9 @@
 (Program
-{ (Other "lambda"
+{ (AnonymousFunction
     (Identifier)
     (Binary
       (Identifier)
       (Other "+")
       (IntegerLiteral)))
-->(Other "lambda"
+->(AnonymousFunction
     (Identifier)) })

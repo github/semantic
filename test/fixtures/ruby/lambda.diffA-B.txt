@@ -1,7 +1,7 @@
 (Program
-{ (Other "lambda"
+{ (AnonymousFunction
     (Identifier))
-->(Other "lambda"
+->(AnonymousFunction
     (Identifier)
     (Binary
       (Identifier)
