@@ -114,13 +114,13 @@ decompose :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField
           -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result -- ^ The sequence of next steps to undertake to continue the algorithm.
 decompose = \case
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-    Just result -> annotate t1 t2 <$> sequenceA result
+    Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
     _ -> byReplacing t1 t2
   RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
   Delete a -> pure (deleting a)
   Insert b -> pure (inserting b)
   Replace a b -> pure (replacing a b)
-  where annotate t1 t2 = wrap . (both (extract t1) (extract t2) :<)
+
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
 defaultM :: Integer
