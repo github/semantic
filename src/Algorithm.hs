@@ -36,6 +36,7 @@ iterAp algebra = go
 diff :: term -> term -> Algorithm term diff diff
 diff = (liftAp .) . Diff
 
+-- | Diff a These of terms without specifying the algorithm to be used.
 diffThese :: These term term -> Algorithm term diff diff
 diffThese = these byDeleting byInserting diff
 
