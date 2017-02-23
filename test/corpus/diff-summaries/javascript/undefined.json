@@ -34,7 +34,7 @@
         "+undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "96b0b5fed694b8dcfb0566309faee71cfdf4dd60..6ab47400bd7d58aef3bf7780d6835556997006e1"
+    "shas": "5b29d374ec36817b00e1ddaef443c76404f2e99a..e6f0ae3d67e0eff5d2a9a36ae9b71c5bb3e88275"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-insert-test",
@@ -89,7 +89,7 @@
         " undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6ab47400bd7d58aef3bf7780d6835556997006e1..e4b1802fe047f8a75e0bc46cd4da315efdf60560"
+    "shas": "e6f0ae3d67e0eff5d2a9a36ae9b71c5bb3e88275..515cdca94fa0fd945d61f0449b767ceebcac3ea0"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-insert-test",
@@ -145,7 +145,7 @@
         " undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e4b1802fe047f8a75e0bc46cd4da315efdf60560..4bb9b8d216bafac43c6307eebd5cfe51b4769e39"
+    "shas": "515cdca94fa0fd945d61f0449b767ceebcac3ea0..c66809182708680b2a90df74832def02c57a5990"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-test",
@@ -201,7 +201,7 @@
         " undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4bb9b8d216bafac43c6307eebd5cfe51b4769e39..6d4c04c9c6972c06d65ba9c83095a168f51e3f95"
+    "shas": "c66809182708680b2a90df74832def02c57a5990..030a5ba301c5ced003b695d988175b393efb8740"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-replacement-test",
@@ -272,7 +272,7 @@
         "+return undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6d4c04c9c6972c06d65ba9c83095a168f51e3f95..11403be2f96636e2cc2cf75b2fe20435a65fe3da"
+    "shas": "030a5ba301c5ced003b695d988175b393efb8740..eb467eaa66bd05de600c7bce70227081ff2dbb43"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-test",
@@ -311,7 +311,7 @@
         " return undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "11403be2f96636e2cc2cf75b2fe20435a65fe3da..f58ac582dcfbebc2199f32e97efbd82e4711f00f"
+    "shas": "eb467eaa66bd05de600c7bce70227081ff2dbb43..262fa201e847e6099945f5141c824203b51f0a7b"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-rest-test",
@@ -349,5 +349,5 @@
         "-return undefined;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f58ac582dcfbebc2199f32e97efbd82e4711f00f..519ad14821c401c1cca201f2a2b02cb503bbfd83"
+    "shas": "262fa201e847e6099945f5141c824203b51f0a7b..5db7a2e323276320f8fea7ae12bf5adf6f3de09d"
 }]

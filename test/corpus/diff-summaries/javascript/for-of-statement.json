@@ -34,7 +34,7 @@
         "+for (let item of items) { process(item); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e9db20e9b701c8a70a82df7f42dc862632f34005..e6d287ef4ceedccefb165e24cc0fd2fd186d5a45"
+    "shas": "89b62eec408922c8dcad9c54e045d34c783da30f..948ba39d4d029f7621a695436a0d2ddf02c6d93b"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-insert-test",
@@ -89,7 +89,7 @@
         " for (let item of items) { process(item); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e6d287ef4ceedccefb165e24cc0fd2fd186d5a45..0f41c6e8f4378275d415c4f89d1ae0edd5861240"
+    "shas": "948ba39d4d029f7621a695436a0d2ddf02c6d93b..7e3b3cdcb0e37778e26c41ded72d66e7a81bd259"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-insert-test",
@@ -196,7 +196,7 @@
         " for (let item of items) { process(item); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0f41c6e8f4378275d415c4f89d1ae0edd5861240..a6b618329e1c061028f5ae9fba2116fd281b6f44"
+    "shas": "7e3b3cdcb0e37778e26c41ded72d66e7a81bd259..214da18c3075208b526872072329e501f8d9d20b"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-test",
@@ -303,7 +303,7 @@
         " for (let item of items) { process(item); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a6b618329e1c061028f5ae9fba2116fd281b6f44..a2b19ddc74c11b06577cc04ee17fb5014c509809"
+    "shas": "214da18c3075208b526872072329e501f8d9d20b..c3f015268cf87cb0fea3dad078b323823bfd27b4"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-replacement-test",
@@ -374,7 +374,7 @@
         "+for (let thing of things) { process(thing); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a2b19ddc74c11b06577cc04ee17fb5014c509809..716471c15df7e4f9d467c16b72773575ab0daf20"
+    "shas": "c3f015268cf87cb0fea3dad078b323823bfd27b4..fccf8a23cc8b1106d1a71d040450fc47f0af84b7"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-test",
@@ -413,7 +413,7 @@
         " for (let thing of things) { process(thing); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "716471c15df7e4f9d467c16b72773575ab0daf20..742d48d2166f7f4e5e0d6d0ebd86afa36266f86a"
+    "shas": "fccf8a23cc8b1106d1a71d040450fc47f0af84b7..8c6c7677d447864b8159d0aeadaaa5c31fd7db04"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-rest-test",
@@ -451,5 +451,5 @@
         "-for (let thing of things) { process(thing); };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "742d48d2166f7f4e5e0d6d0ebd86afa36266f86a..a43b37a27c89c6d1f96f5a83f5498c56b9e45338"
+    "shas": "8c6c7677d447864b8159d0aeadaaa5c31fd7db04..d2768fbb95f8527eec1b8d88197c99a65a72c36a"
 }]

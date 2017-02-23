@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' variable"
+                    "summary": "Added the 'x' var assignment"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+var x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "074b11388910f403aab4a975e06626792b23aca4..a702ccd30aed98e5ff899c18985dec20177ba75a"
+    "shas": "b3deb3a5a3360720b67281c15ada09f11f1bde35..3004be8d009c45ddc97c6423c513c0a47b49c82d"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-insert-test",
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' variable"
+                    "summary": "Added the 'y' var assignment"
                 },
                 {
                     "span": {
@@ -99,7 +99,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' variable"
+                    "summary": "Added the 'x' var assignment"
                 }
             ]
         },
@@ -119,7 +119,7 @@
         " var x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a702ccd30aed98e5ff899c18985dec20177ba75a..dedf9eb86128863958baa2c719eee2c2365fd38f"
+    "shas": "3004be8d009c45ddc97c6423c513c0a47b49c82d..c4877ded849d4d14cbc585235842d7803b73afca"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-insert-test",
@@ -128,30 +128,33 @@
             "var-declaration.js": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'x' variable with the 'x' variable"
+                    "summary": "Added the 'x' var assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' variable"
                 },
                 {
                     "span": {
@@ -166,7 +169,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' variable"
+                    "summary": "Deleted the 'y' var assignment"
                 },
                 {
                     "span": {
@@ -202,7 +205,7 @@
         " var x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "dedf9eb86128863958baa2c719eee2c2365fd38f..3ac59a2a32659d91ac268d9fdb9128290ef16cfc"
+    "shas": "c4877ded849d4d14cbc585235842d7803b73afca..302816cd527375a91124c62cdcd289020b9fa0b6"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-test",
@@ -211,30 +214,18 @@
             "var-declaration.js": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'x' variable with the 'x' variable"
+                    "summary": "Added the 'x' variable"
                 },
                 {
                     "span": {
@@ -249,7 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' variable"
+                    "summary": "Added the 'y' var assignment"
                 },
                 {
                     "span": {
@@ -265,6 +256,21 @@
                         }
                     },
                     "summary": "Added the 'z' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' var assignment"
                 }
             ]
         },
@@ -285,7 +291,7 @@
         " var x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3ac59a2a32659d91ac268d9fdb9128290ef16cfc..8d6a28ccf03158a8e6340a93d09c47328177d318"
+    "shas": "302816cd527375a91124c62cdcd289020b9fa0b6..c8904544791860859cfff9b491bab65d767dc4a3"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-replacement-test",
@@ -320,7 +326,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' variable"
+                    "summary": "Deleted the 'y' var assignment"
                 },
                 {
                     "span": {
@@ -350,7 +356,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' variable"
+                    "summary": "Deleted the 'x' var assignment"
                 },
                 {
                     "span": {
@@ -380,7 +386,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' variable"
+                    "summary": "Added the 'y' var assignment"
                 },
                 {
                     "span": {
@@ -416,7 +422,7 @@
         "+var x, y = {}, z;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8d6a28ccf03158a8e6340a93d09c47328177d318..898d568a47e9c92b96c697433e83aaecbfc571ee"
+    "shas": "c8904544791860859cfff9b491bab65d767dc4a3..752382fe70251463146168b2747b51b0eefd7be0"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-test",
@@ -436,7 +442,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' variable"
+                    "summary": "Deleted the 'x' var assignment"
                 }
             ]
         },
@@ -455,7 +461,7 @@
         " var x, y = {}, z;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "898d568a47e9c92b96c697433e83aaecbfc571ee..8e6e21fcf3109e0e23aaeadbabaa26c5b6b65970"
+    "shas": "752382fe70251463146168b2747b51b0eefd7be0..c6b68258c8a1386f81e2eb00955822e69f421f6a"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-rest-test",
@@ -490,7 +496,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' variable"
+                    "summary": "Deleted the 'y' var assignment"
                 },
                 {
                     "span": {
@@ -523,5 +529,5 @@
         "-var x, y = {}, z;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8e6e21fcf3109e0e23aaeadbabaa26c5b6b65970..b2dce4d2365759cf652927b76a86ca88c71cb3ad"
+    "shas": "c6b68258c8a1386f81e2eb00955822e69f421f6a..4e9add9e716058fa4021b730dad2e7f1fa8ffc7a"
 }]
