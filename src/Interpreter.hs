@@ -101,7 +101,9 @@ runAlgorithm recur = iterAp $ \ r cont -> case r of
   Replace a b -> cont (replacing a b)
 
 -- | Decompose a step of an algorithm into the next steps to perform.
-decompose :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector)) => AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
+decompose :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector))
+          => AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result
+          -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
 decompose = \case
   Linear t1 t2 -> case galignWith recur (unwrap t1) (unwrap t2) of
     Just result -> annotate t1 t2 <$> sequenceA result
