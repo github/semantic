@@ -22,8 +22,10 @@ import Test.Hspec.Expectations.Pretty
 spec :: Spec
 spec = parallel $ do
   it "lists example fixtures" $ do
+    examples "test/fixtures/go/" `shouldNotReturn` []
     examples "test/fixtures/ruby/" `shouldNotReturn` []
 
+  describe "go" $ runTestsIn "test/fixtures/go/"
   describe "ruby" $ runTestsIn "test/fixtures/ruby/"
 
   where

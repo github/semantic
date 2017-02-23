@@ -1,0 +1,8 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (TypeAssertion
+      (Identifier)
+      (QualifiedIdentifier))))
