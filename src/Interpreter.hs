@@ -31,7 +31,7 @@ diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Mayb
 diffComparableTerms = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
-          | comparable a b = runAlgorithm recur (Just <$> algorithmWithTerms a b)
+          | comparable a b = runAlgorithm diffTerms (Just <$> algorithmWithTerms a b)
           | otherwise = Nothing
 
 -- | Test whether two terms are comparable.
@@ -91,17 +91,18 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
 
 -- | Run an algorithm, given functions characterizing the evaluation.
 runAlgorithm :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector))
-  => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
+  => (Cofree f (Record fields) -> Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to diff two subterms recursively.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
 runAlgorithm recur = iterAp $ \ r cont -> case r of
   Linear a b -> cont . maybe (replacing a b) (wrap . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
-    traverse (these (Just . deleting) (Just . inserting) recur) aligned
-  RWS as bs -> cont (rws recur as bs)
+    traverse (these (Just . deleting) (Just . inserting) maybeRecur) aligned
+  RWS as bs -> cont (rws recur comparable as bs)
   Delete a -> cont (deleting a)
   Insert b -> cont (inserting b)
   Replace a b -> cont (replacing a b)
+  where maybeRecur a b = if comparable a b then Just (recur a b) else Nothing
 
 -- | Decompose a step of an algorithm into the next steps to perform.
 decompose :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector))

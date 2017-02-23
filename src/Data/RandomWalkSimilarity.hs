@@ -39,7 +39,7 @@ import System.Random.Mersenne.Pure64
 import Term (termSize, zipTerms, Term, TermF)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
-type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
+type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
 
 -- | Given a function comparing two terms recursively,
 -- a function to compute a Hashable label from an unpacked term, and two lists of terms,
@@ -49,11 +49,12 @@ type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Ma
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields.
        (GAlign f, Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
-    => DiffTerms f fields -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+    => DiffTerms f fields -- ^ A function which compares a pair of terms recursively.
+    -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
     -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
-rws compare as bs
+rws compare canCompare as bs
   | null as, null bs = []
   | null as = inserting . eraseFeatureVector <$> bs
   | null bs = deleting . eraseFeatureVector <$> as
@@ -108,10 +109,10 @@ rws compare as bs
         UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
         -- Return Nothing if their indices don't match
         guard (j == j')
-        compared <- compare a b
+        guard (canCompare a b)
         pure $! do
           put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-          pure (These i j, compared)
+          pure (These i j, compare a b)
 
     -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
     -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
@@ -137,7 +138,9 @@ rws compare as bs
       -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
     nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
-    editDistanceIfComparable a b = maybe maxBound (editDistanceUpTo defaultM) (compare a b)
+    editDistanceIfComparable a b = if canCompare a b
+      then editDistanceUpTo defaultM (compare a b)
+      else maxBound
 
     insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
         insertDiff (i, mappedTerm) into)
