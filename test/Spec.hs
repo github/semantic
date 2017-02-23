@@ -30,4 +30,4 @@ main = hspec . parallel $ do
   describe "Source" Source.Spec.spec
   describe "Term" TermSpec.spec
   describe "TOC" TOCSpec.spec
-  describe "Integration.Spec" IntegrationSpec.spec
+  describe "Integration" IntegrationSpec.spec

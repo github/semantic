@@ -24,15 +24,15 @@ spec = parallel $ do
   it "lists example fixtures" $ do
     examples "test/fixtures/ruby/" `shouldNotReturn` []
 
-  describe "parse and diff ruby" $ runTestsIn "test/fixtures/ruby/"
+  describe "ruby" $ runTestsIn "test/fixtures/ruby/"
 
   where
     runTestsIn :: FilePath -> SpecWith ()
     runTestsIn directory = do
       examples <- runIO $ examples directory
       traverse_ runTest examples
-    runTest ParseExample{..} = it (file <> " (parse)") $ testParse file parseOutput
-    runTest DiffExample{..} = it (diffOutput <> " (diff)") $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
+    runTest ParseExample{..} = it ("parses " <> file) $ testParse file parseOutput
+    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
