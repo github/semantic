@@ -112,7 +112,7 @@ decompose = \case
   Delete a -> pure (deleting a)
   Insert b -> pure (inserting b)
   Replace a b -> pure (replacing a b)
-  where recur = these byDeleting byInserting byReplacing
+  where recur = these byDeleting byInserting linearly
         annotate t1 t2 = wrap . (both (extract t1) (extract t2) :<)
         recur' :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
         recur' = undefined
