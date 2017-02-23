@@ -1,0 +1,6 @@
+(Program
+  (ExpressionStatements
+    (MathAssignment
+      (Identifier)
+    { (NumberLiteral)
+    ->(NumberLiteral) })))

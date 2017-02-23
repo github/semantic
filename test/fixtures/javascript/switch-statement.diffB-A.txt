@@ -1,0 +1,17 @@
+(Program
+  (Switch
+  { (NumberLiteral)
+  ->(NumberLiteral) }
+    (Case
+      (NumberLiteral)
+      (ExpressionStatements
+        (NumberLiteral)))
+    (Case
+      (NumberLiteral)
+      (ExpressionStatements
+      { (NumberLiteral)
+      ->(NumberLiteral) }))
+    (Case
+      (NumberLiteral)
+      (ExpressionStatements
+        (NumberLiteral)))))

@@ -1,0 +1,9 @@
+(Program
+  (ExpressionStatements
+    (Constructor
+      (FunctionCall
+        (Identifier)
+        (Identifier)
+        (NumberLiteral)
+      { (StringLiteral)
+      ->(StringLiteral) }))))

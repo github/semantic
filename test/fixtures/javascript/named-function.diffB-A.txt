@@ -1,0 +1,11 @@
+(Program
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+  {+(Identifier)+}
+  {+(Identifier)+}
+    (ExpressionStatements
+    {+(ExpressionStatements
+        (Identifier))+}
+    {-(Return
+        (Boolean))-})))

@@ -1,0 +1,22 @@
+(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (Method
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (Return
+          (Identifier)))
+      (Method
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (Return
+          (Identifier)))
+      (Method
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (Return
+          (Identifier))))))
