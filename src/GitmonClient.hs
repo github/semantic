@@ -10,6 +10,7 @@ import Arguments
 
 import Network.Socket
 import Network.Socket.ByteString (sendAll)
+import System.Clock
 
 import Data.ByteString.Lazy (toStrict)
 
@@ -47,6 +48,10 @@ instance ToJSON GitmonMsg where
     "data" .= stats
     ]
 
+
+clock :: Clock
+clock = Realtime
+
 processJSON :: GitmonCommand -> ProcessStats -> ByteString
 processJSON command stats = toStrict . encode $ GitmonMsg command stats
 
@@ -57,9 +62,11 @@ reportGitmon program Arguments{..} gitCommand = do
 
   safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
 
+  startTime <- liftIO $ getTime clock
   !result <- gitCommand
 
   safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 })
+  endTime <- liftIO $ getTime clock
 
   safeIO $ close soc
 
