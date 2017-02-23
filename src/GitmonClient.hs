@@ -1,8 +1,9 @@
-{-# LANGUAGE RecordWildCards, BangPatterns #-}
+{-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric #-}
 module GitmonClient where
 
 import Prologue hiding (toStrict)
 import Prelude
+import qualified Data.Yaml as Y
 import Data.Aeson
 import Data.Aeson.Types
 import Git.Libgit2
@@ -13,6 +14,14 @@ import Network.Socket.ByteString (sendAll)
 import System.Clock
 
 import Data.ByteString.Lazy (toStrict)
+
+data ProcIO = ProcIO {
+    read_bytes :: Integer
+  , write_bytes :: Integer
+} deriving (Show, Generic)
+
+instance FromJSON ProcIO
+
 
 data ProcessStats =
     ProcessBeforeStats { gitDir :: String
@@ -63,10 +72,20 @@ reportGitmon program Arguments{..} gitCommand = do
   safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
 
   startTime <- liftIO $ getTime clock
+  beforeProcIOContents <- liftIO (Y.decodeFileEither "/proc/self/io" :: IO (Either Y.ParseException (Maybe ProcIO)))
+
   !result <- gitCommand
 
   safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 })
   endTime <- liftIO $ getTime clock
+  afterProcIOContents <- liftIO (Y.decodeFileEither "/proc/self/io" :: IO (Either Y.ParseException (Maybe ProcIO)))
+
+  let beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
+  let afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
+  let beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
+  let afterDiskWriteBytes = either (const 0) (maybe 0 write_bytes) afterProcIOContents
+
+  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = toNanoSecs endTime - toNanoSecs startTime, diskReadBytes = afterDiskReadBytes - beforeDiskReadBytes, diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes, resultCode = 0 })
 
   safeIO $ close soc
 

@@ -104,6 +104,7 @@ library
                      , javascript
                      , network
                      , clock
+                     , yaml
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase, StrictData
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -j
