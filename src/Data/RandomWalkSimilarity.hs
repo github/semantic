@@ -56,8 +56,8 @@ rws :: forall f fields.
     -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
 rws compare canCompare as bs
   | null as, null bs = []
-  | null as = inserting . eraseFeatureVector <$> bs
-  | null bs = deleting . eraseFeatureVector <$> as
+  | null as = compare . That . eraseFeatureVector <$> bs
+  | null bs = compare . This . eraseFeatureVector <$> as
   | otherwise =
     -- Construct a State who's final value is a list of (Int, Diff leaf (Record fields))
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
@@ -124,7 +124,7 @@ rws compare canCompare as bs
                           (These Int Int, Diff f (Record fields))
     insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
       put (previous, unmappedA, IntMap.delete j unmappedB)
-      pure (That j, inserting b)
+      pure (That j, compare (That b))
 
     -- | Finds the most-similar unmapped term to the passed-in term, if any.
     --
@@ -151,7 +151,7 @@ rws compare canCompare as bs
     deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
         insertDiff (This i, deletion) into)
       diffs
-      ((termIndex &&& deleting . term) <$> unmappedA)
+      ((termIndex &&& compare . This . term) <$> unmappedA)
 
     -- Possibly replace terms in a diff.
     replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
