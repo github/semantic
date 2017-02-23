@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeOperators #-}
 module Data.Functor.Classes.Eq.Generic
 ( genericLiftEq
+, gliftEq
 ) where
 
 import Control.Comonad.Cofree as Cofree
