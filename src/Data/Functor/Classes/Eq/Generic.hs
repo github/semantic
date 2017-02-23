@@ -3,6 +3,7 @@ module Data.Functor.Classes.Eq.Generic
 ( genericLiftEq
 ) where
 
+import Control.Comonad.Cofree as Cofree
 import Data.Functor.Classes
 import GHC.Generics
 import Prologue
@@ -25,6 +26,10 @@ instance GEq1 [] where gliftEq = liftEq
 instance GEq1 Maybe where gliftEq = liftEq
 instance Eq a => GEq1 ((,) a) where gliftEq = liftEq
 instance Eq a => GEq1 (Either a) where gliftEq = liftEq
+
+instance Eq1 f => GEq1 (Cofree f) where
+  gliftEq eq = go
+    where go (a1 Cofree.:< f1) (a2 Cofree.:< f2) = eq a1 a2 && liftEq (gliftEq eq) f1 f2
 
 
 -- Generics
