@@ -78,7 +78,6 @@ reportGitmon program Arguments{..} gitCommand = do
 
   !result <- gitCommand
 
-  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = 100, diskReadBytes = 1000, diskWriteBytes = 1000, resultCode = 0 })
   endTime <- liftIO $ getTime clock
   afterProcIOContents <- liftIO (Y.decodeFileEither "/proc/self/io" :: IO (Either Y.ParseException (Maybe ProcIO)))
 
