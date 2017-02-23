@@ -39,6 +39,7 @@ data ProcessStats =
 instance ToJSON ProcessStats where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = camelTo2 '_' }
 
+
 data GitmonCommand = Update
                    | Finish
                    | Schedule deriving (Show)
@@ -48,6 +49,7 @@ instance ToJSON GitmonCommand where
     Update -> "update"
     Finish -> "finish"
     Schedule -> "schedule"
+
 
 data GitmonMsg = GitmonMsg { command :: GitmonCommand, stats :: ProcessStats } deriving (Show)
 
