@@ -71,17 +71,18 @@ rws compare canCompare as bs
 
   where
     minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
-    sesDiffs = SES.ses replaceIfEqual cost as bs
+    sesDiffs = SES.ses (gliftEq (==) `on` fmap category) cost as bs
 
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
-      foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
-        Pure (Delete term) ->
+      foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case diff of
+        This term ->
           (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
-        Pure (Insert term) ->
+        That term ->
           (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
-        _ ->
-          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff), allDiffs <> pure (Index counterA))
+        These a b ->
+          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, getDiff a b), allDiffs <> pure (Index counterA))
       ) ([], [], 0, 0, [], []) sesDiffs
+    getDiff a b = let Just diff = hylo wrap runCofree <$> zipTerms (eraseFeatureVector a) (eraseFeatureVector b) in diff
 
     findNearestNeighbourToDiff :: TermOrIndexOrNone (UnmappedTerm f fields)
                                -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
@@ -153,13 +154,7 @@ rws compare canCompare as bs
       diffs
       ((termIndex &&& compare . This . term) <$> unmappedA)
 
-    -- Possibly replace terms in a diff.
-    replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
-    replaceIfEqual a b
-      | gliftEq (==) (category <$> a) (category <$> b) = hylo wrap runCofree <$> zipTerms (eraseFeatureVector a) (eraseFeatureVector b)
-      | otherwise = Nothing
-
-    cost = iter (const 0) . (1 <$)
+    cost = these (const 1) (const 1) (const (const 0))
 
     kdas = KdTree.build (elems . feature) featurizedAs
     kdbs = KdTree.build (elems . feature) featurizedBs
