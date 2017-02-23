@@ -1,0 +1,17 @@
+(Program
+  (ExpressionStatements
+    (Function
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) }
+      (ExpressionStatements
+        (Return
+        { (MathOperator
+            (Identifier)
+            (Other "+")
+            (Identifier))
+        ->(MathOperator
+            (Identifier)
+            (Other "*")
+            (Identifier)) })))))

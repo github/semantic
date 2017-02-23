@@ -1,0 +1,7 @@
+(Program
+  (ExpressionStatements
+    (Operator
+      (Other "delete")
+      (SubscriptAccess
+        (Identifier)
+        (StringLiteral)))))

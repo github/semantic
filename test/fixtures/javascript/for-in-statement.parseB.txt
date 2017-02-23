@@ -1,0 +1,8 @@
+(Program
+  (For
+    (Identifier)
+    (Identifier)
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))))

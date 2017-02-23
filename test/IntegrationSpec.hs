@@ -24,8 +24,10 @@ spec = parallel $ do
   it "lists example fixtures" $ do
     examples "test/fixtures/go/" `shouldNotReturn` []
     examples "test/fixtures/ruby/" `shouldNotReturn` []
+    examples "test/fixtures/javascript/" `shouldNotReturn` []
 
   describe "go" $ runTestsIn "test/fixtures/go/"
+  describe "javascript" $ runTestsIn "test/fixtures/javascript/"
   describe "ruby" $ runTestsIn "test/fixtures/ruby/"
 
   where
