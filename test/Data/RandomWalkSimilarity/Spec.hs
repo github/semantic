@@ -2,7 +2,7 @@
 module Data.RandomWalkSimilarity.Spec where
 
 import Category
-import Data.Functor.Both
+import Data.Bifunctor
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -36,20 +36,18 @@ spec = parallel $ do
       \ (as, bs) -> let tas = decorate <$> (unListableF <$> as :: [SyntaxTerm String '[Category]])
                         tbs = decorate <$> (unListableF <$> bs :: [SyntaxTerm String '[Category]])
                         root = cofree . ((Program :. Nil) :<) . Indexed
-                        diff = wrap (pure (Program :. Nil) :< Indexed (stripDiff <$> rws compare canCompare tas tbs)) in
+                        diff = wrap (pure (Program :. Nil) :< Indexed (stripDiff . diffThese <$> rws editDistance canCompare tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf ("a" :: String)) ])), decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf "b") ]))) in
-      fmap stripDiff (rws compare canCompare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, copying b ]
+      fmap (bimap stripTerm stripTerm) (rws editDistance canCompare [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
-  where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => These (Term f (Record fields)) (Term f (Record fields)) -> Diff f (Record fields)
-        compare (These a b) | (category <$> a) == (category <$> b) = copying b
-                            | otherwise = replacing a b
-        compare (This a) = deleting a
-        compare (That b) = inserting b
-        canCompare = (==) `on` extract
-        copying :: Functor f => Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
-        copying = cata wrap . fmap pure
+  where canCompare = (==) `on` extract
+
         decorate :: SyntaxTerm leaf '[Category] -> SyntaxTerm leaf '[Maybe FeatureVector, Category]
         decorate = defaultFeatureVectorDecorator (category . headF)
+
+        diffThese = these deleting inserting replacing
+
+        editDistance = these (const 1) (const 1) (const (const 0))
