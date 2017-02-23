@@ -3,8 +3,9 @@ module Interpreter (diffTerms) where
 
 import Algorithm
 import Data.Align.Generic
-import Data.Functor.Foldable
 import Data.Functor.Both
+import Data.Functor.Classes
+import Data.Functor.Foldable
 import Data.RandomWalkSimilarity as RWS
 import Data.Record
 import Data.These
@@ -86,7 +87,7 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
       (Nothing, Nothing) -> Nothing
 
 -- | Run an algorithm, given functions characterizing the evaluation.
-runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)), Traversable f, HasField fields (Maybe FeatureVector))
+runAlgorithm :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector))
   => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a

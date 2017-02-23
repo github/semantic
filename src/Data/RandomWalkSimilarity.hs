@@ -21,6 +21,8 @@ import Control.Monad.Random
 import Control.Monad.State
 import Data.Align.Generic
 import Data.Array
+import Data.Functor.Classes
+import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
@@ -46,7 +48,7 @@ type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Ma
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields.
-       (GAlign f, Traversable f, Eq (f (Term f Category)), HasField fields Category, HasField fields (Maybe FeatureVector))
+       (GAlign f, Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
     => DiffTerms f fields -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
@@ -149,7 +151,7 @@ rws compare as bs
     -- Possibly replace terms in a diff.
     replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
     replaceIfEqual a b
-      | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms (eraseFeatureVector a) (eraseFeatureVector b)
+      | gliftEq (==) (category <$> a) (category <$> b) = hylo wrap runCofree <$> zipTerms (eraseFeatureVector a) (eraseFeatureVector b)
       | otherwise = Nothing
 
     cost = iter (const 0) . (1 <$)
