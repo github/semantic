@@ -43,6 +43,3 @@
 [submodule "vendor/haskell-tree-sitter"]
 	path = vendor/haskell-tree-sitter
 	url = https://github.com/tree-sitter/haskell-tree-sitter.git
-[submodule "test/corpus/profile"]
-	path = test/corpus/profile
-	url = https://github.com/diff-fixtures/profile.git
