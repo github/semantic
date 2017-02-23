@@ -113,6 +113,8 @@ decompose :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField
           => AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result -- ^ The step in an algorithm to decompose into its next steps.
           -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result -- ^ The sequence of next steps to undertake to continue the algorithm.
 decompose = \case
+  Diff t1 t2 -> case (unwrap t1, unwrap t2) of
+    _ -> byReplacing t1 t2
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
     Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
     _ -> byReplacing t1 t2
