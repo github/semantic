@@ -97,8 +97,8 @@ termAssignment _ category children
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
-  "argument_list" -> Args
   "argument_list_with_parens" -> Args
+  "argument_list" -> Args
   "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
@@ -134,8 +134,9 @@ categoryForRubyName = \case
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
-  "lambda" -> AnonymousFunction
   "lambda_parameters" -> Params
+  "lambda" -> AnonymousFunction
+  "left_assignment_list" -> Args
   "method_call" -> MethodCall
   "method_parameters" -> Params
   "method" -> Method

@@ -1,6 +1,6 @@
 (Program
   (Assignment
-    (Other "left_assignment_list"
+    (Args
       (Identifier)
     {+(Identifier)+}
     {+(Identifier)+}
