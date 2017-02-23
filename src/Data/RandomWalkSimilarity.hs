@@ -135,7 +135,9 @@ rws compare as bs
       -> KdTree.KdTree Double (UnmappedTerm f fields) -- ^ The k-d tree to look up nearest neighbours within.
       -> UnmappedTerm f fields -- ^ The term to find the nearest neighbour to.
       -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
-    nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
+    nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
+
+    editDistanceIfComparable a b = maybe maxBound (editDistanceUpTo defaultM) (compare a b)
 
     insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
         insertDiff (i, mappedTerm) into)
