@@ -2,6 +2,6 @@
   (Case
     (Identifier)
     (When
-      (Other "pattern"
+      (Args
         (Identifier))
       (Identifier))))

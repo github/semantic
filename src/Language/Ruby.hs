@@ -145,6 +145,7 @@ categoryForRubyName = \case
   "operator_assignment" -> OperatorAssignment
   "optional_parameter" -> OptionalParameter
   "pair" -> Pair
+  "pattern" -> Args
   "program" -> Program
   "range" -> RangeExpression
   "regex" -> Regex
