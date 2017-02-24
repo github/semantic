@@ -88,12 +88,9 @@ reportGitmon program Arguments{..} gitCommand = do
   endTime <- liftIO $ getTime clock
   afterProcIOContents <- liftIO (Y.decodeFileEither procFileAddr :: IO ProcInfo)
 
-  let beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
-  let afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
-  let beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
-  let afterDiskWriteBytes = either (const 0) (maybe 0 write_bytes) afterProcIOContents
+  let (diskReadBytes', diskWriteBytes', resultCode') = procStats beforeProcIOContents afterProcIOContents
 
-  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = toNanoSecs endTime - toNanoSecs startTime, diskReadBytes = afterDiskReadBytes - beforeDiskReadBytes, diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes, resultCode = 0 })
+  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = toNanoSecs endTime - toNanoSecs startTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
 
   safeIO $ close soc
 
@@ -104,3 +101,15 @@ reportGitmon program Arguments{..} gitCommand = do
 
         noop :: IOException -> IO ()
         noop _ = return ()
+
+        procStats :: ProcInfo -> ProcInfo -> ( Integer, Integer, Integer )
+        procStats beforeProcIOContents afterProcIOContents = ( diskReadBytes, diskWriteBytes, resultCode )
+          where
+            beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
+            afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
+            beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
+            afterDiskWriteBytes = either (const 0) (maybe 0 write_bytes) afterProcIOContents
+            diskReadBytes = afterDiskReadBytes - beforeDiskReadBytes
+            diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
+            resultCode = 0
+
