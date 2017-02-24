@@ -42,7 +42,7 @@ runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVec
         -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
 runStep = \case
   Return a -> Left a
-  Then algorithm cont -> Right $ decompose algorithm >>= cont
+  algorithm `Then` cont -> Right $ decompose algorithm >>= cont
 
 
 -- | Decompose a step of an algorithm into the next steps to perform.
