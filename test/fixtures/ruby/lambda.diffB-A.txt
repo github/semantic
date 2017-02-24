@@ -1,9 +1,10 @@
 (Program
-{ (AnonymousFunction
-    (Identifier)
+  (AnonymousFunction
+    { -(Identifier)- }
+    {
     (Binary
       (Identifier)
       (Other "+")
-      (IntegerLiteral)))
-->(AnonymousFunction
-    (Identifier)) })
+      (IntegerLiteral))
+    ->
+    (Identifier) }))

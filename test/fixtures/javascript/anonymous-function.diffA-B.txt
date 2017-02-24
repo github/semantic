@@ -7,11 +7,7 @@
     ->(Identifier) }
       (ExpressionStatements
         (Return
-        { (MathOperator
-            (Identifier)
-            (Other "+")
-            (Identifier))
-        ->(MathOperator
-            (Identifier)
-            (Other "*")
-            (Identifier)) })))))
+          (MathOperator
+            { (Identifier) -> (Identifier) }
+            { (Other "+") -> (Other "*") }
+            { (Identifier) -> (Identifier) }))))))

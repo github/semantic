@@ -1,9 +1,7 @@
 (Program
-{ (AnonymousFunction
-    (Identifier))
-->(AnonymousFunction
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (IntegerLiteral)
-    (IntegerLiteral)) })
+  (AnonymousFunction
+    { +(Identifier)+ }
+    { +(Identifier)+ }
+    { +(Identifier)+ }
+    { (Identifier) -> (IntegerLiteral) }
+    { +(IntegerLiteral)+ }))
