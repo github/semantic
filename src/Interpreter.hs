@@ -33,10 +33,10 @@ run algorithm = case runStep algorithm of
 -- | Run an Algorithm to completion, returning the list of steps taken.
 runSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-    -> [Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)]
+    -> [Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result]
 runSteps algorithm = case runStep algorithm of
-  Left a -> [Left a]
-  Right next -> Right next : runSteps next
+  Left a -> [Pure a]
+  Right next -> next : runSteps next
 
 -- | Run a single step of an Algorithm, returning Either its result if it has finished, or the next step otherwise.
 runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
