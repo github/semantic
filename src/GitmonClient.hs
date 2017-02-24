@@ -80,17 +80,15 @@ reportGitmon program Arguments{..} gitCommand = do
 
   safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
 
-  startTime <- liftIO $ getTime clock
-  beforeProcIOContents <- liftIO (Y.decodeFileEither procFileAddr :: IO ProcInfo)
+  (startTime, beforeProcIOContents) <- liftIO collectStats
 
   !result <- gitCommand
 
-  endTime <- liftIO $ getTime clock
-  afterProcIOContents <- liftIO (Y.decodeFileEither procFileAddr :: IO ProcInfo)
+  (afterTime, afterProcIOContents) <- liftIO collectStats
 
-  let (diskReadBytes', diskWriteBytes', resultCode') = procStats beforeProcIOContents afterProcIOContents
+  let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
 
-  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = toNanoSecs endTime - toNanoSecs startTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
+  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
 
   safeIO $ close soc
 
@@ -102,9 +100,16 @@ reportGitmon program Arguments{..} gitCommand = do
         noop :: IOException -> IO ()
         noop _ = return ()
 
-        procStats :: ProcInfo -> ProcInfo -> ( Integer, Integer, Integer )
-        procStats beforeProcIOContents afterProcIOContents = ( diskReadBytes, diskWriteBytes, resultCode )
+        collectStats :: IO (TimeSpec, ProcInfo)
+        collectStats = do
+          time <- getTime clock
+          procIOContents <- Y.decodeFileEither procFileAddr :: IO ProcInfo
+          return (time, procIOContents)
+
+        procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
+        procStats beforeTime afterTime beforeProcIOContents afterProcIOContents = ( cpuTime, diskReadBytes, diskWriteBytes, resultCode )
           where
+            cpuTime = toNanoSecs afterTime - toNanoSecs beforeTime
             beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
             afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
             beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
