@@ -22,7 +22,7 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms a b = fromMaybe (replacing a b) $ diffComparableTerms a b
+diffTerms = (run .) . diff
 
 -- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
 diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
