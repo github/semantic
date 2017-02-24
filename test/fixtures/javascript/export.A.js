@@ -1,0 +1,11 @@
+export { name1, name2, name3, nameN };
+export { variable1 as name1, variable2 as name2, nameN };
+export let name1, name2, nameN;
+export let name1 = value1, name2 = value2, name3, nameN;
+export default namedFunction;
+export default function () { };
+export default function name1() { };
+export { name1 as default };
+export * from 'foo';
+export { name1, name2, nameN } from 'foo';
+export { import1 as name1, import2 as name2, nameN } from 'bar';

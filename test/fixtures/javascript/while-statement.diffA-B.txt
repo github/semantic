@@ -1,0 +1,9 @@
+(Program
+  (While
+  { (Identifier)
+  ->(Identifier) }
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+        { (Identifier)
+        ->(Identifier) })))))
