@@ -1,9 +1,9 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
 module Algorithm where
 
-import Control.Applicative.Free
+import Control.Monad.Free.Freer
 import Data.These
-import Prologue hiding (Pure)
+import Prologue hiding (liftF)
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term diff result where
@@ -21,20 +21,14 @@ data AlgorithmF term diff result where
   Replace :: term -> term -> AlgorithmF term diff diff
 
 -- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
-type Algorithm term diff = Ap (AlgorithmF term diff)
-
--- | Tear down an Ap by iteration, given a continuation.
-iterAp :: (forall x. g x -> (x -> a) -> a) -> Ap g a -> a
-iterAp algebra = go
-  where go (Pure a) = a
-        go (Ap underlying apply) = algebra underlying (go . (apply <*>) . pure)
+type Algorithm term diff = Freer (AlgorithmF term diff)
 
 
 -- DSL
 
 -- | Diff two terms without specifying the algorithm to be used.
 diff :: term -> term -> Algorithm term diff diff
-diff = (liftAp .) . Diff
+diff = (liftF .) . Diff
 
 -- | Diff a These of terms without specifying the algorithm to be used.
 diffThese :: These term term -> Algorithm term diff diff
@@ -42,20 +36,20 @@ diffThese = these byDeleting byInserting diff
 
 -- | Diff two terms linearly.
 linearly :: term -> term -> Algorithm term diff diff
-linearly a b = liftAp (Linear a b)
+linearly a b = liftF (Linear a b)
 
 -- | Diff two terms using RWS.
 byRWS :: [term] -> [term] -> Algorithm term diff [diff]
-byRWS a b = liftAp (RWS a b)
+byRWS a b = liftF (RWS a b)
 
 -- | Delete a term.
 byDeleting :: term -> Algorithm term diff diff
-byDeleting = liftAp . Delete
+byDeleting = liftF . Delete
 
 -- | Insert a term.
 byInserting :: term -> Algorithm term diff diff
-byInserting = liftAp . Insert
+byInserting = liftF . Insert
 
 -- | Replace one term with another.
 byReplacing :: term -> term -> Algorithm term diff diff
-byReplacing = (liftAp .) . Replace
+byReplacing = (liftF .) . Replace

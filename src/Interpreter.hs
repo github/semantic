@@ -2,17 +2,17 @@
 module Interpreter (diffTerms, run, runSteps, runStep) where
 
 import Algorithm
-import Control.Applicative.Free
+import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.RandomWalkSimilarity as RWS
 import Data.Record
 import Data.These
 import Diff
-import Info
+import Info hiding (Return)
 import Patch (inserting, deleting, replacing, patchSum)
-import Prologue hiding (lookup, Pure)
-import Syntax as S
+import Prologue hiding (lookup)
+import Syntax as S hiding (Return)
 import Term
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
@@ -26,16 +26,14 @@ diffTerms = (run .) . diff
 run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
     -> result
-run algorithm = case runStep algorithm of
-  Left a -> a
-  Right next -> run next
+run = either identity run . runStep
 
 -- | Run an Algorithm to completion, returning the list of steps taken.
 runSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
     -> [Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result]
 runSteps algorithm = case runStep algorithm of
-  Left a -> [Pure a]
+  Left a -> [Return a]
   Right next -> next : runSteps next
 
 -- | Run a single step of an Algorithm, returning Either its result if it has finished, or the next step otherwise.
@@ -43,8 +41,8 @@ runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVec
         => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
         -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
 runStep = \case
-  Pure a -> Left a
-  Ap algorithm cont -> Right $ cont <*> decompose algorithm
+  Return a -> Left a
+  Then algorithm cont -> Right $ decompose algorithm >>= cont
 
 
 -- | Decompose a step of an algorithm into the next steps to perform.

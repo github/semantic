@@ -77,6 +77,7 @@ library
                      , dlist
                      , filepath
                      , free
+                     , freer-cofreer
                      , gitlib
                      , gitlib-libgit2
                      , gitrev
