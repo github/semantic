@@ -6,7 +6,6 @@ import Control.Applicative.Free
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.Functor.Classes
-import Data.Functor.Foldable
 import Data.RandomWalkSimilarity as RWS
 import Data.Record
 import Data.These
@@ -23,20 +22,6 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
 diffTerms = (run .) . diff
-
--- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
-diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-                    => SyntaxTerm leaf fields
-                    -> SyntaxTerm leaf fields
-                    -> Maybe (SyntaxDiff leaf fields)
-diffComparableTerms = recur
-  where recur a b
-          | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
-          | comparable a b = runAlgorithm diffTerms' (Just <$> algorithmWithTerms a b)
-          | otherwise = Nothing
-        diffTerms' (These a b) = diffTerms a b
-        diffTerms' (This a) = deleting a
-        diffTerms' (That b) = inserting b
 
 -- | Test whether two terms are comparable.
 comparable :: (Functor f, HasField fields Category) => Term f (Record fields) -> Term f (Record fields) -> Bool
