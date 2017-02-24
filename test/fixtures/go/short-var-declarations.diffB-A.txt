@@ -1,0 +1,16 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (VarDecl
+      (Other "expression_list"
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
+      (Other "expression_list"
+      { (NumberLiteral)
+      ->(NumberLiteral) }
+      { (NumberLiteral)
+      ->(NumberLiteral) }))))

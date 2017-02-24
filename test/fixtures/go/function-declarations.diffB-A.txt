@@ -1,0 +1,38 @@
+(ParseError
+  (Program
+    (Module
+      (Identifier))
+    (Function
+      (Identifier)
+      (ParseError
+        (FunctionCall
+        { (Identifier)
+        ->(Identifier) })))
+    (Function
+    { (Identifier)
+    ->(Identifier) }
+      (ParameterDecl
+        (Identifier)
+        (Identifier))
+      (Identifier)
+      (Identifier)
+      (ParameterDecl
+        (Identifier)
+        (Identifier))
+      (Identifier))
+    (Function
+    { (Identifier)
+    ->(Identifier) }
+      (Args
+        (Identifier)
+        (Identifier)))
+    (Function
+    { (Identifier)
+    ->(Identifier) }
+      (Args
+        (ParameterDecl
+          (Identifier)
+          (Identifier))
+        (ParameterDecl
+          (Identifier)
+          (Identifier))))))

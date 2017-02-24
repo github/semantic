@@ -1,0 +1,26 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "type_declaration"
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (ChannelTy
+          (ChannelTy
+          { (Identifier)
+          ->(Identifier) })))
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (ChannelTy
+          (ChannelTy
+            (StructTy))))
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (ChannelTy
+          (ChannelTy
+          { (Identifier)
+          ->(Identifier) }))))))

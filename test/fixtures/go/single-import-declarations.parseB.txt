@@ -1,0 +1,16 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (ParseError
+      (Identifier))
+    (StringLiteral)
+    (ParseError
+      (Identifier))
+    (StringLiteral)
+    (Identifier)
+    (ParseError
+      (Import
+        (Identifier)
+        (StringLiteral)))))

@@ -1,0 +1,10 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Send
+    { (Identifier)
+    ->(Identifier) }
+    { (NumberLiteral)
+    ->(NumberLiteral) })))

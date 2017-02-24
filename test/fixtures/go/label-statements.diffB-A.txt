@@ -1,0 +1,9 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (ExpressionStatements
+      (Other "label_statement"
+      { (Identifier)
+      ->(Identifier) }))))
