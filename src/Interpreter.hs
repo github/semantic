@@ -110,8 +110,8 @@ runAlgorithm recur = iterAp $ \ r cont -> case r of
 
 -- | Decompose a step of an algorithm into the next steps to perform.
 decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-          => AlgorithmF (Term (Syntax leaf) (Record fields)) (Diff (Syntax leaf) (Record fields)) result -- ^ The step in an algorithm to decompose into its next steps.
-          -> Algorithm (Term (Syntax leaf) (Record fields)) (Diff (Syntax leaf) (Record fields)) result -- ^ The sequence of next steps to undertake to continue the algorithm.
+          => AlgorithmF (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The step in an algorithm to decompose into its next steps.
+          -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The sequence of next steps to undertake to continue the algorithm.
 decompose = \case
   Diff t1 t2 -> algorithmWithTerms t1 t2
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
