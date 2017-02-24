@@ -1,7 +1,4 @@
 (Program
-{ (Modifier Rescue
+  (Modifier Rescue
     (Identifier)
-    (Boolean))
-->(Modifier Rescue
-    (Identifier)
-    (Identifier)) })
+    { (Boolean) -> (Identifier) }))
