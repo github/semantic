@@ -62,11 +62,16 @@ instance ToJSON GitmonMsg where
 gitmonSocketAddr :: String
 gitmonSocketAddr = "/tmp/gitstats.sock"
 
+procFileAddr :: String
+procFileAddr = "/proc/self/io"
+
 clock :: Clock
 clock = Realtime
 
 processJSON :: GitmonCommand -> ProcessStats -> ByteString
 processJSON command stats = toStrict . encode $ GitmonMsg command stats
+
+type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
 reportGitmon :: String -> Arguments -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program Arguments{..} gitCommand = do
@@ -76,12 +81,12 @@ reportGitmon program Arguments{..} gitCommand = do
   safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
 
   startTime <- liftIO $ getTime clock
-  beforeProcIOContents <- liftIO (Y.decodeFileEither "/proc/self/io" :: IO (Either Y.ParseException (Maybe ProcIO)))
+  beforeProcIOContents <- liftIO (Y.decodeFileEither procFileAddr :: IO ProcInfo)
 
   !result <- gitCommand
 
   endTime <- liftIO $ getTime clock
-  afterProcIOContents <- liftIO (Y.decodeFileEither "/proc/self/io" :: IO (Either Y.ParseException (Maybe ProcIO)))
+  afterProcIOContents <- liftIO (Y.decodeFileEither procFileAddr :: IO ProcInfo)
 
   let beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
   let afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
