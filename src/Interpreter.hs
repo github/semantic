@@ -5,7 +5,6 @@ import Algorithm
 import Control.Applicative.Free
 import Data.Align.Generic
 import Data.Functor.Both
-import Data.Functor.Classes
 import Data.RandomWalkSimilarity as RWS
 import Data.Record
 import Data.These
@@ -77,23 +76,6 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
       (Nothing, Just b) -> Just $ pure (inserting b)
       (Just a, Nothing) -> Just $ pure (deleting a)
       (Nothing, Nothing) -> Nothing
-
--- | Run an algorithm, given functions characterizing the evaluation.
-runAlgorithm :: (Eq1 f, GAlign f, Traversable f, HasField fields Category, HasField fields (Maybe FeatureVector))
-  => (These (Cofree f (Record fields)) (Cofree f (Record fields)) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to diff two subterms recursively.
-  -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
-  -> a
-runAlgorithm recur = iterAp $ \ r cont -> case r of
-  Diff t1 t2 -> cont (recur (These t1 t2))
-  Linear a b -> cont . maybe (replacing a b) (wrap . (both (extract a) (extract b) :<)) $ do
-    aligned <- galign (unwrap a) (unwrap b)
-    traverse (these (Just . deleting) (Just . inserting) maybeRecur) aligned
-  RWS as bs -> cont (recur <$> rws (editDistanceUpTo defaultM) comparable as bs)
-  Delete a -> cont (deleting a)
-  Insert b -> cont (inserting b)
-  Replace a b -> cont (replacing a b)
-  where maybeRecur a b = if comparable a b then Just (recur (These a b)) else Nothing
-
 
 run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
