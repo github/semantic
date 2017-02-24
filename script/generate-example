@@ -1,0 +1,38 @@
+#!/bin/bash
+#/ Usage: script/generate-example fileA fileB
+#/
+#/ Generate expected output for a test fixture example.
+#/
+#/ Example:
+#/  script/generate-example test/fixtures/ruby/and-or.{A,B}.rb
+
+set -e
+[ $# -eq 0 ] && set -- --help
+
+if [[ $1 = -h || $1 = --help ]]; then
+  grep ^#/ <"$0" |cut -c4-
+  exit
+fi
+
+# Work out of the project root directory
+root=$(cd $(dirname "$0")/.. && pwd)
+cd "$root"
+
+fileA="$1"
+fileB="$2"
+parseFileA="${fileA%%.*}.parseA.txt"
+parseFileB="${fileB%%.*}.parseB.txt"
+diffFileAB="${fileA%%.*}.diffA-B.txt"
+diffFileBA="${fileB%%.*}.diffB-A.txt"
+
+echo "Generating $parseFileA"
+stack exec semantic-diff -- --sexpression --parse $fileA > $parseFileA
+
+echo "Generating $parseFileB"
+stack exec semantic-diff -- --sexpression --parse $fileB > $parseFileB
+
+echo "Generating $diffFileAB"
+stack exec semantic-diff -- --sexpression --no-index $fileA $fileB > $diffFileAB
+
+echo "Generating $diffFileBA"
+stack exec semantic-diff -- --sexpression --no-index $fileB $fileA > $diffFileBA
