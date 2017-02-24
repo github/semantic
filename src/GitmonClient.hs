@@ -14,7 +14,6 @@ import Prelude
 import Prologue hiding (toStrict)
 import System.Clock
 
-
 data ProcIO = ProcIO {
     read_bytes :: Integer
   , write_bytes :: Integer
@@ -60,6 +59,9 @@ instance ToJSON GitmonMsg where
     ]
 
 
+gitmonSocketAddr :: String
+gitmonSocketAddr = "/tmp/gitstats.sock"
+
 clock :: Clock
 clock = Realtime
 
@@ -69,7 +71,7 @@ processJSON command stats = toStrict . encode $ GitmonMsg command stats
 reportGitmon :: String -> Arguments -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program Arguments{..} gitCommand = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
-  safeIO $ connect soc (SockAddrUnix "/tmp/gitstats.sock")
+  safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
 
   safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
 
