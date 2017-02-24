@@ -22,9 +22,35 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   -> SyntaxDiff leaf fields
 diffTerms = (run .) . diff
 
--- | Test whether two terms are comparable.
-comparable :: (Functor f, HasField fields Category) => Term f (Record fields) -> Term f (Record fields) -> Bool
-comparable = (==) `on` category . extract
+run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
+    -> result
+run algorithm = case runStep algorithm of
+  Left a -> a
+  Right next -> run next
+
+runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+        => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
+        -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
+runStep = \case
+  Pure a -> Left a
+  Ap algorithm cont -> Right $ cont <*> decompose algorithm
+
+
+-- | Decompose a step of an algorithm into the next steps to perform.
+decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+          => AlgorithmF (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The step in an algorithm to decompose into its next steps.
+          -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The sequence of next steps to undertake to continue the algorithm.
+decompose = \case
+  Diff t1 t2 -> algorithmWithTerms t1 t2
+  Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
+    Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
+    _ -> byReplacing t1 t2
+  RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
+  Delete a -> pure (deleting a)
+  Insert b -> pure (inserting b)
+  Replace a b -> pure (replacing a b)
+
 
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: MonadFree (TermF (Syntax leaf) (Both a)) diff
@@ -77,34 +103,10 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
       (Just a, Nothing) -> Just $ pure (deleting a)
       (Nothing, Nothing) -> Nothing
 
-run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-    -> result
-run algorithm = case runStep algorithm of
-  Left a -> a
-  Right next -> run next
 
-runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-        => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-        -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
-runStep = \case
-  Pure a -> Left a
-  Ap algorithm cont -> Right $ cont <*> decompose algorithm
-
-
--- | Decompose a step of an algorithm into the next steps to perform.
-decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-          => AlgorithmF (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The step in an algorithm to decompose into its next steps.
-          -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The sequence of next steps to undertake to continue the algorithm.
-decompose = \case
-  Diff t1 t2 -> algorithmWithTerms t1 t2
-  Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-    Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
-    _ -> byReplacing t1 t2
-  RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
-  Delete a -> pure (deleting a)
-  Insert b -> pure (inserting b)
-  Replace a b -> pure (replacing a b)
+-- | Test whether two terms are comparable.
+comparable :: (Functor f, HasField fields Category) => Term f (Record fields) -> Term f (Record fields) -> Bool
+comparable = (==) `on` category . extract
 
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
