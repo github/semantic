@@ -60,10 +60,6 @@ argumentsParser = info (version <*> helper <*> argumentsP)
       <*> some (argument (eitherReader parseShasAndFiles) (metavar "SHA_A..SHAB FILES..."))
       <*> switch (long "development" <> short 'd' <> help "set development mode which prevents timeout behavior by default")
       <*> flag Diff Parse (long "parse" <> short 'p' <> help "parses a source file without diffing")
-      <*> optional (strOption (long "repo-name" <> help "repo name"))
-      <*> optional (strOption (long "repo-id" <> help "repo id"))
-      <*> optional (strOption (long "user-id" <> help "user id"))
-      <*> optional (strOption (long "real-ip" <> help "ip address of the request"))
       where
         parseShasAndFiles :: String -> Either String ExtraArg
         parseShasAndFiles s = case matchRegex regex s of
