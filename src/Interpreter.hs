@@ -110,6 +110,13 @@ runAlgorithm recur = iterAp $ \ r cont -> case r of
   where maybeRecur a b = if comparable a b then Just (recur (These a b)) else Nothing
 
 
+run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
+    -> result
+run algorithm = case runStep algorithm of
+  Left a -> a
+  Right next -> run next
+
 runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
         => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
         -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
