@@ -26,7 +26,7 @@ diffTerms = (run .) . diff
 run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
     -> result
-run = either identity run . runStep
+run = iterFreer (\ algorithm cont -> cont (run (decompose algorithm)))
 
 -- | Run an Algorithm to completion, returning the list of steps taken.
 runSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
