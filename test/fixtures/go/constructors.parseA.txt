@@ -1,0 +1,27 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (FunctionCall
+      (Identifier)
+      (ChannelTy
+        (Identifier)))
+    (FunctionCall
+      (Identifier)
+      (ChannelTy
+        (Identifier))
+      (RelationalOperator
+        (Identifier)
+        (Identifier)))
+    (FunctionCall
+      (Identifier)
+      (ChannelTy
+        (Identifier))
+      (NumberLiteral)
+      (NumberLiteral))
+    (FunctionCall
+      (Identifier)
+      (DictionaryTy
+        (Identifier)
+        (Identifier)))))

@@ -1,0 +1,17 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (AnonymousFunction
+            (Identifier)
+            (Identifier)
+            (Return
+              (Other "expression_list"
+                (NumberLiteral)
+                (NumberLiteral)))))))))
