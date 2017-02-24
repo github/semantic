@@ -2,6 +2,7 @@
 module Interpreter (diffTerms) where
 
 import Algorithm
+import Control.Applicative.Free
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.Functor.Classes
@@ -12,7 +13,7 @@ import Data.These
 import Diff
 import Info
 import Patch (Patch, inserting, deleting, replacing, patchSum)
-import Prologue hiding (lookup)
+import Prologue hiding (lookup, Pure)
 import Syntax as S
 import Term
 
@@ -107,6 +108,15 @@ runAlgorithm recur = iterAp $ \ r cont -> case r of
   Insert b -> cont (inserting b)
   Replace a b -> cont (replacing a b)
   where maybeRecur a b = if comparable a b then Just (recur (These a b)) else Nothing
+
+
+runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+        => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
+        -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
+runStep = \case
+  Pure a -> Left a
+  Ap algorithm cont -> Right $ cont <*> decompose algorithm
+
 
 -- | Decompose a step of an algorithm into the next steps to perform.
 decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
