@@ -1,0 +1,43 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+          { (Identifier)
+          ->(Identifier) }
+            (Pair
+              (Identifier)
+              (StringLiteral))
+            (Pair
+              (Identifier)
+              (StringLiteral))))))
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+            (StructTy
+              (FieldDecl
+                (Identifier)
+              { (Identifier)
+              ->(Identifier) }))
+            (Pair
+            { (Identifier)
+            ->(Identifier) }
+            { (NumberLiteral)
+            ->(NumberLiteral) })))))
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+          { (QualifiedIdentifier)
+          ->(QualifiedIdentifier) }))))))

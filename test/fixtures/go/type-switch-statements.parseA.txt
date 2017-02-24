@@ -1,0 +1,18 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Switch
+      (Identifier)
+      (Case
+        (Other "type_case"
+          (SliceTy
+            (Identifier)))
+        (FunctionCall
+          (Identifier)))
+      (Case
+        (Other "type_case"
+          (PointerTy
+            (Identifier)))
+        (Break)))))

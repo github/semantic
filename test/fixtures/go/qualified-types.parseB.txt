@@ -1,0 +1,9 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "type_declaration"
+      (TypeDecl
+        (Identifier)
+        (QualifiedIdentifier)))))

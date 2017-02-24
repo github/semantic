@@ -1,0 +1,14 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (FunctionCall
+      (SubscriptAccess
+        (SubscriptAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }))))
