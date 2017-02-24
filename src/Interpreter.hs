@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Interpreter (diffTerms) where
+module Interpreter (diffTerms, run, runSteps, runStep) where
 
 import Algorithm
 import Control.Applicative.Free
