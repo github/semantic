@@ -10,7 +10,7 @@ import Data.Record
 import Data.These
 import Diff
 import Info
-import Patch (Patch, inserting, deleting, replacing, patchSum)
+import Patch (inserting, deleting, replacing, patchSum)
 import Prologue hiding (lookup, Pure)
 import Syntax as S
 import Term
@@ -95,12 +95,11 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
   where
     annotate = wrap . (both (extract t1) (extract t2) :<)
 
-    maybeLinearly :: Applicative f => Maybe a -> Maybe a -> Algorithm a (f (Patch a)) (Maybe (f (Patch a)))
-    maybeLinearly a b = sequenceA $ case (a, b) of
-      (Just a, Just b) -> Just $ linearly a b
-      (Nothing, Just b) -> Just $ pure (inserting b)
-      (Just a, Nothing) -> Just $ pure (deleting a)
-      (Nothing, Nothing) -> Nothing
+    maybeLinearly a b = case (a, b) of
+      (Just a, Just b) -> Just <$> linearly a b
+      (Nothing, Just b) -> Just <$> byInserting b
+      (Just a, Nothing) -> Just <$> byDeleting a
+      (Nothing, Nothing) -> pure Nothing
 
 
 -- | Test whether two terms are comparable.
