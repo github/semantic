@@ -22,6 +22,7 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   -> SyntaxDiff leaf fields
 diffTerms = (run .) . diff
 
+-- | Run an Algorithm to completion, returning its result.
 run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
     -> result
@@ -29,6 +30,7 @@ run algorithm = case runStep algorithm of
   Left a -> a
   Right next -> run next
 
+-- | Run a single step of an Algorithm, returning Either its result if it has finished, or the next step otherwise.
 runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
         => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
         -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
