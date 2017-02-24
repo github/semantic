@@ -53,10 +53,9 @@ decompose = \case
 
 
 -- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: MonadFree (TermF (Syntax leaf) (Both a)) diff
-                   => Term (Syntax leaf) a
-                   -> Term (Syntax leaf) a
-                   -> Algorithm (Term (Syntax leaf) a) (diff (Patch (Term (Syntax leaf) a))) (diff (Patch (Term (Syntax leaf) a)))
+algorithmWithTerms :: SyntaxTerm leaf fields
+                   -> SyntaxTerm leaf fields
+                   -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) (SyntaxDiff leaf fields)
 algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     Just $ Indexed <$> byRWS a b
