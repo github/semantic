@@ -12,6 +12,7 @@ import qualified RangeSpec
 import qualified Source.Spec
 import qualified TermSpec
 import qualified TOCSpec
+import qualified SemanticDiffSpec
 import qualified IntegrationSpec
 import Test.Hspec
 
@@ -28,4 +29,5 @@ main = hspec . parallel $ do
   describe "Source" Source.Spec.spec
   describe "Term" TermSpec.spec
   describe "TOC" TOCSpec.spec
+  describe "SemanticDiffSpec" SemanticDiffSpec.spec
   describe "Integration" IntegrationSpec.spec

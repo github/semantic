@@ -150,6 +150,7 @@ test-suite test
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
+                     , SemanticDiffSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , array
@@ -165,6 +166,8 @@ test-suite test
                      , leancheck
                      , mtl
                      , protolude
+                     , unordered-containers
+                     , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff
                      , text >= 1.2.1.3
