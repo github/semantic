@@ -21,31 +21,25 @@ spec :: Spec
 spec = parallel $ do
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do
-      (errors, summaries) <- getSummaryOutput $ args "test/fixtures/git/examples/ruby.git" "03d0b4db2c6f47c1bb440b9d886a77671e8db340" "5cf7a3421535e139c9a9e47f823db037df3248f6" ["methods.rb"] Renderer.Summary
+      (errors, summaries) <- getOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.Summary
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
 
     it "generates toc summaries for two shas" $ do
-      (errors, summaries) <- getTOCOutput $ args "test/fixtures/git/examples/ruby.git" "03d0b4db2c6f47c1bb440b9d886a77671e8db340" "5cf7a3421535e139c9a9e47f823db037df3248f6" ["methods.rb"] Renderer.TOC
+      (errors, summaries) <- getOutput termText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.TOC
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
     xit "is ok with bad shas" $ do
-      (errors, summaries) <- getSummaryOutput $ args "test/fixtures/git/examples/ruby.git" "dead" "beef" ["methods.rb"] Renderer.Summary
+      (errors, summaries) <- getOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] Renderer.Summary
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
 
-getSummaryOutput :: Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
-getSummaryOutput arguments = do
+getOutput :: (Object -> Text) -> Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
+getOutput f arguments = do
   diffs <- fetchDiffs arguments
   let json = fromJust . decode . E.encodeUtf8 $ T.fromChunks [concatOutputs diffs]
-  pure (errors json, summaries summaryText json)
-
-getTOCOutput :: Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
-getTOCOutput arguments = do
-  diffs <- fetchDiffs arguments
-  let json = fromJust . decode . E.encodeUtf8 $ T.fromChunks [concatOutputs diffs]
-  pure (errors json, summaries termText json)
+  pure (errors json, summaries f json)
 
 -- Diff Summaries payloads look like this:
 -- {
@@ -61,11 +55,11 @@ getTOCOutput arguments = do
 -- }
 summaries :: (Object -> Text) -> Object -> Maybe (Map Text [Text])
 summaries f = parseMaybe $ \o -> do
-              changes <- o .: "changes" :: Parser (Map Text (V.Vector Object))
-              xs <- for (toList changes) $ \(path, s) -> do
-                let ys = fmap f s
-                pure (path, V.toList ys)
-              pure $ fromList xs
+                changes <- o .: "changes" :: Parser (Map Text (V.Vector Object))
+                xs <- for (toList changes) $ \(path, s) -> do
+                  let ys = fmap f s
+                  pure (path, V.toList ys)
+                pure $ fromList xs
 
 summaryText :: Object -> Text
 summaryText o = fromMaybe (panic "key 'summary' not found") $
@@ -74,9 +68,6 @@ summaryText o = fromMaybe (panic "key 'summary' not found") $
 termText :: Object -> Text
 termText o = fromMaybe (panic "key 'term' not found") $
   parseMaybe (.: "term") o
-
-textForKey key o = fromMaybe (panic "key '" <> key <> "' not found") $
-  parseMaybe (.: key) o
 
 errors :: Object -> Maybe (Map Text Value)
 errors = parseMaybe (.: "errors")
