@@ -40,6 +40,7 @@ instance ToJSON ProcessStats where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = camelTo2 '_' }
 
 
+
 data GitmonCommand = Update
                    | Finish
                    | Schedule deriving (Show)
