@@ -58,9 +58,9 @@ programArguments :: CmdLineOptions -> IO Arguments
 programArguments CmdLineOptions{..} = do
   pwd <- getCurrentDirectory
   gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
-  repoName' <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
-  repoID' <- lookupEnv "GIT_SOCKSTAT_VAR_repo_id"
-  userID' <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
+  repoName' <- lookupEnv "repo_name"
+  repoID' <- lookupEnv "repo_id"
+  userID' <- lookupEnv "user_id"
   realIP' <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
   let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
