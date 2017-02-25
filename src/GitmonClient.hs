@@ -29,7 +29,8 @@ data ProcessStats =
                        , repoID :: Maybe String
                        , repoName :: Maybe String
                        , userID :: Maybe String
-                       , via :: String }
+                       , via :: String
+                       , allEnv :: [(String, String)] }
   | ProcessAfterStats { cpu :: Integer
                       , diskReadBytes :: Integer
                       , diskWriteBytes :: Integer

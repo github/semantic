@@ -117,6 +117,7 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , repoID = Nothing
   , userID = Nothing
   , realIP = Nothing
+  , allEnv = [("", "")]
   }
 
 -- | 7 seconds
