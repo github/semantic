@@ -29,8 +29,7 @@ data ProcessStats =
                        , repoID :: Maybe String
                        , repoName :: Maybe String
                        , userID :: Maybe String
-                       , via :: String
-                       , allEnv :: [(String, String)] }
+                       , via :: String }
   | ProcessAfterStats { cpu :: Integer
                       , diskReadBytes :: Integer
                       , diskWriteBytes :: Integer
@@ -80,7 +79,7 @@ reportGitmon program Arguments{..} gitCommand = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
   safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
 
-  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID, allEnv = allEnv })
+  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
 
   (startTime, beforeProcIOContents) <- liftIO collectStats
 

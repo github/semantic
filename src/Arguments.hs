@@ -51,7 +51,6 @@ data Arguments = Arguments
   , repoID :: Maybe String
   , userID :: Maybe String
   , realIP :: Maybe String
-  , allEnv :: [(String, String)]
   } deriving (Show)
 
 -- | Returns Arguments for the program from parsed command line arguments.
@@ -63,7 +62,6 @@ programArguments CmdLineOptions{..} = do
   repoID' <- lookupEnv "GIT_SOCKSTAT_VAR_repo_id"
   userID' <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
   realIP' <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
-  allEnv' <- getEnvironment
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
   let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
                               (Left _) -> []
@@ -87,7 +85,6 @@ programArguments CmdLineOptions{..} = do
     , repoID = repoID'
     , userID = userID'
     , realIP = realIP'
-    , allEnv = allEnv'
     }
   where
     fetchPaths :: [ExtraArg] -> [FilePath]
@@ -117,7 +114,6 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , repoID = Nothing
   , userID = Nothing
   , realIP = Nothing
-  , allEnv = [("", "")]
   }
 
 -- | 7 seconds
