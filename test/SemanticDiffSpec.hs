@@ -5,7 +5,7 @@ import Data.Aeson.Types
 import Data.Maybe
 import Prelude
 import Prologue (($), fmap, (.), pure, for, panic)
-import Test.Hspec (Spec, describe, it, xit, parallel, pending)
+import Test.Hspec hiding (shouldBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 import Data.Text.Lazy.Encoding as E
 import Data.Text.Lazy as T

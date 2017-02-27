@@ -167,7 +167,6 @@ test-suite test
                      , leancheck
                      , mtl
                      , protolude
-                     , unordered-containers
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff
