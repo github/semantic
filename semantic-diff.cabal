@@ -177,27 +177,6 @@ test-suite test
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
 
-test-suite integration-test
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             SpecIntegration.hs
-  other-modules:       IntegrationFormatSpec
-                     , JSONTestCase
-  build-depends:       base
-                     , aeson
-                     , bytestring
-                     , containers
-                     , Glob
-                     , hspec >= 2.4.1
-                     , hspec-expectations-pretty-diff
-                     , semantic-diff
-                     , split
-                     , MissingH
-                     , unordered-containers
-  ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
-  default-language:    Haskell2010
-  default-extensions:  DeriveGeneric, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
-
 source-repository head
   type:     git
   location: https://github.com/github/semantic-diff
