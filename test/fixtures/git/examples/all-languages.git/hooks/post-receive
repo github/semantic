@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Aggressively pack example repos in fixtures
+
+exec git gc --agressive
