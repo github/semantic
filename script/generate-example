@@ -18,37 +18,61 @@ fi
 root=$(cd $(dirname "$0")/.. && pwd)
 cd "$root"
 
-fileA="$1"
-fileB="$2"
-parseFileA="${fileA%%.*}.parseA.txt"
-parseFileB="${fileB%%.*}.parseB.txt"
-diffFileAddA="${fileA%%.*}.diff+A.txt"
-diffFileRemoveA="${fileA%%.*}.diff-A.txt"
-diffFileAddB="${fileB%%.*}.diff+B.txt"
-diffFileRemoveB="${fileB%%.*}.diff-B.txt"
-diffFileAB="${fileA%%.*}.diffA-B.txt"
-diffFileBA="${fileB%%.*}.diffB-A.txt"
+count=0
+status () {
+  tput cuu 1 && tput el
+  echo "Generating $1"
+  ((count+=1))
+}
 
-echo "Generating $parseFileA"
-stack exec semantic-diff -- --sexpression --parse $fileA > $parseFileA
+generate_example () {
+  fileA="$1"
+  fileB="$2"
+  parseFileA="${fileA%%.*}.parseA.txt"
+  parseFileB="${fileB%%.*}.parseB.txt"
+  diffFileAddA="${fileA%%.*}.diff+A.txt"
+  diffFileRemoveA="${fileA%%.*}.diff-A.txt"
+  diffFileAddB="${fileB%%.*}.diff+B.txt"
+  diffFileRemoveB="${fileB%%.*}.diff-B.txt"
+  diffFileAB="${fileA%%.*}.diffA-B.txt"
+  diffFileBA="${fileB%%.*}.diffB-A.txt"
 
-echo "Generating $parseFileB"
-stack exec semantic-diff -- --sexpression --parse $fileB > $parseFileB
+  status $parseFileA
+  stack exec semantic-diff -- --sexpression --parse $fileA > $parseFileA
 
-echo "Generating $diffFileAddA"
-stack exec semantic-diff -- --sexpression --no-index /dev/null $fileA > $diffFileAddA
+  status $parseFileB
+  stack exec semantic-diff -- --sexpression --parse $fileB > $parseFileB
 
-echo "Generating $diffFileRemoveA"
-stack exec semantic-diff -- --sexpression --no-index $fileA /dev/null > $diffFileRemoveA
+  status $diffFileAddA
+  stack exec semantic-diff -- --sexpression --no-index /dev/null $fileA > $diffFileAddA
 
-echo "Generating $diffFileAddB"
-stack exec semantic-diff -- --sexpression --no-index /dev/null $fileB > $diffFileAddB
+  status $diffFileRemoveA
+  stack exec semantic-diff -- --sexpression --no-index $fileA /dev/null > $diffFileRemoveA
 
-echo "Generating $diffFileRemoveB"
-stack exec semantic-diff -- --sexpression --no-index $fileB /dev/null > $diffFileRemoveB
+  status $diffFileAddB
+  stack exec semantic-diff -- --sexpression --no-index /dev/null $fileB > $diffFileAddB
 
-echo "Generating $diffFileAB"
-stack exec semantic-diff -- --sexpression --no-index $fileA $fileB > $diffFileAB
+  status $diffFileRemoveB
+  stack exec semantic-diff -- --sexpression --no-index $fileB /dev/null > $diffFileRemoveB
 
-echo "Generating $diffFileBA"
-stack exec semantic-diff -- --sexpression --no-index $fileB $fileA > $diffFileBA
+  status $diffFileAB
+  stack exec semantic-diff -- --sexpression --no-index $fileA $fileB > $diffFileAB
+
+  status $diffFileBA
+  stack exec semantic-diff -- --sexpression --no-index $fileB $fileA > $diffFileBA
+}
+
+if [[ -d $1 ]]; then
+  echo "Generating all examples for $1"
+  echo ""
+  for f in $(ls $1/*.A.*); do
+    # echo "${f%%.*}.B."${f##*.}""
+    generate_example $f "${f%%.*}.B."${f##*.}""
+  done
+else
+  echo "Generating examples just for $1 $2"
+  echo ""
+  generate_example $1 $2
+fi
+
+echo "Done. Generated $count examples."

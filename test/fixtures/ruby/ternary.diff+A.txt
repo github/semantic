@@ -1,0 +1,5 @@
+{+(Program
+  (Ternary
+    (Identifier)
+    (Identifier)
+    (Identifier)))+}
