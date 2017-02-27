@@ -13,18 +13,9 @@
 [submodule "test/repos/backbone"]
 	path = test/repos/backbone
 	url = https://github.com/jashkenas/backbone
-[submodule "test/corpus/repos/javascript"]
-	path = test/corpus/repos/javascript
-	url = https://github.com/diff-fixtures/javascript
 [submodule "vendor/hspec-expectations-pretty-diff"]
 	path = vendor/hspec-expectations-pretty-diff
 	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
-[submodule "test/corpus/repos/go"]
-	path = test/corpus/repos/go
-	url = https://github.com/diff-fixtures/go.git
-[submodule "test/corpus/repos/ruby"]
-	path = test/corpus/repos/ruby
-	url = https://github.com/diff-fixtures/ruby.git
 [submodule "vendor/effects"]
 	path = vendor/effects
 	url = https://github.com/joshvera/effects.git
