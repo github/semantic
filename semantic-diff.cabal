@@ -158,6 +158,7 @@ test-suite test
                      , bifunctors
                      , deepseq
                      , filepath
+                     , gitlib
                      , Glob
                      , hspec >= 2.4.1
                      , hspec-core

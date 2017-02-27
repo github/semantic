@@ -14,6 +14,7 @@ import qualified Data.Vector as V
 import Arguments
 import SemanticDiff
 import Renderer
+import qualified Git.Types as Git
 
 spec :: Spec
 spec = parallel $ do
@@ -33,12 +34,13 @@ spec = parallel $ do
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
-    xit "errors with bad shas" $ do
-      (errors, summaries) <- fetchDiffsOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] Renderer.Summary
-      errors `shouldBe` Just (fromList [])
-      summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
+    it "errors with bad shas" $
+      fetchDiffsOutput summaryText (args "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] Renderer.Summary)
+        `shouldThrow` (== Git.BackendError "Could not lookup dead: Object not found - no match for prefix (dead000000000000000000000000000000000000)")
 
-    it "errors with bad repo path" pending
+    it "errors with bad repo path" $
+      fetchDiffsOutput summaryText (args "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.Summary)
+        `shouldThrow` errorCall "Could not open repository \"test/fixtures/git/examples/not-a-repo.git\""
 
 fetchDiffsOutput :: (Object -> Text) -> Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f arguments = do
@@ -53,6 +55,21 @@ fetchDiffsOutput f arguments = do
 --      {
 --       "span":{"insert":{"start":[1,1],"end":[2,4]}},
 --       "summary":"Added the 'foo()' method"
+--      }
+--   ]
+-- },
+-- "errors":{}
+-- }
+--
+-- TOC Summaries payloads look like this:
+-- {
+-- "changes": {
+--   "methods.rb": [
+--      {
+--       "span":{"start":[1,1],"end":[2,4]},
+--       "category":"Method",
+--       "term":"foo",
+--       "changeType":"added"
 --      }
 --   ]
 -- },
