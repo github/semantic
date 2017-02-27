@@ -1,10 +1,12 @@
 #!/bin/bash
 #/ Usage: script/generate-example fileA fileB
+#/        script/generate-example directory
 #/
-#/ Generate expected output for a test fixture example.
+#/ Generate expected output for a test fixture example or directory of examples.
 #/
 #/ Example:
 #/  script/generate-example test/fixtures/ruby/and-or.{A,B}.rb
+#/  script/generate-example test/fixtures/ruby
 
 set -e
 [ $# -eq 0 ] && set -- --help
