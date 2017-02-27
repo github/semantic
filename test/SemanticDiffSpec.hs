@@ -5,7 +5,7 @@ import Data.Aeson.Types
 import Data.Maybe
 import Prelude
 import Prologue (($), fmap, (.), pure, for, panic)
-import Test.Hspec (Spec, describe, it, xit, parallel)
+import Test.Hspec (Spec, describe, it, xit, parallel, pending)
 import Test.Hspec.Expectations.Pretty
 import Data.Text.Lazy.Encoding as E
 import Data.Text.Lazy as T
@@ -19,22 +19,29 @@ spec :: Spec
 spec = parallel $ do
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do
-      (errors, summaries) <- getOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.Summary
+      (errors, summaries) <- fetchDiffsOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.Summary
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
 
     it "generates toc summaries for two shas" $ do
-      (errors, summaries) <- getOutput termText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.TOC
+      (errors, summaries) <- fetchDiffsOutput termText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.TOC
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
-    xit "is ok with bad shas" $ do
-      (errors, summaries) <- getOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] Renderer.Summary
+    it "generates toc summaries for two shas inferring paths" $ do
+      (errors, summaries) <- fetchDiffsOutput termText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [] Renderer.TOC
+      errors `shouldBe` Just (fromList [])
+      summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
+
+    xit "errors with bad shas" $ do
+      (errors, summaries) <- fetchDiffsOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] Renderer.Summary
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
 
-getOutput :: (Object -> Text) -> Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
-getOutput f arguments = do
+    it "errors with bad repo path" pending
+
+fetchDiffsOutput :: (Object -> Text) -> Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
+fetchDiffsOutput f arguments = do
   diffs <- fetchDiffs arguments
   let json = fromJust . decode . E.encodeUtf8 $ T.fromChunks [concatOutputs diffs]
   pure (errors json, summaries f json)
