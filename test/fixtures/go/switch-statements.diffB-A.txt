@@ -1,0 +1,36 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Switch
+      (Case
+        (Case
+          (Other "expression_list"
+            (RelationalOperator
+            { (Identifier)
+            ->(Identifier) }
+            { (Identifier)
+            ->(Identifier) })))
+        (FunctionCall
+          (Identifier)))
+      (Case
+        (Case
+          (Other "expression_list"
+            (RelationalOperator
+            { (Identifier)
+            ->(Identifier) }
+            { (Identifier)
+            ->(Identifier) })))
+        (FunctionCall
+          (Identifier)))
+      (Case
+        (Case
+          (Other "expression_list"
+            (RelationalOperator
+            { (Identifier)
+            ->(Identifier) }
+              (NumberLiteral))))
+        (FunctionCall
+        { (Identifier)
+        ->(Identifier) })))))

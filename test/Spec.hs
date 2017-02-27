@@ -2,7 +2,6 @@ module Main where
 
 import Prologue
 import qualified AlignmentSpec
-import qualified CorpusSpec
 import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Diff.Spec
@@ -13,12 +12,12 @@ import qualified RangeSpec
 import qualified Source.Spec
 import qualified TermSpec
 import qualified TOCSpec
+import qualified IntegrationSpec
 import Test.Hspec
 
 main :: IO ()
 main = hspec . parallel $ do
   describe "Alignment" AlignmentSpec.spec
-  describe "Corpus" CorpusSpec.spec
   describe "Data.Mergeable" Data.Mergeable.Spec.spec
   describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
   describe "Diff.Spec" Diff.Spec.spec
@@ -29,3 +28,4 @@ main = hspec . parallel $ do
   describe "Source" Source.Spec.spec
   describe "Term" TermSpec.spec
   describe "TOC" TOCSpec.spec
+  describe "Integration" IntegrationSpec.spec

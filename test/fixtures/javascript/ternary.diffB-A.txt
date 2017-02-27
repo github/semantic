@@ -1,0 +1,22 @@
+(Program
+  (ExpressionStatements
+  {+(Ternary
+      (Identifier)
+      (Identifier)
+      (Identifier))+}
+  {-(Assignment
+      (MemberAccess
+        (Identifier)
+        (Identifier))
+      (Ternary
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (MemberAccess
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          (Identifier))))-}))

@@ -1,0 +1,9 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+  { (IncrementStatement)
+  ->(IncrementStatement) }
+  {+(DecrementStatement)+}
+  {-(IncrementStatement)-}))

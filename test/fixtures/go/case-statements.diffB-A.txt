@@ -1,0 +1,12 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Switch
+    {-(Case
+        (Case
+          (Other "expression_list"
+            (Identifier)))
+        (FunctionCall
+          (Identifier)))-})))

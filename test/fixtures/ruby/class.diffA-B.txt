@@ -1,0 +1,7 @@
+(Program
+  (Class
+    (Constant)
+  {-(Superclass
+      (Constant))-}
+    (Method
+      (Identifier))))

@@ -1,12 +1,12 @@
 {-# LANGUAGE DataKinds #-}
 module TOCSpec where
 
+import Data.Aeson
 import Category as C
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
-import Data.These
 import Data.String
 import Diff
 import Diffing
@@ -15,6 +15,7 @@ import Interpreter
 import Parse
 import Patch
 import Prologue hiding (fst, snd)
+import Renderer
 import Renderer.TOC
 import Source
 import Syntax as S
@@ -26,7 +27,7 @@ import Test.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "tocSummaries" $ do
+  describe "diffTOC" $ do
     it "blank if there are no methods" $
       diffTOC blankDiffBlobs blankDiff `shouldBe` [ ]
 
@@ -95,7 +96,29 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
-        diffTOC blankDiffBlobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
+        diffTOC blankDiffBlobs (diffTerms term term) `shouldBe` []
+
+  describe "JSONSummary" $ do
+    it "encodes InSummarizable to JSON" $ do
+      let summary = JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4))
+      encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
+
+    it "encodes Summarizable to JSON" $ do
+      let summary = JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+      encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
+
+  describe "diffFiles" $ do
+    it "encodes to final JSON" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
+      let parser = parserForFilepath (path (fst sourceBlobs))
+      output <- diffFiles parser toc sourceBlobs
+      concatOutputs (pure output) `shouldBe` ("{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}" :: Text)
+
+    it "encodes to final JSON if there are parse errors" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
+      let parser = parserForFilepath (path (fst sourceBlobs))
+      output <- diffFiles parser toc sourceBlobs
+      concatOutputs (pure output) `shouldBe` ("{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}" :: Text)
 
 type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
 type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
@@ -157,27 +180,22 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   (_ :< S.Function{}) -> True
   _ -> False
 
-testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Cost, Range, Category, SourceSpan]))
+testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Range, Category, SourceSpan]))
 testDiff sourceBlobs = do
   terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
   pure $! stripDiff (diffTerms' terms sourceBlobs)
   where
-    parser = parserWithCost (path . fst $ sourceBlobs)
+    parser = parserForFilepath (path . fst $ sourceBlobs)
     diffTerms' terms blobs = case runBothWith areNullOids blobs of
       (True, False) -> pure $ Insert (snd terms)
       (False, True) -> pure $ Delete (fst terms)
-      (_, _) -> runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
+      (_, _) -> runBothWith diffTerms terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
     hasNullOid blob = oid blob == nullOid || Source.null (source blob)
-    construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-    sumCost = fmap getSum . foldMap (fmap Sum . getCost)
-    getCost diff = case runFree diff of
-      Free (info :< _) -> cost <$> info
-      Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do
-  sources <- sequence $ readAndTranscodeFile . ("test/corpus/toc/" <>) <$> paths
+  sources <- traverse (readAndTranscodeFile . ("test/fixtures/toc/" <>)) paths
   pure $ SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan

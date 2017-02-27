@@ -1,0 +1,15 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "type_declaration"
+      (TypeDecl
+        (Identifier)
+        (PointerTy
+          (Identifier)))
+      (TypeDecl
+        (Identifier)
+        (PointerTy
+          (PointerTy
+            (Identifier)))))))

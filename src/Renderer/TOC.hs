@@ -25,8 +25,8 @@ data JSONSummary = JSONSummary { info :: Summarizable }
 
 instance ToJSON JSONSummary where
   toJSON JSONSummary{..} = object $ case info of
-    InSummarizable{..} -> [ "changeType" .= ("modified" :: Text), "category" .= (show parentCategory :: Text), "term" .= parentTermName, "span" .= parentSourceSpan ]
-    Summarizable{..} -> [ "changeType" .= summarizableChangeType, "category" .= (show summarizableCategory :: Text), "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
+    InSummarizable{..} -> [ "changeType" .= ("modified" :: Text), "category" .= toCategoryName parentCategory, "term" .= parentTermName, "span" .= parentSourceSpan ]
+    Summarizable{..} -> [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
     NotSummarizable -> panic "NotSummarizable should have been pruned"
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
@@ -180,3 +180,9 @@ toTermName parentOffset parentSource term = case unwrap term of
     toTermName' :: SyntaxTerm leaf fields -> Text
     toTermName' = toTermName offset source
     range = byteRange . extract
+
+-- The user-facing category name
+toCategoryName :: Category -> Text
+toCategoryName = \case
+  C.SingletonMethod -> "Method"
+  c -> show c

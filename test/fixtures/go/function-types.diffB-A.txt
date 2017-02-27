@@ -1,0 +1,30 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "type_declaration"
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (FunctionTy
+          (Args
+          { (Identifier)
+          ->(Identifier) })
+        { (Identifier)
+        ->(Identifier) }))
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (FunctionTy
+          (Args
+          {-(Identifier)-}
+            (Identifier)
+          {+(Identifier)+})
+          (Args
+          {+(Identifier)+}
+          {+(Identifier)+}
+          {-(ParameterDecl
+              (ChannelTy
+                (ParseError)
+                (Identifier)))-}))))))

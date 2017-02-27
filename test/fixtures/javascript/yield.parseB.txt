@@ -1,0 +1,13 @@
+(Program
+  (ExpressionStatements
+    (Function
+      (Identifier)
+      (ExpressionStatements
+        (VarDecl
+          (VarAssignment
+            (Identifier)
+            (NumberLiteral)))
+        (Yield
+          (MathOperator
+            (Identifier)
+            (Other "++")))))))

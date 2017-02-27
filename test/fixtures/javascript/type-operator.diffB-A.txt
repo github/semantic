@@ -1,0 +1,9 @@
+(Program
+  (ExpressionStatements
+  { (Operator
+      (Identifier)
+      (Other "instanceof")
+      (Identifier))
+  ->(Operator
+      (Other "typeof")
+      (Identifier)) }))

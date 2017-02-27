@@ -1,0 +1,34 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (If
+      (FunctionCall
+      { (Identifier)
+      ->(Identifier) })
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))
+    (If
+      (VarDecl
+        (Other "expression_list"
+        { (Identifier)
+        ->(Identifier) })
+        (Other "expression_list"
+          (FunctionCall
+            (Identifier))))
+      (Identifier)
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))
+    (If
+      (FunctionCall
+      { (Identifier)
+      ->(Identifier) })
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier)))
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))))

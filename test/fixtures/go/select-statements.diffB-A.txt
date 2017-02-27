@@ -1,0 +1,38 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Select
+      (Case
+        (Other "receive_statement"
+          (Other "expression_list"
+          { (Identifier)
+          ->(Identifier) })
+          (Operator
+            (Identifier))))
+      (FunctionCall
+        (Identifier)
+        (Identifier))
+      (Case
+        (Send
+        { (Identifier)
+        ->(Identifier) }
+          (Identifier)))
+      (FunctionCall
+        (Identifier)
+        (NumberLiteral))
+      (Case
+        (Other "receive_statement"
+          (Operator
+            (FunctionCall
+              (SubscriptAccess
+                (Identifier)
+                (Identifier))
+            { (NumberLiteral)
+            ->(NumberLiteral) }))))
+      (FunctionCall
+        (Identifier)
+        (NumberLiteral))
+      (Case)
+      (Return))))

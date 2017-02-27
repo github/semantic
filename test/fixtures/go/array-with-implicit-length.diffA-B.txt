@@ -1,0 +1,24 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+            (ArrayTy
+              (Identifier))
+          {+(Element
+              (NumberLiteral))+}
+          {+(Element
+              (NumberLiteral))+}
+            (Element
+            { (NumberLiteral)
+            ->(NumberLiteral) })
+          {-(Element
+              (NumberLiteral))-}
+          {-(Element
+              (NumberLiteral))-}))))))

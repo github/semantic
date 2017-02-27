@@ -1,0 +1,9 @@
+(Program
+  (Until
+    (Negate
+      (Identifier))
+  {+(Identifier)+})
+{-(Modifier Until
+    (Negate
+      (Identifier))
+    (Identifier))-})

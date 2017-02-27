@@ -1,0 +1,11 @@
+(Program
+  (For
+  { (Identifier)
+  ->(Identifier) }
+  { (Identifier)
+  ->(Identifier) }
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+        { (Identifier)
+        ->(Identifier) })))))

@@ -1,0 +1,20 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier))
+  (Function
+    (Identifier)
+    (ParameterDecl
+      (PointerTy
+        (Identifier))
+      (Identifier)))
+  (Function
+    (Identifier)
+    (ParameterDecl
+      (Identifier)))
+  (Function
+    (Identifier)
+    (Identifier)
+    (ParameterDecl
+      (Identifier))))

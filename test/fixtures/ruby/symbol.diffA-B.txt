@@ -1,0 +1,7 @@
+(Program
+{+(SymbolLiteral)+}
+{ (SymbolLiteral)
+->(SymbolLiteral) }
+{ (SymbolLiteral)
+->(SymbolLiteral) }
+{-(SymbolLiteral)-})

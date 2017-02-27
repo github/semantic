@@ -1,0 +1,11 @@
+(Program
+  (DoWhile
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier)
+          (Identifier)
+        { (Identifier)
+        ->(Identifier) })))
+  { (Boolean)
+  ->(Boolean) }))

@@ -1,0 +1,17 @@
+(Program
+{ (SubscriptAccess
+    (Identifier)
+    (StringLiteral))
+->(SubscriptAccess
+    (Identifier)
+    (Identifier)) }
+  (SubscriptAccess
+  { (Identifier)
+  ->(Identifier) }
+  { (SymbolLiteral)
+  ->(SymbolLiteral) })
+{+(Assignment
+    (SubscriptAccess
+      (Identifier)
+      (Identifier))
+    (IntegerLiteral))+})

@@ -1,0 +1,14 @@
+(Program
+{ (For
+    (Identifier)
+    (ArrayLiteral
+      (IntegerLiteral)
+      (IntegerLiteral)
+      (IntegerLiteral))
+    (MethodCall
+      (Identifier)
+      (Identifier)))
+->(For
+    (Identifier)
+    (Identifier)
+    (Identifier)) })

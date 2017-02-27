@@ -1,0 +1,13 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Operator
+      (Operator
+      { (Identifier)
+      ->(Identifier) }))
+    (Operator
+      (FunctionCall
+      { (Identifier)
+      ->(Identifier) }))))

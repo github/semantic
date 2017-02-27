@@ -1,0 +1,14 @@
+(Program
+  (VarDecl
+  {+(VarDecl
+      (Other "variable_declarator"
+        (Identifier)))+}
+  {+(VarAssignment
+      (Identifier)
+      (Object))+}
+  {+(VarDecl
+      (Other "variable_declarator"
+        (Identifier)))+}
+  {-(VarAssignment
+      (Identifier)
+      (NumberLiteral))-}))

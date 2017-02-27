@@ -1,0 +1,23 @@
+(Program
+  (For
+    (Assignment
+      (Identifier)
+      (NumberLiteral))
+    (RelationalOperator
+      (Identifier)
+      (Other "<")
+      (NumberLiteral))
+    (MathOperator
+      (Identifier)
+      (Other "++"))
+    (ExpressionStatements
+      (If
+        (RelationalOperator
+          (Identifier)
+          (Other "===")
+          (NumberLiteral))
+        (ExpressionStatements
+        {+(Continue)+}
+        {-(Break)-}))
+      (ExpressionStatements
+        (Identifier)))))

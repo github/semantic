@@ -1,0 +1,30 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "type_declaration"
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (Other "interface_type")))
+    (Other "type_declaration"
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (Other "interface_type"
+          (QualifiedIdentifier))))
+    (Other "type_declaration"
+      (TypeDecl
+      { (Identifier)
+      ->(Identifier) }
+        (Other "interface_type"
+          (Identifier)
+          (QualifiedIdentifier)
+          (Other "method_spec"
+            (Identifier)
+            (Args
+              (ParameterDecl
+                (Identifier)
+                (Identifier)))
+            (Identifier)))))))

@@ -1,0 +1,20 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+            (DictionaryTy
+              (Identifier)
+              (Identifier))
+            (Pair
+              (StringLiteral)
+              (StringLiteral))
+            (Pair
+              (StringLiteral)
+              (StringLiteral))))))))

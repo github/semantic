@@ -1,0 +1,19 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Defer
+      (FunctionCall
+        (SubscriptAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })))
+    (Go
+      (FunctionCall
+        (SubscriptAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })))))

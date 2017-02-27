@@ -1,0 +1,31 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Assignment
+      (Other "expression_list"
+      { (Identifier)
+      ->(Identifier) })
+      (Other "expression_list"
+        (NumberLiteral)))
+    (Assignment
+      (Other "expression_list"
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier))
+      (Other "expression_list"
+        (NumberLiteral)
+        (NumberLiteral)))
+    (Assignment
+      (Other "expression_list"
+      { (Identifier)
+      ->(Identifier) })
+      (Other "expression_list"
+        (NumberLiteral)))
+    (Assignment
+      (Other "expression_list"
+      { (Identifier)
+      ->(Identifier) })
+      (Other "expression_list"
+        (NumberLiteral)))))

@@ -1,0 +1,17 @@
+(Program
+  (OperatorAssignment
+    (Identifier)
+  { (IntegerLiteral)
+  ->(IntegerLiteral) })
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral))
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral))
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral))
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral)))

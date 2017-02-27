@@ -1,0 +1,39 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (TypeConversion
+      (SliceTy
+      { (QualifiedIdentifier)
+      ->(QualifiedIdentifier) })
+      (SubscriptAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))
+    (TypeConversion
+      (SliceTy
+      { (QualifiedIdentifier)
+      ->(QualifiedIdentifier) })
+      (SubscriptAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))
+    (FunctionCall
+      (SubscriptAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
+    { (Identifier)
+    ->(Identifier) })
+    (FunctionCall
+      (SubscriptAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
+    { (Identifier)
+    ->(Identifier) })))

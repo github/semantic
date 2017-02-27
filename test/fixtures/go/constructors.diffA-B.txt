@@ -1,0 +1,34 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (FunctionCall
+      (Identifier)
+      (ChannelTy
+      { (Identifier)
+      ->(Identifier) }))
+    (FunctionCall
+      (Identifier)
+      (ChannelTy
+      { (Identifier)
+      ->(Identifier) })
+      (RelationalOperator
+        (Identifier)
+        (Identifier)))
+    (FunctionCall
+      (Identifier)
+      (ChannelTy
+      { (Identifier)
+      ->(Identifier) })
+    { (NumberLiteral)
+    ->(NumberLiteral) }
+    { (NumberLiteral)
+    ->(NumberLiteral) })
+    (FunctionCall
+      (Identifier)
+      (DictionaryTy
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))))

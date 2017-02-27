@@ -1,0 +1,21 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier))
+  (Function
+    (Identifier)
+    (FunctionCall
+      (Identifier)))
+  (Function
+    (Identifier)
+    (FunctionCall
+      (Identifier))
+    (FunctionCall
+      (Identifier)))
+  (Function
+    (Identifier)
+    (FunctionCall
+      (Identifier))
+    (FunctionCall
+      (Identifier))))

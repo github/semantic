@@ -1,0 +1,16 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (TypeConversion
+      (Identifier)
+    { (StringLiteral)
+    ->(StringLiteral) }
+      (ParseError
+      { (StringLiteral)
+      ->(StringLiteral) }
+        (Import
+          (Identifier)
+        { (StringLiteral)
+        ->(StringLiteral) })))))

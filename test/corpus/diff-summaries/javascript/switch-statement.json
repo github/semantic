@@ -34,7 +34,7 @@
         "+switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "98e620d7e739bab2841281450b4d879405585f38..dca11528b714e0e28922043c278b3b4628089786"
+    "shas": "0e2317b4ac1337d2e6debeeaa18673924f479fbf..789d1512ceec24ff7188e83d24b505e47021a586"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
@@ -89,7 +89,7 @@
         " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "dca11528b714e0e28922043c278b3b4628089786..d54fa5ad0bd0b1629be149303f501364ce459d39"
+    "shas": "789d1512ceec24ff7188e83d24b505e47021a586..11fc01f7955f0009030fbdfaea9b1a231c14c4e3"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-insert-test",
@@ -169,7 +169,7 @@
         " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d54fa5ad0bd0b1629be149303f501364ce459d39..25472c0239ffc946df79545a6d89193906c749e3"
+    "shas": "11fc01f7955f0009030fbdfaea9b1a231c14c4e3..57bb5ac2e0217d1d4e2fa3b18a0aff7070572d5e"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-test",
@@ -249,7 +249,7 @@
         " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "25472c0239ffc946df79545a6d89193906c749e3..30a9228a01816745bb3482059382bb8d8a958691"
+    "shas": "57bb5ac2e0217d1d4e2fa3b18a0aff7070572d5e..144e627bb7376f68bd0b7d093f093d3d2e541fc3"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "30a9228a01816745bb3482059382bb8d8a958691..3107c424ae4915648b7dd8b8453ae467b7995385"
+    "shas": "144e627bb7376f68bd0b7d093f093d3d2e541fc3..38d8d0c05bebf49b2360290ad83003fbd751a1f2"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-test",
@@ -359,7 +359,7 @@
         " switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3107c424ae4915648b7dd8b8453ae467b7995385..724cc2045ea55f544c52a15b3845b17ad71e8248"
+    "shas": "38d8d0c05bebf49b2360290ad83003fbd751a1f2..7d3dcf7f88945abd8e517cc37e43e540565539ee"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-rest-test",
@@ -397,5 +397,5 @@
         "-switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "724cc2045ea55f544c52a15b3845b17ad71e8248..ceabf504bd808117c5723ab62977a38ed153f0ec"
+    "shas": "7d3dcf7f88945abd8e517cc37e43e540565539ee..17956e21d1861646b9889dabcb733d92e971b9b8"
 }]

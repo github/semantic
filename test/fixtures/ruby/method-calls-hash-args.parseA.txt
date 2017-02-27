@@ -1,0 +1,6 @@
+(Program
+  (MethodCall
+    (Identifier)
+    (Pair
+      (SymbolLiteral)
+      (Boolean))))
