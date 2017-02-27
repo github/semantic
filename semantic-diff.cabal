@@ -152,6 +152,7 @@ test-suite test
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
+                     , SemanticDiffSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , array
@@ -159,6 +160,7 @@ test-suite test
                      , bifunctors
                      , deepseq
                      , filepath
+                     , gitlib
                      , Glob
                      , hspec >= 2.4.1
                      , hspec-core
@@ -167,6 +169,7 @@ test-suite test
                      , leancheck
                      , mtl
                      , protolude
+                     , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff
                      , text >= 1.2.1.3
@@ -175,27 +178,6 @@ test-suite test
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
-
-test-suite integration-test
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             SpecIntegration.hs
-  other-modules:       IntegrationFormatSpec
-                     , JSONTestCase
-  build-depends:       base
-                     , aeson
-                     , bytestring
-                     , containers
-                     , Glob
-                     , hspec >= 2.4.1
-                     , hspec-expectations-pretty-diff
-                     , semantic-diff
-                     , split
-                     , MissingH
-                     , unordered-containers
-  ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
-  default-language:    Haskell2010
-  default-extensions:  DeriveGeneric, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
 
 source-repository head
   type:     git
