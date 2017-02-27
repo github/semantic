@@ -8,6 +8,8 @@ xcuserdata
 profiles
 tags
 
+tmp/
+
 vendor/icu/tools
 vendor/icu/lib
 vendor/icu/layoutex
