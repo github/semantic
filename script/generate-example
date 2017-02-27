@@ -22,6 +22,10 @@ fileA="$1"
 fileB="$2"
 parseFileA="${fileA%%.*}.parseA.txt"
 parseFileB="${fileB%%.*}.parseB.txt"
+diffFileAddA="${fileA%%.*}.diff+A.txt"
+diffFileRemoveA="${fileA%%.*}.diff-A.txt"
+diffFileAddB="${fileB%%.*}.diff+B.txt"
+diffFileRemoveB="${fileB%%.*}.diff-B.txt"
 diffFileAB="${fileA%%.*}.diffA-B.txt"
 diffFileBA="${fileB%%.*}.diffB-A.txt"
 
@@ -30,6 +34,18 @@ stack exec semantic-diff -- --sexpression --parse $fileA > $parseFileA
 
 echo "Generating $parseFileB"
 stack exec semantic-diff -- --sexpression --parse $fileB > $parseFileB
+
+echo "Generating $diffFileAddA"
+stack exec semantic-diff -- --sexpression --no-index /dev/null $fileA > $diffFileAddA
+
+echo "Generating $diffFileRemoveA"
+stack exec semantic-diff -- --sexpression --no-index $fileA /dev/null > $diffFileRemoveA
+
+echo "Generating $diffFileAddB"
+stack exec semantic-diff -- --sexpression --no-index /dev/null $fileB > $diffFileAddB
+
+echo "Generating $diffFileRemoveB"
+stack exec semantic-diff -- --sexpression --no-index $fileB /dev/null > $diffFileRemoveB
 
 echo "Generating $diffFileAB"
 stack exec semantic-diff -- --sexpression --no-index $fileA $fileB > $diffFileAB

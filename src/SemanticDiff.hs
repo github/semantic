@@ -16,6 +16,7 @@ import Git.Types
 import Git.Libgit2.Backend
 import Options.Applicative hiding (action)
 import System.Timeout as Timeout
+import System.FilePath.Posix (hasExtension)
 import Data.List ((\\))
 import qualified Diffing as D
 import qualified Git
@@ -88,9 +89,10 @@ diffPaths :: Arguments -> Both FilePath -> IO ()
 diffPaths args@Arguments{..} paths = do
   sources <- traverse readAndTranscodeFile paths
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
-  D.printDiff (parserForFilepath (fst paths)) (diffArgs args) sourceBlobs
+  D.printDiff (parserForFilepath path) (diffArgs args) sourceBlobs
   where
     diffArgs Arguments{..} = R.DiffArguments { format = format, output = output }
+    path = fromMaybe (panic "none of the paths have file extensions") $ find hasExtension paths
 
 fetchDiffs :: Arguments -> IO [R.Output]
 fetchDiffs args@Arguments{..} = do
