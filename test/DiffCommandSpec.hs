@@ -23,7 +23,7 @@ spec = parallel $ do
   context "diff" $ do
     prop "all formats should produce output for file paths" $
       \format -> do
-        output <- diff $ args' "" (both "test/fixtures/ruby/and-or.A.rb" "test/fixtures/ruby/and-or.B.rb") format
+        output <- diff $ diffPathsArgs "" (both "test/fixtures/ruby/and-or.A.rb" "test/fixtures/ruby/and-or.B.rb") format
         output `shouldNotBe` ""
 
     prop "all formats should produce output for commit range" $

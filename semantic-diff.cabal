@@ -151,6 +151,7 @@ test-suite test
                      , TOCSpec
                      , IntegrationSpec
                      , DiffCommandSpec
+                     , ParseCommandSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , array

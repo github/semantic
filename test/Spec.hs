@@ -13,6 +13,7 @@ import qualified Source.Spec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified DiffCommandSpec
+import qualified ParseCommandSpec
 import qualified IntegrationSpec
 import Test.Hspec
 
@@ -30,4 +31,5 @@ main = hspec . parallel $ do
   describe "Term" TermSpec.spec
   describe "TOC" TOCSpec.spec
   describe "DiffCommand" DiffCommandSpec.spec
+  describe "ParseCommand" ParseCommandSpec.spec
   describe "Integration" IntegrationSpec.spec

@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), RunMode(..), programArguments, args, args') where
+module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), RunMode(..), programArguments, args, diffPathsArgs, parseArgs) where
 
 import Data.Functor.Both
 import Data.Maybe
@@ -96,7 +96,7 @@ programArguments CmdLineOptions{..} = do
 -- | Quickly assemble an Arguments data record with defaults.
 args :: FilePath -> String -> String -> [String] -> R.Format -> Arguments
 args gitDir sha1 sha2 filePaths format = Arguments
-  { gitDir =  gitDir
+  { gitDir = gitDir
   , alternateObjectDirs = []
   , format = format
   , timeoutInMicroseconds = defaultTimeout
@@ -108,8 +108,8 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , developmentMode = False
   }
 
-args' :: FilePath -> Both FilePath -> R.Format -> Arguments
-args' gitDir paths format = Arguments
+diffPathsArgs :: FilePath -> Both FilePath -> R.Format -> Arguments
+diffPathsArgs gitDir paths format = Arguments
   { gitDir = gitDir
   , alternateObjectDirs = []
   , format = format
@@ -119,6 +119,20 @@ args' gitDir paths format = Arguments
   , runMode = Diff
   , shaRange = both Nothing Nothing
   , filePaths = []
+  , developmentMode = False
+  }
+
+parseArgs :: [String] -> R.Format -> Arguments
+parseArgs filePaths format = Arguments
+  { gitDir = ""
+  , alternateObjectDirs = []
+  , format = format
+  , timeoutInMicroseconds = defaultTimeout
+  , output = Nothing
+  , diffMode = CommitDiff
+  , runMode = Parse
+  , shaRange = both Nothing Nothing
+  , filePaths = filePaths
   , developmentMode = False
   }
 
