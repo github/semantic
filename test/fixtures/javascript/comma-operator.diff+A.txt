@@ -1,0 +1,9 @@
+{+(Program
+  (ExpressionStatements
+    (CommaOperator
+      (Assignment
+        (Identifier)
+        (NumberLiteral))
+      (Assignment
+        (Identifier)
+        (NumberLiteral)))))+}

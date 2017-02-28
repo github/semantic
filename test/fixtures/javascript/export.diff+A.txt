@@ -1,0 +1,75 @@
+{+(Program
+  (Export
+    (Other "export_specifier"
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier)))
+  (Export
+    (Other "export_specifier"
+      (Identifier)
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier)
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier)))
+  (Export
+    (VarDecl
+      (Other "variable_declarator"
+        (Identifier)))
+    (VarDecl
+      (Other "variable_declarator"
+        (Identifier)))
+    (VarDecl
+      (Other "variable_declarator"
+        (Identifier))))
+  (Export
+    (VarAssignment
+      (Identifier)
+      (Identifier))
+    (VarAssignment
+      (Identifier)
+      (Identifier))
+    (VarDecl
+      (Other "variable_declarator"
+        (Identifier)))
+    (VarDecl
+      (Other "variable_declarator"
+        (Identifier))))
+  (Export
+    (Identifier))
+  (Export
+    (Function
+      (ExpressionStatements)))
+  (Export
+    (Function
+      (Identifier)
+      (ExpressionStatements)))
+  (Export
+    (Other "export_specifier"
+      (Identifier)
+      (Identifier)))
+  (Export
+    (StringLiteral))
+  (Export
+    (StringLiteral)
+    (Other "export_specifier"
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier)))
+  (Export
+    (StringLiteral)
+    (Other "export_specifier"
+      (Identifier)
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier)
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier))))+}

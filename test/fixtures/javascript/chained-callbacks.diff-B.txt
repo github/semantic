@@ -1,0 +1,12 @@
+{-(Program
+  (ExpressionStatements
+    (FunctionCall
+      (Identifier)
+      (Identifier)
+      (Function
+        (Identifier)
+        (ExpressionStatements
+          (Return
+            (MemberAccess
+              (Identifier)
+              (Identifier))))))))-}

@@ -1,0 +1,4 @@
+{+(Program
+  (Identifier)
+  (BeginBlock
+    (Identifier)))+}

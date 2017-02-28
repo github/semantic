@@ -1,0 +1,7 @@
+{+(Program
+  (ExpressionStatements
+    (Assignment
+      (SubscriptAccess
+        (Identifier)
+        (StringLiteral))
+      (NumberLiteral))))+}

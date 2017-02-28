@@ -1,0 +1,19 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "const_declaration"
+      (ParseError
+        (VarAssignment
+          (Other "identifier_list"
+            (Identifier))
+          (Other "expression_list"
+            (NumberLiteral)
+            (Identifier)))
+        (Assignment
+          (Other "expression_list"
+            (NumberLiteral)
+            (Identifier))
+          (Other "expression_list"
+            (NumberLiteral)))))))-}

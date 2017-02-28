@@ -1,0 +1,27 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Slice
+      (Identifier)
+      (NumberLiteral))
+    (Slice
+      (Identifier)
+      (NumberLiteral))
+    (Slice
+      (Identifier)
+      (NumberLiteral))
+    (Slice
+      (Identifier)
+      (NumberLiteral)
+      (NumberLiteral))
+    (Slice
+      (Identifier)
+      (NumberLiteral)
+      (NumberLiteral))
+    (Slice
+      (Identifier)
+      (NumberLiteral)
+      (NumberLiteral)
+      (NumberLiteral))))-}
