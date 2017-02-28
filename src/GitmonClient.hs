@@ -119,3 +119,13 @@ reportGitmon program Arguments{..} gitCommand = do
             diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
             resultCode = 0
 
+        loadEnvVars :: IO (String, Maybe String, Maybe String, Maybe String, Maybe String)
+        loadEnvVars = do
+          pwd <- getCurrentDirectory
+          gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
+          realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
+          repoID <- lookupEnv "GIT_SOCKSTAT_VAR_repo_id"
+          repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
+          userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
+          return (gitDir, realIP, repoID, repoName, userID)
+
