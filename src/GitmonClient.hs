@@ -45,7 +45,7 @@ instance ToJSON ProcessStats where
 
 data GitmonCommand = Update
                    | Finish
-                   | Schedule deriving (Show)
+                   | Schedule deriving (Generic, Show)
 
 instance ToJSON GitmonCommand where
   toJSON command = String $ case command of
