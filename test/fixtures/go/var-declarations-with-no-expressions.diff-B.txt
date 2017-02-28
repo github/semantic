@@ -1,0 +1,16 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "var_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Identifier)))
+    (Other "var_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier)
+          (Identifier))
+        (Identifier)))))-}

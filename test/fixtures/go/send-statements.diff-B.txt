@@ -1,0 +1,8 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Send
+      (Identifier)
+      (NumberLiteral))))-}

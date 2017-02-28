@@ -1,0 +1,30 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Assignment
+      (Other "expression_list"
+        (Identifier))
+      (Other "expression_list"
+        (FloatLiteral)))
+    (Assignment
+      (Other "expression_list"
+        (Identifier))
+      (Other "expression_list"
+        (FloatLiteral)))
+    (Assignment
+      (Other "expression_list"
+        (Identifier))
+      (Other "expression_list"
+        (FloatLiteral)))
+    (Assignment
+      (Other "expression_list"
+        (Identifier))
+      (Other "expression_list"
+        (FloatLiteral)))
+    (Assignment
+      (Other "expression_list"
+        (Identifier))
+      (Other "expression_list"
+        (FloatLiteral)))))-}

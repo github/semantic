@@ -1,0 +1,30 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Switch
+      (Case
+        (Case
+          (Other "expression_list"
+            (RelationalOperator
+              (Identifier)
+              (Identifier))))
+        (FunctionCall
+          (Identifier)))
+      (Case
+        (Case
+          (Other "expression_list"
+            (RelationalOperator
+              (Identifier)
+              (Identifier))))
+        (FunctionCall
+          (Identifier)))
+      (Case
+        (Case
+          (Other "expression_list"
+            (RelationalOperator
+              (Identifier)
+              (NumberLiteral))))
+        (FunctionCall
+          (Identifier))))))-}
