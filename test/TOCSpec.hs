@@ -178,6 +178,9 @@ isMethodOrFunction :: ListableF (Term (Syntax leaf)) (Record '[Range, Category, 
 isMethodOrFunction a = case runCofree (unListableF a) of
   (_ :< S.Method{}) -> True
   (_ :< S.Function{}) -> True
+  (a :< _) | getField a == C.Function -> True
+  (a :< _) | getField a == C.Method -> True
+  (a :< _) | getField a == C.SingletonMethod -> True
   _ -> False
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Range, Category, SourceSpan]))
