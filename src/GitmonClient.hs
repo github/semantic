@@ -25,20 +25,21 @@ data ProcIO = ProcIO {
 instance FromJSON ProcIO
 
 
-data ProcessStats =
-    ProcessBeforeStats { gitDir :: String
-                       , program :: String
-                       , realIP :: Maybe String
-                       , repoID :: Maybe String
-                       , repoName :: Maybe String
-                       , userID :: Maybe String
-                       , via :: String }
-  | ProcessAfterStats { cpu :: Integer
+data ProcessData =
+    ProcessUpdateData { gitDir :: String
+                      , program :: String
+                      , realIP :: Maybe String
+                      , repoID :: Maybe String
+                      , repoName :: Maybe String
+                      , userID :: Maybe String
+                      , via :: String }
+  | ProcessScheduleData
+  | ProcessFinishData { cpu :: Integer
                       , diskReadBytes :: Integer
                       , diskWriteBytes :: Integer
                       , resultCode :: Integer } deriving (Generic, Show)
 
-instance ToJSON ProcessStats where
+instance ToJSON ProcessData where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = camelTo2 '_' }
 
 
@@ -51,12 +52,12 @@ instance ToJSON GitmonCommand where
   toJSON = genericToJSON defaultOptions { constructorTagModifier = unpack . toLower . pack }
 
 
-data GitmonMsg = GitmonMsg { command :: GitmonCommand, stats :: ProcessStats } deriving (Show)
+data GitmonMsg = GitmonMsg { command :: GitmonCommand, processData :: ProcessData } deriving (Show)
 
 instance ToJSON GitmonMsg where
   toJSON GitmonMsg{..} = object [
     "command" .= command,
-    "data" .= stats
+    "data" .= processData
     ]
 
 
@@ -69,8 +70,8 @@ procFileAddr = "/proc/self/io"
 clock :: Clock
 clock = Realtime
 
-processJSON :: GitmonCommand -> ProcessStats -> ByteString
-processJSON command stats = toStrict . encode $ GitmonMsg command stats
+processJSON :: GitmonCommand -> ProcessData -> ByteString
+processJSON command processData = toStrict . encode $ GitmonMsg command processData
 
 type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
@@ -81,8 +82,9 @@ reportGitmon program gitCommand = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
   safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
 
+  safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoID repoName userID "semantic-diff"))
 
-  safeIO $ sendAll soc (processJSON Update (ProcessBeforeStats gitDir program realIP repoID repoName userID "semantic-diff"))
+  safeIO $ sendAll soc (processJSON Schedule ProcessScheduleData)
 
   (startTime, beforeProcIOContents) <- liftIO collectStats
 
@@ -92,7 +94,7 @@ reportGitmon program gitCommand = do
 
   let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
 
-  safeIO $ sendAll soc (processJSON Finish ProcessAfterStats { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
+  safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
 
   safeIO $ close soc
 
