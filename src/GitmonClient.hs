@@ -48,10 +48,7 @@ data GitmonCommand = Update
                    | Schedule deriving (Generic, Show)
 
 instance ToJSON GitmonCommand where
-  toJSON command = String $ case command of
-    Update -> "update"
-    Finish -> "finish"
-    Schedule -> "schedule"
+  toJSON = genericToJSON defaultOptions { constructorTagModifier = unpack . toLower . pack }
 
 
 data GitmonMsg = GitmonMsg { command :: GitmonCommand, stats :: ProcessStats } deriving (Show)
