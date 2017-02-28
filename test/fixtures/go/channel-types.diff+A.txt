@@ -1,0 +1,21 @@
+{+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "type_declaration"
+      (TypeDecl
+        (Identifier)
+        (ChannelTy
+          (ChannelTy
+            (Identifier))))
+      (TypeDecl
+        (Identifier)
+        (ChannelTy
+          (ChannelTy
+            (StructTy))))
+      (TypeDecl
+        (Identifier)
+        (ChannelTy
+          (ChannelTy
+            (Identifier)))))))+}

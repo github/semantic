@@ -1,0 +1,15 @@
+{+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Defer
+      (FunctionCall
+        (SubscriptAccess
+          (Identifier)
+          (Identifier))))
+    (Go
+      (FunctionCall
+        (SubscriptAccess
+          (Identifier)
+          (Identifier))))))+}

@@ -1,0 +1,13 @@
+{+(Program
+  (Try
+    (ExpressionStatements
+      (ExpressionStatements
+        (Identifier)))
+    (Catch
+      (ExpressionStatements
+        (ExpressionStatements
+          (Identifier))))
+    (Finally
+      (ExpressionStatements
+        (ExpressionStatements
+          (Identifier))))))+}

@@ -1,0 +1,15 @@
+{+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier))
+  (Method
+    (Identifier)
+    (Args
+      (ParameterDecl
+        (Identifier)
+        (Identifier)))
+    (Identifier)
+    (ParameterDecl
+      (Identifier)
+      (Identifier))))+}

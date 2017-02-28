@@ -1,18 +1,13 @@
 (Program
   (For
-    { (Identifier) -> (Identifier) }
-    {
-    (ArrayLiteral
+  { (Identifier)
+  ->(Identifier) }
+  { (ArrayLiteral
       (IntegerLiteral)
       (IntegerLiteral)
       (IntegerLiteral))
-    ->
-    (Identifier)
-    }
-    {
-    (MethodCall
+  ->(Identifier) }
+  { (MethodCall
       (Identifier)
       (Identifier))
-    ->
-    (Identifier)
-    }))
+  ->(Identifier) }))

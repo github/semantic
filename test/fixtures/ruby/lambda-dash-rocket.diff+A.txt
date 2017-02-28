@@ -1,0 +1,7 @@
+{+(Program
+  (AnonymousFunction
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (IntegerLiteral)
+    (IntegerLiteral)))+}

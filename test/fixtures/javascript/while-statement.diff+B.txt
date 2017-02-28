@@ -1,0 +1,7 @@
+{+(Program
+  (While
+    (Identifier)
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))))+}

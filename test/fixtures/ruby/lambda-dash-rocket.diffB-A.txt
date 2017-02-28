@@ -1,7 +1,8 @@
 (Program
   (AnonymousFunction
-    { +(Identifier)+ }
-    { +(Identifier)+ }
-    { +(Identifier)+ }
-    { (Identifier) -> (IntegerLiteral) }
-    { +(IntegerLiteral)+ }))
+  {+(Identifier)+}
+  {+(Identifier)+}
+  {+(Identifier)+}
+  { (Identifier)
+  ->(IntegerLiteral) }
+  {+(IntegerLiteral)+}))

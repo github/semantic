@@ -1,0 +1,9 @@
+{-(Program
+  (MethodCall
+    (Identifier)
+    (Pair
+      (Identifier)
+      (Boolean))
+    (Pair
+      (Identifier)
+      (IntegerLiteral))))-}
