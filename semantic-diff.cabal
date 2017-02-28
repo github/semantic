@@ -27,7 +27,6 @@ library
                      , Data.Text.Listable
                      , Diff
                      , DiffCommand
-                     , DiffSummary
                      , Info
                      , Interpreter
                      , Language
@@ -143,7 +142,7 @@ test-suite test
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Diff.Spec
-                     , DiffSummarySpec
+                     , SummarySpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , RangeSpec
