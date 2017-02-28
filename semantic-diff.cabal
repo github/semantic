@@ -141,12 +141,12 @@ test-suite test
   other-modules:       AlignmentSpec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
-                     , Diff.Spec
+                     , DiffSpec
                      , SummarySpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , RangeSpec
-                     , Source.Spec
+                     , SourceSpec
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec

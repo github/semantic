@@ -1,4 +1,4 @@
-module Source.Spec where
+module SourceSpec where
 
 import qualified Data.Text as Text
 import qualified Prelude
