@@ -1,0 +1,15 @@
+{+(Program
+  (Switch
+    (NumberLiteral)
+    (Case
+      (NumberLiteral)
+      (ExpressionStatements
+        (NumberLiteral)))
+    (Case
+      (NumberLiteral)
+      (ExpressionStatements
+        (NumberLiteral)))
+    (Case
+      (NumberLiteral)
+      (ExpressionStatements
+        (NumberLiteral)))))+}

@@ -1,0 +1,34 @@
+{+(Program
+  (Module
+    (Identifier))
+  (Other "const_declaration"
+    (VarAssignment
+      (Other "identifier_list"
+        (Identifier))
+      (Other "expression_list"
+        (RuneLiteral)))
+    (VarAssignment
+      (Other "identifier_list"
+        (Identifier))
+      (Other "expression_list"
+        (RuneLiteral)))
+    (VarAssignment
+      (Other "identifier_list"
+        (Identifier))
+      (Other "expression_list"
+        (RuneLiteral)))
+    (VarAssignment
+      (Other "identifier_list"
+        (Identifier))
+      (Other "expression_list"
+        (RuneLiteral)))
+    (VarAssignment
+      (Other "identifier_list"
+        (Identifier))
+      (Other "expression_list"
+        (RuneLiteral)))
+    (VarAssignment
+      (Other "identifier_list"
+        (Identifier))
+      (Other "expression_list"
+        (RuneLiteral)))))+}

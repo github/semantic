@@ -1,0 +1,14 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "type_declaration"
+      (TypeDecl
+        (Identifier)
+        (StructTy
+          (FieldDecl
+            (Other "identifier_list"
+              (Identifier)
+              (Identifier))
+            (Identifier)))))))-}

@@ -1,0 +1,12 @@
+{-(Program
+  (SubscriptAccess
+    (Identifier)
+    (Identifier))
+  (SubscriptAccess
+    (Identifier)
+    (SymbolLiteral))
+  (Assignment
+    (SubscriptAccess
+      (Identifier)
+      (Identifier))
+    (IntegerLiteral)))-}

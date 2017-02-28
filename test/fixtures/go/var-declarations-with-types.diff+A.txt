@@ -1,0 +1,21 @@
+{+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "var_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Identifier)
+        (Other "expression_list"
+          (NumberLiteral))))
+    (Other "var_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier)
+          (Identifier))
+        (Identifier)
+        (Other "expression_list"
+          (NumberLiteral)
+          (NumberLiteral))))))+}

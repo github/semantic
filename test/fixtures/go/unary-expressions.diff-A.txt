@@ -1,0 +1,11 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Operator
+      (Operator
+        (Identifier)))
+    (Operator
+      (FunctionCall
+        (Identifier)))))-}

@@ -1,0 +1,4 @@
+{-(Program
+  (Method
+    (Identifier)
+    (Identifier)))-}

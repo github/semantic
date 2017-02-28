@@ -1,0 +1,19 @@
+{-(Program
+  (For
+    (Assignment
+      (Identifier)
+      (NumberLiteral))
+    (FunctionCall
+      (Identifier))
+    (RelationalOperator
+      (Identifier)
+      (Other "<")
+      (NumberLiteral))
+    (MathOperator
+      (Identifier)
+      (Other "++"))
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier)
+          (Identifier))))))-}

@@ -5,7 +5,6 @@ module Category where
 import Prologue
 import Data.Functor.Listable
 import Data.Text (pack)
-import Data.Text.Listable
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
@@ -240,120 +239,119 @@ instance (StringConv Category Text) where
   strConv _ = pack . show
 
 instance Listable Category where
-  list =
-    [ Program
-    , ParseError
-    , Boolean
-    , BooleanOperator
-    , MathOperator
-    , DictionaryLiteral
-    , Pair
-    , FunctionCall
-    , Function
-    , Identifier
-    , Params
-    , ExpressionStatements
-    , MethodCall
-    , Args
-    , StringLiteral
-    , IntegerLiteral
-    , NumberLiteral
-    , Regex
-    , Return
-    , SymbolLiteral
-    , TemplateString
-    , ArrayLiteral
-    , Assignment
-    , MathAssignment
-    , MemberAccess
-    , SubscriptAccess
-    , VarAssignment
-    , VarDecl
-    , For
-    , DoWhile
-    , While
-    , Switch
-    , If
-    , Ternary
-    , Case
-    , Operator
-    , CommaOperator
-    , Object
-    , Throw
-    , Constructor
-    , Try
-    , Catch
-    , Finally
-    , Class
-    , Method
-    , Comment
-    , RelationalOperator
-    , Empty
-    , Module
-    , Import
-    , Export
-    , AnonymousFunction
-    , Interpolation
-    , Subshell
-    , OperatorAssignment
-    , Yield
-    , Until
-    , Unless
-    , Begin
-    , Else
-    , Elsif
-    , Ensure
-    , Rescue
-    , RescueModifier
-    , RescuedException
-    , RescueArgs
-    , When
-    , Negate
-    , Select
-    , Defer
-    , Go
-    , Slice
-    , TypeAssertion
-    , TypeConversion
-    , ArgumentPair
-    , KeywordParameter
-    , OptionalParameter
-    , SplatParameter
-    , HashSplatParameter
-    , BlockParameter
-    , FloatLiteral
-    , ArrayTy
-    , DictionaryTy
-    , StructTy
-    , Struct
-    , Break
-    , Continue
-    , Binary
-    , Unary
-    , Constant
-    , Superclass
-    , SingletonClass
-    , RangeExpression
-    , ScopeOperator
-    , BeginBlock
-    , EndBlock
-    , ParameterDecl
-    , DefaultCase
-    , TypeDecl
-    , PointerTy
-    , FieldDecl
-    , SliceTy
-    , Element
-    , Literal
-    , ChannelTy
-    , Send
-    , IndexExpression
-    , FunctionTy
-    , IncrementStatement
-    , DecrementStatement
-    , QualifiedIdentifier
-    , FieldDeclarations
-    , RuneLiteral
-    , Modifier If
-    , SingletonMethod
-    ] ++ concat (mapT (Other . unListableText) tiers)
+  tiers = cons0 Program
+       \/ cons0 ParseError
+       \/ cons0 Boolean
+       \/ cons0 BooleanOperator
+      --  \/ cons0 MathOperator
+      --  \/ cons0 DictionaryLiteral
+      --  \/ cons0 Pair
+       \/ cons0 FunctionCall
+       \/ cons0 Function
+       \/ cons0 Identifier
+      --  \/ cons0 Params
+      --  \/ cons0 ExpressionStatements
+       \/ cons0 MethodCall
+      --  \/ cons0 Args
+       \/ cons0 StringLiteral
+       \/ cons0 IntegerLiteral
+       \/ cons0 NumberLiteral
+      --  \/ cons0 Regex
+       \/ cons0 Return
+      --  \/ cons0 SymbolLiteral
+      --  \/ cons0 TemplateString
+      --  \/ cons0 ArrayLiteral
+      --  \/ cons0 Assignment
+      --  \/ cons0 MathAssignment
+      --  \/ cons0 MemberAccess
+      --  \/ cons0 SubscriptAccess
+      --  \/ cons0 VarAssignment
+      --  \/ cons0 VarDecl
+      --  \/ cons0 For
+      --  \/ cons0 DoWhile
+      --  \/ cons0 While
+      --  \/ cons0 Switch
+       \/ cons0 If
+      --  \/ cons0 Ternary
+      --  \/ cons0 Case
+      --  \/ cons0 Operator
+      --  \/ cons0 CommaOperator
+      --  \/ cons0 Object
+      --  \/ cons0 Throw
+      --  \/ cons0 Constructor
+      --  \/ cons0 Try
+      --  \/ cons0 Catch
+      --  \/ cons0 Finally
+       \/ cons0 Class
+       \/ cons0 Method
+      --  \/ cons0 Comment
+      --  \/ cons0 RelationalOperator
+      --  \/ cons0 Empty
+      --  \/ cons0 Module
+      --  \/ cons0 Import
+      --  \/ cons0 Export
+      --  \/ cons0 AnonymousFunction
+      --  \/ cons0 Interpolation
+      --  \/ cons0 Subshell
+      --  \/ cons0 OperatorAssignment
+      --  \/ cons0 Yield
+      --  \/ cons0 Until
+      --  \/ cons0 Unless
+      --  \/ cons0 Begin
+      --  \/ cons0 Else
+      --  \/ cons0 Elsif
+      --  \/ cons0 Ensure
+      --  \/ cons0 Rescue
+      --  \/ cons0 RescueModifier
+      --  \/ cons0 RescuedException
+      --  \/ cons0 RescueArgs
+      --  \/ cons0 When
+      --  \/ cons0 Negate
+      --  \/ cons0 Select
+      --  \/ cons0 Defer
+      --  \/ cons0 Go
+      --  \/ cons0 Slice
+      --  \/ cons0 TypeAssertion
+      --  \/ cons0 TypeConversion
+      --  \/ cons0 ArgumentPair
+      --  \/ cons0 KeywordParameter
+      --  \/ cons0 OptionalParameter
+      --  \/ cons0 SplatParameter
+      --  \/ cons0 HashSplatParameter
+      --  \/ cons0 BlockParameter
+      --  \/ cons0 FloatLiteral
+      --  \/ cons0 ArrayTy
+      --  \/ cons0 DictionaryTy
+      --  \/ cons0 StructTy
+      --  \/ cons0 Struct
+      --  \/ cons0 Break
+      --  \/ cons0 Continue
+       \/ cons0 Binary
+       \/ cons0 Unary
+      --  \/ cons0 Constant
+      --  \/ cons0 Superclass
+      --  \/ cons0 SingletonClass
+      --  \/ cons0 RangeExpression
+      --  \/ cons0 ScopeOperator
+      --  \/ cons0 BeginBlock
+      --  \/ cons0 EndBlock
+      --  \/ cons0 ParameterDecl
+      --  \/ cons0 DefaultCase
+      --  \/ cons0 TypeDecl
+      --  \/ cons0 PointerTy
+      --  \/ cons0 FieldDecl
+      --  \/ cons0 SliceTy
+      --  \/ cons0 Element
+      --  \/ cons0 Literal
+      --  \/ cons0 ChannelTy
+      --  \/ cons0 Send
+      --  \/ cons0 IndexExpression
+      --  \/ cons0 FunctionTy
+      --  \/ cons0 IncrementStatement
+      --  \/ cons0 DecrementStatement
+      --  \/ cons0 QualifiedIdentifier
+      --  \/ cons0 FieldDeclarations
+      --  \/ cons0 RuneLiteral
+      --  \/ cons0 (Modifier If)
+       \/ cons0 SingletonMethod
+      --  \/ cons0 (Other "other")
