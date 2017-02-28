@@ -47,10 +47,6 @@ data Arguments = Arguments
   , shaRange :: Both (Maybe String)
   , filePaths :: [FilePath]
   , developmentMode :: Bool
-  , repoName :: Maybe String
-  , repoID :: Maybe String
-  , userID :: Maybe String
-  , realIP :: Maybe String
   } deriving (Show)
 
 -- | Returns Arguments for the program from parsed command line arguments.
@@ -58,10 +54,6 @@ programArguments :: CmdLineOptions -> IO Arguments
 programArguments CmdLineOptions{..} = do
   pwd <- getCurrentDirectory
   gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
-  repoName' <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
-  repoID' <- lookupEnv "GIT_SOCKSTAT_VAR_repo_id"
-  userID' <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
-  realIP' <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
   let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
                               (Left _) -> []
@@ -81,10 +73,6 @@ programArguments CmdLineOptions{..} = do
     , shaRange = fetchShas extraArgs
     , filePaths = filePaths
     , developmentMode = developmentMode'
-    , repoName = repoName'
-    , repoID = repoID'
-    , userID = userID'
-    , realIP = realIP'
     }
   where
     fetchPaths :: [ExtraArg] -> [FilePath]
@@ -110,10 +98,6 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
   , developmentMode = False
-  , repoName = Nothing
-  , repoID = Nothing
-  , userID = Nothing
-  , realIP = Nothing
   }
 
 -- | 7 seconds
