@@ -1,7 +1,6 @@
 {-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric #-}
 module GitmonClient where
 
-import Arguments
 import qualified Data.Yaml as Y
 import Data.Aeson
 import Data.Aeson.Types
