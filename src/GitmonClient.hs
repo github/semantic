@@ -74,8 +74,8 @@ processJSON command stats = toStrict . encode $ GitmonMsg command stats
 
 type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
-reportGitmon :: String -> Arguments -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon program Arguments{..} gitCommand = do
+reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon program gitCommand = do
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
   safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
 
