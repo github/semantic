@@ -1,0 +1,11 @@
+{+(Program
+  (Object
+    (Pair
+      (Identifier)
+      (StringLiteral))
+    (Pair
+      (Identifier)
+      (IntegerLiteral))
+    (Pair
+      (Identifier)
+      (Boolean))))+}

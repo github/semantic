@@ -1,0 +1,10 @@
+{+(Program
+  (Assignment
+    (Args
+      (Identifier)
+      (Identifier)
+      (Identifier))
+    (ArrayLiteral
+      (IntegerLiteral)
+      (IntegerLiteral)
+      (IntegerLiteral))))+}

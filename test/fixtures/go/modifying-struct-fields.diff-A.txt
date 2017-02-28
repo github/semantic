@@ -1,0 +1,15 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (VarDecl
+      (Other "expression_list"
+        (Identifier))
+      (Other "expression_list"
+        (Operator
+          (Other "composite_literal"
+            (Identifier)
+            (Pair
+              (Identifier)
+              (Identifier))))))))-}

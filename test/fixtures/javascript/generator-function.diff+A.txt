@@ -1,0 +1,9 @@
+{+(Program
+  (Function
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (ExpressionStatements
+      (Yield)
+      (Yield
+        (Identifier)))))+}

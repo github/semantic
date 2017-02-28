@@ -1,0 +1,7 @@
+{-(Program
+  (AnonymousFunction
+    (Identifier)
+    (Binary
+      (Identifier)
+      (Other "+")
+      (IntegerLiteral))))-}

@@ -19,6 +19,7 @@ import Prologue
 import Source
 import Syntax
 import System.FilePath
+import System.IO (withBinaryFile, hFileSize)
 import Term
 import TreeSitter
 import Renderer
@@ -110,8 +111,21 @@ parserForFilepath = parserForType . toS . takeExtension
 -- | Read the file and convert it to Unicode.
 readAndTranscodeFile :: FilePath -> IO Source
 readAndTranscodeFile path = do
-  text <- B1.readFile path
+  size <- fileSize path
+  text <- case size of
+    0 -> pure B1.empty
+    _ -> B1.readFile path
   transcode text
+
+-- From https://github.com/haskell/bytestring/pull/79/files
+fileSize :: FilePath -> IO Integer
+fileSize f = withBinaryFile f ReadMode $ \h -> do
+  -- hFileSize fails if file is not regular file (like /dev/null). Catch
+  -- exception and try reading anyway.
+  filesz <- catch (hFileSize h) useZeroIfNotRegularFile
+  pure $ fromIntegral filesz `max` 0
+  where useZeroIfNotRegularFile :: IOException -> IO Integer
+        useZeroIfNotRegularFile _ = return 0
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO Source

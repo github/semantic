@@ -1,0 +1,18 @@
+{-(Program
+  (ExpressionStatements
+    (FunctionCall
+      (Identifier)
+      (NumberLiteral)
+      (StringLiteral)
+      (Function
+        (Identifier)
+        (Identifier)
+        (ExpressionStatements
+          (ExpressionStatements
+            (FunctionCall
+              (Identifier)
+              (Identifier)
+              (Identifier)))
+          (Return
+            (Identifier))))
+      (Boolean))))-}

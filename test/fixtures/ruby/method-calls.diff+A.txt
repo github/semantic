@@ -1,0 +1,4 @@
+{+(Program
+  (MethodCall
+    (Identifier)
+    (Identifier)))+}

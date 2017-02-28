@@ -1,0 +1,27 @@
+{-(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (TypeConversion
+      (SliceTy
+        (QualifiedIdentifier))
+      (SubscriptAccess
+        (Identifier)
+        (Identifier)))
+    (TypeConversion
+      (SliceTy
+        (QualifiedIdentifier))
+      (SubscriptAccess
+        (Identifier)
+        (Identifier)))
+    (FunctionCall
+      (SubscriptAccess
+        (Identifier)
+        (Identifier))
+      (Identifier))
+    (FunctionCall
+      (SubscriptAccess
+        (Identifier)
+        (Identifier))
+      (Identifier))))-}

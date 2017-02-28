@@ -1,0 +1,40 @@
+{+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Identifier)
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+            (SliceTy
+              (Identifier))
+            (Literal
+              (Element
+                (StringLiteral)))))))
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+            (SliceTy
+              (Identifier))
+            (Literal
+              (Element
+                (StringLiteral)))))))
+    (Other "const_declaration"
+      (VarAssignment
+        (Other "identifier_list"
+          (Identifier))
+        (Other "expression_list"
+          (Other "composite_literal"
+            (SliceTy
+              (Identifier))
+            (Literal
+              (Element
+                (StringLiteral))
+              (Element
+                (StringLiteral)))))))))+}

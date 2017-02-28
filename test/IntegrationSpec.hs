@@ -6,7 +6,7 @@ import Data.Functor.Both
 import Data.Record
 import qualified Data.Text as T
 import GHC.Show (Show(..))
-import Data.List (union)
+import Data.List (union, concat, transpose)
 import Diffing
 import Info
 import Parse
@@ -59,19 +59,29 @@ examples directory = do
   bs <- globFor "*.B.*"
   sExpAs <- globFor "*.parseA.txt"
   sExpBs <- globFor "*.parseB.txt"
+  sExpDiffsAddA <- globFor "*.diff+A.txt"
+  sExpDiffsRemoveA <- globFor "*.diff-A.txt"
+  sExpDiffsAddB <- globFor "*.diff+B.txt"
+  sExpDiffsRemoveB <- globFor "*.diff-B.txt"
   sExpDiffsAB <- globFor "*.diffA-B.txt"
   sExpDiffsBA <- globFor "*.diffB-A.txt"
 
-  let exampleDiff out name = DiffExample (lookupNormalized name as) (lookupNormalized name bs) out
-  let exampleDiff' out name = DiffExample (lookupNormalized name bs) (lookupNormalized name as) out
+  let exampleDiff lefts rights out name = DiffExample (lookupNormalized name lefts) (lookupNormalized name rights) out
+  let exampleAddDiff files out name = DiffExample "" (lookupNormalized name files) out
+  let exampleRemoveDiff files out name = DiffExample (lookupNormalized name files) "" out
   let exampleParse files out name = ParseExample (lookupNormalized name files) out
 
   let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
-  pure $ getExamples exampleDiff sExpDiffsAB keys
-      <> getExamples exampleDiff' sExpDiffsBA keys
-      <> getExamples (exampleParse as) sExpAs keys
-      <> getExamples (exampleParse bs) sExpBs keys
+  pure $ merge [ getExamples (exampleParse as) sExpAs keys
+               , getExamples (exampleParse bs) sExpBs keys
+               , getExamples (exampleAddDiff as) sExpDiffsAddA keys
+               , getExamples (exampleRemoveDiff as) sExpDiffsRemoveA keys
+               , getExamples (exampleAddDiff bs) sExpDiffsAddB keys
+               , getExamples (exampleRemoveDiff bs) sExpDiffsRemoveB keys
+               , getExamples (exampleDiff as bs) sExpDiffsAB keys
+               , getExamples (exampleDiff bs as) sExpDiffsBA keys ]
   where
+    merge = concat . transpose
     -- Only returns examples if they exist
     getExamples f list = foldr (go f list) []
       where go f list name acc = case lookupNormalized' name list of
@@ -104,14 +114,17 @@ testParse path expectedOutput = do
 
 testDiff :: Renderer (Record '[Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths diff = do
-  sources <- traverse readAndTranscodeFile paths
+  sources <- traverse readAndTranscodeFile' paths
   diff' <- diffFiles parser renderer (sourceBlobs sources)
   let actual = (Verbatim . stripWhitespace. concatOutputs . pure) diff'
   expected <- (Verbatim . stripWhitespace) <$> readFile diff
   actual `shouldBe` expected
   where
-    parser = parserForFilepath (fst paths)
+    parser = parserForFilepath filePath
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
+    readAndTranscodeFile' path | Prologue.null path = pure Source.empty
+                               | otherwise = readAndTranscodeFile path
+    filePath = if fst paths /= "" then fst paths else snd paths
 
 stripWhitespace :: Text -> Text
 stripWhitespace = T.foldl' go T.empty

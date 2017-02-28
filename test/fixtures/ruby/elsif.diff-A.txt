@@ -1,0 +1,7 @@
+{-(Program
+  (If
+    (Identifier)
+    (MethodCall
+      (Identifier))
+    (Elsif
+      (Identifier))))-}

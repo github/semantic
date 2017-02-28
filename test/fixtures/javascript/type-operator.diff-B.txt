@@ -1,0 +1,6 @@
+{-(Program
+  (ExpressionStatements
+    (Operator
+      (Identifier)
+      (Other "instanceof")
+      (Identifier))))-}

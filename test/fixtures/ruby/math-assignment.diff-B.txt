@@ -1,0 +1,16 @@
+{-(Program
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral))
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral))
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral))
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral))
+  (OperatorAssignment
+    (Identifier)
+    (IntegerLiteral)))-}
