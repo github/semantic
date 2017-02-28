@@ -1,10 +1,11 @@
 {-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric #-}
 module GitmonClient where
 
-import qualified Data.Yaml as Y
 import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy (toStrict)
+import Data.Text (pack, unpack, toLower)
+import qualified Data.Yaml as Y
 import GHC.Generics
 import Git.Libgit2
 import Network.Socket
@@ -12,6 +13,9 @@ import Network.Socket.ByteString (sendAll)
 import Prelude
 import Prologue hiding (toStrict)
 import System.Clock
+import System.Directory (getCurrentDirectory)
+import System.Environment
+import System.IO
 
 data ProcIO = ProcIO {
     read_bytes :: Integer
