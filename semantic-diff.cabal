@@ -26,7 +26,7 @@ library
                      , Data.Record
                      , Data.Text.Listable
                      , Diff
-                     , Diffing
+                     , DiffCommand
                      , DiffSummary
                      , Info
                      , Interpreter
@@ -36,7 +36,7 @@ library
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
-                     , Parse
+                     , ParseCommand
                      , Parser
                      , Patch
                      , Paths_semantic_diff
@@ -50,6 +50,7 @@ library
                      , Renderer.SExpression
                      , Renderer.TOC
                      , SemanticDiff
+                     , SemanticDiff.IO
                      , SES
                      , Source
                      , SourceSpan

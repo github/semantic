@@ -8,6 +8,7 @@ import Prologue hiding ((<>))
 import Prelude
 import System.Environment
 import System.Directory
+import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 
 import qualified Renderer as R
@@ -55,6 +56,7 @@ programArguments CmdLineOptions{..} = do
   pwd <- getCurrentDirectory
   gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
+  output <- getOutputPath outputFilePath
   let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
                               (Left _) -> []
                               (Right objectDirs) -> objectDirs
@@ -65,7 +67,7 @@ programArguments CmdLineOptions{..} = do
     , alternateObjectDirs = alternateObjectDirs
     , format = outputFormat
     , timeoutInMicroseconds = maybe defaultTimeout toMicroseconds maybeTimeout
-    , output = outputFilePath
+    , output = output
     , diffMode = case (noIndex, filePaths) of
       (True, [fileA, fileB]) -> PathDiff (both fileA fileB)
       (_, _) -> CommitDiff
@@ -84,6 +86,12 @@ programArguments CmdLineOptions{..} = do
     fetchShas [] = both Nothing Nothing
     fetchShas (ShaPair x:_) = x
     fetchShas (_:xs) = fetchShas xs
+
+    getOutputPath Nothing = pure Nothing
+    getOutputPath (Just path) = do
+      isDir <- doesDirectoryExist path
+      pure . Just $ if isDir then takeFileName path -<.> ".html" else path
+
 
 -- | Quickly assemble an Arguments data record with defaults.
 args :: FilePath -> String -> String -> [String] -> R.Format -> Arguments

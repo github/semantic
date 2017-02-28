@@ -12,7 +12,7 @@ import Data.Text.Lazy as T
 import Data.Map
 import qualified Data.Vector as V
 import Arguments
-import SemanticDiff
+import DiffCommand
 import Renderer
 import qualified Git.Types as Git
 
