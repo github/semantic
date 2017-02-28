@@ -150,6 +150,7 @@ test-suite test
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
+                     , DiffCommandSpec
                      , SemanticDiffSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson

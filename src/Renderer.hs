@@ -5,6 +5,7 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 import Data.Functor.Both
 import Data.Map as Map hiding (null)
 import Data.Text as T (intercalate)
+import Data.Functor.Listable
 import Prologue
 import Source (SourceBlob)
 import Syntax
@@ -71,3 +72,11 @@ toText (SplitOutput text) = text
 toText (PatchOutput text) = text
 toText (SExpressionOutput text) = text
 toText _ = mempty
+
+instance Listable Format where
+  tiers = cons0 Split
+       \/ cons0 Patch
+       \/ cons0 JSON
+       \/ cons0 Summary
+       \/ cons0 SExpression
+       \/ cons0 TOC

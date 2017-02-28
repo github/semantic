@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), RunMode(..), programArguments, args) where
+module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), RunMode(..), programArguments, args, args') where
 
 import Data.Functor.Both
 import Data.Maybe
@@ -105,6 +105,20 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , runMode = Diff
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
+  , developmentMode = False
+  }
+
+args' :: FilePath -> Both FilePath -> R.Format -> Arguments
+args' gitDir paths format = Arguments
+  { gitDir = gitDir
+  , alternateObjectDirs = []
+  , format = format
+  , timeoutInMicroseconds = defaultTimeout
+  , output = Nothing
+  , diffMode = PathDiff paths
+  , runMode = Diff
+  , shaRange = both Nothing Nothing
+  , filePaths = []
   , developmentMode = False
   }
 
