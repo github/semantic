@@ -76,10 +76,13 @@ type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
 reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program gitCommand = do
+  (gitDir, realIP, repoID, repoName, userID) <- liftIO $ loadEnvVars
+
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
   safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
 
-  safeIO $ sendAll soc (processJSON Update ProcessBeforeStats { gitDir = gitDir, via = "semantic-diff", program = program, realIP = realIP, repoID = repoID, repoName = repoName, userID = userID })
+
+  safeIO $ sendAll soc (processJSON Update (ProcessBeforeStats gitDir program realIP repoID repoName userID "semantic-diff"))
 
   (startTime, beforeProcIOContents) <- liftIO collectStats
 
