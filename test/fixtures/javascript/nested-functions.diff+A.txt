@@ -1,0 +1,22 @@
+{+(Program
+  (ExpressionStatements
+    (Function
+      (Identifier)
+      (Identifier)
+      (Identifier)
+      (ExpressionStatements
+        (Function
+          (Identifier)
+          (Identifier)
+          (Identifier)
+          (ExpressionStatements
+            (ExpressionStatements
+              (FunctionCall
+                (Identifier)
+                (Identifier)
+                (Identifier)))
+            (ExpressionStatements
+              (FunctionCall
+                (Identifier)
+                (Identifier)
+                (Identifier)))))))))+}

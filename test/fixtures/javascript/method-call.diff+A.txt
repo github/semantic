@@ -1,0 +1,7 @@
+{+(Program
+  (ExpressionStatements
+    (FunctionCall
+      (Identifier)
+      (Identifier)
+      (Identifier)
+      (StringLiteral))))+}
