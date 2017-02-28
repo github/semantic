@@ -24,7 +24,6 @@ import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
-import SemanticDiff.IO
 
 data ParseJSON = ParseJSON
   { category :: Text

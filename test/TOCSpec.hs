@@ -10,7 +10,6 @@ import Data.Record
 import Data.String
 import Diff
 import DiffCommand
-import SemanticDiff.IO (readAndTranscodeFile)
 import Info
 import Interpreter
 import ParseCommand

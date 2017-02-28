@@ -14,7 +14,6 @@ import Renderer
 import Renderer.SExpression as Renderer
 import Source
 import DiffCommand
-import SemanticDiff.IO (readAndTranscodeFile)
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)

@@ -32,7 +32,6 @@ import Renderer.SExpression
 import Renderer.Split
 import Renderer.Summary
 import Renderer.TOC
-import SemanticDiff.IO
 import Source
 import Syntax
 import Term

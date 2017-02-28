@@ -13,7 +13,9 @@ import qualified Renderer as R
 import Development.GitRev
 import DiffCommand
 import ParseCommand
-import SemanticDiff.IO
+import qualified Data.Text.IO as TextIO
+import System.IO
+import System.Environment (lookupEnv)
 
 main :: IO ()
 main = do
@@ -56,3 +58,18 @@ versionString = "semantic-diff version " <> showVersion Library.version <> " (" 
 
 version :: Parser (a -> a)
 version = infoOption versionString (long "version" <> short 'V' <> help "output the version of the program")
+
+writeToOutput :: Maybe FilePath -> Text -> IO ()
+writeToOutput output text = case output of
+  Nothing -> do
+    setEncoding
+    TextIO.hPutStrLn stdout text
+  Just path -> withFile path WriteMode (`TextIO.hPutStr` text)
+  where
+    setEncoding = do
+      lang <- lookupEnv "LANG"
+      case lang of
+        -- If LANG is set and isn't the empty string, leave the encoding.
+        Just x | x /= "" -> pure ()
+        -- Otherwise default to utf8.
+        _ -> hSetEncoding stdout utf8

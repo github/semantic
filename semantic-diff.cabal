@@ -49,7 +49,6 @@ library
                      , Renderer.SExpression
                      , Renderer.TOC
                      , SemanticDiff
-                     , SemanticDiff.IO
                      , SES
                      , Source
                      , SourceSpan

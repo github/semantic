@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
+import Prelude (FilePath, fromIntegral)
 import Prologue
 import qualified Data.ByteString as B
 import qualified Data.Text as T
@@ -9,6 +10,10 @@ import Numeric
 import Range
 import SourceSpan
 import Test.LeanCheck
+import System.IO
+import Control.Exception (catch, IOException)
+import qualified Data.Text.ICU.Convert as Convert
+import qualified Data.Text.ICU.Detect as Detect
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
 data SourceBlob = SourceBlob { source :: Source, oid :: T.Text, path :: FilePath, blobKind :: Maybe SourceKind }
@@ -22,11 +27,36 @@ newtype Source = Source { sourceText :: B.ByteString }
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
+-- | Read the file and convert it to Unicode.
+readAndTranscodeFile :: FilePath -> IO Source
+readAndTranscodeFile path = do
+  size <- fileSize path
+  text <- case size of
+    0 -> pure B.empty
+    _ -> B.readFile path
+  transcode text
+
+-- From https://github.com/haskell/bytestring/pull/79/files
+fileSize :: FilePath -> IO Integer
+fileSize f = withBinaryFile f ReadMode $ \h -> do
+  -- hFileSize fails if file is not regular file (like /dev/null). Catch
+  -- exception and try reading anyway.
+  filesz <- catch (hFileSize h) useZeroIfNotRegularFile
+  pure $ fromIntegral filesz `max` 0
+  where useZeroIfNotRegularFile :: IOException -> IO Integer
+        useZeroIfNotRegularFile _ = pure 0
+
+-- | Transcode a file to a unicode source.
+transcode :: B.ByteString -> IO Source
+transcode text = fromText <$> do
+  match <- Detect.detectCharset text
+  converter <- Convert.open match Nothing
+  pure $ Convert.toUnicode converter text
+
 modeToDigits :: SourceKind -> Text
 modeToDigits (PlainBlob mode) = toS $ showOct mode ""
 modeToDigits (ExecutableBlob mode) = toS $ showOct mode ""
 modeToDigits (SymlinkBlob mode) = toS $ showOct mode ""
-
 
 -- | The default plain blob mode
 defaultPlainBlob :: SourceKind
