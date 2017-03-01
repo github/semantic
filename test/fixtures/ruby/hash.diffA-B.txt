@@ -1,11 +1,8 @@
 (Program
   (Object
-  { (Pair
-      (SymbolLiteral)
-      (StringLiteral))
-  ->(Pair
-      (Identifier)
-      (StringLiteral)) }
+    (Pair
+      { (SymbolLiteral) -> (Identifier) }
+      { (StringLiteral) -> (StringLiteral) })
   {+(Pair
       (Identifier)
       (IntegerLiteral))+}

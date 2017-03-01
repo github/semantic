@@ -1,12 +1,12 @@
 (Program
   (ExpressionStatements
-  { (Operator
+    (Operator
       (Other "delete")
+      {
       (SubscriptAccess
         (Identifier)
-        (StringLiteral)))
-  ->(Operator
-      (Other "delete")
+        (StringLiteral))
+      ->
       (MemberAccess
         (Identifier)
-        (Identifier))) }))
+        (Identifier)) })))

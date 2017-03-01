@@ -4,23 +4,15 @@
   (Function
     (Identifier)
     (Other "type_declaration"
+    { +(TypeDecl (Identifier) (ChannelTy (ChannelTy (Identifier))))+ }
       (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
+        (Identifier)
         (ChannelTy
           (ChannelTy
-          { (Identifier)
-          ->(Identifier) })))
+            { (Identifier) -> (StructTy) })))
       (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
+        (Identifier)
         (ChannelTy
           (ChannelTy
-            (StructTy))))
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (ChannelTy
-          (ChannelTy
-          { (Identifier)
-          ->(Identifier) }))))))
+            { (StructTy) -> (Identifier) })))
+    { -(TypeDecl (Identifier) (ChannelTy (ChannelTy (Identifier))))- })))

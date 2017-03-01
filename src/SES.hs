@@ -2,24 +2,24 @@
 module SES where
 
 import qualified Data.Map as Map
-import Patch
+import Data.These
 import Prologue
 
 
 -- | Edit constructor for two terms, if comparable. Otherwise returns Nothing.
-type Compare term edit = term -> term -> Maybe edit
+type Comparable term = term -> term -> Bool
 
 -- | A function that computes the cost of an edit.
-type Cost edit = edit -> Int
+type Cost term = These term term -> Int
 
 -- | Find the shortest edit script (diff) between two terms given a function to compute the cost.
-ses :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> [term] -> [term] -> [edit (Patch term)]
-ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
-  diffState = diffAt diffTerms cost (0, 0) as bs
+ses :: Comparable term -> Cost term -> [term] -> [term] -> [These term term]
+ses canCompare cost as bs = fst <$> evalState diffState Map.empty where
+  diffState = diffAt canCompare cost (0, 0) as bs
 
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
-diffAt :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> (Int, Int) -> [term] -> [term] -> State (Map.Map (Int, Int) [(edit (Patch term), Int)]) [(edit (Patch term), Int)]
-diffAt diffTerms cost (i, j) as bs
+diffAt :: Comparable term -> Cost term -> (Int, Int) -> [term] -> [term] -> State (Map.Map (Int, Int) [(These term term, Int)]) [(These term term, Int)]
+diffAt canCompare cost (i, j) as bs
   | (a : as) <- as, (b : bs) <- bs = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
@@ -27,11 +27,11 @@ diffAt diffTerms cost (i, j) as bs
     Nothing -> do
       down <- recur (i, succ j) as (b : bs)
       right <- recur (succ i, j) (a : as) bs
-      nomination <- best <$> case diffTerms a b of
-        Just diff -> do
+      nomination <- best <$> if canCompare a b
+        then do
           diagonal <- recur (succ i, succ j) as bs
-          pure [ delete a down, insert b right, consWithCost cost diff diagonal ]
-        Nothing -> pure [ delete a down, insert b right ]
+          pure [ delete a down, insert b right, consWithCost cost (These a b) diagonal ]
+        else pure [ delete a down, insert b right ]
       cachedDiffs' <- get
       put $ Map.insert (i, j) nomination cachedDiffs'
       pure nomination
@@ -39,13 +39,13 @@ diffAt diffTerms cost (i, j) as bs
   | null bs = pure $ foldr delete [] as
   | otherwise = pure []
   where
-    delete = consWithCost cost . deleting
-    insert = consWithCost cost . inserting
+    delete = consWithCost cost . This
+    insert = consWithCost cost . That
     costOf [] = 0
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)
-    recur = diffAt diffTerms cost
+    recur = diffAt canCompare cost
 
 -- | Prepend an edit script and the cumulative cost onto the edit script.
-consWithCost :: Cost edit -> edit -> [(edit, Int)] -> [(edit, Int)]
+consWithCost :: Cost term -> These term term -> [(These term term, Int)] -> [(These term term, Int)]
 consWithCost cost edit rest = (edit, cost edit + maybe 0 snd (fst <$> uncons rest)) : rest

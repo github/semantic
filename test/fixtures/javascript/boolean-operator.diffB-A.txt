@@ -1,10 +1,6 @@
 (Program
   (ExpressionStatements
-  { (BooleanOperator
+    (BooleanOperator
       (Identifier)
-      (Other "&&")
-      (Identifier))
-  ->(BooleanOperator
-      (Identifier)
-      (Other "||")
-      (Identifier)) }))
+      { (Other "&&") -> (Other "||") }
+      (Identifier))))

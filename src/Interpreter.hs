@@ -1,18 +1,18 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Interpreter (diffTerms) where
+module Interpreter (diffTerms, run, runSteps, runStep) where
 
 import Algorithm
+import Control.Monad.Free.Freer
 import Data.Align.Generic
-import Data.Functor.Foldable
 import Data.Functor.Both
 import Data.RandomWalkSimilarity as RWS
 import Data.Record
 import Data.These
 import Diff
-import Info
-import Patch
+import Info hiding (Return)
+import Patch (inserting, deleting, replacing, patchSum)
 import Prologue hiding (lookup)
-import Syntax as S
+import Syntax as S hiding (Return)
 import Term
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
@@ -20,25 +20,50 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms a b = fromMaybe (replacing a b) $ diffComparableTerms a b
+diffTerms = (run .) . diff
 
--- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
-diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-                    => SyntaxTerm leaf fields
-                    -> SyntaxTerm leaf fields
-                    -> Maybe (SyntaxDiff leaf fields)
-diffComparableTerms = recur
-  where recur a b
-          | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
-          | comparable a b = runAlgorithm recur (Just <$> algorithmWithTerms a b)
-          | otherwise = Nothing
-        comparable = (==) `on` category . extract
+-- | Run an Algorithm to completion, returning its result.
+run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
+    -> result
+run = iterFreer (\ algorithm cont -> cont (run (decompose algorithm)))
+
+-- | Run an Algorithm to completion, returning the list of steps taken.
+runSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
+    -> [Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result]
+runSteps algorithm = case runStep algorithm of
+  Left a -> [Return a]
+  Right next -> next : runSteps next
+
+-- | Run a single step of an Algorithm, returning Either its result if it has finished, or the next step otherwise.
+runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+        => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
+        -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
+runStep = \case
+  Return a -> Left a
+  algorithm `Then` cont -> Right $ decompose algorithm >>= cont
+
+
+-- | Decompose a step of an algorithm into the next steps to perform.
+decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+          => AlgorithmF (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The step in an algorithm to decompose into its next steps.
+          -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The sequence of next steps to undertake to continue the algorithm.
+decompose = \case
+  Diff t1 t2 -> algorithmWithTerms t1 t2
+  Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
+    Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
+    _ -> byReplacing t1 t2
+  RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
+  Delete a -> pure (deleting a)
+  Insert b -> pure (inserting b)
+  Replace a b -> pure (replacing a b)
+
 
 -- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: MonadFree (TermF (Syntax leaf) (Both a)) diff
-                   => Term (Syntax leaf) a
-                   -> Term (Syntax leaf) a
-                   -> Algorithm (Term (Syntax leaf) a) (diff (Patch (Term (Syntax leaf) a))) (diff (Patch (Term (Syntax leaf) a)))
+algorithmWithTerms :: SyntaxTerm leaf fields
+                   -> SyntaxTerm leaf fields
+                   -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) (SyntaxDiff leaf fields)
 algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     Just $ Indexed <$> byRWS a b
@@ -78,20 +103,25 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
   where
     annotate = wrap . (both (extract t1) (extract t2) :<)
 
-    maybeLinearly :: Applicative f => Maybe a -> Maybe a -> Algorithm a (f (Patch a)) (Maybe (f (Patch a)))
-    maybeLinearly a b = sequenceA $ case (a, b) of
-      (Just a, Just b) -> Just $ linearly a b
-      (Nothing, Just b) -> Just $ pure (inserting b)
-      (Just a, Nothing) -> Just $ pure (deleting a)
-      (Nothing, Nothing) -> Nothing
+    maybeLinearly a b = case (a, b) of
+      (Just a, Just b) -> Just <$> linearly a b
+      (Nothing, Just b) -> Just <$> byInserting b
+      (Just a, Nothing) -> Just <$> byDeleting a
+      (Nothing, Nothing) -> pure Nothing
 
--- | Run an algorithm, given functions characterizing the evaluation.
-runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)), Traversable f, HasField fields (Maybe FeatureVector))
-  => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
-  -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
-  -> a
-runAlgorithm recur = iterAp $ \ r cont -> case r of
-  Linear a b -> cont . maybe (replacing a b) (wrap . (both (extract a) (extract b) :<)) $ do
-    aligned <- galign (unwrap a) (unwrap b)
-    traverse (these (Just . deleting) (Just . inserting) recur) aligned
-  RWS as bs -> cont (rws recur as bs)
+
+-- | Test whether two terms are comparable.
+comparable :: (Functor f, HasField fields Category) => Term f (Record fields) -> Term f (Record fields) -> Bool
+comparable = (==) `on` category . extract
+
+
+-- | How many nodes to consider for our constant-time approximation to tree edit distance.
+defaultM :: Integer
+defaultM = 10
+
+-- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
+-- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
+editDistanceUpTo :: (GAlign f, Foldable f, Functor f, HasField fields Category) => Integer -> These (Term f (Record fields)) (Term f (Record fields)) -> Int
+editDistanceUpTo m = these termSize termSize (\ a b -> diffSum (patchSum termSize) (cutoff m (approximateDiff a b)))
+  where diffSum patchCost = sum . fmap (maybe 0 patchCost)
+        approximateDiff a b = maybe (replacing a b) wrap (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
