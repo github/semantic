@@ -10,11 +10,8 @@
         (Operator
           (Other "composite_literal"
             (Identifier)
-          { (Pair
+          (Pair
+            { (Identifier) -> (Identifier) }
+            { (Identifier) -> (FunctionCall
               (Identifier)
-              (Identifier))
-          ->(Pair
-              (Identifier)
-              (FunctionCall
-                (Identifier)
-                (QualifiedIdentifier))) }))))))
+              (QualifiedIdentifier)) })))))))

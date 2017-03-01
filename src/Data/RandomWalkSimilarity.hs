@@ -5,7 +5,6 @@ module Data.RandomWalkSimilarity
 , pqGramDecorator
 , defaultFeatureVectorDecorator
 , featureVectorDecorator
-, editDistanceUpTo
 , defaultD
 , defaultP
 , defaultQ
@@ -21,6 +20,8 @@ import Control.Monad.Random
 import Control.Monad.State
 import Data.Align.Generic
 import Data.Array
+import Data.Functor.Classes
+import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
@@ -34,10 +35,9 @@ import Patch
 import Prologue as P
 import qualified SES
 import System.Random.Mersenne.Pure64
-import Term (termSize, zipTerms, Term, TermF)
+import Term (Term, TermF)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
-type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
 
 -- | Given a function comparing two terms recursively,
 -- a function to compute a Hashable label from an unpacked term, and two lists of terms,
@@ -46,15 +46,16 @@ type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Ma
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields.
-       (GAlign f, Traversable f, Eq (f (Term f Category)), HasField fields Category, HasField fields (Maybe FeatureVector))
-    => DiffTerms f fields -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+       (GAlign f, Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
+    => SES.Cost (Term f (Record fields)) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+    -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
-    -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
-rws compare as bs
+    -> [These (Term f (Record fields)) (Term f (Record fields))] -- ^ The resulting list of similarity-matched diffs.
+rws editDistance canCompare as bs
   | null as, null bs = []
-  | null as = inserting . eraseFeatureVector <$> bs
-  | null bs = deleting . eraseFeatureVector <$> as
+  | null as = That . eraseFeatureVector <$> bs
+  | null bs = This . eraseFeatureVector <$> as
   | otherwise =
     -- Construct a State who's final value is a list of (Int, Diff leaf (Record fields))
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
@@ -68,21 +69,21 @@ rws compare as bs
 
   where
     minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
-    sesDiffs = SES.ses replaceIfEqual cost as bs
+    sesDiffs = SES.ses (gliftEq (==) `on` fmap category) cost as bs
 
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
-      foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
-        Pure (Delete term) ->
+      foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case diff of
+        This term ->
           (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
-        Pure (Insert term) ->
+        That term ->
           (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
-        _ ->
-          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff), allDiffs <> pure (Index counterA))
+        These a b ->
+          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, These a b), allDiffs <> pure (Index counterA))
       ) ([], [], 0, 0, [], []) sesDiffs
 
     findNearestNeighbourToDiff :: TermOrIndexOrNone (UnmappedTerm f fields)
                                -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
-                                        (Maybe (These Int Int, Diff f (Record fields)))
+                                        (Maybe (These Int Int, These (Term f (Record fields)) (Term f (Record fields))))
     findNearestNeighbourToDiff termThing = case termThing of
       None -> pure Nothing
       Term term -> Just <$> findNearestNeighbourTo term
@@ -94,7 +95,7 @@ rws compare as bs
     -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
     findNearestNeighbourTo :: UnmappedTerm f fields
                            -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
-                                    (These Int Int, Diff f (Record fields))
+                                    (These Int Int, These (Term f (Record fields)) (Term f (Record fields)))
     findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
       (previous, unmappedA, unmappedB) <- get
       fromMaybe (insertion previous unmappedA unmappedB term) $ do
@@ -106,10 +107,10 @@ rws compare as bs
         UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
         -- Return Nothing if their indices don't match
         guard (j == j')
-        compared <- compare a b
+        guard (canCompare a b)
         pure $! do
           put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-          pure (These i j, compared)
+          pure (These i j, These a b)
 
     -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
     -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
@@ -118,10 +119,10 @@ rws compare as bs
                  -> UnmappedTerms f fields
                  -> UnmappedTerm f fields
                  -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
-                          (These Int Int, Diff f (Record fields))
+                          (These Int Int, These (Term f (Record fields)) (Term f (Record fields)))
     insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
       put (previous, unmappedA, IntMap.delete j unmappedB)
-      pure (That j, inserting b)
+      pure (That j, That b)
 
     -- | Finds the most-similar unmapped term to the passed-in term, if any.
     --
@@ -133,7 +134,11 @@ rws compare as bs
       -> KdTree.KdTree Double (UnmappedTerm f fields) -- ^ The k-d tree to look up nearest neighbours within.
       -> UnmappedTerm f fields -- ^ The term to find the nearest neighbour to.
       -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
-    nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
+    nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
+
+    editDistanceIfComparable a b = if canCompare a b
+      then editDistance (These a b)
+      else maxBound
 
     insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
         insertDiff (i, mappedTerm) into)
@@ -144,15 +149,9 @@ rws compare as bs
     deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
         insertDiff (This i, deletion) into)
       diffs
-      ((termIndex &&& deleting . term) <$> unmappedA)
+      ((termIndex &&& This . term) <$> unmappedA)
 
-    -- Possibly replace terms in a diff.
-    replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
-    replaceIfEqual a b
-      | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms (eraseFeatureVector a) (eraseFeatureVector b)
-      | otherwise = Nothing
-
-    cost = iter (const 0) . (1 <$)
+    cost = these (const 1) (const 1) (const (const 0))
 
     kdas = KdTree.build (elems . feature) featurizedAs
     kdbs = KdTree.build (elems . feature) featurizedBs
@@ -197,12 +196,6 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
       That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
       These _ _ -> (before, after)
 
--- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
--- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (Foldable f, Functor f) => Integer -> Diff f annotation -> Int
-editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
-  where diffSum patchCost = sum . fmap (maybe 0 patchCost)
-
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
 -- | How many of the most similar terms to consider, to rule out false positives.
@@ -211,9 +204,6 @@ defaultP = 2
 defaultQ = 3
 defaultMoveBound = 2
 
--- | How many nodes to consider for our constant-time approximation to tree edit distance.
-defaultM :: Integer
-defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {

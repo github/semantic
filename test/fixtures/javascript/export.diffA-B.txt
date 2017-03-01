@@ -72,26 +72,28 @@
     (Other "export_specifier"
     { (Identifier)
     ->(Identifier) }))
-{ (Export
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier))))
-->(Export
-    (StringLiteral)
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier))) }
+  (Export
+  { +(StringLiteral)+ }
+  {(VarDecl
+    (Other "variable_declarator"
+      (Identifier)))
+  ->
+  (Other "export_specifier"
+    (Identifier)
+    (Identifier))}
+  {(VarDecl
+    (Other "variable_declarator"
+      (Identifier)))
+  ->
+  (Other "export_specifier"
+    (Identifier)
+    (Identifier))}
+  {(VarDecl
+    (Other "variable_declarator"
+      (Identifier)))
+  ->
+  (Other "export_specifier"
+    (Identifier))}  )
 {-(Export
     (VarAssignment
       (Identifier)
