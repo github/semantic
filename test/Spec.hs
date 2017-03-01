@@ -6,6 +6,7 @@ import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Diff.Spec
 import qualified DiffSummarySpec
+import qualified GitmonClientSpec
 import qualified InterpreterSpec
 import qualified PatchOutputSpec
 import qualified RangeSpec
@@ -31,3 +32,4 @@ main = hspec . parallel $ do
   describe "TOC" TOCSpec.spec
   describe "SemanticDiffSpec" SemanticDiffSpec.spec
   describe "Integration" IntegrationSpec.spec
+  describe "GitmonClient" GitmonClientSpec.spec

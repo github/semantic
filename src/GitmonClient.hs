@@ -71,16 +71,31 @@ clock :: Clock
 clock = Realtime
 
 processJSON :: GitmonCommand -> ProcessData -> ByteString
-processJSON command processData = toStrict . encode $ GitmonMsg command processData
+processJSON command processData = (toStrict . encode $ GitmonMsg command processData) <> "\n"
 
 type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
+safeIO :: MonadIO m => IO () -> m ()
+safeIO command = liftIO $ command `catch` noop
+
+noop :: IOException -> IO ()
+noop _ = return ()
+
 reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program gitCommand = do
-  (gitDir, realIP, repoID, repoName, userID) <- liftIO $ loadEnvVars
-
   soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
+
   safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
+
+  result <- reportGitmon' soc program gitCommand
+
+  safeIO $ close soc
+
+  return result
+
+reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon' soc program gitCommand = do
+  (gitDir, realIP, repoID, repoName, userID) <- liftIO $ loadEnvVars
 
   safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoID repoName userID "semantic-diff"))
 
@@ -96,17 +111,9 @@ reportGitmon program gitCommand = do
 
   safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
 
-  safeIO $ close soc
-
   return result
 
-  where safeIO :: MonadIO m => IO () -> m ()
-        safeIO command = liftIO $ command `catch` noop
-
-        noop :: IOException -> IO ()
-        noop _ = return ()
-
-        collectStats :: IO (TimeSpec, ProcInfo)
+  where collectStats :: IO (TimeSpec, ProcInfo)
         collectStats = do
           time <- getTime clock
           procIOContents <- Y.decodeFileEither procFileAddr :: IO ProcInfo

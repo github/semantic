@@ -149,6 +149,7 @@ test-suite test
                      , Data.RandomWalkSimilarity.Spec
                      , Diff.Spec
                      , DiffSummarySpec
+                     , GitmonClientSpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , RangeSpec
@@ -162,9 +163,11 @@ test-suite test
                      , array
                      , base
                      , bifunctors
+                     , bytestring
                      , deepseq
                      , filepath
                      , gitlib
+                     , gitlib-libgit2
                      , Glob
                      , hspec >= 2.4.1
                      , hspec-core
@@ -172,6 +175,7 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
+                     , network
                      , protolude
                      , containers
                      , recursion-schemes >= 4.1
