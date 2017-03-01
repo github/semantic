@@ -2,6 +2,8 @@
 module Syntax where
 
 import Data.Aeson
+import Data.Functor.Classes
+import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
 import Data.Mergeable
 import GHC.Generics
@@ -170,3 +172,6 @@ instance Listable leaf => Listable1 (Syntax leaf) where
 
 instance (Listable leaf, Listable recur) => Listable (Syntax leaf recur) where
   tiers = tiers1
+
+instance Eq leaf => Eq1 (Syntax leaf) where
+  liftEq = genericLiftEq

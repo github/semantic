@@ -14,6 +14,10 @@ class Functor f => GAlign f where
   default galign :: (Generic1 f, GAlign (Rep1 f)) => f a -> f b -> Maybe (f (These a b))
   galign a b = to1 <$> galign (from1 a) (from1 b)
 
+  -- | Perform generic alignment of values of some functor, applying the given function to alignments of elements.
+  galignWith :: (These a b -> c) -> f a -> f b -> Maybe (f c)
+  galignWith f = (fmap (fmap f) .) . galign
+
 
 -- Generically-derived instances
 

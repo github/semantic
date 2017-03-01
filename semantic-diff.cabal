@@ -19,6 +19,7 @@ library
                      , Category
                      , Data.Align.Generic
                      , Data.Functor.Both
+                     , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
@@ -75,6 +76,7 @@ library
                      , dlist
                      , filepath
                      , free
+                     , freer-cofreer
                      , gitlib
                      , gitlib-libgit2
                      , gitrev
