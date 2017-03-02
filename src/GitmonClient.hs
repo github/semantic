@@ -93,7 +93,7 @@ reportGitmon' soc program gitCommand = do
         shouldContinue err action = do
           maybeCommand <- safeIO $ timeout gitmonTimeout (safeIO $ recv soc 1024)
           case (join . join) maybeCommand of
-            Just command | "fail" `isInfixOf` decodeUtf8 command -> err . unpack $ "Received " <> decodeUtf8 command <> " from Gitmon"
+            Just command | "fail" `isInfixOf` decodeUtf8 command -> err . unpack $ "Received '" <> decodeUtf8 command <> "' from Gitmon"
             _ -> action
 
         procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
