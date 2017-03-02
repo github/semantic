@@ -33,6 +33,9 @@ spec = parallel $ do
 
         let [update, schedule, finish] = infoToCommands info
 
+        liftIO $ close client
+        liftIO $ close server
+
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe update (Just "update")
         liftIO $ shouldBe schedule (Just "schedule")
@@ -53,6 +56,9 @@ spec = parallel $ do
         info <- liftIO $ recv server 1024
 
         let [updateData, _, finishData] = infoToData info
+
+        liftIO $ close client
+        liftIO $ close server
 
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe (either id gitDir updateData) wd
