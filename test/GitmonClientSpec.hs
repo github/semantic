@@ -69,6 +69,22 @@ spec = parallel $ do
         liftIO $ shouldSatisfy (either (const (-1)) diskWriteBytes finishData) (>= 0)
         liftIO $ shouldSatisfy (either (const (-1)) resultCode finishData) (>= 0)
 
+    it "returns the correct git result if the socket is unavailable" $
+      withRepository lgFactory wd $ do
+        (client, server) <- liftIO $ socketPair AF_UNIX Stream defaultProtocol
+        liftIO $ close client
+
+        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        commit <- reportGitmon' client "cat-file" $ lookupCommit object
+        info <- liftIO $ recv server 1024
+
+        liftIO $ close server
+
+        liftIO $ print info
+
+        liftIO $ shouldBe (commitOid commit) object
+        liftIO $ shouldBe "" info
+
 infoToCommands :: ByteString -> [Maybe Text]
 infoToCommands input = command' . toObject <$> Prelude.take 3 (split '\n' input)
   where
