@@ -56,6 +56,9 @@ instance ToJSON GitmonMsg where
   toJSON GitmonMsg{..} = object ["command" .= command, "data" .= processData]
 
 
+type ProcInfo = Either Y.ParseException (Maybe ProcIO)
+
+
 reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program gitCommand = do
   maybeSoc <- safeIO $ socket AF_UNIX Stream defaultProtocol
@@ -79,8 +82,8 @@ reportGitmon' soc program gitCommand = do
     (startTime, beforeProcIOContents) <- liftIO collectStats
     !result <- gitCommand
     (afterTime, afterProcIOContents) <- liftIO collectStats
-    let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-    safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
+    let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
+    safeIO $ sendAll soc (processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode))
     pure result
 
   where collectStats :: IO (TimeSpec, ProcInfo)
@@ -133,8 +136,6 @@ clock = Realtime
 
 processJSON :: GitmonCommand -> ProcessData -> ByteString
 processJSON command processData = (toStrict . encode $ GitmonMsg command processData) <> "\n"
-
-type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
 safeIO :: MonadIO m => IO a -> m (Maybe a)
 safeIO command = liftIO $ (Just <$> command) `catch` noop
