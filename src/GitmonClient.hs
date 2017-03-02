@@ -89,9 +89,9 @@ reportGitmon program gitCommand = do
           safeIO $ close soc
           pure result
          )
-       (\_ -> do
+       (\e -> do
          safeIO $ close soc
-         gitCommand)
+         throwIO e)
 
 reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' soc program gitCommand = do
