@@ -82,14 +82,12 @@ reportGitmon program gitCommand = do
   maybeSoc <- safeIO $ socket AF_UNIX Stream defaultProtocol
   case maybeSoc of
     Nothing -> gitCommand
-    Just soc -> catchError
-       (do
-          safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
-          result <- reportGitmon' soc program gitCommand
-          safeIO $ close soc
-          pure result
-         )
-       (\e -> do
+    Just soc -> do
+      safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
+      result <- reportGitmon' soc program gitCommand
+      safeIO $ close soc
+      pure result
+      `catchError` (\e -> do
          safeIO $ close soc
          throwIO e)
 
