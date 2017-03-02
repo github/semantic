@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric #-}
+{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module GitmonClient where
 
 import Data.Aeson
@@ -70,21 +71,15 @@ processJSON command processData = (toStrict . encode $ GitmonMsg command process
 
 type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
-safeIO :: MonadIO m => IO () -> m ()
-safeIO command = liftIO $ command `catch` noop
+safeIO :: MonadIO m => IO a -> m (Maybe a)
+safeIO command = liftIO $ (Just <$> command) `catch` noop
 
-safeIOValue :: MonadIO m => IO a -> m (Maybe a)
-safeIOValue command = liftIO $ (Just <$> command) `catch` noopValue
-
-noop :: IOException -> IO ()
-noop _ = pure ()
-
-noopValue :: IOException -> IO (Maybe a)
-noopValue _ = pure Nothing
+noop :: IOException -> IO (Maybe a)
+noop _ = pure Nothing
 
 reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program gitCommand = do
-  maybeSoc <- safeIOValue $ socket AF_UNIX Stream defaultProtocol
+  maybeSoc <- safeIO $ socket AF_UNIX Stream defaultProtocol
   case maybeSoc of
     Nothing -> gitCommand
     Just soc -> do
