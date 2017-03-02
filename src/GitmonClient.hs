@@ -82,11 +82,16 @@ reportGitmon program gitCommand = do
   maybeSoc <- safeIO $ socket AF_UNIX Stream defaultProtocol
   case maybeSoc of
     Nothing -> gitCommand
-    Just soc -> do
-      safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
-      result <- reportGitmon' soc program gitCommand
-      safeIO $ close soc
-      pure result
+    Just soc -> catchError
+       (do
+          safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
+          result <- reportGitmon' soc program gitCommand
+          safeIO $ close soc
+          pure result
+         )
+       (\_ -> do
+         safeIO $ close soc
+         gitCommand)
 
 reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' soc program gitCommand = do
