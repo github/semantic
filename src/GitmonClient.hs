@@ -19,31 +19,27 @@ import System.Directory (getCurrentDirectory)
 import System.Environment
 import System.Timeout
 
-data ProcIO = ProcIO {
-    read_bytes :: Integer
-  , write_bytes :: Integer
-} deriving (Show, Generic)
+data ProcIO = ProcIO { read_bytes :: Integer
+                     , write_bytes :: Integer } deriving (Show, Generic)
 
 instance FromJSON ProcIO
 
 
-data ProcessData =
-    ProcessUpdateData { gitDir :: String
-                      , program :: String
-                      , realIP :: Maybe String
-                      , repoID :: Maybe String
-                      , repoName :: Maybe String
-                      , userID :: Maybe String
-                      , via :: String }
-  | ProcessScheduleData
-  | ProcessFinishData { cpu :: Integer
-                      , diskReadBytes :: Integer
-                      , diskWriteBytes :: Integer
-                      , resultCode :: Integer } deriving (Generic, Show)
+data ProcessData = ProcessUpdateData { gitDir :: String
+                                     , program :: String
+                                     , realIP :: Maybe String
+                                     , repoID :: Maybe String
+                                     , repoName :: Maybe String
+                                     , userID :: Maybe String
+                                     , via :: String }
+                 | ProcessScheduleData
+                 | ProcessFinishData { cpu :: Integer
+                                     , diskReadBytes :: Integer
+                                     , diskWriteBytes :: Integer
+                                     , resultCode :: Integer } deriving (Generic, Show)
 
 instance ToJSON ProcessData where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = camelTo2 '_' }
-
 
 
 data GitmonCommand = Update
@@ -54,30 +50,12 @@ instance ToJSON GitmonCommand where
   toJSON = genericToJSON defaultOptions { constructorTagModifier = unpack . toLower . pack }
 
 
-data GitmonMsg = GitmonMsg { command :: GitmonCommand, processData :: ProcessData } deriving (Show)
+data GitmonMsg = GitmonMsg { command :: GitmonCommand
+                           , processData :: ProcessData } deriving (Show)
 
 instance ToJSON GitmonMsg where
   toJSON GitmonMsg{..} = object ["command" .= command, "data" .= processData]
 
-gitmonSocketAddr :: String
-gitmonSocketAddr = "/tmp/gitstats.sock"
-
-procFileAddr :: String
-procFileAddr = "/proc/self/io"
-
-clock :: Clock
-clock = Realtime
-
-processJSON :: GitmonCommand -> ProcessData -> ByteString
-processJSON command processData = (toStrict . encode $ GitmonMsg command processData) <> "\n"
-
-type ProcInfo = Either Y.ParseException (Maybe ProcIO)
-
-safeIO :: MonadIO m => IO a -> m (Maybe a)
-safeIO command = liftIO $ (Just <$> command) `catch` noop
-
-noop :: IOException -> IO (Maybe a)
-noop _ = pure Nothing
 
 reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program gitCommand = do
@@ -115,7 +93,7 @@ reportGitmon' soc program gitCommand = do
 
         shouldContinue :: MonadIO m => m b -> m b -> m b
         shouldContinue err action = do
-          maybeCommand <- safeIO $ timeout (1 * 1000 * 1000) (safeIO $ recv soc 1024)
+          maybeCommand <- safeIO $ timeout gitmonTimeout (safeIO $ recv soc 1024)
           case (join . join) maybeCommand of
             Just command | "fail" `isInfixOf` decodeUtf8 command -> err
             _ -> action
@@ -141,3 +119,27 @@ reportGitmon' soc program gitCommand = do
           repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
           userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
           pure (gitDir, realIP, repoID, repoName, userID)
+
+-- Timeout in nanoseconds to wait before giving up on Gitmon response to schedule.
+gitmonTimeout :: Int
+gitmonTimeout = 1 * 1000 * 1000
+
+gitmonSocketAddr :: String
+gitmonSocketAddr = "/tmp/gitstats.sock"
+
+procFileAddr :: String
+procFileAddr = "/proc/self/io"
+
+clock :: Clock
+clock = Realtime
+
+processJSON :: GitmonCommand -> ProcessData -> ByteString
+processJSON command processData = (toStrict . encode $ GitmonMsg command processData) <> "\n"
+
+type ProcInfo = Either Y.ParseException (Maybe ProcIO)
+
+safeIO :: MonadIO m => IO a -> m (Maybe a)
+safeIO command = liftIO $ (Just <$> command) `catch` noop
+
+noop :: IOException -> IO (Maybe a)
+noop _ = pure Nothing
