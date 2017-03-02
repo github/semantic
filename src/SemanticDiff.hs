@@ -101,7 +101,8 @@ fetchDiffs args@Arguments{..} = do
     ([], Join (Just a, Just b)) -> pathsToDiff args (both a b)
     (ps, _) -> pure ps
 
-  Async.withTaskGroup numCapabilities $ \p -> Async.mapTasks p (fetchDiff args <$> paths)
+  Async.withTaskGroup numCapabilities $ \p ->
+    Async.mapTasks p (fetchDiff args <$> paths)
 
 fetchDiff :: Arguments -> FilePath -> IO R.Output
 fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
@@ -152,9 +153,7 @@ blobEntriesToDiff shas = do
 treeForCommitSha :: String -> ReaderT LgRepo IO (Git.Tree LgRepo)
 treeForCommitSha sha = do
   object <- parseObjOid (toS sha)
-
   commit <- reportGitmon "cat-file" $ lookupCommit object
-
   reportGitmon "cat-file" $ lookupTree (commitTree commit)
 
 -- | Returns a SourceBlob given a relative file path, and the sha to look up.

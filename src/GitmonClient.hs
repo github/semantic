@@ -6,7 +6,6 @@ import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy (toStrict)
 import Data.Text (pack, unpack, toLower, isInfixOf)
--- import Data.Text.Lazy.Encoding (decodeUtf8)
 import qualified Data.Yaml as Y
 import GHC.Generics
 import Git.Libgit2
@@ -71,7 +70,6 @@ reportGitmon program gitCommand = do
          safeIO $ close soc
          throwIO e)
 
--- TODO: Check isReadable and isWritable
 reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' soc program gitCommand = do
   (gitDir, realIP, repoID, repoName, userID) <- liftIO loadEnvVars
