@@ -20,7 +20,7 @@ import Test.Hspec.Expectations.Pretty
 import Control.Exception
 
 spec :: Spec
-spec =
+spec = parallel $ do
   describe "gitmon" $ do
     let wd = "test/fixtures/git/examples/all-languages.git"
     it "receives commands in order" . withSocketPair $ \(client, server) ->
