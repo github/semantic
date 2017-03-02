@@ -15,7 +15,6 @@ import Prologue hiding (toStrict)
 import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
-import System.IO
 
 data ProcIO = ProcIO {
     read_bytes :: Integer

@@ -2,7 +2,6 @@ module GitmonClientSpec where
 
 import Data.Aeson
 import Data.Aeson.Types
-import Data.ByteString.Lazy (fromChunks)
 import Data.ByteString.Char8 (split, ByteString)
 import Data.Foldable
 import Data.Maybe (fromJust)
@@ -14,7 +13,7 @@ import GitmonClient
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString
 import Prelude hiding (lookup)
-import Prologue (liftIO, Map)
+import Prologue (liftIO)
 import System.Environment (setEnv)
 import Test.Hspec hiding (shouldBe, shouldSatisfy)
 import Test.Hspec.Expectations.Pretty
@@ -23,8 +22,9 @@ import Data.Map.Lazy (lookup, fromList)
 spec :: Spec
 spec = parallel $ do
   describe "gitmon" $ do
+    let wd = "test/fixtures/git/examples/all-languages.git"
     it "receives commands in order" $ do
-      withRepository lgFactory "test/fixtures/git/examples/all-languages.git" $ do
+      withRepository lgFactory wd $ do
         (client, server) <- liftIO $ socketPair AF_UNIX Stream defaultProtocol
 
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
@@ -58,10 +58,10 @@ spec = parallel $ do
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe (either id gitDir updateData) wd
         liftIO $ shouldBe (either id program updateData) "cat-file"
-        liftIO $ shouldBe (either Just realIp updateData) (Just "127.0.0.1")
-        liftIO $ shouldBe (either Just repoId updateData) (Just "2")
+        liftIO $ shouldBe (either Just realIP updateData) (Just "127.0.0.1")
+        liftIO $ shouldBe (either Just repoID updateData) (Just "2")
         liftIO $ shouldBe (either Just repoName updateData) (Just "examples/all-languages")
-        liftIO $ shouldBe (either Just userId updateData) (Just "1")
+        liftIO $ shouldBe (either Just userID updateData) (Just "1")
         liftIO $ shouldBe (either id via updateData) "semantic-diff"
 
         liftIO $ shouldSatisfy (either (const (-1)) cpu finishData) (>= 0)
