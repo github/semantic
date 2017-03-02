@@ -13,9 +13,9 @@ import GitmonClient
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString
 import Prelude hiding (lookup)
-import Prologue (liftIO)
+import Prologue (liftIO, runReaderT)
 import System.Environment (setEnv)
-import Test.Hspec hiding (shouldBe, shouldSatisfy)
+import Test.Hspec hiding (shouldBe, shouldSatisfy, shouldThrow, anyErrorCall)
 import Test.Hspec.Expectations.Pretty
 import Control.Exception
 
@@ -25,6 +25,7 @@ spec =
     let wd = "test/fixtures/git/examples/all-languages.git"
     it "receives commands in order" . withSocketPair $ \(client, server) ->
       withRepository lgFactory wd $ do
+        liftIO $ sendAll server "continue"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' client "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
@@ -44,6 +45,7 @@ spec =
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "2"
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
 
+        liftIO $ sendAll server "continue"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' client "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
@@ -74,6 +76,14 @@ spec =
 
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe "" info
+
+    it "throws if schedule response is fail" . withSocketPair $ \(client, server) ->
+      withRepository lgFactory wd $ do
+        repo <- getRepository
+        liftIO $ sendAll server "fail too busy"
+        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+
+        liftIO $ shouldThrow (runReaderT (reportGitmon' client "cat-file" (lookupCommit object)) repo) anyErrorCall
 
 withSocketPair :: ((Socket, Socket) -> IO c) -> IO c
 withSocketPair =

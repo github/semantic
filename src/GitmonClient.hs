@@ -5,14 +5,15 @@ module GitmonClient where
 import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy (toStrict)
-import Data.Text (pack, unpack, toLower)
+import Data.Text (pack, unpack, toLower, isInfixOf)
+-- import Data.Text.Lazy.Encoding (decodeUtf8)
 import qualified Data.Yaml as Y
 import GHC.Generics
 import Git.Libgit2
-import Network.Socket
-import Network.Socket.ByteString (sendAll)
+import Network.Socket hiding (recv)
+import Network.Socket.ByteString (sendAll, recv)
 import Prelude
-import Prologue hiding (toStrict)
+import Prologue hiding (toStrict, error)
 import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
@@ -91,17 +92,22 @@ reportGitmon program gitCommand = do
          safeIO $ close soc
          throwIO e)
 
+-- TODO: Check isReadable and isWritable
 reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' soc program gitCommand = do
   (gitDir, realIP, repoID, repoName, userID) <- liftIO loadEnvVars
   safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoID repoName userID "semantic-diff"))
   safeIO $ sendAll soc (processJSON Schedule ProcessScheduleData)
-  (startTime, beforeProcIOContents) <- liftIO collectStats
-  !result <- gitCommand
-  (afterTime, afterProcIOContents) <- liftIO collectStats
-  let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-  safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
-  pure result
+  maybeCommand <- safeIO $ recv soc 1024
+  case maybeCommand of
+    Just command | "fail" `isInfixOf` decodeUtf8 command -> error "Got fail from Gitmon"
+    _ -> do
+      (startTime, beforeProcIOContents) <- liftIO collectStats
+      !result <- gitCommand
+      (afterTime, afterProcIOContents) <- liftIO collectStats
+      let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
+      safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
+      pure result
 
   where collectStats :: IO (TimeSpec, ProcInfo)
         collectStats = do
