@@ -17,6 +17,7 @@ import Prologue hiding (toStrict, error)
 import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
+import System.Timeout
 
 data ProcIO = ProcIO {
     read_bytes :: Integer
@@ -98,22 +99,26 @@ reportGitmon' soc program gitCommand = do
   (gitDir, realIP, repoID, repoName, userID) <- liftIO loadEnvVars
   safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoID repoName userID "semantic-diff"))
   safeIO $ sendAll soc (processJSON Schedule ProcessScheduleData)
-  maybeCommand <- safeIO $ recv soc 1024
-  case maybeCommand of
-    Just command | "fail" `isInfixOf` decodeUtf8 command -> error "Got fail from Gitmon"
-    _ -> do
-      (startTime, beforeProcIOContents) <- liftIO collectStats
-      !result <- gitCommand
-      (afterTime, afterProcIOContents) <- liftIO collectStats
-      let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-      safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
-      pure result
+  shouldContinue (error "Got fail from Gitmon") $ do
+    (startTime, beforeProcIOContents) <- liftIO collectStats
+    !result <- gitCommand
+    (afterTime, afterProcIOContents) <- liftIO collectStats
+    let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
+    safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
+    pure result
 
   where collectStats :: IO (TimeSpec, ProcInfo)
         collectStats = do
           time <- getTime clock
           procIOContents <- Y.decodeFileEither procFileAddr :: IO ProcInfo
           pure (time, procIOContents)
+
+        shouldContinue :: MonadIO m => m b -> m b -> m b
+        shouldContinue err action = do
+          maybeCommand <- safeIO $ timeout (1 * 1000 * 1000) (safeIO $ recv soc 1024)
+          case (join . join) maybeCommand of
+            Just command | "fail" `isInfixOf` decodeUtf8 command -> err
+            _ -> action
 
         procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
         procStats beforeTime afterTime beforeProcIOContents afterProcIOContents = ( cpuTime, diskReadBytes, diskWriteBytes, resultCode )
