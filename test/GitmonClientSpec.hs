@@ -17,7 +17,6 @@ import Prologue (liftIO)
 import System.Environment (setEnv)
 import Test.Hspec hiding (shouldBe, shouldSatisfy)
 import Test.Hspec.Expectations.Pretty
-import Data.Map.Lazy (lookup, fromList)
 
 spec :: Spec
 spec = parallel $ do
