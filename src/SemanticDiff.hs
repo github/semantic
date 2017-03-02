@@ -128,7 +128,7 @@ fetchDiff' Arguments{..} filepath = do
 
 
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
-pathsToDiff args@Arguments{..} shas = withRepository lgFactory gitDir $ do
+pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
   lift $ runReaderT (pathsToDiff' shas) repo
