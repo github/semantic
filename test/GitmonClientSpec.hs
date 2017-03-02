@@ -38,8 +38,7 @@ spec = parallel $ do
         liftIO $ shouldBe schedule (Just "schedule")
         liftIO $ shouldBe finish (Just "finish")
 
-    it "receives update command with correct data" $ do
-      let wd = "test/fixtures/git/examples/all-languages.git"
+    it "receives update command with correct data" $
       withRepository lgFactory wd $ do
         liftIO $ setEnv "GIT_DIR" wd
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
