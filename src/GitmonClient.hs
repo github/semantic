@@ -54,11 +54,7 @@ instance ToJSON GitmonCommand where
 data GitmonMsg = GitmonMsg { command :: GitmonCommand, processData :: ProcessData } deriving (Show)
 
 instance ToJSON GitmonMsg where
-  toJSON GitmonMsg{..} = object [
-    "command" .= command,
-    "data" .= processData
-    ]
-
+  toJSON GitmonMsg{..} = object ["command" .= command, "data" .= processData]
 
 gitmonSocketAddr :: String
 gitmonSocketAddr = "/tmp/gitstats.sock"
@@ -77,46 +73,43 @@ type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 safeIO :: MonadIO m => IO () -> m ()
 safeIO command = liftIO $ command `catch` noop
 
+safeIOValue :: MonadIO m => IO a -> m (Maybe a)
+safeIOValue command = liftIO $ (Just <$> command) `catch` noopValue
+
 noop :: IOException -> IO ()
-noop _ = return ()
+noop _ = pure ()
+
+noopValue :: IOException -> IO (Maybe a)
+noopValue _ = pure Nothing
 
 reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon program gitCommand = do
-  soc <- liftIO $ socket AF_UNIX Stream defaultProtocol
-
-  safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
-
-  result <- reportGitmon' soc program gitCommand
-
-  safeIO $ close soc
-
-  return result
+  maybeSoc <- safeIOValue $ socket AF_UNIX Stream defaultProtocol
+  case maybeSoc of
+    Nothing -> gitCommand
+    Just soc -> do
+      safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
+      result <- reportGitmon' soc program gitCommand
+      safeIO $ close soc
+      pure result
 
 reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' soc program gitCommand = do
-  (gitDir, realIP, repoID, repoName, userID) <- liftIO $ loadEnvVars
-
+  (gitDir, realIP, repoID, repoName, userID) <- liftIO loadEnvVars
   safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoID repoName userID "semantic-diff"))
-
   safeIO $ sendAll soc (processJSON Schedule ProcessScheduleData)
-
   (startTime, beforeProcIOContents) <- liftIO collectStats
-
   !result <- gitCommand
-
   (afterTime, afterProcIOContents) <- liftIO collectStats
-
   let (cpuTime, diskReadBytes', diskWriteBytes', resultCode') = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-
   safeIO $ sendAll soc (processJSON Finish ProcessFinishData { cpu = cpuTime, diskReadBytes = diskReadBytes', diskWriteBytes = diskWriteBytes', resultCode = resultCode' })
-
-  return result
+  pure result
 
   where collectStats :: IO (TimeSpec, ProcInfo)
         collectStats = do
           time <- getTime clock
           procIOContents <- Y.decodeFileEither procFileAddr :: IO ProcInfo
-          return (time, procIOContents)
+          pure (time, procIOContents)
 
         procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
         procStats beforeTime afterTime beforeProcIOContents afterProcIOContents = ( cpuTime, diskReadBytes, diskWriteBytes, resultCode )
@@ -138,5 +131,4 @@ reportGitmon' soc program gitCommand = do
           repoID <- lookupEnv "GIT_SOCKSTAT_VAR_repo_id"
           repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
           userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
-          return (gitDir, realIP, repoID, repoName, userID)
-
+          pure (gitDir, realIP, repoID, repoName, userID)
