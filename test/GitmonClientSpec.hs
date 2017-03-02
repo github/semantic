@@ -17,30 +17,26 @@ import Prologue (liftIO)
 import System.Environment (setEnv)
 import Test.Hspec hiding (shouldBe, shouldSatisfy)
 import Test.Hspec.Expectations.Pretty
+import Control.Exception
 
 spec :: Spec
-spec = parallel $ do
+spec =
   describe "gitmon" $ do
     let wd = "test/fixtures/git/examples/all-languages.git"
-    it "receives commands in order" $ do
+    it "receives commands in order" . withSocketPair $ \(client, server) ->
       withRepository lgFactory wd $ do
-        (client, server) <- liftIO $ socketPair AF_UNIX Stream defaultProtocol
-
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' client "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [update, schedule, finish] = infoToCommands info
 
-        liftIO $ close client
-        liftIO $ close server
-
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe update (Just "update")
         liftIO $ shouldBe schedule (Just "schedule")
         liftIO $ shouldBe finish (Just "finish")
 
-    it "receives update command with correct data" $
+    it "receives update command with correct data" . withSocketPair $ \(client, server) ->
       withRepository lgFactory wd $ do
         liftIO $ setEnv "GIT_DIR" wd
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
@@ -48,16 +44,11 @@ spec = parallel $ do
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "2"
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
 
-        (client, server) <- liftIO $ socketPair AF_UNIX Stream defaultProtocol
-
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' client "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [updateData, _, finishData] = infoToData info
-
-        liftIO $ close client
-        liftIO $ close server
 
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe (either id gitDir updateData) wd
@@ -73,21 +64,24 @@ spec = parallel $ do
         liftIO $ shouldSatisfy (either (const (-1)) diskWriteBytes finishData) (>= 0)
         liftIO $ shouldSatisfy (either (const (-1)) resultCode finishData) (>= 0)
 
-    it "returns the correct git result if the socket is unavailable" $
+    it "returns the correct git result if the socket is unavailable" . withSocketPair $ \(client, server) ->
       withRepository lgFactory wd $ do
-        (client, server) <- liftIO $ socketPair AF_UNIX Stream defaultProtocol
         liftIO $ close client
 
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' client "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
-        liftIO $ close server
-
-        liftIO $ print info
-
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe "" info
+
+withSocketPair :: ((Socket, Socket) -> IO c) -> IO c
+withSocketPair =
+  bracket
+   (socketPair AF_UNIX Stream defaultProtocol)
+   (\(client, server) -> do
+     close client
+     close server)
 
 infoToCommands :: ByteString -> [Maybe Text]
 infoToCommands input = command' . toObject <$> Prelude.take 3 (split '\n' input)
