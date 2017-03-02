@@ -4,6 +4,7 @@ import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy (fromChunks)
 import Data.ByteString.Char8 (split, ByteString)
+import Data.Foldable
 import Data.Maybe (fromJust)
 import Data.Text hiding (split, take)
 import Git.Libgit2
@@ -15,7 +16,7 @@ import Network.Socket.ByteString
 import Prelude hiding (lookup)
 import Prologue (liftIO, Map)
 import System.Environment (setEnv)
-import Test.Hspec hiding (shouldBe)
+import Test.Hspec hiding (shouldBe, shouldSatisfy)
 import Test.Hspec.Expectations.Pretty
 import Data.Map.Lazy (lookup, fromList)
 
@@ -52,16 +53,21 @@ spec = parallel $ do
         commit <- reportGitmon' client "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
-        let [updateData, _, _] = fromJust <$> infoToData info
+        let [updateData, _, finishData] = infoToData info
 
         liftIO $ shouldBe (commitOid commit) object
-        liftIO $ shouldBe (lookup ("git_dir" :: Text) updateData) (Just (pack wd))
-        liftIO $ shouldBe (lookup ("program" :: Text) updateData) (Just "cat-file")
-        liftIO $ shouldBe (lookup ("real_ip" :: Text) updateData) (Just "127.0.0.1")
-        liftIO $ shouldBe (lookup ("repo_id" :: Text) updateData) (Just "2")
-        liftIO $ shouldBe (lookup ("repo_name" :: Text) updateData) (Just "examples/all-languages")
-        liftIO $ shouldBe (lookup ("user_id" :: Text) updateData) (Just "1")
-        liftIO $ shouldBe (lookup ("via" :: Text) updateData) (Just "semantic-diff")
+        liftIO $ shouldBe (either id gitDir updateData) wd
+        liftIO $ shouldBe (either id program updateData) "cat-file"
+        liftIO $ shouldBe (either Just realIp updateData) (Just "127.0.0.1")
+        liftIO $ shouldBe (either Just repoId updateData) (Just "2")
+        liftIO $ shouldBe (either Just repoName updateData) (Just "examples/all-languages")
+        liftIO $ shouldBe (either Just userId updateData) (Just "1")
+        liftIO $ shouldBe (either id via updateData) "semantic-diff"
+
+        liftIO $ shouldSatisfy (either (const (-1)) cpu finishData) (>= 0)
+        liftIO $ shouldSatisfy (either (const (-1)) diskReadBytes finishData) (>= 0)
+        liftIO $ shouldSatisfy (either (const (-1)) diskWriteBytes finishData) (>= 0)
+        liftIO $ shouldSatisfy (either (const (-1)) resultCode finishData) (>= 0)
 
 infoToCommands :: ByteString -> [Maybe Text]
 infoToCommands input = command' . toObject <$> Prelude.take 3 (split '\n' input)
@@ -69,11 +75,15 @@ infoToCommands input = command' . toObject <$> Prelude.take 3 (split '\n' input)
     command' :: Object -> Maybe Text
     command' = parseMaybe (.: "command")
 
-infoToData :: ByteString -> [Maybe (Map Text Text)]
+infoToData :: ByteString -> [Either String ProcessData]
 infoToData input = data' . toObject <$> Prelude.take 3 (split '\n' input)
-  where
-    data' :: Object -> Maybe (Map Text Text)
-    data' = parseMaybe (.: "data")
+  where data' = parseEither parser
+        parser o = do
+          dataO <- o .: "data"
+          asum [ ProcessUpdateData <$> (dataO .: "git_dir") <*> (dataO .: "program") <*> (dataO .:? "real_ip") <*> (dataO .:? "repo_id") <*> (dataO .:? "repo_name") <*> (dataO .:? "user_id") <*> (dataO .: "via")
+               , ProcessFinishData <$> (dataO .: "cpu") <*> (dataO .: "disk_read_bytes") <*> (dataO .: "disk_write_bytes") <*> (dataO .: "result_code")
+               , pure ProcessScheduleData
+               ]
 
 toObject :: ByteString -> Object
 toObject = fromJust . decodeStrict
