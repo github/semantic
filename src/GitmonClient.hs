@@ -75,7 +75,7 @@ reportGitmon' soc program gitCommand = do
   (gitDir, realIP, repoID, repoName, userID) <- liftIO loadEnvVars
   safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoID repoName userID "semantic-diff"))
   safeIO $ sendAll soc (processJSON Schedule ProcessScheduleData)
-  shouldContinue (error "Got fail from Gitmon") $ do
+  shouldContinue error $ do
     (startTime, beforeProcIOContents) <- liftIO collectStats
     !result <- gitCommand
     (afterTime, afterProcIOContents) <- liftIO collectStats
@@ -89,11 +89,11 @@ reportGitmon' soc program gitCommand = do
           procIOContents <- Y.decodeFileEither procFileAddr :: IO ProcInfo
           pure (time, procIOContents)
 
-        shouldContinue :: MonadIO m => m b -> m b -> m b
+        shouldContinue :: MonadIO m => (String -> m b) -> m b -> m b
         shouldContinue err action = do
           maybeCommand <- safeIO $ timeout gitmonTimeout (safeIO $ recv soc 1024)
           case (join . join) maybeCommand of
-            Just command | "fail" `isInfixOf` decodeUtf8 command -> err
+            Just command | "fail" `isInfixOf` decodeUtf8 command -> err . unpack $ "Received " <> decodeUtf8 command <> " from Gitmon"
             _ -> action
 
         procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
