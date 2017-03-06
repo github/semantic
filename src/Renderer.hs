@@ -1,20 +1,18 @@
-module Renderer (Renderer, DiffArguments(..), Output(..), concatOutputs, toSummaryKey, Format(..)) where
+module Renderer (Renderer, Output(..), concatOutputs, toSummaryKey, Format(..)) where
 
 import Data.Aeson (Value, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 import Data.Functor.Both
 import Data.Map as Map hiding (null)
 import Data.Text as T (intercalate)
-import Diff
+import Data.Functor.Listable
 import Prologue
 import Source (SourceBlob)
 import Syntax
+import Diff
 
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
-
-data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath }
- deriving (Show)
 
 -- | The available types of diff rendering.
 data Format = Split | Patch | JSON | Summary | SExpression | TOC
@@ -74,3 +72,11 @@ toText (SplitOutput text) = text
 toText (PatchOutput text) = text
 toText (SExpressionOutput text) = text
 toText _ = mempty
+
+instance Listable Format where
+  tiers = cons0 Split
+       \/ cons0 Patch
+       \/ cons0 JSON
+       \/ cons0 Summary
+       \/ cons0 SExpression
+       \/ cons0 TOC

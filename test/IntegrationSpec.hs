@@ -7,13 +7,13 @@ import Data.Record
 import qualified Data.Text as T
 import GHC.Show (Show(..))
 import Data.List (union, concat, transpose)
-import Diffing
 import Info
-import Parse
+import ParseCommand
 import Prologue hiding (fst, snd)
 import Renderer
 import Renderer.SExpression as Renderer
 import Source
+import DiffCommand
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)

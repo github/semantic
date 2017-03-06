@@ -22,8 +22,8 @@ import Source hiding (break, length, null)
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
-truncatePatch :: DiffArguments -> Both SourceBlob -> Text
-truncatePatch _ blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
+truncatePatch :: Both SourceBlob -> Text
+truncatePatch blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
 patch :: HasField fields Range => Renderer (Record fields)

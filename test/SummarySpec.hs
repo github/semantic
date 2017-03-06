@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module DiffSummarySpec where
+module SummarySpec where
 
 import Category
 import Data.Functor.Both
@@ -9,7 +9,7 @@ import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
 import Diff
-import DiffSummary
+import Renderer.Summary
 import Info
 import Interpreter
 import Patch
@@ -35,10 +35,10 @@ testDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
 
 testSummary :: DiffSummary DiffInfo
-testSummary = DiffSummary { patch = Insert (LeafInfo StringLiteral "a" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [] }
+testSummary = DiffSummary { diffSummaryPatch = Insert (LeafInfo StringLiteral "a" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [] }
 
 replacementSummary :: DiffSummary DiffInfo
-replacementSummary = DiffSummary { patch = Replace (LeafInfo StringLiteral "a" $ sourceSpanBetween (1, 2) (1, 4)) (LeafInfo SymbolLiteral "b" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
+replacementSummary = DiffSummary { diffSummaryPatch = Replace (LeafInfo StringLiteral "a" $ sourceSpanBetween (1, 2) (1, 4)) (LeafInfo SymbolLiteral "b" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
 
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
@@ -60,13 +60,13 @@ spec = parallel $ do
         summaries = diffToDiffSummaries (source <$> blobs) diff
         patches = toList diff
         in
-          case (partition isBranchNode (patch <$> summaries), partition isIndexedOrFixed patches) of
+          case (partition isBranchNode (diffSummaryPatch <$> summaries), partition isIndexedOrFixed patches) of
             ((branchPatches, otherPatches), (branchDiffPatches, otherDiffPatches)) ->
               (() <$ branchPatches, () <$ otherPatches) `shouldBe` (() <$ branchDiffPatches, () <$ otherDiffPatches)
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
         diff = unListableDiff a :: SyntaxDiff String '[Category, Range, SourceSpan]
-        diffInfoPatches = patch <$> diffToDiffSummaries (source <$> blobs) diff
+        diffInfoPatches = diffSummaryPatch <$> diffToDiffSummaries (source <$> blobs) diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children
