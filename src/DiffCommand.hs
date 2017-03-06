@@ -126,7 +126,7 @@ getSourceBlob path sha = do
   (bytestring, oid, mode) <- case entry of
     Nothing -> pure (mempty, mempty, Nothing)
     Just (BlobEntry entryOid entryKind) -> do
-      blob <- lookupBlob entryOid
+      blob <- reportGitmon "cat-file" $ lookupBlob entryOid
       s <- blobToByteString blob
       let oid = renderObjOid $ blobOid blob
       pure (s, oid, Just entryKind)
