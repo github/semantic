@@ -1,16 +1,12 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators, DeriveAnyClass #-}
-module Parse where
+{-# LANGUAGE DataKinds, TypeOperators, DeriveAnyClass #-}
+module ParseCommand where
 
 import Arguments
 import Category
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty
-import qualified Data.ByteString as B1
-import qualified Data.Text.ICU.Convert as Convert
-import qualified Data.Text.ICU.Detect as Detect
 import Data.Record
 import qualified Data.Text as T
-import qualified Data.Text.IO as T
 import Info
 import Language
 import Language.Markdown
@@ -19,7 +15,6 @@ import Prologue
 import Source
 import Syntax
 import System.FilePath
-import System.IO (withBinaryFile, hFileSize)
 import Term
 import TreeSitter
 import Renderer
@@ -37,12 +32,12 @@ data ParseJSON = ParseJSON
   , children :: [ParseJSON]
   } deriving (Show, Generic, ToJSON)
 
-run :: Arguments -> IO ()
-run Arguments{..} = do
+parse :: Arguments -> IO Text
+parse Arguments{..} = do
   sources <- traverse readAndTranscodeFile filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
-  writeToOutput output $ case format of
+  pure . T.intercalate "\n" $ case format of
     SExpression -> [foldr (\t acc -> printTerm t 0 TreeOnly <> acc) "" terms]
     _ -> toS . encodePretty . cata algebra <$> terms
 
@@ -58,13 +53,6 @@ run Arguments{..} = do
         category' = toS . Info.category
         range' = byteRange
         text' = Info.sourceText
-
-    writeToOutput :: Maybe FilePath -> [Text] -> IO ()
-    writeToOutput output text =
-      case output of
-        Nothing -> for_ text putStrLn
-        Just path -> for_ text (T.writeFile path)
-
 
 -- | Return a parser that decorates with the source text.
 parserWithSource :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
@@ -107,29 +95,3 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
 parserForFilepath = parserForType . toS . takeExtension
-
--- | Read the file and convert it to Unicode.
-readAndTranscodeFile :: FilePath -> IO Source
-readAndTranscodeFile path = do
-  size <- fileSize path
-  text <- case size of
-    0 -> pure B1.empty
-    _ -> B1.readFile path
-  transcode text
-
--- From https://github.com/haskell/bytestring/pull/79/files
-fileSize :: FilePath -> IO Integer
-fileSize f = withBinaryFile f ReadMode $ \h -> do
-  -- hFileSize fails if file is not regular file (like /dev/null). Catch
-  -- exception and try reading anyway.
-  filesz <- catch (hFileSize h) useZeroIfNotRegularFile
-  pure $ fromIntegral filesz `max` 0
-  where useZeroIfNotRegularFile :: IOException -> IO Integer
-        useZeroIfNotRegularFile _ = return 0
-
--- | Transcode a file to a unicode source.
-transcode :: B1.ByteString -> IO Source
-transcode text = fromText <$> do
-  match <- Detect.detectCharset text
-  converter <- Convert.open match Nothing
-  pure $ Convert.toUnicode converter text

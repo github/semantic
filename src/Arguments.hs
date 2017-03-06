@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), RunMode(..), programArguments, args) where
+module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), RunMode(..), programArguments, args, diffPathsArgs, parseArgs) where
 
 import Data.Functor.Both
 import Data.Maybe
@@ -8,6 +8,7 @@ import Prologue hiding ((<>))
 import Prelude
 import System.Environment
 import System.Directory
+import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 
 import qualified Renderer as R
@@ -55,6 +56,7 @@ programArguments CmdLineOptions{..} = do
   pwd <- getCurrentDirectory
   gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
+  output <- getOutputPath outputFilePath
   let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
                               (Left _) -> []
                               (Right objectDirs) -> objectDirs
@@ -65,7 +67,7 @@ programArguments CmdLineOptions{..} = do
     , alternateObjectDirs = alternateObjectDirs
     , format = outputFormat
     , timeoutInMicroseconds = maybe defaultTimeout toMicroseconds maybeTimeout
-    , output = outputFilePath
+    , output = output
     , diffMode = case (noIndex, filePaths) of
       (True, [fileA, fileB]) -> PathDiff (both fileA fileB)
       (_, _) -> CommitDiff
@@ -85,10 +87,16 @@ programArguments CmdLineOptions{..} = do
     fetchShas (ShaPair x:_) = x
     fetchShas (_:xs) = fetchShas xs
 
+    getOutputPath Nothing = pure Nothing
+    getOutputPath (Just path) = do
+      isDir <- doesDirectoryExist path
+      pure . Just $ if isDir then takeFileName path -<.> ".html" else path
+
+
 -- | Quickly assemble an Arguments data record with defaults.
 args :: FilePath -> String -> String -> [String] -> R.Format -> Arguments
 args gitDir sha1 sha2 filePaths format = Arguments
-  { gitDir =  gitDir
+  { gitDir = gitDir
   , alternateObjectDirs = []
   , format = format
   , timeoutInMicroseconds = defaultTimeout
@@ -96,6 +104,34 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , diffMode = CommitDiff
   , runMode = Diff
   , shaRange = Just <$> both sha1 sha2
+  , filePaths = filePaths
+  , developmentMode = False
+  }
+
+diffPathsArgs :: FilePath -> Both FilePath -> R.Format -> Arguments
+diffPathsArgs gitDir paths format = Arguments
+  { gitDir = gitDir
+  , alternateObjectDirs = []
+  , format = format
+  , timeoutInMicroseconds = defaultTimeout
+  , output = Nothing
+  , diffMode = PathDiff paths
+  , runMode = Diff
+  , shaRange = both Nothing Nothing
+  , filePaths = []
+  , developmentMode = False
+  }
+
+parseArgs :: [String] -> R.Format -> Arguments
+parseArgs filePaths format = Arguments
+  { gitDir = ""
+  , alternateObjectDirs = []
+  , format = format
+  , timeoutInMicroseconds = defaultTimeout
+  , output = Nothing
+  , diffMode = CommitDiff
+  , runMode = Parse
+  , shaRange = both Nothing Nothing
   , filePaths = filePaths
   , developmentMode = False
   }

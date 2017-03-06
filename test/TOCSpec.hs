@@ -9,10 +9,10 @@ import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
 import Diff
-import Diffing
+import DiffCommand
 import Info
 import Interpreter
-import Parse
+import ParseCommand
 import Patch
 import Prologue hiding (fst, snd)
 import Renderer

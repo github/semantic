@@ -1,23 +1,36 @@
-module SemanticDiffSpec where
+module DiffCommandSpec where
 
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Maybe
+import Data.Functor.Both
 import Prelude
 import Prologue (($), fmap, (.), pure, for, panic)
-import Test.Hspec hiding (shouldBe, shouldThrow, errorCall)
+import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
+import Test.Hspec.LeanCheck
 import Data.Text.Lazy.Encoding as E
 import Data.Text.Lazy as T
 import Data.Map
 import qualified Data.Vector as V
 import Arguments
-import SemanticDiff
+import DiffCommand
 import Renderer
 import qualified Git.Types as Git
 
 spec :: Spec
 spec = parallel $ do
+  context "diff" $ do
+    prop "all formats should produce output for file paths" $
+      \format -> do
+        output <- diff $ diffPathsArgs "" (both "test/fixtures/ruby/and-or.A.rb" "test/fixtures/ruby/and-or.B.rb") format
+        output `shouldNotBe` ""
+
+    prop "all formats should produce output for commit range" $
+      \format -> do
+        output <- diff $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] format
+        output `shouldNotBe` ""
+
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do
       (errors, summaries) <- fetchDiffsOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.Summary
@@ -50,28 +63,12 @@ fetchDiffsOutput f arguments = do
 
 -- Diff Summaries payloads look like this:
 -- {
--- "changes": {
---   "methods.rb": [
---      {
---       "span":{"insert":{"start":[1,1],"end":[2,4]}},
---       "summary":"Added the 'foo()' method"
---      }
---   ]
--- },
+--  "changes": { "methods.rb": [{ "span":{"insert":{"start":[1,1],"end":[2,4]}}, "summary":"Added the 'foo()' method" }] },
 -- "errors":{}
 -- }
---
 -- TOC Summaries payloads look like this:
 -- {
--- "changes": {
---   "methods.rb": [
---      {
---       "span":{"start":[1,1],"end":[2,4]},
---       "category":"Method",
---       "term":"foo",
---       "changeType":"added"
---      }
---   ]
+-- "changes": { "methods.rb": [{ "span":{"start":[1,1],"end":[2,4]}, "category":"Method", "term":"foo", "changeType":"added" }]
 -- },
 -- "errors":{}
 -- }

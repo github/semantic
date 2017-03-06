@@ -1,5 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeSynonymInstances, ScopedTypeVariables #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE TypeSynonymInstances, ScopedTypeVariables #-}
 module Diff where
 
 import Prologue
@@ -37,7 +36,6 @@ beforeTerm = mergeMaybe before Both.fst
 afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 afterTerm = mergeMaybe after Both.snd
 
-
 -- | Map a function over the annotations in a diff, whether in diff or term nodes.
 --
 --   Typed using Free so as to accommodate Free structures derived from diffs that don’t fit into the Diff type synonym.
@@ -46,7 +44,6 @@ mapAnnotations :: (Functor f, Functor g)
                -> Free (TermF f (g annotation))  (Patch (Term f annotation))
                -> Free (TermF f (g annotation')) (Patch (Term f annotation'))
 mapAnnotations f = iter (\ (h :< functor) -> wrap (fmap f h :< functor)) . fmap (pure . fmap (fmap f))
-
 
 -- | Map a function over the annotations of a single diff node, if it is in Free.
 modifyAnnotations :: (Functor f, Functor g) => (annotation -> annotation) -> Free (TermF f (g annotation)) a -> Free (TermF f (g annotation)) a

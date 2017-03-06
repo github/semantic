@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Diff.Spec where
+module DiffSpec where
 
 import Category
 import Data.Bifunctor.Join
