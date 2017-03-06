@@ -123,7 +123,6 @@ getSourceBlob :: FilePath -> String -> ReaderT LgRepo IO Source.SourceBlob
 getSourceBlob path sha = do
   tree <- treeForCommitSha sha
   entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
-
   (bytestring, oid, mode) <- case entry of
     Nothing -> pure (mempty, mempty, Nothing)
     Just (BlobEntry entryOid entryKind) -> do
@@ -138,7 +137,6 @@ getSourceBlob path sha = do
     toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
     toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
     toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
-
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
