@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric, RankNTypes #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module GitmonClient where
 
@@ -57,10 +57,13 @@ instance ToJSON GitmonMsg where
 
 type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
--- newtype SocketFactory a = SocketFactory { withSocket :: (Socket -> IO a) -> IO a }
+newtype SocketFactory = SocketFactory { withSocket :: forall a. (Socket -> IO a) -> IO a }
 
-reportGitmon'' :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon'' program gitCommand = do
+reportGitmon''' :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon''' = reportGitmon'' SocketFactory { withSocket = withGitmonSocket }
+
+reportGitmon'' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon'' SocketFactory{..} program gitCommand = do
   (gitDir, realIP, repoName, userID) <- liftIO loadEnvVars
   (startTime, beforeProcIOContents) <- liftIO collectStats
 
@@ -109,8 +112,8 @@ reportGitmon'' program gitCommand = do
       userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
       pure (gitDir, realIP, repoName, userID)
 
-withSocket :: (Socket -> IO a) -> IO a
-withSocket = bracket connectSocket close
+withGitmonSocket :: (Socket -> IO c) -> IO c
+withGitmonSocket = bracket connectSocket close
   where
     connectSocket = do
       s <- socket AF_UNIX Stream defaultProtocol
