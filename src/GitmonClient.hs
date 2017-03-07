@@ -59,30 +59,29 @@ type ProcInfo = Either Y.ParseException (Maybe ProcIO)
 
 newtype SocketFactory = SocketFactory { withSocket :: forall a. (Socket -> IO a) -> IO a }
 
-reportGitmon''' :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon''' = reportGitmon'' SocketFactory { withSocket = withGitmonSocket }
+reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon = reportGitmon' SocketFactory { withSocket = withGitmonSocket }
 
-reportGitmon'' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon'' SocketFactory{..} program gitCommand = do
+reportGitmon' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+reportGitmon' SocketFactory{..} program gitCommand = do
   (gitDir, realIP, repoName, userID) <- liftIO loadEnvVars
   (startTime, beforeProcIOContents) <- liftIO collectStats
 
   maybeCommand <- safeIO . timeout gitmonTimeout . withSocket $ \s -> do
-    sendAll s (processJSON Update (ProcessUpdateData gitDir program realIP repoName userID "semantic-diff"))
-    sendAll s (processJSON Schedule ProcessScheduleData)
+    sendAll s $ processJSON Update (ProcessUpdateData gitDir program realIP repoName userID "semantic-diff")
+    sendAll s $ processJSON Schedule ProcessScheduleData
     recv s 1024
 
-  !r <- case join maybeCommand of
-    Just command | "fail" `isInfixOf` decodeUtf8 command -> error . unpack $ "Received '" <> decodeUtf8 command <> "' from Gitmon"
+  !result <- case join maybeCommand of
+    Just command | "fail" `isInfixOf` decodeUtf8 command ->
+      error . unpack $ "Received '" <> decodeUtf8 command <> "' from Gitmon"
     _ -> gitCommand
 
   (afterTime, afterProcIOContents) <- liftIO collectStats
-
   let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-  safeIO . withSocket $ \s ->
-    sendAll s (processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode))
+  safeIO . withSocket . flip sendAll $ processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode)
 
-  pure r
+  pure result
 
   where
     collectStats :: IO (TimeSpec, ProcInfo)
@@ -119,67 +118,6 @@ withGitmonSocket = bracket connectSocket close
       s <- socket AF_UNIX Stream defaultProtocol
       connect s (SockAddrUnix gitmonSocketAddr)
       pure s
-
-reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon program gitCommand = do
-  maybeSoc <- safeIO $ socket AF_UNIX Stream defaultProtocol
-  case maybeSoc of
-    Nothing -> gitCommand
-    Just soc -> do
-      safeIO $ connect soc (SockAddrUnix gitmonSocketAddr)
-      result <- reportGitmon' soc program gitCommand
-      safeIO $ close soc
-      pure result
-      `catchError` (\e -> do
-         safeIO $ close soc
-         throwIO e)
-
-reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon' soc program gitCommand = do
-  (gitDir, realIP, repoName, userID) <- liftIO loadEnvVars
-  safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoName userID "semantic-diff"))
-  safeIO $ sendAll soc (processJSON Schedule ProcessScheduleData)
-  shouldContinue error $ do
-    (startTime, beforeProcIOContents) <- liftIO collectStats
-    !result <- gitCommand
-    (afterTime, afterProcIOContents) <- liftIO collectStats
-    let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-    safeIO $ sendAll soc (processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode))
-    pure result
-
-  where collectStats :: IO (TimeSpec, ProcInfo)
-        collectStats = do
-          time <- getTime clock
-          procIOContents <- Y.decodeFileEither procFileAddr :: IO ProcInfo
-          pure (time, procIOContents)
-
-        shouldContinue :: MonadIO m => (String -> m b) -> m b -> m b
-        shouldContinue err action = do
-          maybeCommand <- safeIO $ timeout gitmonTimeout (safeIO $ recv soc 1024)
-          case (join . join) maybeCommand of
-            Just command | "fail" `isInfixOf` decodeUtf8 command -> err . unpack $ "Received '" <> decodeUtf8 command <> "' from Gitmon"
-            _ -> action
-
-        procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
-        procStats beforeTime afterTime beforeProcIOContents afterProcIOContents = ( cpuTime, diskReadBytes, diskWriteBytes, resultCode )
-          where
-            cpuTime = toNanoSecs afterTime - toNanoSecs beforeTime
-            beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
-            afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
-            beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
-            afterDiskWriteBytes = either (const 0) (maybe 0 write_bytes) afterProcIOContents
-            diskReadBytes = afterDiskReadBytes - beforeDiskReadBytes
-            diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
-            resultCode = 0
-
-        loadEnvVars :: IO (String, Maybe String, Maybe String, Maybe String)
-        loadEnvVars = do
-          pwd <- getCurrentDirectory
-          gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
-          realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
-          repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
-          userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
-          pure (gitDir, realIP, repoName, userID)
 
 -- Timeout in nanoseconds to wait before giving up on Gitmon response to schedule.
 gitmonTimeout :: Int
