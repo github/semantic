@@ -28,7 +28,6 @@ data ProcessData = ProcessUpdateData { gitDir :: String
                                      , program :: String
                                      , realIP :: Maybe String
                                      , repoName :: Maybe String
-                                     , userID :: Maybe String
                                      , via :: String }
                  | ProcessScheduleData
                  | ProcessFinishData { cpu :: Integer
@@ -74,8 +73,8 @@ reportGitmon program gitCommand = do
 
 reportGitmon' :: Socket -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' soc program gitCommand = do
-  (gitDir, realIP, repoName, userID) <- liftIO loadEnvVars
-  safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoName userID "semantic-diff"))
+  (gitDir, realIP, repoName) <- liftIO loadEnvVars
+  safeIO $ sendAll soc (processJSON Update (ProcessUpdateData gitDir program realIP repoName "semantic-diff"))
   safeIO $ sendAll soc (processJSON Schedule ProcessScheduleData)
   shouldContinue error $ do
     (startTime, beforeProcIOContents) <- liftIO collectStats
@@ -110,14 +109,13 @@ reportGitmon' soc program gitCommand = do
             diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
             resultCode = 0
 
-        loadEnvVars :: IO (String, Maybe String, Maybe String, Maybe String)
+        loadEnvVars :: IO (String, Maybe String, Maybe String)
         loadEnvVars = do
           pwd <- getCurrentDirectory
           gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
           realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
           repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
-          userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
-          pure (gitDir, realIP, repoName, userID)
+          pure (gitDir, realIP, repoName)
 
 -- Timeout in nanoseconds to wait before giving up on Gitmon response to schedule.
 gitmonTimeout :: Int
