@@ -23,7 +23,7 @@ main = do
   text <- case runMode of
     Diff -> diff args
     Parse -> parse args
-  writeToOutput output text
+  writeToOutput outputPath text
 
 -- | A parser for the application's command-line arguments.
 argumentsParser :: ParserInfo CmdLineOptions

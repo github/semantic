@@ -42,7 +42,7 @@ data Arguments = Arguments
   , alternateObjectDirs :: [Text]
   , format :: R.Format
   , timeoutInMicroseconds :: Int
-  , output :: Maybe FilePath
+  , outputPath :: Maybe FilePath
   , diffMode :: DiffMode
   , runMode :: RunMode
   , shaRange :: Both (Maybe String)
@@ -56,7 +56,7 @@ programArguments CmdLineOptions{..} = do
   pwd <- getCurrentDirectory
   gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
-  output <- getOutputPath outputFilePath
+  outputPath <- getOutputPath outputFilePath
   let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
                               (Left _) -> []
                               (Right objectDirs) -> objectDirs
@@ -67,7 +67,7 @@ programArguments CmdLineOptions{..} = do
     , alternateObjectDirs = alternateObjectDirs
     , format = outputFormat
     , timeoutInMicroseconds = maybe defaultTimeout toMicroseconds maybeTimeout
-    , output = output
+    , outputPath = outputPath
     , diffMode = case (noIndex, filePaths) of
       (True, [fileA, fileB]) -> PathDiff (both fileA fileB)
       (_, _) -> CommitDiff
@@ -100,7 +100,7 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , alternateObjectDirs = []
   , format = format
   , timeoutInMicroseconds = defaultTimeout
-  , output = Nothing
+  , outputPath = Nothing
   , diffMode = CommitDiff
   , runMode = Diff
   , shaRange = Just <$> both sha1 sha2
@@ -114,7 +114,7 @@ diffPathsArgs gitDir paths format = Arguments
   , alternateObjectDirs = []
   , format = format
   , timeoutInMicroseconds = defaultTimeout
-  , output = Nothing
+  , outputPath = Nothing
   , diffMode = PathDiff paths
   , runMode = Diff
   , shaRange = both Nothing Nothing
@@ -128,7 +128,7 @@ parseArgs filePaths format = Arguments
   , alternateObjectDirs = []
   , format = format
   , timeoutInMicroseconds = defaultTimeout
-  , output = Nothing
+  , outputPath = Nothing
   , diffMode = CommitDiff
   , runMode = Parse
   , shaRange = both Nothing Nothing
