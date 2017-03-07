@@ -39,7 +39,7 @@ instance (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasFiel
 
 instance ToJSON Category where
   toJSON (Other s) = String s
-  toJSON s = String . T.pack $ show s
+  toJSON s = String (toS s)
 
 instance ToJSON Range where
   toJSON (Range start end) = A.Array . Vector.fromList $ toJSON <$> [ start, end ]

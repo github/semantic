@@ -5,6 +5,7 @@ module Category where
 import Prologue
 import Data.Functor.Listable
 import Data.Text (pack)
+import Data.Text.Encoding (encodeUtf8)
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
@@ -237,6 +238,9 @@ instance Hashable Category
 
 instance (StringConv Category Text) where
   strConv _ = pack . show
+
+instance (StringConv Category ByteString) where
+  strConv _ = encodeUtf8 . show
 
 instance Listable Category where
   tiers = cons0 Program

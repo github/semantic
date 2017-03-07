@@ -7,6 +7,7 @@ import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty
 import Data.Record
 import qualified Data.Text as T
+import qualified Data.ByteString as B
 import Info
 import Language
 import Language.Markdown
@@ -32,18 +33,18 @@ data ParseJSON = ParseJSON
   , children :: [ParseJSON]
   } deriving (Show, Generic, ToJSON)
 
-parse :: Arguments -> IO Text
+parse :: Arguments -> IO ByteString
 parse Arguments{..} = do
   sources <- traverse readAndTranscodeFile filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
-  pure . T.intercalate "\n" $ case format of
-    SExpression -> [foldr (\t acc -> printTerm t 0 TreeOnly <> acc) "" terms]
-    _ -> toS . encodePretty . cata algebra <$> terms
-
+  pure $ B.intercalate "\n" (outputLines terms) <> "\n"
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
     parsers = parserWithSource <$> filePaths
+    outputLines terms = case format of
+      SExpression -> [foldr (\t acc -> printTerm t 0 TreeOnly <> acc) "" terms]
+      _ -> toS . encodePretty . cata algebra <$> terms
 
     algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
     algebra term = case term of
