@@ -23,11 +23,11 @@ spec :: Spec
 spec = parallel $ do
   describe "gitmon" $ do
     let wd = "test/fixtures/git/examples/all-languages.git"
-    it "receives commands in order" . withSocketPair $ \(client, server) ->
+    it "receives commands in order" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ sendAll server "continue"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
-        commit <- reportGitmon' client "cat-file" $ lookupCommit object
+        commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [update, schedule, finish] = infoToCommands info
@@ -37,7 +37,7 @@ spec = parallel $ do
         liftIO $ shouldBe schedule (Just "schedule")
         liftIO $ shouldBe finish (Just "finish")
 
-    it "receives update command with correct data" . withSocketPair $ \(client, server) ->
+    it "receives update command with correct data" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ setEnv "GIT_DIR" wd
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
@@ -45,7 +45,7 @@ spec = parallel $ do
 
         liftIO $ sendAll server "continue"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
-        commit <- reportGitmon' client "cat-file" $ lookupCommit object
+        commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [updateData, _, finishData] = infoToData info
@@ -62,32 +62,34 @@ spec = parallel $ do
         liftIO $ shouldSatisfy (either (const (-1)) diskWriteBytes finishData) (>= 0)
         liftIO $ shouldSatisfy (either (const (-1)) resultCode finishData) (>= 0)
 
-    it "returns the correct git result if the socket is unavailable" . withSocketPair $ \(client, server) ->
+    it "returns the correct git result if the socket is unavailable" . withSocketPair $ \(client, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ close client
 
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
-        commit <- reportGitmon' client "cat-file" $ lookupCommit object
+        commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         liftIO $ shouldBe (commitOid commit) object
         liftIO $ shouldBe "" info
 
-    it "throws if schedule response is fail" . withSocketPair $ \(client, server) ->
+    it "throws if schedule response is fail" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         repo <- getRepository
         liftIO $ sendAll server "fail too busy"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
 
-        liftIO $ shouldThrow (runReaderT (reportGitmon' client "cat-file" (lookupCommit object)) repo) anyErrorCall
+        liftIO $ shouldThrow (runReaderT (reportGitmon' socketFactory "cat-file" (lookupCommit object)) repo) anyErrorCall
 
-withSocketPair :: ((Socket, Socket) -> IO c) -> IO c
-withSocketPair =
-  bracket
-   (socketPair AF_UNIX Stream defaultProtocol)
-   (\(client, server) -> do
-     close client
-     close server)
+withSocketPair :: ((Socket, Socket, SocketFactory) -> IO c) -> IO c
+withSocketPair = bracket create release
+  where
+    create = do
+      (client, server) <- socketPair AF_UNIX Stream defaultProtocol
+      pure (client, server, SocketFactory (\f -> f client))
+    release (client, server, _) = do
+      close client
+      close server
 
 infoToCommands :: ByteString -> [Maybe Text]
 infoToCommands input = command' . toObject <$> Prelude.take 3 (split '\n' input)
