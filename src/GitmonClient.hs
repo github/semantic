@@ -28,7 +28,6 @@ data ProcessData = ProcessUpdateData { gitDir :: String
                                      , program :: String
                                      , realIP :: Maybe String
                                      , repoName :: Maybe String
-                                     , userID :: Maybe String
                                      , via :: String }
                  | ProcessScheduleData
                  | ProcessFinishData { cpu :: Integer
@@ -64,11 +63,11 @@ reportGitmon = reportGitmon' SocketFactory { withSocket = withGitmonSocket }
 
 reportGitmon' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' SocketFactory{..} program gitCommand = do
-  (gitDir, realIP, repoName, userID) <- liftIO loadEnvVars
+  (gitDir, realIP, repoName) <- liftIO loadEnvVars
   (startTime, beforeProcIOContents) <- liftIO collectStats
 
   maybeCommand <- safeIO . timeout gitmonTimeout . withSocket $ \s -> do
-    sendAll s $ processJSON Update (ProcessUpdateData gitDir program realIP repoName userID "semantic-diff")
+    sendAll s $ processJSON Update (ProcessUpdateData gitDir program realIP repoName "semantic-diff")
     sendAll s $ processJSON Schedule ProcessScheduleData
     recv s 1024
 
@@ -102,14 +101,13 @@ reportGitmon' SocketFactory{..} program gitCommand = do
         diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
         resultCode = 0
 
-    loadEnvVars :: IO (String, Maybe String, Maybe String, Maybe String)
+    loadEnvVars :: IO (String, Maybe String, Maybe String)
     loadEnvVars = do
       pwd <- getCurrentDirectory
       gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
       realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
       repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
-      userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
-      pure (gitDir, realIP, repoName, userID)
+      pure (gitDir, realIP, repoName)
 
 withGitmonSocket :: (Socket -> IO c) -> IO c
 withGitmonSocket = bracket connectSocket close
