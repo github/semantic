@@ -3,8 +3,7 @@ module ParseCommand where
 
 import Arguments
 import Category
-import Data.Aeson (ToJSON)
-import Data.Aeson.Encode.Pretty
+import Data.Aeson (ToJSON, encode)
 import Data.Record
 import qualified Data.Text as T
 import qualified Data.ByteString as B
@@ -44,7 +43,7 @@ parse Arguments{..} = do
     parsers = parserWithSource <$> filePaths
     toByteString terms = case format of
       SExpression -> printTerms TreeOnly terms
-      _ -> B.intercalate "\n" (toS . encodePretty . cata algebra <$> terms)
+      _ -> B.intercalate "\n" (toS . encode . cata algebra <$> terms) <> "\n"
 
     algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
     algebra term = case term of
