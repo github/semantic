@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module GitmonClient where
 
+import Control.Exception (throw)
 import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy (toStrict)
@@ -17,6 +18,11 @@ import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
 import System.Timeout
+
+newtype GitmonException = GitmonException String deriving (Show, Typeable)
+
+instance Exception GitmonException
+
 
 data ProcIO = ProcIO { read_bytes :: Integer
                      , write_bytes :: Integer } deriving (Show, Generic)
@@ -73,7 +79,7 @@ reportGitmon' SocketFactory{..} program gitCommand = do
 
   !result <- case join maybeCommand of
     Just command | "fail" `isInfixOf` decodeUtf8 command ->
-      error . unpack $ "Received '" <> decodeUtf8 command <> "' from Gitmon"
+      throw . GitmonException . unpack $ "Received '" <> decodeUtf8 command <> "' from Gitmon"
     _ -> gitCommand
 
   (afterTime, afterProcIOContents) <- liftIO collectStats
