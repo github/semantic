@@ -81,7 +81,7 @@ reportGitmon' SocketFactory{..} program gitCommand = do
 
   (afterTime, afterProcIOContents) <- liftIO collectStats
   let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-  safeIO . withSocket . flip sendAll $ processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode)
+  safeIO . timeout gitmonTimeout . withSocket . flip sendAll $ processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode)
 
   pure result
 
