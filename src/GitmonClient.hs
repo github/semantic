@@ -103,11 +103,17 @@ reportGitmon' SocketFactory{..} program gitCommand = do
 
     loadEnvVars :: IO (String, Maybe String, Maybe String)
     loadEnvVars = do
-      pwd <- getCurrentDirectory
+      pwd <- safeGetCurrentDirectory
       gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
       realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
       repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
       pure (gitDir, realIP, repoName)
+      where
+        safeGetCurrentDirectory :: IO String
+        safeGetCurrentDirectory = getCurrentDirectory `catch` handleIOException
+
+        handleIOException :: IOException -> IO String
+        handleIOException _ = pure ""
 
 withGitmonSocket :: (Socket -> IO c) -> IO c
 withGitmonSocket = bracket connectSocket close
