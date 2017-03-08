@@ -92,7 +92,7 @@ reportGitmon' SocketFactory{..} program gitCommand = do
       _ -> gitCommand
 
     throwGitmonException :: ByteString -> e
-    throwGitmonException command = throw . GitmonException . unpack $ "Received from Gitmon: '" <> decodeUtf8 command <> "' from Gitmon"
+    throwGitmonException command = throw . GitmonException . unpack $ "Received: '" <> decodeUtf8 command <> "' from Gitmon"
 
     collectStats :: IO (TimeSpec, ProcInfo)
     collectStats = do

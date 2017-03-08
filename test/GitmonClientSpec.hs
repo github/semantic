@@ -79,7 +79,10 @@ spec = parallel $ do
         liftIO $ sendAll server "fail too busy"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
 
-        liftIO $ shouldThrow (runReaderT (reportGitmon' socketFactory "cat-file" (lookupCommit object)) repo) anyErrorCall
+        liftIO $ shouldThrow (runReaderT (reportGitmon' socketFactory "cat-file" (lookupCommit object)) repo) gitmonException
+
+gitmonException :: GitmonException -> Bool
+gitmonException = const True
 
 withSocketPair :: ((Socket, Socket, SocketFactory) -> IO c) -> IO c
 withSocketPair = bracket create release
