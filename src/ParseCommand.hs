@@ -36,7 +36,6 @@ parse :: Arguments -> IO ByteString
 parse Arguments{..} = do
   sources <- traverse readAndTranscodeFile filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
-
   pure $! toByteString terms
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
