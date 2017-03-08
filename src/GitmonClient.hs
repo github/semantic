@@ -72,15 +72,12 @@ reportGitmon' SocketFactory{..} program gitCommand = do
   (gitDir, realIP, repoName) <- liftIO loadEnvVars
   (startTime, beforeProcIOContents) <- liftIO collectStats
 
-  maybeCommand <- safeIO . timeout gitmonTimeout . withSocket $ \s -> do
+  gitmonStatus <- safeIO . timeout gitmonTimeout . withSocket $ \s -> do
     sendAll s $ processJSON Update (ProcessUpdateData gitDir program realIP repoName "semantic-diff")
     sendAll s $ processJSON Schedule ProcessScheduleData
     recv s 1024
 
-  !result <- case join maybeCommand of
-    Just command | "fail" `isInfixOf` decodeUtf8 command ->
-      throw . GitmonException . unpack $ "Received '" <> decodeUtf8 command <> "' from Gitmon"
-    _ -> gitCommand
+  !result <- withGitmonStatus (join gitmonStatus) gitCommand
 
   (afterTime, afterProcIOContents) <- liftIO collectStats
   let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
@@ -89,6 +86,14 @@ reportGitmon' SocketFactory{..} program gitCommand = do
   pure result
 
   where
+    withGitmonStatus :: Maybe ByteString -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
+    withGitmonStatus maybeGitmonStatus gitCommand = case maybeGitmonStatus of
+      Just gitmonStatus | "fail" `isInfixOf` decodeUtf8 gitmonStatus -> throwGitmonException gitmonStatus
+      _ -> gitCommand
+
+    throwGitmonException :: ByteString -> e
+    throwGitmonException command = throw . GitmonException . unpack $ "Received from Gitmon: '" <> decodeUtf8 command <> "' from Gitmon"
+
     collectStats :: IO (TimeSpec, ProcInfo)
     collectStats = do
       time <- getTime clock
