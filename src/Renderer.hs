@@ -66,7 +66,6 @@ isSummary _ = False
 isText :: [Output] -> Bool
 isText (SplitOutput _ : _) = True
 isText (PatchOutput _ : _) = True
-isText (SExpressionOutput _ : _) = True
 isText _ = False
 
 toText :: Output -> Text
