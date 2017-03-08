@@ -38,13 +38,13 @@ parse Arguments{..} = do
   sources <- traverse readAndTranscodeFile filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
-  pure $ B.intercalate "\n" (outputLines terms) <> "\n"
+  pure $! toByteString terms
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
     parsers = parserWithSource <$> filePaths
-    outputLines terms = case format of
-      SExpression -> [foldr (\t acc -> printTerm t 0 TreeOnly <> acc) "" terms]
-      _ -> toS . encodePretty . cata algebra <$> terms
+    toByteString terms = case format of
+      SExpression -> printTerms TreeOnly terms
+      _ -> B.intercalate "\n" (toS . encodePretty . cata algebra <$> terms)
 
     algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
     algebra term = case term of
