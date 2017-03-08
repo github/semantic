@@ -196,8 +196,6 @@ printDiff parser arguments sources = do
     SplitOutput text -> encodeUtf8 text
     PatchOutput text -> encodeUtf8 text
     SExpressionOutput text -> text
-    JSONOutput series -> encodingToText (toJSON series)
-    SummaryOutput summaries -> encodingToText (toJSON summaries)
-    TOCOutput summaries -> encodingToText (toJSON summaries)
-  where
-    encodingToText = toS . encode
+    JSONOutput series -> toS $ encode series
+    SummaryOutput summaries -> toS $ encode summaries
+    TOCOutput summaries -> toS $ encode summaries
