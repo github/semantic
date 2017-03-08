@@ -4,10 +4,9 @@ import Data.Aeson (Value, encode)
 import Data.Functor.Both
 import Data.Map as Map hiding (null)
 import Data.Text.Encoding (encodeUtf8)
-import Data.ByteString.Lazy (toStrict)
 import qualified Data.ByteString as B
 import Data.Functor.Listable
-import Prologue hiding (toStrict)
+import Prologue
 import Source (SourceBlob)
 import Syntax
 import Diff
@@ -39,12 +38,12 @@ toSummaryKey = runBothWith $ \before after ->
 -- changes and errors.
 -- Split and Patch output is appended together with newlines.
 concatOutputs :: [Output] -> ByteString
-concatOutputs list | isJSON list = toStrict . encode $ concatJSON list
+concatOutputs list | isJSON list = toS . encode $ concatJSON list
   where
     concatJSON :: [Output] -> Map Text Value
     concatJSON (JSONOutput hash : rest) = Map.union hash (concatJSON rest)
     concatJSON _ = mempty
-concatOutputs list | isSummary list = toStrict . encode $ concatSummaries list
+concatOutputs list | isSummary list = toS . encode $ concatSummaries list
   where
     concatSummaries :: [Output] -> Map Text (Map Text [Value])
     concatSummaries (SummaryOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
