@@ -158,6 +158,7 @@ test-suite test
                      , array
                      , base
                      , bifunctors
+                     , bytestring
                      , deepseq
                      , filepath
                      , gitlib
