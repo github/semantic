@@ -1,3 +1,4 @@
+-- | We use BangPatterns to force evaluation of git operations to preserve accuracy in measuring system stats (particularly disk read bytes)
 {-# LANGUAGE RecordWildCards, BangPatterns, DeriveGeneric, RankNTypes #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module GitmonClient where
@@ -77,6 +78,7 @@ reportGitmon' SocketFactory{..} program gitCommand = do
     sendAll s $ processJSON Schedule ProcessScheduleData
     recv s 1024
 
+  -- | We are eagerly evaluating the gitCommand with BangPatterns. This is to preserve accuracy in measuring the process stats calculated, in particular disk read bytes.
   !result <- withGitmonStatus (join gitmonStatus) gitCommand
 
   (afterTime, afterProcIOContents) <- liftIO collectStats
