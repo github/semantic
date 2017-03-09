@@ -68,10 +68,10 @@ getK :: Direction -> Diagonal -> Myers Endpoint
 getK direction (Diagonal diagonal) = do
   MyersState forward backward (Diagonal offset) <- get
   let v = case direction of { Forward -> forward ; Reverse -> backward }
-  return $! v `at` Diagonal (offset + diagonal)
+  return $! v `at` (offset + diagonal)
 
-at :: Vector.Vector Int -> Diagonal -> Endpoint
-at v (Diagonal k) = Endpoint (v Vector.! k) 0
+at :: Vector.Vector Int -> Int -> Endpoint
+at v k = Endpoint (v Vector.! k) 0
 
 overlaps :: Endpoint -> Endpoint -> Bool
 overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
