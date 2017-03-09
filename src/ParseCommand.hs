@@ -38,25 +38,43 @@ data ParseJSON =
     } deriving (Show, Generic, ToJSON)
 
 parse :: Arguments -> IO Text
-parse Arguments{..} = do
-  jsonProgram <- for filePaths constructJSONPrograms
-
-  return $ toS . encode  $ jsonProgram
-
-  -- pure . T.intercalate "\n" $ case format of
-  --   SExpression -> [foldr (\t acc -> printTerm t 0 TreeOnly <> acc) "" terms]
-  --   _ -> toS . encodePretty . cata algebra <$> terms
+parse Arguments{..} =
+  case format of
+    SExpression -> parseSExpression filePaths
+    _ -> parseJSON filePaths
 
   where
+    parseSExpression :: [FilePath] -> IO Text
+    parseSExpression filePaths = do
+      terms' <- sequenceA $ terms <$> filePaths
+      return $ foldr (\t acc -> printTerm t 0 TreeOnly <> acc) T.empty terms'
+
+    parseJSON :: [FilePath] -> IO Text
+    parseJSON filePaths = fmap (toS . encode) jsonPrograms
+      where jsonPrograms = for filePaths constructJSONPrograms
+
+    constructJSONPrograms :: FilePath -> IO ParseJSON
     constructJSONPrograms filePath = do
       programNodes <- constructProgramNodes filePath
       return $ JSONProgram filePath programNodes
 
+    constructProgramNodes :: FilePath -> IO ParseJSON
     constructProgramNodes filePath = do
-      source <- readAndTranscodeFile filePath
-      terms <- parser filePath $ sourceBlob' filePath source
+      terms' <- terms filePath
+      return $ cata algebra terms'
 
-      return $ cata algebra terms
+      where
+        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
+        algebra (annotation :< syntax) = JSONProgramNode (category' annotation) (range' annotation) (text' annotation) (toList syntax)
+
+        category' = toS . Info.category
+        range' = byteRange
+        text' = Info.sourceText
+
+    terms :: FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
+    terms filePath = do
+      source <- readAndTranscodeFile filePath
+      parser filePath $ sourceBlob' filePath source
 
       where
         sourceBlob' :: FilePath -> Source -> SourceBlob
@@ -65,12 +83,7 @@ parse Arguments{..} = do
         parser :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
         parser = parserWithSource
 
-        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-        algebra (annotation :< syntax) = JSONProgramNode (category' annotation) (range' annotation) (text' annotation) (toList syntax)
 
-        category' = toS . Info.category
-        range' = byteRange
-        text' = Info.sourceText
 
 -- | Return a parser that decorates with the source text.
 parserWithSource :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
