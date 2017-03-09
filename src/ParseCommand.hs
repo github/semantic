@@ -41,18 +41,18 @@ data ParseJSON =
 parse :: Arguments -> IO ByteString
 parse Arguments{..} =
   case format of
-    SExpression -> parseSExpression filePaths
-    _ -> parseJSON filePaths
+    SExpression -> renderSExpression filePaths
+    _ -> renderParseJSON filePaths
 
   where
-    parseSExpression :: [FilePath] -> IO ByteString
-    parseSExpression filePaths = do
+    renderSExpression :: [FilePath] -> IO ByteString
+    renderSExpression filePaths = do
       terms' <- sequenceA $ terms <$> filePaths
       return $ printTerms TreeOnly terms'
 
     -- | Constructs a ParseJSON structure for each file path.
-    parseJSON :: [FilePath] -> IO ByteString
-    parseJSON filePaths = fmap (toS . encode) jsonPrograms
+    renderParseJSON :: [FilePath] -> IO ByteString
+    renderParseJSON filePaths = fmap (toS . encode) jsonPrograms
       where jsonPrograms = for filePaths constructJSONPrograms
 
     -- | Constructs the top level structure ProgramJSON structure.
