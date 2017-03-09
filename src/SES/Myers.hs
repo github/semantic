@@ -38,6 +38,12 @@ decompose myers = case myers of
 
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int), offset :: Diagonal }
 
+getK :: Direction -> Diagonal -> Myers Endpoint
+getK direction diagonal = do
+  state <- get
+  let v = (case direction of { Forward -> forward ; Reverse -> backward }) state
+  v `at` diagonal
+
 at :: Vector.Vector Int -> Diagonal -> Myers Endpoint
 at v (Diagonal k) = do
   Diagonal o <- gets offset
