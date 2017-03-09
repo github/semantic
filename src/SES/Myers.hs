@@ -18,6 +18,7 @@ data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
 newtype EditDistance = EditDistance { unEditDistance :: Int }
 newtype Diagonal = Diagonal { unDiagonal :: Int }
 newtype Endpoint = Endpoint { unEndpoint :: (Int, Int) }
+data Direction = Forward | Reverse
 
 
 decompose :: MyersF a -> Myers a
