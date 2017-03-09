@@ -22,7 +22,7 @@ diffAt :: Comparable term -> Cost term -> (Int, Int) -> [term] -> [term] -> Stat
 diffAt canCompare cost (i, j) as bs
   | (a : as) <- as, (b : bs) <- bs = do
   cachedDiffs <- get
-  case Map.lookup (cantor i j) cachedDiffs of
+  case Map.lookup cantorKey cachedDiffs of
     Just diffs -> pure diffs
     Nothing -> do
       down <- recur (i, succ j) as (b : bs)
@@ -33,14 +33,13 @@ diffAt canCompare cost (i, j) as bs
           pure [ delete a down, insert b right, consWithCost cost (These a b) diagonal ]
         else pure [ delete a down, insert b right ]
       cachedDiffs' <- get
-      put $ Map.insert (cantor i j) nomination cachedDiffs'
+      put $ Map.insert cantorKey nomination cachedDiffs'
       pure nomination
   | null as = pure $ foldr insert [] bs
   | null bs = pure $ foldr delete [] as
   | otherwise = pure []
   where
-    cantor :: Int -> Int -> Int
-    cantor i j = ((i + j) * (i + j + 1)) `div` 2 + j
+    cantorKey = ((i + j) * (i + j + 1)) `div` 2 + j
     delete = consWithCost cost . This
     insert = consWithCost cost . That
     costOf [] = 0
