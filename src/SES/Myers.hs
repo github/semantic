@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, MultiParamTypeClasses #-}
 module SES.Myers where
 
 import Control.Monad.Free.Freer
@@ -13,9 +13,7 @@ data MyersF a where
 
 data StepF a where
   M :: MyersF a -> StepF a
-  S :: State (MyersState a) a -> StepF a
-
-data MyersState a = MyersState { forward :: !(Vector.Vector a), backward :: !(Vector.Vector a) }
+  S :: State MyersState a -> StepF a
 
 type Myers = Freer StepF
 
@@ -34,3 +32,15 @@ decompose myers = case myers of
   MiddleSnake {} -> return (Snake (Endpoint (0, 0)) (Endpoint (0, 0)), EditDistance 0)
 
   FindDPath {} -> return (Endpoint (0, 0))
+
+
+-- Implementation details
+
+data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int), offset :: Diagonal }
+
+
+-- Instances
+
+instance MonadState MyersState Myers where
+  get = S get `Then` return
+  put a = S (put a) `Then` return
