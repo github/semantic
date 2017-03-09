@@ -84,6 +84,9 @@ decompose myers = case myers of
 findDPath :: Direction -> EditDistance -> Diagonal -> Myers Endpoint
 findDPath direction d k = M (FindDPath direction d k) `Then` return
 
+middleSnake :: Vector.Vector a -> Vector.Vector a -> Myers (Snake, EditDistance)
+middleSnake as bs = M (MiddleSnake as bs) `Then` return
+
 
 -- Implementation details
 
