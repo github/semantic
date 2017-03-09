@@ -4,7 +4,7 @@ module SES.Myers where
 import Control.Monad.Free.Freer
 import Data.These
 import qualified Data.Vector as Vector
-import Prologue
+import Prologue hiding (for)
 
 data MyersF a where
   SES :: [a] -> [a] -> MyersF [These a a]
@@ -36,26 +36,29 @@ decompose :: MyersF a -> Myers a
 decompose myers = case myers of
   SES {} -> return []
 
-  MiddleSnake as bs -> do
-    for 0 maxD 1 $ \ d -> do
-      for (negate d) d 2 $ \ k -> do
-        Endpoint x y <- findDPath Forward (EditDistance d) (Diagonal k)
-        return ()
+  MiddleSnake as bs ->
+    for [0..maxD] $ \ d -> do
+      for [negate d, negate d + 2 .. d] $ \ k -> do
+        forwardEndpoint <- findDPath Forward (EditDistance d) (Diagonal k)
+        backwardV <- gets backward
+        let reverseEndpoint = backwardV `at` (maxD + k)
+        if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps forwardEndpoint reverseEndpoint
+          then return (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1)
+          else continue
 
-      for (negate d) d 2 $ \ k -> do
-        Endpoint x y <- findDPath Reverse (EditDistance d) (Diagonal (k + delta))
-        return ()
-    return (Snake (Endpoint 0 0) (Endpoint 0 0), EditDistance 0)
+      for [negate d, negate d + 2 .. d] $ \ k -> do
+        reverseEndpoint <- findDPath Reverse (EditDistance d) (Diagonal (k + delta))
+        forwardV <- gets forward
+        let forwardEndpoint = forwardV `at` (maxD + k + delta)
+        if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
+          then return (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d)
+          else continue
+
     where ceilDiv = (uncurry (+) .) . divMod
           n = length as
           m = length bs
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
-
-          for :: (Real a, Monad m) => a -> a -> a -> (a -> m b) -> m ()
-          for from to by with
-            | from >= to = with from >> for (from + by) to by with
-            | otherwise = return ()
 
   FindDPath {} -> return (Endpoint 0 0)
 
