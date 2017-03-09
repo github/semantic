@@ -34,6 +34,12 @@ decompose myers = case myers of
   FindDPath {} -> return (Endpoint 0 0)
 
 
+-- Smart constructors
+
+findDPath :: Direction -> EditDistance -> Diagonal -> Myers Endpoint
+findDPath direction d k = M (FindDPath direction d k) `Then` return
+
+
 -- Implementation details
 
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int), offset :: Diagonal }
