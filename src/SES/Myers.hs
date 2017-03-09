@@ -15,14 +15,9 @@ data State s a where
   Get :: State s s
   Put :: s -> State s ()
 
-data For a where
-  For :: [a] -> For a
-  Continue :: For a
-
 data StepF a where
   M :: MyersF a -> StepF a
   S :: State MyersState a -> StepF a
-  F :: For a -> StepF a
 
 type Myers = Freer StepF
 
@@ -40,14 +35,14 @@ decompose :: MyersF a -> Myers a
 decompose myers = case myers of
   SES {} -> return []
 
-  MiddleSnake as bs ->
+  MiddleSnake as bs -> fmap (fromMaybe (error "bleah")) $
     for [0..maxD] $ \ d -> do
       for [negate d, negate d + 2 .. d] $ \ k -> do
         forwardEndpoint <- findDPath Forward (EditDistance d) (Diagonal k)
         backwardV <- gets backward
         let reverseEndpoint = backwardV `at` (maxD + k)
         if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps forwardEndpoint reverseEndpoint
-          then return (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1)
+          then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1))
           else continue
 
       for [negate d, negate d + 2 .. d] $ \ k -> do
@@ -55,7 +50,7 @@ decompose myers = case myers of
         forwardV <- gets forward
         let forwardEndpoint = forwardV `at` (maxD + k + delta)
         if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
-          then return (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d)
+          then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d))
           else continue
 
     where ceilDiv = (uncurry (+) .) . divMod
@@ -64,6 +59,11 @@ decompose myers = case myers of
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
 
+          for :: [a] -> (a -> Myers (Maybe b)) -> Myers (Maybe b)
+          for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
+
+          continue = return Nothing
+
   FindDPath {} -> return (Endpoint 0 0)
 
 
@@ -71,12 +71,6 @@ decompose myers = case myers of
 
 findDPath :: Direction -> EditDistance -> Diagonal -> Myers Endpoint
 findDPath direction d k = M (FindDPath direction d k) `Then` return
-
-for :: [a] -> (a -> Myers b) -> Myers b
-for all run = F (For all) `Then` run
-
-continue :: Myers a
-continue = F Continue `Then` return
 
 
 -- Implementation details
