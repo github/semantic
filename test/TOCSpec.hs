@@ -112,13 +112,13 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       let parser = parserForFilepath (path (fst sourceBlobs))
       output <- diffFiles parser toc sourceBlobs
-      concatOutputs (pure output) `shouldBe` ("{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}" :: Text)
+      concatOutputs (pure output) `shouldBe` ("{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}" )
 
     it "encodes to final JSON if there are parse errors" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
       let parser = parserForFilepath (path (fst sourceBlobs))
       output <- diffFiles parser toc sourceBlobs
-      concatOutputs (pure output) `shouldBe` ("{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}" :: Text)
+      concatOutputs (pure output) `shouldBe` ("{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}" )
 
 type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
 type Term' = SyntaxTerm String '[Range, Category, SourceSpan]

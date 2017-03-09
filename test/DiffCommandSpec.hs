@@ -9,8 +9,8 @@ import Prologue (($), fmap, (.), pure, for, panic)
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
-import Data.Text.Lazy.Encoding as E
 import Data.Text.Lazy as T
+import qualified Data.ByteString.Lazy as BL
 import Data.Map
 import qualified Data.Vector as V
 import Arguments
@@ -58,7 +58,7 @@ spec = parallel $ do
 fetchDiffsOutput :: (Object -> Text) -> Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f arguments = do
   diffs <- fetchDiffs arguments
-  let json = fromJust . decode . E.encodeUtf8 $ T.fromChunks [concatOutputs diffs]
+  let json = fromJust . decode . BL.fromStrict $ concatOutputs diffs
   pure (errors json, summaries f json)
 
 -- Diff Summaries payloads look like this:
