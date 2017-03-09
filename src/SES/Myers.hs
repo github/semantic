@@ -32,7 +32,9 @@ decompose myers = case myers of
   SES {} -> return []
 
   MiddleSnake as bs -> do
-    for 0 ((m + n) `ceilDiv` 2) 1 $ \ _ -> return ()
+    for 0 ((m + n) `ceilDiv` 2) 1 $ \ d ->
+      for (negate d) d 2 $ \ _k ->
+        return ()
     return (Snake (Endpoint 0 0) (Endpoint 0 0), EditDistance 0)
     where ceilDiv = (uncurry (+) .) . divMod
           n = length as
