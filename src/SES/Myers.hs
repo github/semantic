@@ -4,12 +4,16 @@ module SES.Myers where
 import Control.Monad.Free.Freer
 import Data.These
 import qualified Data.Vector as Vector
-import Prologue hiding (for)
+import Prologue hiding (for, State)
 
 data MyersF a where
   SES :: [a] -> [a] -> MyersF [These a a]
   MiddleSnake :: Vector.Vector a -> Vector.Vector a -> MyersF (Snake, EditDistance)
   FindDPath :: Direction -> EditDistance -> Diagonal -> MyersF Endpoint
+
+data State s a where
+  Get :: State s s
+  Put :: s -> State s ()
 
 data For a where
   For :: [a] -> For a
@@ -98,5 +102,5 @@ inInterval k (lower, upper) = k >= lower && k <= upper
 -- Instances
 
 instance MonadState MyersState Myers where
-  get = S get `Then` return
-  put a = S (put a) `Then` return
+  get = S Get `Then` return
+  put a = S (Put a) `Then` return
