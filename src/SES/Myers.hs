@@ -17,6 +17,7 @@ data Snake = Snake { x :: Int, y :: Int, u :: Int, v :: Int }
 
 newtype EditDistance = EditDistance { unEditDistance :: Int }
 newtype Diagonal = Diagonal { unDiagonal :: Int }
+newtype Endpoint = Endpoint { unEndpoint :: (Int, Int) }
 
 
 decompose :: MyersF a -> Myers a
