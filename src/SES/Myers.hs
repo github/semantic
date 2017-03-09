@@ -11,7 +11,13 @@ data MyersF a where
   MiddleSnake :: Vector.Vector a -> Vector.Vector a -> MyersF (Snake, EditDistance)
   FindDPath :: Direction -> EditDistance -> Diagonal -> MyersF Endpoint
 
-type Myers = Freer MyersF
+data StepF a where
+  M :: MyersF a -> StepF a
+  S :: State (MyersState a) a -> StepF a
+
+data MyersState a = MyersState { forward :: !(Vector.Vector a), backward :: !(Vector.Vector a) }
+
+type Myers = Freer StepF
 
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
 
