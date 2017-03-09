@@ -21,7 +21,7 @@ data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
 
 newtype EditDistance = EditDistance { unEditDistance :: Int }
 newtype Diagonal = Diagonal { unDiagonal :: Int }
-newtype Endpoint = Endpoint { unEndpoint :: (Int, Int) }
+data Endpoint = Endpoint { x :: !Int, y :: !Int }
 data Direction = Forward | Reverse
 
 
@@ -29,9 +29,9 @@ decompose :: MyersF a -> Myers a
 decompose myers = case myers of
   SES {} -> return []
 
-  MiddleSnake {} -> return (Snake (Endpoint (0, 0)) (Endpoint (0, 0)), EditDistance 0)
+  MiddleSnake {} -> return (Snake (Endpoint 0 0) (Endpoint 0 0), EditDistance 0)
 
-  FindDPath {} -> return (Endpoint (0, 0))
+  FindDPath {} -> return (Endpoint 0 0)
 
 
 -- Implementation details
@@ -47,10 +47,10 @@ getK direction diagonal = do
 at :: Vector.Vector Int -> Diagonal -> Myers Endpoint
 at v (Diagonal k) = do
   Diagonal o <- gets offset
-  return (Endpoint (v Vector.! o + k, 0))
+  return (Endpoint (v Vector.! o + k) 0)
 
 overlaps :: Endpoint -> Endpoint -> Bool
-overlaps (Endpoint (x, y)) (Endpoint (u, v)) = x - y == u - v && x <= u
+overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
 
 
 -- Instances
