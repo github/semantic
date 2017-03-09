@@ -1,10 +1,12 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module IntegrationSpec where
 
 import Category as C
 import Data.Functor.Both
 import Data.Record
 import qualified Data.Text as T
+import qualified Data.ByteString as B
+import Data.Text.Encoding (decodeUtf8)
 import GHC.Show (Show(..))
 import Data.List (union, concat, transpose)
 import Info
@@ -109,7 +111,7 @@ testParse path expectedOutput = do
   let blob = sourceBlob source path
   term <- parserWithSource path blob
   let actual = (Verbatim . stripWhitespace) $ printTerm term 0 TreeOnly
-  expected <- (Verbatim . stripWhitespace) <$> readFile expectedOutput
+  expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
 testDiff :: Renderer (Record '[Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
@@ -117,7 +119,7 @@ testDiff renderer paths diff = do
   sources <- traverse readAndTranscodeFile' paths
   diff' <- diffFiles parser renderer (sourceBlobs sources)
   let actual = (Verbatim . stripWhitespace. concatOutputs . pure) diff'
-  expected <- (Verbatim . stripWhitespace) <$> readFile diff
+  expected <- (Verbatim . stripWhitespace) <$> B.readFile diff
   actual `shouldBe` expected
   where
     parser = parserForFilepath filePath
@@ -126,14 +128,14 @@ testDiff renderer paths diff = do
                                | otherwise = readAndTranscodeFile path
     filePath = if fst paths /= "" then fst paths else snd paths
 
-stripWhitespace :: Text -> Text
-stripWhitespace = T.foldl' go T.empty
-  where go acc x | x `elem` [' ', '\t', '\n'] = acc
-                 | otherwise = T.snoc acc x
+stripWhitespace :: ByteString -> ByteString
+stripWhitespace = B.foldl' go B.empty
+  where go acc x | x `B.elem` " \t\n" = acc
+                 | otherwise = B.snoc acc x
 
--- | A wrapper around `Text` with a more readable `Show` instance.
-newtype Verbatim = Verbatim Text
+-- | A wrapper around `ByteString` with a more readable `Show` instance.
+newtype Verbatim = Verbatim ByteString
   deriving (Eq, NFData)
 
 instance Show Verbatim where
-  showsPrec _ (Verbatim text) = ('\n':) . (T.unpack text ++)
+  showsPrec _ (Verbatim byteString) = ('\n':) . (T.unpack (decodeUtf8 byteString) ++)

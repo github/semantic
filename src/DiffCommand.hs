@@ -5,6 +5,7 @@ import Data.Aeson hiding (json)
 import Data.Functor.Both as Both
 import Data.List ((\\))
 import Data.String
+import Data.Text.Encoding (encodeUtf8)
 import GHC.Conc (numCapabilities)
 import Prologue hiding (fst, snd, null)
 import qualified Control.Concurrent.Async.Pool as Async
@@ -37,13 +38,13 @@ import Source
 import Syntax
 import Term
 
-diff :: Arguments -> IO Text
+diff :: Arguments -> IO ByteString
 diff args@Arguments{..} = case diffMode of
     PathDiff paths -> diffPaths args paths
     CommitDiff -> diffCommits args
 
 -- | Compare changes between two commits.
-diffCommits :: Arguments -> IO Text
+diffCommits :: Arguments -> IO ByteString
 diffCommits args@Arguments{..} = do
   ts <- fetchTerms args
   pure $ maybe mempty concatOutputs ts
@@ -52,7 +53,7 @@ diffCommits args@Arguments{..} = do
                             else timeout timeoutInMicroseconds (fetchDiffs args)
 
 -- | Compare two paths on the filesystem (compariable to git diff --no-index).
-diffPaths :: Arguments -> Both FilePath -> IO Text
+diffPaths :: Arguments -> Both FilePath -> IO ByteString
 diffPaths args@Arguments{..} paths = do
   sources <- traverse readAndTranscodeFile paths
   let sourceBlobs = SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just defaultPlainBlob)
@@ -190,15 +191,13 @@ truncatedDiff Arguments{..} sources = pure $ case format of
   TOC -> TOCOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (ToJSON (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO Text
+printDiff :: (ToJSON (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO ByteString
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   pure $ case rendered of
-    SplitOutput text -> text
-    PatchOutput text -> text
+    SplitOutput text -> encodeUtf8 text
+    PatchOutput text -> encodeUtf8 text
     SExpressionOutput text -> text
-    JSONOutput series -> encodingToText (toJSON series)
-    SummaryOutput summaries -> encodingToText (toJSON summaries)
-    TOCOutput summaries -> encodingToText (toJSON summaries)
-  where
-    encodingToText = toS . encode
+    JSONOutput series -> toS $ encode series
+    SummaryOutput summaries -> toS $ encode summaries
+    TOCOutput summaries -> toS $ encode summaries
