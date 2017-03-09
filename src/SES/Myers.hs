@@ -46,16 +46,16 @@ decompose myers = case myers of
   SES {} -> return []
 
   MiddleSnake as bs -> fmap (fromMaybe (error "bleah")) $
-    for [0..maxD] $ \ d -> do
-      for [negate d, negate d + 2 .. d] (\ k -> do
+    for [0..maxD] $ \ d ->
+      (<|>)
+      <$> for [negate d, negate d + 2 .. d] (\ k -> do
         forwardEndpoint <- findDPath Forward (EditDistance d) (Diagonal k)
         backwardV <- gets backward
         let reverseEndpoint = backwardV `at` (maxD + k)
         if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1))
           else continue)
-
-      for [negate d, negate d + 2 .. d] (\ k -> do
+      <*> for [negate d, negate d + 2 .. d] (\ k -> do
         reverseEndpoint <- findDPath Reverse (EditDistance d) (Diagonal (k + delta))
         forwardV <- gets forward
         let forwardEndpoint = forwardV `at` (maxD + k + delta)
