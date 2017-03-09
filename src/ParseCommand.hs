@@ -51,9 +51,7 @@ parse Arguments{..} = do
     parsers = parserWithSource <$> filePaths
 
     algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-    algebra term = case term of
-      (annotation :< Leaf _) -> ParseJSON (category' annotation) (range' annotation) (text' annotation) []
-      (annotation :< syntax) -> ParseJSON (category' annotation) (range' annotation) (text' annotation) (toList syntax)
+    algebra (annotation :< syntax) = JSONProgramNode (category' annotation) (range' annotation) (text' annotation) (toList syntax)
       where
         category' = toS . Info.category
         range' = byteRange
