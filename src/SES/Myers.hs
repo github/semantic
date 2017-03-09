@@ -78,6 +78,9 @@ at v (Diagonal k) = do
 overlaps :: Endpoint -> Endpoint -> Bool
 overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
 
+isOdd :: Integral a => a -> Bool
+isOdd = (== 1) . (`mod` 2)
+
 
 -- Instances
 
