@@ -9,7 +9,7 @@ import Prologue
 data MyersF a where
   SES :: [a] -> [a] -> MyersF [These a a]
   MiddleSnake :: Vector.Vector a -> Vector.Vector a -> MyersF (Snake, EditDistance)
-  FindDPath :: EditDistance -> Diagonal -> MyersF Int
+  FindDPath :: EditDistance -> Diagonal -> MyersF Endpoint
 
 type Myers = Freer MyersF
 
@@ -26,4 +26,4 @@ decompose myers = case myers of
 
   MiddleSnake _ _ -> return (Snake (Endpoint (0, 0)) (Endpoint (0, 0)), EditDistance 0)
 
-  FindDPath _ _ -> return 0
+  FindDPath _ _ -> return (Endpoint (0, 0))
