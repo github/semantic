@@ -6,7 +6,6 @@ import Category
 import Data.Aeson (ToJSON, encode)
 import Data.Record
 import qualified Data.Text as T
-import qualified Data.ByteString as B
 import Info
 import Language
 import Language.Markdown
@@ -36,11 +35,6 @@ data ParseJSON =
     { filePath :: FilePath
     , programNodes :: ParseJSON
     } deriving (Show, Generic, ToJSON)
-
-    -- toByteString terms = case format of
-    --   SExpression -> printTerms TreeOnly terms
-    --   _ -> B.intercalate "\n" (toS . encode . cata algebra <$> terms) <> "\n"
-
 
 -- | Parses filePaths into two possible formats: SExpression or JSON.
 parse :: Arguments -> IO ByteString
