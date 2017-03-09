@@ -11,6 +11,10 @@ data MyersF a where
   MiddleSnake :: Vector.Vector a -> Vector.Vector a -> MyersF (Snake, EditDistance)
   FindDPath :: Direction -> EditDistance -> Diagonal -> MyersF Endpoint
 
+data For a where
+  For :: [a] -> For a
+  Continue :: For a
+
 data StepF a where
   M :: MyersF a -> StepF a
   S :: State MyersState a -> StepF a
