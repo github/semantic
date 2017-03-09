@@ -31,7 +31,16 @@ decompose :: MyersF a -> Myers a
 decompose myers = case myers of
   SES {} -> return []
 
-  MiddleSnake {} -> return (Snake (Endpoint 0 0) (Endpoint 0 0), EditDistance 0)
+  MiddleSnake as bs -> do
+    for 0 ((m + n) `ceilDiv` 2) 1 $ \ _ -> return ()
+    return (Snake (Endpoint 0 0) (Endpoint 0 0), EditDistance 0)
+    where ceilDiv = (uncurry (+) .) . divMod
+          n = length as
+          m = length bs
+
+          for from to by with
+            | from >= to = with from >> for (from + by) to by with
+            | otherwise = return ()
 
   FindDPath {} -> return (Endpoint 0 0)
 
