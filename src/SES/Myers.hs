@@ -25,6 +25,8 @@ data Endpoint = Endpoint { x :: !Int, y :: !Int }
 data Direction = Forward | Reverse
 
 
+-- Evaluation
+
 decompose :: MyersF a -> Myers a
 decompose myers = case myers of
   SES {} -> return []
