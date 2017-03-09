@@ -36,11 +36,11 @@ readAndTranscodeFile path = do
     _ -> B.readFile path
   transcode text
 
--- From https://github.com/haskell/bytestring/pull/79/files
+-- Based on https://github.com/haskell/bytestring/pull/79/files
 fileSize :: FilePath -> IO Integer
 fileSize f = withBinaryFile f ReadMode $ \h -> do
   -- hFileSize fails if file is not regular file (like /dev/null). Catch
-  -- exception and try reading anyway.
+  -- exception and return 0 in that case.
   filesz <- catch (hFileSize h) useZeroIfNotRegularFile
   pure $ fromIntegral filesz `max` 0
   where useZeroIfNotRegularFile :: IOException -> IO Integer

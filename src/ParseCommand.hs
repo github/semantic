@@ -4,9 +4,9 @@ module ParseCommand where
 import Arguments
 import Category
 import Data.Aeson (ToJSON, encode)
-import Data.Aeson.Encode.Pretty
 import Data.Record
 import qualified Data.Text as T
+import qualified Data.ByteString as B
 import Info
 import Language
 import Language.Markdown
@@ -37,21 +37,26 @@ data ParseJSON =
     , programNodes :: ParseJSON
     } deriving (Show, Generic, ToJSON)
 
+    -- toByteString terms = case format of
+    --   SExpression -> printTerms TreeOnly terms
+    --   _ -> B.intercalate "\n" (toS . encode . cata algebra <$> terms) <> "\n"
+
+
 -- | Parses filePaths into two possible formats: SExpression or JSON.
-parse :: Arguments -> IO Text
+parse :: Arguments -> IO ByteString
 parse Arguments{..} =
   case format of
     SExpression -> parseSExpression filePaths
     _ -> parseJSON filePaths
 
   where
-    parseSExpression :: [FilePath] -> IO Text
+    parseSExpression :: [FilePath] -> IO ByteString
     parseSExpression filePaths = do
       terms' <- sequenceA $ terms <$> filePaths
-      return $ foldr (\t acc -> printTerm t 0 TreeOnly <> acc) T.empty terms'
+      return $ printTerms TreeOnly terms'
 
     -- | Constructs a ParseJSON structure for each file path.
-    parseJSON :: [FilePath] -> IO Text
+    parseJSON :: [FilePath] -> IO ByteString
     parseJSON filePaths = fmap (toS . encode) jsonPrograms
       where jsonPrograms = for filePaths constructJSONPrograms
 
