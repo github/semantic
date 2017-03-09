@@ -27,8 +27,9 @@ import Text.Parser.TreeSitter.Ruby
 data ParseJSON =
     JSONProgramNode
     { category :: Text
-    , range :: Range
-    , text :: SourceText
+    , sourceRange :: Range
+    , sourceText :: SourceText
+    , sourceSpan :: SourceSpan
     , children :: [ParseJSON]
     }
   | JSONProgram
@@ -68,11 +69,12 @@ parse Arguments{..} =
 
       where
         algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-        algebra (annotation :< syntax) = JSONProgramNode (category' annotation) (range' annotation) (text' annotation) (toList syntax)
+        algebra (annotation :< syntax) = JSONProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (toList syntax)
 
         category' = toS . Info.category
         range' = byteRange
         text' = Info.sourceText
+        sourceSpan' = Info.sourceSpan
 
     -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
     terms :: FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
