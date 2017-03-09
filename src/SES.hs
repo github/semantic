@@ -1,7 +1,7 @@
 {-# LANGUAGE Strict #-}
 module SES where
 
-import qualified Data.Map as Map
+import qualified Data.IntMap as Map
 import Data.These
 import Prologue
 
@@ -18,7 +18,7 @@ ses canCompare cost as bs = fst <$> evalState diffState Map.empty where
   diffState = diffAt canCompare cost (0, 0) as bs
 
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
-diffAt :: Comparable term -> Cost term -> (Int, Int) -> [term] -> [term] -> State (Map.Map Int [(These term term, Int)]) [(These term term, Int)]
+diffAt :: Comparable term -> Cost term -> (Int, Int) -> [term] -> [term] -> State (Map.IntMap [(These term term, Int)]) [(These term term, Int)]
 diffAt canCompare cost (i, j) as bs
   | (a : as) <- as, (b : bs) <- bs = do
   cachedDiffs <- get
