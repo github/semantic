@@ -25,12 +25,17 @@ import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 
-data ParseJSON = ParseJSON
-  { category :: Text
-  , range :: Range
-  , text :: SourceText
-  , children :: [ParseJSON]
-  } deriving (Show, Generic, ToJSON)
+data ParseJSON =
+    JSONProgramNode
+    { category :: Text
+    , range :: Range
+    , text :: SourceText
+    , children :: [ParseJSON]
+    }
+  | JSONProgram
+    { filePath :: FilePath
+    , children :: [ParseJSON]
+    } deriving (Show, Generic, ToJSON)
 
 parse :: Arguments -> IO Text
 parse Arguments{..} = do
