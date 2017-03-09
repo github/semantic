@@ -32,14 +32,19 @@ decompose myers = case myers of
   SES {} -> return []
 
   MiddleSnake as bs -> do
-    for 0 ((m + n) `ceilDiv` 2) 1 $ \ d ->
+    for 0 ((m + n) `ceilDiv` 2) 1 $ \ d -> do
       for (negate d) d 2 $ \ k -> do
         Endpoint x y <- findDPath Forward (EditDistance d) (Diagonal k)
+        return ()
+
+      for (negate d) d 2 $ \ k -> do
+        Endpoint x y <- findDPath Reverse (EditDistance d) (Diagonal (k + delta))
         return ()
     return (Snake (Endpoint 0 0) (Endpoint 0 0), EditDistance 0)
     where ceilDiv = (uncurry (+) .) . divMod
           n = length as
           m = length bs
+          delta = n - m
 
           for :: (Real a, Monad m) => a -> a -> a -> (a -> m b) -> m ()
           for from to by with
