@@ -17,3 +17,12 @@ data Snake = Snake { x :: Int, y :: Int, u :: Int, v :: Int }
 
 newtype EditDistance = EditDistance { unEditDistance :: Int }
 newtype Diagonal = Diagonal { unDiagonal :: Int }
+
+
+decompose :: MyersF a -> Myers a
+decompose myers = case myers of
+  SES _ _ -> return []
+
+  MiddleSnake _ _ -> return (Snake 0 0 0 0, EditDistance 0)
+
+  FindDPath _ _ -> return 0
