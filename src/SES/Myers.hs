@@ -31,6 +31,16 @@ data Direction = Forward | Reverse
 
 -- Evaluation
 
+runMyersStep :: MyersState -> Myers a -> Either a (MyersState, Myers a)
+runMyersStep state step = case step of
+  Return a -> Left a
+  Then step cont -> case step of
+    M myers -> Right (state, decompose myers >>= cont)
+
+    S Get -> Right (state, cont state)
+    S (Put state') -> Right (state', cont ())
+
+
 decompose :: MyersF a -> Myers a
 decompose myers = case myers of
   SES {} -> return []
