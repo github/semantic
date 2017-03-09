@@ -40,6 +40,7 @@ decompose myers = case myers of
           n = length as
           m = length bs
 
+          for :: (Real a, Monad m) => a -> a -> a -> (a -> m b) -> m ()
           for from to by with
             | from >= to = with from >> for (from + by) to by with
             | otherwise = return ()
