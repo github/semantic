@@ -43,6 +43,8 @@ runMyersStep state step = case step of
 
 decompose :: MyersF a -> Myers a
 decompose myers = case myers of
+  SES as [] -> return (This <$> as)
+  SES [] bs -> return (That <$> bs)
   SES {} -> return []
 
   MiddleSnake as bs -> fmap (fromMaybe (error "bleah")) $
