@@ -18,6 +18,7 @@ data For a where
 data StepF a where
   M :: MyersF a -> StepF a
   S :: State MyersState a -> StepF a
+  F :: For a -> StepF a
 
 type Myers = Freer StepF
 
@@ -63,6 +64,12 @@ decompose myers = case myers of
 
 findDPath :: Direction -> EditDistance -> Diagonal -> Myers Endpoint
 findDPath direction d k = M (FindDPath direction d k) `Then` return
+
+for :: [a] -> (a -> Myers b) -> Myers b
+for all run = F (For all) `Then` run
+
+continue :: Myers a
+continue = F Continue `Then` return
 
 
 -- Implementation details
