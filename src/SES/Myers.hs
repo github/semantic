@@ -49,6 +49,9 @@ at v (Diagonal k) = do
   Diagonal o <- gets offset
   return (Endpoint (v Vector.! o + k, 0))
 
+overlaps :: Endpoint -> Endpoint -> Bool
+overlaps (Endpoint (x, y)) (Endpoint (u, v)) = x - y == u - v && x <= u
+
 
 -- Instances
 
