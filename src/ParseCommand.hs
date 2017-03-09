@@ -37,6 +37,7 @@ data ParseJSON =
     , programNodes :: ParseJSON
     } deriving (Show, Generic, ToJSON)
 
+-- | Parses filePaths into two possible formats: SExpression or JSON.
 parse :: Arguments -> IO Text
 parse Arguments{..} =
   case format of
@@ -49,15 +50,18 @@ parse Arguments{..} =
       terms' <- sequenceA $ terms <$> filePaths
       return $ foldr (\t acc -> printTerm t 0 TreeOnly <> acc) T.empty terms'
 
+    -- | Constructs a ParseJSON structure for each file path.
     parseJSON :: [FilePath] -> IO Text
     parseJSON filePaths = fmap (toS . encode) jsonPrograms
       where jsonPrograms = for filePaths constructJSONPrograms
 
+    -- | Constructs the top level structure ProgramJSON structure.
     constructJSONPrograms :: FilePath -> IO ParseJSON
     constructJSONPrograms filePath = do
       programNodes <- constructProgramNodes filePath
       return $ JSONProgram filePath programNodes
 
+    -- | Constructs the inner children nodes (ProgramNodesJSON) structure.
     constructProgramNodes :: FilePath -> IO ParseJSON
     constructProgramNodes filePath = do
       terms' <- terms filePath
@@ -71,6 +75,7 @@ parse Arguments{..} =
         range' = byteRange
         text' = Info.sourceText
 
+    -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
     terms :: FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
     terms filePath = do
       source <- readAndTranscodeFile filePath
@@ -82,8 +87,6 @@ parse Arguments{..} =
 
         parser :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
         parser = parserWithSource
-
-
 
 -- | Return a parser that decorates with the source text.
 parserWithSource :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
