@@ -65,15 +65,13 @@ findDPath direction d k = M (FindDPath direction d k) `Then` return
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int), offset :: Diagonal }
 
 getK :: Direction -> Diagonal -> Myers Endpoint
-getK direction diagonal = do
-  state <- get
-  let v = (case direction of { Forward -> forward ; Reverse -> backward }) state
-  v `at` diagonal
+getK direction (Diagonal diagonal) = do
+  MyersState forward backward (Diagonal offset) <- get
+  let v = case direction of { Forward -> forward ; Reverse -> backward }
+  return $! v `at` Diagonal (offset + diagonal)
 
-at :: Vector.Vector Int -> Diagonal -> Myers Endpoint
-at v (Diagonal k) = do
-  Diagonal o <- gets offset
-  return (Endpoint (v Vector.! o + k) 0)
+at :: Vector.Vector Int -> Diagonal -> Endpoint
+at v (Diagonal k) = Endpoint (v Vector.! k) 0
 
 overlaps :: Endpoint -> Endpoint -> Bool
 overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
