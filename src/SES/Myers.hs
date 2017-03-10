@@ -115,7 +115,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           maxD = (m + n) `ceilDiv` 2
 
           slide eq (Endpoint x y)
-            | (as Vector.! x) `eq` (bs Vector.! y) = slide eq (Endpoint (succ x) (succ y))
+            | x < length as
+            , y < length bs
+            , (as Vector.! x) `eq` (bs Vector.! y) = slide eq (Endpoint (succ x) (succ y))
             | otherwise = Endpoint x y
 
   FindDPath (EditGraph as bs) Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
