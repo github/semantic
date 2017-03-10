@@ -7,7 +7,7 @@ import qualified Data.Vector as Vector
 import Prologue hiding (for, State)
 
 data MyersF a where
-  SES :: [a] -> [a] -> MyersF [These a a]
+  SES :: Vector.Vector a -> Vector.Vector a -> MyersF [These a a]
   MiddleSnake :: Vector.Vector a -> Vector.Vector a -> MyersF (Snake, EditDistance)
   FindDPath :: Direction -> EditDistance -> Diagonal -> MyersF Endpoint
 
@@ -43,9 +43,11 @@ runMyersStep state step = case step of
 
 decompose :: MyersF a -> Myers a
 decompose myers = case myers of
-  SES as [] -> return (This <$> as)
-  SES [] bs -> return (That <$> bs)
-  SES {} -> return []
+  SES as bs
+    | null bs -> return (This <$> toList as)
+    | null as -> return (That <$> toList bs)
+    | otherwise -> do
+      return []
 
   MiddleSnake as bs -> fmap (fromMaybe (error "bleah")) $
     for [0..maxD] $ \ d ->
