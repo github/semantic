@@ -7,9 +7,9 @@ import qualified Data.Vector as Vector
 import Prologue hiding (for, State)
 
 data MyersF a where
-  SES :: Vector.Vector a -> Vector.Vector a -> MyersF [These a a]
-  MiddleSnake :: Vector.Vector a -> Vector.Vector a -> MyersF (Snake, EditDistance)
-  FindDPath :: Vector.Vector a -> Vector.Vector a -> Direction -> EditDistance -> Diagonal -> MyersF Endpoint
+  SES :: EditGraph a -> MyersF [These a a]
+  MiddleSnake :: EditGraph a -> MyersF (Snake, EditDistance)
+  FindDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF Endpoint
 
 data State s a where
   Get :: State s s
@@ -44,46 +44,62 @@ runMyersStep state step = case step of
 
 decompose :: MyersF a -> Myers a
 decompose myers = case myers of
-  SES as bs
-    | null bs -> return (This <$> toList as)
-    | null as -> return (That <$> toList bs)
+  SES graph
+    | null (bs graph) -> return (This <$> toList (as graph))
+    | null (as graph) -> return (That <$> toList (bs graph))
     | otherwise -> do
       return []
 
-  MiddleSnake as bs -> fmap (fromMaybe (error "bleah")) $
+  MiddleSnake graph -> fmap (fromMaybe (error "bleah")) $
     for [0..maxD] $ \ d ->
       (<|>)
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
-        forwardEndpoint <- findDPath as bs Forward (EditDistance d) (Diagonal k)
+        forwardEndpoint <- findDPath graph Forward (EditDistance d) (Diagonal k)
         backwardV <- gets backward
         let reverseEndpoint = backwardV `at` (maxD + k)
         if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1))
           else continue)
       <*> for [negate d, negate d + 2 .. d] (\ k -> do
-        reverseEndpoint <- findDPath as bs Reverse (EditDistance d) (Diagonal (k + delta))
+        reverseEndpoint <- findDPath graph Reverse (EditDistance d) (Diagonal (k + delta))
         forwardV <- gets forward
         let forwardEndpoint = forwardV `at` (maxD + k + delta)
         if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d))
           else continue)
-    where n = length as
-          m = length bs
+    where n = length (as graph)
+          m = length (bs graph)
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
 
+  FindDPath (EditGraph as bs eq) Forward (EditDistance d) (Diagonal k) -> do
+    v <- gets forward
+    let prev = v `at` (maxD + pred k)
+    let next = v `at` (maxD + succ k)
+    let xy = if k == negate d || k /= d && x prev < x next
+          then next
+          else let x' = succ (x prev) in Endpoint x' (x' - k)
+    let Endpoint x' y' = slide xy
+    setForward (v Vector.// [(maxD + k, x')])
+    return (Endpoint x' y')
+    where n = length as
+          m = length bs
+          maxD = (m + n) `ceilDiv` 2
 
-  FindDPath as bs Forward (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
-  FindDPath as bs Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
+          slide (Endpoint x y)
+            | (as Vector.! x) `eq` (bs Vector.! y) = slide (Endpoint (succ x) (succ y))
+            | otherwise = Endpoint x y
+
+  FindDPath (EditGraph as bs eq) Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
 
 
 -- Smart constructors
 
-findDPath :: Vector.Vector a -> Vector.Vector a -> Direction -> EditDistance -> Diagonal -> Myers Endpoint
-findDPath as bs direction d k = M (FindDPath as bs direction d k) `Then` return
+findDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers Endpoint
+findDPath graph direction d k = M (FindDPath graph direction d k) `Then` return
 
-middleSnake :: Vector.Vector a -> Vector.Vector a -> Myers (Snake, EditDistance)
-middleSnake as bs = M (MiddleSnake as bs) `Then` return
+middleSnake :: EditGraph a -> Myers (Snake, EditDistance)
+middleSnake graph = M (MiddleSnake graph) `Then` return
 
 
 -- Implementation details
