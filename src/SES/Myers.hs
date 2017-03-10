@@ -7,10 +7,10 @@ import qualified Data.Vector as Vector
 import Prologue hiding (for, State)
 
 data MyersF a where
-  SES :: EditGraph a -> MyersF [These a a]
-  LCS :: EditGraph a -> MyersF [a]
-  MiddleSnake :: EditGraph a -> MyersF (Snake, EditDistance)
-  FindDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF Endpoint
+  SES :: (a -> a -> Bool) -> EditGraph a -> MyersF [These a a]
+  LCS :: (a -> a -> Bool) -> EditGraph a -> MyersF [a]
+  MiddleSnake :: (a -> a -> Bool) -> EditGraph a -> MyersF (Snake, EditDistance)
+  FindDPath :: (a -> a -> Bool) -> EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF Endpoint
 
 data State s a where
   Get :: State s s
@@ -22,7 +22,7 @@ data StepF a where
 
 type Myers = Freer StepF
 
-data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a), eq :: !(a -> a -> Bool) }
+data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a) }
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
 
 newtype EditDistance = EditDistance { unEditDistance :: Int }
@@ -45,28 +45,28 @@ runMyersStep state step = case step of
 
 decompose :: MyersF a -> Myers a
 decompose myers = case myers of
-  LCS graph
+  LCS eq graph
     | null (as graph) || null (bs graph) -> return []
     | otherwise -> return []
 
-  SES graph
+  SES eq graph
     | null (bs graph) -> return (This <$> toList (as graph))
     | null (as graph) -> return (That <$> toList (bs graph))
     | otherwise -> do
       return []
 
-  MiddleSnake graph -> fmap (fromMaybe (error "bleah")) $
+  MiddleSnake eq graph -> fmap (fromMaybe (error "bleah")) $
     for [0..maxD] $ \ d ->
       (<|>)
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
-        forwardEndpoint <- findDPath graph Forward (EditDistance d) (Diagonal k)
+        forwardEndpoint <- findDPath eq graph Forward (EditDistance d) (Diagonal k)
         backwardV <- gets backward
         let reverseEndpoint = backwardV `at` (maxD + k)
         if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1))
           else continue)
       <*> for [negate d, negate d + 2 .. d] (\ k -> do
-        reverseEndpoint <- findDPath graph Reverse (EditDistance d) (Diagonal (k + delta))
+        reverseEndpoint <- findDPath eq graph Reverse (EditDistance d) (Diagonal (k + delta))
         forwardV <- gets forward
         let forwardEndpoint = forwardV `at` (maxD + k + delta)
         if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
@@ -77,7 +77,7 @@ decompose myers = case myers of
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
 
-  FindDPath (EditGraph as bs eq) Forward (EditDistance d) (Diagonal k) -> do
+  FindDPath eq (EditGraph as bs) Forward (EditDistance d) (Diagonal k) -> do
     v <- gets forward
     let prev = v `at` (maxD + pred k)
     let next = v `at` (maxD + succ k)
@@ -95,19 +95,19 @@ decompose myers = case myers of
             | (as Vector.! x) `eq` (bs Vector.! y) = slide (Endpoint (succ x) (succ y))
             | otherwise = Endpoint x y
 
-  FindDPath (EditGraph as bs eq) Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
+  FindDPath eq (EditGraph as bs) Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
 
 
 -- Smart constructors
 
-lcs :: EditGraph a -> Myers [a]
-lcs graph = M (LCS graph) `Then` return
+lcs :: (a -> a -> Bool) -> EditGraph a -> Myers [a]
+lcs eq graph = M (LCS eq graph) `Then` return
 
-findDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers Endpoint
-findDPath graph direction d k = M (FindDPath graph direction d k) `Then` return
+findDPath :: (a -> a -> Bool) -> EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers Endpoint
+findDPath eq graph direction d k = M (FindDPath eq graph direction d k) `Then` return
 
-middleSnake :: EditGraph a -> Myers (Snake, EditDistance)
-middleSnake graph = M (MiddleSnake graph) `Then` return
+middleSnake :: (a -> a -> Bool) -> EditGraph a -> Myers (Snake, EditDistance)
+middleSnake eq graph = M (MiddleSnake eq graph) `Then` return
 
 
 -- Implementation details
