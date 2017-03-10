@@ -9,7 +9,7 @@ import Prologue hiding (for, State)
 data MyersF a where
   SES :: Vector.Vector a -> Vector.Vector a -> MyersF [These a a]
   MiddleSnake :: Vector.Vector a -> Vector.Vector a -> MyersF (Snake, EditDistance)
-  FindDPath :: Direction -> EditDistance -> Diagonal -> MyersF Endpoint
+  FindDPath :: Vector.Vector a -> Vector.Vector a -> Direction -> EditDistance -> Diagonal -> MyersF Endpoint
 
 data State s a where
   Get :: State s s
@@ -53,14 +53,14 @@ decompose myers = case myers of
     for [0..maxD] $ \ d ->
       (<|>)
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
-        forwardEndpoint <- findDPath Forward (EditDistance d) (Diagonal k)
+        forwardEndpoint <- findDPath as bs Forward (EditDistance d) (Diagonal k)
         backwardV <- gets backward
         let reverseEndpoint = backwardV `at` (maxD + k)
         if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1))
           else continue)
       <*> for [negate d, negate d + 2 .. d] (\ k -> do
-        reverseEndpoint <- findDPath Reverse (EditDistance d) (Diagonal (k + delta))
+        reverseEndpoint <- findDPath as bs Reverse (EditDistance d) (Diagonal (k + delta))
         forwardV <- gets forward
         let forwardEndpoint = forwardV `at` (maxD + k + delta)
         if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
@@ -72,14 +72,14 @@ decompose myers = case myers of
           maxD = (m + n) `ceilDiv` 2
 
 
-  FindDPath Forward (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
-  FindDPath Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
+  FindDPath as bs Forward (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
+  FindDPath as bs Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
 
 
 -- Smart constructors
 
-findDPath :: Direction -> EditDistance -> Diagonal -> Myers Endpoint
-findDPath direction d k = M (FindDPath direction d k) `Then` return
+findDPath :: Vector.Vector a -> Vector.Vector a -> Direction -> EditDistance -> Diagonal -> Myers Endpoint
+findDPath as bs direction d k = M (FindDPath as bs direction d k) `Then` return
 
 middleSnake :: Vector.Vector a -> Vector.Vector a -> Myers (Snake, EditDistance)
 middleSnake as bs = M (MiddleSnake as bs) `Then` return
