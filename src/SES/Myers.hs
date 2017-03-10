@@ -19,6 +19,8 @@ data State s a where
 data StepF element result where
   M :: MyersF a b -> StepF a b
   S :: State MyersState b -> StepF a b
+  GetGraph :: StepF a (EditGraph a)
+  GetEq :: StepF a (a -> a -> Bool)
 
 type Myers a = Freer (StepF a)
 
@@ -33,20 +35,23 @@ data Direction = Forward | Reverse
 
 -- Evaluation
 
-runMyers :: Myers a b -> b
-runMyers = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
-  where runAll state step = case runMyersStep state step of
+runMyers :: (a -> a -> Bool) -> EditGraph a -> Myers a b -> b
+runMyers eq graph = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
+  where runAll state step = case runMyersStep eq graph state step of
           Left a -> a
           Right next -> uncurry runAll next
 
-runMyersStep :: MyersState -> Myers a b -> Either b (MyersState, Myers a b)
-runMyersStep state step = case step of
+runMyersStep :: (a -> a -> Bool) -> EditGraph a -> MyersState -> Myers a b -> Either b (MyersState, Myers a b)
+runMyersStep eq graph state step = case step of
   Return a -> Left a
   Then step cont -> case step of
     M myers -> Right (state, decompose myers >>= cont)
 
     S Get -> Right (state, cont state)
     S (Put state') -> Right (state', cont ())
+
+    GetGraph -> Right (state, cont graph)
+    GetEq -> Right (state, cont eq)
 
 
 decompose :: MyersF a b -> Myers a b
