@@ -19,7 +19,6 @@ data State s a where
 data StepF element result where
   M :: MyersF a b -> StepF a b
   S :: State MyersState b -> StepF a b
-  GetGraph :: StepF a (EditGraph a)
   GetEq :: StepF a (a -> a -> Bool)
 
 type Myers a = Freer (StepF a)
@@ -35,14 +34,14 @@ data Direction = Forward | Reverse
 
 -- Evaluation
 
-runMyers :: (a -> a -> Bool) -> EditGraph a -> Myers a b -> b
-runMyers eq graph = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
-  where runAll state step = case runMyersStep eq graph state step of
+runMyers :: (a -> a -> Bool) -> Myers a b -> b
+runMyers eq = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
+  where runAll state step = case runMyersStep eq state step of
           Left a -> a
           Right next -> uncurry runAll next
 
-runMyersStep :: (a -> a -> Bool) -> EditGraph a -> MyersState -> Myers a b -> Either b (MyersState, Myers a b)
-runMyersStep eq graph state step = case step of
+runMyersStep :: (a -> a -> Bool) -> MyersState -> Myers a b -> Either b (MyersState, Myers a b)
+runMyersStep eq state step = case step of
   Return a -> Left a
   Then step cont -> case step of
     M myers -> Right (state, decompose myers >>= cont)
@@ -50,7 +49,6 @@ runMyersStep eq graph state step = case step of
     S Get -> Right (state, cont state)
     S (Put state') -> Right (state', cont ())
 
-    GetGraph -> Right (state, cont graph)
     GetEq -> Right (state, cont eq)
 
 
@@ -132,9 +130,6 @@ findDPath graph direction d k = M (FindDPath graph direction d k) `Then` return
 
 middleSnake :: EditGraph a -> Myers a (Snake, EditDistance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
-
-getEditGraph :: Myers a (EditGraph a)
-getEditGraph = GetGraph `Then` return
 
 getEq :: Myers a (a -> a -> Bool)
 getEq = GetEq `Then` return
