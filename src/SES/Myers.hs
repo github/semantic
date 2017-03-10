@@ -117,10 +117,12 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           slide eq (Endpoint x y)
             | x < length as
             , y < length bs
-            , (as Vector.! x) `eq` (bs Vector.! y) = slide eq (Endpoint (succ x) (succ y))
+            , (as ! x) `eq` (bs ! y) = slide eq (Endpoint (succ x) (succ y))
             | otherwise = Endpoint x y
 
   FindDPath (EditGraph as bs) Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
+
+  where (!) = (Vector.!)
 
 
 -- Smart constructors
