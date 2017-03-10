@@ -90,12 +90,6 @@ middleSnake as bs = M (MiddleSnake as bs) `Then` return
 
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int), offset :: Diagonal }
 
-getK :: Direction -> Diagonal -> Myers Endpoint
-getK direction (Diagonal diagonal) = do
-  MyersState forward backward (Diagonal offset) <- get
-  let v = case direction of { Forward -> forward ; Reverse -> backward }
-  return $! v `at` (offset + diagonal)
-
 at :: Vector.Vector Int -> Int -> Endpoint
 at v k = Endpoint (v Vector.! k) 0
 
