@@ -57,9 +57,9 @@ decompose myers = case myers of
         after' <- lcs eq after
         return $! before' <> toList (as mid) <> after'
       else if length (bs graph) > length (as graph) then
-        return []
+        return (toList (as graph))
       else
-        return []
+        return (toList (bs graph))
 
   SES eq graph
     | null (bs graph) -> return (This <$> toList (as graph))
