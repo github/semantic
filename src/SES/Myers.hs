@@ -83,14 +83,14 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
         forwardEndpoint <- findDPath graph Forward (EditDistance d) (Diagonal k)
         backwardV <- gets backward
-        let reverseEndpoint = backwardV `at` (maxD + k)
+        let reverseEndpoint = backwardV `at` k
         if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d - 1))
           else continue)
       <*> for [negate d, negate d + 2 .. d] (\ k -> do
         reverseEndpoint <- findDPath graph Reverse (EditDistance d) (Diagonal (k + delta))
         forwardV <- gets forward
-        let forwardEndpoint = forwardV `at` (maxD + k + delta)
+        let forwardEndpoint = forwardV `at` (k + delta)
         if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d))
           else continue)
@@ -99,11 +99,13 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
 
+          at v k = let x = v ! maxD + k in Endpoint x (x - k)
+
   FindDPath (EditGraph as bs) Forward (EditDistance d) (Diagonal k) -> do
     v <- gets forward
     eq <- getEq
-    let prev = v `at` (maxD + pred k)
-    let next = v `at` (maxD + succ k)
+    let prev = v `at` pred k
+    let next = v `at` succ k
     let xy = if k == negate d || k /= d && x prev < x next
           then next
           else let x' = succ (x prev) in Endpoint x' (x' - k)
@@ -119,6 +121,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
             , y < length bs
             , (as ! x) `eq` (bs ! y) = slide eq (Endpoint (succ x) (succ y))
             | otherwise = Endpoint x y
+
+          at v k = let x = v ! maxD + k in Endpoint x (x - k)
 
   FindDPath (EditGraph as bs) Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
 
@@ -149,9 +153,6 @@ setForward v = modify (\ s -> s { forward = v })
 
 setBackward :: Vector.Vector Int -> Myers a ()
 setBackward v = modify (\ s -> s { backward = v })
-
-at :: Vector.Vector Int -> Int -> Endpoint
-at v k = let x = v Vector.! k in Endpoint x (x - k)
 
 overlaps :: Endpoint -> Endpoint -> Bool
 overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
