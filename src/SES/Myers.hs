@@ -33,6 +33,12 @@ data Direction = Forward | Reverse
 
 -- Evaluation
 
+runMyers :: Myers a -> a
+runMyers = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
+  where runAll state step = case runMyersStep state step of
+          Left a -> a
+          Right next -> uncurry runAll next
+
 runMyersStep :: MyersState -> Myers a -> Either a (MyersState, Myers a)
 runMyersStep state step = case step of
   Return a -> Left a
