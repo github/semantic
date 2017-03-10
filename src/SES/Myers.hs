@@ -66,9 +66,7 @@ decompose myers = case myers of
         if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d))
           else continue)
-
-    where ceilDiv = (uncurry (+) .) . divMod
-          n = length as
+    where n = length as
           m = length bs
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
@@ -111,6 +109,9 @@ for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 
 continue :: Myers (Maybe a)
 continue = return Nothing
+
+ceilDiv :: Integral a => a -> a -> a
+ceilDiv = (uncurry (+) .) . divMod
 
 
 -- Instances
