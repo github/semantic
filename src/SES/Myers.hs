@@ -88,7 +88,7 @@ middleSnake as bs = M (MiddleSnake as bs) `Then` return
 
 -- Implementation details
 
-data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int), offset :: Diagonal }
+data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int) }
 
 at :: Vector.Vector Int -> Int -> Endpoint
 at v k = Endpoint (v Vector.! k) 0
