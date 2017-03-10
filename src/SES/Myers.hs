@@ -132,6 +132,12 @@ findDPath eq graph direction d k = M (FindDPath eq graph direction d k) `Then` r
 middleSnake :: (a -> a -> Bool) -> EditGraph a -> Myers a (Snake, EditDistance)
 middleSnake eq graph = M (MiddleSnake eq graph) `Then` return
 
+getEditGraph :: Myers a (EditGraph a)
+getEditGraph = GetGraph `Then` return
+
+getEq :: Myers a (a -> a -> Bool)
+getEq = GetEq `Then` return
+
 
 -- Implementation details
 
