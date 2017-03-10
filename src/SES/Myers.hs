@@ -21,6 +21,7 @@ data StepF a where
 
 type Myers = Freer StepF
 
+data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a), eq :: !(a -> a -> Bool) }
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
 
 newtype EditDistance = EditDistance { unEditDistance :: Int }
