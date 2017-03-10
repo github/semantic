@@ -3,7 +3,7 @@ module ParseCommand where
 
 import Arguments
 import Category
-import Data.Aeson (ToJSON, encode)
+import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Record
 import qualified Data.Text as T
 import Info
@@ -36,6 +36,9 @@ data ParseJSON =
     { filePath :: FilePath
     , programNodes :: ParseJSON
     } deriving (Show, Generic, ToJSON)
+instance ToJSON ParseJSON where
+  toJSON JSONProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan ]
+  toJSON JSONProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
 -- | Parses filePaths into two possible formats: SExpression or JSON.
 parse :: Arguments -> IO ByteString
