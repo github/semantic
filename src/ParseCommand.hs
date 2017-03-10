@@ -25,27 +25,41 @@ import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 
 data ParseJSON =
-    JSONProgramNode
+    ParseTreeProgramNode
     { category :: Text
     , sourceRange :: Range
     , sourceText :: SourceText
     , sourceSpan :: SourceSpan
     , children :: [ParseJSON]
     }
-  | JSONProgram
+  | ParseTreeProgram
     { filePath :: FilePath
-    , programNodes :: ParseJSON
-    } deriving (Show, Generic, ToJSON)
+    , programNode :: ParseJSON
+    }
+  | IndexProgramNode
+    { category :: Text
+    , sourceRange :: Range
+    , sourceText :: SourceText
+    , sourceSpan :: SourceSpan
+    }
+  | IndexProgram
+    { filePath :: FilePath
+    , programNodes :: [ParseJSON]
+    } deriving (Show, Generic)
+
 instance ToJSON ParseJSON where
-  toJSON JSONProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan ]
-  toJSON JSONProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
+  toJSON ParseTreeProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan, "children" .= children ]
+  toJSON ParseTreeProgram{..} = object [ "filePath" .= filePath, "programNode" .= programNode ]
+  toJSON IndexProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan ]
+  toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
 -- | Parses filePaths into two possible formats: SExpression or JSON.
 parse :: Arguments -> IO ByteString
 parse Arguments{..} =
   case format of
     SExpression -> renderSExpression filePaths
-    _ -> renderParseJSON filePaths
+    Index -> renderIndex filePaths
+    _ -> renderParseTree filePaths
 
   where
     renderSExpression :: [FilePath] -> IO ByteString
@@ -53,31 +67,52 @@ parse Arguments{..} =
       terms' <- sequenceA $ terms <$> filePaths
       return $ printTerms TreeOnly terms'
 
-    -- | Constructs a ParseJSON structure for each file path.
-    renderParseJSON :: [FilePath] -> IO ByteString
-    renderParseJSON filePaths = fmap (toS . encode) jsonPrograms
-      where jsonPrograms = for filePaths constructJSONPrograms
-
-    -- | Constructs the top level structure ProgramJSON structure.
-    constructJSONPrograms :: FilePath -> IO ParseJSON
-    constructJSONPrograms filePath = do
-      programNodes <- constructProgramNodes filePath
-      return $ JSONProgram filePath programNodes
-
-    -- | Constructs the inner children nodes (ProgramNodesJSON) structure.
-    constructProgramNodes :: FilePath -> IO ParseJSON
-    constructProgramNodes filePath = do
-      terms' <- terms filePath
-      return $ cata algebra terms'
-
+    -- | Constructs a ParseJSON suitable for indexing for each file path.
+    renderIndex :: [FilePath] -> IO ByteString
+    renderIndex filePaths = fmap (toS . encode) (for filePaths render)
       where
-        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-        algebra (annotation :< syntax) = JSONProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (toList syntax)
+        render :: FilePath -> IO ParseJSON
+        render filePath = do
+          programNodes <- constructIndexProgramNodes filePath
+          return $ IndexProgram filePath programNodes
 
-        category' = toS . Info.category
-        range' = byteRange
-        text' = Info.sourceText
-        sourceSpan' = Info.sourceSpan
+        constructIndexProgramNodes :: FilePath -> IO [ParseJSON]
+        constructIndexProgramNodes filePath = do
+          terms' <- terms filePath
+          return $ cata algebra terms'
+
+        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
+        algebra (annotation :< syntax) = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) : concat syntax
+
+    -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
+    renderParseTree :: [FilePath] -> IO ByteString
+    renderParseTree filePaths = fmap (toS . encode) (for filePaths render)
+      where
+        render :: FilePath -> IO ParseJSON
+        render filePath = do
+          programNodes <- constructParseTreeProgramNodes filePath
+          return $ ParseTreeProgram filePath programNodes
+
+        constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
+        constructParseTreeProgramNodes filePath = do
+          terms' <- terms filePath
+          return $ cata algebra terms'
+
+        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
+        algebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (toList syntax)
+
+
+    category' :: Record '[SourceText, Range, Category, SourceSpan] -> Text
+    category' = toS . Info.category
+
+    range' :: Record '[SourceText, Range, Category, SourceSpan] -> Range
+    range' = byteRange
+
+    text' :: Record '[SourceText, Range, Category, SourceSpan] -> SourceText
+    text' = Info.sourceText
+
+    sourceSpan' :: Record '[SourceText, Range, Category, SourceSpan] -> SourceSpan
+    sourceSpan' = Info.sourceSpan
 
     -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
     terms :: FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
