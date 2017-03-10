@@ -91,6 +91,12 @@ middleSnake as bs = M (MiddleSnake as bs) `Then` return
 
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int) }
 
+setForward :: Vector.Vector Int -> Myers ()
+setForward v = modify (\ s -> s { forward = v })
+
+setBackward :: Vector.Vector Int -> Myers ()
+setBackward v = modify (\ s -> s { backward = v })
+
 at :: Vector.Vector Int -> Int -> Endpoint
 at v k = Endpoint (v Vector.! k) 0 -- FIXME: Bogus.
 
