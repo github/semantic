@@ -14,7 +14,7 @@ import Git.Libgit2
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString (sendAll, recv)
 import Prelude
-import Prologue hiding (toStrict, error)
+import Prologue hiding (toStrict)
 import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
