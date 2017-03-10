@@ -130,7 +130,15 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   FindDPath _ Reverse (EditDistance d) (Diagonal k) -> do
     v <- gets backward
     eq <- getEq
-    return (Endpoint 0 0)
+    let prev = v `at` pred k
+    let next = v `at` succ k
+    let xy = if k == negate d || k /= d && x prev < x next
+          then next
+          else let x' = succ (x prev) in Endpoint x' (x' - k)
+    let Endpoint x' y' = slide (negate 1) eq xy
+    setBackward (v Vector.// [(maxD + k, x')])
+    return (Endpoint x' y')
+    where at v k = let x = v ! maxD + delta + k in Endpoint x (x - k)
 
   where (!) = (Vector.!)
         EditGraph as bs = editGraph myers
