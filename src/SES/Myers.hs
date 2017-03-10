@@ -120,8 +120,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           maxD = (m + n) `ceilDiv` 2
 
           slide eq (Endpoint x y)
-            | x < length as
-            , y < length bs
+            | x > 0, x < length as
+            , y > 0, y < length bs
             , (as ! x) `eq` (bs ! y) = slide eq (Endpoint (succ x) (succ y))
             | otherwise = Endpoint x y
 
