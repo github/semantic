@@ -77,7 +77,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | otherwise -> do
       return []
 
-  MiddleSnake graph -> fmap (fromMaybe (error "bleah")) $
+  MiddleSnake graph@(EditGraph as bs) -> fmap (fromMaybe (error "bleah")) $
     for [0..maxD] $ \ d ->
       (<|>)
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
@@ -94,8 +94,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         if even delta && k `inInterval` (negate d, d) && overlaps forwardEndpoint reverseEndpoint
           then return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d))
           else continue)
-    where n = length (as graph)
-          m = length (bs graph)
+    where n = length as
+          m = length bs
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
 
