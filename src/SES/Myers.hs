@@ -138,6 +138,11 @@ continue = return Nothing
 ceilDiv :: Integral a => a -> a -> a
 ceilDiv = (uncurry (+) .) . divMod
 
+divideGraph :: EditGraph a -> Endpoint -> (EditGraph a, EditGraph a)
+divideGraph (EditGraph as bs) (Endpoint x y) =
+  ( EditGraph (Vector.slice 0  x              as) (Vector.slice 0  y              bs)
+  , EditGraph (Vector.slice x (length as - x) as) (Vector.slice y (length bs - y) bs) )
+
 
 -- Instances
 
