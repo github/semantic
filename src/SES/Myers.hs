@@ -1,9 +1,10 @@
-{-# LANGUAGE GADTs, MultiParamTypeClasses #-}
+{-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses #-}
 module SES.Myers where
 
 import Control.Monad.Free.Freer
 import Data.These
 import qualified Data.Vector as Vector
+import GHC.Stack
 import Prologue hiding (for, State)
 
 data MyersF element result where
@@ -34,14 +35,14 @@ data Direction = Forward | Reverse
 
 -- Evaluation
 
-runMyers :: (a -> a -> Bool) -> Myers a b -> b
+runMyers :: HasCallStack => (a -> a -> Bool) -> Myers a b -> b
 runMyers eq = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
   where runAll state step = case runMyersStep eq state step of
           Left a -> a
           Right next -> uncurry runAll next
 
-runMyersStep :: (a -> a -> Bool) -> MyersState -> Myers a b -> Either b (MyersState, Myers a b)
-runMyersStep eq state step = case step of
+runMyersStep :: HasCallStack => (a -> a -> Bool) -> MyersState -> Myers a b -> Either b (MyersState, Myers a b)
+runMyersStep eq state step = let ?callStack = popCallStack callStack in case step of
   Return a -> Left a
   Then step cont -> case step of
     M myers -> Right (state, decompose myers >>= cont)
@@ -52,8 +53,8 @@ runMyersStep eq state step = case step of
     GetEq -> Right (state, cont eq)
 
 
-decompose :: MyersF a b -> Myers a b
-decompose myers = case myers of
+decompose :: HasCallStack => MyersF a b -> Myers a b
+decompose myers = let ?callStack = popCallStack callStack in case myers of
   LCS graph
     | null (as graph) || null (bs graph) -> return []
     | otherwise -> do
@@ -122,16 +123,16 @@ decompose myers = case myers of
 
 -- Smart constructors
 
-lcs :: EditGraph a -> Myers a [a]
+lcs :: HasCallStack => EditGraph a -> Myers a [a]
 lcs graph = M (LCS graph) `Then` return
 
-findDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers a Endpoint
+findDPath :: HasCallStack => EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers a Endpoint
 findDPath graph direction d k = M (FindDPath graph direction d k) `Then` return
 
-middleSnake :: EditGraph a -> Myers a (Snake, EditDistance)
+middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, EditDistance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
 
-getEq :: Myers a (a -> a -> Bool)
+getEq :: HasCallStack => Myers a (a -> a -> Bool)
 getEq = GetEq `Then` return
 
 
