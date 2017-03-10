@@ -24,19 +24,19 @@ ses canCompare cost as bs = runST $ do
 diffAt :: STArray s Int (Maybe [(These term term, Int)]) -> Int -> Comparable term -> Cost term -> (Int, Int) -> [term] -> [term] -> ST s [(These term term, Int)]
 diffAt array lenJ canCompare cost (i, j) as bs
   | (a : as) <- as, (b : bs) <- bs = do
-    el <- readArray array index
-    case el of
-      Just diffs -> pure diffs
-      Nothing -> do
-        down <- recur (i, succ j) as (b : bs)
-        right <- recur (succ i, j) (a : as) bs
-        nomination <- best <$> if canCompare a b
-          then do
-            diagonal <- recur (succ i, succ j) as bs
-            pure [ delete a down, insert b right, consWithCost cost (These a b) diagonal ]
-          else pure [ delete a down, insert b right ]
-        writeArray array index (Just nomination)
-        pure nomination
+  el <- readArray array index
+  case el of
+    Just diffs -> pure diffs
+    Nothing -> do
+      down <- recur (i, succ j) as (b : bs)
+      right <- recur (succ i, j) (a : as) bs
+      nomination <- best <$> if canCompare a b
+        then do
+          diagonal <- recur (succ i, succ j) as bs
+          pure [ delete a down, insert b right, consWithCost cost (These a b) diagonal ]
+        else pure [ delete a down, insert b right ]
+      writeArray array index (Just nomination)
+      pure nomination
   | null as = pure $ foldr insert [] bs
   | null bs = pure $ foldr delete [] as
   | otherwise = pure []
