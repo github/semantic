@@ -13,6 +13,13 @@ data MyersF element result where
   MiddleSnake :: EditGraph a -> MyersF a (Snake, EditDistance)
   FindDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF a Endpoint
 
+editGraph :: MyersF a b -> EditGraph a
+editGraph myers = case myers of
+  SES g -> g
+  LCS g -> g
+  MiddleSnake g -> g
+  FindDPath g _ _ _ -> g
+
 data State s a where
   Get :: State s s
   Put :: s -> State s ()
@@ -56,28 +63,28 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
 decompose :: HasCallStack => MyersF a b -> Myers a b
 decompose myers = let ?callStack = popCallStack callStack in case myers of
   LCS graph
-    | null (as graph) || null (bs graph) -> return []
+    | null as || null bs -> return []
     | otherwise -> do
       (Snake xy uv, EditDistance d) <- middleSnake graph
       if d > 1 then do
         let (before, _) = divideGraph graph xy
         let (start, after) = divideGraph graph uv
-        let (mid, _) = divideGraph start xy
+        let (EditGraph mid _, _) = divideGraph start xy
         before' <- lcs before
         after' <- lcs after
-        return $! before' <> toList (as mid) <> after'
-      else if length (bs graph) > length (as graph) then
-        return (toList (as graph))
+        return $! before' <> toList mid <> after'
+      else if length bs > length as then
+        return (toList as)
       else
-        return (toList (bs graph))
+        return (toList bs)
 
   SES graph
-    | null (bs graph) -> return (This <$> toList (as graph))
-    | null (as graph) -> return (That <$> toList (bs graph))
+    | null bs -> return (This <$> toList as)
+    | null as -> return (That <$> toList bs)
     | otherwise -> do
       return []
 
-  MiddleSnake graph@(EditGraph as bs) -> fmap (fromMaybe (error "bleah")) $
+  MiddleSnake graph -> fmap (fromMaybe (error "bleah")) $
     for [0..maxD] $ \ d ->
       (<|>)
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
@@ -100,14 +107,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           return (Just (Snake reverseEndpoint forwardEndpoint, EditDistance $ 2 * d))
         else
           continue)
-    where n = length as
-          m = length bs
-          delta = n - m
-          maxD = (m + n) `ceilDiv` 2
 
-          at v k = let x = v ! maxD + k in Endpoint x (x - k)
-
-  FindDPath (EditGraph as bs) Forward (EditDistance d) (Diagonal k) -> do
+  FindDPath _ Forward (EditDistance d) (Diagonal k) -> do
     v <- gets forward
     eq <- getEq
     let prev = v `at` pred k
@@ -118,24 +119,26 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     let Endpoint x' y' = slide eq xy
     setForward (v Vector.// [(maxD + k, x')])
     return (Endpoint x' y')
-    where n = length as
-          m = length bs
-          maxD = (m + n) `ceilDiv` 2
 
-          slide eq (Endpoint x y)
-            | x > 0, x < length as
-            , y > 0, y < length bs
-            , (as ! x) `eq` (bs ! y) = slide eq (Endpoint (succ x) (succ y))
-            | otherwise = Endpoint x y
-
-          at v k = let x = v ! maxD + k in Endpoint x (x - k)
-
-  FindDPath (EditGraph as bs) Reverse (EditDistance d) (Diagonal k) -> do
+  FindDPath _ Reverse (EditDistance d) (Diagonal k) -> do
     v <- gets backward
     eq <- getEq
     return (Endpoint 0 0)
 
   where (!) = (Vector.!)
+        EditGraph as bs = editGraph myers
+        n = length as
+        m = length bs
+        delta = n - m
+        maxD = (m + n) `ceilDiv` 2
+
+        at v k = let x = v ! maxD + k in Endpoint x (x - k)
+
+        slide eq (Endpoint x y)
+          | x > 0, x < length as
+          , y > 0, y < length bs
+          , (as ! x) `eq` (bs ! y) = slide eq (Endpoint (succ x) (succ y))
+          | otherwise = Endpoint x y
 
 
 -- Smart constructors
