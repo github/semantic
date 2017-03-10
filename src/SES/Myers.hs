@@ -74,7 +74,8 @@ decompose myers = case myers of
           maxD = (m + n) `ceilDiv` 2
 
 
-  FindDPath {} -> return (Endpoint 0 0)
+  FindDPath Forward (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
+  FindDPath Reverse (EditDistance d) (Diagonal k) -> return (Endpoint 0 0)
 
 
 -- Smart constructors
