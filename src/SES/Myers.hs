@@ -8,6 +8,7 @@ import Prologue hiding (for, State)
 
 data MyersF a where
   SES :: EditGraph a -> MyersF [These a a]
+  LCS :: EditGraph a -> MyersF [a]
   MiddleSnake :: EditGraph a -> MyersF (Snake, EditDistance)
   FindDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF Endpoint
 
@@ -44,6 +45,10 @@ runMyersStep state step = case step of
 
 decompose :: MyersF a -> Myers a
 decompose myers = case myers of
+  LCS graph
+    | null (as graph) || null (bs graph) -> return []
+    | otherwise -> return []
+
   SES graph
     | null (bs graph) -> return (This <$> toList (as graph))
     | null (as graph) -> return (That <$> toList (bs graph))
