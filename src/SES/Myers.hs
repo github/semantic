@@ -35,9 +35,16 @@ data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
 
 newtype EditDistance = EditDistance { unEditDistance :: Int }
+  deriving (Eq, Show)
+
 newtype Diagonal = Diagonal { unDiagonal :: Int }
+  deriving (Eq, Show)
+
 data Endpoint = Endpoint { x :: !Int, y :: !Int }
+  deriving (Eq, Show)
+
 data Direction = Forward | Reverse
+  deriving (Eq, Show)
 
 
 -- Evaluation
