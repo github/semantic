@@ -6,21 +6,21 @@ import Data.These
 import qualified Data.Vector as Vector
 import Prologue hiding (for, State)
 
-data MyersF a where
-  SES :: (a -> a -> Bool) -> EditGraph a -> MyersF [These a a]
-  LCS :: (a -> a -> Bool) -> EditGraph a -> MyersF [a]
-  MiddleSnake :: (a -> a -> Bool) -> EditGraph a -> MyersF (Snake, EditDistance)
-  FindDPath :: (a -> a -> Bool) -> EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF Endpoint
+data MyersF element result where
+  SES :: (a -> a -> Bool) -> EditGraph a -> MyersF a [These a a]
+  LCS :: (a -> a -> Bool) -> EditGraph a -> MyersF a [a]
+  MiddleSnake :: (a -> a -> Bool) -> EditGraph a -> MyersF a (Snake, EditDistance)
+  FindDPath :: (a -> a -> Bool) -> EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF a Endpoint
 
 data State s a where
   Get :: State s s
   Put :: s -> State s ()
 
-data StepF a where
-  M :: MyersF a -> StepF a
-  S :: State MyersState a -> StepF a
+data StepF element result where
+  M :: MyersF a b -> StepF a b
+  S :: State MyersState b -> StepF a b
 
-type Myers = Freer StepF
+type Myers a = Freer (StepF a)
 
 data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a) }
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
@@ -33,13 +33,13 @@ data Direction = Forward | Reverse
 
 -- Evaluation
 
-runMyers :: Myers a -> a
+runMyers :: Myers a b -> b
 runMyers = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
   where runAll state step = case runMyersStep state step of
           Left a -> a
           Right next -> uncurry runAll next
 
-runMyersStep :: MyersState -> Myers a -> Either a (MyersState, Myers a)
+runMyersStep :: MyersState -> Myers a b -> Either b (MyersState, Myers a b)
 runMyersStep state step = case step of
   Return a -> Left a
   Then step cont -> case step of
@@ -49,7 +49,7 @@ runMyersStep state step = case step of
     S (Put state') -> Right (state', cont ())
 
 
-decompose :: MyersF a -> Myers a
+decompose :: MyersF a b -> Myers a b
 decompose myers = case myers of
   LCS eq graph
     | null (as graph) || null (bs graph) -> return []
@@ -118,13 +118,13 @@ decompose myers = case myers of
 
 -- Smart constructors
 
-lcs :: (a -> a -> Bool) -> EditGraph a -> Myers [a]
+lcs :: (a -> a -> Bool) -> EditGraph a -> Myers a [a]
 lcs eq graph = M (LCS eq graph) `Then` return
 
-findDPath :: (a -> a -> Bool) -> EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers Endpoint
+findDPath :: (a -> a -> Bool) -> EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers a Endpoint
 findDPath eq graph direction d k = M (FindDPath eq graph direction d k) `Then` return
 
-middleSnake :: (a -> a -> Bool) -> EditGraph a -> Myers (Snake, EditDistance)
+middleSnake :: (a -> a -> Bool) -> EditGraph a -> Myers a (Snake, EditDistance)
 middleSnake eq graph = M (MiddleSnake eq graph) `Then` return
 
 
@@ -132,10 +132,10 @@ middleSnake eq graph = M (MiddleSnake eq graph) `Then` return
 
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int) }
 
-setForward :: Vector.Vector Int -> Myers ()
+setForward :: Vector.Vector Int -> Myers a ()
 setForward v = modify (\ s -> s { forward = v })
 
-setBackward :: Vector.Vector Int -> Myers ()
+setBackward :: Vector.Vector Int -> Myers a ()
 setBackward v = modify (\ s -> s { backward = v })
 
 at :: Vector.Vector Int -> Int -> Endpoint
@@ -147,10 +147,10 @@ overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
 inInterval :: Ord a => a -> (a, a) -> Bool
 inInterval k (lower, upper) = k >= lower && k <= upper
 
-for :: [a] -> (a -> Myers (Maybe b)) -> Myers (Maybe b)
+for :: [a] -> (a -> Myers c (Maybe b)) -> Myers c (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 
-continue :: Myers (Maybe a)
+continue :: Myers b (Maybe a)
 continue = return Nothing
 
 ceilDiv :: Integral a => a -> a -> a
@@ -164,6 +164,6 @@ divideGraph (EditGraph as bs) (Endpoint x y) =
 
 -- Instances
 
-instance MonadState MyersState Myers where
+instance MonadState MyersState (Myers a) where
   get = S Get `Then` return
   put a = S (Put a) `Then` return
