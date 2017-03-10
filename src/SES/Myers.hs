@@ -73,10 +73,6 @@ decompose myers = case myers of
           delta = n - m
           maxD = (m + n) `ceilDiv` 2
 
-          for :: [a] -> (a -> Myers (Maybe b)) -> Myers (Maybe b)
-          for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
-
-          continue = return Nothing
 
   FindDPath {} -> return (Endpoint 0 0)
 
@@ -108,6 +104,12 @@ overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
 
 inInterval :: Ord a => a -> (a, a) -> Bool
 inInterval k (lower, upper) = k >= lower && k <= upper
+
+for :: [a] -> (a -> Myers (Maybe b)) -> Myers (Maybe b)
+for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
+
+continue :: Myers (Maybe a)
+continue = return Nothing
 
 
 -- Instances
