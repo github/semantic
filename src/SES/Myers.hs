@@ -89,7 +89,16 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | null bs -> return (This <$> toList as)
     | null as -> return (That <$> toList bs)
     | otherwise -> do
-      return []
+      (Snake xy uv, EditDistance d) <- middleSnake graph
+      if d > 1 then do
+        let (before, _) = divideGraph graph xy
+        let (start, after) = divideGraph graph uv
+        let (EditGraph midAs midBs, _) = divideGraph start xy
+        before' <- ses before
+        after' <- ses after
+        return $! before' <> zipWith These (toList midAs) (toList midBs) <> after'
+      else
+        return (zipWith These (toList as) (toList bs))
 
   MiddleSnake graph -> fmap (fromMaybe (error "bleah")) $
     for [0..maxD] $ \ d ->
@@ -153,6 +162,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
 
 -- Smart constructors
+
+ses :: HasCallStack => EditGraph a -> Myers a [These a a]
+ses graph = M (SES graph) `Then` return
 
 lcs :: HasCallStack => EditGraph a -> Myers a [a]
 lcs graph = M (LCS graph) `Then` return
