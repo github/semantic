@@ -98,7 +98,7 @@ setBackward :: Vector.Vector Int -> Myers ()
 setBackward v = modify (\ s -> s { backward = v })
 
 at :: Vector.Vector Int -> Int -> Endpoint
-at v k = Endpoint (v Vector.! k) 0 -- FIXME: Bogus.
+at v k = let x = v Vector.! k in Endpoint x (x - k)
 
 overlaps :: Endpoint -> Endpoint -> Bool
 overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
