@@ -51,10 +51,11 @@ decompose myers = case myers of
       (Snake xy uv, EditDistance d) <- middleSnake eq graph
       if d > 1 then do
         let (before, _) = divideGraph graph xy
-        let (_, after) = divideGraph graph uv
+        let (start, after) = divideGraph graph uv
+        let (mid, _) = divideGraph start xy
         before' <- lcs eq before
         after' <- lcs eq after
-        return $! before' <> toList [] <> after'
+        return $! before' <> toList (as mid) <> after'
       else if length (bs graph) > length (as graph) then
         return []
       else
