@@ -47,7 +47,18 @@ decompose :: MyersF a -> Myers a
 decompose myers = case myers of
   LCS eq graph
     | null (as graph) || null (bs graph) -> return []
-    | otherwise -> return []
+    | otherwise -> do
+      (Snake xy uv, EditDistance d) <- middleSnake eq graph
+      if d > 1 then do
+        let (before, _) = divideGraph graph xy
+        let (_, after) = divideGraph graph uv
+        before' <- lcs eq before
+        after' <- lcs eq after
+        return $! before' <> toList [] <> after'
+      else if length (bs graph) > length (as graph) then
+        return []
+      else
+        return []
 
   SES eq graph
     | null (bs graph) -> return (This <$> toList (as graph))
