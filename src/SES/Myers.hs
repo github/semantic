@@ -143,7 +143,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     let Endpoint x' y' = slide (negate 1) eq xy
     setBackward (v Vector.// [(maxD + k, x')])
     return (Endpoint x' y')
-    where at v k = let x = v ! maxD + k in Endpoint x (x - k)
 
   where (!) = (Vector.!)
         EditGraph as bs = editGraph myers
