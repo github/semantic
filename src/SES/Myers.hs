@@ -116,7 +116,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     let xy = if k == negate d || k /= d && x prev < x next
           then next
           else let x' = succ (x prev) in Endpoint x' (x' - k)
-    let Endpoint x' y' = slide eq xy
+    let Endpoint x' y' = slide 1 eq xy
     setForward (v Vector.// [(maxD + k, x')])
     return (Endpoint x' y')
 
@@ -134,10 +134,10 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         at v k = let x = v ! maxD + k in Endpoint x (x - k)
 
-        slide eq (Endpoint x y)
+        slide by eq (Endpoint x y)
           | x > 0, x < length as
           , y > 0, y < length bs
-          , (as ! x) `eq` (bs ! y) = slide eq (Endpoint (succ x) (succ y))
+          , (as ! x) `eq` (bs ! y) = slide by eq (Endpoint (x + by) (y + by))
           | otherwise = Endpoint x y
 
 
