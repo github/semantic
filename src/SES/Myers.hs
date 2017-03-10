@@ -92,7 +92,7 @@ middleSnake as bs = M (MiddleSnake as bs) `Then` return
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int) }
 
 at :: Vector.Vector Int -> Int -> Endpoint
-at v k = Endpoint (v Vector.! k) 0
+at v k = Endpoint (v Vector.! k) 0 -- FIXME: Bogus.
 
 overlaps :: Endpoint -> Endpoint -> Bool
 overlaps (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= u
