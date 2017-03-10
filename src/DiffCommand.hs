@@ -146,7 +146,8 @@ diffFiles :: HasField fields Category
           -> Both SourceBlob
           -> IO Output
 diffFiles parse render sourceBlobs = do
-  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parse) sourceBlobs
+  terms <- Async.withTaskGroup numCapabilities . flip Async.mapTasks $
+    (fmap (defaultFeatureVectorDecorator getLabel) . parse) <$> sourceBlobs
   pure $! render sourceBlobs (stripDiff (diffTerms' terms))
 
   where
