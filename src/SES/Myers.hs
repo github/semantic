@@ -100,6 +100,9 @@ decompose myers = case myers of
 
 -- Smart constructors
 
+lcs :: EditGraph a -> Myers [a]
+lcs graph = M (LCS graph) `Then` return
+
 findDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers Endpoint
 findDPath graph direction d k = M (FindDPath graph direction d k) `Then` return
 
