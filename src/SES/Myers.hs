@@ -236,3 +236,6 @@ instance Show2 State where
   liftShowsPrec2 sp1 _ _ _ d state = case state of
     Get -> showString "Get"
     Put s -> showsUnaryWith sp1 "Put" d s
+
+instance Show s => Show1 (State s) where
+  liftShowsPrec = liftShowsPrec2 showsPrec showList
