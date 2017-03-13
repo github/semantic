@@ -117,16 +117,16 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Forward . Diagonal)
           <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Reverse . Diagonal)
 
-  SearchAlongK graph (EditDistance d) direction@Forward (Diagonal k) -> do
-    forwardEndpoint <- findDPath graph (EditDistance d) direction (diagonalFor direction k)
+  SearchAlongK graph d direction@Forward (Diagonal k) -> do
+    forwardEndpoint <- findDPath graph d direction (diagonalFor direction k)
     reverseEndpoint <- getOppositeEndpoint direction k
     if odd delta && k `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (editDistance direction d))
     else
       continue
 
-  SearchAlongK graph (EditDistance d) direction@Reverse (Diagonal k) -> do
-    reverseEndpoint <- findDPath graph (EditDistance d) direction (diagonalFor direction k)
+  SearchAlongK graph d direction@Reverse (Diagonal k) -> do
+    reverseEndpoint <- findDPath graph d direction (diagonalFor direction k)
     forwardEndpoint <- getOppositeEndpoint direction k
     if even delta && (k + delta) `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (editDistance direction d))
@@ -166,8 +166,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         at v (Diagonal k) = v ! maxD + k
 
-        diagonalInterval Forward d = (delta - pred d, delta + pred d)
-        diagonalInterval Reverse d = (negate d, d)
+        diagonalInterval Forward (EditDistance d) = (delta - pred d, delta + pred d)
+        diagonalInterval Reverse (EditDistance d) = (negate d, d)
 
         diagonalFor Forward k = Diagonal k
         diagonalFor Reverse k = Diagonal (k + delta)
@@ -176,9 +176,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           v <- gets (case direction of { Reverse -> backward ; Forward -> forward })
           let x = v `at` diagonalFor direction k in return $ Endpoint x (x - k)
 
-        done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, EditDistance d)
-        editDistance Forward d = 2 * d - 1
-        editDistance Reverse d = 2 * d
+        done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, d)
+        editDistance Forward (EditDistance d) = EditDistance (2 * d - 1)
+        editDistance Reverse (EditDistance d) = EditDistance (2 * d)
 
         slide dir eq (Endpoint x y)
           | x >= 0, x < length as
