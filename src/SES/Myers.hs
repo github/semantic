@@ -27,7 +27,10 @@ data StepF element result where
 type Myers a = Freer (StepF a)
 
 data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a) }
+  deriving (Eq, Show)
+
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
+  deriving (Eq, Show)
 
 newtype EditDistance = EditDistance { unEditDistance :: Int }
   deriving (Eq, Show)
