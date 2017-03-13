@@ -13,13 +13,6 @@ data MyersF element result where
   MiddleSnake :: EditGraph a -> MyersF a (Snake, EditDistance)
   FindDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF a Endpoint
 
-editGraph :: MyersF a b -> EditGraph a
-editGraph myers = case myers of
-  SES g -> g
-  LCS g -> g
-  MiddleSnake g -> g
-  FindDPath g _ _ _ -> g
-
 data State s a where
   Get :: State s s
   Put :: s -> State s ()
@@ -216,6 +209,14 @@ divideGraph (EditGraph as bs) (Endpoint x y) =
   ( EditGraph (slice 0  x              as) (slice 0  y              bs)
   , EditGraph (slice x (length as - x) as) (slice y (length bs - y) bs) )
   where slice from to v = Vector.slice (max 0 (min from (length v))) (max 0 (min to (length v))) v
+
+
+editGraph :: MyersF a b -> EditGraph a
+editGraph myers = case myers of
+  SES g -> g
+  LCS g -> g
+  MiddleSnake g -> g
+  FindDPath g _ _ _ -> g
 
 
 -- Instances
