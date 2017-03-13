@@ -71,30 +71,30 @@ fetchDiff :: Arguments -> FilePath -> IO (Both SourceBlob, SyntaxDiff Text '[Ran
 fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
-  lift $ runReaderT (fetchDiff' args filepath) repo
+  lift $ runReaderT (go args filepath) repo
+  where
+    go :: Arguments -> FilePath -> ReaderT LgRepo IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
+    go Arguments{..} filepath = do
+      liftIO $ traceEventIO ("START fetchDiff: " <> filepath)
+      sourcesAndOids <- sequence $ traverse (getSourceBlob filepath) <$> shaRange
 
-fetchDiff' :: Arguments -> FilePath -> ReaderT LgRepo IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
-fetchDiff' Arguments{..} filepath = do
-  liftIO $ traceEventIO ("START fetchDiff: " <> filepath)
-  sourcesAndOids <- sequence $ traverse (getSourceBlob filepath) <$> shaRange
+      let sources = fromMaybe (emptySourceBlob filepath) <$> sourcesAndOids
+      let sourceBlobs = idOrEmptySourceBlob <$> sources
 
-  let sources = fromMaybe (emptySourceBlob filepath) <$> sourcesAndOids
-  let sourceBlobs = idOrEmptySourceBlob <$> sources
+      diff <- liftIO $ diffFiles (parserForFilepath filepath) sourceBlobs
+      pure $! traceEvent ("END fetchDiff: " <> filepath) (sourceBlobs, diff)
 
-  diff <- liftIO $ diffFiles (parserForFilepath filepath) sourceBlobs
-  pure $! traceEvent ("END fetchDiff: " <> filepath) (sourceBlobs, diff)
-
+-- | Returns a list of relative file paths that have changed between the given commit shas.
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
 pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
-  lift $ runReaderT (pathsToDiff' shas) repo
-
--- | Returns a list of relative file paths that have changed between the given commit shas.
-pathsToDiff' :: Both String -> ReaderT LgRepo IO [FilePath]
-pathsToDiff' shas = do
-  entries <- blobEntriesToDiff shas
-  pure $ (\(p, _, _) -> toS p) <$> entries
+  lift $ runReaderT (go shas) repo
+  where
+    go :: Both String -> ReaderT LgRepo IO [FilePath]
+    go shas = do
+      entries <- blobEntriesToDiff shas
+      pure $ (\(p, _, _) -> toS p) <$> entries
 
 -- | Returns a list of blob entries that have changed between the given commits shas.
 blobEntriesToDiff :: Both String -> ReaderT LgRepo IO [(TreeFilePath, Git.BlobOid LgRepo, BlobKind)]
