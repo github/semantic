@@ -13,6 +13,7 @@ import Prologue hiding (for, State)
 data MyersF element result where
   SES :: EditGraph a -> MyersF a [These a a]
   LCS :: EditGraph a -> MyersF a [a]
+  EditDistance :: EditGraph a -> MyersF a Int
   MiddleSnake :: EditGraph a -> MyersF a (Snake, Distance)
   SearchUpToD :: EditGraph a -> Distance -> MyersF a (Maybe (Snake, Distance))
   SearchAlongK :: EditGraph a -> Distance -> Direction -> Diagonal -> MyersF a (Maybe (Snake, Distance))
@@ -106,6 +107,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         return $! before' <> zipWith These (toList midAs) (toList midBs) <> after'
       else
         return (zipWith These (toList as) (toList bs))
+
+  EditDistance graph -> unDistance . snd <$> middleSnake graph
 
   MiddleSnake graph -> do
     result <- for [0..maxD] (searchUpToD graph . Distance)
@@ -256,6 +259,7 @@ editGraph :: MyersF a b -> EditGraph a
 editGraph myers = case myers of
   SES g -> g
   LCS g -> g
+  EditDistance g -> g
   MiddleSnake g -> g
   SearchUpToD g _ -> g
   SearchAlongK g _ _ _ -> g
@@ -290,6 +294,7 @@ instance Show2 MyersF where
   liftShowsPrec2 sp1 sl1 _ _ d m = case m of
     SES graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "SES" d graph
     LCS graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "LCS" d graph
+    EditDistance graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "EditDistance" d graph
     MiddleSnake graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "MiddleSnake" d graph
     SearchUpToD graph distance -> showsBinaryWith (liftShowsPrec sp1 sl1) showsPrec "SearchUpToD" d graph distance
     SearchAlongK graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "SearchAlongK" d graph direction distance diagonal
