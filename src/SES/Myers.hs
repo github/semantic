@@ -110,9 +110,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   MiddleSnake graph -> fmap (fromMaybe (error "bleah")) (for [0..maxD] (searchUpToD graph . EditDistance))
 
   SearchUpToD graph (EditDistance d) ->
-    (<|>)
-      <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Forward . Diagonal)
-      <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Reverse . Diagonal)
+    (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Forward . Diagonal)
+          <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Reverse . Diagonal)
 
   SearchAlongK graph (EditDistance d) Forward (Diagonal k) -> do
     forwardEndpoint <- findDPath graph (EditDistance d) Forward (Diagonal k)
