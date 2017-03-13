@@ -208,8 +208,9 @@ ceilDiv = (uncurry (+) .) . divMod
 
 divideGraph :: EditGraph a -> Endpoint -> (EditGraph a, EditGraph a)
 divideGraph (EditGraph as bs) (Endpoint x y) =
-  ( EditGraph (Vector.slice 0  x              as) (Vector.slice 0  y              bs)
-  , EditGraph (Vector.slice x (length as - x) as) (Vector.slice y (length bs - y) bs) )
+  ( EditGraph (slice 0  x              as) (slice 0  y              bs)
+  , EditGraph (slice x (length as - x) as) (slice y (length bs - y) bs) )
+  where slice from to v = Vector.slice (max 0 (min from (length v))) (max 0 (min to (length v))) v
 
 
 -- Instances
