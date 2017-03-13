@@ -183,6 +183,7 @@ getEq = GetEq `Then` return
 -- Implementation details
 
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int) }
+  deriving (Eq, Show)
 
 emptyStateForStep :: Myers a b -> MyersState
 emptyStateForStep _ = MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
