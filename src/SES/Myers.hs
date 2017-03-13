@@ -176,11 +176,11 @@ ses graph = M (SES graph) `Then` return
 lcs :: HasCallStack => EditGraph a -> Myers a [a]
 lcs graph = M (LCS graph) `Then` return
 
-findDPath :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a Endpoint
-findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
-
 middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, EditDistance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
+
+findDPath :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a Endpoint
+findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
 getEq :: HasCallStack => Myers a (a -> a -> Bool)
 getEq = GetEq `Then` return
