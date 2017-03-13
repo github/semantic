@@ -16,7 +16,7 @@ import Term
 data SExpressionFormat = TreeOnly | TreeAndRanges
 
 sExpression :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Record fields)
-sExpression format _ diff = SExpressionOutput $ printDiff diff 0 format <> "\n"
+sExpression format _ diff = SExpressionOutput $ printDiff diff 0 format
 
 printDiff :: (HasField fields Category, HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> Int -> SExpressionFormat -> ByteString
 printDiff diff level format = case runFree diff of
@@ -34,7 +34,7 @@ printDiff diff level format = case runFree diff of
           | otherwise = "\n" <> replicate (2 * n) space
 
 printTerms :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> [Term (Syntax t) (Record fields)] -> ByteString
-printTerms format terms = foldr (\t acc -> printTerm t 0 format <> acc) "" terms <> "\n"
+printTerms format terms = foldr (\t acc -> printTerm t 0 format <> acc) "" terms
 
 printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> SExpressionFormat -> ByteString
 printTerm term level format = go term level 0
