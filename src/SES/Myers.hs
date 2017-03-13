@@ -107,7 +107,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       else
         return (zipWith These (toList as) (toList bs))
 
-  MiddleSnake graph -> fmap (fromMaybe (error "bleah")) (for [0..maxD] (searchUpToD graph . EditDistance))
+  MiddleSnake graph -> do
+    result <- for [0..maxD] (searchUpToD graph . EditDistance)
+    case result of
+      Just result -> return result
+      Nothing -> error "MiddleSnake must always find a value."
 
   SearchUpToD graph (EditDistance d) ->
     (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Forward . Diagonal)
