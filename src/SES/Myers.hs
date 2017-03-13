@@ -55,6 +55,11 @@ runMyers eq = runAll $ MyersState (Vector.replicate 100 0) (Vector.replicate 100
           Left a -> a
           Right next -> uncurry runAll next
 
+runMyersSteps :: HasCallStack => (a -> a -> Bool) -> MyersState -> Myers a b -> [(MyersState, Myers a b)]
+runMyersSteps eq state step = let ?callStack = popCallStack callStack in (state, step) : case runMyersStep eq state step of
+  Left result -> [ (state, return result) ]
+  Right next -> uncurry (runMyersSteps eq) next
+
 runMyersStep :: HasCallStack => (a -> a -> Bool) -> MyersState -> Myers a b -> Either b (MyersState, Myers a b)
 runMyersStep eq state step = let ?callStack = popCallStack callStack in case step of
   Return a -> Left a
