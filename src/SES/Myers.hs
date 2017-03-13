@@ -192,7 +192,9 @@ data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Ve
   deriving (Eq, Show)
 
 emptyStateForStep :: Myers a b -> MyersState
-emptyStateForStep _ = MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
+emptyStateForStep step = case step of
+  Return _ -> MyersState Vector.empty Vector.empty
+  Then _ _ -> MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
 
 setForward :: Vector.Vector Int -> Myers a ()
 setForward v = modify (\ s -> s { forward = v })
