@@ -117,20 +117,20 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Forward . Diagonal)
           <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Reverse . Diagonal)
 
-  SearchAlongK graph (EditDistance d) Forward (Diagonal k) -> do
-    forwardEndpoint <- findDPath graph (EditDistance d) Forward (Diagonal k)
+  SearchAlongK graph (EditDistance d) direction@Forward (Diagonal k) -> do
+    forwardEndpoint <- findDPath graph (EditDistance d) direction (Diagonal k)
     backwardV <- gets backward
     let reverseEndpoint = let x = backwardV `at` k in Endpoint x (x - k)
-    if odd delta && k `inInterval` diagonalInterval Forward d && overlaps graph forwardEndpoint reverseEndpoint then
+    if odd delta && k `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (2 * d - 1))
     else
       continue
 
-  SearchAlongK graph (EditDistance d) Reverse (Diagonal k) -> do
-    reverseEndpoint <- findDPath graph (EditDistance d) Reverse (Diagonal (k + delta))
+  SearchAlongK graph (EditDistance d) direction@Reverse (Diagonal k) -> do
+    reverseEndpoint <- findDPath graph (EditDistance d) direction (Diagonal (k + delta))
     forwardV <- gets forward
     let forwardEndpoint = let x = forwardV `at` (k + delta) in Endpoint x (x - k)
-    if even delta && (k + delta) `inInterval` diagonalInterval Reverse d && overlaps graph forwardEndpoint reverseEndpoint then
+    if even delta && (k + delta) `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (2 * d))
     else
       continue
