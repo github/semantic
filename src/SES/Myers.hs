@@ -278,3 +278,6 @@ instance Show2 StepF where
 
 instance Show a => Show1 (StepF a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance Show a => Show (StepF a b) where
+  showsPrec = liftShowsPrec (const (const identity)) (const identity)
