@@ -199,6 +199,9 @@ ses graph = M (SES graph) `Then` return
 lcs :: HasCallStack => EditGraph a -> Myers a [a]
 lcs graph = M (LCS graph) `Then` return
 
+editDistance :: HasCallStack => EditGraph a -> Myers a Int
+editDistance graph = M (EditDistance graph) `Then` return
+
 middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, Distance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
 
