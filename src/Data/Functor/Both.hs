@@ -31,3 +31,5 @@ instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
 
 instance (Semigroup a) => Semigroup (Join (,) a) where
   a <> b = Join $ runJoin a <> runJoin b
+
+instance NFData a => NFData (Join (,) a)

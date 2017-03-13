@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Range where
 
 import qualified Data.Char as Char
@@ -10,7 +11,7 @@ import Test.LeanCheck
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: Int, end :: Int }
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Show, Generic, NFData)
 
 -- | Make a range at a given index.
 rangeAt :: Int -> Range
