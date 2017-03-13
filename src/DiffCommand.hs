@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 module DiffCommand where
 
@@ -5,12 +6,10 @@ import Data.Aeson hiding (json)
 import Data.Functor.Both as Both
 import Data.List ((\\))
 import Data.String
-import Data.Text.Encoding (encodeUtf8)
 import GHC.Conc (numCapabilities)
 import Prologue hiding (fst, snd, null)
 import qualified Control.Concurrent.Async.Pool as Async
 import System.FilePath.Posix (hasExtension)
-import System.Timeout (timeout)
 import Git.Blob
 import Git.Libgit2
 import Git.Libgit2.Backend
@@ -22,6 +21,7 @@ import Category
 import Data.RandomWalkSimilarity
 import Data.Record
 import Info
+import Diff
 import Interpreter
 import ParseCommand (parserForFilepath)
 import Parser
@@ -35,7 +35,7 @@ import Renderer.Summary
 import Renderer.TOC
 import Source
 import Syntax
-import Term
+import Debug.Trace
 
 diff :: Arguments -> IO ByteString
 diff args@Arguments{..} = case diffMode of
@@ -45,11 +45,8 @@ diff args@Arguments{..} = case diffMode of
 -- | Compare changes between two commits.
 diffCommits :: Arguments -> IO ByteString
 diffCommits args@Arguments{..} = do
-  ts <- fetchTerms args
-  pure $ maybe mempty concatOutputs ts
-  where fetchTerms args = if developmentMode
-                            then Just <$> fetchDiffs args
-                            else timeout timeoutInMicroseconds (fetchDiffs args)
+  outputs <- fetchDiffs args
+  pure $! concatOutputs outputs
 
 -- | Compare two paths on the filesystem (compariable to git diff --no-index).
 diffPaths :: Arguments -> Both FilePath -> IO ByteString
@@ -66,28 +63,27 @@ fetchDiffs args@Arguments{..} = do
     ([], Join (Just a, Just b)) -> pathsToDiff args (both a b)
     (ps, _) -> pure ps
 
-  Async.withTaskGroup numCapabilities $ \p -> Async.mapTasks p (fetchDiff args <$> paths)
+  diffs <- Async.withTaskGroup numCapabilities . flip Async.mapTasks $
+    fetchDiff args <$> paths
 
-fetchDiff :: Arguments -> FilePath -> IO Output
+  pure $ uncurry (renderDiff args) <$> diffs
+
+fetchDiff :: Arguments -> FilePath -> IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
 fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
   lift $ runReaderT (fetchDiff' args filepath) repo
 
-fetchDiff' :: Arguments -> FilePath -> ReaderT LgRepo IO Output
-fetchDiff' args@Arguments{..} filepath = do
+fetchDiff' :: Arguments -> FilePath -> ReaderT LgRepo IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
+fetchDiff' Arguments{..} filepath = do
+  liftIO $ traceEventIO ("START fetchDiff: " <> filepath)
   sourcesAndOids <- sequence $ traverse (getSourceBlob filepath) <$> shaRange
 
   let sources = fromMaybe (emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = idOrEmptySourceBlob <$> sources
 
-  text <- liftIO . render $ textDiff (parserForFilepath filepath) args sourceBlobs
-  truncatedPatch <- liftIO $ truncatedDiff args sourceBlobs
-  pure $ fromMaybe truncatedPatch text
-  where
-    render output = if developmentMode
-                    then Just <$> output
-                    else timeout timeoutInMicroseconds output
+  diff <- liftIO $ diffFiles (parserForFilepath filepath) sourceBlobs
+  pure $! traceEvent ("END fetchDiff: " <> filepath) (sourceBlobs, diff)
 
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
 pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
@@ -136,20 +132,19 @@ getSourceBlob path sha = do
     toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
     toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
--- | Given a parser and renderer, diff two sources and return the rendered
--- | result.
--- | Returns the rendered result strictly, so it's always fully evaluated
--- | with respect to other IO actions.
-diffFiles :: HasField fields Category
+-- | Given a parser, diff two sources and return a SyntaxDiff.
+-- | Returns the rendered result strictly, so it's always fully evaluated with respect to other IO actions.
+diffFiles :: (HasField fields Category, NFData (Record fields))
           => Parser (Syntax Text) (Record fields)
-          -> Renderer (Record fields)
           -> Both SourceBlob
-          -> IO Output
-diffFiles parse render sourceBlobs = do
+          -> IO (SyntaxDiff Text fields)
+diffFiles parse sourceBlobs = do
+  traceEventIO $ "diffFiles@SEMANTIC-DIFF START parse terms: " <> paths
   terms <- Async.withTaskGroup numCapabilities . flip Async.mapTasks $
     (fmap (defaultFeatureVectorDecorator getLabel) . parse) <$> sourceBlobs
-  pure $! render sourceBlobs (stripDiff (diffTerms' terms))
-
+  traceEventIO $ "diffFiles@SEMANTIC-DIFF END parse terms: " <> paths
+  traceEventIO $ "diffFiles@SEMANTIC-DIFF START diff terms: " <> paths
+  traceEvent ("diffFiles@SEMANTIC-DIFF END diff terms: " <> paths) pure $!! stripDiff (diffTerms' terms)
   where
     diffTerms' terms = case runBothWith areNullOids sourceBlobs of
         (True, False) -> pure $ Insert (snd terms)
@@ -158,19 +153,18 @@ diffFiles parse render sourceBlobs = do
           runBothWith diffTerms terms
     areNullOids a b = (hasNullOid a, hasNullOid b)
     hasNullOid blob = oid blob == nullOid || null (source blob)
+    -- For trace events
+    paths = runBothWith (\a b -> fileAtSha a <> " -> " <> fileAtSha b) sourceBlobs
+    fileAtSha x = path x <> "@" <> toS (oid x)
 
-getLabel :: HasField fields Category => CofreeF (Syntax leaf) (Record fields) b -> (Category, Maybe leaf)
-getLabel (h :< t) = (category h, case t of
-  Leaf s -> Just s
-  _ -> Nothing)
+    getLabel :: HasField fields Category => CofreeF (Syntax leaf) (Record fields) b -> (Category, Maybe leaf)
+    getLabel (h :< t) = (category h, case t of
+      Leaf s -> Just s
+      _ -> Nothing)
 
--- | Determine whether two terms are comparable based on the equality of their categories.
-compareCategoryEq :: Functor f => HasField fields Category => Term f (Record fields) -> Term f (Record fields) -> Bool
-compareCategoryEq = (==) `on` category . extract
-
--- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (ToJSON (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO Output
-textDiff parser arguments = diffFiles parser $ case format arguments of
+-- | Returns a rendered diff given arguments and two source blobs.
+renderDiff :: (ToJSON (Record fields), NFData (Record fields), DefaultFields fields) => Arguments -> Both SourceBlob -> SyntaxDiff Text fields -> Output
+renderDiff args = case format args of
   Split -> split
   Patch -> patch
   SExpression -> sExpression TreeOnly
@@ -178,24 +172,8 @@ textDiff parser arguments = diffFiles parser $ case format arguments of
   Summary -> summary
   TOC -> toc
 
--- | Returns a truncated diff given diff arguments and two source blobs.
-truncatedDiff :: Arguments -> Both SourceBlob -> IO Output
-truncatedDiff Arguments{..} sources = pure $ case format of
-  Split -> SplitOutput mempty
-  Patch -> PatchOutput (truncatePatch sources)
-  SExpression -> SExpressionOutput mempty
-  JSON -> JSONOutput mempty
-  Summary -> SummaryOutput mempty
-  TOC -> TOCOutput mempty
-
--- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (ToJSON (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO ByteString
-printDiff parser arguments sources = do
-  rendered <- textDiff parser arguments sources
-  pure $ case rendered of
-    SplitOutput text -> encodeUtf8 text
-    PatchOutput text -> encodeUtf8 text
-    SExpressionOutput text -> text
-    JSONOutput series -> toS $ encode series
-    SummaryOutput summaries -> toS $ encode summaries
-    TOCOutput summaries -> toS $ encode summaries
+-- | Prints a rendered diff to stdio or a filepath given a parser, arguments and two source blobs.
+printDiff :: (ToJSON (Record fields), NFData (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO ByteString
+printDiff parser args sources = do
+  diff <- diffFiles parser sources
+  pure $! concatOutputs [renderDiff args sources diff]

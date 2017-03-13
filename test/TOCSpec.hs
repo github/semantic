@@ -110,18 +110,22 @@ spec = parallel $ do
   describe "diffFiles" $ do
     it "encodes to final JSON" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      let parser = parserForFilepath (path (fst sourceBlobs))
-      output <- diffFiles parser toc sourceBlobs
-      concatOutputs (pure output) `shouldBe` ("{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}" )
+      output <- diffOutput sourceBlobs
+      output `shouldBe` "{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}"
 
     it "encodes to final JSON if there are parse errors" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
-      let parser = parserForFilepath (path (fst sourceBlobs))
-      output <- diffFiles parser toc sourceBlobs
-      concatOutputs (pure output) `shouldBe` ("{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}" )
+      output <- diffOutput sourceBlobs
+      output `shouldBe` "{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}"
 
 type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
 type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
+
+diffOutput :: Both SourceBlob -> IO ByteString
+diffOutput sourceBlobs = do
+  let parser = parserForFilepath (path (fst sourceBlobs))
+  diff <- diffFiles parser sourceBlobs
+  pure $ concatOutputs [toc sourceBlobs diff]
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
@@ -184,17 +188,9 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   _ -> False
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Range, Category, SourceSpan]))
-testDiff sourceBlobs = do
-  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
-  pure $! stripDiff (diffTerms' terms sourceBlobs)
+testDiff sourceBlobs = diffFiles parser sourceBlobs
   where
     parser = parserForFilepath (path . fst $ sourceBlobs)
-    diffTerms' terms blobs = case runBothWith areNullOids blobs of
-      (True, False) -> pure $ Insert (snd terms)
-      (False, True) -> pure $ Delete (fst terms)
-      (_, _) -> runBothWith diffTerms terms
-    areNullOids a b = (hasNullOid a, hasNullOid b)
-    hasNullOid blob = oid blob == nullOid || Source.null (source blob)
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do
