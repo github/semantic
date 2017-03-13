@@ -2,8 +2,10 @@
 module SES.Myers where
 
 import Control.Monad.Free.Freer
+import Data.Functor.Classes
 import Data.These
 import qualified Data.Vector as Vector
+import GHC.Show
 import GHC.Stack
 import Prologue hiding (for, State)
 
@@ -229,3 +231,8 @@ editGraph myers = case myers of
 instance MonadState MyersState (Myers a) where
   get = S Get `Then` return
   put a = S (Put a) `Then` return
+
+instance Show2 State where
+  liftShowsPrec2 sp1 _ _ _ d state = case state of
+    Get -> showString "Get"
+    Put s -> showsUnaryWith sp1 "Put" d s
