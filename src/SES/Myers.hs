@@ -14,7 +14,7 @@ data MyersF element result where
   SES :: EditGraph a -> MyersF a [These a a]
   LCS :: EditGraph a -> MyersF a [a]
   MiddleSnake :: EditGraph a -> MyersF a (Snake, EditDistance)
-  FindDPath :: EditGraph a -> Direction -> EditDistance -> Diagonal -> MyersF a Endpoint
+  FindDPath :: EditGraph a -> EditDistance -> Direction -> Diagonal -> MyersF a Endpoint
 
 data State s a where
   Get :: State s s
@@ -109,7 +109,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     for [0..maxD] $ \ d ->
       (<|>)
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
-        forwardEndpoint <- findDPath graph Forward (EditDistance d) (Diagonal k)
+        forwardEndpoint <- findDPath graph (EditDistance d) Forward (Diagonal k)
         backwardV <- gets backward
         let reverseEndpoint = let x = backwardV `at` k in Endpoint x (x - k)
         if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps graph forwardEndpoint reverseEndpoint then
@@ -117,7 +117,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         else
           continue)
       <*> for [negate d, negate d + 2 .. d] (\ k -> do
-        reverseEndpoint <- findDPath graph Reverse (EditDistance d) (Diagonal (k + delta))
+        reverseEndpoint <- findDPath graph (EditDistance d) Reverse (Diagonal (k + delta))
         forwardV <- gets forward
         let forwardEndpoint = let x = forwardV `at` (k + delta) in Endpoint x (x - k)
         if even delta && (k + delta) `inInterval` (negate d, d) && overlaps graph forwardEndpoint reverseEndpoint then
@@ -125,7 +125,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         else
           continue)
 
-  FindDPath _ Forward (EditDistance d) (Diagonal k) -> do
+  FindDPath _ (EditDistance d) Forward (Diagonal k) -> do
     v <- gets forward
     eq <- getEq
     let prev = v `at` pred k
@@ -137,7 +137,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     setForward (v Vector.// [(maxD + k, x')])
     return (Endpoint x' y')
 
-  FindDPath _ Reverse (EditDistance d) (Diagonal k) -> do
+  FindDPath _ (EditDistance d) Reverse (Diagonal k) -> do
     v <- gets backward
     eq <- getEq
     let prev = v `at` pred k
@@ -176,8 +176,8 @@ ses graph = M (SES graph) `Then` return
 lcs :: HasCallStack => EditGraph a -> Myers a [a]
 lcs graph = M (LCS graph) `Then` return
 
-findDPath :: HasCallStack => EditGraph a -> Direction -> EditDistance -> Diagonal -> Myers a Endpoint
-findDPath graph direction d k = M (FindDPath graph direction d k) `Then` return
+findDPath :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a Endpoint
+findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
 middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, EditDistance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
@@ -266,7 +266,7 @@ instance Show2 MyersF where
     SES graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "SES" d graph
     LCS graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "LCS" d graph
     MiddleSnake graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "MiddleSnake" d graph
-    FindDPath graph direction distance diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph direction distance diagonal
+    FindDPath graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph direction distance diagonal
     where showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
           showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
             showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
