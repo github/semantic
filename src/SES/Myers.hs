@@ -275,3 +275,6 @@ instance Show2 StepF where
     M m -> showsUnaryWith (liftShowsPrec2 sp1 sl1 sp2 sl2) "M" d m
     S s -> showsUnaryWith (liftShowsPrec2 showsPrec showList sp2 sl2) "S" d s
     GetEq -> showString "GetEq"
+
+instance Show a => Show1 (StepF a) where
+  liftShowsPrec = liftShowsPrec2 showsPrec showList
