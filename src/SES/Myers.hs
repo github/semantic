@@ -119,14 +119,14 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   SearchAlongK graph d direction@Forward (Diagonal k) -> do
     (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d direction k
-    if odd delta && k `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
+    if odd delta && diagonalFor direction k `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (editDistance direction d))
     else
       continue
 
   SearchAlongK graph d direction@Reverse (Diagonal k) -> do
     (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d direction k
-    if even delta && (k + delta) `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
+    if even delta && diagonalFor direction k `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (editDistance direction d))
     else
       continue
@@ -149,6 +149,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         m = length bs
         delta = n - m
         maxD = (m + n) `ceilDiv` 2
+
+        inInterval (Diagonal k) (lower, upper) = k >= lower && k <= upper
 
         diagonalInterval Forward (EditDistance d) = (delta - pred d, delta + pred d)
         diagonalInterval Reverse (EditDistance d) = (negate d, d)
@@ -237,9 +239,6 @@ setBackward v = modify (\ s -> s { backward = v })
 
 overlaps :: EditGraph a -> Endpoint -> Endpoint -> Bool
 overlaps (EditGraph as _) (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= length as - u
-
-inInterval :: Ord a => a -> (a, a) -> Bool
-inInterval k (lower, upper) = k >= lower && k <= upper
 
 for :: [a] -> (a -> Myers c (Maybe b)) -> Myers c (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
