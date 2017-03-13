@@ -239,3 +239,6 @@ instance Show2 State where
 
 instance Show s => Show1 (State s) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance Show s => Show (State s a) where
+  showsPrec = liftShowsPrec2 showsPrec showList (const (const identity)) (const identity)
