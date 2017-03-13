@@ -122,7 +122,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     backwardV <- gets backward
     let reverseEndpoint = let x = backwardV `at` k in Endpoint x (x - k)
     if odd delta && k `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
-      return (done reverseEndpoint forwardEndpoint (2 * d - 1))
+      return (done reverseEndpoint forwardEndpoint (editDistance direction d))
     else
       continue
 
@@ -131,7 +131,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     forwardV <- gets forward
     let forwardEndpoint = let x = forwardV `at` (k + delta) in Endpoint x (x - k)
     if even delta && (k + delta) `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
-      return (done reverseEndpoint forwardEndpoint (2 * d))
+      return (done reverseEndpoint forwardEndpoint (editDistance direction d))
     else
       continue
 
@@ -172,6 +172,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         diagonalInterval Reverse d = (negate d, d)
 
         done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, EditDistance d)
+        editDistance Forward d = 2 * d - 1
+        editDistance Reverse d = 2 * d
 
         slide dir eq (Endpoint x y)
           | x >= 0, x < length as
