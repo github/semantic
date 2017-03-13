@@ -133,28 +133,28 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     else
       continue
 
-  FindDPath _ (EditDistance d) Forward (Diagonal k) -> do
+  FindDPath _ (EditDistance d) direction@Forward (Diagonal k) -> do
     v <- gets forward
     eq <- getEq
-    let prev = v `at` Diagonal (pred k)
-    let next = v `at` Diagonal (succ k)
+    let prev = v ! offsetFor direction + pred k
+    let next = v ! offsetFor direction + succ k
     let x = if k == negate d || k /= d && prev < next
           then next
           else succ prev
     let Endpoint x' y' = slide Reverse eq (Endpoint x (x - k))
-    setForward (v Vector.// [(maxD + k, x')])
+    setForward (v Vector.// [(offsetFor direction + k, x')])
     return (Endpoint x' y')
 
-  FindDPath _ (EditDistance d) Reverse (Diagonal k) -> do
+  FindDPath _ (EditDistance d) direction@Reverse (Diagonal k) -> do
     v <- gets backward
     eq <- getEq
-    let prev = v ! maxD + (pred k - delta)
-    let next = v ! maxD + (succ k - delta)
+    let prev = v ! offsetFor direction + pred k
+    let next = v ! offsetFor direction + succ k
     let x = if k == negate d || k /= d && prev < next
           then next
           else succ prev
     let Endpoint x' y' = slide Reverse eq (Endpoint x (x - k))
-    setBackward (v Vector.// [(maxD + (k - delta), x')])
+    setBackward (v Vector.// [(offsetFor direction + k, x')])
     return (Endpoint x' y')
 
   where (!) = (Vector.!)
@@ -164,17 +164,18 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         delta = n - m
         maxD = (m + n) `ceilDiv` 2
 
-        at v (Diagonal k) = v ! maxD + k
-
         diagonalInterval Forward (EditDistance d) = (delta - pred d, delta + pred d)
         diagonalInterval Reverse (EditDistance d) = (negate d, d)
 
         diagonalFor Forward k = Diagonal k
         diagonalFor Reverse k = Diagonal (k + delta)
 
+        offsetFor Forward = maxD
+        offsetFor Reverse = maxD - delta
+
         getOppositeEndpoint direction k = do
           v <- gets (case direction of { Reverse -> backward ; Forward -> forward })
-          let x = v `at` diagonalFor direction k in return $ Endpoint x (x - k)
+          let x = v ! offsetFor direction + unDiagonal (diagonalFor direction k) in return $ Endpoint x (x - k)
 
         done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, d)
         editDistance Forward (EditDistance d) = EditDistance (2 * d - 1)
