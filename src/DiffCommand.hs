@@ -65,7 +65,6 @@ fetchDiffs args@Arguments{..} = do
 
   diffs <- Async.withTaskGroup numCapabilities . flip Async.mapTasks $
     fetchDiff args <$> paths
-
   pure $ uncurry (renderDiff args) <$> diffs
 
 fetchDiff :: Arguments -> FilePath -> IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
