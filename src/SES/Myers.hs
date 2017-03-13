@@ -15,6 +15,7 @@ data MyersF element result where
   LCS :: EditGraph a -> MyersF a [a]
   MiddleSnake :: EditGraph a -> MyersF a (Snake, EditDistance)
   SearchUpToD :: EditGraph a -> EditDistance -> MyersF a (Maybe (Snake, EditDistance))
+  SearchAlongK :: EditGraph a -> EditDistance -> Direction -> Diagonal -> MyersF a (Maybe (Snake, EditDistance))
   FindDPath :: EditGraph a -> EditDistance -> Direction -> Diagonal -> MyersF a Endpoint
 
 data State s a where
@@ -110,22 +111,26 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   SearchUpToD graph (EditDistance d) ->
     (<|>)
-      <$> for [negate d, negate d + 2 .. d] (\ k -> do
-        forwardEndpoint <- findDPath graph (EditDistance d) Forward (Diagonal k)
-        backwardV <- gets backward
-        let reverseEndpoint = let x = backwardV `at` k in Endpoint x (x - k)
-        if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps graph forwardEndpoint reverseEndpoint then
-          return (Just (Snake (Endpoint (n - x reverseEndpoint) (m - y reverseEndpoint)) forwardEndpoint, EditDistance $ 2 * d - 1))
-        else
-          continue)
-      <*> for [negate d, negate d + 2 .. d] (\ k -> do
-        reverseEndpoint <- findDPath graph (EditDistance d) Reverse (Diagonal (k + delta))
-        forwardV <- gets forward
-        let forwardEndpoint = let x = forwardV `at` (k + delta) in Endpoint x (x - k)
-        if even delta && (k + delta) `inInterval` (negate d, d) && overlaps graph forwardEndpoint reverseEndpoint then
-          return (Just (Snake (Endpoint (n - x reverseEndpoint) (m - y reverseEndpoint)) forwardEndpoint, EditDistance $ 2 * d))
-        else
-          continue)
+      <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Forward . Diagonal)
+      <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Reverse . Diagonal)
+
+  SearchAlongK graph (EditDistance d) Forward (Diagonal k) -> do
+    forwardEndpoint <- findDPath graph (EditDistance d) Forward (Diagonal k)
+    backwardV <- gets backward
+    let reverseEndpoint = let x = backwardV `at` k in Endpoint x (x - k)
+    if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps graph forwardEndpoint reverseEndpoint then
+      return (Just (Snake (Endpoint (n - x reverseEndpoint) (m - y reverseEndpoint)) forwardEndpoint, EditDistance $ 2 * d - 1))
+    else
+      continue
+
+  SearchAlongK graph (EditDistance d) Reverse (Diagonal k) -> do
+    reverseEndpoint <- findDPath graph (EditDistance d) Reverse (Diagonal (k + delta))
+    forwardV <- gets forward
+    let forwardEndpoint = let x = forwardV `at` (k + delta) in Endpoint x (x - k)
+    if even delta && (k + delta) `inInterval` (negate d, d) && overlaps graph forwardEndpoint reverseEndpoint then
+      return (Just (Snake (Endpoint (n - x reverseEndpoint) (m - y reverseEndpoint)) forwardEndpoint, EditDistance $ 2 * d))
+    else
+      continue
 
   FindDPath _ (EditDistance d) Forward (Diagonal k) -> do
     v <- gets forward
@@ -184,6 +189,9 @@ middleSnake graph = M (MiddleSnake graph) `Then` return
 searchUpToD :: HasCallStack => EditGraph a -> EditDistance -> Myers a (Maybe (Snake, EditDistance))
 searchUpToD graph distance = M (SearchUpToD graph distance) `Then` return
 
+searchAlongK :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a (Maybe (Snake, EditDistance))
+searchAlongK graph d direction k = M (SearchAlongK graph d direction k) `Then` return
+
 findDPath :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a Endpoint
 findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
@@ -240,6 +248,7 @@ editGraph myers = case myers of
   LCS g -> g
   MiddleSnake g -> g
   SearchUpToD g _ -> g
+  SearchAlongK g _ _ _ -> g
   FindDPath g _ _ _ -> g
 
 
@@ -273,6 +282,7 @@ instance Show2 MyersF where
     LCS graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "LCS" d graph
     MiddleSnake graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "MiddleSnake" d graph
     SearchUpToD graph distance -> showsBinaryWith (liftShowsPrec sp1 sl1) showsPrec "SearchUpToD" d graph distance
+    SearchAlongK graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "SearchAlongK" d graph direction distance diagonal
     FindDPath graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph direction distance diagonal
     where showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
           showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
