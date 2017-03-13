@@ -269,3 +269,9 @@ instance Show a => Show1 (MyersF a) where
 
 instance Show a => Show (MyersF a b) where
   showsPrec = liftShowsPrec (const (const identity)) (const identity)
+
+instance Show2 StepF where
+  liftShowsPrec2 sp1 sl1 sp2 sl2 d step = case step of
+    M m -> showsUnaryWith (liftShowsPrec2 sp1 sl1 sp2 sl2) "M" d m
+    S s -> showsUnaryWith (liftShowsPrec2 showsPrec showList sp2 sl2) "S" d s
+    GetEq -> showString "GetEq"
