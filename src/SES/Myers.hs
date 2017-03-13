@@ -229,6 +229,10 @@ editGraph myers = case myers of
   FindDPath g _ _ _ -> g
 
 
+liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Vector.Vector a -> ShowS
+liftShowsVector sp sl d = liftShowsPrec sp sl d . toList
+
+
 -- Instances
 
 instance MonadState MyersState (Myers a) where
