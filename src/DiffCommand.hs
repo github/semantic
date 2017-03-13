@@ -80,15 +80,14 @@ fetchDiff' args@Arguments{..} filepath = do
 
   let sources = fromMaybe (emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = idOrEmptySourceBlob <$> sources
-  let textDiff' = textDiff (parserForFilepath filepath) args sourceBlobs
 
-  text <- fetchText textDiff'
+  text <- liftIO . render $ textDiff (parserForFilepath filepath) args sourceBlobs
   truncatedPatch <- liftIO $ truncatedDiff args sourceBlobs
   pure $ fromMaybe truncatedPatch text
   where
-    fetchText textDiff = if developmentMode
-                          then liftIO $ Just <$> textDiff
-                          else liftIO $ timeout timeoutInMicroseconds textDiff
+    render output = if developmentMode
+                    then Just <$> output
+                    else timeout timeoutInMicroseconds output
 
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
 pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
@@ -147,7 +146,8 @@ diffFiles :: HasField fields Category
           -> Both SourceBlob
           -> IO Output
 diffFiles parse render sourceBlobs = do
-  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parse) sourceBlobs
+  terms <- Async.withTaskGroup numCapabilities . flip Async.mapTasks $
+    (fmap (defaultFeatureVectorDecorator getLabel) . parse) <$> sourceBlobs
   pure $! render sourceBlobs (stripDiff (diffTerms' terms))
 
   where
