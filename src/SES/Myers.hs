@@ -133,8 +133,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     else
       continue
 
-  FindDPath _ (EditDistance d) direction@Forward (Diagonal k) -> do
-    v <- gets forward
+  FindDPath _ (EditDistance d) direction (Diagonal k) -> do
+    v <- gets (stateFor direction)
     eq <- getEq
     let prev = v ! offsetFor direction + pred k
     let next = v ! offsetFor direction + succ k
@@ -142,19 +142,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           then next
           else succ prev
     let Endpoint x' y' = slide Reverse eq (Endpoint x (x - k))
-    setForward (v Vector.// [(offsetFor direction + k, x')])
-    return (Endpoint x' y')
-
-  FindDPath _ (EditDistance d) direction@Reverse (Diagonal k) -> do
-    v <- gets backward
-    eq <- getEq
-    let prev = v ! offsetFor direction + pred k
-    let next = v ! offsetFor direction + succ k
-    let x = if k == negate d || k /= d && prev < next
-          then next
-          else succ prev
-    let Endpoint x' y' = slide Reverse eq (Endpoint x (x - k))
-    setBackward (v Vector.// [(offsetFor direction + k, x')])
+    setStateFor direction (v Vector.// [(offsetFor direction + k, x')])
     return (Endpoint x' y')
 
   where (!) = (Vector.!)
@@ -172,6 +160,12 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         offsetFor Forward = maxD
         offsetFor Reverse = maxD - delta
+
+        stateFor Forward = forward
+        stateFor Reverse = backward
+
+        setStateFor Forward = setForward
+        setStateFor Reverse = setBackward
 
         getOppositeEndpoint direction k = do
           v <- gets (case direction of { Reverse -> backward ; Forward -> forward })
