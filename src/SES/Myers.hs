@@ -249,3 +249,6 @@ instance Show s => Show1 (State s) where
 
 instance Show s => Show (State s a) where
   showsPrec = liftShowsPrec2 showsPrec showList (const (const identity)) (const identity)
+
+instance Show1 EditGraph where
+  liftShowsPrec sp sl d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp sl) (liftShowsVector sp sl) "EditGraph" d as bs
