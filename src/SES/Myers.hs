@@ -193,7 +193,12 @@ data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Ve
 
 emptyStateForStep :: Myers a b -> MyersState
 emptyStateForStep step = case step of
-  Then (M m) _ -> let EditGraph as bs = editGraph m in MyersState (Vector.replicate (length as) 0) (Vector.replicate (length bs) 0)
+  Then (M myers) _ ->
+    let EditGraph as bs = editGraph myers
+        n = length as
+        m = length bs
+        maxD = (m + n) `ceilDiv` 2
+    in MyersState (Vector.replicate (maxD * 2) 0) (Vector.replicate (maxD * 2) 0)
   _ -> MyersState Vector.empty Vector.empty
 
 setForward :: Vector.Vector Int -> Myers a ()
