@@ -3,6 +3,7 @@ module SES.Myers where
 
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
+import Data.String
 import Data.These
 import qualified Data.Vector as Vector
 import GHC.Show
@@ -252,3 +253,13 @@ instance Show s => Show (State s a) where
 
 instance Show1 EditGraph where
   liftShowsPrec sp sl d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp sl) (liftShowsVector sp sl) "EditGraph" d as bs
+
+instance Show2 MyersF where
+  liftShowsPrec2 sp1 sl1 _ _ d m = case m of
+    SES graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "SES" d graph
+    LCS graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "LCS" d graph
+    MiddleSnake graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "MiddleSnake" d graph
+    FindDPath graph direction distance diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph direction distance diagonal
+    where showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
+          showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
+            showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
