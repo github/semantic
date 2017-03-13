@@ -226,7 +226,7 @@ emptyStateForStep step = case step of
         n = length as
         m = length bs
         maxD = (m + n) `ceilDiv` 2
-    in MyersState (Vector.replicate (maxD * 2) 0) (Vector.replicate (maxD * 2) 0)
+    in MyersState (Vector.replicate (succ (maxD * 2)) 0) (Vector.replicate (succ (maxD * 2)) 0)
   _ -> MyersState Vector.empty Vector.empty
 
 setForward :: Vector.Vector Int -> Myers a ()
