@@ -13,10 +13,10 @@ import Prologue hiding (for, State)
 data MyersF element result where
   SES :: EditGraph a -> MyersF a [These a a]
   LCS :: EditGraph a -> MyersF a [a]
-  MiddleSnake :: EditGraph a -> MyersF a (Snake, EditDistance)
-  SearchUpToD :: EditGraph a -> EditDistance -> MyersF a (Maybe (Snake, EditDistance))
-  SearchAlongK :: EditGraph a -> EditDistance -> Direction -> Diagonal -> MyersF a (Maybe (Snake, EditDistance))
-  FindDPath :: EditGraph a -> EditDistance -> Direction -> Diagonal -> MyersF a Endpoint
+  MiddleSnake :: EditGraph a -> MyersF a (Snake, Distance)
+  SearchUpToD :: EditGraph a -> Distance -> MyersF a (Maybe (Snake, Distance))
+  SearchAlongK :: EditGraph a -> Distance -> Direction -> Diagonal -> MyersF a (Maybe (Snake, Distance))
+  FindDPath :: EditGraph a -> Distance -> Direction -> Diagonal -> MyersF a Endpoint
 
 data State s a where
   Get :: State s s
@@ -35,7 +35,7 @@ data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
   deriving (Eq, Show)
 
-newtype EditDistance = EditDistance { unEditDistance :: Int }
+newtype Distance = Distance { unDistance :: Int }
   deriving (Eq, Show)
 
 newtype Diagonal = Diagonal { unDiagonal :: Int }
@@ -79,7 +79,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   LCS graph
     | null as || null bs -> return []
     | otherwise -> do
-      (Snake xy uv, EditDistance d) <- middleSnake graph
+      (Snake xy uv, Distance d) <- middleSnake graph
       if d > 1 then do
         let (before, _) = divideGraph graph xy
         let (start, after) = divideGraph graph uv
@@ -96,7 +96,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | null bs -> return (This <$> toList as)
     | null as -> return (That <$> toList bs)
     | otherwise -> do
-      (Snake xy uv, EditDistance d) <- middleSnake graph
+      (Snake xy uv, Distance d) <- middleSnake graph
       if d > 1 then do
         let (before, _) = divideGraph graph xy
         let (start, after) = divideGraph graph uv
@@ -108,14 +108,14 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         return (zipWith These (toList as) (toList bs))
 
   MiddleSnake graph -> do
-    result <- for [0..maxD] (searchUpToD graph . EditDistance)
+    result <- for [0..maxD] (searchUpToD graph . Distance)
     case result of
       Just result -> return result
       Nothing -> error "MiddleSnake must always find a value."
 
-  SearchUpToD graph (EditDistance d) ->
-    (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Forward . Diagonal)
-          <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (EditDistance d) Reverse . Diagonal)
+  SearchUpToD graph (Distance d) ->
+    (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Forward . Diagonal)
+          <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Reverse . Diagonal)
 
   SearchAlongK graph d direction (Diagonal k) -> do
     (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d direction k
@@ -124,7 +124,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     else
       continue
 
-  FindDPath _ (EditDistance d) direction (Diagonal k) -> do
+  FindDPath _ (Distance d) direction (Diagonal k) -> do
     v <- gets (stateFor direction)
     eq <- getEq
     let prev = v ! offsetFor direction + pred k
@@ -145,8 +145,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         inInterval (Diagonal k) (lower, upper) = k >= lower && k <= upper
 
-        diagonalInterval Forward (EditDistance d) = (delta - pred d, delta + pred d)
-        diagonalInterval Reverse (EditDistance d) = (negate d, d)
+        diagonalInterval Forward (Distance d) = (delta - pred d, delta + pred d)
+        diagonalInterval Reverse (Distance d) = (negate d, d)
 
         diagonalFor Forward k = Diagonal k
         diagonalFor Reverse k = Diagonal (k + delta)
@@ -175,8 +175,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           let x = v ! offsetFor direction + unDiagonal (diagonalFor direction k) in return $ Endpoint x (x - k)
 
         done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, d)
-        editDistance Forward (EditDistance d) = EditDistance (2 * d - 1)
-        editDistance Reverse (EditDistance d) = EditDistance (2 * d)
+        editDistance Forward (Distance d) = Distance (2 * d - 1)
+        editDistance Reverse (Distance d) = Distance (2 * d)
 
         slide dir eq (Endpoint x y)
           | x >= 0, x < length as
@@ -196,16 +196,16 @@ ses graph = M (SES graph) `Then` return
 lcs :: HasCallStack => EditGraph a -> Myers a [a]
 lcs graph = M (LCS graph) `Then` return
 
-middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, EditDistance)
+middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, Distance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
 
-searchUpToD :: HasCallStack => EditGraph a -> EditDistance -> Myers a (Maybe (Snake, EditDistance))
+searchUpToD :: HasCallStack => EditGraph a -> Distance -> Myers a (Maybe (Snake, Distance))
 searchUpToD graph distance = M (SearchUpToD graph distance) `Then` return
 
-searchAlongK :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a (Maybe (Snake, EditDistance))
+searchAlongK :: HasCallStack => EditGraph a -> Distance -> Direction -> Diagonal -> Myers a (Maybe (Snake, Distance))
 searchAlongK graph d direction k = M (SearchAlongK graph d direction k) `Then` return
 
-findDPath :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a Endpoint
+findDPath :: HasCallStack => EditGraph a -> Distance -> Direction -> Diagonal -> Myers a Endpoint
 findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
 getEq :: HasCallStack => Myers a (a -> a -> Bool)
