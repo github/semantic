@@ -43,7 +43,7 @@ data Direction = Forward | Reverse
 -- Evaluation
 
 runMyers :: HasCallStack => (a -> a -> Bool) -> Myers a b -> b
-runMyers eq = runAll emptyState
+runMyers eq step = runAll (emptyStateForStep step) step
   where runAll state step = case runMyersStep eq state step of
           Left a -> a
           Right next -> uncurry runAll next
@@ -183,8 +183,8 @@ getEq = GetEq `Then` return
 
 data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Vector.Vector Int) }
 
-emptyState :: MyersState
-emptyState = MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
+emptyStateForStep :: Myers a b -> MyersState
+emptyStateForStep _ = MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
 
 setForward :: Vector.Vector Int -> Myers a ()
 setForward v = modify (\ s -> s { forward = v })
