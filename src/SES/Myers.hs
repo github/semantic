@@ -14,6 +14,7 @@ data MyersF element result where
   SES :: EditGraph a -> MyersF a [These a a]
   LCS :: EditGraph a -> MyersF a [a]
   MiddleSnake :: EditGraph a -> MyersF a (Snake, EditDistance)
+  SearchUpToD :: EditGraph a -> EditDistance -> MyersF a (Maybe (Snake, EditDistance))
   FindDPath :: EditGraph a -> EditDistance -> Direction -> Diagonal -> MyersF a Endpoint
 
 data State s a where
@@ -105,9 +106,10 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       else
         return (zipWith These (toList as) (toList bs))
 
-  MiddleSnake graph -> fmap (fromMaybe (error "bleah")) $
-    for [0..maxD] $ \ d ->
-      (<|>)
+  MiddleSnake graph -> fmap (fromMaybe (error "bleah")) (for [0..maxD] (searchUpToD graph . EditDistance))
+
+  SearchUpToD graph (EditDistance d) ->
+    (<|>)
       <$> for [negate d, negate d + 2 .. d] (\ k -> do
         forwardEndpoint <- findDPath graph (EditDistance d) Forward (Diagonal k)
         backwardV <- gets backward
@@ -179,6 +181,9 @@ lcs graph = M (LCS graph) `Then` return
 middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, EditDistance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
 
+searchUpToD :: HasCallStack => EditGraph a -> EditDistance -> Myers a (Maybe (Snake, EditDistance))
+searchUpToD graph distance = M (SearchUpToD graph distance) `Then` return
+
 findDPath :: HasCallStack => EditGraph a -> EditDistance -> Direction -> Diagonal -> Myers a Endpoint
 findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
@@ -234,6 +239,7 @@ editGraph myers = case myers of
   SES g -> g
   LCS g -> g
   MiddleSnake g -> g
+  SearchUpToD g _ -> g
   FindDPath g _ _ _ -> g
 
 
@@ -266,6 +272,7 @@ instance Show2 MyersF where
     SES graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "SES" d graph
     LCS graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "LCS" d graph
     MiddleSnake graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "MiddleSnake" d graph
+    SearchUpToD graph distance -> showsBinaryWith (liftShowsPrec sp1 sl1) showsPrec "SearchUpToD" d graph distance
     FindDPath graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph direction distance diagonal
     where showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
           showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
