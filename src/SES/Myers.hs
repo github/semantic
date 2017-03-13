@@ -121,7 +121,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     forwardEndpoint <- findDPath graph (EditDistance d) Forward (Diagonal k)
     backwardV <- gets backward
     let reverseEndpoint = let x = backwardV `at` k in Endpoint x (x - k)
-    if odd delta && k `inInterval` (delta - pred d, delta + pred d) && overlaps graph forwardEndpoint reverseEndpoint then
+    if odd delta && k `inInterval` diagonalInterval Forward d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (2 * d - 1))
     else
       continue
@@ -130,7 +130,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     reverseEndpoint <- findDPath graph (EditDistance d) Reverse (Diagonal (k + delta))
     forwardV <- gets forward
     let forwardEndpoint = let x = forwardV `at` (k + delta) in Endpoint x (x - k)
-    if even delta && (k + delta) `inInterval` (negate d, d) && overlaps graph forwardEndpoint reverseEndpoint then
+    if even delta && (k + delta) `inInterval` diagonalInterval Reverse d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (2 * d))
     else
       continue
@@ -167,6 +167,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         maxD = (m + n) `ceilDiv` 2
 
         at v k = v ! maxD + k
+
+        diagonalInterval Forward d = (delta - pred d, delta + pred d)
+        diagonalInterval Reverse d = (negate d, d)
 
         done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, EditDistance d)
 
