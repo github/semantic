@@ -193,8 +193,8 @@ data MyersState = MyersState { forward :: !(Vector.Vector Int), backward :: !(Ve
 
 emptyStateForStep :: Myers a b -> MyersState
 emptyStateForStep step = case step of
-  Return _ -> MyersState Vector.empty Vector.empty
-  Then _ _ -> MyersState (Vector.replicate 100 0) (Vector.replicate 100 0)
+  Then (M m) _ -> let EditGraph as bs = editGraph m in MyersState (Vector.replicate (length as) 0) (Vector.replicate (length bs) 0)
+  _ -> MyersState Vector.empty Vector.empty
 
 setForward :: Vector.Vector Int -> Myers a ()
 setForward v = modify (\ s -> s { forward = v })
