@@ -266,3 +266,6 @@ instance Show2 MyersF where
 
 instance Show a => Show1 (MyersF a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance Show a => Show (MyersF a b) where
+  showsPrec = liftShowsPrec (const (const identity)) (const identity)
