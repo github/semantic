@@ -30,6 +30,7 @@ data CmdLineOptions = CmdLineOptions
   { outputFormat :: R.Format
   , maybeTimeout :: Maybe Float
   , outputFilePath :: Maybe FilePath
+  , blobEntry :: Maybe String
   , noIndex :: Bool
   , extraArgs :: [ExtraArg]
   , developmentMode' :: Bool
