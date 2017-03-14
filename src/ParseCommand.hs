@@ -63,18 +63,24 @@ parse args@Arguments{..} = do
 
   where
     renderSExpression :: Arguments -> IO ByteString
-    renderSExpression Arguments{..} = do
-      terms' <- sequenceA $ terms <$> filePaths
-      return $ printTerms TreeOnly terms'
+    renderSExpression Arguments{..} =
+      case blobEntry of
+        Just blob -> undefined
+        Nothing -> do
+          terms' <- sequenceA $ terms <$> filePaths
+          return $ printTerms TreeOnly terms'
 
     -- | Constructs a ParseJSON suitable for indexing for each file path.
     renderIndex :: Arguments -> IO ByteString
     renderIndex Arguments{..} = fmap (toS . encode) (for filePaths render)
       where
         render :: FilePath -> IO ParseJSON
-        render filePath = do
-          programNodes <- constructIndexProgramNodes filePath
-          return $ IndexProgram filePath programNodes
+        render filePath =
+          case blobEntry of
+            Just blob -> undefined
+            _ -> do
+              programNodes <- constructIndexProgramNodes filePath
+              return $ IndexProgram filePath programNodes
 
         constructIndexProgramNodes :: FilePath -> IO [ParseJSON]
         constructIndexProgramNodes filePath = do
@@ -89,9 +95,12 @@ parse args@Arguments{..} = do
     renderParseTree Arguments{..} = fmap (toS . encode) (for filePaths render)
       where
         render :: FilePath -> IO ParseJSON
-        render filePath = do
-          programNodes <- constructParseTreeProgramNodes filePath
-          return $ ParseTreeProgram filePath programNodes
+        render filePath =
+          case blobEntry of
+            Just blob -> undefined
+            Nothing -> do
+              programNodes <- constructParseTreeProgramNodes filePath
+              return $ ParseTreeProgram filePath programNodes
 
         constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
         constructParseTreeProgramNodes filePath = do
