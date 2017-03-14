@@ -141,7 +141,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     let fromX = if k == negate d || k /= d && prev < next
           then next
           else succ prev
-    endpoint <- slide graph Reverse (Endpoint fromX (fromX - k))
+    endpoint <- slide graph direction (Endpoint fromX (fromX - k))
     setK graph direction (Diagonal k) (x endpoint)
     return endpoint
 
