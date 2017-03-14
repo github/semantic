@@ -133,15 +133,15 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     else
       continue
 
-  FindDPath graph (Distance d) direction k -> do
+  FindDPath graph (Distance d) direction (Diagonal k) -> do
     eq <- getEq
-    prev <- getK graph direction (Diagonal (pred (unDiagonal k)))
-    next <- getK graph direction (Diagonal (succ (unDiagonal k)))
-    let fromX = if unDiagonal k == negate d || unDiagonal k /= d && prev < next
+    prev <- getK graph direction (Diagonal (pred k))
+    next <- getK graph direction (Diagonal (succ k))
+    let fromX = if k == negate d || k /= d && prev < next
           then next
           else succ prev
-    let endpoint = slide Reverse eq (Endpoint fromX (fromX - unDiagonal k))
-    setK graph direction k (x endpoint)
+    let endpoint = slide Reverse eq (Endpoint fromX (fromX - k))
+    setK graph direction (Diagonal k) (x endpoint)
     return endpoint
 
   GetK _ direction (Diagonal k) -> do
