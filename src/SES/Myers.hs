@@ -19,6 +19,8 @@ data MyersF element result where
   SearchAlongK :: EditGraph a -> Distance -> Direction -> Diagonal -> MyersF a (Maybe (Snake, Distance))
   FindDPath :: EditGraph a -> Distance -> Direction -> Diagonal -> MyersF a Endpoint
 
+  GetK :: EditGraph a -> Direction -> Diagonal -> MyersF a Int
+
 data State s a where
   Get :: State s s
   Put :: s -> State s ()
@@ -127,17 +129,21 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     else
       continue
 
-  FindDPath _ (Distance d) direction (Diagonal k) -> do
+  FindDPath graph (Distance d) direction (Diagonal k) -> do
     v <- gets (stateFor direction)
     eq <- getEq
-    let prev = v ! offsetFor direction + pred k
-    let next = v ! offsetFor direction + succ k
+    prev <- getK graph direction (Diagonal (pred k))
+    next <- getK graph direction (Diagonal (succ k))
     let x = if k == negate d || k /= d && prev < next
           then next
           else succ prev
     let Endpoint x' y' = slide Reverse eq (Endpoint x (x - k))
     setStateFor direction (v Vector.// [(offsetFor direction + k, x')])
     return (Endpoint x' y')
+
+  GetK _ direction (Diagonal k) -> do
+    v <- gets (stateFor direction)
+    return (v ! offsetFor direction + k)
 
   where (!) = (Vector.!)
         EditGraph as bs = editGraph myers
@@ -214,6 +220,9 @@ searchAlongK graph d direction k = M (SearchAlongK graph d direction k) `Then` r
 findDPath :: HasCallStack => EditGraph a -> Distance -> Direction -> Diagonal -> Myers a Endpoint
 findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
+getK :: HasCallStack => EditGraph a -> Direction -> Diagonal -> Myers a Int
+getK graph direction diagonal = M (GetK graph direction diagonal) `Then` return
+
 getEq :: HasCallStack => Myers a (a -> a -> Bool)
 getEq = GetEq `Then` return
 
@@ -267,6 +276,7 @@ editGraph myers = case myers of
   SearchUpToD g _ -> g
   SearchAlongK g _ _ _ -> g
   FindDPath g _ _ _ -> g
+  GetK g _ _ -> g
 
 
 liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Vector.Vector a -> ShowS
@@ -301,8 +311,12 @@ instance Show2 MyersF where
     MiddleSnake graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "MiddleSnake" d graph
     SearchUpToD graph distance -> showsBinaryWith (liftShowsPrec sp1 sl1) showsPrec "SearchUpToD" d graph distance
     SearchAlongK graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "SearchAlongK" d graph direction distance diagonal
-    FindDPath graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph direction distance diagonal
-    where showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
+    FindDPath graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph distance direction diagonal
+    GetK graph direction diagonal -> showsTernaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec "GetK" d graph direction diagonal
+    where showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
+          showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
+            showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
+          showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
           showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
             showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
 
