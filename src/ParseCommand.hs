@@ -55,21 +55,21 @@ instance ToJSON ParseJSON where
 
 -- | Parses filePaths into two possible formats: SExpression or JSON.
 parse :: Arguments -> IO ByteString
-parse Arguments{..} =
+parse args@Arguments{..} = do
   case format of
-    SExpression -> renderSExpression filePaths
-    Index -> renderIndex filePaths
-    _ -> renderParseTree filePaths
+    SExpression -> renderSExpression args
+    Index -> renderIndex args
+    _ -> renderParseTree args
 
   where
-    renderSExpression :: [FilePath] -> IO ByteString
-    renderSExpression filePaths = do
+    renderSExpression :: Arguments -> IO ByteString
+    renderSExpression Arguments{..} = do
       terms' <- sequenceA $ terms <$> filePaths
       return $ printTerms TreeOnly terms'
 
     -- | Constructs a ParseJSON suitable for indexing for each file path.
-    renderIndex :: [FilePath] -> IO ByteString
-    renderIndex filePaths = fmap (toS . encode) (for filePaths render)
+    renderIndex :: Arguments -> IO ByteString
+    renderIndex Arguments{..} = fmap (toS . encode) (for filePaths render)
       where
         render :: FilePath -> IO ParseJSON
         render filePath = do
@@ -85,8 +85,8 @@ parse Arguments{..} =
         algebra (annotation :< syntax) = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) : concat syntax
 
     -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
-    renderParseTree :: [FilePath] -> IO ByteString
-    renderParseTree filePaths = fmap (toS . encode) (for filePaths render)
+    renderParseTree :: Arguments -> IO ByteString
+    renderParseTree Arguments{..} = fmap (toS . encode) (for filePaths render)
       where
         render :: FilePath -> IO ParseJSON
         render filePath = do
