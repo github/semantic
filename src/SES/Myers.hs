@@ -156,10 +156,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | x >= 0, x < n
     , y >= 0, y < m -> do
       eq <- getEq
-      if nth direction as x `eq` nth direction bs y
+      if (as `at` x) `eq` (bs `at` y)
         then slide graph direction (Endpoint (succ x) (succ y))
         else return (Endpoint x y)
     | otherwise -> return (Endpoint x y)
+    where v `at` i = v Vector.! case direction of { Forward -> i ; Reverse -> length v - succ i }
 
   where EditGraph as bs = editGraph myers
         n = length as
@@ -198,9 +199,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         editDistance Forward (Distance d) = Distance (2 * d - 1)
         editDistance Reverse (Distance d) = Distance (2 * d)
-
-        nth Forward v i = v Vector.! i
-        nth Reverse v i = v Vector.! (length v - succ i)
 
 
 -- Smart constructors
