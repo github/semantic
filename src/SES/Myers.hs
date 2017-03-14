@@ -22,6 +22,8 @@ data MyersF element result where
   GetK :: EditGraph a -> Direction -> Diagonal -> MyersF a Int
   SetK :: EditGraph a -> Direction -> Diagonal -> Int -> MyersF a ()
 
+  Slide :: EditGraph a -> Direction -> Endpoint -> MyersF a Endpoint
+
 data State s a where
   Get :: State s s
   Put :: s -> State s ()
@@ -134,13 +136,12 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       continue
 
   FindDPath graph (Distance d) direction (Diagonal k) -> do
-    eq <- getEq
     prev <- getK graph direction (Diagonal (pred k))
     next <- getK graph direction (Diagonal (succ k))
     let fromX = if k == negate d || k /= d && prev < next
           then next
           else succ prev
-    let endpoint = slide Reverse eq (Endpoint fromX (fromX - k))
+    endpoint <- slide graph Reverse (Endpoint fromX (fromX - k))
     setK graph direction (Diagonal k) (x endpoint)
     return endpoint
 
@@ -150,6 +151,15 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   SetK _ direction (Diagonal k) x ->
     setStateFor direction (Vector.// [(offsetFor direction + k, x)])
+
+  Slide graph direction (Endpoint x y)
+    | x >= 0, x < n
+    , y >= 0, y < m -> do
+      eq <- getEq
+      if nth direction as x `eq` nth direction bs y
+        then slide graph direction (Endpoint (succ x) (succ y))
+        else return (Endpoint x y)
+    | otherwise -> return (Endpoint x y)
 
   where (!) = (Vector.!)
         graph@(EditGraph as bs) = editGraph myers
@@ -193,12 +203,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         editDistance Forward (Distance d) = Distance (2 * d - 1)
         editDistance Reverse (Distance d) = Distance (2 * d)
 
-        slide dir eq (Endpoint x y)
-          | x >= 0, x < length as
-          , y >= 0, y < length bs
-          , nth dir as x `eq` nth dir bs y = slide dir eq (Endpoint (succ x) (succ y))
-          | otherwise = Endpoint x y
-
         nth Forward v i = v ! i
         nth Reverse v i = v ! (length v - 1 - i)
 
@@ -231,6 +235,9 @@ getK graph direction diagonal = M (GetK graph direction diagonal) `Then` return
 
 setK :: HasCallStack => EditGraph a -> Direction -> Diagonal -> Int -> Myers a ()
 setK graph direction diagonal x = M (SetK graph direction diagonal x) `Then` return
+
+slide :: HasCallStack => EditGraph a -> Direction -> Endpoint -> Myers a Endpoint
+slide graph direction from = M (Slide graph direction from) `Then` return
 
 getEq :: HasCallStack => Myers a (a -> a -> Bool)
 getEq = GetEq `Then` return
@@ -280,6 +287,7 @@ editGraph myers = case myers of
   FindDPath g _ _ _ -> g
   GetK g _ _ -> g
   SetK g _ _ _ -> g
+  Slide g _ _ -> g
 
 
 liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Vector.Vector a -> ShowS
@@ -317,6 +325,7 @@ instance Show2 MyersF where
     FindDPath graph distance direction diagonal -> showsQuaternaryWith showGraph showsPrec showsPrec showsPrec "FindDPath" d graph distance direction diagonal
     GetK graph direction diagonal -> showsTernaryWith showGraph showsPrec showsPrec "GetK" d graph direction diagonal
     SetK graph direction diagonal v -> showsQuaternaryWith showGraph showsPrec showsPrec showsPrec "SetK" d graph direction diagonal v
+    Slide graph direction endpoint -> showsTernaryWith showGraph showsPrec showsPrec "Slide" d graph direction endpoint
     where showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
           showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
             showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
