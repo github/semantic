@@ -187,14 +187,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         endpointsFor graph d direction k = do
           here <- findDPath graph d direction k
-          there <- getOppositeEndpoint direction k
+          x <- getK graph (invert direction) k
+          let there = Endpoint x (x - unDiagonal k)
           case direction of
             Forward -> return (here, there)
             Reverse -> return (there, here)
-
-        getOppositeEndpoint direction k = do
-          x <- getK graph (invert direction) k
-          return $ Endpoint x (x - unDiagonal k)
 
         invert Forward = Reverse
         invert Reverse = Forward
