@@ -147,7 +147,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
-    return (v Vector.! offsetFor direction + k)
+    return (v Vector.! (offsetFor direction + k))
 
   SetK _ direction (Diagonal k) x ->
     setStateFor direction (Vector.// [(offsetFor direction + k, x)])
