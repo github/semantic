@@ -308,21 +308,22 @@ instance Show1 EditGraph where
 
 instance Show2 MyersF where
   liftShowsPrec2 sp1 sl1 _ _ d m = case m of
-    SES graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "SES" d graph
-    LCS graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "LCS" d graph
-    EditDistance graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "EditDistance" d graph
-    MiddleSnake graph -> showsUnaryWith (liftShowsPrec sp1 sl1) "MiddleSnake" d graph
-    SearchUpToD graph distance -> showsBinaryWith (liftShowsPrec sp1 sl1) showsPrec "SearchUpToD" d graph distance
-    SearchAlongK graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "SearchAlongK" d graph direction distance diagonal
-    FindDPath graph distance direction diagonal -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "FindDPath" d graph distance direction diagonal
-    GetK graph direction diagonal -> showsTernaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec "GetK" d graph direction diagonal
-    SetK graph direction diagonal v -> showsQuaternaryWith (liftShowsPrec sp1 sl1) showsPrec showsPrec showsPrec "SetK" d graph direction diagonal v
+    SES graph -> showsUnaryWith showGraph "SES" d graph
+    LCS graph -> showsUnaryWith showGraph "LCS" d graph
+    EditDistance graph -> showsUnaryWith showGraph "EditDistance" d graph
+    MiddleSnake graph -> showsUnaryWith showGraph "MiddleSnake" d graph
+    SearchUpToD graph distance -> showsBinaryWith showGraph showsPrec "SearchUpToD" d graph distance
+    SearchAlongK graph distance direction diagonal -> showsQuaternaryWith showGraph showsPrec showsPrec showsPrec "SearchAlongK" d graph direction distance diagonal
+    FindDPath graph distance direction diagonal -> showsQuaternaryWith showGraph showsPrec showsPrec showsPrec "FindDPath" d graph distance direction diagonal
+    GetK graph direction diagonal -> showsTernaryWith showGraph showsPrec showsPrec "GetK" d graph direction diagonal
+    SetK graph direction diagonal v -> showsQuaternaryWith showGraph showsPrec showsPrec showsPrec "SetK" d graph direction diagonal v
     where showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
           showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
             showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
           showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
           showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
             showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
+          showGraph = (liftShowsPrec :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> EditGraph a -> ShowS) sp1 sl1
 
 instance Show a => Show1 (MyersF a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
