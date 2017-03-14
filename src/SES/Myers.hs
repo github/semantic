@@ -62,9 +62,12 @@ runMyers eq step = runAll (emptyStateForStep step) step
 
 runMyersSteps :: HasCallStack => (a -> a -> Bool) -> Myers a b -> [(MyersState, Myers a b)]
 runMyersSteps eq step = go (emptyStateForStep step) step
-  where go state step = let ?callStack = popCallStack callStack in (state, step) : case runMyersStep eq state step of
+  where go state step = let ?callStack = popCallStack callStack in prefix state step $ case runMyersStep eq state step of
           Left result -> [ (state, return result) ]
           Right next -> uncurry go next
+        prefix state step = case step of
+          Then (M _) _ -> ((state, step) :)
+          _ -> identity
 
 runMyersStep :: HasCallStack => (a -> a -> Bool) -> MyersState -> Myers a b -> Either b (MyersState, Myers a b)
 runMyersStep eq state step = let ?callStack = popCallStack callStack in case step of
