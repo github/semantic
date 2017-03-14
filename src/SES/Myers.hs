@@ -161,7 +161,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         else return (Endpoint x y)
     | otherwise -> return (Endpoint x y)
 
-  where graph@(EditGraph as bs) = editGraph myers
+  where EditGraph as bs = editGraph myers
         n = length as
         m = length bs
         delta = n - m
