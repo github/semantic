@@ -175,7 +175,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         diagonalInterval Reverse (Distance d) = (negate d, d)
 
         diagonalFor Forward k = k
-        diagonalFor Reverse k = Diagonal (unDiagonal k + delta)
+        diagonalFor Reverse (Diagonal k) = Diagonal (k + delta)
 
         shouldTestOn Forward = odd delta
         shouldTestOn Reverse = even delta
