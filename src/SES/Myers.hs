@@ -137,12 +137,12 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     eq <- getEq
     prev <- getK graph direction (Diagonal (pred (unDiagonal k)))
     next <- getK graph direction (Diagonal (succ (unDiagonal k)))
-    let x = if unDiagonal k == negate d || unDiagonal k /= d && prev < next
+    let fromX = if unDiagonal k == negate d || unDiagonal k /= d && prev < next
           then next
           else succ prev
-    let Endpoint x' y' = slide Reverse eq (Endpoint x (x - unDiagonal k))
-    setK graph direction k x'
-    return (Endpoint x' y')
+    let endpoint = slide Reverse eq (Endpoint fromX (fromX - unDiagonal k))
+    setK graph direction k (x endpoint)
+    return endpoint
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
