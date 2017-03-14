@@ -122,7 +122,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Forward . Diagonal)
           <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Reverse . Diagonal)
 
-  SearchAlongK graph d direction (Diagonal k) -> do
+  SearchAlongK graph d direction k -> do
     (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d direction k
     if shouldTestOn direction && diagonalFor direction k `inInterval` diagonalInterval direction d && overlaps graph forwardEndpoint reverseEndpoint then
       return (done reverseEndpoint forwardEndpoint (editDistance direction d))
@@ -146,7 +146,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     return (v ! offsetFor direction + k)
 
   where (!) = (Vector.!)
-        EditGraph as bs = editGraph myers
+        graph@(EditGraph as bs) = editGraph myers
         n = length as
         m = length bs
         delta = n - m
@@ -157,8 +157,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         diagonalInterval Forward (Distance d) = (delta - pred d, delta + pred d)
         diagonalInterval Reverse (Distance d) = (negate d, d)
 
-        diagonalFor Forward k = Diagonal k
-        diagonalFor Reverse k = Diagonal (k + delta)
+        diagonalFor Forward k = k
+        diagonalFor Reverse k = Diagonal (unDiagonal k + delta)
 
         shouldTestOn Forward = odd delta
         shouldTestOn Reverse = even delta
@@ -180,8 +180,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
             Reverse -> return (there, here)
 
         getOppositeEndpoint direction k = do
-          v <- gets (case direction of { Reverse -> backward ; Forward -> forward })
-          let x = v ! offsetFor direction + unDiagonal (diagonalFor direction k) in return $ Endpoint x (x - k)
+          x <- getK graph direction k
+          return $ Endpoint x (x - unDiagonal k)
 
         done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, d)
         editDistance Forward (Distance d) = Distance (2 * d - 1)
