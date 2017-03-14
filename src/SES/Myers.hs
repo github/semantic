@@ -194,8 +194,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
             Reverse -> return (there, here)
 
         getOppositeEndpoint direction k = do
-          x <- getK graph direction k
+          x <- getK graph (invert direction) k
           return $ Endpoint x (x - unDiagonal k)
+
+        invert Forward = Reverse
+        invert Reverse = Forward
 
         done (Endpoint x y) uv d = Just (Snake (Endpoint (n - x) (m - y)) uv, d)
         editDistance Forward (Distance d) = Distance (2 * d - 1)
