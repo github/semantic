@@ -30,7 +30,7 @@ data CmdLineOptions = CmdLineOptions
   { outputFormat :: R.Format
   , maybeTimeout :: Maybe Float
   , outputFilePath :: Maybe FilePath
-  , blobEntry :: Maybe String
+  , blobEntry' :: Maybe String
   , noIndex :: Bool
   , extraArgs :: [ExtraArg]
   , developmentMode' :: Bool
@@ -44,6 +44,7 @@ data Arguments = Arguments
   , format :: R.Format
   , timeoutInMicroseconds :: Int
   , outputPath :: Maybe FilePath
+  , blobEntry :: Maybe String
   , diffMode :: DiffMode
   , runMode :: RunMode
   , shaRange :: Both (Maybe String)
@@ -69,6 +70,7 @@ programArguments CmdLineOptions{..} = do
     , format = outputFormat
     , timeoutInMicroseconds = maybe defaultTimeout toMicroseconds maybeTimeout
     , outputPath = outputPath
+    , blobEntry = blobEntry'
     , diffMode = case (noIndex, filePaths) of
       (True, [fileA, fileB]) -> PathDiff (both fileA fileB)
       (_, _) -> CommitDiff
@@ -102,6 +104,7 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , format = format
   , timeoutInMicroseconds = defaultTimeout
   , outputPath = Nothing
+  , blobEntry = Nothing
   , diffMode = CommitDiff
   , runMode = Diff
   , shaRange = Just <$> both sha1 sha2
@@ -116,6 +119,7 @@ diffPathsArgs gitDir paths format = Arguments
   , format = format
   , timeoutInMicroseconds = defaultTimeout
   , outputPath = Nothing
+  , blobEntry = Nothing
   , diffMode = PathDiff paths
   , runMode = Diff
   , shaRange = both Nothing Nothing
@@ -130,6 +134,7 @@ parseArgs filePaths format = Arguments
   , format = format
   , timeoutInMicroseconds = defaultTimeout
   , outputPath = Nothing
+  , blobEntry = Nothing
   , diffMode = CommitDiff
   , runMode = Parse
   , shaRange = both Nothing Nothing
