@@ -200,7 +200,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         editDistance Reverse (Distance d) = Distance (2 * d)
 
         nth Forward v i = v Vector.! i
-        nth Reverse v i = v Vector.! (length v - 1 - i)
+        nth Reverse v i = v Vector.! (length v - succ i)
 
 
 -- Smart constructors
