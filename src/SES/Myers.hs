@@ -147,7 +147,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
-    return (v ! offsetFor direction + k)
+    return (v Vector.! offsetFor direction + k)
 
   SetK _ direction (Diagonal k) x ->
     setStateFor direction (Vector.// [(offsetFor direction + k, x)])
@@ -161,8 +161,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         else return (Endpoint x y)
     | otherwise -> return (Endpoint x y)
 
-  where (!) = (Vector.!)
-        graph@(EditGraph as bs) = editGraph myers
+  where graph@(EditGraph as bs) = editGraph myers
         n = length as
         m = length bs
         delta = n - m
@@ -203,8 +202,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         editDistance Forward (Distance d) = Distance (2 * d - 1)
         editDistance Reverse (Distance d) = Distance (2 * d)
 
-        nth Forward v i = v ! i
-        nth Reverse v i = v ! (length v - 1 - i)
+        nth Forward v i = v Vector.! i
+        nth Reverse v i = v Vector.! (length v - 1 - i)
 
 
 -- Smart constructors
