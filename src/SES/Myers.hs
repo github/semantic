@@ -147,10 +147,10 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
-    return (v Vector.! (offsetFor direction + k))
+    return (v Vector.! index v k)
 
   SetK _ direction (Diagonal k) x ->
-    setStateFor direction (Vector.// [(offsetFor direction + k, x)])
+    setStateFor direction (\ v -> v Vector.// [(index v k, x)])
 
   Slide graph direction (Endpoint x y)
     | x >= 0, x < n
@@ -167,6 +167,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         delta = n - m
         maxD = (m + n) `ceilDiv` 2
 
+        index v k = if k >= 0 then k else length v + k
+
         inInterval (Diagonal k) (lower, upper) = k >= lower && k <= upper
 
         diagonalInterval Forward (Distance d) = (delta - pred d, delta + pred d)
@@ -177,9 +179,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         shouldTestOn Forward = odd delta
         shouldTestOn Reverse = even delta
-
-        offsetFor Forward = maxD
-        offsetFor Reverse = maxD - delta
 
         stateFor Forward = fst
         stateFor Reverse = snd
