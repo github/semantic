@@ -258,7 +258,7 @@ emptyStateForStep step = case step of
   _ -> (Vector.empty, Vector.empty)
 
 overlaps :: EditGraph a -> Endpoint -> Endpoint -> Bool
-overlaps (EditGraph as _) (Endpoint x y) (Endpoint u v) = x - y == u - v && x <= length as - u
+overlaps (EditGraph as _) (Endpoint x y) (Endpoint u v) = x - y == u - v && length as - u <= x
 
 for :: [a] -> (a -> Myers c (Maybe b)) -> Myers c (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
