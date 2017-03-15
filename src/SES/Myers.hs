@@ -115,6 +115,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         return $! before' <> zipWith These (toList midAs) (toList midBs) <> after'
       else if m > n then
         return $! zipWith These (toList as) (toList bs) <> [ That (bs Vector.! n) ]
+      else if n > m then
+        return $! zipWith These (toList as) (toList bs) <> [ This (as Vector.! m) ]
       else
         return (zipWith These (toList as) (toList bs))
 
