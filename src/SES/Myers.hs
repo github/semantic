@@ -149,11 +149,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     where at :: Vector.Vector a -> Int -> a
           v `at` i = v Vector.! case direction of { Forward -> i ; Reverse -> length v - succ i }
 
-  where EditGraph as bs = editGraph myers
-        n = length as
-        m = length bs
-        delta = n - m
-        maxD = (m + n) `ceilDiv` 2
+  where (EditGraph as bs, n, m, maxD, delta) = editGraph myers
 
         index v k = if k >= 0 then k else length v + k
 
@@ -243,11 +239,8 @@ type MyersState = (Vector.Vector Int, Vector.Vector Int)
 emptyStateForStep :: Myers a b c -> MyersState
 emptyStateForStep step = case step of
   Then (M myers) _ ->
-    let EditGraph as bs = editGraph myers
-        n = length as
-        m = length bs
-        maxD = (m + n) `ceilDiv` 2
-    in (Vector.replicate (succ (maxD * 2)) 0, Vector.replicate (succ (maxD * 2)) 0)
+    let (_, _, _, maxD, _) = editGraph myers in
+    (Vector.replicate (succ (maxD * 2)) 0, Vector.replicate (succ (maxD * 2)) 0)
   _ -> (Vector.empty, Vector.empty)
 
 overlaps :: EditGraph a b -> Endpoint -> Endpoint -> Bool
@@ -269,18 +262,20 @@ divideGraph (EditGraph as bs) (Endpoint x y) =
   where slice from to v = Vector.slice (max 0 (min from (length v))) (max 0 (min to (length v))) v
 
 
-editGraph :: MyersF a b c -> EditGraph a b
-editGraph myers = case myers of
-  SES g -> g
-  LCS g -> g
-  EditDistance g -> g
-  MiddleSnake g -> g
-  SearchUpToD g _ -> g
-  SearchAlongK g _ _ _ -> g
-  FindDPath g _ _ _ -> g
-  GetK g _ _ -> g
-  SetK g _ _ _ -> g
-  Slide g _ _ -> g
+editGraph :: MyersF a b c -> (EditGraph a b, Int, Int, Int, Int)
+editGraph myers = (EditGraph as bs, n, m, (m + n) `ceilDiv` 2, n - m)
+  where EditGraph as bs = case myers of
+          SES g -> g
+          LCS g -> g
+          EditDistance g -> g
+          MiddleSnake g -> g
+          SearchUpToD g _ -> g
+          SearchAlongK g _ _ _ -> g
+          FindDPath g _ _ _ -> g
+          GetK g _ _ -> g
+          SetK g _ _ _ -> g
+          Slide g _ _ -> g
+        (n, m) = (length as, length bs)
 
 
 liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Vector.Vector a -> ShowS
