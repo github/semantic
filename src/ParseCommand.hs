@@ -8,7 +8,6 @@ import Data.Record
 import qualified Data.Text as T
 import Git.Blob
 import Git.Libgit2
-import Git.Libgit2.Backend
 import Git.Repository
 import Git.Types
 import qualified Git
