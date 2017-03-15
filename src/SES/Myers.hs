@@ -11,8 +11,8 @@ import GHC.Stack
 import Prologue hiding (for, State)
 
 data MyersF a b result where
-  SESNSpace :: EditGraph a b -> MyersF a b [These a b]
-  LCSNSpace :: EditGraph a b -> MyersF a b [(a, b)]
+  SES :: EditGraph a b -> MyersF a b [These a b]
+  LCS :: EditGraph a b -> MyersF a b [(a, b)]
   EditDistance :: EditGraph a b -> MyersF a b Int
   MiddleSnake :: EditGraph a b -> MyersF a b (Snake, Distance)
   SearchUpToD :: EditGraph a b -> Distance -> MyersF a b (Maybe (Snake, Distance))
@@ -90,19 +90,19 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
 
 decompose :: HasCallStack => MyersF a b c -> Myers a b c
 decompose myers = let ?callStack = popCallStack callStack in case myers of
-  LCSNSpace graph
+  LCS graph
     | null as || null bs -> return []
     | otherwise -> do
-      result <- divideAndConquer graph lcsNSpace
+      result <- divideAndConquer graph lcs
       return $! case result of
         Left (a, EditGraph midAs midBs, c) -> a <> zip (toList midAs) (toList midBs) <> c
         _ -> zip (toList as) (toList bs)
 
-  SESNSpace graph
+  SES graph
     | null bs -> return (This <$> toList as)
     | null as -> return (That <$> toList bs)
     | otherwise -> do
-      result <- divideAndConquer graph sesNSpace
+      result <- divideAndConquer graph ses
       return $! case result of
         Left (a, EditGraph midAs midBs, c) -> a <> zipWith These (toList midAs) (toList midBs) <> c
         Right d -> zipWith These (toList as) (toList bs) <> [ if m > n then That (bs Vector.! n) else This (as Vector.! m) | d == 1 ]
@@ -203,11 +203,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
 -- Smart constructors
 
-sesNSpace :: HasCallStack => EditGraph a b -> Myers a b [These a b]
-sesNSpace graph = M (SESNSpace graph) `Then` return
+ses :: HasCallStack => EditGraph a b -> Myers a b [These a b]
+ses graph = M (SES graph) `Then` return
 
-lcsNSpace :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
-lcsNSpace graph = M (LCSNSpace graph) `Then` return
+lcs :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
+lcs graph = M (LCS graph) `Then` return
 
 editDistance :: HasCallStack => EditGraph a b -> Myers a b Int
 editDistance graph = M (EditDistance graph) `Then` return
@@ -270,8 +270,8 @@ divideGraph (EditGraph as bs) (Endpoint x y) =
 editGraph :: MyersF a b c -> (EditGraph a b, Int, Int, Int, Int)
 editGraph myers = (EditGraph as bs, n, m, (m + n) `ceilDiv` 2, n - m)
   where EditGraph as bs = case myers of
-          SESNSpace g -> g
-          LCSNSpace g -> g
+          SES g -> g
+          LCS g -> g
           EditDistance g -> g
           MiddleSnake g -> g
           SearchUpToD g _ -> g
@@ -288,8 +288,8 @@ liftShowsVector sp sl d = liftShowsPrec sp sl d . toList
 
 liftShowsMyersF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> MyersF a b c -> ShowS
 liftShowsMyersF sp1 sl1 sp2 sl2 d m = case m of
-  SESNSpace graph -> showsUnaryWith showGraph "SES" d graph
-  LCSNSpace graph -> showsUnaryWith showGraph "LCS" d graph
+  SES graph -> showsUnaryWith showGraph "SES" d graph
+  LCS graph -> showsUnaryWith showGraph "LCS" d graph
   EditDistance graph -> showsUnaryWith showGraph "EditDistance" d graph
   MiddleSnake graph -> showsUnaryWith showGraph "MiddleSnake" d graph
   SearchUpToD graph distance -> showsBinaryWith showGraph showsPrec "SearchUpToD" d graph distance
