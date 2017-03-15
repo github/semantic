@@ -12,7 +12,7 @@ import Prologue hiding (for, State)
 import Text.Show
 
 data MyersF a b result where
-  SES :: EditGraph a b -> MyersF a b [These a b]
+  SES :: EditGraph a b -> MyersF a b (EditScript a b)
   LCS :: EditGraph a b -> MyersF a b [(a, b)]
   EditDistance :: EditGraph a b -> MyersF a b Int
   MiddleSnake :: EditGraph a b -> MyersF a b (Snake, Distance)
@@ -24,6 +24,8 @@ data MyersF a b result where
   SetK :: EditGraph a b -> Direction -> Diagonal -> Int -> MyersF a b ()
 
   Slide :: EditGraph a b -> Direction -> Endpoint -> MyersF a b Endpoint
+
+type EditScript a b = [These a b]
 
 data State s a where
   Get :: State s s
@@ -204,7 +206,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
 -- Smart constructors
 
-ses :: HasCallStack => EditGraph a b -> Myers a b [These a b]
+ses :: HasCallStack => EditGraph a b -> Myers a b (EditScript a b)
 ses graph = M (SES graph) `Then` return
 
 lcs :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
@@ -240,7 +242,7 @@ getEq = GetEq `Then` return
 
 -- Implementation details
 
-newtype MyersState a b = MyersState { unMyersState :: (Vector.Vector (Int, [These a b]), Vector.Vector (Int, [These a b])) }
+newtype MyersState a b = MyersState { unMyersState :: (Vector.Vector (Int, (EditScript a b)), Vector.Vector (Int, (EditScript a b))) }
   deriving (Eq, Show)
 
 emptyStateForStep :: Myers a b c -> MyersState a b
