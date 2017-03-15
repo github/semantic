@@ -20,7 +20,7 @@ data MyersF a b result where
   SearchAlongK :: EditGraph a b -> Distance -> Direction -> Diagonal -> MyersF a b (Maybe (Snake, Distance))
   FindDPath :: EditGraph a b -> Distance -> Direction -> Diagonal -> MyersF a b Endpoint
 
-  GetK :: EditGraph a b -> Direction -> Diagonal -> MyersF a b Int
+  GetK :: EditGraph a b -> Direction -> Diagonal -> MyersF a b (Int, EditScript a b)
   SetK :: EditGraph a b -> Direction -> Diagonal -> Int -> MyersF a b ()
 
   Slide :: EditGraph a b -> Direction -> Endpoint -> MyersF a b Endpoint
@@ -128,8 +128,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       continue
 
   FindDPath graph (Distance d) direction (Diagonal k) -> do
-    prev <- getK graph direction (Diagonal (pred k))
-    next <- getK graph direction (Diagonal (succ k))
+    (prev, _) <- getK graph direction (Diagonal (pred k))
+    (next, _) <- getK graph direction (Diagonal (succ k))
     let fromX = if k == negate d || k /= d && prev < next
           then next
           else succ prev
@@ -141,7 +141,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
-    return (fst (v Vector.! index v k))
+    return (v Vector.! index v k)
 
   SetK _ direction (Diagonal k) x ->
     setStateFor direction (\ v -> v Vector.// [(index v k, (x, []))])
@@ -179,7 +179,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         endpointsFor graph d direction k = do
           here <- findDPath graph d direction k
-          x <- getK graph (invert direction) k
+          (x, _) <- getK graph (invert direction) k
           let there = Endpoint x (x - unDiagonal k)
           case direction of
             Forward -> return (here, there)
@@ -227,7 +227,7 @@ searchAlongK graph d direction k = M (SearchAlongK graph d direction k) `Then` r
 findDPath :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b Endpoint
 findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
-getK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Myers a b Int
+getK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Myers a b (Int, EditScript a b)
 getK graph direction diagonal = M (GetK graph direction diagonal) `Then` return
 
 setK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Int -> Myers a b ()
