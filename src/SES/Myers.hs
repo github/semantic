@@ -96,7 +96,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         before' <- lcs before
         after' <- lcs after
         return $! before' <> toList mid <> after'
-      else if length bs > length as then
+      else if m > n then
         return (toList as)
       else
         return (toList bs)
