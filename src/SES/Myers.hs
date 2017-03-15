@@ -119,10 +119,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   EditDistance graph -> unDistance . snd <$> middleSnake graph
 
   MiddleSnake graph -> do
-    result <- for [0..maxD] (searchUpToD graph . Distance)
-    case result of
-      Just result -> return result
-      Nothing -> error "MiddleSnake must always find a value."
+    Just result <- for [0..maxD] (searchUpToD graph . Distance)
+    return result
 
   SearchUpToD graph (Distance d) ->
     (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Forward . Diagonal)
