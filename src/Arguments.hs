@@ -33,7 +33,7 @@ data CmdLineOptions = CmdLineOptions
   , commitSha' :: Maybe String
   , noIndex :: Bool
   , extraArgs :: [ExtraArg]
-  , developmentMode' :: Bool
+  , debug' :: Bool
   , runMode' :: RunMode
   }
 
@@ -49,7 +49,7 @@ data Arguments = Arguments
   , runMode :: RunMode
   , shaRange :: Both (Maybe String)
   , filePaths :: [FilePath]
-  , developmentMode :: Bool
+  , debug :: Bool
   } deriving (Show)
 
 -- | Returns Arguments for the program from parsed command line arguments.
@@ -77,7 +77,7 @@ programArguments CmdLineOptions{..} = do
     , runMode = runMode'
     , shaRange = fetchShas extraArgs
     , filePaths = filePaths
-    , developmentMode = developmentMode'
+    , debug = debug'
     }
   where
     fetchPaths :: [ExtraArg] -> [FilePath]
@@ -109,7 +109,7 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , runMode = Diff
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
-  , developmentMode = False
+  , debug = False
   }
 
 diffPathsArgs :: FilePath -> Both FilePath -> R.Format -> Arguments
@@ -124,7 +124,7 @@ diffPathsArgs gitDir paths format = Arguments
   , runMode = Diff
   , shaRange = both Nothing Nothing
   , filePaths = []
-  , developmentMode = False
+  , debug = False
   }
 
 parseArgs :: [String] -> R.Format -> Arguments
@@ -139,7 +139,7 @@ parseArgs filePaths format = Arguments
   , runMode = Parse
   , shaRange = both Nothing Nothing
   , filePaths = filePaths
-  , developmentMode = False
+  , debug = False
   }
 
 -- | 7 seconds
