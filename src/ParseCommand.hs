@@ -35,6 +35,7 @@ data ParseJSON =
     , sourceRange :: Range
     , sourceText :: SourceText
     , sourceSpan :: SourceSpan
+    , identifier :: Text
     , children :: [ParseJSON]
     }
   | ParseTreeProgram
@@ -46,6 +47,7 @@ data ParseJSON =
     , sourceRange :: Range
     , sourceText :: SourceText
     , sourceSpan :: SourceSpan
+    , identifier :: Text
     }
   | IndexProgram
     { filePath :: FilePath
@@ -53,9 +55,9 @@ data ParseJSON =
     } deriving (Show, Generic)
 
 instance ToJSON ParseJSON where
-  toJSON ParseTreeProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan, "children" .= children ]
+  toJSON ParseTreeProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan, "identifier" .= identifier, "children" .= children ]
   toJSON ParseTreeProgram{..} = object [ "filePath" .= filePath, "programNode" .= programNode ]
-  toJSON IndexProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan ]
+  toJSON IndexProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan, "identifier" .= identifier ]
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
 sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
