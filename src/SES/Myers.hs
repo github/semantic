@@ -100,10 +100,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       result <- divideAndConquer graph ses
       return $! case result of
         Left (a, EditGraph midAs midBs, c) -> a <> zipWith These (toList midAs) (toList midBs) <> c
-        Right d -> if d == 1 then
-          zipWith These (toList as) (toList bs) <> [ if m > n then That (bs Vector.! n) else This (as Vector.! m) ]
-        else
-          zipWith These (toList as) (toList bs)
+        Right d -> zipWith These (toList as) (toList bs) <> [ if m > n then That (bs Vector.! n) else This (as Vector.! m) | d == 1 ]
 
   EditDistance graph -> unDistance . snd <$> middleSnake graph
 
