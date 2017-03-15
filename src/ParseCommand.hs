@@ -123,17 +123,18 @@ parse args@Arguments{..} = do
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
                   do terms' <- parserWithSource path sourceBlob
-                     return $ IndexProgram path (cata indexAlgebra terms'))
+                     return $ IndexProgram path (cata algebra terms'))
 
             _ -> sequence $ constructIndexProgramNodes <$> filePaths
 
         constructIndexProgramNodes :: FilePath -> IO ParseJSON
         constructIndexProgramNodes filePath = do
           terms' <- terms filePath
-          return $ IndexProgram filePath (cata indexAlgebra terms')
+          return $ IndexProgram filePath (cata algebra terms')
 
-    indexAlgebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
-    indexAlgebra (annotation :< syntax) = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) : concat syntax
+        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
+        algebra (annotation :< syntax) = indexProgramNode annotation : concat syntax
+          where indexProgramNode annotation = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) "identifier"
 
     -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
     renderParseTree :: Arguments -> IO ByteString
@@ -147,17 +148,17 @@ parse args@Arguments{..} = do
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
                   do terms' <- parserWithSource path sourceBlob
-                     return $ ParseTreeProgram path (cata parseTreeAlgebra terms'))
+                     return $ ParseTreeProgram path (cata algebra terms'))
 
             Nothing -> sequence $ constructParseTreeProgramNodes <$> filePaths
 
         constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
         constructParseTreeProgramNodes filePath = do
           terms' <- terms filePath
-          return $ ParseTreeProgram filePath (cata parseTreeAlgebra terms')
+          return $ ParseTreeProgram filePath (cata algebra terms')
 
-    parseTreeAlgebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-    parseTreeAlgebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (toList syntax)
+        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
+        algebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) "identifier" (toList syntax)
 
     category' :: Record '[SourceText, Range, Category, SourceSpan] -> Text
     category' = toS . Info.category
