@@ -6,6 +6,12 @@ import Category
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Record
 import qualified Data.Text as T
+import Git.Blob
+import Git.Libgit2
+import Git.Libgit2.Backend
+import Git.Repository
+import Git.Types
+import qualified Git
 import Info
 import Language
 import Language.Markdown
@@ -53,6 +59,37 @@ instance ToJSON ParseJSON where
   toJSON IndexProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan ]
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
+sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
+sourceBlobs Arguments{..} commitSha' =
+
+  withRepository lgFactory gitDir $ do
+    repo   <- getRepository
+    object <- parseObjOid commitSha'
+    commit <- lookupCommit object
+    tree   <- lookupTree (commitTree commit)
+
+    lift $ runReaderT (sequence $ toSourceBlob tree <$> filePaths) repo
+
+    where
+      toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO SourceBlob
+      toSourceBlob tree filePath = do
+        entry <- treeEntry tree (toS filePath)
+        (bytestring, oid, mode) <- case entry of
+          Just (BlobEntry entryOid entryKind) -> do
+            blob <- lookupBlob entryOid
+            s <- blobToByteString blob
+            let oid = renderObjOid $ blobOid blob
+            pure (s, oid, Just entryKind)
+          Nothing -> pure (mempty, mempty, Nothing)
+          _ -> pure (mempty, mempty, Nothing)
+        s <- liftIO $ transcode bytestring
+        lift $ pure $ SourceBlob s (toS oid) filePath (toSourceKind <$> mode)
+        where
+          toSourceKind :: Git.BlobKind -> SourceKind
+          toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
+          toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
+          toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
+
 -- | Parses filePaths into two possible formats: SExpression or JSON.
 parse :: Arguments -> IO ByteString
 parse args@Arguments{..} = do
@@ -63,53 +100,63 @@ parse args@Arguments{..} = do
 
   where
     renderSExpression :: Arguments -> IO ByteString
-    renderSExpression Arguments{..} =
-      case blobEntry of
-        Just blob -> undefined
+    renderSExpression args@Arguments{..} =
+      case commitSha of
+        Just commitSha' -> do
+          sourceBlobs' <- sourceBlobs args (T.pack commitSha')
+          terms' <- traverse (\sourceBlob@SourceBlob{..} -> parserWithSource path sourceBlob) sourceBlobs'
+          return $ printTerms TreeOnly terms'
         Nothing -> do
           terms' <- sequenceA $ terms <$> filePaths
           return $ printTerms TreeOnly terms'
 
     -- | Constructs a ParseJSON suitable for indexing for each file path.
     renderIndex :: Arguments -> IO ByteString
-    renderIndex Arguments{..} = fmap (toS . encode) (for filePaths render)
+    renderIndex Arguments{..} = fmap (toS . encode) (render filePaths)
       where
-        render :: FilePath -> IO ParseJSON
-        render filePath =
-          case blobEntry of
-            Just blob -> undefined
-            _ -> do
-              programNodes <- constructIndexProgramNodes filePath
-              return $ IndexProgram filePath programNodes
+        render :: [FilePath] -> IO [ParseJSON]
+        render filePaths =
+          case commitSha of
+            Just commitSha' -> do
+              sourceBlobs' <- sourceBlobs args (T.pack commitSha')
+              for sourceBlobs'
+                (\sourceBlob@SourceBlob{..} ->
+                  do terms' <- parserWithSource path sourceBlob
+                     return $ IndexProgram path (cata indexAlgebra terms'))
 
-        constructIndexProgramNodes :: FilePath -> IO [ParseJSON]
+            _ -> sequence $ constructIndexProgramNodes <$> filePaths
+
+        constructIndexProgramNodes :: FilePath -> IO ParseJSON
         constructIndexProgramNodes filePath = do
           terms' <- terms filePath
-          return $ cata algebra terms'
+          return $ IndexProgram filePath (cata indexAlgebra terms')
 
-        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
-        algebra (annotation :< syntax) = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) : concat syntax
+    indexAlgebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
+    indexAlgebra (annotation :< syntax) = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) : concat syntax
 
     -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
     renderParseTree :: Arguments -> IO ByteString
-    renderParseTree Arguments{..} = fmap (toS . encode) (for filePaths render)
+    renderParseTree Arguments{..} = fmap (toS . encode) (render filePaths)
       where
-        render :: FilePath -> IO ParseJSON
-        render filePath =
-          case blobEntry of
-            Just blob -> undefined
-            Nothing -> do
-              programNodes <- constructParseTreeProgramNodes filePath
-              return $ ParseTreeProgram filePath programNodes
+        render :: [FilePath] -> IO [ParseJSON]
+        render filePaths =
+          case commitSha of
+            Just commitSha' -> do
+              sourceBlobs' <- sourceBlobs args (T.pack commitSha')
+              for sourceBlobs'
+                (\sourceBlob@SourceBlob{..} ->
+                  do terms' <- parserWithSource path sourceBlob
+                     return $ ParseTreeProgram path (cata parseTreeAlgebra terms'))
+
+            Nothing -> sequence $ constructParseTreeProgramNodes <$> filePaths
 
         constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
         constructParseTreeProgramNodes filePath = do
           terms' <- terms filePath
-          return $ cata algebra terms'
+          return $ ParseTreeProgram filePath (cata parseTreeAlgebra terms')
 
-        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-        algebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (toList syntax)
-
+    parseTreeAlgebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
+    parseTreeAlgebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (toList syntax)
 
     category' :: Record '[SourceText, Range, Category, SourceSpan] -> Text
     category' = toS . Info.category
