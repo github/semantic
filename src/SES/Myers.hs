@@ -143,7 +143,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           else succ prev
     endpoint <- slide graph direction (Endpoint fromX (fromX - k))
     setK graph direction (Diagonal k) (x endpoint)
-    return endpoint
+    return $ case direction of
+      Forward -> endpoint
+      Reverse -> Endpoint (n - x endpoint) (m - y endpoint)
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
