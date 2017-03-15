@@ -11,6 +11,7 @@ import Language
 import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.JavaScript as JS
+import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import Parser
 import Range
@@ -86,6 +87,7 @@ assignTerm language source annotation children allChildren =
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
           Ruby -> Ruby.termAssignment
+          TypeScript -> TS.termAssignment
           _ -> \ _ _ _ -> Nothing
 
 defaultTermAssignment :: Source -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
@@ -134,6 +136,7 @@ categoryForLanguageProductionName = withDefaults . \case
   C -> C.categoryForCProductionName
   Ruby -> Ruby.categoryForRubyName
   Language.Go -> Go.categoryForGoName
+  TypeScript -> TS.categoryForTypeScriptName
   _ -> Other
   where withDefaults productionMap = \case
           "ERROR" -> ParseError

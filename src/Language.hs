@@ -26,6 +26,7 @@ data Language =
     | R
     | Ruby
     | Swift
+    | TypeScript
     | Go
     deriving (Show)
 
@@ -38,6 +39,7 @@ languageForType mediaType = case mediaType of
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
     ".go" -> Just Language.Go
+    ".ts" -> Just TypeScript
     _ -> Nothing
 
 toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)

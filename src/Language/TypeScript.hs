@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Language.JavaScript where
+module Language.TypeScript where
 
 import Info
 import Prologue
@@ -13,4 +13,8 @@ termAssignment
   -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in Maybe.
-termAssignment _ category children
+termAssignment _ category children = undefined
+
+categoryForTypeScriptName :: Text -> Category
+categoryForTypeScriptName = \case
+  s -> Other s
