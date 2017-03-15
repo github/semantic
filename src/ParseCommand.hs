@@ -55,9 +55,9 @@ data ParseJSON =
     } deriving (Show, Generic)
 
 instance ToJSON ParseJSON where
-  toJSON ParseTreeProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan, "identifier" .= identifier, "children" .= children ]
+  toJSON ParseTreeProgramNode{..} = object $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "identifier" .= identifier, "children" .= children ] <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ]
   toJSON ParseTreeProgram{..} = object [ "filePath" .= filePath, "programNode" .= programNode ]
-  toJSON IndexProgramNode{..} = object [ "category" .= category, "sourceRange" .= sourceRange, "sourceText" .= sourceText, "sourceSpan" .= sourceSpan, "identifier" .= identifier ]
+  toJSON IndexProgramNode{..} = object $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "identifier" .= identifier ] <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ]
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
 sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
@@ -105,10 +105,10 @@ parse args@Arguments{..} = do
       case commitSha of
         Just commitSha' -> do
           sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-          terms' <- traverse (\sourceBlob@SourceBlob{..} -> parserWithSource path sourceBlob) sourceBlobs'
+          terms' <- traverse (\sourceBlob@SourceBlob{..} -> conditionalParserWithSource args path sourceBlob) sourceBlobs'
           return $ printTerms TreeOnly terms'
         Nothing -> do
-          terms' <- sequenceA $ terms <$> filePaths
+          terms' <- sequenceA $ terms args <$> filePaths
           return $ printTerms TreeOnly terms'
 
     -- | Constructs a ParseJSON suitable for indexing for each file path.
@@ -122,14 +122,14 @@ parse args@Arguments{..} = do
               sourceBlobs' <- sourceBlobs args (T.pack commitSha')
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
-                  do terms' <- parserWithSource path sourceBlob
+                  do terms' <- conditionalParserWithSource args path sourceBlob
                      return $ IndexProgram path (cata algebra terms'))
 
             _ -> sequence $ constructIndexProgramNodes <$> filePaths
 
         constructIndexProgramNodes :: FilePath -> IO ParseJSON
         constructIndexProgramNodes filePath = do
-          terms' <- terms filePath
+          terms' <- terms args filePath
           return $ IndexProgram filePath (cata algebra terms')
 
         algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
@@ -147,14 +147,14 @@ parse args@Arguments{..} = do
               sourceBlobs' <- sourceBlobs args (T.pack commitSha')
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
-                  do terms' <- parserWithSource path sourceBlob
+                  do terms' <- conditionalParserWithSource args path sourceBlob
                      return $ ParseTreeProgram path (cata algebra terms'))
 
             Nothing -> sequence $ constructParseTreeProgramNodes <$> filePaths
 
         constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
         constructParseTreeProgramNodes filePath = do
-          terms' <- terms filePath
+          terms' <- terms args filePath
           return $ ParseTreeProgram filePath (cata algebra terms')
 
         algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
@@ -173,8 +173,8 @@ parse args@Arguments{..} = do
     sourceSpan' = Info.sourceSpan
 
     -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
-    terms :: FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
-    terms filePath = do
+    terms :: Arguments -> FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
+    terms args filePath = do
       source <- readAndTranscodeFile filePath
       parser filePath $ sourceBlob' filePath source
 
@@ -183,11 +183,11 @@ parse args@Arguments{..} = do
         sourceBlob' filePath source = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
 
         parser :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
-        parser = parserWithSource
+        parser = conditionalParserWithSource args
 
 -- | Return a parser that decorates with the source text.
-parserWithSource :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
-parserWithSource path blob = decorateTerm (termSourceDecorator (source blob)) <$> parserForType (toS (takeExtension path)) blob
+conditionalParserWithSource :: Arguments -> FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
+conditionalParserWithSource args path blob = decorateTerm (termSourceDecorator args (source blob)) <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
@@ -207,8 +207,10 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Term decorator extracting the source text for a term.
-termSourceDecorator :: (HasField fields Range) => Source -> TermDecorator f fields SourceText
-termSourceDecorator source c = SourceText . toText $ Source.slice range' source
+termSourceDecorator :: (HasField fields Range) => Arguments -> Source -> TermDecorator f fields SourceText
+termSourceDecorator Arguments{..} source c = case debug of
+  True -> SourceText . toText $ Source.slice range' source
+  False -> SourceText ""
  where range' = byteRange $ headF c
 
 -- | A fallback parser that treats a file simply as rows of strings.
