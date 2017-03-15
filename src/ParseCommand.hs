@@ -105,10 +105,10 @@ parse args@Arguments{..} = do
       case commitSha of
         Just commitSha' -> do
           sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-          terms' <- traverse (\sourceBlob@SourceBlob{..} -> conditionalParserWithSource args path sourceBlob) sourceBlobs'
+          terms' <- traverse (\sourceBlob@SourceBlob{..} -> conditionalParserWithSource debug path sourceBlob) sourceBlobs'
           return $ printTerms TreeOnly terms'
         Nothing -> do
-          terms' <- sequenceA $ terms args <$> filePaths
+          terms' <- sequenceA $ terms debug <$> filePaths
           return $ printTerms TreeOnly terms'
 
     -- | Constructs a ParseJSON suitable for indexing for each file path.
@@ -122,14 +122,14 @@ parse args@Arguments{..} = do
               sourceBlobs' <- sourceBlobs args (T.pack commitSha')
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
-                  do terms' <- conditionalParserWithSource args path sourceBlob
+                  do terms' <- conditionalParserWithSource debug path sourceBlob
                      return $ IndexProgram path (cata algebra terms'))
 
             _ -> sequence $ constructIndexProgramNodes <$> filePaths
 
         constructIndexProgramNodes :: FilePath -> IO ParseJSON
         constructIndexProgramNodes filePath = do
-          terms' <- terms args filePath
+          terms' <- terms debug filePath
           return $ IndexProgram filePath (cata algebra terms')
 
         algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
@@ -147,14 +147,14 @@ parse args@Arguments{..} = do
               sourceBlobs' <- sourceBlobs args (T.pack commitSha')
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
-                  do terms' <- conditionalParserWithSource args path sourceBlob
+                  do terms' <- conditionalParserWithSource debug path sourceBlob
                      return $ ParseTreeProgram path (cata algebra terms'))
 
             Nothing -> sequence $ constructParseTreeProgramNodes <$> filePaths
 
         constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
         constructParseTreeProgramNodes filePath = do
-          terms' <- terms args filePath
+          terms' <- terms debug filePath
           return $ ParseTreeProgram filePath (cata algebra terms')
 
         algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
@@ -173,8 +173,8 @@ parse args@Arguments{..} = do
     sourceSpan' = Info.sourceSpan
 
     -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
-    terms :: Arguments -> FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
-    terms args filePath = do
+    terms :: Bool -> FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
+    terms debug filePath = do
       source <- readAndTranscodeFile filePath
       parser filePath $ sourceBlob' filePath source
 
@@ -183,11 +183,11 @@ parse args@Arguments{..} = do
         sourceBlob' filePath source = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
 
         parser :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
-        parser = conditionalParserWithSource args
+        parser = conditionalParserWithSource debug
 
 -- | Return a parser that decorates with the source text.
-conditionalParserWithSource :: Arguments -> FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
-conditionalParserWithSource args path blob = decorateTerm (termSourceDecorator args (source blob)) <$> parserForType (toS (takeExtension path)) blob
+conditionalParserWithSource :: Bool -> FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
+conditionalParserWithSource debug path blob = decorateTerm (termSourceDecorator debug (source blob)) <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
@@ -207,8 +207,8 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Term decorator extracting the source text for a term.
-termSourceDecorator :: (HasField fields Range) => Arguments -> Source -> TermDecorator f fields SourceText
-termSourceDecorator Arguments{..} source c = case debug of
+termSourceDecorator :: (HasField fields Range) => Bool -> Source -> TermDecorator f fields SourceText
+termSourceDecorator debug source c = case debug of
   True -> SourceText . toText $ Source.slice range' source
   False -> SourceText ""
  where range' = byteRange $ headF c
