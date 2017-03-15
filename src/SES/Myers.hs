@@ -11,18 +11,18 @@ import GHC.Stack
 import Prologue hiding (for, State)
 
 data MyersF element result where
-  SES :: EditGraph a -> MyersF a [These a a]
-  LCS :: EditGraph a -> MyersF a [a]
-  EditDistance :: EditGraph a -> MyersF a Int
-  MiddleSnake :: EditGraph a -> MyersF a (Snake, Distance)
-  SearchUpToD :: EditGraph a -> Distance -> MyersF a (Maybe (Snake, Distance))
-  SearchAlongK :: EditGraph a -> Distance -> Direction -> Diagonal -> MyersF a (Maybe (Snake, Distance))
-  FindDPath :: EditGraph a -> Distance -> Direction -> Diagonal -> MyersF a Endpoint
+  SES :: EditGraph a a -> MyersF a [These a a]
+  LCS :: EditGraph a a -> MyersF a [a]
+  EditDistance :: EditGraph a a -> MyersF a Int
+  MiddleSnake :: EditGraph a a -> MyersF a (Snake, Distance)
+  SearchUpToD :: EditGraph a a -> Distance -> MyersF a (Maybe (Snake, Distance))
+  SearchAlongK :: EditGraph a a -> Distance -> Direction -> Diagonal -> MyersF a (Maybe (Snake, Distance))
+  FindDPath :: EditGraph a a -> Distance -> Direction -> Diagonal -> MyersF a Endpoint
 
-  GetK :: EditGraph a -> Direction -> Diagonal -> MyersF a Int
-  SetK :: EditGraph a -> Direction -> Diagonal -> Int -> MyersF a ()
+  GetK :: EditGraph a a -> Direction -> Diagonal -> MyersF a Int
+  SetK :: EditGraph a a -> Direction -> Diagonal -> Int -> MyersF a ()
 
-  Slide :: EditGraph a -> Direction -> Endpoint -> MyersF a Endpoint
+  Slide :: EditGraph a a -> Direction -> Endpoint -> MyersF a Endpoint
 
 data State s a where
   Get :: State s s
@@ -35,7 +35,7 @@ data StepF element result where
 
 type Myers a = Freer (StepF a)
 
-data EditGraph a = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector a) }
+data EditGraph a b = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector b) }
   deriving (Eq, Show)
 
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
@@ -207,34 +207,34 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
 -- Smart constructors
 
-ses :: HasCallStack => EditGraph a -> Myers a [These a a]
+ses :: HasCallStack => EditGraph a a -> Myers a [These a a]
 ses graph = M (SES graph) `Then` return
 
-lcs :: HasCallStack => EditGraph a -> Myers a [a]
+lcs :: HasCallStack => EditGraph a a -> Myers a [a]
 lcs graph = M (LCS graph) `Then` return
 
-editDistance :: HasCallStack => EditGraph a -> Myers a Int
+editDistance :: HasCallStack => EditGraph a a -> Myers a Int
 editDistance graph = M (EditDistance graph) `Then` return
 
-middleSnake :: HasCallStack => EditGraph a -> Myers a (Snake, Distance)
+middleSnake :: HasCallStack => EditGraph a a -> Myers a (Snake, Distance)
 middleSnake graph = M (MiddleSnake graph) `Then` return
 
-searchUpToD :: HasCallStack => EditGraph a -> Distance -> Myers a (Maybe (Snake, Distance))
+searchUpToD :: HasCallStack => EditGraph a a -> Distance -> Myers a (Maybe (Snake, Distance))
 searchUpToD graph distance = M (SearchUpToD graph distance) `Then` return
 
-searchAlongK :: HasCallStack => EditGraph a -> Distance -> Direction -> Diagonal -> Myers a (Maybe (Snake, Distance))
+searchAlongK :: HasCallStack => EditGraph a a -> Distance -> Direction -> Diagonal -> Myers a (Maybe (Snake, Distance))
 searchAlongK graph d direction k = M (SearchAlongK graph d direction k) `Then` return
 
-findDPath :: HasCallStack => EditGraph a -> Distance -> Direction -> Diagonal -> Myers a Endpoint
+findDPath :: HasCallStack => EditGraph a a -> Distance -> Direction -> Diagonal -> Myers a Endpoint
 findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
-getK :: HasCallStack => EditGraph a -> Direction -> Diagonal -> Myers a Int
+getK :: HasCallStack => EditGraph a a -> Direction -> Diagonal -> Myers a Int
 getK graph direction diagonal = M (GetK graph direction diagonal) `Then` return
 
-setK :: HasCallStack => EditGraph a -> Direction -> Diagonal -> Int -> Myers a ()
+setK :: HasCallStack => EditGraph a a -> Direction -> Diagonal -> Int -> Myers a ()
 setK graph direction diagonal x = M (SetK graph direction diagonal x) `Then` return
 
-slide :: HasCallStack => EditGraph a -> Direction -> Endpoint -> Myers a Endpoint
+slide :: HasCallStack => EditGraph a a -> Direction -> Endpoint -> Myers a Endpoint
 slide graph direction from = M (Slide graph direction from) `Then` return
 
 getEq :: HasCallStack => Myers a (a -> a -> Bool)
@@ -255,7 +255,7 @@ emptyStateForStep step = case step of
     in (Vector.replicate (succ (maxD * 2)) 0, Vector.replicate (succ (maxD * 2)) 0)
   _ -> (Vector.empty, Vector.empty)
 
-overlaps :: EditGraph a -> Endpoint -> Endpoint -> Bool
+overlaps :: EditGraph a b -> Endpoint -> Endpoint -> Bool
 overlaps (EditGraph as _) (Endpoint x y) (Endpoint u v) = x - y == u - v && length as - u <= x
 
 for :: [a] -> (a -> Myers c (Maybe b)) -> Myers c (Maybe b)
@@ -267,14 +267,14 @@ continue = return Nothing
 ceilDiv :: Integral a => a -> a -> a
 ceilDiv = (uncurry (+) .) . divMod
 
-divideGraph :: EditGraph a -> Endpoint -> (EditGraph a, EditGraph a)
+divideGraph :: EditGraph a b -> Endpoint -> (EditGraph a b, EditGraph a b)
 divideGraph (EditGraph as bs) (Endpoint x y) =
   ( EditGraph (slice 0  x              as) (slice 0  y              bs)
   , EditGraph (slice x (length as - x) as) (slice y (length bs - y) bs) )
   where slice from to v = Vector.slice (max 0 (min from (length v))) (max 0 (min to (length v))) v
 
 
-editGraph :: MyersF a b -> EditGraph a
+editGraph :: MyersF a b -> EditGraph a a
 editGraph myers = case myers of
   SES g -> g
   LCS g -> g
@@ -309,8 +309,8 @@ instance Show s => Show1 (State s) where
 instance Show s => Show (State s a) where
   showsPrec = liftShowsPrec (const (const identity)) (const identity)
 
-instance Show1 EditGraph where
-  liftShowsPrec sp sl d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp sl) (liftShowsVector sp sl) "EditGraph" d as bs
+instance Show2 EditGraph where
+  liftShowsPrec2 sp1 sl1 sp2 sl2 d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp1 sl1) (liftShowsVector sp2 sl2) "EditGraph" d as bs
 
 instance Show2 MyersF where
   liftShowsPrec2 sp1 sl1 _ _ d m = case m of
@@ -330,7 +330,7 @@ instance Show2 MyersF where
           showsQuaternaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> (Int -> d -> ShowS) -> String -> Int -> a -> b -> c -> d -> ShowS
           showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
             showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
-          showGraph = (liftShowsPrec :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> EditGraph a -> ShowS) sp1 sl1
+          showGraph = (liftShowsPrec2 :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> EditGraph a b -> ShowS) sp1 sl1 sp1 sl1
 
 instance Show a => Show1 (MyersF a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
