@@ -47,9 +47,7 @@ diffCommits :: Arguments -> IO ByteString
 diffCommits args@Arguments{..} = do
   ts <- fetchTerms args
   pure $ maybe mempty concatOutputs ts
-  where fetchTerms args = if developmentMode
-                            then Just <$> fetchDiffs args
-                            else timeout timeoutInMicroseconds (fetchDiffs args)
+  where fetchTerms args = timeout timeoutInMicroseconds (fetchDiffs args)
 
 -- | Compare two paths on the filesystem (compariable to git diff --no-index).
 diffPaths :: Arguments -> Both FilePath -> IO ByteString
@@ -86,9 +84,7 @@ fetchDiff' args@Arguments{..} filepath = do
   truncatedPatch <- liftIO $ truncatedDiff args sourceBlobs
   pure $ fromMaybe truncatedPatch text
   where
-    fetchText textDiff = if developmentMode
-                          then liftIO $ Just <$> textDiff
-                          else liftIO $ timeout timeoutInMicroseconds textDiff
+    fetchText textDiff = liftIO $ timeout timeoutInMicroseconds textDiff
 
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
 pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
