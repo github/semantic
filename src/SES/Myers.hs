@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses #-}
+{-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
 module SES.Myers where
 
 import Control.Monad.Free.Freer
@@ -56,11 +56,16 @@ data Direction = Forward | Reverse
 
 -- Evaluation
 
-runMyers :: HasCallStack => (a -> b -> Bool) -> Myers a b c -> c
-runMyers eq step = runAll (emptyStateForStep step) step
-  where runAll state step = case runMyersStep eq state step of
-          Left a -> a
-          Right next -> uncurry runAll next
+runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> Myers a b c -> c
+runMyers eq step = evalState (go step) (emptyStateForStep step)
+  where go :: forall c. Myers a b c -> StateT MyersState Identity c
+        go = iterFreerA algebra
+        algebra :: forall c x. StepF a b x -> (x -> StateT MyersState Identity c) -> StateT MyersState Identity c
+        algebra step cont = case step of
+          M m -> go (decompose m) >>= cont
+          S Get -> get >>= cont
+          S (Put s) -> put s >>= cont
+          GetEq -> cont eq
 
 runMyersSteps :: HasCallStack => (a -> b -> Bool) -> Myers a b c -> [(MyersState, Myers a b c)]
 runMyersSteps eq step = go (emptyStateForStep step) step
