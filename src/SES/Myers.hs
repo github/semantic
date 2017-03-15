@@ -23,7 +23,7 @@ data MyersF a b result where
   GetK :: EditGraph a b -> Direction -> Diagonal -> MyersF a b (Int, EditScript a b)
   SetK :: EditGraph a b -> Direction -> Diagonal -> Int -> EditScript a b -> MyersF a b ()
 
-  Slide :: EditGraph a b -> Direction -> Endpoint -> MyersF a b (Endpoint, EditScript a b)
+  Slide :: EditGraph a b -> Direction -> Endpoint -> MyersF a b (Endpoint, [(a, b)])
 
 type EditScript a b = [These a b]
 
@@ -134,7 +134,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           then next
           else succ prev
     (endpoint, script) <- slide graph direction (Endpoint fromX (fromX - k))
-    setK graph direction (Diagonal k) (x endpoint) script
+    setK graph direction (Diagonal k) (x endpoint) (uncurry These <$> script)
     return $ case direction of
       Forward -> endpoint
       Reverse -> Endpoint (n - x endpoint) (m - y endpoint)
@@ -233,7 +233,7 @@ getK graph direction diagonal = M (GetK graph direction diagonal) `Then` return
 setK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Int -> EditScript a b -> Myers a b ()
 setK graph direction diagonal x script = M (SetK graph direction diagonal x script) `Then` return
 
-slide :: HasCallStack => EditGraph a b -> Direction -> Endpoint -> Myers a b (Endpoint, EditScript a b)
+slide :: HasCallStack => EditGraph a b -> Direction -> Endpoint -> Myers a b (Endpoint, [(a, b)])
 slide graph direction from = M (Slide graph direction from) `Then` return
 
 getEq :: HasCallStack => Myers a b (a -> b -> Bool)
