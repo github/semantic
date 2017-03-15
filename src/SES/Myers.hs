@@ -88,33 +88,22 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   LCS graph
     | null as || null bs -> return []
     | otherwise -> do
-      (Snake xy uv, Distance d) <- middleSnake graph
-      if d > 1 then do
-        let (before, _) = divideGraph graph xy
-        let (start, after) = divideGraph graph uv
-        let (EditGraph midAs midBs, _) = divideGraph start xy
-        before' <- lcs before
-        after' <- lcs after
-        return $! before' <> zip (toList midAs) (toList midBs) <> after'
-      else
-        return (zip (toList as) (toList bs))
+      result <- divideAndConquer graph lcs
+      return $! case result of
+        Left (a, EditGraph midAs midBs, c) -> a <> zip (toList midAs) (toList midBs) <> c
+        _ -> zip (toList as) (toList bs)
 
   SES graph
     | null bs -> return (This <$> toList as)
     | null as -> return (That <$> toList bs)
     | otherwise -> do
-      (Snake xy uv, Distance d) <- middleSnake graph
-      if d > 1 then do
-        let (before, _) = divideGraph graph xy
-        let (start, after) = divideGraph graph uv
-        let (EditGraph midAs midBs, _) = divideGraph start xy
-        before' <- ses before
-        after' <- ses after
-        return $! before' <> zipWith These (toList midAs) (toList midBs) <> after'
-      else if d == 1 then
-        return $! zipWith These (toList as) (toList bs) <> [ if m > n then That (bs Vector.! n) else This (as Vector.! m) ]
-      else
-        return (zipWith These (toList as) (toList bs))
+      result <- divideAndConquer graph ses
+      return $! case result of
+        Left (a, EditGraph midAs midBs, c) -> a <> zipWith These (toList midAs) (toList midBs) <> c
+        Right d -> if d == 1 then
+          zipWith These (toList as) (toList bs) <> [ if m > n then That (bs Vector.! n) else This (as Vector.! m) ]
+        else
+          zipWith These (toList as) (toList bs)
 
   EditDistance graph -> unDistance . snd <$> middleSnake graph
 
@@ -200,6 +189,18 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         editDistance Forward (Distance d) = Distance (2 * d - 1)
         editDistance Reverse (Distance d) = Distance (2 * d)
+
+        divideAndConquer graph with = do
+          (Snake xy uv, Distance d) <- middleSnake graph
+          if d > 1 then do
+            let (before, _) = divideGraph graph xy
+            let (start, after) = divideGraph graph uv
+            let (mid, _) = divideGraph start xy
+            before' <- with before
+            after' <- with after
+            return (Left (before', mid, after'))
+          else
+            return (Right d)
 
 
 -- Smart constructors
