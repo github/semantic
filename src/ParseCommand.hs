@@ -67,7 +67,7 @@ sourceBlobs Arguments{..} commitSha' =
     commit <- lookupCommit object
     tree   <- lookupTree (commitTree commit)
 
-    lift $ runReaderT (sequence $ toSourceBlob tree <$> filePaths) repo
+    lift $ runReaderT (sequence $ fmap (toSourceBlob tree) filePaths) repo
 
     where
       toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO SourceBlob
