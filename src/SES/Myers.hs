@@ -333,6 +333,9 @@ liftShowsThese sa sb d t = case t of
   That b -> showsUnaryWith sb "That" d b
   These a b -> showsBinaryWith sa sb "These" d a b
 
+liftShowsEditScript :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> EditScript a b -> ShowS
+liftShowsEditScript sa sb _ = showListWith (liftShowsThese sa sb 0)
+
 
 -- Instances
 
@@ -342,7 +345,7 @@ instance MonadState (MyersState a b) (Myers a b) where
 
 instance Show2 MyersState where
   liftShowsPrec2 sp1 _ sp2 _ d (MyersState (v1, v2)) = showsUnaryWith (showsWith (showsWith liftShowsPrec2 showsStateVector) showsStateVector) "MyersState" d (v1, v2)
-    where showsStateVector = showsWith liftShowsVector (showsWith liftShowsPrec (showsWith liftShowsPrec (liftShowsThese sp1 sp2)))
+    where showsStateVector = showsWith liftShowsVector (showsWith liftShowsPrec (liftShowsEditScript sp1 sp2))
           showsWith g f = g f (showListWith (f 0))
 
 instance Show s => Show1 (State s) where
