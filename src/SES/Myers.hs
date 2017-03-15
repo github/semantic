@@ -9,6 +9,7 @@ import qualified Data.Vector as Vector
 import GHC.Show
 import GHC.Stack
 import Prologue hiding (for, State)
+import Text.Show
 
 data MyersF a b result where
   SES :: EditGraph a b -> MyersF a b [These a b]
@@ -30,7 +31,7 @@ data State s a where
 
 data StepF a b result where
   M :: MyersF a b c -> StepF a b c
-  S :: State MyersState c -> StepF a b c
+  S :: State (MyersState a b) c -> StepF a b c
   GetEq :: StepF a b (a -> b -> Bool)
 
 type Myers a b = Freer (StepF a b)
@@ -58,16 +59,16 @@ data Direction = Forward | Reverse
 
 runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> Myers a b c -> c
 runMyers eq step = evalState (go step) (emptyStateForStep step)
-  where go :: forall c. Myers a b c -> StateT MyersState Identity c
+  where go :: forall c. Myers a b c -> StateT (MyersState a b) Identity c
         go = iterFreerA algebra
-        algebra :: forall c x. StepF a b x -> (x -> StateT MyersState Identity c) -> StateT MyersState Identity c
+        algebra :: forall c x. StepF a b x -> (x -> StateT (MyersState a b) Identity c) -> StateT (MyersState a b) Identity c
         algebra step cont = case step of
           M m -> go (decompose m) >>= cont
           S Get -> get >>= cont
           S (Put s) -> put s >>= cont
           GetEq -> cont eq
 
-runMyersSteps :: HasCallStack => (a -> b -> Bool) -> Myers a b c -> [(MyersState, Myers a b c)]
+runMyersSteps :: HasCallStack => (a -> b -> Bool) -> Myers a b c -> [(MyersState a b, Myers a b c)]
 runMyersSteps eq step = go (emptyStateForStep step) step
   where go state step = let ?callStack = popCallStack callStack in prefix state step $ case runMyersStep eq state step of
           Left result -> [ (state, return result) ]
@@ -76,7 +77,7 @@ runMyersSteps eq step = go (emptyStateForStep step) step
           Then (M _) _ -> ((state, step) :)
           _ -> identity
 
-runMyersStep :: HasCallStack => (a -> b -> Bool) -> MyersState -> Myers a b c -> Either c (MyersState, Myers a b c)
+runMyersStep :: HasCallStack => (a -> b -> Bool) -> MyersState a b -> Myers a b c -> Either c (MyersState a b, Myers a b c)
 runMyersStep eq state step = let ?callStack = popCallStack callStack in case step of
   Return a -> Left a
   Then step cont -> case step of
@@ -138,10 +139,10 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
-    return (v Vector.! index v k)
+    return (fst (v Vector.! index v k))
 
   SetK _ direction (Diagonal k) x ->
-    setStateFor direction (\ v -> v Vector.// [(index v k, x)])
+    setStateFor direction (\ v -> v Vector.// [(index v k, (x, []))])
 
   Slide graph direction (Endpoint x y)
     | x >= 0, x < n
@@ -168,11 +169,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         shouldTestOn Forward = odd delta
         shouldTestOn Reverse = even delta
 
-        stateFor Forward = fst
-        stateFor Reverse = snd
+        stateFor Forward = fst . unMyersState
+        stateFor Reverse = snd . unMyersState
 
-        setStateFor Forward = modify . first
-        setStateFor Reverse = modify . second
+        setStateFor Forward f = modify (MyersState . first f . unMyersState)
+        setStateFor Reverse f = modify (MyersState . second f . unMyersState)
 
         endpointsFor graph d direction k = do
           here <- findDPath graph d direction k
@@ -239,14 +240,15 @@ getEq = GetEq `Then` return
 
 -- Implementation details
 
-type MyersState = (Vector.Vector Int, Vector.Vector Int)
+newtype MyersState a b = MyersState { unMyersState :: (Vector.Vector (Int, [These a b]), Vector.Vector (Int, [These a b])) }
+  deriving (Eq, Show)
 
-emptyStateForStep :: Myers a b c -> MyersState
+emptyStateForStep :: Myers a b c -> MyersState a b
 emptyStateForStep step = case step of
   Then (M myers) _ ->
     let (_, _, _, maxD, _) = editGraph myers in
-    (Vector.replicate (succ (maxD * 2)) 0, Vector.replicate (succ (maxD * 2)) 0)
-  _ -> (Vector.empty, Vector.empty)
+    MyersState (Vector.replicate (succ (maxD * 2)) (0, []), Vector.replicate (succ (maxD * 2)) (0, []))
+  _ -> MyersState (Vector.empty, Vector.empty)
 
 overlaps :: EditGraph a b -> Endpoint -> Endpoint -> Bool
 overlaps (EditGraph as _) (Endpoint x y) (Endpoint u v) = x - y == u - v && length as - u <= x
@@ -316,15 +318,26 @@ liftShowsState sp d state = case state of
 liftShowsStepF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> StepF a b c -> ShowS
 liftShowsStepF sp1 sl1 sp2 sl2 d step = case step of
   M m -> showsUnaryWith (liftShowsMyersF sp1 sl1 sp2 sl2) "M" d m
-  S s -> showsUnaryWith (liftShowsState showsPrec) "S" d s
+  S s -> showsUnaryWith (liftShowsState (liftShowsPrec2 sp1 sl1 sp2 sl2)) "S" d s
   GetEq -> showString "GetEq"
+
+liftShowsThese :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> These a b -> ShowS
+liftShowsThese sa sb d t = case t of
+  This a -> showsUnaryWith sa "This" d a
+  That b -> showsUnaryWith sb "That" d b
+  These a b -> showsBinaryWith sa sb "These" d a b
 
 
 -- Instances
 
-instance MonadState MyersState (Myers a b) where
+instance MonadState (MyersState a b) (Myers a b) where
   get = S Get `Then` return
   put a = S (Put a) `Then` return
+
+instance Show2 MyersState where
+  liftShowsPrec2 sp1 _ sp2 _ d (MyersState (v1, v2)) = showsUnaryWith (showsWith (showsWith liftShowsPrec2 showsStateVector) showsStateVector) "MyersState" d (v1, v2)
+    where showsStateVector = showsWith liftShowsVector (showsWith liftShowsPrec (showsWith liftShowsPrec (liftShowsThese sp1 sp2)))
+          showsWith g f = g f (showListWith (f 0))
 
 instance Show s => Show1 (State s) where
   liftShowsPrec _ _ = liftShowsState showsPrec
