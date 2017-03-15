@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
@@ -16,6 +16,12 @@ type TermF = CofreeF
 -- | A Term with a Syntax leaf and a record of fields.
 type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
 type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
+
+instance (NFData (f (Cofree f a)), NFData a, Functor f) => NFData (Cofree f a) where
+  rnf = rnf . runCofree
+
+instance (NFData a, NFData (f b)) => NFData (CofreeF f a b) where
+  rnf (a :< s) = rnf a `seq` rnf s `seq` ()
 
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.

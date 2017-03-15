@@ -1,4 +1,5 @@
-{-# LANGUAGE TypeSynonymInstances, ScopedTypeVariables #-}
+{-# LANGUAGE TypeSynonymInstances, ScopedTypeVariables, UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Diff where
 
 import Prologue
@@ -50,3 +51,8 @@ modifyAnnotations :: (Functor f, Functor g) => (annotation -> annotation) -> Fre
 modifyAnnotations f r = case runFree r of
   Free (ga :< functor) -> wrap (fmap f ga :< functor)
   _ -> r
+
+instance (NFData (f (Diff f a)), NFData (Cofree f a), NFData a, Functor f) => NFData (Diff f a) where
+  rnf fa = case runFree fa of
+    Free f -> rnf f `seq` ()
+    Pure a -> rnf a `seq` ()

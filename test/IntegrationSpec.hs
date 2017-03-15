@@ -115,11 +115,12 @@ testParse path expectedOutput = do
   actual `shouldBe` expected
 
 testDiff :: Renderer (Record '[Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
-testDiff renderer paths diff = do
+testDiff renderer paths expectedOutput = do
   sources <- traverse readAndTranscodeFile' paths
-  diff' <- diffFiles parser renderer (sourceBlobs sources)
-  let actual = (Verbatim . stripWhitespace. concatOutputs . pure) diff'
-  expected <- (Verbatim . stripWhitespace) <$> B.readFile diff
+  diff <- diffFiles parser (sourceBlobs sources)
+  let diffOutput = renderer (sourceBlobs sources) diff
+  let actual = (Verbatim . stripWhitespace. concatOutputs . pure) diffOutput
+  expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
   actual `shouldBe` expected
   where
     parser = parserForFilepath filePath

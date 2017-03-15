@@ -26,7 +26,7 @@ data SourcePos = SourcePos
     -- Column number
     --
   , column :: Int
-  } deriving (Show, Read, Eq, Ord, Generic, Hashable)
+  } deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
 
 displaySourcePos :: SourcePos -> Text
 displaySourcePos SourcePos{..} =
@@ -49,7 +49,7 @@ data SourceSpan = SourceSpan
     -- End of the span
     --
   , spanEnd :: SourcePos
-  } deriving (Show, Read, Eq, Ord, Generic, Hashable)
+  } deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
 
 displayStartEndPos :: SourceSpan -> Text
 displayStartEndPos sp =
