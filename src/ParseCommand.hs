@@ -61,30 +61,29 @@ instance ToJSON ParseJSON where
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
 sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
-sourceBlobs Arguments{..} commitSha' =
-
-  withRepository lgFactory gitDir $ do
+sourceBlobs Arguments{..} commitSha' = do
+  maybeBlobs <- withRepository lgFactory gitDir $ do
     repo   <- getRepository
     object <- parseObjOid commitSha'
     commit <- lookupCommit object
     tree   <- lookupTree (commitTree commit)
+    lift $ runReaderT (getBlobs tree) repo
 
-    lift $ runReaderT (sequence $ fmap (toSourceBlob tree) filePaths) repo
+  pure $ catMaybes maybeBlobs
 
     where
-      toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO SourceBlob
+      getBlobs tree = traverse (toSourceBlob tree) filePaths
+      toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO (Maybe SourceBlob)
       toSourceBlob tree filePath = do
         entry <- treeEntry tree (toS filePath)
-        (bytestring, oid, mode) <- case entry of
+        case entry of
           Just (BlobEntry entryOid entryKind) -> do
             blob <- lookupBlob entryOid
-            s <- blobToByteString blob
+            bytestring <- blobToByteString blob
             let oid = renderObjOid $ blobOid blob
-            pure (s, oid, Just entryKind)
-          Nothing -> pure (mempty, mempty, Nothing)
-          _ -> pure (mempty, mempty, Nothing)
-        s <- liftIO $ transcode bytestring
-        lift $ pure $ SourceBlob s (toS oid) filePath (toSourceKind <$> mode)
+            s <- liftIO $ transcode bytestring
+            pure . Just $ SourceBlob s (toS oid) filePath (Just (toSourceKind entryKind))
+          _ -> pure Nothing
         where
           toSourceKind :: Git.BlobKind -> SourceKind
           toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
