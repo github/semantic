@@ -1,4 +1,4 @@
-module Text.Parser.TreeSitter.Typescript where
+module Text.Parser.TreeSitter.TypeScript where
 
 import Text.Parser.TreeSitter
 import Foreign.Ptr

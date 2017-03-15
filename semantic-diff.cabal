@@ -1,4 +1,5 @@
 name:                semantic-diff
+
 version:             0.2.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
@@ -33,6 +34,7 @@ library
                      , Language
                      , Language.C
                      , Language.JavaScript
+                     , Language.TypeScript
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
