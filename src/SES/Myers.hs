@@ -150,12 +150,15 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | x >= 0, x < n
     , y >= 0, y < m -> do
       eq <- getEq
-      if (as `at` x) `eq` (bs `at` y)
-        then slide graph direction (Endpoint (succ x) (succ y))
+      let a = as `at` x
+      let b = bs `at` y
+      if a `eq` b
+        then second (add (a, b)) <$> slide graph direction (Endpoint (succ x) (succ y))
         else return (Endpoint x y, [])
     | otherwise -> return (Endpoint x y, [])
     where at :: Vector.Vector a -> Int -> a
           v `at` i = v Vector.! case direction of { Forward -> i ; Reverse -> length v - succ i }
+          add pair = case direction of { Forward -> (++ [pair]) ; Reverse -> (pair :) }
 
   where (EditGraph as bs, n, m, maxD, delta) = editGraph myers
 
