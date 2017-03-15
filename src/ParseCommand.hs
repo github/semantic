@@ -60,39 +60,10 @@ instance ToJSON ParseJSON where
   toJSON IndexProgramNode{..} = object $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "identifier" .= identifier ] <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ]
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
-sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
-sourceBlobs Arguments{..} commitSha' = do
-  maybeBlobs <- withRepository lgFactory gitDir $ do
-    repo   <- getRepository
-    object <- parseObjOid commitSha'
-    commit <- lookupCommit object
-    tree   <- lookupTree (commitTree commit)
-    lift $ runReaderT (getBlobs tree) repo
-
-  pure $ catMaybes maybeBlobs
-
-    where
-      getBlobs tree = traverse (toSourceBlob tree) filePaths
-      toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO (Maybe SourceBlob)
-      toSourceBlob tree filePath = do
-        entry <- treeEntry tree (toS filePath)
-        case entry of
-          Just (BlobEntry entryOid entryKind) -> do
-            blob <- lookupBlob entryOid
-            bytestring <- blobToByteString blob
-            let oid = renderObjOid $ blobOid blob
-            s <- liftIO $ transcode bytestring
-            pure . Just $ SourceBlob s (toS oid) filePath (Just (toSourceKind entryKind))
-          _ -> pure Nothing
-        where
-          toSourceKind :: Git.BlobKind -> SourceKind
-          toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
-          toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
-          toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
 -- | Parses filePaths into two possible formats: SExpression or JSON.
 parse :: Arguments -> IO ByteString
-parse args@Arguments{..} = do
+parse args@Arguments{..} =
   case format of
     SExpression -> renderSExpression args
     Index -> renderIndex args
@@ -184,6 +155,36 @@ parse args@Arguments{..} = do
         parser :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
         parser = conditionalParserWithSource debug
 
+-- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
+sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
+sourceBlobs Arguments{..} commitSha' = do
+  maybeBlobs <- withRepository lgFactory gitDir $ do
+    repo   <- getRepository
+    object <- parseObjOid commitSha'
+    commit <- lookupCommit object
+    tree   <- lookupTree (commitTree commit)
+    lift $ runReaderT (traverse (toSourceBlob tree) filePaths) repo
+
+  pure $ catMaybes maybeBlobs
+
+  where
+    toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO (Maybe SourceBlob)
+    toSourceBlob tree filePath = do
+      entry <- treeEntry tree (toS filePath)
+      case entry of
+        Just (BlobEntry entryOid entryKind) -> do
+          blob <- lookupBlob entryOid
+          bytestring <- blobToByteString blob
+          let oid = renderObjOid $ blobOid blob
+          s <- liftIO $ transcode bytestring
+          pure . Just $ SourceBlob s (toS oid) filePath (Just (toSourceKind entryKind))
+        _ -> pure Nothing
+      where
+        toSourceKind :: Git.BlobKind -> SourceKind
+        toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
+        toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
+        toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
+
 -- | Return a parser that decorates with the source text.
 conditionalParserWithSource :: Bool -> FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
 conditionalParserWithSource debug path blob = decorateTerm (termSourceDecorator debug (source blob)) <$> parserForType (toS (takeExtension path)) blob
@@ -207,9 +208,7 @@ type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fi
 
 -- | Term decorator extracting the source text for a term.
 termSourceDecorator :: (HasField fields Range) => Bool -> Source -> TermDecorator f fields SourceText
-termSourceDecorator debug source c = case debug of
-  True -> SourceText . toText $ Source.slice range' source
-  False -> SourceText ""
+termSourceDecorator debug source c = if debug then SourceText . toText $ Source.slice range' source else SourceText ""
  where range' = byteRange $ headF c
 
 -- | A fallback parser that treats a file simply as rows of strings.
