@@ -106,11 +106,13 @@ categoryForJavaScriptProductionName name = case name of
   "arguments" -> Args
   "statement_block" -> ExpressionStatements
   "assignment" -> Assignment
+  "assignment_pattern" -> Assignment
   "member_access" -> MemberAccess
   "op" -> Operator
   "subscript_access" -> SubscriptAccess
   "regex" -> Regex
   "template_string" -> TemplateString
+  "lexical_declaration" -> VarDecl
   "variable_declaration" -> VarDecl
   "trailing_variable_declaration" -> VarDecl
   "switch_statement" -> Switch
@@ -136,5 +138,5 @@ categoryForJavaScriptProductionName name = case name of
   "export_statement" -> Export
   "break_statement" -> Break
   "continue_statement" -> Continue
-  "yield_statement" -> Yield
+  "yield_expression" -> Yield
   _ -> Other name

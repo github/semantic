@@ -7,5 +7,5 @@
           (VarAssignment
             (Identifier)
             (NumberLiteral)))
-        (Yield
-          (Identifier))))))
+        (ExpressionStatements (Yield
+          (Identifier)))))))
