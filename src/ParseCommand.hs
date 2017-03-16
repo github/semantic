@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators, DeriveAnyClass #-}
+{-# LANGUAGE DataKinds, TypeOperators, DeriveAnyClass, ScopedTypeVariables #-}
 module ParseCommand where
 
 import Arguments
