@@ -141,7 +141,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     where at :: Vector.Vector a -> Int -> a
           v `at` i = v Vector.! case direction of { Forward -> i ; Reverse -> length v - succ i }
           addInBounds :: Vector.Vector a -> Int -> (a -> b) -> [b] -> [b]
-          addInBounds v i with to = if d /= 0 && i >= 0 && i < length v then addFor direction (with (v `at` i)) to else to
+          addInBounds v i with to = if (d /= 0 || direction == Reverse) && i >= 0 && i < length v then addFor direction (with (v `at` i)) to else to
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
