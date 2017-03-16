@@ -107,6 +107,7 @@ categoryForJavaScriptProductionName name = case name of
   "statement_block" -> ExpressionStatements
   "assignment" -> Assignment
   "assignment_pattern" -> Assignment
+  "public_field_definition" -> Assignment
   "member_access" -> MemberAccess
   "op" -> Operator
   "subscript_access" -> SubscriptAccess
