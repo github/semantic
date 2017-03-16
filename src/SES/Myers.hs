@@ -236,7 +236,7 @@ getEq = GetEq `Then` return
 
 -- Implementation details
 
-newtype MyersState a b = MyersState { unMyersState :: (Vector.Vector (Int, (EditScript a b)), Vector.Vector (Int, (EditScript a b))) }
+newtype MyersState a b = MyersState { unMyersState :: (Vector.Vector (Int, EditScript a b), Vector.Vector (Int, EditScript a b)) }
   deriving (Eq, Show)
 
 emptyStateForStep :: Myers a b c -> MyersState a b
