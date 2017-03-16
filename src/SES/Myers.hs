@@ -197,18 +197,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         editDistance Forward (Distance d) = Distance (2 * d - 1)
         editDistance Reverse (Distance d) = Distance (2 * d)
 
-        divideAndConquer graph with = do
-          (Snake xy uv, Distance d) <- middleSnake graph
-          if d > 1 then do
-            let (before, _) = divideGraph graph xy
-            let (start, after) = divideGraph graph uv
-            let (mid, _) = divideGraph start xy
-            before' <- with before
-            after' <- with after
-            return (Left (before', mid, after'))
-          else
-            return (Right d)
-
 
 -- Smart constructors
 
