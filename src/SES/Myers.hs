@@ -131,8 +131,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     (prev, prevScript) <- getK graph direction (Diagonal (pred k))
     (next, nextScript) <- getK graph direction (Diagonal (succ k))
     let (fromX, fromScript) = if k == negate d || k /= d && prev < next
-          then (next, nextScript)
-          else (succ prev, prevScript)
+          then (next, if d /= 0 && inBounds bs next then addFor direction (That (bs `at` next)) nextScript else nextScript) -- downward (insertion)
+          else (succ prev, if d /= 0 && inBounds as prev then addFor direction (This (as `at` prev)) prevScript else prevScript) -- rightward (deletion)
     (endpoint, script) <- slide graph direction (Endpoint fromX (fromX - k)) fromScript
     setK graph direction (Diagonal k) (x endpoint) script
     return $ case direction of
@@ -140,6 +140,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       Reverse -> Endpoint (n - x endpoint) (m - y endpoint)
     where at :: Vector.Vector a -> Int -> a
           v `at` i = v Vector.! case direction of { Forward -> i ; Reverse -> length v - succ i }
+          inBounds v i = i >= 0 && i < length v
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
