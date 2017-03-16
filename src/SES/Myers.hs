@@ -96,10 +96,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   LCS graph
     | null as || null bs -> return []
     | otherwise -> do
-      result <- divideAndConquer graph lcs
-      return $! case result of
-        Left (a, EditGraph midAs midBs, c) -> a <> zip (toList midAs) (toList midBs) <> c
-        _ -> zip (toList as) (toList bs)
+      result <- ses graph
+      return (catMaybes (these (const Nothing) (const Nothing) ((Just .) . (,)) <$> result))
 
   SES graph
     | null bs -> return (This <$> toList as)
