@@ -93,18 +93,21 @@ parse args@Arguments{..} =
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
                   do terms' <- conditionalParserWithSource debug path sourceBlob
-                     return $ IndexProgram path (cata algebra terms'))
+                     return $ IndexProgram path (para algebra terms'))
 
             _ -> traverse constructIndexProgramNodes filePaths
 
         constructIndexProgramNodes :: FilePath -> IO ParseJSON
         constructIndexProgramNodes filePath = do
           terms' <- terms debug filePath
-          return $ IndexProgram filePath (cata algebra terms')
+          return $ IndexProgram filePath (para algebra terms')
 
-        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) [ParseJSON] -> [ParseJSON]
-        algebra (annotation :< syntax) = indexProgramNode annotation : concat syntax
-          where indexProgramNode annotation = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) "identifier"
+
+        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
+        algebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
+          where indexProgramNode annotation = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (identifierFor (Prologue.fst <$> syntax))
+                identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan])) -> Maybe T.Text
+                identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
     -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
     renderParseTree :: Arguments -> IO ByteString
@@ -118,17 +121,19 @@ parse args@Arguments{..} =
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} ->
                   do terms' <- conditionalParserWithSource debug path sourceBlob
-                     return $ ParseTreeProgram path (cata algebra terms'))
+                     return $ ParseTreeProgram path (para algebra terms'))
 
             Nothing -> traverse constructParseTreeProgramNodes filePaths
 
         constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
         constructParseTreeProgramNodes filePath = do
           terms' <- terms debug filePath
-          return $ ParseTreeProgram filePath (cata algebra terms')
+          return $ ParseTreeProgram filePath (para algebra terms')
 
-        algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-        algebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) "identifier" (toList syntax)
+        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
+        algebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
+          where identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan])) -> Maybe T.Text
+                identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
     category' :: Record '[SourceText, Range, Category, SourceSpan] -> Text
     category' = toS . Info.category
