@@ -95,7 +95,7 @@ parse args@Arguments{..} =
                   do terms' <- conditionalParserWithSource debug path sourceBlob
                      return $ IndexProgram path (cata algebra terms'))
 
-            _ -> sequence $ constructIndexProgramNodes <$> filePaths
+            _ -> traverse constructIndexProgramNodes filePaths
 
         constructIndexProgramNodes :: FilePath -> IO ParseJSON
         constructIndexProgramNodes filePath = do
@@ -120,7 +120,7 @@ parse args@Arguments{..} =
                   do terms' <- conditionalParserWithSource debug path sourceBlob
                      return $ ParseTreeProgram path (cata algebra terms'))
 
-            Nothing -> sequence $ constructParseTreeProgramNodes <$> filePaths
+            Nothing -> traverse constructParseTreeProgramNodes filePaths
 
         constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
         constructParseTreeProgramNodes filePath = do
