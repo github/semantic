@@ -35,7 +35,7 @@ data ParseJSON =
     , sourceRange :: Range
     , sourceText :: SourceText
     , sourceSpan :: SourceSpan
-    , identifier :: Text
+    , identifier :: Maybe Text
     , children :: [ParseJSON]
     }
   | ParseTreeProgram
@@ -47,7 +47,7 @@ data ParseJSON =
     , sourceRange :: Range
     , sourceText :: SourceText
     , sourceSpan :: SourceSpan
-    , identifier :: Text
+    , identifier :: Maybe Text
     }
   | IndexProgram
     { filePath :: FilePath
@@ -55,9 +55,9 @@ data ParseJSON =
     } deriving (Show, Generic)
 
 instance ToJSON ParseJSON where
-  toJSON ParseTreeProgramNode{..} = object $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "identifier" .= identifier, "children" .= children ] <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ]
+  toJSON ParseTreeProgramNode{..} = object $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "children" .= children ] <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ] <> [ "identifier" .= identifier | isJust identifier ]
   toJSON ParseTreeProgram{..} = object [ "filePath" .= filePath, "programNode" .= programNode ]
-  toJSON IndexProgramNode{..} = object $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "identifier" .= identifier ] <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ]
+  toJSON IndexProgramNode{..} = object $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan] <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ] <> [ "identifier" .= identifier | isJust identifier ]
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
 
