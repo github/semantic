@@ -109,6 +109,28 @@ data Syntax a f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
 
 
+extractLeafValue :: forall b leaf. S.Syntax leaf b -> Maybe leaf
+extractLeafValue syntax = case syntax of
+  S.Leaf a -> Just a
+  _ -> Nothing
+
+maybeIdentifier :: forall leaf identifier. S.Syntax leaf identifier -> Maybe identifier
+maybeIdentifier syntax = case syntax of
+  S.Assignment f _ -> Just f
+  S.Class f _ _ -> Just f
+  S.Export f _ -> f
+  S.Function f _ _ _ -> Just f
+  S.FunctionCall f _ -> Just f
+  S.Import f _ -> Just f
+  S.Method f _ _ _ _ -> Just f
+  S.MethodCall _ f _ -> Just f
+  S.Module f _ -> Just f
+  S.OperatorAssignment f _ -> Just f
+  S.SubscriptAccess f _  -> Just f
+  S.TypeDecl f _ -> Just f
+  S.VarAssignment f _ -> Just f
+  _ -> Nothing
+
 -- Instances
 
 instance Listable2 Syntax where
