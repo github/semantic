@@ -184,7 +184,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         setStateFor Reverse f = modify (MyersState . second f . unMyersState)
 
         addFor :: Direction -> a -> [a] -> [a]
-        addFor dir a = case dir of { Forward -> (++ [a]) ; Reverse -> (a :) }
+        addFor dir a = case dir of { Forward -> (<> [a]) ; Reverse -> (a :) }
 
         endpointsFor graph d direction k = do
           here <- findDPath graph d direction k
