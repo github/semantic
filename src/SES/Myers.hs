@@ -4,6 +4,7 @@ module SES.Myers where
 import Control.Exception
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
+import Data.Ix (inRange)
 import Data.String
 import Data.These
 import qualified Data.Vector as Vector
@@ -175,8 +176,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         index v k = if k >= 0 then k else length v + k
 
         inInterval (Distance d) direction (Diagonal k) = case direction of
-          Forward -> k >= (delta - pred d) && k <= (delta + pred d)
-          Reverse -> (k + delta) >= negate d && (k + delta) <= d
+          Forward -> inRange (delta - pred d, delta + pred d) k
+          Reverse -> inRange (negate d, d) (k + delta)
 
         addFor :: Direction -> a -> [a] -> [a]
         addFor dir a = direction dir (<> [a]) (a :)
