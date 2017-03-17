@@ -90,4 +90,4 @@ categoryForTypeScriptName = \case
   "break_statement" -> Break
   "continue_statement" -> Continue
   "yield_expression" -> Yield
-  _ -> Other name
+  name -> Other name
