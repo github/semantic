@@ -153,8 +153,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
     return (v Vector.! i)
 
-  SetK _ direction (Diagonal k) x script ->
-    setStateFor direction (\ v -> v Vector.// [(index v k, (x, script))])
+  SetK _ dir (Diagonal k) x script ->
+    modify (MyersState . direction dir first second set . unMyersState)
+    where set v = v Vector.// [(index v k, (x, script))]
 
   Slide graph dir (Endpoint x y) script
     | x >= 0, x < n
@@ -179,9 +180,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         diagonalFor Forward k = k
         diagonalFor Reverse (Diagonal k) = Diagonal (k + delta)
-
-        setStateFor Forward f = modify (MyersState . first f . unMyersState)
-        setStateFor Reverse f = modify (MyersState . second f . unMyersState)
 
         addFor :: Direction -> a -> [a] -> [a]
         addFor dir a = case dir of { Forward -> (<> [a]) ; Reverse -> (a :) }
