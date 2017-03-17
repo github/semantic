@@ -122,10 +122,10 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Forward . Diagonal)
           <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Reverse . Diagonal)
 
-  SearchAlongK graph d direction k -> do
-    (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d direction (diagonalFor direction k)
-    if shouldTestOn direction && inInterval d direction k && overlaps graph forwardEndpoint reverseEndpoint then
-      return (Just (Snake reverseEndpoint forwardEndpoint, editDistance direction d))
+  SearchAlongK graph d dir k -> do
+    (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d dir (diagonalFor dir k)
+    if direction dir odd even delta && inInterval d dir k && overlaps graph forwardEndpoint reverseEndpoint then
+      return (Just (Snake reverseEndpoint forwardEndpoint, editDistance dir d))
     else
       continue
 
@@ -179,9 +179,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         diagonalFor Forward k = k
         diagonalFor Reverse (Diagonal k) = Diagonal (k + delta)
-
-        shouldTestOn Forward = odd delta
-        shouldTestOn Reverse = even delta
 
         stateFor Forward = fst . unMyersState
         stateFor Reverse = snd . unMyersState
