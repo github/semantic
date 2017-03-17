@@ -90,7 +90,7 @@ styleName category = "category-" <> case category of
   C.Interpolation -> "interpolation"
   C.Subshell -> "subshell"
   C.OperatorAssignment -> "operator_assignment"
-  C.Yield -> "yield_statement"
+  C.Yield -> "yield_expression"
   C.Until -> "until"
   C.Unless -> "unless_statement"
   C.Begin -> "begin_statement"
