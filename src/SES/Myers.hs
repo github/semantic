@@ -144,7 +144,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           addInBounds v i with to = if (d /= 0 || dir == Reverse) && i >= 0 && i < length v then addFor dir (with (v `at` i)) to else to
 
   GetK _ dir (Diagonal k) -> do
-    v <- gets (stateFor dir)
+    v <- gets (direction dir fst snd . unMyersState)
     let i = index v k
     let offset = direction dir 0 delta
     when (i < 0) $
@@ -179,9 +179,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
         diagonalFor Forward k = k
         diagonalFor Reverse (Diagonal k) = Diagonal (k + delta)
-
-        stateFor Forward = fst . unMyersState
-        stateFor Reverse = snd . unMyersState
 
         setStateFor Forward f = modify (MyersState . first f . unMyersState)
         setStateFor Reverse f = modify (MyersState . second f . unMyersState)
