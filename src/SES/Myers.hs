@@ -125,7 +125,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   SearchAlongK graph d dir k -> do
     (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d dir (diagonalFor dir k)
     if direction dir odd even delta && inInterval d dir k && overlaps graph forwardEndpoint reverseEndpoint then
-      return (Just (Snake reverseEndpoint forwardEndpoint, editDistance dir d))
+      return (Just (Snake reverseEndpoint forwardEndpoint, Distance (2 * unDistance d - direction dir 1 0)))
     else
       continue
 
@@ -194,9 +194,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         fail :: (HasCallStack, Monad m) => String -> m a
         fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
           throw (MyersException s callStack)
-
-        editDistance Forward (Distance d) = Distance (2 * d - 1)
-        editDistance Reverse (Distance d) = Distance (2 * d)
 
 
 -- Smart constructors
