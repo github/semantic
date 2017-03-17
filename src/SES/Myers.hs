@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
 module SES.Myers where
 
+import Control.Exception
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
 import Data.String
@@ -8,8 +9,8 @@ import Data.These
 import qualified Data.Vector as Vector
 import GHC.Show
 import GHC.Stack
-import Prologue hiding (for, State)
-import Text.Show
+import Prologue hiding (for, State, error)
+import Text.Show (showListWith)
 
 data MyersF a b result where
   SES :: EditGraph a b -> MyersF a b (EditScript a b)
@@ -32,7 +33,7 @@ data State s a where
   Put :: s -> State s ()
 
 data StepF a b result where
-  M :: MyersF a b c -> StepF a b c
+  M :: HasCallStack => MyersF a b c -> StepF a b c
   S :: State (MyersState a b) c -> StepF a b c
   GetEq :: StepF a b (a -> b -> Bool)
 
@@ -92,7 +93,7 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
 
 
 decompose :: HasCallStack => MyersF a b c -> Myers a b c
-decompose myers = let ?callStack = popCallStack callStack in case myers of
+decompose myers = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack (popCallStack callStack))) in case myers of
   LCS graph
     | null as || null bs -> return []
     | otherwise -> do
@@ -142,7 +143,13 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
-    return (v Vector.! index v k)
+    let i = index v k
+    if i < 0 then
+      throw (MyersException ("negative index " <> Prologue.show i) callStack)
+    else if i >= length v then
+      throw (MyersException ("index " <> Prologue.show i <> "past end of state vector " <> Prologue.show (length v)) callStack)
+    else
+      return (v Vector.! i)
 
   SetK _ direction (Diagonal k) x script ->
     setStateFor direction (\ v -> v Vector.// [(index v k, (x, script))])
@@ -183,6 +190,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         addFor :: Direction -> a -> [a] -> [a]
         addFor dir a = case dir of { Forward -> (<> [a]) ; Reverse -> (a :) }
 
+        endpointsFor :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b (Endpoint, Endpoint)
         endpointsFor graph d direction k = do
           here <- findDPath graph d direction k
           (x, _) <- getK graph (invert direction) k
@@ -330,6 +338,9 @@ liftShowsThese sa sb d t = case t of
 liftShowsEditScript :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> EditScript a b -> ShowS
 liftShowsEditScript sa sb _ = showListWith (liftShowsThese sa sb 0)
 
+data MyersException = MyersException String CallStack
+  deriving (Typeable)
+
 
 -- Instances
 
@@ -362,3 +373,8 @@ instance (Show a, Show b) => Show1 (StepF a b) where
 
 instance (Show a, Show b) => Show (StepF a b c) where
   showsPrec = liftShowsStepF showsPrec showList showsPrec showList
+
+instance Exception MyersException
+
+instance Show MyersException where
+  showsPrec _ (MyersException s c) = showString "Exception: " . showString s . showChar '\n' . showString (prettyCallStack c)
