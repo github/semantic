@@ -93,7 +93,7 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
 
 
 decompose :: HasCallStack => MyersF a b c -> Myers a b c
-decompose myers = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack (popCallStack callStack))) in case myers of
+decompose myers = let ?callStack = popCallStack callStack in case myers of
   LCS graph
     | null as || null bs -> return []
     | otherwise -> do
@@ -145,9 +145,9 @@ decompose myers = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (ge
     v <- gets (stateFor direction)
     let i = index v k
     if i < 0 then
-      throw (MyersException ("negative index " <> Prologue.show i) callStack)
+      fail ("negative index " <> Prologue.show i)
     else if i >= length v then
-      throw (MyersException ("index " <> Prologue.show i <> "past end of state vector " <> Prologue.show (length v)) callStack)
+      fail ("index " <> Prologue.show i <> "past end of state vector " <> Prologue.show (length v))
     else
       return (v Vector.! i)
 
@@ -198,6 +198,10 @@ decompose myers = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (ge
           case direction of
             Forward -> return (here, there)
             Reverse -> return (there, here)
+
+        fail :: (HasCallStack, Monad m) => String -> m a
+        fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
+          throw (MyersException s callStack)
 
         invert Forward = Reverse
         invert Reverse = Forward
