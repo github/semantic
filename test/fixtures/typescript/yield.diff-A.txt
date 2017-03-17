@@ -1,0 +1,11 @@
+{-(Program
+  (ExpressionStatements
+    (Function
+      (Identifier)
+      (ExpressionStatements
+        (VarDecl
+          (VarAssignment
+            (Identifier)
+            (NumberLiteral)))
+        (ExpressionStatements (Yield
+          (Identifier)))))))-}

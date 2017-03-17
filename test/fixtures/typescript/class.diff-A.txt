@@ -1,0 +1,20 @@
+{-(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (Assignment(Identifier)(NumberLiteral))
+      (Method
+        (Identifier)
+        (Identifier)
+        (Return
+          (Identifier)))
+      (Method
+        (Identifier)
+        (Identifier)
+        (Return
+          (Identifier)))
+      (Method
+        (Identifier)
+        (Identifier)
+        (Return
+          (Identifier))))))-}

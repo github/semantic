@@ -1,0 +1,4 @@
+{-(Program
+  (ExpressionStatements
+    (ArrayLiteral
+      (StringLiteral))))-}

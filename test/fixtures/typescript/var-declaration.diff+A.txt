@@ -1,0 +1,5 @@
+{+(Program
+  (VarDecl
+    (VarAssignment
+      (Identifier)
+      (NumberLiteral))))+}

@@ -1,0 +1,12 @@
+{-(Program
+  (ExpressionStatements
+    (Object
+      (Method
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Return
+          (MathOperator
+            (Identifier)
+            (Other "-")
+            (Identifier)))))))-}
