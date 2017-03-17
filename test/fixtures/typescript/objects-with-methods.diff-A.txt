@@ -3,8 +3,11 @@
     (Object
       (Method
         (Identifier)
-        (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier))
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (MathOperator
             (Identifier)

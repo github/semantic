@@ -39,14 +39,14 @@
         (Identifier)
         (Identifier))))+}
   (Import
-    { (StringLiteral) -> (StringLiteral) }
-    {
-    (Other "named_imports"
+  { (StringLiteral)
+  ->(StringLiteral) }
+  { (Other "named_imports"
       (Other "import_specifier"
         (Identifier)))
-    ->
-    (Identifier) }
-    { +(Other "namespace_import" (Identifier))+ })
+  ->(Identifier) }
+  {+(Other "namespace_import"
+      (Identifier))+})
 {+(Import
     (StringLiteral))+}
 {-(Import

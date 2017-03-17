@@ -2,11 +2,16 @@
   (ExpressionStatements
     (Object
       (Method
-      { (Identifier) -> (Identifier) }
-        (Identifier)
-        (Identifier)
+      { (Identifier)
+      ->(Identifier) }
+        (Params
+          (Other "required_parameter"
+            (Identifier))
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (MathOperator
             (Identifier)
-            { (Other "+") -> (Other "-") }
+          { (Other "+")
+          ->(Other "-") }
             (Identifier)))))))

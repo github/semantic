@@ -2,9 +2,13 @@
   (Function
   { (Identifier)
   ->(Identifier) }
-    (Identifier)
-    (Identifier)
+    (Other "required_parameter"
+      (Identifier))
+    (Other "required_parameter"
+      (Identifier))
     (ExpressionStatements
-      (ExpressionStatements (Yield))
-      (ExpressionStatements (Yield
-        (Identifier))))))
+      (ExpressionStatements
+        (Yield))
+      (ExpressionStatements
+        (Yield
+          (Identifier))))))

@@ -2,19 +2,27 @@
   (ExpressionStatements
     (Class
       (Identifier)
-      (Assignment(Identifier)(NumberLiteral))
+      (Other "public_field_definition"
+        (Identifier)
+        (NumberLiteral))
       (Method
         (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier)))
       (Method
         (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier)))
       (Method
         (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier))))))

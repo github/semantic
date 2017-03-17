@@ -1,13 +1,18 @@
 (Program
   (ExpressionStatements
     (Function
-    { (Identifier)
-    ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) }
+      (Params
+        (Other "required_parameter"
+        { (Identifier)
+        ->(Identifier) })
+        (Other "required_parameter"
+          (Identifier)))
       (ExpressionStatements
         (Return
           (MathOperator
-            { (Identifier) -> (Identifier) }
-            { (Other "*") -> (Other "+") }
-            { (Identifier) -> (Identifier) }))))))
+          { (Identifier)
+          ->(Identifier) }
+          { (Other "*")
+          ->(Other "+") }
+          { (Identifier)
+          ->(Identifier) }))))))

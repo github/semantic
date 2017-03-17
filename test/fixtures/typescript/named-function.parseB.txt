@@ -1,6 +1,7 @@
 (Program
   (Function
     (Identifier)
+    (Params)
     (ExpressionStatements
       (Return
         (Boolean)))))

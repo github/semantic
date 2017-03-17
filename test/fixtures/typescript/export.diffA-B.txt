@@ -22,36 +22,33 @@
     (Other "export_specifier"
       (Identifier)))+}
 {+(Export
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier))))+}
+    (Other "variable_declarator"
+      (Identifier))
+    (Other "variable_declarator"
+      (Identifier))
+    (Other "variable_declarator"
+      (Identifier)))+}
 {+(Export
-    (VarAssignment
+    (Other "variable_declarator"
       (Identifier)
       (Identifier))
-    (VarAssignment
+    (Other "variable_declarator"
       (Identifier)
       (Identifier))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier))))+}
+    (Other "variable_declarator"
+      (Identifier))
+    (Other "variable_declarator"
+      (Identifier)))+}
 {+(Export
     (Identifier))+}
 {+(Export
     (Function
       (Identifier)
+      (Params)
       (ExpressionStatements)))+}
 {+(Export
     (Function
+      (Params)
       (ExpressionStatements)))+}
 {+(Export
     (Other "export_specifier"
@@ -72,49 +69,44 @@
     (Other "export_specifier"
     { (Identifier)
     ->(Identifier) }))
-  (Export
-  { +(StringLiteral)+ }
-  {(VarDecl
-    (Other "variable_declarator"
-      (Identifier)))
-  ->
-  (Other "export_specifier"
-    (Identifier)
-    (Identifier))}
-  {(VarDecl
-    (Other "variable_declarator"
-      (Identifier)))
-  ->
-  (Other "export_specifier"
-    (Identifier)
-    (Identifier))}
-  {(VarDecl
-    (Other "variable_declarator"
-      (Identifier)))
-  ->
-  (Other "export_specifier"
-    (Identifier))}  )
+{+(Export
+    (StringLiteral)
+    (Other "export_specifier"
+      (Identifier)
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier)
+      (Identifier))
+    (Other "export_specifier"
+      (Identifier)))+}
 {-(Export
-    (VarAssignment
+    (Other "variable_declarator"
+      (Identifier))
+    (Other "variable_declarator"
+      (Identifier))
+    (Other "variable_declarator"
+      (Identifier)))-}
+{-(Export
+    (Other "variable_declarator"
       (Identifier)
       (Identifier))
-    (VarAssignment
+    (Other "variable_declarator"
       (Identifier)
       (Identifier))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
-    (VarDecl
-      (Other "variable_declarator"
-        (Identifier))))-}
+    (Other "variable_declarator"
+      (Identifier))
+    (Other "variable_declarator"
+      (Identifier)))-}
 {-(Export
     (Identifier))-}
 {-(Export
     (Function
+      (Params)
       (ExpressionStatements)))-}
 {-(Export
     (Function
       (Identifier)
+      (Params)
       (ExpressionStatements)))-}
 {-(Export
     (Other "export_specifier"

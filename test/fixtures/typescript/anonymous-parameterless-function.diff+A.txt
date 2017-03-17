@@ -1,6 +1,7 @@
 {+(Program
   (ExpressionStatements
     (Function
+      (Params)
       (ExpressionStatements
         (Return
           (StringLiteral))))))+}

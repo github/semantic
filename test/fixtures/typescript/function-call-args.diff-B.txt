@@ -5,8 +5,11 @@
       (NumberLiteral)
       (StringLiteral)
       (Function
-        (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier))
+          (Other "required_parameter"
+            (Identifier)))
         (ExpressionStatements
           (ExpressionStatements
             (FunctionCall

@@ -4,7 +4,9 @@
       (Identifier)
       (Identifier)
       (Function
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (ExpressionStatements
           (Return
             (MemberAccess

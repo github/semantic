@@ -1,8 +1,11 @@
 {-(Program
   (ExpressionStatements
     (Function
-      (Identifier)
-      (Identifier)
+      (Params
+        (Other "required_parameter"
+          (Identifier))
+        (Other "required_parameter"
+          (Identifier)))
       (ExpressionStatements
         (Return
           (MathOperator

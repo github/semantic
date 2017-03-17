@@ -2,8 +2,12 @@
   (Function
   { (Identifier)
   ->(Identifier) }
-  {+(Identifier)+}
-  {+(Identifier)+}
+  { (Params)
+  ->(Params
+      (Other "required_parameter"
+        (Identifier))
+      (Other "required_parameter"
+        (Identifier))) }
     (ExpressionStatements
     {+(ExpressionStatements
         (Identifier))+}

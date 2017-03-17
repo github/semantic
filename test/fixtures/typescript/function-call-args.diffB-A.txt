@@ -6,10 +6,12 @@
     { (StringLiteral)
     ->(StringLiteral) }
       (Function
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }
+        (Params
+          (Other "required_parameter"
+          { (Identifier)
+          ->(Identifier) })
+          (Other "required_parameter"
+            (Identifier)))
         (ExpressionStatements
           (ExpressionStatements
             (FunctionCall
