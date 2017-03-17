@@ -156,18 +156,18 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   SetK _ direction (Diagonal k) x script ->
     setStateFor direction (\ v -> v Vector.// [(index v k, (x, script))])
 
-  Slide graph direction (Endpoint x y) script
+  Slide graph dir (Endpoint x y) script
     | x >= 0, x < n
     , y >= 0, y < m -> do
       eq <- getEq
       let a = as `at` x
       let b = bs `at` y
       if a `eq` b
-        then slide graph direction (Endpoint (succ x) (succ y)) (addFor direction (These a b) script)
+        then slide graph dir (Endpoint (succ x) (succ y)) (addFor dir (These a b) script)
         else return (Endpoint x y, script)
     | otherwise -> return (Endpoint x y, script)
     where at :: Vector.Vector a -> Int -> a
-          v `at` i = v Vector.! case direction of { Forward -> i ; Reverse -> length v - succ i }
+          v `at` i = v Vector.! direction dir i (length v - succ i)
 
   where (EditGraph as bs, n, m, maxD, delta) = editGraph myers
 
