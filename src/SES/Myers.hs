@@ -129,21 +129,19 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     else
       continue
 
-  FindDPath graph (Distance d) direction (Diagonal k) -> do
-    (prev, prevScript) <- getK graph direction (Diagonal (pred k))
-    (next, nextScript) <- getK graph direction (Diagonal (succ k))
+  FindDPath graph (Distance d) dir (Diagonal k) -> do
+    (prev, prevScript) <- getK graph dir (Diagonal (pred k))
+    (next, nextScript) <- getK graph dir (Diagonal (succ k))
     let (fromX, fromScript) = if k == negate d || k /= d && prev < next
           then (next,      addInBounds bs (next - succ k) That nextScript) -- downward (insertion)
           else (succ prev, addInBounds as  prev           This prevScript) -- rightward (deletion)
-    (endpoint, script) <- slide graph direction (Endpoint fromX (fromX - k)) fromScript
-    setK graph direction (Diagonal k) (x endpoint) script
-    return $ case direction of
-      Forward -> endpoint
-      Reverse -> Endpoint (n - x endpoint) (m - y endpoint)
+    (endpoint, script) <- slide graph dir (Endpoint fromX (fromX - k)) fromScript
+    setK graph dir (Diagonal k) (x endpoint) script
+    return (direction dir endpoint (Endpoint (n - x endpoint) (m - y endpoint)))
     where at :: Vector.Vector a -> Int -> a
-          v `at` i = v Vector.! case direction of { Forward -> i ; Reverse -> length v - succ i }
+          v `at` i = v Vector.! direction dir i (length v - succ i)
           addInBounds :: Vector.Vector a -> Int -> (a -> b) -> [b] -> [b]
-          addInBounds v i with to = if (d /= 0 || direction == Reverse) && i >= 0 && i < length v then addFor direction (with (v `at` i)) to else to
+          addInBounds v i with to = if (d /= 0 || dir == Reverse) && i >= 0 && i < length v then addFor dir (with (v `at` i)) to else to
 
   GetK _ direction (Diagonal k) -> do
     v <- gets (stateFor direction)
