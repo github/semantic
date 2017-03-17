@@ -179,7 +179,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           Reverse -> (k + delta) >= negate d && (k + delta) <= d
 
         addFor :: Direction -> a -> [a] -> [a]
-        addFor dir a = case dir of { Forward -> (<> [a]) ; Reverse -> (a :) }
+        addFor dir a = direction dir (<> [a]) (a :)
 
         endpointsFor :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b (Endpoint, Endpoint)
         endpointsFor graph d dir k = do
