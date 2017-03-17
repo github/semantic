@@ -57,6 +57,10 @@ data Endpoint = Endpoint { x :: !Int, y :: !Int }
 data Direction = Forward | Reverse
   deriving (Eq, Show)
 
+-- | Eliminate a Direction by selecting the first value for the Forward case and the second value for the Reverse case.
+direction :: Direction -> a -> a -> a
+direction d a b = case d of { Forward -> a ; Reverse -> b }
+
 
 -- Evaluation
 
