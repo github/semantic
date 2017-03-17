@@ -7,7 +7,7 @@ import Data.Functor.Classes
 import Data.String
 import Data.These
 import qualified Data.Vector as Vector
-import GHC.Show
+import GHC.Show hiding (show)
 import GHC.Stack
 import Prologue hiding (for, State, error)
 import Text.Show (showListWith)
@@ -143,13 +143,14 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
           addInBounds :: Vector.Vector a -> Int -> (a -> b) -> [b] -> [b]
           addInBounds v i with to = if (d /= 0 || dir == Reverse) && i >= 0 && i < length v then addFor dir (with (v `at` i)) to else to
 
-  GetK _ direction (Diagonal k) -> do
-    v <- gets (stateFor direction)
+  GetK _ dir (Diagonal k) -> do
+    v <- gets (stateFor dir)
     let i = index v k
+    let offset = direction dir 0 delta
     if i < 0 then
-      fail ("negative index " <> Prologue.show i)
+      fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
     else if i >= length v then
-      fail ("index " <> Prologue.show i <> "past end of state vector " <> Prologue.show (length v))
+      fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
     else
       return (v Vector.! i)
 
