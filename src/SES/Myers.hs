@@ -147,12 +147,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     v <- gets (stateFor dir)
     let i = index v k
     let offset = direction dir 0 delta
-    if i < 0 then
+    when (i < 0) $
       fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
-    else if i >= length v then
+    when (i >= length v) $
       fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
-    else
-      return (v Vector.! i)
+    return (v Vector.! i)
 
   SetK _ direction (Diagonal k) x script ->
     setStateFor direction (\ v -> v Vector.// [(index v k, (x, script))])
