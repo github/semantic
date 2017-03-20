@@ -14,3 +14,6 @@ spec = do
 
     prop "returns deletions in This" $
       \ as -> runMyers (==) (ses (makeEditGraph as [] :: EditGraph Char Char)) `shouldBe` fmap This as
+
+    prop "returns insertions in That" $
+      \ bs -> runMyers (==) (ses (makeEditGraph [] bs :: EditGraph Char Char)) `shouldBe` fmap That bs
