@@ -186,9 +186,10 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       eq <- getEq
       let a = as `at` x
       let b = bs `at` y
-      if a `eq` b
-        then slide graph dir (Endpoint (succ x) (succ y)) (addFor dir (These a b) script)
-        else return (Endpoint x y, script)
+      if a `eq` b then
+        slide graph dir (Endpoint (succ x) (succ y)) (addFor dir (These a b) script)
+      else
+        return (Endpoint x y, script)
     | otherwise -> return (Endpoint x y, script)
     where at :: Vector.Vector a -> Int -> a
           v `at` i = v Vector.! direction dir i (length v - succ i)
