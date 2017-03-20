@@ -134,11 +134,19 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       continue
 
   FindDPath graph (Distance d) dir (Diagonal k) -> do
-    (prev, prevScript) <- getK graph dir (Diagonal (pred k))
-    (next, nextScript) <- getK graph dir (Diagonal (succ k))
-    let (fromX, fromScript) = if k == negate d || k /= d && prev < next
-          then (next,      addInBounds bs (next - succ k) That nextScript) -- downward (insertion)
-          else (succ prev, addInBounds as  prev           This prevScript) -- rightward (deletion)
+    (fromX, fromScript) <- if k == negate d then do
+      (next, nextScript) <- getK graph dir (Diagonal (succ k))
+      return (next,      addInBounds bs (next - succ k) That nextScript) -- downward (insertion)
+    else if k /= d then do
+      (prev, prevScript) <- getK graph dir (Diagonal (pred k))
+      (next, nextScript) <- getK graph dir (Diagonal (succ k))
+      return $ if prev < next then
+        (next,      addInBounds bs (next - succ k) That nextScript) -- downward (insertion)
+      else
+        (succ prev, addInBounds as  prev           This prevScript) -- rightward (deletion)
+    else do
+      (prev, prevScript) <- getK graph dir (Diagonal (pred k))
+      return (succ prev, addInBounds as  prev           This prevScript) -- rightward (deletion)
     (endpoint, script) <- slide graph dir (Endpoint fromX (fromX - k)) fromScript
     setK graph dir (Diagonal k) (x endpoint) script
     return (direction dir endpoint (Endpoint (n - x endpoint) (m - y endpoint)))
