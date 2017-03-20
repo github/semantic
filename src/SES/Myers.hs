@@ -196,7 +196,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         endpointsFor :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b (Endpoint, Endpoint)
         endpointsFor graph d dir k = do
           here <- findDPath graph d dir k
-          (there, _) <- getK graph (direction dir Reverse Forward) k
+          (there, _) <- getK graph (direction dir Reverse Forward) (Diagonal (unDiagonal k + delta))
           return (direction dir (here, there) (there, here))
 
         fail :: (HasCallStack, Monad m) => String -> m a
