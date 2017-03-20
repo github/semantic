@@ -27,6 +27,8 @@ data MyersF a b result where
 
   Slide :: EditGraph a b -> Direction -> Endpoint -> EditScript a b -> MyersF a b (Endpoint, EditScript a b)
 
+  Overlaps :: EditGraph a b -> Endpoint -> Endpoint -> MyersF a b Bool
+
 type EditScript a b = [These a b]
 
 data State s a where
@@ -133,8 +135,12 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   SearchAlongK graph d dir k -> do
     (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d dir k
-    if direction dir odd even delta && inInterval d dir k && overlaps graph forwardEndpoint reverseEndpoint then
-      return (Just (Snake reverseEndpoint forwardEndpoint, Distance (2 * unDistance d - direction dir 1 0)))
+    if direction dir odd even delta && inInterval d dir k then do
+      overlapping <- overlaps graph forwardEndpoint reverseEndpoint
+      if overlapping then
+        return (Just (Snake reverseEndpoint forwardEndpoint, Distance (2 * unDistance d - direction dir 1 0)))
+      else
+        continue
     else
       continue
 
@@ -186,6 +192,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | otherwise -> return (Endpoint x y, script)
     where at :: Vector.Vector a -> Int -> a
           v `at` i = v Vector.! direction dir i (length v - succ i)
+
+  Overlaps _ (Endpoint x y) (Endpoint u v) ->
+    return $ x - y == u - v && n - u <= x
 
   where (EditGraph as bs, n, m, maxD, delta) = editGraph myers
 
@@ -241,6 +250,9 @@ setK graph direction diagonal x script = M (SetK graph direction diagonal x scri
 slide :: HasCallStack => EditGraph a b -> Direction -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
 slide graph direction from script = M (Slide graph direction from script) `Then` return
 
+overlaps :: HasCallStack => EditGraph a b -> Endpoint -> Endpoint -> Myers a b Bool
+overlaps graph forward reverse = M (Overlaps graph forward reverse) `Then` return
+
 getEq :: HasCallStack => Myers a b (a -> b -> Bool)
 getEq = GetEq `Then` return
 
@@ -256,9 +268,6 @@ emptyStateForStep step = case step of
     let (_, _, _, maxD, _) = editGraph myers in
     MyersState (Vector.replicate (succ (maxD * 2)) (0, []), Vector.replicate (succ (maxD * 2)) (0, []))
   _ -> MyersState (Vector.empty, Vector.empty)
-
-overlaps :: EditGraph a b -> Endpoint -> Endpoint -> Bool
-overlaps (EditGraph as _) (Endpoint x y) (Endpoint u v) = x - y == u - v && length as - u <= x
 
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
@@ -289,6 +298,7 @@ editGraph myers = (EditGraph as bs, n, m, (m + n) `ceilDiv` 2, n - m)
           GetK g _ _ -> g
           SetK g _ _ _ _ -> g
           Slide g _ _ _ -> g
+          Overlaps g _ _ -> g
         (n, m) = (length as, length bs)
 
 
@@ -307,6 +317,7 @@ liftShowsMyersF sp1 sl1 sp2 sl2 d m = case m of
   GetK graph direction diagonal -> showsTernaryWith showGraph showsPrec showsPrec "GetK" d graph direction diagonal
   SetK graph direction diagonal v script -> showsQuinaryWith showGraph showsPrec showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d graph direction diagonal v script
   Slide graph direction endpoint script -> showsQuaternaryWith showGraph showsPrec showsPrec (liftShowsEditScript sp1 sp2) "Slide" d graph direction endpoint script
+  Overlaps graph forward reverse -> showsTernaryWith showGraph showsPrec showsPrec "Overlaps" d graph forward reverse
   where showGraph = (liftShowsPrec2 :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> EditGraph a b -> ShowS) sp1 sl1 sp2 sl2
 
 showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
