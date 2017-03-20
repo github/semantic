@@ -148,6 +148,7 @@ test-suite test
                      , InterpreterSpec
                      , PatchOutputSpec
                      , RangeSpec
+                     , SES.Myers.Spec
                      , SourceSpec
                      , TermSpec
                      , TOCSpec
