@@ -134,20 +134,20 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       continue
 
   FindDPath graph (Distance d) dir (Diagonal k) -> do
-    (fromX, fromScript) <- if k == negate d then do
+    (from, fromScript) <- if k == negate d then do
       (Endpoint nextX nextY, nextScript) <- getK graph dir (Diagonal (succ k))
-      return (nextX,     addInBounds bs nextY That nextScript) -- downward (insertion)
+      return (Endpoint nextX (succ nextY),     addInBounds bs nextY That nextScript) -- downward (insertion)
     else if k /= d then do
-      (Endpoint prevX _, prevScript) <- getK graph dir (Diagonal (pred k))
+      (Endpoint prevX prevY, prevScript) <- getK graph dir (Diagonal (pred k))
       (Endpoint nextX nextY, nextScript) <- getK graph dir (Diagonal (succ k))
       return $ if prevX < nextX then
-        (nextX,      addInBounds bs nextY That nextScript) -- downward (insertion)
+        (Endpoint nextX (succ nextY), addInBounds bs nextY That nextScript) -- downward (insertion)
       else
-        (succ prevX, addInBounds as prevX This prevScript) -- rightward (deletion)
+        (Endpoint (succ prevX) prevY, addInBounds as prevX This prevScript) -- rightward (deletion)
     else do
-      (Endpoint prevX _, prevScript) <- getK graph dir (Diagonal (pred k))
-      return (succ prevX, addInBounds as prevX This prevScript) -- rightward (deletion)
-    (endpoint, script) <- slide graph dir (Endpoint fromX (fromX - k)) fromScript
+      (Endpoint prevX prevY, prevScript) <- getK graph dir (Diagonal (pred k))
+      return (Endpoint (succ prevX) prevY, addInBounds as prevX This prevScript) -- rightward (deletion)
+    (endpoint, script) <- slide graph dir from fromScript
     setK graph dir (Diagonal k) (x endpoint) script
     return (direction dir endpoint (Endpoint (n - x endpoint) (m - y endpoint)))
     where at :: Vector.Vector a -> Int -> a
