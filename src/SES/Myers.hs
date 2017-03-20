@@ -22,7 +22,7 @@ data MyersF a b result where
   SearchAlongK :: EditGraph a b -> Distance -> Direction -> Diagonal -> MyersF a b (Maybe (Snake, Distance))
   FindDPath :: EditGraph a b -> Distance -> Direction -> Diagonal -> MyersF a b Endpoint
 
-  GetK :: EditGraph a b -> Direction -> Diagonal -> MyersF a b (Int, EditScript a b)
+  GetK :: EditGraph a b -> Direction -> Diagonal -> MyersF a b (Endpoint, EditScript a b)
   SetK :: EditGraph a b -> Direction -> Diagonal -> Int -> EditScript a b -> MyersF a b ()
 
   Slide :: EditGraph a b -> Direction -> Endpoint -> EditScript a b -> MyersF a b (Endpoint, EditScript a b)
@@ -135,18 +135,18 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   FindDPath graph (Distance d) dir (Diagonal k) -> do
     (fromX, fromScript) <- if k == negate d then do
-      (next, nextScript) <- getK graph dir (Diagonal (succ k))
-      return (next,      addInBounds bs (next - succ k) That nextScript) -- downward (insertion)
+      (Endpoint nextX nextY, nextScript) <- getK graph dir (Diagonal (succ k))
+      return (nextX,     addInBounds bs nextY That nextScript) -- downward (insertion)
     else if k /= d then do
-      (prev, prevScript) <- getK graph dir (Diagonal (pred k))
-      (next, nextScript) <- getK graph dir (Diagonal (succ k))
-      return $ if prev < next then
-        (next,      addInBounds bs (next - succ k) That nextScript) -- downward (insertion)
+      (Endpoint prevX _, prevScript) <- getK graph dir (Diagonal (pred k))
+      (Endpoint nextX nextY, nextScript) <- getK graph dir (Diagonal (succ k))
+      return $ if prevX < nextX then
+        (nextX,      addInBounds bs nextY That nextScript) -- downward (insertion)
       else
-        (succ prev, addInBounds as  prev           This prevScript) -- rightward (deletion)
+        (succ prevX, addInBounds as prevX This prevScript) -- rightward (deletion)
     else do
-      (prev, prevScript) <- getK graph dir (Diagonal (pred k))
-      return (succ prev, addInBounds as  prev           This prevScript) -- rightward (deletion)
+      (Endpoint prevX _, prevScript) <- getK graph dir (Diagonal (pred k))
+      return (succ prevX, addInBounds as prevX This prevScript) -- rightward (deletion)
     (endpoint, script) <- slide graph dir (Endpoint fromX (fromX - k)) fromScript
     setK graph dir (Diagonal k) (x endpoint) script
     return (direction dir endpoint (Endpoint (n - x endpoint) (m - y endpoint)))
@@ -163,7 +163,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
     when (i >= length v) $
       fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
-    return (v Vector.! i)
+    let (x, script) = v Vector.! i in return (Endpoint x (x - k), script)
 
   SetK _ dir (Diagonal k) x script ->
     modify (MyersState . direction dir first second set . unMyersState)
@@ -196,8 +196,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         endpointsFor :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b (Endpoint, Endpoint)
         endpointsFor graph d dir k = do
           here <- findDPath graph d dir k
-          (x, _) <- getK graph (direction dir Reverse Forward) k
-          let there = Endpoint x (x - unDiagonal k)
+          (there, _) <- getK graph (direction dir Reverse Forward) k
           return (direction dir (here, there) (there, here))
 
         fail :: (HasCallStack, Monad m) => String -> m a
@@ -228,7 +227,7 @@ searchAlongK graph d direction k = M (SearchAlongK graph d direction k) `Then` r
 findDPath :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b Endpoint
 findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
 
-getK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Myers a b (Int, EditScript a b)
+getK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Myers a b (Endpoint, EditScript a b)
 getK graph direction diagonal = M (GetK graph direction diagonal) `Then` return
 
 setK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Int -> EditScript a b -> Myers a b ()
