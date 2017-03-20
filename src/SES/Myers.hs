@@ -114,7 +114,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | otherwise -> do
       Just (_, Distance d) <- for [0..maxD] (searchUpToD graph . Distance)
       v <- gets ((if odd d then fst else snd) . unMyersState)
-      return (snd (v Vector.! if odd d then 0 else index v delta))
+      return (snd (v Vector.! index v delta))
 
   EditDistance graph -> unDistance . snd <$> middleSnake graph
 
