@@ -3,7 +3,6 @@ module SES where
 
 import qualified Data.Map as Map
 import Data.These
-import qualified Data.Vector as Vector
 import Prologue
 import qualified SES.Myers as Myers
 
@@ -16,7 +15,7 @@ type Cost term = These term term -> Int
 
 -- | Find the shortest edit script (diff) between two terms given a function to compute the cost.
 ses :: Comparable term -> Cost term -> [term] -> [term] -> [These term term]
-ses canCompare _ as bs = Myers.runMyers canCompare (Myers.ses (Myers.EditGraph (Vector.fromList as) (Vector.fromList bs)))
+ses canCompare _ as bs = Myers.runMyers canCompare (Myers.ses (Myers.makeEditGraph as bs))
 
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
 diffAt :: Comparable term -> Cost term -> (Int, Int) -> [term] -> [term] -> State (Map.Map (Int, Int) [(These term term, Int)]) [(These term term, Int)]
