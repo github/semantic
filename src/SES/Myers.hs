@@ -43,6 +43,9 @@ type Myers a b = Freer (StepF a b)
 data EditGraph a b = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector b) }
   deriving (Eq, Show)
 
+makeEditGraph :: (Foldable t, Foldable u) => t a -> u b -> EditGraph a b
+makeEditGraph as bs = EditGraph (Vector.fromList (toList as)) (Vector.fromList (toList bs))
+
 data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
   deriving (Eq, Show)
 
