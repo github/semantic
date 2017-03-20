@@ -11,3 +11,6 @@ spec = do
   describe "ses" $ do
     prop "returns equal lists in These" $
       \ as -> runMyers (==) (ses (makeEditGraph as as :: EditGraph Char Char)) `shouldBe` zipWith These as as
+
+    prop "returns deletions in This" $
+      \ as -> runMyers (==) (ses (makeEditGraph as [] :: EditGraph Char Char)) `shouldBe` fmap This as
