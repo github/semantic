@@ -19,6 +19,7 @@ import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
 import System.Timeout
+import Text.Regex
 
 newtype GitmonException = GitmonException String deriving (Show, Typeable)
 
@@ -129,6 +130,15 @@ reportGitmon' SocketFactory{..} program gitCommand = do
 
         handleIOException :: IOException -> IO String
         handleIOException _ = pure ""
+
+        readIntFromEnv :: Maybe String -> Maybe Int
+        readIntFromEnv Nothing = Nothing
+        readIntFromEnv (Just s) = Just (readInt $ subRegex regex s "")
+          where regex :: Regex
+                regex = mkRegexWithOpts "uint:" True False
+
+                readInt :: String -> Int
+                readInt s = read s :: Int
 
 withGitmonSocket :: (Socket -> IO c) -> IO c
 withGitmonSocket = bracket connectSocket close
