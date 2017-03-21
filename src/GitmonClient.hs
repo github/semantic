@@ -46,7 +46,9 @@ data ProcessData = ProcessUpdateData { gitDir :: String
                                      , resultCode :: Integer } deriving (Generic, Show)
 
 instance ToJSON ProcessData where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = camelTo2 '_' }
+  toJSON ProcessUpdateData{..} = object [ "git_dir" .= gitDir, "program" .= program, "repo_name" .= repoName, "real_ip" .= realIP, "repo_id" .= repoID, "user_id" .= userID, "via" .= via ]
+  toJSON ProcessScheduleData = object []
+  toJSON ProcessFinishData{..} = object [ "cpu" .= cpu, "disk_read_bytes" .= diskReadBytes, "disk_write_bytes" .= diskWriteBytes, "result_code" .= resultCode ]
 
 
 data GitmonCommand = Update
@@ -61,7 +63,10 @@ data GitmonMsg = GitmonMsg { command :: GitmonCommand
                            , processData :: ProcessData } deriving (Show)
 
 instance ToJSON GitmonMsg where
-  toJSON GitmonMsg{..} = object ["command" .= command, "data" .= processData]
+  toJSON GitmonMsg{..} = case command of
+    Update -> object ["command" .= ("update" :: String), "data" .= processData]
+    Finish -> object ["command" .= ("finish" :: String), "data" .= processData]
+    Schedule -> object ["command" .= ("schedule" :: String)]
 
 
 type ProcInfo = Either Y.ParseException (Maybe ProcIO)
