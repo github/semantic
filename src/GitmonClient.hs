@@ -135,12 +135,17 @@ reportGitmon' SocketFactory{..} program gitCommand = do
 
         readIntFromEnv :: Maybe String -> Maybe Int
         readIntFromEnv Nothing = Nothing
-        readIntFromEnv (Just s) = Just (readInt $ subRegex regex s "")
-          where regex :: Regex
-                regex = mkRegexWithOpts "uint:" True False
+        readIntFromEnv (Just s) = readInt $ matchRegex regex s
+          where
+            -- | Expected format for userID and repoID is: "uint:123",
+            -- | where "uint:" indicates an unsigned integer followed by an integer value.
+            regex :: Regex
+            regex = mkRegex "^uint:([0-9]+)$"
 
-                readInt :: String -> Int
-                readInt s = read s :: Int
+            readInt :: Maybe [String] -> Maybe Int
+            readInt (Just [s]) = Just (read s :: Int)
+            readInt _ = Nothing
+
 
 withGitmonSocket :: (Socket -> IO c) -> IO c
 withGitmonSocket = bracket connectSocket close
