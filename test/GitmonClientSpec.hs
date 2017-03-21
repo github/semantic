@@ -67,6 +67,22 @@ spec = parallel $ do
         liftIO $ shouldSatisfy (either (const (-1)) diskWriteBytes finishData) (>= 0)
         liftIO $ shouldSatisfy (either (const (-1)) resultCode finishData) (>= 0)
 
+        -- | I discovered disabling `parallel` still creates race conditions when testing
+        -- | GitmonClient operations with environment variables, so this test also verifies
+        -- | incorrectly formatted environment variable values are handled correctly.
+
+        -- | Verifying valid prefix but invalid id returns Nothing.
+        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:this_is_not_a_valid_repo_id"
+        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:this_is_not_a_valid_user_id"
+
+        liftIO $ sendAll server "continue"
+        _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
+        info <- liftIO $ recv server 1024
+
+        let [updateData, _, _] = infoToData info
+
+        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) Nothing
+        liftIO $ shouldBe (either (const $ Just 1) userID updateData) Nothing
     it "returns the correct git result if the socket is unavailable" . withSocketPair $ \(client, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ close client
