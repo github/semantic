@@ -73,11 +73,11 @@ reportGitmon = reportGitmon' SocketFactory { withSocket = withGitmonSocket }
 
 reportGitmon' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' SocketFactory{..} program gitCommand = do
-  (gitDir, realIP, repoName) <- liftIO loadEnvVars
+  (gitDir, realIP, repoName, repoID, userID) <- liftIO loadEnvVars
   (startTime, beforeProcIOContents) <- liftIO collectStats
 
   gitmonStatus <- safeIO . timeout gitmonTimeout . withSocket $ \s -> do
-    sendAll s $ processJSON Update (ProcessUpdateData gitDir program realIP repoName "semantic-diff")
+    sendAll s $ processJSON Update (ProcessUpdateData gitDir program realIP repoName repoID userID "semantic-diff")
     sendAll s $ processJSON Schedule ProcessScheduleData
     recv s 1024
 
@@ -117,13 +117,15 @@ reportGitmon' SocketFactory{..} program gitCommand = do
         diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
         resultCode = 0
 
-    loadEnvVars :: IO (String, Maybe String, Maybe String)
+    loadEnvVars :: IO (String, Maybe String, Maybe String, Maybe Int, Maybe Int)
     loadEnvVars = do
       pwd <- safeGetCurrentDirectory
       gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
       realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
       repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
-      pure (gitDir, realIP, repoName)
+      repoID <- lookupEnv "GIT_SOCKSTAT_VAR_repo_id"
+      userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
+      pure (gitDir, realIP, repoName, readIntFromEnv repoID, readIntFromEnv userID)
       where
         safeGetCurrentDirectory :: IO String
         safeGetCurrentDirectory = getCurrentDirectory `catch` handleIOException
