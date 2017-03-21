@@ -108,7 +108,7 @@ reportGitmon' SocketFactory{..} program gitCommand = do
     procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
     procStats beforeTime afterTime beforeProcIOContents afterProcIOContents = ( cpuTime, diskReadBytes, diskWriteBytes, resultCode )
       where
-        cpuTime = toNanoSecs afterTime - toNanoSecs beforeTime
+        cpuTime = toNanoSecs $ afterTime - beforeTime
         beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
         afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
         beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
