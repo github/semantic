@@ -42,6 +42,8 @@ spec = parallel $ do
         liftIO $ setEnv "GIT_DIR" wd
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
+        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:10"
+        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:20"
 
         liftIO $ sendAll server "continue"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
@@ -55,6 +57,8 @@ spec = parallel $ do
         liftIO $ shouldBe (either id program updateData) "cat-file"
         liftIO $ shouldBe (either Just realIP updateData) (Just "127.0.0.1")
         liftIO $ shouldBe (either Just repoName updateData) (Just "examples/all-languages")
+        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) (Just 10)
+        liftIO $ shouldBe (either (const $ Just 1) userID updateData) (Just 20)
         liftIO $ shouldBe (either id via updateData) "semantic-diff"
 
         liftIO $ shouldSatisfy (either (const (-1)) cpu finishData) (>= 0)
@@ -105,7 +109,7 @@ infoToData input = data' . toObject <$> Prelude.take 3 (split '\n' input)
   where data' = parseEither parser
         parser o = do
           dataO <- o .: "data"
-          asum [ ProcessUpdateData <$> (dataO .: "git_dir") <*> (dataO .: "program") <*> (dataO .:? "real_ip") <*> (dataO .:? "repo_name") <*> (dataO .: "via")
+          asum [ ProcessUpdateData <$> (dataO .: "git_dir") <*> (dataO .: "program") <*> (dataO .:? "real_ip") <*> (dataO .:? "repo_name") <*> (dataO .:? "repo_id") <*> (dataO .:? "user_id") <*> (dataO .: "via")
                , ProcessFinishData <$> (dataO .: "cpu") <*> (dataO .: "disk_read_bytes") <*> (dataO .: "disk_write_bytes") <*> (dataO .: "result_code")
                , pure ProcessScheduleData
                ]
