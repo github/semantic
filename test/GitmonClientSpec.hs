@@ -83,6 +83,20 @@ spec = parallel $ do
 
         liftIO $ shouldBe (either (const $ Just 1) repoID updateData) Nothing
         liftIO $ shouldBe (either (const $ Just 1) userID updateData) Nothing
+
+        -- | Verifying valid prefix and mixed id containing invalid characters before a valid ID returns Nothing.
+        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:abc100"
+        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:abc100"
+
+        liftIO $ sendAll server "continue"
+        _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
+        info <- liftIO $ recv server 1024
+
+        let [updateData, _, _] = infoToData info
+
+        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) Nothing
+        liftIO $ shouldBe (either (const $ Just 1) userID updateData) Nothing
+
     it "returns the correct git result if the socket is unavailable" . withSocketPair $ \(client, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ close client
