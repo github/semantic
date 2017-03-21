@@ -174,7 +174,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
     when (i >= length v) $
       fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
-    let (x, script) = v Vector.! i in return (Endpoint x (x - k), script)
+    let (x, script) = v Vector.! i in return (Endpoint x (direction dir (x - k) (x - k + delta)), script)
 
   SetK _ dir (Diagonal k) x script ->
     modify (MyersState . direction dir first second set . unMyersState)
