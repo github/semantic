@@ -35,6 +35,8 @@ data ProcessData = ProcessUpdateData { gitDir :: String
                                      , program :: String
                                      , realIP :: Maybe String
                                      , repoName :: Maybe String
+                                     , repoID :: Maybe Int
+                                     , userID :: Maybe Int
                                      , via :: String }
                  | ProcessScheduleData
                  | ProcessFinishData { cpu :: Integer
