@@ -199,8 +199,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   where (EditGraph as bs, n, m, maxD, delta) = editGraph myers
 
-        index v k = if k >= 0 then k else length v + k
-
         inInterval (Distance d) direction (Diagonal k) = case direction of
           Forward -> inRange (delta - pred d, delta + pred d) k
           Reverse -> inRange (negate d, d) (k + delta)
@@ -278,6 +276,9 @@ continue = return Nothing
 
 ceilDiv :: Integral a => a -> a -> a
 ceilDiv = (uncurry (+) .) . divMod
+
+index :: Vector.Vector a -> Int -> Int
+index v k = if k >= 0 then k else length v + k
 
 divideGraph :: EditGraph a b -> Endpoint -> (EditGraph a b, EditGraph a b)
 divideGraph (EditGraph as bs) (Endpoint x y) =
