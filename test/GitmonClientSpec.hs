@@ -45,6 +45,7 @@ spec = parallel $ do
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:10"
         liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:20"
 
+        -- | Prepares server to tell GitmonClient to "continue"
         liftIO $ sendAll server "continue"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
