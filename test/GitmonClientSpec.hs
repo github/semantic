@@ -20,9 +20,10 @@ import Test.Hspec.Expectations.Pretty
 import Control.Exception
 
 spec :: Spec
-spec = parallel $ do
+spec =
   describe "gitmon" $ do
     let wd = "test/fixtures/git/examples/all-languages.git"
+
     it "receives commands in order" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ sendAll server "continue"
@@ -32,96 +33,122 @@ spec = parallel $ do
 
         let [update, schedule, finish] = infoToCommands info
 
-        liftIO $ shouldBe (commitOid commit) object
-        liftIO $ shouldBe update (Just "update")
-        liftIO $ shouldBe schedule (Just "schedule")
-        liftIO $ shouldBe finish (Just "finish")
+        liftIO $ do
+          shouldBe (commitOid commit) object
+          shouldBe update (Just "update")
+          shouldBe schedule (Just "schedule")
+          shouldBe finish (Just "finish")
 
     it "receives update command with correct data" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
-        liftIO $ setEnv "GIT_DIR" wd
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:10"
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:20"
+        liftIO $ do
+          setEnv "GIT_DIR" wd
+          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
+          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
+          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:10"
+          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:20"
+          sendAll server "continue"
 
-        -- | Prepares server to tell GitmonClient to "continue"
-        liftIO $ sendAll server "continue"
         object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [updateData, _, finishData] = infoToData info
 
-        liftIO $ shouldBe (commitOid commit) object
-        liftIO $ shouldBe (either id gitDir updateData) wd
-        liftIO $ shouldBe (either id program updateData) "cat-file"
-        liftIO $ shouldBe (either Just realIP updateData) (Just "127.0.0.1")
-        liftIO $ shouldBe (either Just repoName updateData) (Just "examples/all-languages")
-        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) (Just 10)
-        liftIO $ shouldBe (either (const $ Just 1) userID updateData) (Just 20)
-        liftIO $ shouldBe (either id via updateData) "semantic-diff"
+        liftIO $ do
+          shouldBe (commitOid commit) object
+          shouldBe (either id gitDir updateData) wd
+          shouldBe (either id program updateData) "cat-file"
+          shouldBe (either Just realIP updateData) (Just "127.0.0.1")
+          shouldBe (either Just repoName updateData) (Just "examples/all-languages")
+          shouldBe (either (const $ Just 1) repoID updateData) (Just 10)
+          shouldBe (either (const $ Just 1) userID updateData) (Just 20)
+          shouldBe (either id via updateData) "semantic-diff"
 
-        liftIO $ shouldSatisfy (either (const (-1)) cpu finishData) (>= 0)
-        liftIO $ shouldSatisfy (either (const (-1)) diskReadBytes finishData) (>= 0)
-        liftIO $ shouldSatisfy (either (const (-1)) diskWriteBytes finishData) (>= 0)
-        liftIO $ shouldSatisfy (either (const (-1)) resultCode finishData) (>= 0)
+          shouldSatisfy (either (const (-1)) cpu finishData) (>= 0)
+          shouldSatisfy (either (const (-1)) diskReadBytes finishData) (>= 0)
+          shouldSatisfy (either (const (-1)) diskWriteBytes finishData) (>= 0)
+          shouldSatisfy (either (const (-1)) resultCode finishData) (>= 0)
 
-        -- | I discovered disabling `parallel` still creates race conditions when testing
-        -- | GitmonClient operations with environment variables, so this test also verifies
-        -- | incorrectly formatted environment variable values are handled correctly.
+    it "reads Nothing for user_id and repo_id when valid prefix but invalid value" . withSocketPair $ \(_, server, socketFactory) ->
+      withRepository lgFactory wd $ do
+        liftIO $ do
+          setEnv "GIT_DIR" wd
+          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
+          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
+          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:not_valid"
+          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:not_valid"
+          sendAll server "continue"
 
-        -- | Verifying valid prefix but invalid id returns Nothing.
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:this_is_not_a_valid_repo_id"
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:this_is_not_a_valid_user_id"
-
-        liftIO $ sendAll server "continue"
+        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [updateData, _, _] = infoToData info
 
-        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) Nothing
-        liftIO $ shouldBe (either (const $ Just 1) userID updateData) Nothing
+        liftIO $ do
+          shouldBe (either (const $ Just 1) repoID updateData) Nothing
+          shouldBe (either (const $ Just 1) userID updateData) Nothing
 
-        -- | Verifying valid prefix and mixed id containing invalid characters before a valid ID returns Nothing.
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:abc100"
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:abc100"
+    it "reads Nothing for user_id and repo_id when valid prefix but value is preceeded by invalid chars" . withSocketPair $ \(_, server, socketFactory) ->
+      withRepository lgFactory wd $ do
+        liftIO $ do
+          setEnv "GIT_DIR" wd
+          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
+          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
+          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:abc100"
+          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:abc100"
+          sendAll server "continue"
 
-        liftIO $ sendAll server "continue"
+        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [updateData, _, _] = infoToData info
 
-        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) Nothing
-        liftIO $ shouldBe (either (const $ Just 1) userID updateData) Nothing
+        liftIO $ do
+          shouldBe (either (const $ Just 1) repoID updateData) Nothing
+          shouldBe (either (const $ Just 1) userID updateData) Nothing
 
-        -- | Verifying valid prefix and mixed id containing invalid characters after a valid ID returns Nothing.
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:10abc"
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:20abc"
+    it "reads Nothing for user_id and repo_id when valid prefix but value is proceeded by invalid chars" . withSocketPair $ \(_, server, socketFactory) ->
+      withRepository lgFactory wd $ do
+        liftIO $ do
+          setEnv "GIT_DIR" wd
+          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
+          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
+          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:100abc"
+          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:100abc"
+          sendAll server "continue"
 
-        liftIO $ sendAll server "continue"
+        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [updateData, _, _] = infoToData info
 
-        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) Nothing
-        liftIO $ shouldBe (either (const $ Just 1) userID updateData) Nothing
+        liftIO $ do
+          shouldBe (either (const $ Just 1) repoID updateData) Nothing
+          shouldBe (either (const $ Just 1) userID updateData) Nothing
 
-        -- | Verifying invalid prefix and valid ID returns Nothing.
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_repo_id" "10"
-        liftIO $ setEnv "GIT_SOCKSTAT_VAR_user_id" "20"
+    it "reads Nothing for user_id and repo_id when missing prefix but value is valid" . withSocketPair $ \(_, server, socketFactory) ->
+      withRepository lgFactory wd $ do
+        liftIO $ do
+          setEnv "GIT_DIR" wd
+          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
+          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
+          setEnv "GIT_SOCKSTAT_VAR_repo_id" "100"
+          setEnv "GIT_SOCKSTAT_VAR_user_id" "100"
+          sendAll server "continue"
 
-        liftIO $ sendAll server "continue"
+        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
         let [updateData, _, _] = infoToData info
 
-        liftIO $ shouldBe (either (const $ Just 1) repoID updateData) Nothing
-        liftIO $ shouldBe (either (const $ Just 1) userID updateData) Nothing
+        liftIO $ do
+          shouldBe (either (const $ Just 1) repoID updateData) Nothing
+          shouldBe (either (const $ Just 1) userID updateData) Nothing
 
     it "returns the correct git result if the socket is unavailable" . withSocketPair $ \(client, server, socketFactory) ->
       withRepository lgFactory wd $ do
