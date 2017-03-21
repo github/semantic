@@ -5,6 +5,6 @@
     (Identifier)
     (Identifier)
     (ExpressionStatements
-      (Yield)
-      (Yield
-        (Identifier)))))
+      (ExpressionStatements (Yield))
+      (ExpressionStatements (Yield
+        (Identifier))))))
