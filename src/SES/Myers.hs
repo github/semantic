@@ -18,7 +18,7 @@ data MyersF a b result where
   EditDistance :: EditGraph a b -> MyersF a b Int
   SearchUpToD :: EditGraph a b -> Distance -> MyersF a b (Maybe (EditScript a b, Distance))
   SearchAlongK :: EditGraph a b -> Distance -> Diagonal -> MyersF a b (Maybe (EditScript a b, Distance))
-  FindDPath :: EditGraph a b -> Distance -> Diagonal -> MyersF a b Endpoint
+  MoveFromAdjacent :: EditGraph a b -> Distance -> Diagonal -> MyersF a b Endpoint
 
   GetK :: EditGraph a b -> Diagonal -> MyersF a b (Endpoint, EditScript a b)
   SetK :: EditGraph a b -> Diagonal -> Int -> EditScript a b -> MyersF a b ()
@@ -110,14 +110,14 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   SearchUpToD graph (Distance d) -> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
 
   SearchAlongK graph d k -> if negate m > unDiagonal k || unDiagonal k > n then continue else do
-    Endpoint x y <- findDPath graph d k
+    Endpoint x y <- moveFromAdjacent graph d k
     if x >= n && y >= m then do
       (_, script) <- getK graph k
       return (Just (script, d))
     else
       continue
 
-  FindDPath graph (Distance d) (Diagonal k) -> do
+  MoveFromAdjacent graph (Distance d) (Diagonal k) -> do
     (from, fromScript) <- if d == 0 then
       return (Endpoint 0 0, [])
     else if k == negate d then do
@@ -191,8 +191,8 @@ searchUpToD graph distance = M (SearchUpToD graph distance) `Then` return
 searchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
 searchAlongK graph d k = M (SearchAlongK graph d k) `Then` return
 
-findDPath :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b Endpoint
-findDPath graph d k = M (FindDPath graph d k) `Then` return
+moveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b Endpoint
+moveFromAdjacent graph d k = M (MoveFromAdjacent graph d k) `Then` return
 
 getK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint, EditScript a b)
 getK graph diagonal = M (GetK graph diagonal) `Then` return
@@ -243,7 +243,7 @@ editGraph myers = (EditGraph as bs, n, m)
           EditDistance g -> g
           SearchUpToD g _ -> g
           SearchAlongK g _ _ -> g
-          FindDPath g _ _ -> g
+          MoveFromAdjacent g _ _ -> g
           GetK g _ -> g
           SetK g _ _ _ -> g
           Slide g _ _ -> g
@@ -260,7 +260,7 @@ liftShowsMyersF sp1 sl1 sp2 sl2 d m = case m of
   EditDistance graph -> showsUnaryWith showGraph "EditDistance" d graph
   SearchUpToD graph distance -> showsBinaryWith showGraph showsPrec "SearchUpToD" d graph distance
   SearchAlongK graph distance diagonal -> showsTernaryWith showGraph showsPrec showsPrec "SearchAlongK" d graph distance diagonal
-  FindDPath graph distance diagonal -> showsTernaryWith showGraph showsPrec showsPrec "FindDPath" d graph distance diagonal
+  MoveFromAdjacent graph distance diagonal -> showsTernaryWith showGraph showsPrec showsPrec "MoveFromAdjacent" d graph distance diagonal
   GetK graph diagonal -> showsBinaryWith showGraph showsPrec "GetK" d graph diagonal
   SetK graph diagonal v script -> showsQuaternaryWith showGraph showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d graph diagonal v script
   Slide graph endpoint script -> showsTernaryWith showGraph showsPrec (liftShowsEditScript sp1 sp2) "Slide" d graph endpoint script
