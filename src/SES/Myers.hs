@@ -122,22 +122,20 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       return (Endpoint 0 0, [])
     else if k == negate d then do
       (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
-      return (Endpoint nextX (succ nextY),     addInBounds bs nextY That nextScript) -- downward (insertion)
+      return (Endpoint nextX (succ nextY),     That (bs Vector.! nextY) : nextScript) -- downward (insertion)
     else if k /= d then do
       (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
       (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
       return $ if prevX < nextX then
-        (Endpoint nextX (succ nextY), addInBounds bs nextY That nextScript) -- downward (insertion)
+        (Endpoint nextX (succ nextY), That (bs Vector.! nextY) : nextScript) -- downward (insertion)
       else
-        (Endpoint (succ prevX) prevY, addInBounds as prevX This prevScript) -- rightward (deletion)
+        (Endpoint (succ prevX) prevY, This (as Vector.! prevX) : prevScript) -- rightward (deletion)
     else do
       (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
-      return (Endpoint (succ prevX) prevY, addInBounds as prevX This prevScript) -- rightward (deletion)
+      return (Endpoint (succ prevX) prevY, This (as Vector.! prevX) : prevScript) -- rightward (deletion)
     (endpoint, script) <- slide graph from fromScript
     setK graph (Diagonal k) (x endpoint) script
     return endpoint
-    where addInBounds :: Vector.Vector a -> Int -> (a -> b) -> [b] -> [b]
-          addInBounds v i with to = if i >= 0 && i < length v then with (v Vector.! i) : to else to
 
   GetK _ (Diagonal k) -> do
     v <- gets unMyersState
