@@ -100,7 +100,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | null bs -> return (This <$> toList as)
     | null as -> return (That <$> toList bs)
     | otherwise -> do
-      result <- for [0..maxD] (searchUpToD graph . Distance)
+      result <- for [0..(m + n)] (searchUpToD graph . Distance)
       case result of
         Just (script, _) -> return script
         _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
@@ -143,9 +143,9 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     v <- gets unMyersState
     let i = index v k
     when (i < 0) $
-      fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate maxD) <> ".." <> show maxD <> " (0.." <> show (2 * maxD) <> ")")
+      fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
     when (i >= length v) $
-      fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD) <> ".." <> show maxD <> " (0.." <> show (2 * maxD) <> ")")
+      fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
     let (x, script) = v Vector.! i in return (Endpoint x (x - k), script)
 
   SetK _ (Diagonal k) x script ->
@@ -164,7 +164,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         return (Endpoint x y, script)
     | otherwise -> return (Endpoint x y, script)
 
-  where (EditGraph as bs, n, m, maxD) = editGraph myers
+  where (EditGraph as bs, n, m) = editGraph myers
 
         fail :: (HasCallStack, Monad m) => String -> m a
         fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
@@ -212,7 +212,7 @@ newtype MyersState a b = MyersState { unMyersState :: Vector.Vector (Int, EditSc
 emptyStateForStep :: Myers a b c -> MyersState a b
 emptyStateForStep step = case step of
   Then (M myers) _ ->
-    let (_, n, m, _) = editGraph myers in
+    let (_, n, m) = editGraph myers in
     MyersState (Vector.replicate (succ (m + n)) (0, []))
   _ -> MyersState Vector.empty
 
@@ -221,9 +221,6 @@ for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 
 continue :: Myers b c (Maybe a)
 continue = return Nothing
-
-ceilDiv :: Integral a => a -> a -> a
-ceilDiv = (uncurry (+) .) . divMod
 
 index :: Vector.Vector a -> Int -> Int
 index v k = if k >= 0 then k else length v + k
@@ -235,8 +232,8 @@ divideGraph (EditGraph as bs) (Endpoint x y) =
   where slice from to v = Vector.slice (max 0 (min from (length v))) (max 0 (min to (length v))) v
 
 
-editGraph :: MyersF a b c -> (EditGraph a b, Int, Int, Int)
-editGraph myers = (EditGraph as bs, n, m, (m + n) `ceilDiv` 2)
+editGraph :: MyersF a b c -> (EditGraph a b, Int, Int)
+editGraph myers = (EditGraph as bs, n, m)
   where EditGraph as bs = case myers of
           SES g -> g
           LCS g -> g
