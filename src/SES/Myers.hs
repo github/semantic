@@ -122,17 +122,17 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       return (Endpoint 0 0, [])
     else if k == negate d then do
       (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
-      return (Endpoint nextX (succ nextY),     That (bs Vector.! nextY) : nextScript) -- downward (insertion)
+      return (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
     else if k /= d then do
       (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
       (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
       return $ if prevX < nextX then
-        (Endpoint nextX (succ nextY), That (bs Vector.! nextY) : nextScript) -- downward (insertion)
+        (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
       else
-        (Endpoint (succ prevX) prevY, This (as Vector.! prevX) : prevScript) -- rightward (deletion)
+        (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
     else do
       (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
-      return (Endpoint (succ prevX) prevY, This (as Vector.! prevX) : prevScript) -- rightward (deletion)
+      return (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
     (endpoint, script) <- slide graph from fromScript
     setK graph (Diagonal k) (x endpoint) script
     return endpoint
@@ -163,6 +163,11 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | otherwise -> return (Endpoint x y, script)
 
   where (EditGraph as bs, n, m) = editGraph myers
+
+        (!) :: HasCallStack => Vector.Vector a -> Int -> a
+        v ! i | i < length v = v Vector.! i
+              | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
+                  throw (MyersException ("index " <> show i <> " out of bounds") callStack)
 
         fail :: (HasCallStack, Monad m) => String -> m a
         fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
