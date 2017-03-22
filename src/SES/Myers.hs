@@ -212,8 +212,8 @@ newtype MyersState a b = MyersState { unMyersState :: Vector.Vector (Int, EditSc
 emptyStateForStep :: Myers a b c -> MyersState a b
 emptyStateForStep step = case step of
   Then (M myers) _ ->
-    let (_, _, _, maxD) = editGraph myers in
-    MyersState (Vector.replicate (succ (maxD * 2)) (0, []))
+    let (_, n, m, _) = editGraph myers in
+    MyersState (Vector.replicate (succ (m + n)) (0, []))
   _ -> MyersState Vector.empty
 
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
