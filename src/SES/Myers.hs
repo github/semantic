@@ -4,7 +4,6 @@ module SES.Myers where
 import Control.Exception
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
-import Data.Ix (inRange)
 import Data.String
 import Data.These
 import qualified Data.Vector as Vector
@@ -17,17 +16,14 @@ data MyersF a b result where
   SES :: EditGraph a b -> MyersF a b (EditScript a b)
   LCS :: EditGraph a b -> MyersF a b [(a, b)]
   EditDistance :: EditGraph a b -> MyersF a b Int
-  MiddleSnake :: EditGraph a b -> MyersF a b (Snake, Distance)
-  SearchUpToD :: EditGraph a b -> Distance -> MyersF a b (Maybe (Snake, Distance))
-  SearchAlongK :: EditGraph a b -> Distance -> Direction -> Diagonal -> MyersF a b (Maybe (Snake, Distance))
-  FindDPath :: EditGraph a b -> Distance -> Direction -> Diagonal -> MyersF a b Endpoint
+  SearchUpToD :: EditGraph a b -> Distance -> MyersF a b (Maybe (EditScript a b, Distance))
+  SearchAlongK :: EditGraph a b -> Distance -> Diagonal -> MyersF a b (Maybe (EditScript a b, Distance))
+  FindDPath :: EditGraph a b -> Distance -> Diagonal -> MyersF a b Endpoint
 
-  GetK :: EditGraph a b -> Direction -> Diagonal -> MyersF a b (Endpoint, EditScript a b)
-  SetK :: EditGraph a b -> Direction -> Diagonal -> Int -> EditScript a b -> MyersF a b ()
+  GetK :: EditGraph a b -> Diagonal -> MyersF a b (Endpoint, EditScript a b)
+  SetK :: EditGraph a b -> Diagonal -> Int -> EditScript a b -> MyersF a b ()
 
-  Slide :: EditGraph a b -> Direction -> Endpoint -> EditScript a b -> MyersF a b (Endpoint, EditScript a b)
-
-  Overlaps :: EditGraph a b -> Endpoint -> Endpoint -> MyersF a b Bool
+  Slide :: EditGraph a b -> Endpoint -> EditScript a b -> MyersF a b (Endpoint, EditScript a b)
 
 type EditScript a b = [These a b]
 
@@ -48,9 +44,6 @@ data EditGraph a b = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector
 makeEditGraph :: (Foldable t, Foldable u) => t a -> u b -> EditGraph a b
 makeEditGraph as bs = EditGraph (Vector.fromList (toList as)) (Vector.fromList (toList bs))
 
-data Snake = Snake { xy :: Endpoint, uv :: Endpoint }
-  deriving (Eq, Show)
-
 newtype Distance = Distance { unDistance :: Int }
   deriving (Eq, Show)
 
@@ -59,13 +52,6 @@ newtype Diagonal = Diagonal { unDiagonal :: Int }
 
 data Endpoint = Endpoint { x :: !Int, y :: !Int }
   deriving (Eq, Show)
-
-data Direction = Forward | Reverse
-  deriving (Eq, Show)
-
--- | Eliminate a Direction by selecting the first value for the Forward case and the second value for the Reverse case.
-direction :: Direction -> a -> a -> a
-direction d a b = case d of { Forward -> a ; Reverse -> b }
 
 
 -- Evaluation
@@ -116,101 +102,69 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | otherwise -> do
       result <- for [0..maxD] (searchUpToD graph . Distance)
       case result of
-        Just (_, Distance d) -> do
-          v <- gets ((if odd d then fst else snd) . unMyersState)
-          return (snd (v Vector.! index v delta))
-        _ -> fail "no middle snake found in edit graph."
+        Just (script, _) -> return script
+        _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
 
-  EditDistance graph -> unDistance . snd <$> middleSnake graph
+  EditDistance graph -> length . filter (these (const True) (const True) (const (const False))) <$> ses graph
 
-  MiddleSnake graph -> do
-    result <- for [0..maxD] (searchUpToD graph . Distance)
-    case result of
-      Just result -> return result
-      _ -> fail "no middle snake found in edit graph."
+  SearchUpToD graph (Distance d) -> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
 
-  SearchUpToD graph (Distance d) ->
-    (<|>) <$> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Forward . Diagonal)
-          <*> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) Reverse . Diagonal)
-
-  SearchAlongK graph d dir k -> do
-    (forwardEndpoint, reverseEndpoint) <- endpointsFor graph d dir k
-    if direction dir odd even delta && inInterval d dir k then do
-      overlapping <- overlaps graph forwardEndpoint reverseEndpoint
-      if overlapping then
-        return (Just (Snake reverseEndpoint forwardEndpoint, Distance (2 * unDistance d - direction dir 1 0)))
-      else
-        continue
+  SearchAlongK graph d k -> do
+    Endpoint x y <- findDPath graph d k
+    if x >= n && y >= m then do
+      (_, script) <- getK graph k
+      return (Just (script, d))
     else
       continue
 
-  FindDPath graph (Distance d) dir (Diagonal k) -> do
-    (from, fromScript) <- if k == negate d then do
-      (Endpoint nextX nextY, nextScript) <- getK graph dir (Diagonal (succ k))
+  FindDPath graph (Distance d) (Diagonal k) -> do
+    (from, fromScript) <- if d == 0 then
+      return (Endpoint 0 0, [])
+    else if k == negate d then do
+      (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
       return (Endpoint nextX (succ nextY),     addInBounds bs nextY That nextScript) -- downward (insertion)
     else if k /= d then do
-      (Endpoint prevX prevY, prevScript) <- getK graph dir (Diagonal (pred k))
-      (Endpoint nextX nextY, nextScript) <- getK graph dir (Diagonal (succ k))
+      (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
+      (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
       return $ if prevX < nextX then
         (Endpoint nextX (succ nextY), addInBounds bs nextY That nextScript) -- downward (insertion)
       else
         (Endpoint (succ prevX) prevY, addInBounds as prevX This prevScript) -- rightward (deletion)
     else do
-      (Endpoint prevX prevY, prevScript) <- getK graph dir (Diagonal (pred k))
+      (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
       return (Endpoint (succ prevX) prevY, addInBounds as prevX This prevScript) -- rightward (deletion)
-    (endpoint, script) <- slide graph dir from fromScript
-    setK graph dir (Diagonal k) (x endpoint) script
-    return (direction dir endpoint (Endpoint (n - x endpoint) (m - y endpoint)))
-    where at :: Vector.Vector a -> Int -> a
-          v `at` i = v Vector.! direction dir i (length v - succ i)
-          addInBounds :: Vector.Vector a -> Int -> (a -> b) -> [b] -> [b]
-          addInBounds v i with to = if (d /= 0 || dir == Reverse) && i >= 0 && i < length v then addFor dir (with (v `at` i)) to else to
+    (endpoint, script) <- slide graph from fromScript
+    setK graph (Diagonal k) (x endpoint) script
+    return endpoint
+    where addInBounds :: Vector.Vector a -> Int -> (a -> b) -> [b] -> [b]
+          addInBounds v i with to = if i >= 0 && i < length v then with (v Vector.! i) : to else to
 
-  GetK _ dir (Diagonal k) -> do
-    v <- gets (direction dir fst snd . unMyersState)
+  GetK _ (Diagonal k) -> do
+    v <- gets unMyersState
     let i = index v k
-    let offset = direction dir 0 delta
     when (i < 0) $
-      fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
+      fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate maxD) <> ".." <> show maxD <> " (0.." <> show (2 * maxD) <> ")")
     when (i >= length v) $
-      fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD + offset) <> ".." <> show (maxD + offset) <> " (0.." <> show (2 * maxD) <> ")")
-    let (x, script) = v Vector.! i in return (Endpoint x (direction dir (x - k) (x - k + delta)), script)
+      fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate maxD) <> ".." <> show maxD <> " (0.." <> show (2 * maxD) <> ")")
+    let (x, script) = v Vector.! i in return (Endpoint x (x - k), script)
 
-  SetK _ dir (Diagonal k) x script ->
-    modify (MyersState . direction dir first second set . unMyersState)
+  SetK _ (Diagonal k) x script ->
+    modify (MyersState . set . unMyersState)
     where set v = v Vector.// [(index v k, (x, script))]
 
-  Slide graph dir (Endpoint x y) script
+  Slide graph (Endpoint x y) script
     | x >= 0, x < n
     , y >= 0, y < m -> do
       eq <- getEq
-      let a = as `at` x
-      let b = bs `at` y
+      let a = as Vector.! x
+      let b = bs Vector.! y
       if a `eq` b then
-        slide graph dir (Endpoint (succ x) (succ y)) (addFor dir (These a b) script)
+        slide graph (Endpoint (succ x) (succ y)) (These a b : script)
       else
         return (Endpoint x y, script)
     | otherwise -> return (Endpoint x y, script)
-    where at :: Vector.Vector a -> Int -> a
-          v `at` i = v Vector.! direction dir i (length v - succ i)
 
-  Overlaps _ (Endpoint x y) (Endpoint u v) ->
-    return $ x - y == u - v && n - u <= x
-
-  where (EditGraph as bs, n, m, maxD, delta) = editGraph myers
-
-        inInterval (Distance d) direction (Diagonal k) = case direction of
-          Forward -> inRange (delta - pred d, delta + pred d) k
-          Reverse -> inRange (negate d, d) (k + delta)
-
-        addFor :: Direction -> a -> [a] -> [a]
-        addFor dir a = direction dir (<> [a]) (a :)
-
-        endpointsFor :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b (Endpoint, Endpoint)
-        endpointsFor graph d dir k = do
-          here <- findDPath graph d dir k
-          (there, _) <- getK graph (direction dir Reverse Forward) (Diagonal (unDiagonal k + delta))
-          return (direction dir (here, there) (there, here))
+  where (EditGraph as bs, n, m, maxD) = editGraph myers
 
         fail :: (HasCallStack, Monad m) => String -> m a
         fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
@@ -228,29 +182,23 @@ lcs graph = M (LCS graph) `Then` return
 editDistance :: HasCallStack => EditGraph a b -> Myers a b Int
 editDistance graph = M (EditDistance graph) `Then` return
 
-middleSnake :: HasCallStack => EditGraph a b -> Myers a b (Snake, Distance)
-middleSnake graph = M (MiddleSnake graph) `Then` return
-
-searchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (Snake, Distance))
+searchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (EditScript a b, Distance))
 searchUpToD graph distance = M (SearchUpToD graph distance) `Then` return
 
-searchAlongK :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b (Maybe (Snake, Distance))
-searchAlongK graph d direction k = M (SearchAlongK graph d direction k) `Then` return
+searchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
+searchAlongK graph d k = M (SearchAlongK graph d k) `Then` return
 
-findDPath :: HasCallStack => EditGraph a b -> Distance -> Direction -> Diagonal -> Myers a b Endpoint
-findDPath graph d direction k = M (FindDPath graph d direction k) `Then` return
+findDPath :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b Endpoint
+findDPath graph d k = M (FindDPath graph d k) `Then` return
 
-getK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Myers a b (Endpoint, EditScript a b)
-getK graph direction diagonal = M (GetK graph direction diagonal) `Then` return
+getK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint, EditScript a b)
+getK graph diagonal = M (GetK graph diagonal) `Then` return
 
-setK :: HasCallStack => EditGraph a b -> Direction -> Diagonal -> Int -> EditScript a b -> Myers a b ()
-setK graph direction diagonal x script = M (SetK graph direction diagonal x script) `Then` return
+setK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
+setK graph diagonal x script = M (SetK graph diagonal x script) `Then` return
 
-slide :: HasCallStack => EditGraph a b -> Direction -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
-slide graph direction from script = M (Slide graph direction from script) `Then` return
-
-overlaps :: HasCallStack => EditGraph a b -> Endpoint -> Endpoint -> Myers a b Bool
-overlaps graph forward reverse = M (Overlaps graph forward reverse) `Then` return
+slide :: HasCallStack => EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
+slide graph from script = M (Slide graph from script) `Then` return
 
 getEq :: HasCallStack => Myers a b (a -> b -> Bool)
 getEq = GetEq `Then` return
@@ -258,15 +206,15 @@ getEq = GetEq `Then` return
 
 -- Implementation details
 
-newtype MyersState a b = MyersState { unMyersState :: (Vector.Vector (Int, EditScript a b), Vector.Vector (Int, EditScript a b)) }
+newtype MyersState a b = MyersState { unMyersState :: Vector.Vector (Int, EditScript a b) }
   deriving (Eq, Show)
 
 emptyStateForStep :: Myers a b c -> MyersState a b
 emptyStateForStep step = case step of
   Then (M myers) _ ->
-    let (_, _, _, maxD, _) = editGraph myers in
-    MyersState (Vector.replicate (succ (maxD * 2)) (0, []), Vector.replicate (succ (maxD * 2)) (0, []))
-  _ -> MyersState (Vector.empty, Vector.empty)
+    let (_, _, _, maxD) = editGraph myers in
+    MyersState (Vector.replicate (succ (maxD * 2)) (0, []))
+  _ -> MyersState Vector.empty
 
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
@@ -287,20 +235,18 @@ divideGraph (EditGraph as bs) (Endpoint x y) =
   where slice from to v = Vector.slice (max 0 (min from (length v))) (max 0 (min to (length v))) v
 
 
-editGraph :: MyersF a b c -> (EditGraph a b, Int, Int, Int, Int)
-editGraph myers = (EditGraph as bs, n, m, (m + n) `ceilDiv` 2, n - m)
+editGraph :: MyersF a b c -> (EditGraph a b, Int, Int, Int)
+editGraph myers = (EditGraph as bs, n, m, (m + n) `ceilDiv` 2)
   where EditGraph as bs = case myers of
           SES g -> g
           LCS g -> g
           EditDistance g -> g
-          MiddleSnake g -> g
           SearchUpToD g _ -> g
-          SearchAlongK g _ _ _ -> g
-          FindDPath g _ _ _ -> g
-          GetK g _ _ -> g
-          SetK g _ _ _ _ -> g
-          Slide g _ _ _ -> g
-          Overlaps g _ _ -> g
+          SearchAlongK g _ _ -> g
+          FindDPath g _ _ -> g
+          GetK g _ -> g
+          SetK g _ _ _ -> g
+          Slide g _ _ -> g
         (n, m) = (length as, length bs)
 
 
@@ -312,14 +258,12 @@ liftShowsMyersF sp1 sl1 sp2 sl2 d m = case m of
   SES graph -> showsUnaryWith showGraph "SES" d graph
   LCS graph -> showsUnaryWith showGraph "LCS" d graph
   EditDistance graph -> showsUnaryWith showGraph "EditDistance" d graph
-  MiddleSnake graph -> showsUnaryWith showGraph "MiddleSnake" d graph
   SearchUpToD graph distance -> showsBinaryWith showGraph showsPrec "SearchUpToD" d graph distance
-  SearchAlongK graph distance direction diagonal -> showsQuaternaryWith showGraph showsPrec showsPrec showsPrec "SearchAlongK" d graph direction distance diagonal
-  FindDPath graph distance direction diagonal -> showsQuaternaryWith showGraph showsPrec showsPrec showsPrec "FindDPath" d graph distance direction diagonal
-  GetK graph direction diagonal -> showsTernaryWith showGraph showsPrec showsPrec "GetK" d graph direction diagonal
-  SetK graph direction diagonal v script -> showsQuinaryWith showGraph showsPrec showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d graph direction diagonal v script
-  Slide graph direction endpoint script -> showsQuaternaryWith showGraph showsPrec showsPrec (liftShowsEditScript sp1 sp2) "Slide" d graph direction endpoint script
-  Overlaps graph forward reverse -> showsTernaryWith showGraph showsPrec showsPrec "Overlaps" d graph forward reverse
+  SearchAlongK graph distance diagonal -> showsTernaryWith showGraph showsPrec showsPrec "SearchAlongK" d graph distance diagonal
+  FindDPath graph distance diagonal -> showsTernaryWith showGraph showsPrec showsPrec "FindDPath" d graph distance diagonal
+  GetK graph diagonal -> showsBinaryWith showGraph showsPrec "GetK" d graph diagonal
+  SetK graph diagonal v script -> showsQuaternaryWith showGraph showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d graph diagonal v script
+  Slide graph endpoint script -> showsTernaryWith showGraph showsPrec (liftShowsEditScript sp1 sp2) "Slide" d graph endpoint script
   where showGraph = (liftShowsPrec2 :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> EditGraph a b -> ShowS) sp1 sl1 sp2 sl2
 
 showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
@@ -365,7 +309,7 @@ instance MonadState (MyersState a b) (Myers a b) where
   put a = S (Put a) `Then` return
 
 instance Show2 MyersState where
-  liftShowsPrec2 sp1 _ sp2 _ d (MyersState (v1, v2)) = showsUnaryWith (showsWith (showsWith liftShowsPrec2 showsStateVector) showsStateVector) "MyersState" d (v1, v2)
+  liftShowsPrec2 sp1 _ sp2 _ d (MyersState v) = showsUnaryWith showsStateVector "MyersState" d v
     where showsStateVector = showsWith liftShowsVector (showsWith liftShowsPrec (liftShowsEditScript sp1 sp2))
           showsWith g f = g f (showListWith (f 0))
 
