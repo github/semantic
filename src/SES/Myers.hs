@@ -118,12 +118,12 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       continue
 
   MoveFromAdjacent graph (Distance d) (Diagonal k) -> do
-    (from, fromScript) <- if d == 0 then
+    (from, fromScript) <- if d == 0 || k < negate m || k > n then
       return (Endpoint 0 0, [])
-    else if k == negate d then do
+    else if k == negate d || k == negate m then do
       (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
       return (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
-    else if k /= d then do
+    else if k /= d && k /= n then do
       (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
       (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
       return $ if prevX < nextX then
