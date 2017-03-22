@@ -109,7 +109,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   SearchUpToD graph (Distance d) -> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
 
-  SearchAlongK graph d k -> do
+  SearchAlongK graph d k -> if unDiagonal k > n then continue else do
     Endpoint x y <- findDPath graph d k
     if x >= n && y >= m then do
       (_, script) <- getK graph k
