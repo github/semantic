@@ -102,7 +102,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     | otherwise -> do
       result <- for [0..(m + n)] (searchUpToD graph . Distance)
       case result of
-        Just (script, _) -> return script
+        Just (script, _) -> return (reverse script)
         _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
 
   EditDistance graph -> length . filter (these (const True) (const True) (const (const False))) <$> ses graph
