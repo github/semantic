@@ -93,8 +93,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   SES graph -> runSES graph
   LCS graph -> runLCS graph
   EditDistance graph -> runEditDistance graph
-
-  SearchUpToD graph (Distance d) -> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
+  SearchUpToD graph d -> runSearchUpToD graph d
 
   SearchAlongK (EditGraph as bs) d k -> if negate (length bs) > unDiagonal k || unDiagonal k > length as then continue else do
     Endpoint x y <- moveFromAdjacent (EditGraph as bs) d k
@@ -176,6 +175,10 @@ runLCS (EditGraph as bs)
 
 runEditDistance :: HasCallStack => EditGraph a b -> Myers a b Int
 runEditDistance graph = length . filter (these (const True) (const True) (const (const False))) <$> ses graph
+
+
+runSearchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (EditScript a b, Distance))
+runSearchUpToD graph (Distance d) = for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
 
 
 -- Smart constructors
