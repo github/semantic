@@ -174,9 +174,15 @@ runGetK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack
   let (x, script) = v ! i in return (Endpoint x (x - k), script)
 
 runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
-runSetK graph (Diagonal k) x script = let ?callStack = popCallStack callStack in
-  modify (MyersState . set . unMyersState)
-  where set v = v Array.// [(index v k, (x, script))]
+runSetK (EditGraph as bs) (Diagonal k) x script = let ?callStack = popCallStack callStack in do
+  v <- gets unMyersState
+  let i = index v k
+  let (n, m) = (length as, length bs)
+  when (i < 0) $
+    fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
+  when (i >= length v) $
+    fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
+  put (MyersState (v Array.// [(index v k, (x, script))]))
 
 runSlide :: HasCallStack => EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
 runSlide (EditGraph as bs) (Endpoint x y) script
