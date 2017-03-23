@@ -91,9 +91,11 @@ runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
         go = iterFreerA algebra
         algebra :: forall c x. Step a b x -> (x -> StateT (MyersState a b) Identity c) -> StateT (MyersState a b) Identity c
         algebra step cont = case step of
-          M m -> go (decompose eq graph m) >>= cont
+          M m -> go (decompose' m) >>= cont
           S Get -> get >>= cont
           S (Put s) -> put s >>= cont
+        decompose' :: forall c. MyersF a b c -> Myers a b c
+        decompose' = decompose eq graph
 
 -- | Fully evaluate an operation in Myers’ algorithm given a comparator function and an edit graph, returning a list of states and next steps.
 runMyersSteps :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Myers a b c -> [(MyersState a b, Myers a b c)]
