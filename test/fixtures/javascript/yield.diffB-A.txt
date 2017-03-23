@@ -7,9 +7,9 @@
           (VarAssignment
             (Identifier)
             (NumberLiteral)))
-      (Yield {
+      (ExpressionStatements (Yield {
         (MathOperator
           (Identifier)
           (Other "++"))
         ->
-        (Identifier) })))))
+        (Identifier) }))))))

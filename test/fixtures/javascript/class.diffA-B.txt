@@ -1,22 +1,10 @@
 (Program
   (ExpressionStatements
-    (Class
-      (Identifier)
-      (Method
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier)
-        (Return
-          (Identifier)))
-      (Method
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier)
-        (Return
-          (Identifier)))
-      (Method
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier)
-        (Return
-          (Identifier))))))
+    (Class (Identifier)
+      {+(Method(Identifier)(Identifier)(Return(Identifier)))+}
+      { +(Method(Identifier)(Identifier)(Return(Identifier)))+ }
+      { +(Method(Identifier)(Identifier)(Return(Identifier)))+ }
+      { -(Assignment(Identifier)(NumberLiteral))- }
+      { -(Method(Identifier)(Identifier)(Return(Identifier)))- }
+      { -(Method(Identifier)(Identifier)(Return(Identifier)))- }
+      { -(Method(Identifier)(Identifier)(Return(Identifier)))- })))

@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Patch
 ( Patch(..)
@@ -24,7 +25,7 @@ data Patch a
   = Replace a a
   | Insert a
   | Delete a
-  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable, NFData)
 
 
 -- DSL
