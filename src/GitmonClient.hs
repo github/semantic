@@ -166,6 +166,12 @@ gitmonTimeout = 1 * 1000 * 1000
 gitmonSocketAddr :: String
 gitmonSocketAddr = "/tmp/gitstats.sock"
 
+safeGitmonIO :: MonadIO m => IO a -> m (Maybe a)
+safeGitmonIO command = liftIO $ timeout gitmonTimeout command `catch` noop
+
+noop :: IOException -> IO (Maybe a)
+noop _ = pure Nothing
+
 procFileAddr :: String
 procFileAddr = "/proc/self/io"
 
@@ -175,8 +181,3 @@ clock = Realtime
 processJSON :: GitmonCommand -> ProcessData -> ByteString
 processJSON command processData = (toStrict . encode $ GitmonMsg command processData) <> "\n"
 
-safeIO :: MonadIO m => IO a -> m (Maybe a)
-safeIO command = liftIO $ (Just <$> command) `catch` noop
-
-noop :: IOException -> IO (Maybe a)
-noop _ = pure Nothing
