@@ -19,7 +19,7 @@ module SES.Myers
 import Control.Exception
 import Control.Monad.Free.Freer
 import qualified Data.Array as Array
-import Data.Ix (inRange)
+import Data.Ix
 import Data.Functor.Classes
 import Data.String
 import Data.These
@@ -68,7 +68,7 @@ newtype Distance = Distance { unDistance :: Int }
 
 -- | A diagonal in the edit graph of lists of lengths n and m, numbered from -m to n.
 newtype Diagonal = Diagonal { unDiagonal :: Int }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ix, Ord, Show)
 
 -- | The endpoint of a path through the edit graph, represented as the x/y indices and the script of edits made to get to that point.
 data Endpoint a b = Endpoint { x :: !Int, y :: !Int, script :: !(EditScript a b) }
