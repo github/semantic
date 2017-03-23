@@ -98,10 +98,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   MoveFromAdjacent graph d k -> runMoveFromAdjacent graph d k
 
   GetK graph k -> runGetK graph k
-
-  SetK _ (Diagonal k) x script ->
-    modify (MyersState . set . unMyersState)
-    where set v = v // [(index v k, (x, script))]
+  SetK graph k x script -> runSetK graph k x script
 
   Slide (EditGraph as bs) (Endpoint x y) script
     | x >= 0, x < length as
@@ -190,6 +187,11 @@ runGetK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack
   when (i >= length v) $
     fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
   let (x, script) = v ! i in return (Endpoint x (x - k), script)
+
+runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
+runSetK graph (Diagonal k) x script = let ?callStack = popCallStack callStack in
+  modify (MyersState . set . unMyersState)
+  where set v = v // [(index v k, (x, script))]
 
 
 -- Smart constructors
