@@ -21,10 +21,10 @@ data MyersF a b result where
   SearchAlongK :: Distance -> Diagonal -> MyersF a b (Maybe (EditScript a b, Distance))
   MoveFromAdjacent :: Distance -> Diagonal -> MyersF a b (Endpoint a b)
 
-  GetK :: Diagonal -> MyersF a b (Endpoint a b, EditScript a b)
+  GetK :: Diagonal -> MyersF a b (Endpoint a b)
   SetK :: Diagonal -> Int -> EditScript a b -> MyersF a b ()
 
-  Slide :: Endpoint a b -> EditScript a b -> MyersF a b (Endpoint a b, EditScript a b)
+  Slide :: Endpoint a b -> MyersF a b (Endpoint a b)
 
 type EditScript a b = [These a b]
 
@@ -50,7 +50,7 @@ newtype Distance = Distance { unDistance :: Int }
 newtype Diagonal = Diagonal { unDiagonal :: Int }
   deriving (Eq, Show)
 
-data Endpoint a b = Endpoint { x :: !Int, y :: !Int }
+data Endpoint a b = Endpoint { x :: !Int, y :: !Int, script :: !(EditScript a b) }
   deriving (Eq, Show)
 
 
@@ -100,7 +100,7 @@ decompose eq graph myers = let ?callStack = popCallStack callStack in case myers
   GetK k -> runGetK graph k
   SetK k x script -> runSetK graph k x script
 
-  Slide from script -> runSlide eq graph from script
+  Slide from -> runSlide eq graph from
 {-# INLINE decompose #-}
 
 
@@ -132,9 +132,8 @@ runSearchUpToD (EditGraph as bs) (Distance d) = let ?callStack = popCallStack ca
 
 runSearchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
 runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack in do
-  Endpoint x y <- moveFromAdjacent d k
-  if x >= length as && y >= length bs then do
-    (_, script) <- getK k
+  Endpoint x y script <- moveFromAdjacent d k
+  if x >= length as && y >= length bs then
     return (Just (script, d))
   else
     continue
@@ -142,44 +141,44 @@ runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack 
 runMoveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Endpoint a b)
 runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack = popCallStack callStack in do
   let (n, m) = (length as, length bs)
-  (from, fromScript) <- if d == 0 || k < negate m || k > n then
-    return (Endpoint 0 0, [])
+  from <- if d == 0 || k < negate m || k > n then
+    return (Endpoint 0 0 [])
   else if k == negate d || k == negate m then do
-    (Endpoint nextX nextY, nextScript) <- getK (Diagonal (succ k))
-    return (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
+    (Endpoint nextX nextY nextScript) <- getK (Diagonal (succ k))
+    return (Endpoint nextX (succ nextY) (if nextY < m then That (bs ! nextY) : nextScript else nextScript)) -- downward (insertion)
   else if k /= d && k /= n then do
-    (Endpoint prevX prevY, prevScript) <- getK (Diagonal (pred k))
-    (Endpoint nextX nextY, nextScript) <- getK (Diagonal (succ k))
+    (Endpoint prevX prevY prevScript) <- getK (Diagonal (pred k))
+    (Endpoint nextX nextY nextScript) <- getK (Diagonal (succ k))
     return $ if prevX < nextX then
-      (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
+      (Endpoint nextX (succ nextY) (if nextY < m then That (bs ! nextY) : nextScript else nextScript)) -- downward (insertion)
     else
-      (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
+      (Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript)) -- rightward (deletion)
   else do
-    (Endpoint prevX prevY, prevScript) <- getK (Diagonal (pred k))
-    return (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
-  (endpoint, script) <- slide from fromScript
-  setK (Diagonal k) (x endpoint) script
+    (Endpoint prevX prevY prevScript) <- getK (Diagonal (pred k))
+    return (Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript)) -- rightward (deletion)
+  endpoint <- slide from
+  setK (Diagonal k) (x endpoint) (script endpoint)
   return endpoint
 
 
-runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint a b, EditScript a b)
+runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint a b)
 runGetK graph k = let ?callStack = popCallStack callStack in do
   (i, v) <- checkK graph k
-  let (x, script) = v ! i in return (Endpoint x (x - unDiagonal k), script)
+  let (x, script) = v ! i in return (Endpoint x (x - unDiagonal k) script)
 
 runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
 runSetK graph k x script = let ?callStack = popCallStack callStack in do
   (i, v) <- checkK graph k
   put (MyersState (v Array.// [(i, (x, script))]))
 
-runSlide :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint a b -> EditScript a b -> Myers a b (Endpoint a b, EditScript a b)
-runSlide eq (EditGraph as bs) (Endpoint x y) script
+runSlide :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint a b -> Myers a b (Endpoint a b)
+runSlide eq (EditGraph as bs) (Endpoint x y script)
   | x >= 0, x < length as
   , y >= 0, y < length bs
   , a <- as ! x
   , b <- bs ! y
-  , a `eq` b  = slide  (Endpoint (succ x) (succ y)) (These a b : script)
-  | otherwise = return (Endpoint       x        y,   script)
+  , a `eq` b  = slide  (Endpoint (succ x) (succ y) (These a b : script))
+  | otherwise = return (Endpoint       x        y               script)
 
 
 -- Smart constructors
@@ -199,14 +198,14 @@ searchAlongK d k = M (SearchAlongK d k) `Then` return
 moveFromAdjacent :: HasCallStack => Distance -> Diagonal -> Myers a b (Endpoint a b)
 moveFromAdjacent d k = M (MoveFromAdjacent d k) `Then` return
 
-getK :: HasCallStack => Diagonal -> Myers a b (Endpoint a b, EditScript a b)
+getK :: HasCallStack => Diagonal -> Myers a b (Endpoint a b)
 getK diagonal = M (GetK diagonal) `Then` return
 
 setK :: HasCallStack => Diagonal -> Int -> EditScript a b -> Myers a b ()
 setK diagonal x script = M (SetK diagonal x script) `Then` return
 
-slide :: HasCallStack => Endpoint a b -> EditScript a b -> Myers a b (Endpoint a b, EditScript a b)
-slide from script = M (Slide from script) `Then` return
+slide :: HasCallStack => Endpoint a b -> Myers a b (Endpoint a b)
+slide from = M (Slide from) `Then` return
 
 
 -- Implementation details
@@ -262,7 +261,7 @@ liftShowsMyersF sp1 sp2 d m = case m of
   MoveFromAdjacent distance diagonal -> showsBinaryWith showsPrec showsPrec "MoveFromAdjacent" d distance diagonal
   GetK diagonal -> showsUnaryWith showsPrec "GetK" d diagonal
   SetK diagonal v script -> showsTernaryWith showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d diagonal v script
-  Slide endpoint script -> showsBinaryWith showsPrec (liftShowsEditScript sp1 sp2) "Slide" d endpoint script
+  Slide endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "Slide" d endpoint
 
 showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
 showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
@@ -295,6 +294,9 @@ liftShowsThese sa sb d t = case t of
 liftShowsEditScript :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> EditScript a b -> ShowS
 liftShowsEditScript sa sb _ = showListWith (liftShowsThese sa sb 0)
 
+liftShowsEndpoint :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> Endpoint a b -> ShowS
+liftShowsEndpoint sp1 sp2 d (Endpoint x y script) = showsTernaryWith showsPrec showsPrec (liftShowsEditScript sp1 sp2) "Endpoint" d x y script
+
 data MyersException = MyersException String CallStack
   deriving (Typeable)
 
@@ -318,6 +320,9 @@ instance Show s => Show (State s a) where
 
 instance Show2 EditGraph where
   liftShowsPrec2 sp1 sl1 sp2 sl2 d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp1 sl1) (liftShowsVector sp2 sl2) "EditGraph" d as bs
+
+instance Show2 Endpoint where
+  liftShowsPrec2 sp1 _ sp2 _ = liftShowsEndpoint sp1 sp2
 
 instance (Show a, Show b) => Show1 (MyersF a b) where
   liftShowsPrec _ _ = liftShowsMyersF showsPrec showsPrec
