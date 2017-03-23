@@ -165,9 +165,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
               | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
                   throw (MyersException ("index " <> show i <> " out of bounds") callStack)
 
-        fail :: (HasCallStack, Monad m) => String -> m a
-        fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
-          throw (MyersException s callStack)
 
 runLCS :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
 runLCS (EditGraph as bs)
@@ -245,6 +242,11 @@ editGraph myers = (EditGraph as bs, n, m)
           SetK g _ _ _ -> g
           Slide g _ _ -> g
         (n, m) = (length as, length bs)
+
+
+fail :: (HasCallStack, Monad m) => String -> m a
+fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
+  throw (MyersException s callStack)
 
 
 liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array Int a -> ShowS
