@@ -56,10 +56,13 @@ data Endpoint a b = Endpoint { x :: !Int, y :: !Int, script :: !(EditScript a b)
   deriving (Eq, Show)
 
 
--- Evaluation
+-- API
 
 ses :: (HasCallStack, Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript a b
 ses eq as bs = runMyers eq (makeEditGraph as bs) (M SES `Then` return)
+
+
+-- Evaluation
 
 runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> EditGraph a b ->Myers a b c -> c
 runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
