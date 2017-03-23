@@ -19,12 +19,12 @@ data MyersF a b result where
   EditDistance :: MyersF a b Int
   SearchUpToD :: Distance -> MyersF a b (Maybe (EditScript a b, Distance))
   SearchAlongK :: Distance -> Diagonal -> MyersF a b (Maybe (EditScript a b, Distance))
-  MoveFromAdjacent :: Distance -> Diagonal -> MyersF a b Endpoint
+  MoveFromAdjacent :: Distance -> Diagonal -> MyersF a b (Endpoint a b)
 
-  GetK :: Diagonal -> MyersF a b (Endpoint, EditScript a b)
+  GetK :: Diagonal -> MyersF a b (Endpoint a b, EditScript a b)
   SetK :: Diagonal -> Int -> EditScript a b -> MyersF a b ()
 
-  Slide :: Endpoint -> EditScript a b -> MyersF a b (Endpoint, EditScript a b)
+  Slide :: Endpoint a b -> EditScript a b -> MyersF a b (Endpoint a b, EditScript a b)
 
 type EditScript a b = [These a b]
 
@@ -50,7 +50,7 @@ newtype Distance = Distance { unDistance :: Int }
 newtype Diagonal = Diagonal { unDiagonal :: Int }
   deriving (Eq, Show)
 
-data Endpoint = Endpoint { x :: !Int, y :: !Int }
+data Endpoint a b = Endpoint { x :: !Int, y :: !Int }
   deriving (Eq, Show)
 
 
@@ -139,7 +139,7 @@ runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack 
   else
     continue
 
-runMoveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b Endpoint
+runMoveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Endpoint a b)
 runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack = popCallStack callStack in do
   let (n, m) = (length as, length bs)
   (from, fromScript) <- if d == 0 || k < negate m || k > n then
@@ -162,7 +162,7 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
   return endpoint
 
 
-runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint, EditScript a b)
+runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint a b, EditScript a b)
 runGetK graph k = let ?callStack = popCallStack callStack in do
   (i, v) <- checkK graph k
   let (x, script) = v ! i in return (Endpoint x (x - unDiagonal k), script)
@@ -172,7 +172,7 @@ runSetK graph k x script = let ?callStack = popCallStack callStack in do
   (i, v) <- checkK graph k
   put (MyersState (v Array.// [(i, (x, script))]))
 
-runSlide :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
+runSlide :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint a b -> EditScript a b -> Myers a b (Endpoint a b, EditScript a b)
 runSlide eq (EditGraph as bs) (Endpoint x y) script
   | x >= 0, x < length as
   , y >= 0, y < length bs
@@ -196,16 +196,16 @@ searchUpToD distance = M (SearchUpToD distance) `Then` return
 searchAlongK :: HasCallStack => Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
 searchAlongK d k = M (SearchAlongK d k) `Then` return
 
-moveFromAdjacent :: HasCallStack => Distance -> Diagonal -> Myers a b Endpoint
+moveFromAdjacent :: HasCallStack => Distance -> Diagonal -> Myers a b (Endpoint a b)
 moveFromAdjacent d k = M (MoveFromAdjacent d k) `Then` return
 
-getK :: HasCallStack => Diagonal -> Myers a b (Endpoint, EditScript a b)
+getK :: HasCallStack => Diagonal -> Myers a b (Endpoint a b, EditScript a b)
 getK diagonal = M (GetK diagonal) `Then` return
 
 setK :: HasCallStack => Diagonal -> Int -> EditScript a b -> Myers a b ()
 setK diagonal x script = M (SetK diagonal x script) `Then` return
 
-slide :: HasCallStack => Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
+slide :: HasCallStack => Endpoint a b -> EditScript a b -> Myers a b (Endpoint a b, EditScript a b)
 slide from script = M (Slide from script) `Then` return
 
 
