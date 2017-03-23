@@ -179,6 +179,7 @@ test-suite test
                      , protolude
                      , containers
                      , recursion-schemes >= 4.1
+                     , regex-compat
                      , semantic-diff
                      , text >= 1.2.1.3
                      , these

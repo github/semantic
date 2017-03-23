@@ -178,5 +178,5 @@ clock :: Clock
 clock = Realtime
 
 processJSON :: GitmonCommand -> ProcessData -> ByteString
-processJSON command processData = (toStrict . encode $ GitmonMsg command processData) <> "\n"
+processJSON command processData = (toStrict . encode $ GitmonMsg command processData)
 

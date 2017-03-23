@@ -1,11 +1,12 @@
 module GitmonClientSpec where
 
+import Control.Exception
 import Data.Aeson
 import Data.Aeson.Types
-import Data.ByteString.Char8 (split, ByteString)
+import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Foldable
 import Data.Maybe (fromJust)
-import Data.Text hiding (split, take)
+import Data.Text
 import Git.Libgit2
 import Git.Repository
 import Git.Types hiding (Object)
@@ -17,7 +18,7 @@ import Prologue (liftIO, runReaderT)
 import System.Environment (setEnv)
 import Test.Hspec hiding (shouldBe, shouldSatisfy, shouldThrow, anyErrorCall)
 import Test.Hspec.Expectations.Pretty
-import Control.Exception
+import Text.Regex
 
 spec :: Spec
 spec =
@@ -27,17 +28,17 @@ spec =
     it "receives commands in order" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ sendAll server "continue"
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
-        let [update, schedule, finish] = infoToCommands info
+        let [updateData, scheduleData, finishData] = infoToCommands info
 
         liftIO $ do
           shouldBe (commitOid commit) object
-          shouldBe update (Just "update")
-          shouldBe schedule (Just "schedule")
-          shouldBe finish (Just "finish")
+          shouldBe updateData (Just "update")
+          shouldBe scheduleData (Just "schedule")
+          shouldBe finishData (Just "finish")
 
     it "receives update command with correct data" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
@@ -49,7 +50,7 @@ spec =
           setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:20"
           sendAll server "continue"
 
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
@@ -80,7 +81,7 @@ spec =
           setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:not_valid"
           sendAll server "continue"
 
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
@@ -100,7 +101,7 @@ spec =
           setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:abc100"
           sendAll server "continue"
 
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
@@ -120,7 +121,7 @@ spec =
           setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:100abc"
           sendAll server "continue"
 
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
@@ -140,7 +141,7 @@ spec =
           setEnv "GIT_SOCKSTAT_VAR_user_id" "100"
           sendAll server "continue"
 
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         _ <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
@@ -154,7 +155,7 @@ spec =
       withRepository lgFactory wd $ do
         liftIO $ close client
 
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
         commit <- reportGitmon' socketFactory "cat-file" $ lookupCommit object
         info <- liftIO $ recv server 1024
 
@@ -165,7 +166,7 @@ spec =
       withRepository lgFactory wd $ do
         repo <- getRepository
         liftIO $ sendAll server "fail too busy"
-        object <- parseObjOid (pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
+        object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
 
         liftIO $ shouldThrow (runReaderT (reportGitmon' socketFactory "cat-file" (lookupCommit object)) repo) gitmonException
 
@@ -183,20 +184,27 @@ withSocketPair = bracket create release
       close server
 
 infoToCommands :: ByteString -> [Maybe Text]
-infoToCommands input = command' . toObject <$> Prelude.take 3 (split '\n' input)
+infoToCommands input = command' . toObject <$> extract regex input
   where
     command' :: Object -> Maybe Text
     command' = parseMaybe (.: "command")
 
 infoToData :: ByteString -> [Either String ProcessData]
-infoToData input = data' . toObject <$> Prelude.take 3 (split '\n' input)
-  where data' = parseEither parser
-        parser o = do
-          dataO <- o .: "data"
-          asum [ ProcessUpdateData <$> (dataO .: "git_dir") <*> (dataO .: "program") <*> (dataO .:? "real_ip") <*> (dataO .:? "repo_name") <*> (dataO .:? "repo_id") <*> (dataO .:? "user_id") <*> (dataO .: "via")
-               , ProcessFinishData <$> (dataO .: "cpu") <*> (dataO .: "disk_read_bytes") <*> (dataO .: "disk_write_bytes") <*> (dataO .: "result_code")
-               , pure ProcessScheduleData
-               ]
+infoToData input = data' . toObject <$> extract regex input
+  where
+    data' = parseEither parser
+    parser o = do
+      dataO <- o .: "data"
+      asum [ ProcessUpdateData <$> (dataO .: "git_dir") <*> (dataO .: "program") <*> (dataO .:? "real_ip") <*> (dataO .:? "repo_name") <*> (dataO .:? "repo_id") <*> (dataO .:? "user_id") <*> (dataO .: "via")
+           , ProcessFinishData <$> (dataO .: "cpu") <*> (dataO .: "disk_read_bytes") <*> (dataO .: "disk_write_bytes") <*> (dataO .: "result_code")
+           , pure ProcessScheduleData
+           ]
 
 toObject :: ByteString -> Object
 toObject = fromJust . decodeStrict
+
+regex :: Regex
+regex = mkRegexWithOpts "({.*\"update\".*\"}})({.*\"schedule\"})({.*\"finish\".*}})" False True
+
+extract :: Regex -> ByteString -> [ByteString]
+extract regex input = Data.ByteString.Char8.pack <$> fromJust (matchRegex regex (Data.ByteString.Char8.unpack input))
