@@ -20,6 +20,8 @@ data MyersF a b result where
   SearchUpToD :: Distance -> MyersF a b (Maybe (EditScript a b, Distance))
   SearchAlongK :: Distance -> Diagonal -> MyersF a b (Maybe (EditScript a b, Distance))
   MoveFromAdjacent :: Distance -> Diagonal -> MyersF a b (Endpoint a b)
+  MoveDownFrom :: Endpoint a b -> MyersF a b (Endpoint a b)
+  MoveRightFrom :: Endpoint a b -> MyersF a b (Endpoint a b)
 
   GetK :: Diagonal -> MyersF a b (Endpoint a b)
   SetK :: Diagonal -> Endpoint a b -> MyersF a b ()
@@ -96,6 +98,8 @@ decompose eq graph myers = let ?callStack = popCallStack callStack in case myers
   SearchUpToD d -> runSearchUpToD graph d
   SearchAlongK d k -> runSearchAlongK graph d k
   MoveFromAdjacent d k -> runMoveFromAdjacent graph d k
+  MoveDownFrom e -> runMoveDownFrom graph e
+  MoveRightFrom e -> runMoveRightFrom graph e
 
   GetK k -> runGetK graph k
   SetK k x -> runSetK graph k x
@@ -143,23 +147,26 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
   let (n, m) = (length as, length bs)
   from <- if d == 0 || k < negate m || k > n then
     return (Endpoint 0 0 [])
-  else if k == negate d || k == negate m then do
-    (Endpoint nextX nextY nextScript) <- getK (Diagonal (succ k))
-    return (Endpoint nextX (succ nextY) (if nextY < m then That (bs ! nextY) : nextScript else nextScript)) -- downward (insertion)
+  else if k == negate d || k == negate m then
+    getK (Diagonal (succ k)) >>= moveDownFrom
   else if k /= d && k /= n then do
-    (Endpoint prevX prevY prevScript) <- getK (Diagonal (pred k))
-    (Endpoint nextX nextY nextScript) <- getK (Diagonal (succ k))
-    return $ if prevX < nextX then
-      Endpoint nextX (succ nextY) (if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
+    prev <- getK (Diagonal (pred k))
+    next <- getK (Diagonal (succ k))
+    if x prev < x next then
+      moveDownFrom next
     else
-      Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
-  else do
-    (Endpoint prevX prevY prevScript) <- getK (Diagonal (pred k))
-    return (Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript)) -- rightward (deletion)
+      moveRightFrom prev
+  else
+    getK (Diagonal (pred k)) >>= moveRightFrom
   endpoint <- slide from
   setK (Diagonal k) endpoint
   return endpoint
 
+runMoveDownFrom :: HasCallStack => EditGraph a b -> Endpoint a b -> Myers a b (Endpoint a b)
+runMoveDownFrom (EditGraph _ bs) (Endpoint x y script) = return (Endpoint x (succ y) (if y < length bs then That (bs ! y) : script else script))
+
+runMoveRightFrom :: HasCallStack => EditGraph a b -> Endpoint a b -> Myers a b (Endpoint a b)
+runMoveRightFrom (EditGraph as _) (Endpoint x y script) = return (Endpoint (succ x) y (if x < length as then This (as ! x) : script else script))
 
 runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint a b)
 runGetK graph k = let ?callStack = popCallStack callStack in do
@@ -197,6 +204,12 @@ searchAlongK d k = M (SearchAlongK d k) `Then` return
 
 moveFromAdjacent :: HasCallStack => Distance -> Diagonal -> Myers a b (Endpoint a b)
 moveFromAdjacent d k = M (MoveFromAdjacent d k) `Then` return
+
+moveDownFrom :: HasCallStack => Endpoint a b -> Myers a b (Endpoint a b)
+moveDownFrom e = M (MoveDownFrom e) `Then` return
+
+moveRightFrom :: HasCallStack => Endpoint a b -> Myers a b (Endpoint a b)
+moveRightFrom e = M (MoveRightFrom e) `Then` return
 
 getK :: HasCallStack => Diagonal -> Myers a b (Endpoint a b)
 getK diagonal = M (GetK diagonal) `Then` return
@@ -259,6 +272,8 @@ liftShowsMyersF sp1 sp2 d m = case m of
   SearchUpToD distance -> showsUnaryWith showsPrec "SearchUpToD" d distance
   SearchAlongK distance diagonal -> showsBinaryWith showsPrec showsPrec "SearchAlongK" d distance diagonal
   MoveFromAdjacent distance diagonal -> showsBinaryWith showsPrec showsPrec "MoveFromAdjacent" d distance diagonal
+  MoveDownFrom endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "MoveDownFrom" d endpoint
+  MoveRightFrom endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "MoveRightFrom" d endpoint
   GetK diagonal -> showsUnaryWith showsPrec "GetK" d diagonal
   SetK diagonal v -> showsBinaryWith showsPrec (liftShowsEndpoint sp1 sp2) "SetK" d diagonal v
   Slide endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "Slide" d endpoint
