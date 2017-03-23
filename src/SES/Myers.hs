@@ -33,11 +33,11 @@ data MyersF a b result where
 type EditScript a b = [These a b]
 
 -- | Steps in the execution of Myers’ algorithm, i.e. the sum of MyersF and State.
-data StepF a b result where
-  M :: HasCallStack => MyersF a b c -> StepF a b c
-  S :: State (MyersState a b) c -> StepF a b c
+data Step a b result where
+  M :: HasCallStack => MyersF a b c -> Step a b c
+  S :: State (MyersState a b) c -> Step a b c
 
-type Myers a b = Freer (StepF a b)
+type Myers a b = Freer (Step a b)
 
 -- | Notionally the cartesian product of two sequences, represented as a simple wrapper around those arrays holding those sequences’ elements for O(1) lookups.
 data EditGraph a b = EditGraph { as :: !(Array.Array Int a), bs :: !(Array.Array Int b) }
@@ -74,7 +74,7 @@ runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> EditGraph a b -> M
 runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
   where go :: forall c. Myers a b c -> StateT (MyersState a b) Identity c
         go = iterFreerA algebra
-        algebra :: forall c x. StepF a b x -> (x -> StateT (MyersState a b) Identity c) -> StateT (MyersState a b) Identity c
+        algebra :: forall c x. Step a b x -> (x -> StateT (MyersState a b) Identity c) -> StateT (MyersState a b) Identity c
         algebra step cont = case step of
           M m -> go (decompose eq graph m) >>= cont
           S Get -> get >>= cont
@@ -344,8 +344,8 @@ liftShowsState sp d state = case state of
   Put s -> showsUnaryWith sp "Put" d s
 
 -- | Lift value/list showing functions into a showing function for steps in Myers’ algorithm.
-liftShowsStepF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> StepF a b c -> ShowS
-liftShowsStepF sp1 sl1 sp2 sl2 d step = case step of
+liftShowsStep :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> Step a b c -> ShowS
+liftShowsStep sp1 sl1 sp2 sl2 d step = case step of
   M m -> showsUnaryWith (liftShowsMyersF sp1 sp2) "M" d m
   S s -> showsUnaryWith (liftShowsState (liftShowsPrec2 sp1 sl1 sp2 sl2)) "S" d s
 
@@ -398,11 +398,11 @@ instance (Show a, Show b) => Show1 (MyersF a b) where
 instance (Show a, Show b) => Show (MyersF a b c) where
   showsPrec = liftShowsMyersF showsPrec showsPrec
 
-instance (Show a, Show b) => Show1 (StepF a b) where
-  liftShowsPrec _ _ = liftShowsStepF showsPrec showList showsPrec showList
+instance (Show a, Show b) => Show1 (Step a b) where
+  liftShowsPrec _ _ = liftShowsStep showsPrec showList showsPrec showList
 
-instance (Show a, Show b) => Show (StepF a b c) where
-  showsPrec = liftShowsStepF showsPrec showList showsPrec showList
+instance (Show a, Show b) => Show (Step a b c) where
+  showsPrec = liftShowsStep showsPrec showList showsPrec showList
 
 instance Exception MyersException
 
