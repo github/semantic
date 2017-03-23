@@ -34,7 +34,6 @@ data State s a where
 data StepF a b result where
   M :: HasCallStack => MyersF a b c -> StepF a b c
   S :: State (MyersState a b) c -> StepF a b c
-  GetEq :: StepF a b (a -> b -> Bool)
 
 type Myers a b = Freer (StepF a b)
 
@@ -65,7 +64,6 @@ runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
           M m -> go (decompose eq graph m) >>= cont
           S Get -> get >>= cont
           S (Put s) -> put s >>= cont
-          GetEq -> cont eq
 
 runMyersSteps :: HasCallStack => (a -> b -> Bool) -> EditGraph a b ->Myers a b c -> [(MyersState a b, Myers a b c)]
 runMyersSteps eq graph = go (emptyStateForGraph graph)
@@ -84,8 +82,6 @@ runMyersStep eq graph state step = let ?callStack = popCallStack callStack in ca
 
     S Get -> Right (state, cont state)
     S (Put state') -> Right (state', cont ())
-
-    GetEq -> Right (state, cont eq)
 
 
 decompose :: HasCallStack => (a -> b -> Bool) -> EditGraph a b ->MyersF a b c -> Myers a b c
@@ -215,9 +211,6 @@ setK diagonal x script = M (SetK diagonal x script) `Then` return
 slide :: HasCallStack => Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
 slide from script = M (Slide from script) `Then` return
 
-getEq :: HasCallStack => Myers a b (a -> b -> Bool)
-getEq = GetEq `Then` return
-
 
 -- Implementation details
 
@@ -295,7 +288,6 @@ liftShowsStepF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -
 liftShowsStepF sp1 sl1 sp2 sl2 d step = case step of
   M m -> showsUnaryWith (liftShowsMyersF sp1 sp2) "M" d m
   S s -> showsUnaryWith (liftShowsState (liftShowsPrec2 sp1 sl1 sp2 sl2)) "S" d s
-  GetEq -> showString "GetEq"
 
 liftShowsThese :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> These a b -> ShowS
 liftShowsThese sa sb d t = case t of
