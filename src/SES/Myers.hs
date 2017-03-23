@@ -56,6 +56,9 @@ data Endpoint = Endpoint { x :: !Int, y :: !Int }
 
 -- Evaluation
 
+ses :: (HasCallStack, Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript a b
+ses eq as bs = runMyers eq (makeEditGraph as bs) (M SES `Then` return)
+
 runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> EditGraph a b ->Myers a b c -> c
 runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
   where go :: forall c. Myers a b c -> StateT (MyersState a b) Identity c
@@ -180,9 +183,6 @@ runSlide eq (EditGraph as bs) (Endpoint x y) script
 
 
 -- Smart constructors
-
-ses :: HasCallStack => Myers a b (EditScript a b)
-ses = M SES `Then` return
 
 lcs :: HasCallStack => Myers a b [(a, b)]
 lcs = M LCS `Then` return

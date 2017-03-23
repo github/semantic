@@ -16,7 +16,7 @@ type Cost term = These term term -> Int
 
 -- | Find the shortest edit script (diff) between two terms given a function to compute the cost.
 ses :: Comparable term -> Cost term -> [term] -> [term] -> [These term term]
-ses canCompare _ as bs = Myers.runMyers canCompare (Myers.makeEditGraph as bs) Myers.ses
+ses canCompare _ as bs = Myers.ses canCompare as bs
 
 
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
