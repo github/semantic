@@ -144,7 +144,7 @@ reportGitmon' SocketFactory{..} program gitCommand =
             -- | Expected format for userID and repoID is: "uint:123",
             -- | where "uint:" indicates an unsigned integer followed by an integer value.
             regex :: Regex
-            regex = mkRegex "^uint:([0-9]+)$"
+            regex = mkRegexWithOpts "^uint:([0-9]+)$" False True
 
             readInt :: Maybe [String] -> Maybe Int
             readInt (Just [s]) = Just (read s :: Int)
