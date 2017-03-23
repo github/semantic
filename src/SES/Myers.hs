@@ -101,6 +101,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   SetK graph k x script -> runSetK graph k x script
 
   Slide graph from script -> runSlide graph from script
+{-# INLINE decompose #-}
 
 
 runSES :: HasCallStack => EditGraph a b -> Myers a b (EditScript a b)
