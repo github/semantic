@@ -3,7 +3,7 @@ module SES.Myers where
 
 import Control.Exception
 import Control.Monad.Free.Freer
-import Data.Array hiding (index)
+import qualified Data.Array as Array
 import Data.Functor.Classes
 import Data.String
 import Data.These
@@ -38,11 +38,11 @@ data StepF a b result where
 
 type Myers a b = Freer (StepF a b)
 
-data EditGraph a b = EditGraph { as :: !(Array Int a), bs :: !(Array Int b) }
+data EditGraph a b = EditGraph { as :: !(Array.Array Int a), bs :: !(Array.Array Int b) }
   deriving (Eq, Show)
 
 makeEditGraph :: (Foldable t, Foldable u) => t a -> u b -> EditGraph a b
-makeEditGraph as bs = EditGraph (listArray (0, pred (length as)) (toList as)) (listArray (0, pred (length bs)) (toList bs))
+makeEditGraph as bs = EditGraph (Array.listArray (0, pred (length as)) (toList as)) (Array.listArray (0, pred (length bs)) (toList bs))
 
 newtype Distance = Distance { unDistance :: Int }
   deriving (Eq, Show)
@@ -111,11 +111,6 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       else
         return (Endpoint x y, script)
     | otherwise -> return (Endpoint x y, script)
-
-  where (!) :: HasCallStack => Array Int a -> Int -> a
-        v ! i | i < length v = v Data.Array.! i
-              | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
-                  throw (MyersException ("index " <> show i <> " out of bounds") callStack)
 
 
 runSES :: HasCallStack => EditGraph a b -> Myers a b (EditScript a b)
@@ -191,7 +186,7 @@ runGetK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack
 runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
 runSetK graph (Diagonal k) x script = let ?callStack = popCallStack callStack in
   modify (MyersState . set . unMyersState)
-  where set v = v // [(index v k, (x, script))]
+  where set v = v Array.// [(index v k, (x, script))]
 
 
 -- Smart constructors
@@ -229,15 +224,15 @@ getEq = GetEq `Then` return
 
 -- Implementation details
 
-newtype MyersState a b = MyersState { unMyersState :: Array Int (Int, EditScript a b) }
+newtype MyersState a b = MyersState { unMyersState :: Array.Array Int (Int, EditScript a b) }
   deriving (Eq, Show)
 
 emptyStateForStep :: Myers a b c -> MyersState a b
 emptyStateForStep step = case step of
   Then (M myers) _ ->
     let (_, n, m) = editGraph myers in
-    MyersState (listArray (0, m + n) (repeat (0, [])))
-  _ -> MyersState (listArray (0, negate 1) [])
+    MyersState (Array.listArray (0, m + n) (repeat (0, [])))
+  _ -> MyersState (Array.listArray (0, negate 1) [])
 
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
@@ -245,7 +240,7 @@ for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 continue :: Myers b c (Maybe a)
 continue = return Nothing
 
-index :: Array Int a -> Int -> Int
+index :: Array.Array Int a -> Int -> Int
 index v k = if k >= 0 then k else length v + k
 
 
@@ -268,8 +263,13 @@ fail :: (HasCallStack, Monad m) => String -> m a
 fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
   throw (MyersException s callStack)
 
+(!) :: HasCallStack => Array.Array Int a -> Int -> a
+v ! i | i < length v = v Array.! i
+      | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
+          throw (MyersException ("index " <> show i <> " out of bounds") callStack)
 
-liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array Int a -> ShowS
+
+liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array.Array Int a -> ShowS
 liftShowsVector sp sl d = liftShowsPrec sp sl d . toList
 
 liftShowsMyersF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> MyersF a b c -> ShowS
