@@ -150,9 +150,9 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
     (Endpoint prevX prevY prevScript) <- getK (Diagonal (pred k))
     (Endpoint nextX nextY nextScript) <- getK (Diagonal (succ k))
     return $ if prevX < nextX then
-      (Endpoint nextX (succ nextY) (if nextY < m then That (bs ! nextY) : nextScript else nextScript)) -- downward (insertion)
+      Endpoint nextX (succ nextY) (if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
     else
-      (Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript)) -- rightward (deletion)
+      Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
   else do
     (Endpoint prevX prevY prevScript) <- getK (Diagonal (pred k))
     return (Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript)) -- rightward (deletion)
