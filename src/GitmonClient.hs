@@ -77,23 +77,21 @@ reportGitmon :: String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon = reportGitmon' SocketFactory { withSocket = withGitmonSocket }
 
 reportGitmon' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
-reportGitmon' SocketFactory{..} program gitCommand = do
-  (gitDir, realIP, repoName, repoID, userID) <- liftIO loadEnvVars
-  (startTime, beforeProcIOContents) <- liftIO collectStats
+reportGitmon' SocketFactory{..} program gitCommand =
+  join . liftIO . withSocket $ \socket' -> do
+    (gitDir, realIP, repoName, repoID, userID) <- loadEnvVars
+    safeGitmonIO . sendAll socket' $ processJSON Update (ProcessUpdateData gitDir program realIP repoName repoID userID "semantic-diff")
+    safeGitmonIO . sendAll socket' $ processJSON Schedule ProcessScheduleData
+    gitmonStatus <- safeGitmonIO $ recv socket' 1024
 
-  gitmonStatus <- safeIO . timeout gitmonTimeout . withSocket $ \s -> do
-    sendAll s $ processJSON Update (ProcessUpdateData gitDir program realIP repoName repoID userID "semantic-diff")
-    sendAll s $ processJSON Schedule ProcessScheduleData
-    recv s 1024
+    (startTime, beforeProcIOContents) <- collectStats
+    -- | We are eagerly evaluating the gitCommand with BangPatterns. This is to preserve accuracy in measuring the process stats calculated, in particular disk read bytes.
+    let !result = withGitmonStatus gitmonStatus gitCommand
+    (afterTime, afterProcIOContents) <- collectStats
 
-  -- | We are eagerly evaluating the gitCommand with BangPatterns. This is to preserve accuracy in measuring the process stats calculated, in particular disk read bytes.
-  !result <- withGitmonStatus (join gitmonStatus) gitCommand
-
-  (afterTime, afterProcIOContents) <- liftIO collectStats
-  let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-  safeIO . timeout gitmonTimeout . withSocket . flip sendAll $ processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode)
-
-  pure result
+    let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
+    safeGitmonIO . sendAll socket' $ processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode)
+    pure result
 
   where
     withGitmonStatus :: Maybe ByteString -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
