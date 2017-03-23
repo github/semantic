@@ -1,5 +1,17 @@
 {-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
-module SES.Myers where
+module SES.Myers
+( MyersF(..)
+, EditScript
+, Step(..)
+, Myers
+, EditGraph(..)
+, Distance(..)
+, Diagonal(..)
+, Endpoint(..)
+, ses
+, MyersState(..)
+, index
+) where
 
 import Control.Exception
 import Control.Monad.Free.Freer
