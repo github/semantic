@@ -90,11 +90,7 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
 
 decompose :: HasCallStack => MyersF a b c -> Myers a b c
 decompose myers = let ?callStack = popCallStack callStack in case myers of
-  LCS (EditGraph as bs)
-    | null as || null bs -> return []
-    | otherwise -> do
-      result <- ses (EditGraph as bs)
-      return (catMaybes (these (const Nothing) (const Nothing) ((Just .) . (,)) <$> result))
+  LCS graph -> runLCS graph
 
   SES (EditGraph as bs)
     | null bs -> return (This <$> toList as)
@@ -172,6 +168,13 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
         fail :: (HasCallStack, Monad m) => String -> m a
         fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
           throw (MyersException s callStack)
+
+runLCS :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
+runLCS (EditGraph as bs)
+  | null as || null bs = return []
+  | otherwise = let ?callStack = popCallStack callStack in do
+    result <- ses (EditGraph as bs)
+    return (catMaybes (these (const Nothing) (const Nothing) ((Just .) . (,)) <$> result))
 
 
 -- Smart constructors
