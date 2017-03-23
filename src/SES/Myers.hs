@@ -13,17 +13,17 @@ import Prologue hiding (for, State, error)
 import Text.Show (showListWith)
 
 data MyersF a b result where
-  SES :: EditGraph a b -> MyersF a b (EditScript a b)
-  LCS :: EditGraph a b -> MyersF a b [(a, b)]
-  EditDistance :: EditGraph a b -> MyersF a b Int
-  SearchUpToD :: EditGraph a b -> Distance -> MyersF a b (Maybe (EditScript a b, Distance))
-  SearchAlongK :: EditGraph a b -> Distance -> Diagonal -> MyersF a b (Maybe (EditScript a b, Distance))
-  MoveFromAdjacent :: EditGraph a b -> Distance -> Diagonal -> MyersF a b Endpoint
+  SES :: MyersF a b (EditScript a b)
+  LCS :: MyersF a b [(a, b)]
+  EditDistance :: MyersF a b Int
+  SearchUpToD :: Distance -> MyersF a b (Maybe (EditScript a b, Distance))
+  SearchAlongK :: Distance -> Diagonal -> MyersF a b (Maybe (EditScript a b, Distance))
+  MoveFromAdjacent :: Distance -> Diagonal -> MyersF a b Endpoint
 
-  GetK :: EditGraph a b -> Diagonal -> MyersF a b (Endpoint, EditScript a b)
-  SetK :: EditGraph a b -> Diagonal -> Int -> EditScript a b -> MyersF a b ()
+  GetK :: Diagonal -> MyersF a b (Endpoint, EditScript a b)
+  SetK :: Diagonal -> Int -> EditScript a b -> MyersF a b ()
 
-  Slide :: EditGraph a b -> Endpoint -> EditScript a b -> MyersF a b (Endpoint, EditScript a b)
+  Slide :: Endpoint -> EditScript a b -> MyersF a b (Endpoint, EditScript a b)
 
 type EditScript a b = [These a b]
 
@@ -56,31 +56,31 @@ data Endpoint = Endpoint { x :: !Int, y :: !Int }
 
 -- Evaluation
 
-runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> Myers a b c -> c
-runMyers eq step = evalState (go step) (emptyStateForStep step)
+runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> EditGraph a b ->Myers a b c -> c
+runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
   where go :: forall c. Myers a b c -> StateT (MyersState a b) Identity c
         go = iterFreerA algebra
         algebra :: forall c x. StepF a b x -> (x -> StateT (MyersState a b) Identity c) -> StateT (MyersState a b) Identity c
         algebra step cont = case step of
-          M m -> go (decompose m) >>= cont
+          M m -> go (decompose graph m) >>= cont
           S Get -> get >>= cont
           S (Put s) -> put s >>= cont
           GetEq -> cont eq
 
-runMyersSteps :: HasCallStack => (a -> b -> Bool) -> Myers a b c -> [(MyersState a b, Myers a b c)]
-runMyersSteps eq step = go (emptyStateForStep step) step
-  where go state step = let ?callStack = popCallStack callStack in prefix state step $ case runMyersStep eq state step of
+runMyersSteps :: HasCallStack => (a -> b -> Bool) -> EditGraph a b ->Myers a b c -> [(MyersState a b, Myers a b c)]
+runMyersSteps eq graph = go (emptyStateForGraph graph)
+  where go state step = let ?callStack = popCallStack callStack in prefix state step $ case runMyersStep eq graph state step of
           Left result -> [ (state, return result) ]
           Right next -> uncurry go next
         prefix state step = case step of
           Then (M _) _ -> ((state, step) :)
           _ -> identity
 
-runMyersStep :: HasCallStack => (a -> b -> Bool) -> MyersState a b -> Myers a b c -> Either c (MyersState a b, Myers a b c)
-runMyersStep eq state step = let ?callStack = popCallStack callStack in case step of
+runMyersStep :: HasCallStack => (a -> b -> Bool) -> EditGraph a b ->MyersState a b -> Myers a b c -> Either c (MyersState a b, Myers a b c)
+runMyersStep eq graph state step = let ?callStack = popCallStack callStack in case step of
   Return a -> Left a
   Then step cont -> case step of
-    M myers -> Right (state, decompose myers >>= cont)
+    M myers -> Right (state, decompose graph myers >>= cont)
 
     S Get -> Right (state, cont state)
     S (Put state') -> Right (state', cont ())
@@ -88,19 +88,19 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
     GetEq -> Right (state, cont eq)
 
 
-decompose :: HasCallStack => MyersF a b c -> Myers a b c
-decompose myers = let ?callStack = popCallStack callStack in case myers of
-  SES graph -> runSES graph
-  LCS graph -> runLCS graph
-  EditDistance graph -> runEditDistance graph
-  SearchUpToD graph d -> runSearchUpToD graph d
-  SearchAlongK graph d k -> runSearchAlongK graph d k
-  MoveFromAdjacent graph d k -> runMoveFromAdjacent graph d k
+decompose :: HasCallStack => EditGraph a b ->MyersF a b c -> Myers a b c
+decompose graph myers = let ?callStack = popCallStack callStack in case myers of
+  SES -> runSES graph
+  LCS -> runLCS graph
+  EditDistance -> runEditDistance graph
+  SearchUpToD d -> runSearchUpToD graph d
+  SearchAlongK d k -> runSearchAlongK graph d k
+  MoveFromAdjacent d k -> runMoveFromAdjacent graph d k
 
-  GetK graph k -> runGetK graph k
-  SetK graph k x script -> runSetK graph k x script
+  GetK k -> runGetK graph k
+  SetK k x script -> runSetK graph k x script
 
-  Slide graph from script -> runSlide graph from script
+  Slide from script -> runSlide graph from script
 {-# INLINE decompose #-}
 
 
@@ -109,7 +109,7 @@ runSES (EditGraph as bs)
   | null bs = return (This <$> toList as)
   | null as = return (That <$> toList bs)
   | otherwise = let ?callStack = popCallStack callStack in do
-    result <- for [0..(length as + length bs)] (searchUpToD (EditGraph as bs) . Distance)
+    result <- for [0..(length as + length bs)] (searchUpToD . Distance)
     case result of
       Just (script, _) -> return (reverse script)
       _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
@@ -118,24 +118,24 @@ runLCS :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
 runLCS (EditGraph as bs)
   | null as || null bs = return []
   | otherwise = let ?callStack = popCallStack callStack in do
-    result <- ses (EditGraph as bs)
+    result <- ses
     return (catMaybes (these (const Nothing) (const Nothing) ((Just .) . (,)) <$> result))
 
 runEditDistance :: HasCallStack => EditGraph a b -> Myers a b Int
-runEditDistance graph = let ?callStack = popCallStack callStack in length . filter (these (const True) (const True) (const (const False))) <$> ses graph
+runEditDistance _ = let ?callStack = popCallStack callStack in length . filter (these (const True) (const True) (const (const False))) <$> ses
 
 
 runSearchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (EditScript a b, Distance))
-runSearchUpToD graph (Distance d) = let ?callStack = popCallStack callStack in for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
+runSearchUpToD _ (Distance d) = let ?callStack = popCallStack callStack in for [negate d, negate d + 2 .. d] (searchAlongK (Distance d) . Diagonal)
 
 runSearchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
 runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack in
   if negate (length bs) > unDiagonal k || unDiagonal k > length as then
     continue
   else do
-    Endpoint x y <- moveFromAdjacent (EditGraph as bs) d k
+    Endpoint x y <- moveFromAdjacent d k
     if x >= length as && y >= length bs then do
-      (_, script) <- getK (EditGraph as bs) k
+      (_, script) <- getK k
       return (Just (script, d))
     else
       continue
@@ -146,20 +146,20 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
   (from, fromScript) <- if d == 0 || k < negate m || k > n then
     return (Endpoint 0 0, [])
   else if k == negate d || k == negate m then do
-    (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
+    (Endpoint nextX nextY, nextScript) <- getK (Diagonal (succ k))
     return (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
   else if k /= d && k /= n then do
-    (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
-    (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
+    (Endpoint prevX prevY, prevScript) <- getK (Diagonal (pred k))
+    (Endpoint nextX nextY, nextScript) <- getK (Diagonal (succ k))
     return $ if prevX < nextX then
       (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
     else
       (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
   else do
-    (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
+    (Endpoint prevX prevY, prevScript) <- getK (Diagonal (pred k))
     return (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
-  (endpoint, script) <- slide (EditGraph as bs) from fromScript
-  setK (EditGraph as bs) (Diagonal k) (x endpoint) script
+  (endpoint, script) <- slide from fromScript
+  setK (Diagonal k) (x endpoint) script
   return endpoint
 
 
@@ -181,7 +181,7 @@ runSlide (EditGraph as bs) (Endpoint x y) script
     let a = as ! x
     let b = bs ! y
     if a `eq` b then
-      slide (EditGraph as bs) (Endpoint (succ x) (succ y)) (These a b : script)
+      slide (Endpoint (succ x) (succ y)) (These a b : script)
     else
       return (Endpoint x y, script)
   | otherwise = return (Endpoint x y, script)
@@ -189,32 +189,32 @@ runSlide (EditGraph as bs) (Endpoint x y) script
 
 -- Smart constructors
 
-ses :: HasCallStack => EditGraph a b -> Myers a b (EditScript a b)
-ses graph = M (SES graph) `Then` return
+ses :: HasCallStack => Myers a b (EditScript a b)
+ses = M SES `Then` return
 
-lcs :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
-lcs graph = M (LCS graph) `Then` return
+lcs :: HasCallStack => Myers a b [(a, b)]
+lcs = M LCS `Then` return
 
-editDistance :: HasCallStack => EditGraph a b -> Myers a b Int
-editDistance graph = M (EditDistance graph) `Then` return
+editDistance :: HasCallStack => Myers a b Int
+editDistance = M EditDistance `Then` return
 
-searchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (EditScript a b, Distance))
-searchUpToD graph distance = M (SearchUpToD graph distance) `Then` return
+searchUpToD :: HasCallStack => Distance -> Myers a b (Maybe (EditScript a b, Distance))
+searchUpToD distance = M (SearchUpToD distance) `Then` return
 
-searchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
-searchAlongK graph d k = M (SearchAlongK graph d k) `Then` return
+searchAlongK :: HasCallStack => Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
+searchAlongK d k = M (SearchAlongK d k) `Then` return
 
-moveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b Endpoint
-moveFromAdjacent graph d k = M (MoveFromAdjacent graph d k) `Then` return
+moveFromAdjacent :: HasCallStack => Distance -> Diagonal -> Myers a b Endpoint
+moveFromAdjacent d k = M (MoveFromAdjacent d k) `Then` return
 
-getK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint, EditScript a b)
-getK graph diagonal = M (GetK graph diagonal) `Then` return
+getK :: HasCallStack => Diagonal -> Myers a b (Endpoint, EditScript a b)
+getK diagonal = M (GetK diagonal) `Then` return
 
-setK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
-setK graph diagonal x script = M (SetK graph diagonal x script) `Then` return
+setK :: HasCallStack => Diagonal -> Int -> EditScript a b -> Myers a b ()
+setK diagonal x script = M (SetK diagonal x script) `Then` return
 
-slide :: HasCallStack => EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
-slide graph from script = M (Slide graph from script) `Then` return
+slide :: HasCallStack => Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
+slide from script = M (Slide from script) `Then` return
 
 getEq :: HasCallStack => Myers a b (a -> b -> Bool)
 getEq = GetEq `Then` return
@@ -225,12 +225,9 @@ getEq = GetEq `Then` return
 newtype MyersState a b = MyersState { unMyersState :: Array.Array Int (Int, EditScript a b) }
   deriving (Eq, Show)
 
-emptyStateForStep :: Myers a b c -> MyersState a b
-emptyStateForStep step = case step of
-  Then (M myers) _ ->
-    let (_, n, m) = editGraph myers in
-    MyersState (Array.listArray (0, m + n) (repeat (0, [])))
-  _ -> MyersState (Array.listArray (0, negate 1) [])
+emptyStateForGraph :: EditGraph a b -> MyersState a b
+emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
+  MyersState (Array.listArray (0, m + n) (repeat (0, [])))
 
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
@@ -240,21 +237,6 @@ continue = return Nothing
 
 index :: Array.Array Int a -> Int -> Int
 index v k = if k >= 0 then k else length v + k
-
-
-editGraph :: MyersF a b c -> (EditGraph a b, Int, Int)
-editGraph myers = (EditGraph as bs, n, m)
-  where EditGraph as bs = case myers of
-          SES g -> g
-          LCS g -> g
-          EditDistance g -> g
-          SearchUpToD g _ -> g
-          SearchAlongK g _ _ -> g
-          MoveFromAdjacent g _ _ -> g
-          GetK g _ -> g
-          SetK g _ _ _ -> g
-          Slide g _ _ -> g
-        (n, m) = (length as, length bs)
 
 
 fail :: (HasCallStack, Monad m) => String -> m a
@@ -281,18 +263,17 @@ checkK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack 
 liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array.Array Int a -> ShowS
 liftShowsVector sp sl d = liftShowsPrec sp sl d . toList
 
-liftShowsMyersF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> MyersF a b c -> ShowS
-liftShowsMyersF sp1 sl1 sp2 sl2 d m = case m of
-  SES graph -> showsUnaryWith showGraph "SES" d graph
-  LCS graph -> showsUnaryWith showGraph "LCS" d graph
-  EditDistance graph -> showsUnaryWith showGraph "EditDistance" d graph
-  SearchUpToD graph distance -> showsBinaryWith showGraph showsPrec "SearchUpToD" d graph distance
-  SearchAlongK graph distance diagonal -> showsTernaryWith showGraph showsPrec showsPrec "SearchAlongK" d graph distance diagonal
-  MoveFromAdjacent graph distance diagonal -> showsTernaryWith showGraph showsPrec showsPrec "MoveFromAdjacent" d graph distance diagonal
-  GetK graph diagonal -> showsBinaryWith showGraph showsPrec "GetK" d graph diagonal
-  SetK graph diagonal v script -> showsQuaternaryWith showGraph showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d graph diagonal v script
-  Slide graph endpoint script -> showsTernaryWith showGraph showsPrec (liftShowsEditScript sp1 sp2) "Slide" d graph endpoint script
-  where showGraph = (liftShowsPrec2 :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> EditGraph a b -> ShowS) sp1 sl1 sp2 sl2
+liftShowsMyersF :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> MyersF a b c -> ShowS
+liftShowsMyersF sp1 sp2 d m = case m of
+  SES -> showString "SES"
+  LCS -> showString "LCS"
+  EditDistance -> showString "EditDistance"
+  SearchUpToD distance -> showsUnaryWith showsPrec "SearchUpToD" d distance
+  SearchAlongK distance diagonal -> showsBinaryWith showsPrec showsPrec "SearchAlongK" d distance diagonal
+  MoveFromAdjacent distance diagonal -> showsBinaryWith showsPrec showsPrec "MoveFromAdjacent" d distance diagonal
+  GetK diagonal -> showsUnaryWith showsPrec "GetK" d diagonal
+  SetK diagonal v script -> showsTernaryWith showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d diagonal v script
+  Slide endpoint script -> showsBinaryWith showsPrec (liftShowsEditScript sp1 sp2) "Slide" d endpoint script
 
 showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
 showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
@@ -313,7 +294,7 @@ liftShowsState sp d state = case state of
 
 liftShowsStepF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> StepF a b c -> ShowS
 liftShowsStepF sp1 sl1 sp2 sl2 d step = case step of
-  M m -> showsUnaryWith (liftShowsMyersF sp1 sl1 sp2 sl2) "M" d m
+  M m -> showsUnaryWith (liftShowsMyersF sp1 sp2) "M" d m
   S s -> showsUnaryWith (liftShowsState (liftShowsPrec2 sp1 sl1 sp2 sl2)) "S" d s
   GetEq -> showString "GetEq"
 
@@ -351,10 +332,10 @@ instance Show2 EditGraph where
   liftShowsPrec2 sp1 sl1 sp2 sl2 d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp1 sl1) (liftShowsVector sp2 sl2) "EditGraph" d as bs
 
 instance (Show a, Show b) => Show1 (MyersF a b) where
-  liftShowsPrec _ _ = liftShowsMyersF showsPrec showList showsPrec showList
+  liftShowsPrec _ _ = liftShowsMyersF showsPrec showsPrec
 
 instance (Show a, Show b) => Show (MyersF a b c) where
-  showsPrec = liftShowsMyersF showsPrec showList showsPrec showList
+  showsPrec = liftShowsMyersF showsPrec showsPrec
 
 instance (Show a, Show b) => Show1 (StepF a b) where
   liftShowsPrec _ _ = liftShowsStepF showsPrec showList showsPrec showList
