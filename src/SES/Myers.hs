@@ -163,26 +163,14 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
 
 
 runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint, EditScript a b)
-runGetK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack in do
-  v <- gets unMyersState
-  let i = index v k
-  let (n, m) = (length as, length bs)
-  when (i < 0) $
-    fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-  when (i >= length v) $
-    fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-  let (x, script) = v ! i in return (Endpoint x (x - k), script)
+runGetK graph k = let ?callStack = popCallStack callStack in do
+  (i, v) <- checkK graph k
+  let (x, script) = v ! i in return (Endpoint x (x - unDiagonal k), script)
 
 runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
-runSetK (EditGraph as bs) (Diagonal k) x script = let ?callStack = popCallStack callStack in do
-  v <- gets unMyersState
-  let i = index v k
-  let (n, m) = (length as, length bs)
-  when (i < 0) $
-    fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-  when (i >= length v) $
-    fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-  put (MyersState (v Array.// [(index v k, (x, script))]))
+runSetK graph k x script = let ?callStack = popCallStack callStack in do
+  (i, v) <- checkK graph k
+  put (MyersState (v Array.// [(i, (x, script))]))
 
 runSlide :: HasCallStack => EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
 runSlide (EditGraph as bs) (Endpoint x y) script
@@ -276,6 +264,17 @@ fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStac
 v ! i | i < length v = v Array.! i
       | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
           throw (MyersException ("index " <> show i <> " out of bounds") callStack)
+
+checkK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Int, Array.Array Int (Int, EditScript a b))
+checkK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack in do
+  v <- gets unMyersState
+  let i = index v k
+  let (n, m) = (length as, length bs)
+  when (i < 0) $
+    fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
+  when (i >= length v) $
+    fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
+  return (i, v)
 
 
 liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array.Array Int a -> ShowS
