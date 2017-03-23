@@ -128,16 +128,13 @@ runSearchUpToD (EditGraph as bs) (Distance d) = let ?callStack = popCallStack ca
   where (n, m) = (length as, length bs)
 
 runSearchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
-runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack in
-  if negate (length bs) > unDiagonal k || unDiagonal k > length as then
+runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack in do
+  Endpoint x y <- moveFromAdjacent d k
+  if x >= length as && y >= length bs then do
+    (_, script) <- getK k
+    return (Just (script, d))
+  else
     continue
-  else do
-    Endpoint x y <- moveFromAdjacent d k
-    if x >= length as && y >= length bs then do
-      (_, script) <- getK k
-      return (Just (script, d))
-    else
-      continue
 
 runMoveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b Endpoint
 runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack = popCallStack callStack in do
