@@ -90,17 +90,17 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
 
 decompose :: HasCallStack => MyersF a b c -> Myers a b c
 decompose myers = let ?callStack = popCallStack callStack in case myers of
-  LCS graph
+  LCS (EditGraph as bs)
     | null as || null bs -> return []
     | otherwise -> do
-      result <- ses graph
+      result <- ses (EditGraph as bs)
       return (catMaybes (these (const Nothing) (const Nothing) ((Just .) . (,)) <$> result))
 
-  SES graph
+  SES (EditGraph as bs)
     | null bs -> return (This <$> toList as)
     | null as -> return (That <$> toList bs)
     | otherwise -> do
-      result <- for [0..(m + n)] (searchUpToD graph . Distance)
+      result <- for [0..(length as + length bs)] (searchUpToD (EditGraph as bs) . Distance)
       case result of
         Just (script, _) -> return (reverse script)
         _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
@@ -109,37 +109,39 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   SearchUpToD graph (Distance d) -> for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
 
-  SearchAlongK graph d k -> if negate m > unDiagonal k || unDiagonal k > n then continue else do
-    Endpoint x y <- moveFromAdjacent graph d k
-    if x >= n && y >= m then do
-      (_, script) <- getK graph k
+  SearchAlongK (EditGraph as bs) d k -> if negate (length bs) > unDiagonal k || unDiagonal k > length as then continue else do
+    Endpoint x y <- moveFromAdjacent (EditGraph as bs) d k
+    if x >= length as && y >= length bs then do
+      (_, script) <- getK (EditGraph as bs) k
       return (Just (script, d))
     else
       continue
 
-  MoveFromAdjacent graph (Distance d) (Diagonal k) -> do
+  MoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) -> do
+    let (n, m) = (length as, length bs)
     (from, fromScript) <- if d == 0 || k < negate m || k > n then
       return (Endpoint 0 0, [])
     else if k == negate d || k == negate m then do
-      (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
+      (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
       return (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
     else if k /= d && k /= n then do
-      (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
-      (Endpoint nextX nextY, nextScript) <- getK graph (Diagonal (succ k))
+      (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
+      (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
       return $ if prevX < nextX then
         (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
       else
         (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
     else do
-      (Endpoint prevX prevY, prevScript) <- getK graph (Diagonal (pred k))
+      (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
       return (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
-    (endpoint, script) <- slide graph from fromScript
-    setK graph (Diagonal k) (x endpoint) script
+    (endpoint, script) <- slide (EditGraph as bs) from fromScript
+    setK (EditGraph as bs) (Diagonal k) (x endpoint) script
     return endpoint
 
-  GetK _ (Diagonal k) -> do
+  GetK (EditGraph as bs) (Diagonal k) -> do
     v <- gets unMyersState
     let i = index v k
+    let (n, m) = (length as, length bs)
     when (i < 0) $
       fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
     when (i >= length v) $
@@ -150,21 +152,19 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
     modify (MyersState . set . unMyersState)
     where set v = v // [(index v k, (x, script))]
 
-  Slide graph (Endpoint x y) script
-    | x >= 0, x < n
-    , y >= 0, y < m -> do
+  Slide (EditGraph as bs) (Endpoint x y) script
+    | x >= 0, x < length as
+    , y >= 0, y < length bs -> do
       eq <- getEq
       let a = as ! x
       let b = bs ! y
       if a `eq` b then
-        slide graph (Endpoint (succ x) (succ y)) (These a b : script)
+        slide (EditGraph as bs) (Endpoint (succ x) (succ y)) (These a b : script)
       else
         return (Endpoint x y, script)
     | otherwise -> return (Endpoint x y, script)
 
-  where (EditGraph as bs, n, m) = editGraph myers
-
-        (!) :: HasCallStack => Array Int a -> Int -> a
+  where (!) :: HasCallStack => Array Int a -> Int -> a
         v ! i | i < length v = v Data.Array.! i
               | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
                   throw (MyersException ("index " <> show i <> " out of bounds") callStack)
