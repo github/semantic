@@ -100,17 +100,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   GetK graph k -> runGetK graph k
   SetK graph k x script -> runSetK graph k x script
 
-  Slide (EditGraph as bs) (Endpoint x y) script
-    | x >= 0, x < length as
-    , y >= 0, y < length bs -> do
-      eq <- getEq
-      let a = as ! x
-      let b = bs ! y
-      if a `eq` b then
-        slide (EditGraph as bs) (Endpoint (succ x) (succ y)) (These a b : script)
-      else
-        return (Endpoint x y, script)
-    | otherwise -> return (Endpoint x y, script)
+  Slide graph from script -> runSlide graph from script
 
 
 runSES :: HasCallStack => EditGraph a b -> Myers a b (EditScript a b)
@@ -187,6 +177,19 @@ runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b ->
 runSetK graph (Diagonal k) x script = let ?callStack = popCallStack callStack in
   modify (MyersState . set . unMyersState)
   where set v = v Array.// [(index v k, (x, script))]
+
+runSlide :: HasCallStack => EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
+runSlide (EditGraph as bs) (Endpoint x y) script
+  | x >= 0, x < length as
+  , y >= 0, y < length bs = let ?callStack = popCallStack callStack in do
+    eq <- getEq
+    let a = as ! x
+    let b = bs ! y
+    if a `eq` b then
+      slide (EditGraph as bs) (Endpoint (succ x) (succ y)) (These a b : script)
+    else
+      return (Endpoint x y, script)
+  | otherwise = return (Endpoint x y, script)
 
 
 -- Smart constructors
