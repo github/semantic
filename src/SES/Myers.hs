@@ -4,6 +4,7 @@ module SES.Myers where
 import Control.Exception
 import Control.Monad.Free.Freer
 import qualified Data.Array as Array
+import Data.Ix (inRange)
 import Data.Functor.Classes
 import Data.String
 import Data.These
@@ -122,7 +123,9 @@ runEditDistance _ = let ?callStack = popCallStack callStack in length . filter (
 
 
 runSearchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (EditScript a b, Distance))
-runSearchUpToD _ (Distance d) = let ?callStack = popCallStack callStack in for [negate d, negate d + 2 .. d] (searchAlongK (Distance d) . Diagonal)
+runSearchUpToD (EditGraph as bs) (Distance d) = let ?callStack = popCallStack callStack in
+  for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK (Distance d) . Diagonal)
+  where (n, m) = (length as, length bs)
 
 runSearchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
 runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack in
