@@ -95,27 +95,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   EditDistance graph -> runEditDistance graph
   SearchUpToD graph d -> runSearchUpToD graph d
   SearchAlongK graph d k -> runSearchAlongK graph d k
-
-  MoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) -> do
-    let (n, m) = (length as, length bs)
-    (from, fromScript) <- if d == 0 || k < negate m || k > n then
-      return (Endpoint 0 0, [])
-    else if k == negate d || k == negate m then do
-      (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
-      return (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
-    else if k /= d && k /= n then do
-      (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
-      (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
-      return $ if prevX < nextX then
-        (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
-      else
-        (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
-    else do
-      (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
-      return (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
-    (endpoint, script) <- slide (EditGraph as bs) from fromScript
-    setK (EditGraph as bs) (Diagonal k) (x endpoint) script
-    return endpoint
+  MoveFromAdjacent graph d k -> runMoveFromAdjacent graph d k
 
   GetK (EditGraph as bs) (Diagonal k) -> do
     v <- gets unMyersState
@@ -184,6 +164,28 @@ runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack 
       return (Just (script, d))
     else
       continue
+
+runMoveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b Endpoint
+runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack = popCallStack callStack in do
+  let (n, m) = (length as, length bs)
+  (from, fromScript) <- if d == 0 || k < negate m || k > n then
+    return (Endpoint 0 0, [])
+  else if k == negate d || k == negate m then do
+    (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
+    return (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
+  else if k /= d && k /= n then do
+    (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
+    (Endpoint nextX nextY, nextScript) <- getK (EditGraph as bs) (Diagonal (succ k))
+    return $ if prevX < nextX then
+      (Endpoint nextX (succ nextY), if nextY < m then That (bs ! nextY) : nextScript else nextScript) -- downward (insertion)
+    else
+      (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
+  else do
+    (Endpoint prevX prevY, prevScript) <- getK (EditGraph as bs) (Diagonal (pred k))
+    return (Endpoint (succ prevX) prevY, if prevX < n then This (as ! prevX) : prevScript else prevScript) -- rightward (deletion)
+  (endpoint, script) <- slide (EditGraph as bs) from fromScript
+  setK (EditGraph as bs) (Diagonal k) (x endpoint) script
+  return endpoint
 
 
 -- Smart constructors
