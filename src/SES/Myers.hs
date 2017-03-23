@@ -9,6 +9,10 @@ module SES.Myers
 , Diagonal(..)
 , Endpoint(..)
 , ses
+, runMyers
+, runMyersSteps
+, lcs
+, editDistance
 , MyersState(..)
 , index
 ) where
