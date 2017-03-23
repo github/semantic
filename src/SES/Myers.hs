@@ -38,11 +38,11 @@ data MyersF a b result where
   MoveFromAdjacent :: Distance -> Diagonal -> MyersF a b (Endpoint a b)
   MoveDownFrom :: Endpoint a b -> MyersF a b (Endpoint a b)
   MoveRightFrom :: Endpoint a b -> MyersF a b (Endpoint a b)
+  SlideFrom :: Endpoint a b -> MyersF a b (Endpoint a b)
 
   GetK :: Diagonal -> MyersF a b (Endpoint a b)
   SetK :: Diagonal -> Endpoint a b -> MyersF a b ()
 
-  Slide :: Endpoint a b -> MyersF a b (Endpoint a b)
 
 -- | An edit script, i.e. a sequence of changes/copies of elements.
 type EditScript a b = [These a b]
@@ -133,7 +133,7 @@ decompose eq graph myers = let ?callStack = popCallStack callStack in case myers
   GetK k -> runGetK graph k
   SetK k x -> runSetK graph k x
 
-  Slide from -> runSlide eq graph from
+  SlideFrom from -> runSlideFrom eq graph from
 {-# INLINE decompose #-}
 
 
@@ -197,7 +197,7 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
   else
     -- The upper/right extent of the search region or edit graph, whichever is smaller.
     getK (Diagonal (pred k)) >>= moveRightFrom
-  endpoint <- slide from
+  endpoint <- slideFrom from
   setK (Diagonal k) endpoint
   return endpoint
 
@@ -222,13 +222,13 @@ runSetK graph k (Endpoint x _ script) = let ?callStack = popCallStack callStack 
   put (MyersState (v Array.// [(unDiagonal k, (x, script))]))
 
 -- | Slide down any diagonal edges from a given vertex.
-runSlide :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint a b -> Myers a b (Endpoint a b)
-runSlide eq (EditGraph as bs) (Endpoint x y script)
+runSlideFrom :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint a b -> Myers a b (Endpoint a b)
+runSlideFrom eq (EditGraph as bs) (Endpoint x y script)
   | x >= 0, x < length as
   , y >= 0, y < length bs
   , a <- as ! x
   , b <- bs ! y
-  , a `eq` b  = slide  (Endpoint (succ x) (succ y) (These a b : script))
+  , a `eq` b  = slideFrom  (Endpoint (succ x) (succ y) (These a b : script))
   | otherwise = return (Endpoint       x        y               script)
 
 
@@ -271,8 +271,8 @@ setK :: HasCallStack => Diagonal -> Endpoint a b -> Myers a b ()
 setK diagonal x = M (SetK diagonal x) `Then` return
 
 -- | Slide down any diagonal edges from a given vertex.
-slide :: HasCallStack => Endpoint a b -> Myers a b (Endpoint a b)
-slide from = M (Slide from) `Then` return
+slideFrom :: HasCallStack => Endpoint a b -> Myers a b (Endpoint a b)
+slideFrom from = M (SlideFrom from) `Then` return
 
 
 -- Implementation details
@@ -336,7 +336,7 @@ liftShowsMyersF sp1 sp2 d m = case m of
   MoveRightFrom endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "MoveRightFrom" d endpoint
   GetK diagonal -> showsUnaryWith showsPrec "GetK" d diagonal
   SetK diagonal v -> showsBinaryWith showsPrec (liftShowsEndpoint sp1 sp2) "SetK" d diagonal v
-  Slide endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "Slide" d endpoint
+  SlideFrom endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "SlideFrom" d endpoint
 
 -- | Lifted showing of ternary constructors.
 showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
