@@ -22,7 +22,7 @@ data MyersF a b result where
   MoveFromAdjacent :: Distance -> Diagonal -> MyersF a b (Endpoint a b)
 
   GetK :: Diagonal -> MyersF a b (Endpoint a b)
-  SetK :: Diagonal -> Int -> EditScript a b -> MyersF a b ()
+  SetK :: Diagonal -> Endpoint a b -> MyersF a b ()
 
   Slide :: Endpoint a b -> MyersF a b (Endpoint a b)
 
@@ -98,7 +98,7 @@ decompose eq graph myers = let ?callStack = popCallStack callStack in case myers
   MoveFromAdjacent d k -> runMoveFromAdjacent graph d k
 
   GetK k -> runGetK graph k
-  SetK k x script -> runSetK graph k x script
+  SetK k x -> runSetK graph k x
 
   Slide from -> runSlide eq graph from
 {-# INLINE decompose #-}
@@ -157,7 +157,7 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
     (Endpoint prevX prevY prevScript) <- getK (Diagonal (pred k))
     return (Endpoint (succ prevX) prevY (if prevX < n then This (as ! prevX) : prevScript else prevScript)) -- rightward (deletion)
   endpoint <- slide from
-  setK (Diagonal k) (x endpoint) (script endpoint)
+  setK (Diagonal k) endpoint
   return endpoint
 
 
@@ -166,8 +166,8 @@ runGetK graph k = let ?callStack = popCallStack callStack in do
   (i, v) <- checkK graph k
   let (x, script) = v ! i in return (Endpoint x (x - unDiagonal k) script)
 
-runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Int -> EditScript a b -> Myers a b ()
-runSetK graph k x script = let ?callStack = popCallStack callStack in do
+runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Endpoint a b -> Myers a b ()
+runSetK graph k (Endpoint x _ script) = let ?callStack = popCallStack callStack in do
   (i, v) <- checkK graph k
   put (MyersState (v Array.// [(i, (x, script))]))
 
@@ -201,8 +201,8 @@ moveFromAdjacent d k = M (MoveFromAdjacent d k) `Then` return
 getK :: HasCallStack => Diagonal -> Myers a b (Endpoint a b)
 getK diagonal = M (GetK diagonal) `Then` return
 
-setK :: HasCallStack => Diagonal -> Int -> EditScript a b -> Myers a b ()
-setK diagonal x script = M (SetK diagonal x script) `Then` return
+setK :: HasCallStack => Diagonal -> Endpoint a b -> Myers a b ()
+setK diagonal x = M (SetK diagonal x) `Then` return
 
 slide :: HasCallStack => Endpoint a b -> Myers a b (Endpoint a b)
 slide from = M (Slide from) `Then` return
@@ -260,7 +260,7 @@ liftShowsMyersF sp1 sp2 d m = case m of
   SearchAlongK distance diagonal -> showsBinaryWith showsPrec showsPrec "SearchAlongK" d distance diagonal
   MoveFromAdjacent distance diagonal -> showsBinaryWith showsPrec showsPrec "MoveFromAdjacent" d distance diagonal
   GetK diagonal -> showsUnaryWith showsPrec "GetK" d diagonal
-  SetK diagonal v script -> showsTernaryWith showsPrec showsPrec (liftShowsEditScript sp1 sp2) "SetK" d diagonal v script
+  SetK diagonal v -> showsBinaryWith showsPrec (liftShowsEndpoint sp1 sp2) "SetK" d diagonal v
   Slide endpoint -> showsUnaryWith (liftShowsEndpoint sp1 sp2) "Slide" d endpoint
 
 showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
