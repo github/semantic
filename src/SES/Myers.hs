@@ -14,7 +14,6 @@ module SES.Myers
 , lcs
 , editDistance
 , MyersState(..)
-, index
 ) where
 
 import Control.Exception
@@ -213,14 +212,14 @@ runMoveRightFrom (EditGraph as _) (Endpoint x y script) = return (Endpoint (succ
 -- | Return the maximum extent reached and path taken along a given diagonal.
 runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint a b)
 runGetK graph k = let ?callStack = popCallStack callStack in do
-  (i, v) <- checkK graph k
-  let (x, script) = v ! i in return (Endpoint x (x - unDiagonal k) script)
+  v <- checkK graph k
+  let (x, script) = v ! unDiagonal k in return (Endpoint x (x - unDiagonal k) script)
 
 -- | Update the maximum extent reached and path taken along a given diagonal.
 runSetK :: HasCallStack => EditGraph a b -> Diagonal -> Endpoint a b -> Myers a b ()
 runSetK graph k (Endpoint x _ script) = let ?callStack = popCallStack callStack in do
-  (i, v) <- checkK graph k
-  put (MyersState (v Array.// [(i, (x, script))]))
+  v <- checkK graph k
+  put (MyersState (v Array.// [(unDiagonal k, (x, script))]))
 
 -- | Slide down any diagonal edges from a given vertex.
 runSlide :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint a b -> Myers a b (Endpoint a b)
@@ -290,7 +289,7 @@ data State s a where
 -- | Compute the empty state of length m + n + 1 for a given edit graph.
 emptyStateForGraph :: EditGraph a b -> MyersState a b
 emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
-  MyersState (Array.listArray (0, m + n) (repeat (0, [])))
+  MyersState (Array.listArray (negate m, n) (repeat (0, [])))
 
 -- | Evaluate some function for each value in a list until one returns a value or the list is exhausted.
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
@@ -300,10 +299,6 @@ for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 continue :: Myers b c (Maybe a)
 continue = return Nothing
 
--- | Compute the actual index into the state array from a (possibly negative) diagonal number.
-index :: Array.Array Int a -> Int -> Int
-index v k = if k >= 0 then k else length v + k
-
 
 -- | Throw a failure. Used to indicate an error in the implementation of Myers’ algorithm.
 fail :: (HasCallStack, Monad m) => String -> m a
@@ -312,21 +307,16 @@ fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStac
 
 -- | Bounds-checked indexing of arrays, preserving the call stack.
 (!) :: HasCallStack => Array.Array Int a -> Int -> a
-v ! i | i < length v = v Array.! i
+v ! i | inRange (Array.bounds v) i = v Array.! i
       | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
           throw (MyersException ("index " <> show i <> " out of bounds") callStack)
 
 -- | Check that a given diagonal is in-bounds for the edit graph, returning the actual index to use and the state array.
-checkK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Int, Array.Array Int (Int, EditScript a b))
-checkK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack in do
+checkK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Array.Array Int (Int, EditScript a b))
+checkK _ (Diagonal k) = let ?callStack = popCallStack callStack in do
   v <- gets unMyersState
-  let i = index v k
-  let (n, m) = (length as, length bs)
-  when (i < 0) $
-    fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-  when (i >= length v) $
-    fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-  return (i, v)
+  unless (inRange (Array.bounds v) k) $ fail ("diagonal " <> show k <> " outside state bounds " <> show (Array.bounds v))
+  return v
 
 
 -- | Lifted showing of arrays.
