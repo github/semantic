@@ -90,16 +90,8 @@ runMyersStep eq state step = let ?callStack = popCallStack callStack in case ste
 
 decompose :: HasCallStack => MyersF a b c -> Myers a b c
 decompose myers = let ?callStack = popCallStack callStack in case myers of
+  SES graph -> runSES graph
   LCS graph -> runLCS graph
-
-  SES (EditGraph as bs)
-    | null bs -> return (This <$> toList as)
-    | null as -> return (That <$> toList bs)
-    | otherwise -> do
-      result <- for [0..(length as + length bs)] (searchUpToD (EditGraph as bs) . Distance)
-      case result of
-        Just (script, _) -> return (reverse script)
-        _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
 
   EditDistance graph -> length . filter (these (const True) (const True) (const (const False))) <$> ses graph
 
@@ -165,6 +157,16 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
               | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
                   throw (MyersException ("index " <> show i <> " out of bounds") callStack)
 
+
+runSES :: HasCallStack => EditGraph a b -> Myers a b (EditScript a b)
+runSES (EditGraph as bs)
+  | null bs = return (This <$> toList as)
+  | null as = return (That <$> toList bs)
+  | otherwise = let ?callStack = popCallStack callStack in do
+    result <- for [0..(length as + length bs)] (searchUpToD (EditGraph as bs) . Distance)
+    case result of
+      Just (script, _) -> return (reverse script)
+      _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
 
 runLCS :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
 runLCS (EditGraph as bs)
