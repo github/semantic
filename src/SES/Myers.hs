@@ -62,7 +62,7 @@ runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
         go = iterFreerA algebra
         algebra :: forall c x. StepF a b x -> (x -> StateT (MyersState a b) Identity c) -> StateT (MyersState a b) Identity c
         algebra step cont = case step of
-          M m -> go (decompose graph m) >>= cont
+          M m -> go (decompose eq graph m) >>= cont
           S Get -> get >>= cont
           S (Put s) -> put s >>= cont
           GetEq -> cont eq
@@ -80,7 +80,7 @@ runMyersStep :: HasCallStack => (a -> b -> Bool) -> EditGraph a b ->MyersState a
 runMyersStep eq graph state step = let ?callStack = popCallStack callStack in case step of
   Return a -> Left a
   Then step cont -> case step of
-    M myers -> Right (state, decompose graph myers >>= cont)
+    M myers -> Right (state, decompose eq graph myers >>= cont)
 
     S Get -> Right (state, cont state)
     S (Put state') -> Right (state', cont ())
@@ -88,8 +88,8 @@ runMyersStep eq graph state step = let ?callStack = popCallStack callStack in ca
     GetEq -> Right (state, cont eq)
 
 
-decompose :: HasCallStack => EditGraph a b ->MyersF a b c -> Myers a b c
-decompose graph myers = let ?callStack = popCallStack callStack in case myers of
+decompose :: HasCallStack => (a -> b -> Bool) -> EditGraph a b ->MyersF a b c -> Myers a b c
+decompose eq graph myers = let ?callStack = popCallStack callStack in case myers of
   SES -> runSES graph
   LCS -> runLCS graph
   EditDistance -> runEditDistance graph
@@ -100,7 +100,7 @@ decompose graph myers = let ?callStack = popCallStack callStack in case myers of
   GetK k -> runGetK graph k
   SetK k x script -> runSetK graph k x script
 
-  Slide from script -> runSlide graph from script
+  Slide from script -> runSlide eq graph from script
 {-# INLINE decompose #-}
 
 
@@ -173,11 +173,10 @@ runSetK graph k x script = let ?callStack = popCallStack callStack in do
   (i, v) <- checkK graph k
   put (MyersState (v Array.// [(i, (x, script))]))
 
-runSlide :: HasCallStack => EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
-runSlide (EditGraph as bs) (Endpoint x y) script
+runSlide :: HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Endpoint -> EditScript a b -> Myers a b (Endpoint, EditScript a b)
+runSlide eq (EditGraph as bs) (Endpoint x y) script
   | x >= 0, x < length as
   , y >= 0, y < length bs = let ?callStack = popCallStack callStack in do
-    eq <- getEq
     let a = as ! x
     let b = bs ! y
     if a `eq` b then
