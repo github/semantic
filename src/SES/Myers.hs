@@ -228,12 +228,6 @@ continue = return Nothing
 index :: Vector.Vector a -> Int -> Int
 index v k = if k >= 0 then k else length v + k
 
-divideGraph :: EditGraph a b -> Endpoint -> (EditGraph a b, EditGraph a b)
-divideGraph (EditGraph as bs) (Endpoint x y) =
-  ( EditGraph (slice 0  x              as) (slice 0  y              bs)
-  , EditGraph (slice x (length as - x) as) (slice y (length bs - y) bs) )
-  where slice from to v = Vector.slice (max 0 (min from (length v))) (max 0 (min to (length v))) v
-
 
 editGraph :: MyersF a b c -> (EditGraph a b, Int, Int)
 editGraph myers = (EditGraph as bs, n, m)
