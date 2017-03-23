@@ -30,10 +30,6 @@ data MyersF a b result where
 
 type EditScript a b = [These a b]
 
-data State s a where
-  Get :: State s s
-  Put :: s -> State s ()
-
 data StepF a b result where
   M :: HasCallStack => MyersF a b c -> StepF a b c
   S :: State (MyersState a b) c -> StepF a b c
@@ -228,6 +224,10 @@ slide from = M (Slide from) `Then` return
 
 newtype MyersState a b = MyersState { unMyersState :: Array.Array Int (Int, EditScript a b) }
   deriving (Eq, Show)
+
+data State s a where
+  Get :: State s s
+  Put :: s -> State s ()
 
 emptyStateForGraph :: EditGraph a b -> MyersState a b
 emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
