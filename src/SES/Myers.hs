@@ -97,15 +97,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   SearchAlongK graph d k -> runSearchAlongK graph d k
   MoveFromAdjacent graph d k -> runMoveFromAdjacent graph d k
 
-  GetK (EditGraph as bs) (Diagonal k) -> do
-    v <- gets unMyersState
-    let i = index v k
-    let (n, m) = (length as, length bs)
-    when (i < 0) $
-      fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-    when (i >= length v) $
-      fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-    let (x, script) = v ! i in return (Endpoint x (x - k), script)
+  GetK graph k -> runGetK graph k
 
   SetK _ (Diagonal k) x script ->
     modify (MyersState . set . unMyersState)
@@ -186,6 +178,18 @@ runMoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) = let ?callStack
   (endpoint, script) <- slide (EditGraph as bs) from fromScript
   setK (EditGraph as bs) (Diagonal k) (x endpoint) script
   return endpoint
+
+
+runGetK :: HasCallStack => EditGraph a b -> Diagonal -> Myers a b (Endpoint, EditScript a b)
+runGetK (EditGraph as bs) (Diagonal k) = let ?callStack = popCallStack callStack in do
+  v <- gets unMyersState
+  let i = index v k
+  let (n, m) = (length as, length bs)
+  when (i < 0) $
+    fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
+  when (i >= length v) $
+    fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
+  let (x, script) = v ! i in return (Endpoint x (x - k), script)
 
 
 -- Smart constructors
