@@ -111,7 +111,8 @@ reportGitmon' SocketFactory{..} program gitCommand =
     procStats :: TimeSpec -> TimeSpec -> ProcInfo -> ProcInfo -> ( Integer, Integer, Integer, Integer )
     procStats beforeTime afterTime beforeProcIOContents afterProcIOContents = ( cpuTime, diskReadBytes, diskWriteBytes, resultCode )
       where
-        cpuTime = toNanoSecs $ afterTime - beforeTime
+        -- | toNanoSecs converts TimeSpec to Integer, and we further convert this value to milliseconds (expected by Gitmon).
+        cpuTime = div (1 * 1000 * 1000) . toNanoSecs $ afterTime - beforeTime
         beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
         afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
         beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
