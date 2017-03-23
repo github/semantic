@@ -3,10 +3,10 @@ module SES.Myers where
 
 import Control.Exception
 import Control.Monad.Free.Freer
+import Data.Array hiding (index)
 import Data.Functor.Classes
 import Data.String
 import Data.These
-import qualified Data.Vector as Vector
 import GHC.Show hiding (show)
 import GHC.Stack
 import Prologue hiding (for, State, error)
@@ -38,11 +38,11 @@ data StepF a b result where
 
 type Myers a b = Freer (StepF a b)
 
-data EditGraph a b = EditGraph { as :: !(Vector.Vector a), bs :: !(Vector.Vector b) }
+data EditGraph a b = EditGraph { as :: !(Array Int a), bs :: !(Array Int b) }
   deriving (Eq, Show)
 
 makeEditGraph :: (Foldable t, Foldable u) => t a -> u b -> EditGraph a b
-makeEditGraph as bs = EditGraph (Vector.fromList (toList as)) (Vector.fromList (toList bs))
+makeEditGraph as bs = EditGraph (listArray (0, pred (length as)) (toList as)) (listArray (0, pred (length bs)) (toList bs))
 
 newtype Distance = Distance { unDistance :: Int }
   deriving (Eq, Show)
@@ -144,18 +144,18 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
       fail ("diagonal " <> show k <> " (" <> show i <> ") underflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
     when (i >= length v) $
       fail ("diagonal " <> show k <> " (" <> show i <> ") overflows state indices " <> show (negate m) <> ".." <> show n <> " (0.." <> show (succ (m + n)) <> ")")
-    let (x, script) = v Vector.! i in return (Endpoint x (x - k), script)
+    let (x, script) = v ! i in return (Endpoint x (x - k), script)
 
   SetK _ (Diagonal k) x script ->
     modify (MyersState . set . unMyersState)
-    where set v = v Vector.// [(index v k, (x, script))]
+    where set v = v // [(index v k, (x, script))]
 
   Slide graph (Endpoint x y) script
     | x >= 0, x < n
     , y >= 0, y < m -> do
       eq <- getEq
-      let a = as Vector.! x
-      let b = bs Vector.! y
+      let a = as ! x
+      let b = bs ! y
       if a `eq` b then
         slide graph (Endpoint (succ x) (succ y)) (These a b : script)
       else
@@ -164,8 +164,8 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
 
   where (EditGraph as bs, n, m) = editGraph myers
 
-        (!) :: HasCallStack => Vector.Vector a -> Int -> a
-        v ! i | i < length v = v Vector.! i
+        (!) :: HasCallStack => Array Int a -> Int -> a
+        v ! i | i < length v = v Data.Array.! i
               | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
                   throw (MyersException ("index " <> show i <> " out of bounds") callStack)
 
@@ -209,15 +209,15 @@ getEq = GetEq `Then` return
 
 -- Implementation details
 
-newtype MyersState a b = MyersState { unMyersState :: Vector.Vector (Int, EditScript a b) }
+newtype MyersState a b = MyersState { unMyersState :: Array Int (Int, EditScript a b) }
   deriving (Eq, Show)
 
 emptyStateForStep :: Myers a b c -> MyersState a b
 emptyStateForStep step = case step of
   Then (M myers) _ ->
     let (_, n, m) = editGraph myers in
-    MyersState (Vector.replicate (succ (m + n)) (0, []))
-  _ -> MyersState Vector.empty
+    MyersState (listArray (0, m + n) (repeat (0, [])))
+  _ -> MyersState (listArray (0, negate 1) [])
 
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
@@ -225,7 +225,7 @@ for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 continue :: Myers b c (Maybe a)
 continue = return Nothing
 
-index :: Vector.Vector a -> Int -> Int
+index :: Array Int a -> Int -> Int
 index v k = if k >= 0 then k else length v + k
 
 
@@ -244,7 +244,7 @@ editGraph myers = (EditGraph as bs, n, m)
         (n, m) = (length as, length bs)
 
 
-liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Vector.Vector a -> ShowS
+liftShowsVector :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array Int a -> ShowS
 liftShowsVector sp sl d = liftShowsPrec sp sl d . toList
 
 liftShowsMyersF :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> MyersF a b c -> ShowS
