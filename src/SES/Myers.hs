@@ -94,14 +94,7 @@ decompose myers = let ?callStack = popCallStack callStack in case myers of
   LCS graph -> runLCS graph
   EditDistance graph -> runEditDistance graph
   SearchUpToD graph d -> runSearchUpToD graph d
-
-  SearchAlongK (EditGraph as bs) d k -> if negate (length bs) > unDiagonal k || unDiagonal k > length as then continue else do
-    Endpoint x y <- moveFromAdjacent (EditGraph as bs) d k
-    if x >= length as && y >= length bs then do
-      (_, script) <- getK (EditGraph as bs) k
-      return (Just (script, d))
-    else
-      continue
+  SearchAlongK graph d k -> runSearchAlongK graph d k
 
   MoveFromAdjacent (EditGraph as bs) (Distance d) (Diagonal k) -> do
     let (n, m) = (length as, length bs)
@@ -179,6 +172,18 @@ runEditDistance graph = let ?callStack = popCallStack callStack in length . filt
 
 runSearchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (EditScript a b, Distance))
 runSearchUpToD graph (Distance d) = let ?callStack = popCallStack callStack in for [negate d, negate d + 2 .. d] (searchAlongK graph (Distance d) . Diagonal)
+
+runSearchAlongK :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Maybe (EditScript a b, Distance))
+runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack in
+  if negate (length bs) > unDiagonal k || unDiagonal k > length as then
+    continue
+  else do
+    Endpoint x y <- moveFromAdjacent (EditGraph as bs) d k
+    if x >= length as && y >= length bs then do
+      (_, script) <- getK (EditGraph as bs) k
+      return (Just (script, d))
+    else
+      continue
 
 
 -- Smart constructors
