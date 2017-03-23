@@ -118,11 +118,11 @@ runLCS :: HasCallStack => EditGraph a b -> Myers a b [(a, b)]
 runLCS (EditGraph as bs)
   | null as || null bs = return []
   | otherwise = let ?callStack = popCallStack callStack in do
-    result <- ses
+    result <- M SES `Then` return
     return (catMaybes (these (const Nothing) (const Nothing) ((Just .) . (,)) <$> result))
 
 runEditDistance :: HasCallStack => EditGraph a b -> Myers a b Int
-runEditDistance _ = let ?callStack = popCallStack callStack in length . filter (these (const True) (const True) (const (const False))) <$> ses
+runEditDistance _ = let ?callStack = popCallStack callStack in length . filter (these (const True) (const True) (const (const False))) <$> (M SES `Then` return)
 
 
 runSearchUpToD :: HasCallStack => EditGraph a b -> Distance -> Myers a b (Maybe (EditScript a b, Distance))
