@@ -150,7 +150,6 @@ reportGitmon' SocketFactory{..} program gitCommand =
             readInt (Just [s]) = Just (read s :: Int)
             readInt _ = Nothing
 
-
 withGitmonSocket :: (Socket -> IO c) -> IO c
 withGitmonSocket = bracket connectSocket close
   where
