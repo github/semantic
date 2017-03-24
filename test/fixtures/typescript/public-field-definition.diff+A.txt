@@ -1,0 +1,62 @@
+{+(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (VarAssignment
+        (Other "readonly")
+        (Identifier))
+      (VarAssignment
+        (Other "readonly")
+        (Identifier))
+      (VarAssignment
+        (Other "accessibility_modifier")
+        (Other "readonly")
+        (Identifier))
+      (VarAssignment
+        (Other "accessibility_modifier")
+        (Other "readonly")
+        (Identifier)
+        (NumberLiteral))
+      (VarAssignment
+        (Other "accessibility_modifier")
+        (Other "readonly")
+        (Identifier)
+        (Other "type_annotation"
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (VarAssignment
+        (Identifier)
+        (Other "type_annotation"
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (VarAssignment
+        (Identifier)
+        (Other "type_annotation"
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (VarAssignment
+        (Other "readonly")
+        (Identifier)
+        (Other "type_annotation"
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (VarAssignment
+        (Other "readonly")
+        (Identifier)
+        (Other "type_annotation"
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (VarAssignment
+        (Identifier)
+        (Other "type_annotation"
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (VarAssignment
+        (Identifier)
+        (NumberLiteral)))))+}
