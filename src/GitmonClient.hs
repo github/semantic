@@ -1,5 +1,4 @@
 {-# LANGUAGE RecordWildCards, DeriveGeneric, RankNTypes #-}
-{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module GitmonClient where
 
 import Control.Exception (throw)
