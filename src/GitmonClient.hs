@@ -76,18 +76,18 @@ reportGitmon = reportGitmon' SocketFactory { withSocket = withGitmonSocket }
 
 reportGitmon' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' SocketFactory{..} program gitCommand =
-  join . liftIO . withSocket $ \socket' -> do
+  join . liftIO . withSocket $ \sock -> do
     (gitDir, realIP, repoName, repoID, userID) <- loadEnvVars
-    safeGitmonIO . sendAll socket' $ processJSON Update (ProcessUpdateData gitDir program realIP repoName repoID userID "semantic-diff")
-    safeGitmonIO . sendAll socket' $ processJSON Schedule ProcessScheduleData
-    gitmonStatus <- safeGitmonIO $ recv socket' 1024
+    void . safeGitmonIO . sendAll sock $ processJSON Update (ProcessUpdateData gitDir program realIP repoName repoID userID "semantic-diff")
+    void . safeGitmonIO . sendAll sock $ processJSON Schedule ProcessScheduleData
+    gitmonStatus <- safeGitmonIO $ recv sock 1024
 
     (startTime, beforeProcIOContents) <- collectStats
     let result = withGitmonStatus gitmonStatus gitCommand
     (afterTime, afterProcIOContents) <- collectStats
 
     let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
-    safeGitmonIO . sendAll socket' $ processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode)
+    void . safeGitmonIO . sendAll sock $ processJSON Finish (ProcessFinishData cpuTime diskReadBytes diskWriteBytes resultCode)
     pure result
 
   where
