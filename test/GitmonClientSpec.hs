@@ -5,8 +5,9 @@ import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Foldable
-import Data.Maybe (fromJust)
-import Data.Text
+import Data.HashMap.Lazy (empty)
+import Data.Maybe (fromJust, fromMaybe)
+import Data.Text hiding (empty)
 import Git.Libgit2
 import Git.Repository
 import Git.Types hiding (Object)
@@ -201,10 +202,10 @@ infoToData input = data' . toObject <$> extract regex input
            ]
 
 toObject :: ByteString -> Object
-toObject = fromJust . decodeStrict
+toObject input = fromMaybe empty (decodeStrict input)
 
 regex :: Regex
 regex = mkRegexWithOpts "({.*\"update\".*\"}})({.*\"schedule\"})({.*\"finish\".*}})" False True
 
 extract :: Regex -> ByteString -> [ByteString]
-extract regex input = Data.ByteString.Char8.pack <$> fromJust (matchRegex regex (Data.ByteString.Char8.unpack input))
+extract regex input = Data.ByteString.Char8.pack <$> fromMaybe [""] (matchRegex regex (Data.ByteString.Char8.unpack input))
