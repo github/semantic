@@ -33,7 +33,7 @@ import Diff
 import Info
 import Patch
 import Prologue as P
-import qualified SES
+import SES
 import System.Random.Mersenne.Pure64
 import Term (Term, TermF)
 
@@ -47,7 +47,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields.
        (GAlign f, Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
-    => SES.Cost (Term f (Record fields)) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+    => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
     -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
@@ -69,7 +69,7 @@ rws editDistance canCompare as bs
 
   where
     minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
-    sesDiffs = SES.ses (gliftEq (==) `on` fmap category) cost as bs
+    sesDiffs = ses (gliftEq (==) `on` fmap category) as bs
 
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
       foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case diff of
@@ -150,8 +150,6 @@ rws editDistance canCompare as bs
         insertDiff (This i, deletion) into)
       diffs
       ((termIndex &&& This . term) <$> unmappedA)
-
-    cost = these (const 1) (const 1) (const (const 0))
 
     kdas = KdTree.build (elems . feature) featurizedAs
     kdbs = KdTree.build (elems . feature) featurizedBs
