@@ -18,6 +18,7 @@ library
                      , haskell-tree-sitter
   default-language:    Haskell2010
   c-sources:           vendor/tree-sitter-typescript/src/parser.c
+                     , vendor/tree-sitter-typescript/src/scanner.c
 
 source-repository head
   type:     git
