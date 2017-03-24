@@ -51,6 +51,7 @@ library
                      , Renderer.TOC
                      , SemanticDiff
                      , SES
+                     , SES.Myers
                      , Source
                      , SourceSpan
                      , SplitDiff
@@ -147,6 +148,7 @@ test-suite test
                      , InterpreterSpec
                      , PatchOutputSpec
                      , RangeSpec
+                     , SES.Myers.Spec
                      , SourceSpec
                      , TermSpec
                      , TOCSpec
