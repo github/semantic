@@ -5,14 +5,15 @@ import Control.Exception (throw)
 import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy (toStrict)
-import Data.Text (pack, unpack, toLower, isInfixOf)
+import Data.Char (toLower)
+import Data.Text (pack, unpack, isInfixOf)
 import qualified Data.Yaml as Y
 import GHC.Generics
 import Git.Libgit2
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString (sendAll, recv)
 import Prelude
-import Prologue hiding (toStrict)
+import Prologue hiding (toStrict, map)
 import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
@@ -54,7 +55,7 @@ data GitmonCommand = Update
                    | Schedule deriving (Generic, Show)
 
 instance ToJSON GitmonCommand where
-  toJSON = genericToJSON defaultOptions { constructorTagModifier = unpack . toLower . pack }
+  toJSON = genericToJSON defaultOptions { constructorTagModifier = map toLower }
 
 
 data GitmonMsg = GitmonMsg { command :: GitmonCommand
