@@ -23,7 +23,7 @@
             (Identifier)))
         (Return
           (Identifier)))+}
-    {-(Other "public_field_definition"
+    {-(VarAssignment
         (Identifier)
         (NumberLiteral))-}
     {-(Method

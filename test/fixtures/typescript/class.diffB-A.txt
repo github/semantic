@@ -2,7 +2,7 @@
   (ExpressionStatements
     (Class
       (Identifier)
-    {+(Other "public_field_definition"
+    {+(VarAssignment
         (Identifier)
         (NumberLiteral))+}
       (Method
