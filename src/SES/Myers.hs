@@ -26,6 +26,7 @@ import Data.These
 import GHC.Show hiding (show)
 import GHC.Stack
 import Prologue hiding (for, State, error)
+import qualified Prologue
 import Text.Show (showListWith)
 
 -- | Operations in Myers’ algorithm.
@@ -87,9 +88,9 @@ ses eq as bs = runMyers eq (makeEditGraph as bs) (M SES `Then` return)
 -- | Fully evaluate an operation in Myers’ algorithm given a comparator function and an edit graph.
 runMyers :: forall a b c. HasCallStack => (a -> b -> Bool) -> EditGraph a b -> Myers a b c -> c
 runMyers eq graph step = evalState (go step) (emptyStateForGraph graph)
-  where go :: forall c. Myers a b c -> StateT (MyersState a b) Identity c
+  where go :: forall c. Myers a b c -> Prologue.State (MyersState a b) c
         go = iterFreerA algebra
-        algebra :: forall c x. Step a b x -> (x -> StateT (MyersState a b) Identity c) -> StateT (MyersState a b) Identity c
+        algebra :: forall c x. Step a b x -> (x -> Prologue.State (MyersState a b) c) -> Prologue.State (MyersState a b) c
         algebra step cont = case step of
           M m -> go (decompose' m) >>= cont
           S Get -> get >>= cont
