@@ -176,7 +176,7 @@ runSearchAlongK (EditGraph as bs) d k = let ?callStack = popCallStack callStack 
   if x >= length as && y >= length bs then
     return (Just (script, d))
   else
-    continue
+    return Nothing
 
 -- | Move onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and slide down any diagonal edges eagerly.
 runMoveFromAdjacent :: HasCallStack => EditGraph a b -> Distance -> Diagonal -> Myers a b (Endpoint a b)
@@ -296,10 +296,6 @@ emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
 -- | Evaluate some function for each value in a list until one returns a value or the list is exhausted.
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
-
--- | Continue evaluation of a for loop without returning a value. To exit the loop without continuing, return a value in 'Just' instead.
-continue :: Myers b c (Maybe a)
-continue = return Nothing
 
 
 -- | Throw a failure. Used to indicate an error in the implementation of Myers’ algorithm.
