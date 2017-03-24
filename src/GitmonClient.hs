@@ -1,4 +1,3 @@
--- | We use BangPatterns to force evaluation of git operations to preserve accuracy in measuring system stats (particularly disk read bytes)
 {-# LANGUAGE RecordWildCards, DeriveGeneric, RankNTypes #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module GitmonClient where
