@@ -205,7 +205,7 @@ toObject :: ByteString -> Object
 toObject input = fromMaybe empty (decodeStrict input)
 
 regex :: Regex
-regex = mkRegexWithOpts "({.*\"update\".*\"}})({.*\"schedule\"})({.*\"finish\".*}})" False True
+regex = mkRegexWithOpts "(\\{.*\"update\".*\"\\}\\})(\\{.*\"schedule\"\\})(\\{.*\"finish\".*\\}\\})" False True
 
 extract :: Regex -> ByteString -> [ByteString]
 extract regex input = Data.ByteString.Char8.pack <$> fromMaybe [""] (matchRegex regex (Data.ByteString.Char8.unpack input))
