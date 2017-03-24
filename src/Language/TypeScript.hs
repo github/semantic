@@ -28,6 +28,7 @@ termAssignment _ category children =
     (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (VarDecl, _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
+    (VarAssignment, _ ) -> toPublicFieldDefinition children
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
     (Constructor, [ expr ]) -> Just $ S.Constructor expr
@@ -137,4 +138,5 @@ categoryForTypeScriptName = \case
   "break_statement" -> Break
   "continue_statement" -> Continue
   "yield_expression" -> Yield
+  "public_field_definition" -> VarAssignment
   name -> Other name
