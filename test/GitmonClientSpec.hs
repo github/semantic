@@ -6,7 +6,7 @@ import Data.Aeson.Types
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Foldable
 import Data.HashMap.Lazy (empty)
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromMaybe)
 import Data.Text hiding (empty)
 import Git.Libgit2
 import Git.Repository
