@@ -182,6 +182,12 @@ test-suite test
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
 
+custom-setup
+  setup-depends:  base >= 4.8 && < 5
+                , Cabal
+                , directory
+                , process
+
 source-repository head
   type:     git
   location: https://github.com/github/semantic-diff
