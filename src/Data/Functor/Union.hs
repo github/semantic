@@ -27,3 +27,12 @@ instance {-# OVERLAPPABLE #-} InUnion fs f => InUnion (g ': fs) f where
   emb f = There (emb f)
   proj (There fs) = proj fs
   proj _ = Nothing
+
+
+instance (Eq (f a), Eq (Union fs a)) => Eq (Union (f ': fs) a) where
+  Here f1 == Here f2 = f1 == f2
+  There fs1 == There fs2 = fs1 == fs2
+  _ == _ = False
+
+instance Eq (Union '[] a) where
+  _ == _ = True
