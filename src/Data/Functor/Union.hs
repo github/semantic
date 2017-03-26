@@ -1,6 +1,7 @@
-{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
 module Data.Functor.Union where
 
+import Data.Kind
 import GHC.Show
 import Prologue
 
@@ -23,6 +24,10 @@ unwrapU = proj . unwrap
 class InUnion (fs :: [* -> *]) (f :: * -> *) where
   emb :: f a -> Union fs a
   proj :: Union fs a -> Maybe (f a)
+
+type family Superset (fs :: [* -> *]) (gs :: [* -> *]) :: Constraint where
+  Superset fs (g ': gs) = (InUnion fs g, Superset fs gs)
+  Superset fs '[] = ()
 
 
 -- Instances
