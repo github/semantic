@@ -14,7 +14,7 @@ newtype IntegerLiteral a = IntegerLiteral { integerLiteralContent :: ByteString 
 
 -- Strings, symbols
 
-newtype StringLiteral a = StringLiteral { stringElements :: [Union '[InterpolationElement, TextElement] a] } -- may also wish to include escapes
+newtype StringLiteral a = StringLiteral { stringLiteralElements :: [Union '[InterpolationElement, TextElement] a] } -- may also wish to include escapes
   deriving (Eq, Show)
 
 -- | An interpolation element within a string literal.
