@@ -30,6 +30,7 @@ library
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
                      , Data.Syntax.Literal
+                     , Data.Syntax.Statement
                      , Data.Text.Listable
                      , Diff
                      , DiffCommand
