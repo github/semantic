@@ -5,6 +5,11 @@ import Data.Syntax.Comment
 import Data.Functor.Union
 import Prologue
 
+-- Boolean
+
+newtype BooleanLiteral a = BooleanLiteral Bool
+  deriving (Eq, Show)
+
 
 -- Numeric
 
