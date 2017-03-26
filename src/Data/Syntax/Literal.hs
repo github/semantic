@@ -40,3 +40,8 @@ newtype HashLiteral a = HashLiteral { hashLiteralElements :: [Union '[KeyValue, 
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Show)
+
+
+-- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
+-- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
+-- TODO: Regexp literals.
