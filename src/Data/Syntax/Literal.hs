@@ -20,7 +20,7 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
   deriving (Eq, Show)
 
 
-newtype SymbolLiteral a = SymbolLiteral { symbolContent :: ByteString }
+newtype SymbolLiteral a = SymbolLiteral { symbolLiteralContent :: ByteString }
   deriving (Eq, Show)
 
 
