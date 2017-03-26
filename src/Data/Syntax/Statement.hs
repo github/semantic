@@ -14,3 +14,9 @@ newtype Return a = Return a
 
 newtype Yield a = Yield a
   deriving (Eq, Show)
+
+
+-- Exception handling
+
+newtype Throw a = Throw a
+  deriving (Eq, Show)
