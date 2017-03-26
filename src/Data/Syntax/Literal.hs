@@ -6,6 +6,12 @@ import Data.Functor.Union
 import Prologue
 
 
+-- Numeric
+
+-- | A literal integer of unspecified width. No particular base is implied.
+newtype IntegerLiteral a = IntegerLiteral { integerLiteralContent :: ByteString }
+
+
 -- Strings, symbols
 
 newtype StringLiteral a = StringLiteral { stringElements :: [Union '[InterpolationElement, TextElement] a] } -- may also wish to include escapes
