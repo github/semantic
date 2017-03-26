@@ -25,6 +25,7 @@ library
                      , Data.Mergeable.Generic
                      , Data.RandomWalkSimilarity
                      , Data.Record
+                     , Data.Syntax
                      , Data.Text.Listable
                      , Diff
                      , DiffCommand
