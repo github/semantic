@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Data.Syntax.Literal where
 
+import Data.Syntax.Comment
 import Data.Functor.Union
 import Prologue
 
@@ -20,4 +21,16 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 
 
 newtype SymbolLiteral a = SymbolLiteral { symbolContent :: ByteString }
+  deriving (Eq, Show)
+
+
+-- Collections
+
+newtype ArrayLiteral a = ArrayLiteral { arrayLiteralElements :: [Union '[Identity, Comment] a] }
+  deriving (Eq, Show)
+
+newtype HashLiteral a = HashLiteral { hashLiteralElements :: [Union '[KeyValue, Comment] a] }
+  deriving (Eq, Show)
+
+data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Show)
