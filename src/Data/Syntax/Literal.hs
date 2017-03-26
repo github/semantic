@@ -17,3 +17,7 @@ newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: ByteString }
   deriving (Eq, Show)
+
+
+newtype SymbolLiteral a = SymbolLiteral { symbolContent :: ByteString }
+  deriving (Eq, Show)
