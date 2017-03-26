@@ -28,6 +28,7 @@ library
                      , Data.Record
                      , Data.Syntax
                      , Data.Syntax.Comment
+                     , Data.Syntax.Declaration
                      , Data.Syntax.Literal
                      , Data.Text.Listable
                      , Diff
