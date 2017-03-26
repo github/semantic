@@ -27,6 +27,7 @@ library
                      , Data.RandomWalkSimilarity
                      , Data.Record
                      , Data.Syntax
+                     , Data.Syntax.Comment
                      , Data.Syntax.Literal
                      , Data.Text.Listable
                      , Diff
