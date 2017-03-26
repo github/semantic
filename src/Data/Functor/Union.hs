@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Functor.Union where
 
+import GHC.Show
 import Prologue
 
 -- | N-ary union of type constructors.
@@ -36,3 +37,12 @@ instance (Eq (f a), Eq (Union fs a)) => Eq (Union (f ': fs) a) where
 
 instance Eq (Union '[] a) where
   _ == _ = True
+
+
+instance (Show (f a), Show (Union fs a)) => Show (Union (f ': fs) a) where
+  showsPrec d s = case s of
+    Here f -> showsPrec d f
+    There fs -> showsPrec d fs
+
+instance Show (Union '[] a) where
+  showsPrec _ _ = identity
