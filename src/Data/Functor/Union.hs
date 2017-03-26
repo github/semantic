@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, PolyKinds, TypeFamilies, TypeOperators #-}
 module Data.Functor.Union where
 
 import Data.Kind
@@ -25,9 +25,9 @@ class InUnion (fs :: [* -> *]) (f :: * -> *) where
   emb :: f a -> Union fs a
   proj :: Union fs a -> Maybe (f a)
 
-type family Superset (fs :: [* -> *]) (gs :: [* -> *]) :: Constraint where
-  Superset fs (g ': gs) = (InUnion fs g, Superset fs gs)
-  Superset fs '[] = ()
+type family Superset (combine :: [k] -> k -> Constraint) (fs :: [k]) (gs :: [k]) :: Constraint where
+  Superset combine fs (g ': gs) = (combine fs g, Superset combine fs gs)
+  Superset combine fs '[] = ()
 
 
 -- Instances
