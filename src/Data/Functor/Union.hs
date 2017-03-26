@@ -14,3 +14,16 @@ data Union (ts :: [* -> *]) (a :: *) where
 class InUnion (fs :: [* -> *]) (f :: * -> *) where
   emb :: f a -> Union fs a
   proj :: Union fs a -> Maybe (f a)
+
+
+-- Instances
+
+instance {-# OVERLAPPABLE #-} InUnion (f ': fs) f where
+  emb = Here
+  proj (Here f) = Just f
+  proj _ = Nothing
+
+instance {-# OVERLAPPABLE #-} InUnion fs f => InUnion (g ': fs) f where
+  emb f = There (emb f)
+  proj (There fs) = proj fs
+  proj _ = Nothing
