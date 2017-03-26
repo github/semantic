@@ -13,6 +13,10 @@ data Union (ts :: [* -> *]) (a :: *) where
 wrapU :: (MonadFree (Union fs) m, InUnion fs f) => f (m a) -> m a
 wrapU = wrap . emb
 
+-- | Unwrap a cofree comonad and project a functor from the resulting union.
+unwrapU :: (ComonadCofree (Union fs) w, InUnion fs f) => w a -> Maybe (f (w a))
+unwrapU = proj . unwrap
+
 
 -- Classes
 
