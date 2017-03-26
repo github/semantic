@@ -9,6 +9,10 @@ data Union (ts :: [* -> *]) (a :: *) where
   Here :: f a -> Union (f ': ts) a
   There :: Union ts a -> Union (f ': ts) a
 
+-- | Embed a functor in a union and lift the union into a free monad.
+wrapU :: (MonadFree (Union fs) m, InUnion fs f) => f (m a) -> m a
+wrapU = wrap . emb
+
 
 -- Classes
 
