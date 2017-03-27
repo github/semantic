@@ -153,7 +153,7 @@ withGitmonSocket = bracket connectSocket close
   where
     connectSocket = do
       s <- socket AF_UNIX Stream defaultProtocol
-      safeGitmonIO $ connect s (SockAddrUnix gitmonSocketAddr)
+      void . safeGitmonIO $ connect s (SockAddrUnix gitmonSocketAddr)
       pure s
 
 -- Timeout in nanoseconds to wait before giving up on Gitmon response to schedule.
