@@ -67,7 +67,6 @@ documentToTerm language document SourceBlob{..} = do
         copyAll = ts_node_copy_child_nodes document
 
 
-
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
 
