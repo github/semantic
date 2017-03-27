@@ -141,4 +141,5 @@ categoryForTypeScriptName = \case
   "yield_expression" -> Yield
   "public_field_definition" -> VarAssignment
   "type_annotation" -> Ty
+  "accessibility_modifier" -> Identifier
   name -> Other name
