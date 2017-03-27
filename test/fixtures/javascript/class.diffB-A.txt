@@ -2,7 +2,7 @@
   (ExpressionStatements
     (Class
       (Identifier)
-			{+(Assignment(Identifier)(NumberLiteral))+}
+      {+(Assignment(Identifier)(NumberLiteral))+}
       (Method
       { (Identifier)
       ->(Identifier) }
