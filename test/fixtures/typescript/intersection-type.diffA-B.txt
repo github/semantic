@@ -1,0 +1,12 @@
+(Program
+  (Other "lexical_declaration"
+    (Other "variable_declarator"
+      (Identifier)
+      (Ty
+        (Other "intersection_type"
+          (Other "type_reference"
+          { (Identifier)
+          ->(Identifier) })
+          (Other "type_reference"
+          { (Identifier)
+          ->(Identifier) }))))))
