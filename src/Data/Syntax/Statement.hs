@@ -7,6 +7,8 @@ import Prologue
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
   deriving (Eq, Show)
 
+-- TODO: What if we defined If as: data If a = If ![(a, a)] !(Maybe a)
+
 
 -- Returns
 
