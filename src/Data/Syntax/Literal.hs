@@ -16,6 +16,10 @@ newtype BooleanLiteral a = BooleanLiteral Bool
 -- | A literal integer of unspecified width. No particular base is implied.
 newtype IntegerLiteral a = IntegerLiteral { integerLiteralContent :: ByteString }
 
+-- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
+-- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
+-- TODO: Float/Double literals.
+
 
 -- Strings, symbols
 
