@@ -34,7 +34,7 @@ termAssignment source category children = case (category, children) of
     | [ident] <- toList (unwrap idList)
     -> Just (S.FieldDecl ident (Just ty) (Just tag))
   (ParameterDecl, param : ty) -> Just $ S.ParameterDecl (listToMaybe ty) param
-  (Assignment, [identifier, expression]) -> Just $ S.VarAssignment identifier expression
+  (Assignment, [identifier, expression]) -> Just $ S.VarAssignment [identifier] expression
   (Select, _) -> Just $ S.Select (children >>= toList . unwrap)
   (Go, [expr]) -> Just $ S.Go expr
   (Defer, [expr]) -> Just $ S.Defer expr
@@ -54,8 +54,8 @@ termAssignment source category children = case (category, children) of
   (TypeAssertion, [a, b]) -> Just $ S.TypeAssertion a b
   (TypeConversion, [a, b]) -> Just $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
-  (VarAssignment, [identifier, expression]) -> Just $ S.VarAssignment identifier expression
-  (VarDecl, [idList, ty]) | Identifier <- Info.category (extract ty) -> Just $ S.VarDecl idList (Just ty)
+  (VarAssignment, [identifier, expression]) -> Just $ S.VarAssignment [identifier] expression
+  (VarDecl, children) -> Just $ S.VarDecl children
   (FunctionCall, id : rest) -> Just $ S.FunctionCall id rest
   (AnonymousFunction, [params, _, body])
     | [params'] <- toList (unwrap params)

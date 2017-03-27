@@ -61,6 +61,7 @@ termAssignment _ category children =
     (Function, [ body ]) -> Just $ S.AnonymousFunction [] [body]
     (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
     (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) Nothing [body]
+    (Ty, children) -> Just $ S.Ty children
     _ -> Nothing
 
 categoryForTypeScriptName :: Text -> Category
@@ -139,4 +140,5 @@ categoryForTypeScriptName = \case
   "continue_statement" -> Continue
   "yield_expression" -> Yield
   "public_field_definition" -> VarAssignment
+  "type_annotation" -> Ty
   name -> Other name

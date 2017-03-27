@@ -228,6 +228,8 @@ data Category
   | Modifier Category
   -- | A singleton method declaration, e.g. `def self.foo;end` in Ruby
   | SingletonMethod
+  -- | An arbitrary type annotation.
+  | Ty
   deriving (Eq, Generic, Ord, Show, NFData)
 
 {-# DEPRECATED RescueModifier "Deprecated; use Modifier Rescue instead." #-}

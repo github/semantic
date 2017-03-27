@@ -149,6 +149,7 @@ styleName category = "category-" <> case category of
   C.FieldDeclarations -> "field_declarations"
   C.RuneLiteral -> "rune_literal"
   C.Modifier c -> styleName c <> "_modifier"
+  C.Ty -> "type"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
