@@ -13,7 +13,7 @@ import Git.Libgit2
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString (sendAll, recv)
 import Prelude
-import Prologue hiding (toStrict, map)
+import Prologue hiding (toStrict, map, print)
 import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
@@ -161,10 +161,12 @@ gitmonSocketAddr :: String
 gitmonSocketAddr = "/tmp/gitstats.sock"
 
 safeGitmonIO :: MonadIO m => IO a -> m (Maybe a)
-safeGitmonIO command = liftIO $ timeout gitmonTimeout command `catch` noop
+safeGitmonIO command = liftIO $ timeout gitmonTimeout command `catch` logError
 
-noop :: IOException -> IO (Maybe a)
-noop _ = pure Nothing
+logError :: IOException -> IO (Maybe a)
+logError e = do
+  print e
+  pure Nothing
 
 procFileAddr :: String
 procFileAddr = "/proc/self/io"
