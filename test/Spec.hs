@@ -10,6 +10,7 @@ import qualified GitmonClientSpec
 import qualified InterpreterSpec
 import qualified PatchOutputSpec
 import qualified RangeSpec
+import qualified SES.Myers.Spec
 import qualified SourceSpec
 import qualified TermSpec
 import qualified TOCSpec
@@ -29,6 +30,7 @@ main = do
     describe "Interpreter" InterpreterSpec.spec
     describe "PatchOutput" PatchOutputSpec.spec
     describe "Range" RangeSpec.spec
+    describe "SES.Myers" SES.Myers.Spec.spec
     describe "Source" SourceSpec.spec
     describe "Term" TermSpec.spec
     describe "TOC" TOCSpec.spec
