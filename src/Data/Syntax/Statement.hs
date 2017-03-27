@@ -21,6 +21,9 @@ newtype Yield a = Yield a
 
 -- Loops
 
+data For a = For { forBefore :: !a, forCondition :: !a, forStep :: !a, forBody :: !a }
+  deriving (Eq, Show)
+
 data While a = While { whileCondition :: !a, whileBody :: !a }
   deriving (Eq, Show)
 
