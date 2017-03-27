@@ -14,10 +14,11 @@ import Git.Libgit2
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString (sendAll, recv)
 import Prelude
-import Prologue hiding (toStrict, map, print)
+import Prologue hiding (toStrict, map, print, show)
 import System.Clock
 import System.Directory (getCurrentDirectory)
 import System.Environment
+import System.IO (hPrint, stderr)
 import System.Timeout
 import Text.Regex
 
@@ -167,7 +168,7 @@ safeGitmonIO command = liftIO $ timeout gitmonTimeout command `catch` logError
 
 logError :: IOException -> IO (Maybe a)
 logError e = do
-  print e
+  hPrint stderr e
   pure Nothing
 
 procFileAddr :: String
