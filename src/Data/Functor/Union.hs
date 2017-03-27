@@ -6,7 +6,7 @@ import GHC.Show
 import Prologue
 
 -- | N-ary union of type constructors.
-data Union (ts :: [* -> *]) (a :: *) where
+data Union (ts :: [k -> *]) (a :: k) where
   Here :: f a -> Union (f ': ts) a
   There :: Union ts a -> Union (f ': ts) a
 
