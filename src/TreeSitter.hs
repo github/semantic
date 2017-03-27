@@ -63,12 +63,9 @@ documentToTerm language document SourceBlob{..} = do
                 return $! filter isNonEmpty children
 
           children <- getChildren (fromIntegral (nodeNamedChildCount node)) ts_node_copy_named_child_nodes
-
-          let sourceSpan = nodeSpan node
-
           let allChildren = getChildren (fromIntegral (nodeChildCount node)) ts_node_copy_child_nodes
 
-          assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
+          assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
 
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
