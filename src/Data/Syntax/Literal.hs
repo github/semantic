@@ -23,8 +23,10 @@ newtype IntegerLiteral a = IntegerLiteral { integerLiteralContent :: ByteString 
 
 -- Strings, symbols
 
-newtype StringLiteral a = StringLiteral { stringLiteralElements :: [Union '[InterpolationElement, TextElement] a] } -- may also wish to include escapes
+newtype StringLiteral a = StringLiteral { stringLiteralElements :: [Union '[InterpolationElement, TextElement] a] }
   deriving (Eq, Show)
+
+-- TODO: Should string literal bodies include escapes too?
 
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
@@ -37,6 +39,8 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 
 newtype SymbolLiteral a = SymbolLiteral { symbolLiteralContent :: ByteString }
   deriving (Eq, Show)
+
+-- TODO: Character literals.
 
 
 -- Collections
