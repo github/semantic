@@ -1,0 +1,5 @@
+{+(Program
+  (ExpressionStatements
+    (Other "as_expression"
+      (Identifier)
+      (Other "predefined_type"))))+}
