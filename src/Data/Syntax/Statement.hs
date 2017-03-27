@@ -9,6 +9,14 @@ data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
 
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
+-- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
+data Match with a = Switch { matchSubject :: !a, matchPatterns :: ![with a] }
+  deriving (Eq, Show)
+
+-- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
+newtype Pattern a = Pattern a
+  deriving (Eq, Show)
+
 
 -- Returns
 
