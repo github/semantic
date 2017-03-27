@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards, DeriveGeneric, RankNTypes #-}
+-- | We use BangPatterns to force evaluation of git operations to preserve accuracy in measuring system stats (particularly disk read bytes)
+{-# LANGUAGE RecordWildCards, DeriveGeneric, RankNTypes, BangPatterns #-}
 module GitmonClient where
 
 import Control.Exception (throw)
@@ -87,7 +88,8 @@ reportGitmon' SocketFactory{..} program gitCommand =
     gitmonStatus <- safeGitmonIO $ recv sock 1024
 
     (startTime, beforeProcIOContents) <- collectStats
-    let result = withGitmonStatus gitmonStatus gitCommand
+    -- | The result of the gitCommand is strictly evaluated (to next normal form). This is not equivalent to a `deepseq`. The underlying `Git.Types` do not have instances of `NFData` preventing us from using `deepseq` at this time.
+    let !result = withGitmonStatus gitmonStatus gitCommand
     (afterTime, afterProcIOContents) <- collectStats
 
     let (cpuTime, diskReadBytes, diskWriteBytes, resultCode) = procStats startTime afterTime beforeProcIOContents afterProcIOContents
