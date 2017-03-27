@@ -42,20 +42,23 @@ treeSitterParser language grammar blob = do
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
-documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
-  ts_document_root_node_p document root
+documentToTerm language document SourceBlob{..} = do
+  root <- alloca (\ rootPtr -> do
+    ts_document_root_node_p document rootPtr
+    peek rootPtr)
   toTerm root (totalRange source) source
-  where toTerm :: Ptr Node -> Range -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
-        toTerm nodePtr range source = do
-          node <- peek nodePtr
+  where toTerm :: Node -> Range -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
+        toTerm node range source = do
           name <- peekCString (nodeType node)
 
-          let childToTerm childNodePtr = do
-                childRange <- fmap nodeRange (peek childNodePtr)
-                toTerm childNodePtr childRange (slice (offsetRange childRange (negate (start range))) source)
-          let getChildren count copy = allocaArray count $ \ childNodesPtr -> do
-                _ <- copy document nodePtr childNodesPtr (fromIntegral count)
-                traverse (childToTerm . advancePtr childNodesPtr) [0..pred count]
+          let childToTerm childNode =
+                let childRange = nodeRange childNode in
+                toTerm childNode childRange (slice (offsetRange childRange (negate (start range))) source)
+          let getChildren count copy = do
+                nodes <- allocaArray count $ \ childNodesPtr -> do
+                  _ <- with node (\ nodePtr -> copy document nodePtr childNodesPtr (fromIntegral count))
+                  peekArray count childNodesPtr
+                traverse childToTerm nodes
 
           let namedChildCount = fromIntegral (nodeNamedChildCount node)
           children <- filter isNonEmpty <$> getChildren namedChildCount ts_node_copy_named_child_nodes
