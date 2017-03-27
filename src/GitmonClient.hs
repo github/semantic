@@ -25,10 +25,13 @@ newtype GitmonException = GitmonException String deriving (Show, Typeable)
 instance Exception GitmonException
 
 
-data ProcIO = ProcIO { read_bytes :: Integer
-                     , write_bytes :: Integer } deriving (Show, Generic)
+data ProcIO = ProcIO { readBytes :: Integer
+                     , writeBytes :: Integer } deriving (Show, Generic)
 
 instance FromJSON ProcIO
+
+instance ToJSON ProcIO where
+  toJSON ProcIO{..} = object [ "read_bytes" .= readBytes, "write_bytes" .= writeBytes ]
 
 
 data ProcessData = ProcessUpdateData { gitDir :: String
@@ -111,10 +114,10 @@ reportGitmon' SocketFactory{..} program gitCommand =
       where
         -- | toNanoSecs converts TimeSpec to Integer, and we further convert this value to milliseconds (expected by Gitmon).
         cpuTime = div (1 * 1000 * 1000) . toNanoSecs $ afterTime - beforeTime
-        beforeDiskReadBytes = either (const 0) (maybe 0 read_bytes) beforeProcIOContents
-        afterDiskReadBytes = either (const 0) (maybe 0 read_bytes) afterProcIOContents
-        beforeDiskWriteBytes = either (const 0) (maybe 0 write_bytes) beforeProcIOContents
-        afterDiskWriteBytes = either (const 0) (maybe 0 write_bytes) afterProcIOContents
+        beforeDiskReadBytes = either (const 0) (maybe 0 readBytes) beforeProcIOContents
+        afterDiskReadBytes = either (const 0) (maybe 0 readBytes) afterProcIOContents
+        beforeDiskWriteBytes = either (const 0) (maybe 0 writeBytes) beforeProcIOContents
+        afterDiskWriteBytes = either (const 0) (maybe 0 writeBytes) afterProcIOContents
         diskReadBytes = afterDiskReadBytes - beforeDiskReadBytes
         diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
         resultCode = 0
@@ -176,5 +179,5 @@ clock :: Clock
 clock = Realtime
 
 processJSON :: GitmonCommand -> ProcessData -> ByteString
-processJSON command processData = (toStrict . encode $ GitmonMsg command processData)
+processJSON command processData = toStrict . encode $ GitmonMsg command processData
 
