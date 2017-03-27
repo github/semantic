@@ -106,8 +106,6 @@ parse args@Arguments{..} =
         algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
         algebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
           where indexProgramNode annotation = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (identifierFor (Prologue.fst <$> syntax))
-                identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan])) -> Maybe T.Text
-                identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
     -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
     renderParseTree :: Arguments -> IO ByteString
@@ -132,8 +130,9 @@ parse args@Arguments{..} =
 
         algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
         algebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
-          where identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan])) -> Maybe T.Text
-                identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
+
+    identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan])) -> Maybe T.Text
+    identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
     category' :: Record '[SourceText, Range, Category, SourceSpan] -> Text
     category' = toS . Info.category
