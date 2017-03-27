@@ -1,24 +1,12 @@
-declare class Error {
-  constructor: Function
+declare namespace Erro {
 }
 
-declare var foo: number;
-
-declare function greet(greeting: string): void;
-
-declare namespace myLib {
-    function makeGreeting(s: string): string;
-    let numberOfGreetings: number;
-
-    interface LogOptions {
-      verbose?: boolean;
-    }
-    interface AlertOptions {
-      modal: boolean;
-      title?: string;
-      color?: string;
-    }
+declare class Bar {
 }
+
+declare interface LogOptions {
+}
+
 
 declare class Greeter {
   constructor(greeting: string);
@@ -26,3 +14,5 @@ declare class Greeter {
   greeting: string;
   showGreeting(): void;
 }
+
+declare function foo(): Bar;

@@ -1,70 +1,14 @@
 {+(Program
   (Other "ambient_declaration"
-    (Class
-      (Identifier)
-      (VarAssignment
-        (Identifier)
-        (Ty
-          (Other "type_reference"
-            (Identifier))))))
-  (Other "ambient_declaration"
-    (Other "ambient_variable"
-      (Other "ambient_binding"
-        (Identifier)
-        (Ty
-          (Other "predefined_type")))))
-  (Other "ambient_declaration"
-    (Other "ambient_function"
-      (Identifier)
-      (Other "call_signature"
-        (Params
-          (Other "required_parameter"
-            (Identifier)
-            (Ty
-              (Other "predefined_type"))))
-        (Ty
-          (Other "predefined_type")))))
-  (Other "ambient_declaration"
     (Other "ambient_namespace"
+      (Identifier)))
+  (Other "ambient_declaration"
+    (Class
+      (Identifier)))
+  (Other "ambient_declaration"
+    (Other "interface_declaration"
       (Identifier)
-      (Other "ambient_namespace_body"
-        (Other "ambient_function"
-          (Identifier)
-          (Other "call_signature"
-            (Params
-              (Other "required_parameter"
-                (Identifier)
-                (Ty
-                  (Other "predefined_type"))))
-            (Ty
-              (Other "predefined_type"))))
-        (Other "lexical_declaration"
-          (Other "variable_declarator"
-            (Identifier)
-            (Ty
-              (Other "predefined_type"))))
-        (Other "interface_declaration"
-          (Identifier)
-          (Other "object_type"
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type")))))
-        (Other "interface_declaration"
-          (Identifier)
-          (Other "object_type"
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type")))
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type")))
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type"))))))))
+      (Other "object_type")))
   (Other "ambient_declaration"
     (Class
       (Identifier)
@@ -85,4 +29,12 @@
         (Other "call_signature"
           (Params)
           (Ty
-            (Other "predefined_type")))))))+}
+            (Other "predefined_type"))))))
+  (Other "ambient_declaration"
+    (Other "ambient_function"
+      (Identifier)
+      (Other "call_signature"
+        (Params)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))))))+}
