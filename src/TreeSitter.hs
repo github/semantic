@@ -46,14 +46,15 @@ documentToTerm language document SourceBlob{..} = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
     peek rootPtr)
-  toTerm root (totalRange source) source
-  where toTerm :: Node -> Range -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
-        toTerm node range source = do
+  toTerm root source
+  where toTerm :: Node -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
+        toTerm node source = do
           name <- peekCString (nodeType node)
+          let range = nodeRange node
 
           let childToTerm childNode =
                 let childRange = nodeRange childNode in
-                toTerm childNode childRange (slice (offsetRange childRange (negate (start range))) source)
+                toTerm childNode (slice (offsetRange childRange (negate (start range))) source)
           let getChildren count copy = do
                 nodes <- allocaArray count $ \ childNodesPtr -> do
                   _ <- with node (\ nodePtr -> copy document nodePtr childNodesPtr (fromIntegral count))
