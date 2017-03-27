@@ -17,6 +17,12 @@ newtype Yield a = Yield a
   deriving (Eq, Show)
 
 
+-- Loops
+
+data While a = While !a !a
+  deriving (Eq, Show)
+
+
 -- Exception handling
 
 newtype Throw a = Throw a
