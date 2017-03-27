@@ -12,3 +12,9 @@ data Method a = Method { methodName :: !a, methodParameters :: ![a], methodBody 
 
 -- TODO: Should we replace this with Function and differentiate by context?
 -- TODO: How should we distinguish class/instance methods?
+
+
+data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classScope :: !a }
+  deriving (Eq, Show)
+
+-- TODO: Generics, constraints.
