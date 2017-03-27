@@ -139,7 +139,7 @@ reportGitmon' SocketFactory{..} program gitCommand =
         readIntFromEnv (Just s) = readInt $ matchRegex regex s
           where
             -- | Expected format for userID and repoID is: "uint:123",
-            -- | where "uint:" indicates an unsigned integer followed by an integer value.
+            -- where "uint:" indicates an unsigned integer followed by an integer value.
             regex :: Regex
             regex = mkRegexWithOpts "^uint:([0-9]+)$" False True
 
@@ -155,7 +155,7 @@ withGitmonSocket = bracket connectSocket close
       void . safeGitmonIO $ connect s (SockAddrUnix gitmonSocketAddr)
       pure s
 
--- Timeout in nanoseconds to wait before giving up on Gitmon response to schedule.
+-- | Timeout in nanoseconds to wait before giving up on Gitmon response to schedule.
 gitmonTimeout :: Int
 gitmonTimeout = 1 * 1000 * 1000
 
