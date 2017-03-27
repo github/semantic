@@ -19,7 +19,10 @@ newtype Yield a = Yield a
 
 -- Loops
 
-data While a = While !a !a
+data While a = While { whileCondition :: !a, whileBody :: !a }
+  deriving (Eq, Show)
+
+data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Eq, Show)
 
 
