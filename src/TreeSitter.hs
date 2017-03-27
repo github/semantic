@@ -57,7 +57,7 @@ documentToTerm language document SourceBlob{..} = do
           assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
           where getChildren count copy = do
                   nodes <- allocaArray count $ \ childNodesPtr -> do
-                    _ <- with node (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
+                    _ <- with (nodeTSNode node) (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
                     peekArray count childNodesPtr
                   children <- traverse childNodeToTerm nodes
                   return $! filter isNonEmpty children
