@@ -6,7 +6,7 @@ import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy (toStrict)
 import Data.Char (toLower)
-import Data.Text (pack, unpack, isInfixOf)
+import Data.Text (unpack, isInfixOf)
 import qualified Data.Yaml as Y
 import GHC.Generics
 import Git.Libgit2
