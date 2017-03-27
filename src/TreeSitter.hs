@@ -50,22 +50,21 @@ documentToTerm language document SourceBlob{..} = do
   where toTerm :: Node -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
         toTerm node source = do
           name <- peekCString (nodeType node)
-          let range = nodeRange node
 
-          let childToTerm childNode =
-                let childRange = nodeRange childNode in
-                toTerm childNode (slice (offsetRange childRange (negate (start range))) source)
-          let getChildren count copy = do
-                nodes <- allocaArray count $ \ childNodesPtr -> do
-                  _ <- with node (\ nodePtr -> copy document nodePtr childNodesPtr (fromIntegral count))
-                  peekArray count childNodesPtr
-                children <- traverse childToTerm nodes
-                return $! filter isNonEmpty children
-
-          children <- getChildren (fromIntegral (nodeNamedChildCount node)) ts_node_copy_named_child_nodes
-          let allChildren = getChildren (fromIntegral (nodeChildCount node)) ts_node_copy_child_nodes
+          children <- getChildren (fromIntegral (nodeNamedChildCount node)) (ts_node_copy_named_child_nodes document)
+          let allChildren = getChildren (fromIntegral (nodeChildCount node)) (ts_node_copy_child_nodes document)
 
           assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
+          where getChildren count copy = do
+                  nodes <- allocaArray count $ \ childNodesPtr -> do
+                    _ <- with node (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
+                    peekArray count childNodesPtr
+                  children <- traverse childNodeToTerm nodes
+                  return $! filter isNonEmpty children
+                childNodeToTerm childNode = toTerm childNode (slice (offsetRange (nodeRange childNode) (negate (start range))) source)
+                range = nodeRange node
+
+
 
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
