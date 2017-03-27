@@ -111,7 +111,7 @@ parse args@Arguments{..} =
 
         algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
         algebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
-          where indexProgramNode annotation = IndexProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (identifierFor (Prologue.fst <$> syntax))
+          where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (Info.sourceText annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
 
     -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
     renderParseTree :: Arguments -> IO ByteString
@@ -135,22 +135,10 @@ parse args@Arguments{..} =
           return $ ParseTreeProgram filePath (para algebra terms')
 
         algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
-        algebra (annotation :< syntax) = ParseTreeProgramNode (category' annotation) (range' annotation) (text' annotation) (sourceSpan' annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
+        algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (Info.sourceText annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
 
     identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan])) -> Maybe T.Text
     identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
-
-    category' :: Record '[SourceText, Range, Category, SourceSpan] -> Text
-    category' = toS . Info.category
-
-    range' :: Record '[SourceText, Range, Category, SourceSpan] -> Range
-    range' = byteRange
-
-    text' :: Record '[SourceText, Range, Category, SourceSpan] -> SourceText
-    text' = Info.sourceText
-
-    sourceSpan' :: Record '[SourceText, Range, Category, SourceSpan] -> SourceSpan
-    sourceSpan' = Info.sourceSpan
 
     -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
     terms :: Bool -> FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
