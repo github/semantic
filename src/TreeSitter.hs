@@ -62,13 +62,11 @@ documentToTerm language document SourceBlob{..} = do
                 children <- traverse childToTerm nodes
                 return $! filter isNonEmpty children
 
-          let namedChildCount = fromIntegral (nodeNamedChildCount node)
-          children <- getChildren namedChildCount ts_node_copy_named_child_nodes
+          children <- getChildren (fromIntegral (nodeNamedChildCount node)) ts_node_copy_named_child_nodes
 
           let sourceSpan = nodeSpan node
 
-          let childCount = fromIntegral (nodeChildCount node)
-          let allChildren = getChildren childCount ts_node_copy_child_nodes
+          let allChildren = getChildren (fromIntegral (nodeChildCount node)) ts_node_copy_child_nodes
 
           assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
 
