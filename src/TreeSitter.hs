@@ -18,6 +18,7 @@ import Source
 import qualified Syntax
 import Foreign
 import Foreign.C.String (peekCString)
+import Foreign.Marshal.Array (allocaArray)
 import Data.Text.Foreign (withCStringLen)
 import qualified Syntax as S
 import Term
@@ -44,24 +45,25 @@ documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Recor
 documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
   ts_document_root_node_p document root
   toTerm root (totalRange source) source
-  where toTerm node range source = do
-          name <- ts_node_p_name node document
-          name <- peekCString name
-          count <- ts_node_p_named_child_count node
+  where toTerm :: Ptr Node -> Range -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
+        toTerm nodePtr range source = do
+          node <- peek nodePtr
+          name <- peekCString (nodeType node)
 
-          let getChild getter parentNode n childNode = do
-                _ <- getter parentNode n childNode
-                let childRange = nodeRange childNode
-                toTerm childNode childRange (slice (offsetRange childRange (negate (start range))) source)
+          let childToTerm childNodePtr = do
+                childRange <- fmap nodeRange (peek childNodePtr)
+                toTerm childNodePtr childRange (slice (offsetRange childRange (negate (start range))) source)
+          let getChildren count copy = allocaArray count $ \ childNodesPtr -> do
+                _ <- copy document nodePtr childNodesPtr (fromIntegral count)
+                traverse (childToTerm . advancePtr childNodesPtr) [0..pred count]
 
-          children <- filter isNonEmpty <$> traverse (alloca . getChild ts_node_p_named_child node) (take (fromIntegral count) [0..])
+          let namedChildCount = fromIntegral (nodeNamedChildCount node)
+          children <- filter isNonEmpty <$> getChildren namedChildCount ts_node_copy_named_child_nodes
 
-          let startPos = SourcePos (1 + (fromIntegral $! ts_node_p_start_point_row node)) (1 + (fromIntegral $! ts_node_p_start_point_column node))
-          let endPos = SourcePos (1 + (fromIntegral $! ts_node_p_end_point_row node)) (1 + (fromIntegral $! ts_node_p_end_point_column node))
-          let sourceSpan = SourceSpan { spanStart = startPos , spanEnd = endPos }
+          let sourceSpan = nodeSpan node
 
-          allChildrenCount <- ts_node_p_child_count node
-          let allChildren = filter isNonEmpty <$> traverse (alloca . getChild ts_node_p_child node) (take (fromIntegral allChildrenCount) [0..])
+          let childCount = fromIntegral (nodeChildCount node)
+          let allChildren = filter isNonEmpty <$> getChildren childCount ts_node_copy_child_nodes
 
           -- Note: The strict application here is semantically important.
           -- Without it, we may not evaluate the value until after we’ve exited
@@ -72,8 +74,12 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
 
-nodeRange :: Ptr Node -> Range
-nodeRange node = Range { start = fromIntegral (ts_node_p_start_byte node), end = fromIntegral (ts_node_p_end_byte node) }
+nodeRange :: Node -> Range
+nodeRange Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
+
+nodeSpan :: Node -> SourceSpan
+nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` SourceSpan (pointPos nodeStartPoint) (pointPos nodeEndPoint)
+  where pointPos Point{..} = pointRow `seq` pointColumn `seq` SourcePos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
 
 assignTerm :: Language -> Source -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren =
