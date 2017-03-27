@@ -33,7 +33,7 @@ data ParseJSON =
     ParseTreeProgramNode
     { category :: Text
     , sourceRange :: Range
-    , sourceText :: SourceText
+    , sourceText :: Maybe SourceText
     , sourceSpan :: SourceSpan
     , identifier :: Maybe Text
     , children :: [ParseJSON]
@@ -45,7 +45,7 @@ data ParseJSON =
   | IndexProgramNode
     { category :: Text
     , sourceRange :: Range
-    , sourceText :: SourceText
+    , sourceText :: Maybe SourceText
     , sourceSpan :: SourceSpan
     , identifier :: Maybe Text
     }
@@ -57,12 +57,12 @@ data ParseJSON =
 instance ToJSON ParseJSON where
   toJSON ParseTreeProgramNode{..} = object
     $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "children" .= children ]
-    <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ]
+    <> [ "sourceText" .= sourceText | isJust sourceText ]
     <> [ "identifier" .= identifier | isJust identifier ]
   toJSON ParseTreeProgram{..} = object [ "filePath" .= filePath, "programNode" .= programNode ]
   toJSON IndexProgramNode{..} = object
     $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan]
-    <> [ "sourceText" .= sourceText | not (T.null . unText $ sourceText) ]
+    <> [ "sourceText" .= sourceText | isJust sourceText ]
     <> [ "identifier" .= identifier | isJust identifier ]
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
@@ -109,9 +109,9 @@ parse args@Arguments{..} =
           return $ IndexProgram filePath (para algebra terms')
 
 
-        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
+        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
         algebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
-          where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (Info.sourceText annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
+          where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
 
     -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
     renderParseTree :: Arguments -> IO ByteString
@@ -134,14 +134,14 @@ parse args@Arguments{..} =
           terms' <- terms debug filePath
           return $ ParseTreeProgram filePath (para algebra terms')
 
-        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
-        algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (Info.sourceText annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
+        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
+        algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
 
-    identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan])) -> Maybe T.Text
+    identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
     identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
     -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
-    terms :: Bool -> FilePath -> IO (SyntaxTerm Text '[SourceText, Range, Category, SourceSpan])
+    terms :: Bool -> FilePath -> IO (SyntaxTerm Text '[(Maybe SourceText), Range, Category, SourceSpan])
     terms debug filePath = do
       source <- readAndTranscodeFile filePath
       parser filePath $ sourceBlob' filePath source
@@ -150,7 +150,7 @@ parse args@Arguments{..} =
         sourceBlob' :: FilePath -> Source -> SourceBlob
         sourceBlob' filePath source = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
 
-        parser :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
+        parser :: FilePath -> Parser (Syntax Text) (Record '[(Maybe SourceText), Range, Category, SourceSpan])
         parser = conditionalParserWithSource debug
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
@@ -184,7 +184,7 @@ sourceBlobs Arguments{..} commitSha' = do
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
 -- | Return a parser that decorates with the source text.
-conditionalParserWithSource :: Bool -> FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
+conditionalParserWithSource :: Bool -> FilePath -> Parser (Syntax Text) (Record '[(Maybe SourceText), Range, Category, SourceSpan])
 conditionalParserWithSource debug path blob = decorateTerm (termSourceDecorator debug (source blob)) <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
@@ -205,8 +205,8 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Term decorator extracting the source text for a term.
-termSourceDecorator :: (HasField fields Range) => Bool -> Source -> TermDecorator f fields SourceText
-termSourceDecorator debug source c = if debug then SourceText . toText $ Source.slice range' source else SourceText ""
+termSourceDecorator :: (HasField fields Range) => Bool -> Source -> TermDecorator f fields (Maybe SourceText)
+termSourceDecorator debug source c = if debug then Just . SourceText . toText $ Source.slice range' source else Nothing
  where range' = byteRange $ headF c
 
 -- | A fallback parser that treats a file simply as rows of strings.
