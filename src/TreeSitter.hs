@@ -51,8 +51,8 @@ documentToTerm language document SourceBlob{..} = do
         toTerm node source = do
           name <- peekCString (nodeType node)
 
-          children <- getChildren (fromIntegral (nodeNamedChildCount node)) (ts_node_copy_named_child_nodes document)
-          let allChildren = getChildren (fromIntegral (nodeChildCount node)) (ts_node_copy_child_nodes document)
+          children <- getChildren (fromIntegral (nodeNamedChildCount node)) copyNamed
+          let allChildren = getChildren (fromIntegral (nodeChildCount node)) copyAll
 
           assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
           where getChildren count copy = do
@@ -63,6 +63,8 @@ documentToTerm language document SourceBlob{..} = do
                   return $! filter isNonEmpty children
                 childNodeToTerm childNode = toTerm childNode (slice (offsetRange (nodeRange childNode) (negate (start range))) source)
                 range = nodeRange node
+        copyNamed = ts_node_copy_named_child_nodes document
+        copyAll = ts_node_copy_child_nodes document
 
 
 
