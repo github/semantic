@@ -24,6 +24,9 @@ newtype Yield a = Yield a
 data For a = For { forBefore :: !a, forCondition :: !a, forStep :: !a, forBody :: !a }
   deriving (Eq, Show)
 
+data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
+  deriving (Eq, Show)
+
 data While a = While { whileCondition :: !a, whileBody :: !a }
   deriving (Eq, Show)
 
