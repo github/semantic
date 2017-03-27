@@ -18,3 +18,12 @@ data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classSc
   deriving (Eq, Show)
 
 -- TODO: Generics, constraints.
+
+
+-- | An ADT, i.e. a disjoint sum of products, like 'data' in Haskell, or 'enum' in Rust or Swift.
+data Datatype a = Datatype { datatypeName :: !a, datatypeConstructors :: ![a] }
+  deriving (Eq, Show)
+
+-- | A single constructor in a datatype.
+data Constructor a = Constructor { constructorName :: !a, constructorFields :: ![a] }
+  deriving (Eq, Show)
