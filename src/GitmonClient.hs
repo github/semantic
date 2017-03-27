@@ -124,7 +124,7 @@ reportGitmon' SocketFactory{..} program gitCommand =
 
     loadEnvVars :: IO (String, Maybe String, Maybe String, Maybe Int, Maybe Int)
     loadEnvVars = do
-      pwd <- safeGetCurrentDirectory
+      pwd <- getCurrentDirectory `catch` ((\ _ -> pure "") :: IOException -> IO String)
       gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
       realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
       repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
@@ -132,12 +132,6 @@ reportGitmon' SocketFactory{..} program gitCommand =
       userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
       pure (gitDir, realIP, repoName, readIntFromEnv repoID, readIntFromEnv userID)
       where
-        safeGetCurrentDirectory :: IO String
-        safeGetCurrentDirectory = getCurrentDirectory `catch` handleIOException
-
-        handleIOException :: IOException -> IO String
-        handleIOException _ = pure ""
-
         readIntFromEnv :: Maybe String -> Maybe Int
         readIntFromEnv Nothing = Nothing
         readIntFromEnv (Just s) = readInt $ matchRegex regex s
