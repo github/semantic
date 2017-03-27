@@ -25,6 +25,8 @@ spec :: Spec
 spec =
   describe "gitmon" $ do
     let wd = "test/fixtures/git/examples/all-languages.git"
+        realIP' = "127.0.0.1"
+        repoName' = "examples/all-languages"
 
     it "receives commands in order" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
@@ -44,11 +46,7 @@ spec =
     it "receives update command with correct data" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ do
-          setEnv "GIT_DIR" wd
-          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
-          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
-          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:10"
-          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:20"
+          traverse_ (uncurry setEnv) [("GIT_DIR", wd), ("GIT_SOCKSTAT_VAR_real_ip", realIP'), ("GIT_SOCKSTAT_VAR_repo_name", repoName'), ("GIT_SOCKSTAT_VAR_repo_id", "uint:10"), ("GIT_SOCKSTAT_VAR_user_id", "uint:20")]
           sendAll server "continue"
 
         object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
@@ -75,11 +73,7 @@ spec =
     it "reads Nothing for user_id and repo_id when valid prefix but invalid value" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ do
-          setEnv "GIT_DIR" wd
-          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
-          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
-          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:not_valid"
-          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:not_valid"
+          traverse_ (uncurry setEnv) [("GIT_DIR", wd), ("GIT_SOCKSTAT_VAR_real_ip", realIP'), ("GIT_SOCKSTAT_VAR_repo_name", repoName'), ("GIT_SOCKSTAT_VAR_repo_id", "uint:not_valid"), ("GIT_SOCKSTAT_VAR_user_id", "uint:not_valid")]
           sendAll server "continue"
 
         object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
@@ -95,11 +89,7 @@ spec =
     it "reads Nothing for user_id and repo_id when valid prefix but value is preceeded by invalid chars" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ do
-          setEnv "GIT_DIR" wd
-          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
-          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
-          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:abc100"
-          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:abc100"
+          traverse_ (uncurry setEnv) [("GIT_DIR", wd), ("GIT_SOCKSTAT_VAR_real_ip", realIP'), ("GIT_SOCKSTAT_VAR_repo_name", repoName'), ("GIT_SOCKSTAT_VAR_repo_id", "uint:abc100"), ("GIT_SOCKSTAT_VAR_user_id", "uint:abc100")]
           sendAll server "continue"
 
         object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
@@ -115,11 +105,7 @@ spec =
     it "reads Nothing for user_id and repo_id when valid prefix but value is proceeded by invalid chars" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ do
-          setEnv "GIT_DIR" wd
-          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
-          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
-          setEnv "GIT_SOCKSTAT_VAR_repo_id" "uint:100abc"
-          setEnv "GIT_SOCKSTAT_VAR_user_id" "uint:100abc"
+          traverse_ (uncurry setEnv) [("GIT_DIR", wd), ("GIT_SOCKSTAT_VAR_real_ip", realIP'), ("GIT_SOCKSTAT_VAR_repo_name", repoName'), ("GIT_SOCKSTAT_VAR_repo_id", "uint:100abc"), ("GIT_SOCKSTAT_VAR_user_id", "uint:100abc")]
           sendAll server "continue"
 
         object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
@@ -135,11 +121,7 @@ spec =
     it "reads Nothing for user_id and repo_id when missing prefix but value is valid" . withSocketPair $ \(_, server, socketFactory) ->
       withRepository lgFactory wd $ do
         liftIO $ do
-          setEnv "GIT_DIR" wd
-          setEnv "GIT_SOCKSTAT_VAR_real_ip" "127.0.0.1"
-          setEnv "GIT_SOCKSTAT_VAR_repo_name" "examples/all-languages"
-          setEnv "GIT_SOCKSTAT_VAR_repo_id" "100"
-          setEnv "GIT_SOCKSTAT_VAR_user_id" "100"
+          traverse_ (uncurry setEnv) [("GIT_DIR", wd), ("GIT_SOCKSTAT_VAR_real_ip", realIP'), ("GIT_SOCKSTAT_VAR_repo_name", repoName'), ("GIT_SOCKSTAT_VAR_repo_id", "100"), ("GIT_SOCKSTAT_VAR_user_id", "100")]
           sendAll server "continue"
 
         object <- parseObjOid (Data.Text.pack "dfac8fd681b0749af137aebf3203e77a06fbafc2")
