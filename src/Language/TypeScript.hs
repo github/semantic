@@ -140,6 +140,7 @@ categoryForTypeScriptName = \case
   "continue_statement" -> Continue
   "yield_expression" -> Yield
   "public_field_definition" -> VarAssignment
+  "variable_declarator" -> VarAssignment
   "type_annotation" -> Ty
   "accessibility_modifier" -> Identifier
   name -> Other name

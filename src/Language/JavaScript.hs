@@ -140,4 +140,5 @@ categoryForJavaScriptProductionName name = case name of
   "break_statement" -> Break
   "continue_statement" -> Continue
   "yield_expression" -> Yield
+  "variable_declarator" -> VarAssignment
   _ -> Other name
