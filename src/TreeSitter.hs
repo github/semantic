@@ -68,11 +68,7 @@ documentToTerm language document SourceBlob{..} = do
           let childCount = fromIntegral (nodeChildCount node)
           let allChildren = filter isNonEmpty <$> getChildren childCount ts_node_copy_child_nodes
 
-          -- Note: The strict application here is semantically important.
-          -- Without it, we may not evaluate the value until after we’ve exited
-          -- the scope that `node` was allocated within, meaning `alloca` will
-          -- free it & other stack data may overwrite it.
-          range `seq` sourceSpan `seq` assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
+          assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
 
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
