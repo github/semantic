@@ -24,6 +24,6 @@ data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classSc
 data Datatype a = Datatype { datatypeName :: !a, datatypeConstructors :: ![a] }
   deriving (Eq, Show)
 
--- | A single constructor in a datatype.
+-- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
 data Constructor a = Constructor { constructorName :: !a, constructorFields :: ![a] }
   deriving (Eq, Show)
