@@ -40,15 +40,11 @@ newtype Throw a = Throw a
   deriving (Eq, Show)
 
 data Try with a = Try !a ![with a]
+deriving instance (Eq a, Eq (with a)) => Eq (Try with a)
+deriving instance (Show a, Show (with a)) => Show (Try with a)
 
 data Catch a = Catch !(Maybe a) !a
   deriving (Eq, Show)
 
 newtype Finally a = Finally a
   deriving (Eq, Show)
-
-
--- Instances
-
-deriving instance (Eq a, Eq (with a)) => Eq (Try with a)
-deriving instance (Show a, Show (with a)) => Show (Try with a)
