@@ -76,7 +76,7 @@ termAssignment source category children = case (category, children) of
   _ -> Nothing
 
 categoryForGoName :: Text -> Category
-categoryForGoName = \case
+categoryForGoName name = case name of
   "identifier" -> Identifier
   "int_literal" -> NumberLiteral
   "float_literal" -> FloatLiteral
