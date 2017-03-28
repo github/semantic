@@ -50,7 +50,7 @@ data ProcessData = ProcessUpdateData { gitDir :: Maybe String
 
 instance ToJSON ProcessData where
   toJSON ProcessUpdateData{..} = object [ "git_dir" .= gitDir, "program" .= program, "repo_name" .= repoName, "real_ip" .= realIP, "repo_id" .= repoID, "user_id" .= userID, "via" .= via ]
-  toJSON ProcessScheduleData = object []
+  toJSON ProcessScheduleData   = object []
   toJSON ProcessFinishData{..} = object [ "cpu" .= cpu, "disk_read_bytes" .= diskReadBytes, "disk_write_bytes" .= diskWriteBytes, "result_code" .= resultCode ]
 
 
