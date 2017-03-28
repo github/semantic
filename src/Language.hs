@@ -6,7 +6,6 @@ import Info
 import Prologue
 import qualified Syntax as S
 import Term
-import Data.List (partition)
 
 -- | A programming language.
 data Language =
