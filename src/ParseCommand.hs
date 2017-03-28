@@ -75,6 +75,17 @@ parse args@Arguments{..} =
     _ -> parse' args
 
   where
+    renderSExpression :: Arguments -> IO ByteString
+    renderSExpression args@Arguments{..} =
+      case commitSha of
+        Just commitSha' -> do
+          sourceBlobs' <- sourceBlobs args (T.pack commitSha')
+          terms' <- traverse (\sourceBlob@SourceBlob{..} -> conditionalParserWithSource debug path sourceBlob) sourceBlobs'
+          return $ printTerms TreeOnly terms'
+        Nothing -> do
+          terms' <- sequenceA $ terms debug <$> filePaths
+          return $ printTerms TreeOnly terms'
+
 
     parse' :: Arguments -> IO ByteString
     parse' args@Arguments{..} = fmap (toS . encode) (render filePaths)
@@ -99,17 +110,6 @@ parse args@Arguments{..} =
       case format of
         Index -> return $ IndexProgram filePath (para parseIndexAlgebra terms')
         _ -> return $ ParseTreeProgram filePath (para parseTreeAlgebra terms')
-
-    renderSExpression :: Arguments -> IO ByteString
-    renderSExpression args@Arguments{..} =
-      case commitSha of
-        Just commitSha' -> do
-          sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-          terms' <- traverse (\sourceBlob@SourceBlob{..} -> conditionalParserWithSource debug path sourceBlob) sourceBlobs'
-          return $ printTerms TreeOnly terms'
-        Nothing -> do
-          terms' <- sequenceA $ terms debug <$> filePaths
-          return $ printTerms TreeOnly terms'
 
     parseIndexAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
     parseIndexAlgebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
