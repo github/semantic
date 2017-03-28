@@ -220,7 +220,7 @@ toTermName source term = case unwrap term of
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ _ -> toTermName' identifier
   S.ParameterDecl _ _ -> termNameFromSource term
-  S.FunctionCall i args -> case unwrap i of
+  S.FunctionCall i _ args -> case unwrap i of
     S.AnonymousFunction params _ ->
       -- Omit a function call's arguments if it's arguments match the underlying
       -- anonymous function's arguments.
@@ -233,7 +233,7 @@ toTermName source term = case unwrap term of
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
     (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
     (_, _) -> toTermName' base <> "." <> toTermName' property
-  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> paramsToArgNames methodParams
+  S.MethodCall targetId methodId _ methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> paramsToArgNames methodParams
     where sep = case unwrap targetId of
             S.FunctionCall{} -> "()."
             _ -> "."

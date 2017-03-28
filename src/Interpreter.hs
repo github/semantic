@@ -69,8 +69,9 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
     Just $ Indexed <$> byRWS a b
   (S.Module idA a, S.Module idB b) ->
     Just $ S.Module <$> linearly idA idB <*> byRWS a b
-  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> Just $
+  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> Just $
     S.FunctionCall <$> linearly identifierA identifierB
+                   <*> byRWS typeParamsA typeParamsB
                    <*> byRWS argsA argsB
   (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
     S.Switch <$> byRWS exprA exprB

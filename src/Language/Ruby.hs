@@ -50,9 +50,9 @@ termAssignment _ category children
     (MethodCall, fn : args)
       | MemberAccess <- Info.category (extract fn)
       , [target, method] <- toList (unwrap fn)
-      -> Just $ S.MethodCall target method (toList . unwrap =<< args)
+      -> Just $ S.MethodCall target method [] (toList . unwrap =<< args)
       | otherwise
-      -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
+      -> Just $ S.FunctionCall fn [] (toList . unwrap =<< args)
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
     (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]

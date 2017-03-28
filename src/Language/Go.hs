@@ -46,7 +46,7 @@ termAssignment source category children = case (category, children) of
   -- TODO: Handle multiple var specs
   (VarAssignment, [identifier, expression]) -> Just $ S.VarAssignment [identifier] expression
   (VarDecl, children) -> Just $ S.VarDecl children
-  (FunctionCall, id : rest) -> Just $ S.FunctionCall id rest
+  (FunctionCall, id : rest) -> Just $ S.FunctionCall id [] rest
   (AnonymousFunction, [params, _, body])
     | [params'] <- toList (unwrap params)
     -> Just $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))

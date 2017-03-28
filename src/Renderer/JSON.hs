@@ -101,14 +101,14 @@ syntaxToTermField syntax = case syntax of
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
-  S.FunctionCall identifier parameters -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ]
+  S.FunctionCall identifier typeParameters parameters -> [ "identifier" .= identifier ] <> [ "typeArguments" .= typeParameters] <> [ "parameters" .= parameters ]
   S.Ternary expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
   S.AnonymousFunction parameters c -> [ "parameters" .= parameters ] <> childrenFields c
   S.Function identifier parameters ty c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "type" .= ty ] <> childrenFields c
   S.Assignment assignmentId value -> [ "identifier" .= assignmentId ] <> [ "value" .= value ]
   S.OperatorAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
-  S.MethodCall identifier methodIdentifier parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "parameters" .= parameters ]
+  S.MethodCall identifier methodIdentifier typeParameters parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "typeParameters" .= typeParameters ] <> [ "parameters" .= parameters ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
   S.VarDecl children -> childrenFields children
   S.VarAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]

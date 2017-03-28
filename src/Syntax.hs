@@ -21,7 +21,7 @@ data Syntax a f
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
   | Fixed [f]
   -- | A function call has an identifier where f is a (Leaf a) and a list of arguments.
-  | FunctionCall f [f]
+  | FunctionCall f [f] [f]
   -- | A ternary has a condition, a true case and a false case
   | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
   -- | An anonymous function has a list of expressions and params.
@@ -37,7 +37,7 @@ data Syntax a f
   | MemberAccess { memberId :: f, property :: f }
   -- | A method call consisting of its target, the method name, and the parameters passed to the method.
   -- | e.g. in Javascript console.log('hello') represents a method call.
-  | MethodCall { targetId :: f, methodId :: f, methodParams :: [f] }
+  | MethodCall { targetId :: f, methodId :: f, typeArgs :: [f], methodParams :: [f] }
   -- | An operator can be applied to a list of syntaxes.
   | Operator [f]
   -- | A variable declaration. e.g. var foo;
@@ -119,14 +119,14 @@ instance Listable2 Syntax where
     =  liftCons1 leaf Leaf
     \/ liftCons1 (liftTiers recur) Indexed
     \/ liftCons1 (liftTiers recur) Fixed
-    \/ liftCons2 recur (liftTiers recur) FunctionCall
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FunctionCall
     \/ liftCons2 recur (liftTiers recur) Ternary
     \/ liftCons2 (liftTiers recur) (liftTiers recur) AnonymousFunction
     \/ liftCons4 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Function
     \/ liftCons2 recur recur Assignment
     \/ liftCons2 recur recur OperatorAssignment
     \/ liftCons2 recur recur MemberAccess
-    \/ liftCons3 recur recur (liftTiers recur) MethodCall
+    \/ liftCons4 recur recur (liftTiers recur) (liftTiers recur) MethodCall
     \/ liftCons1 (liftTiers recur) Operator
     \/ liftCons1 (liftTiers recur) VarDecl
     \/ liftCons2 (liftTiers recur) recur VarAssignment

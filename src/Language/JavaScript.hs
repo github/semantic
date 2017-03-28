@@ -24,8 +24,8 @@ termAssignment _ category children
       -> Just $ S.Indexed $ a : rest
     (FunctionCall, member : args)
       | S.MemberAccess target method <- unwrap member
-      -> Just $ S.MethodCall target method (toList . unwrap =<< args)
-    (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
+      -> Just $ S.MethodCall target method [] (toList . unwrap =<< args)
+    (FunctionCall, function : args) -> Just $ S.FunctionCall function [] (toList . unwrap =<< args)
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (VarDecl, _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children

@@ -22,10 +22,12 @@ termAssignment _ category children =
     (CommaOperator, [ a, b ])
       | S.Indexed rest <- unwrap b
       -> Just $ S.Indexed $ a : rest
-    (FunctionCall, member : args)
-      | S.MemberAccess target method <- unwrap member
-      -> Just $ S.MethodCall target method (toList . unwrap =<< args)
-    (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
+    (FunctionCall, id : rest) -> case Prologue.break ((== Args) . Info.category . extract) rest of
+      (typeArgs, [ args ]) -> let flatArgs = toList (unwrap args) in
+           Just $ case unwrap id of
+             S.MemberAccess target method -> S.MethodCall target method typeArgs flatArgs
+             _                            -> S.FunctionCall id typeArgs flatArgs
+      _ -> Nothing
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (Other "variable_declaration", _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
     (Other "trailing_variable_declaration", _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
