@@ -101,7 +101,7 @@ data Syntax a f
   -- | A type declaration has an identifier and a type.
   | TypeDecl f f
   -- | A field declaration with an optional type, and an optional tag.
-  | FieldDecl f (Maybe f) (Maybe f)
+  | FieldDecl [f]
   -- | A type.
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
@@ -162,7 +162,7 @@ instance Listable2 Syntax where
     \/ liftCons1 (liftTiers recur) BlockStatement
     \/ liftCons2 (liftTiers recur) recur ParameterDecl
     \/ liftCons2 recur recur TypeDecl
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FieldDecl
+    \/ liftCons1 (liftTiers recur) FieldDecl
     \/ liftCons1 (liftTiers recur) Ty
     \/ liftCons2 recur recur Send
     \/ liftCons1 (liftTiers recur) DefaultCase

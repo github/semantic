@@ -282,7 +282,7 @@ toTermName source term = case unwrap term of
   S.Continue expr -> maybe "" toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
   S.DefaultCase children -> termNameFromChildren term children
-  S.FieldDecl id expr tag -> termNameFromSource id <> maybe "" (\expr' -> " " <> termNameFromSource expr') expr <> maybe "" ((" " <>) . termNameFromSource) tag
+  S.FieldDecl children -> termNameFromChildren term children
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)

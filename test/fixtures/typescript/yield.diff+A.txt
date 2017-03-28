@@ -3,7 +3,7 @@
     (Function
       (Identifier)
       (ExpressionStatements
-        (VarDecl
+        (Other "variable_declaration"
           (VarAssignment
             (Identifier)
             (NumberLiteral)))

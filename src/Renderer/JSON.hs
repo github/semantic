@@ -149,7 +149,7 @@ syntaxToTermField syntax = case syntax of
   S.ParameterDecl ty field -> [ "type" .= ty ] <> [ "identifier" .= field ]
   S.DefaultCase c -> childrenFields c
   S.TypeDecl id ty -> [ "type" .= ty ] <> [ "identifier" .= id ]
-  S.FieldDecl id ty tag -> [ "type" .= ty ] <> [ "identifier" .= id ] <> [ "tag" .= tag]
+  S.FieldDecl children -> childrenFields children
   S.Ty ty -> [ "type" .= ty ]
   S.Send channel expr -> [ "channel" .= channel ] <> [ "expression" .= expr ]
   where childrenFields c = [ "children" .= c ]

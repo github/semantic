@@ -22,17 +22,7 @@ termAssignment source category children = case (category, children) of
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> Just $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
   (TypeDecl, [identifier, ty]) -> Just $ S.TypeDecl identifier ty
   (StructTy, _) -> Just (S.Ty children)
-  (FieldDecl, [idList])
-    | [ident] <- toList (unwrap idList)
-    -> Just (S.FieldDecl ident Nothing Nothing)
-  (FieldDecl, [idList, ty])
-    | [ident] <- toList (unwrap idList)
-    -> Just $ case Info.category (extract ty) of
-      StringLiteral -> S.FieldDecl ident Nothing (Just ty)
-      _ -> S.FieldDecl ident (Just ty) Nothing
-  (FieldDecl, [idList, ty, tag])
-    | [ident] <- toList (unwrap idList)
-    -> Just (S.FieldDecl ident (Just ty) (Just tag))
+  (FieldDecl, _) -> Just (S.FieldDecl children)
   (ParameterDecl, param : ty) -> Just $ S.ParameterDecl (listToMaybe ty) param
   (Assignment, [identifier, expression]) -> Just $ S.VarAssignment [identifier] expression
   (Select, _) -> Just $ S.Select (children >>= toList . unwrap)

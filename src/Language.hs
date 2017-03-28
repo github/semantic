@@ -46,7 +46,8 @@ languageForType mediaType = case mediaType of
 toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDeclOrAssignment child = case unwrap child of
   S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment [child'] assignment
-  S.VarDecl _ -> child
+  S.Indexed [child'] -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child']
+  S.VarDecl _ -> cofree $ setCategory (extract child) VarDecl :< unwrap child
   S.VarAssignment _ _ -> child
   _ -> toVarDecl child
 

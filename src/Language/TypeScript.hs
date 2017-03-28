@@ -27,8 +27,10 @@ termAssignment _ category children =
       -> Just $ S.MethodCall target method (toList . unwrap =<< args)
     (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
-    (VarDecl, _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
-    (VarAssignment, _ ) -> toPublicFieldDefinition children
+    (Other "variable_declaration", _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
+    (Other "trailing_variable_declaration", _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
+    (VarAssignment, [id, assignment]) -> Just $ S.VarAssignment [id] assignment
+    (FieldDecl, _) -> Just $ S.FieldDecl children
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
     (Constructor, [ expr ]) -> Just $ S.Constructor expr
@@ -113,8 +115,6 @@ categoryForTypeScriptName = \case
   "subscript_access" -> SubscriptAccess
   "regex" -> Regex
   "template_string" -> TemplateString
-  "variable_declaration" -> VarDecl
-  "trailing_variable_declaration" -> VarDecl
   "switch_statement" -> Switch
   "math_assignment" -> MathAssignment
   "case" -> Case
@@ -139,7 +139,7 @@ categoryForTypeScriptName = \case
   "break_statement" -> Break
   "continue_statement" -> Continue
   "yield_expression" -> Yield
-  "public_field_definition" -> VarAssignment
+  "public_field_definition" -> FieldDecl
   "variable_declarator" -> VarAssignment
   "type_annotation" -> Ty
   "accessibility_modifier" -> Identifier
