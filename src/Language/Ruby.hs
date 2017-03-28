@@ -41,9 +41,9 @@ termAssignment _ category children
           _ -> S.Try body rescues Nothing Nothing
     (Class, constant : superclass : body)
       | Superclass <- Info.category (extract superclass)
-      -> Just $ S.Class constant (Just superclass) body
-    (Class, constant : rest) -> Just $ S.Class constant Nothing rest
-    (SingletonClass, identifier : rest) -> Just $ S.Class identifier Nothing rest
+      -> Just $ S.Class constant [superclass] body
+    (Class, constant : rest) -> Just $ S.Class constant [] rest
+    (SingletonClass, identifier : rest) -> Just $ S.Class identifier [] rest
     (Case, _) -> Just $ uncurry S.Switch (Prologue.break ((== When) . Info.category . extract) children)
     (When, expr : body) -> Just $ S.Case expr body
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases

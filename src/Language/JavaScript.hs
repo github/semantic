@@ -45,8 +45,8 @@ termAssignment _ category children
     (ArrayLiteral, _) -> Just $ S.Array Nothing children
     (Method, [ identifier, params, exprs ]) -> Just $ S.Method identifier Nothing Nothing (toList (unwrap params)) (toList (unwrap exprs))
     (Method, [ identifier, exprs ]) -> Just $ S.Method identifier Nothing Nothing [] (toList (unwrap exprs))
-    (Class, [ identifier, superclass, definitions ]) -> Just $ S.Class identifier (Just superclass) (toList (unwrap definitions))
-    (Class, [ identifier, definitions ]) -> Just $ S.Class identifier Nothing (toList (unwrap definitions))
+    (Class, [ identifier, superclass, definitions ]) -> Just $ S.Class identifier [superclass] (toList (unwrap definitions))
+    (Class, [ identifier, definitions ]) -> Just $ S.Class identifier [] (toList (unwrap definitions))
     (Import, [ statements, identifier ] ) -> Just $ S.Import identifier (toList (unwrap statements))
     (Import, [ identifier ] ) -> Just $ S.Import identifier []
     (Export, [ statements, identifier] ) -> Just $ S.Export (Just identifier) (toList (unwrap statements))

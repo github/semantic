@@ -72,7 +72,7 @@ data Syntax a f
   -- | An array literal with list of children.
   | Array (Maybe f) [f]
   -- | A class with an identifier, superclass, and a list of definitions.
-  | Class f (Maybe f) [f]
+  | Class f [f] [f]
   -- | A method definition with an identifier, optional receiver, optional return type, params, and a list of expressions.
   | Method f (Maybe f) (Maybe f) [f] [f]
   -- | An if statement with an expression and maybe more expression clauses.

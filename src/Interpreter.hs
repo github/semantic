@@ -84,9 +84,9 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
   (Array tyA a, Array tyB b) -> Just $
     Array <$> maybeLinearly tyA tyB
           <*> byRWS a b
-  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> Just $
+  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> Just $
     S.Class <$> linearly identifierA identifierB
-            <*> maybeLinearly paramsA paramsB
+            <*> byRWS clausesA clausesB
             <*> byRWS expressionsA expressionsB
   (S.Method identifierA receiverA tyA paramsA expressionsA, S.Method identifierB receiverB tyB paramsB expressionsB) -> Just $
     S.Method <$> linearly identifierA identifierB
