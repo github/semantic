@@ -1,24 +1,23 @@
 (Program
-  (ExpressionStatements
-    (Function
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (ExpressionStatements
-        (Function
-          (Identifier)
-          (Identifier)
-          (Identifier)
+  (Function
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (ExpressionStatements
+      (Function
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (ExpressionStatements
           (ExpressionStatements
-            (ExpressionStatements
-              (FunctionCall
-                (Identifier)
-                (Identifier)
-              { (Identifier)
-              ->(Identifier) }))
-            (ExpressionStatements
-              (FunctionCall
-                (Identifier)
-                (Identifier)
-              { (Identifier)
-              ->(Identifier) }))))))))
+            (FunctionCall
+              (Identifier)
+              (Identifier)
+            { (Identifier)
+            ->(Identifier) }))
+          (ExpressionStatements
+            (FunctionCall
+              (Identifier)
+              (Identifier)
+            { (Identifier)
+            ->(Identifier) })))))))

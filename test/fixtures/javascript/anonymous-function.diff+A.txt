@@ -1,11 +1,10 @@
 {+(Program
-  (ExpressionStatements
-    (Function
-      (Identifier)
-      (Identifier)
-      (ExpressionStatements
-        (Return
-          (MathOperator
-            (Identifier)
-            (Other "+")
-            (Identifier)))))))+}
+  (Function
+    (Identifier)
+    (Identifier)
+    (ExpressionStatements
+      (Return
+        (MathOperator
+          (Identifier)
+          (Other "+")
+          (Identifier))))))+}

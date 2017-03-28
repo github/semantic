@@ -85,6 +85,7 @@ styleName category = "category-" <> case category of
   Other string -> string
   C.Module -> "module_statement"
   C.Namespace -> "namespace"
+  C.Interface -> "interface"
   C.Import -> "import_statement"
   C.Export -> "export_statement"
   C.AnonymousFunction -> "anonymous_function"

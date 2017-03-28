@@ -1,4 +1,0 @@
-{-(Program
-  (Other "interface_declaration"
-    (Identifier)
-    (Other "object_type")))-}

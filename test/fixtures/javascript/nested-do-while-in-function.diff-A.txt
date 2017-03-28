@@ -1,14 +1,13 @@
 {-(Program
-  (ExpressionStatements
-    (Function
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (ExpressionStatements
-        (DoWhile
+  (Function
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (ExpressionStatements
+      (DoWhile
+        (ExpressionStatements
           (ExpressionStatements
-            (ExpressionStatements
-              (FunctionCall
-                (Identifier)
-                (Identifier))))
-          (Identifier))))))-}
+            (FunctionCall
+              (Identifier)
+              (Identifier))))
+        (Identifier)))))-}

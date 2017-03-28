@@ -1,14 +1,13 @@
 {+(Program
   (Other "ambient_declaration"
-    (Other "ambient_namespace"
+    (Namespace
       (Identifier)))
   (Other "ambient_declaration"
     (Class
       (Identifier)))
   (Other "ambient_declaration"
-    (Other "interface_declaration"
-      (Identifier)
-      (Other "object_type")))
+    (Interface
+      (Identifier)))
   (Other "ambient_declaration"
     (Class
       (Identifier)

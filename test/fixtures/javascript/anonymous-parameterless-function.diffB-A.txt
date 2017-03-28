@@ -1,7 +1,6 @@
 (Program
-  (ExpressionStatements
-    (Function
-      (ExpressionStatements
-        (Return
-        { (StringLiteral)
-        ->(StringLiteral) })))))
+  (Function
+    (ExpressionStatements
+      (Return
+      { (StringLiteral)
+      ->(StringLiteral) }))))

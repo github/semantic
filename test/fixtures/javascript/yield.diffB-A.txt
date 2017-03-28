@@ -1,15 +1,14 @@
 (Program
-  (ExpressionStatements
-    (Function
-      (Identifier)
-      (ExpressionStatements
-        (VarDecl
-          (VarAssignment
-            (Identifier)
-            (NumberLiteral)))
-      (ExpressionStatements (Yield {
-        (MathOperator
+  (Function
+    (Identifier)
+    (ExpressionStatements
+      (VarDecl
+        (VarAssignment
           (Identifier)
-          (Other "++"))
-        ->
-        (Identifier) }))))))
+          (NumberLiteral)))
+      (ExpressionStatements
+        (Yield
+        { (MathOperator
+            (Identifier)
+            (Other "++"))
+        ->(Identifier) })))))

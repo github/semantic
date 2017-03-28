@@ -1,19 +1,18 @@
 (Program
-  (ExpressionStatements
-    (Class
+  (Class
+    (Identifier)
+    (Method
       (Identifier)
-      (Method
-        (Identifier)
-        (Identifier)
-        (Return
-          (Identifier)))
-      (Method
-        (Identifier)
-        (Identifier)
-        (Return
-          (Identifier)))
-      (Method
-        (Identifier)
-        (Identifier)
-        (Return
-          (Identifier))))))
+      (Identifier)
+      (Return
+        (Identifier)))
+    (Method
+      (Identifier)
+      (Identifier)
+      (Return
+        (Identifier)))
+    (Method
+      (Identifier)
+      (Identifier)
+      (Return
+        (Identifier)))))

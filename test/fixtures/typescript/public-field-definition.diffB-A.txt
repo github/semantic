@@ -53,28 +53,36 @@
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (FieldDecl
-      { (Identifier)
-      ->(Other "readonly") }
-      { (Other "readonly")
-      ->(Identifier) }
-      { (Identifier)
-      ->(Ty
-          (Other "type_reference"
-            (Identifier))) }
-      { (Ty
-          (Other "type_reference"
-            (Identifier)))
-      ->(NumberLiteral) }
-      {-(StringLiteral)-})
-      (FieldDecl
-      { (Identifier)
-      ->(Identifier) }
+    {+(FieldDecl
+        (Other "readonly")
+        (Identifier)
         (Ty
           (Other "type_reference"
             (Identifier)))
-        (NumberLiteral))
-      (FieldDecl
+        (NumberLiteral))+}
+    {+(FieldDecl
         (Identifier)
-      { (NumberLiteral)
-      ->(NumberLiteral) }))))
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))+}
+    {+(FieldDecl
+        (Identifier)
+        (NumberLiteral))+}
+    {-(FieldDecl
+        (Identifier)
+        (Other "readonly")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (StringLiteral))-}
+    {-(FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))-}
+    {-(FieldDecl
+        (Identifier)
+        (NumberLiteral))-})))

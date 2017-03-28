@@ -113,6 +113,7 @@ categoryForJavaScriptProductionName name = case name of
   "subscript_access" -> SubscriptAccess
   "regex" -> Regex
   "template_string" -> TemplateString
+  "template_chars" -> TemplateString
   "lexical_declaration" -> VarDecl
   "variable_declaration" -> VarDecl
   "trailing_variable_declaration" -> VarDecl

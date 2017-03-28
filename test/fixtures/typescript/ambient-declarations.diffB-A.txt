@@ -25,56 +25,52 @@
         (Ty
           (Other "predefined_type")))))+}
 {+(Other "ambient_declaration"
-    (Other "ambient_namespace"
+    (Namespace
       (Identifier)
-      (Other "ambient_namespace_body"
-        (Other "ambient_function"
+      (Other "ambient_function"
+        (Identifier)
+        (Other "call_signature"
+          (Params
+            (Other "required_parameter"
+              (Identifier)
+              (Ty
+                (Other "predefined_type"))))
+          (Ty
+            (Other "predefined_type"))))
+      (Other "lexical_declaration"
+        (VarAssignment
           (Identifier)
-          (Other "call_signature"
-            (Params
-              (Other "required_parameter"
-                (Identifier)
-                (Ty
-                  (Other "predefined_type"))))
-            (Ty
-              (Other "predefined_type"))))
-        (Other "lexical_declaration"
-          (VarAssignment
-            (Identifier)
-            (Ty
-              (Other "predefined_type"))))
-        (Other "interface_declaration"
+          (Ty
+            (Other "predefined_type"))))
+      (Interface
+        (Identifier)
+        (Other "property_signature"
           (Identifier)
-          (Other "object_type"
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type")))))
-        (Other "interface_declaration"
+          (Ty
+            (Other "predefined_type"))))
+      (Interface
+        (Identifier)
+        (Other "property_signature"
           (Identifier)
-          (Other "object_type"
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type")))
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type")))
-            (Other "property_signature"
-              (Identifier)
-              (Ty
-                (Other "predefined_type"))))))))+}
+          (Ty
+            (Other "predefined_type")))
+        (Other "property_signature"
+          (Identifier)
+          (Ty
+            (Other "predefined_type")))
+        (Other "property_signature"
+          (Identifier)
+          (Ty
+            (Other "predefined_type"))))))+}
 {-(Other "ambient_declaration"
-    (Other "ambient_namespace"
+    (Namespace
       (Identifier)))-}
 {-(Other "ambient_declaration"
     (Class
       (Identifier)))-}
 {-(Other "ambient_declaration"
-    (Other "interface_declaration"
-      (Identifier)
-      (Other "object_type")))-}
+    (Interface
+      (Identifier)))-}
   (Other "ambient_declaration"
     (Class
       (Identifier)

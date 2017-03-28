@@ -133,6 +133,7 @@ syntaxToTermField syntax = case syntax of
   S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
   S.Module identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Namespace identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
+  S.Interface identifier clauses definitions -> [ "identifier" .= identifier ] <> [ "clauses" .= clauses ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
