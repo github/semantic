@@ -8,5 +8,6 @@
         (Identifier)
         (StructTy
           (FieldDecl
-            (Identifier)
+            (Other "identifier_list"
+              (Identifier))
             (Identifier)))))))-}

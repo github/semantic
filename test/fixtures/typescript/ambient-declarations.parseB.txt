@@ -20,7 +20,7 @@
               (Identifier)
               (Ty
                 (Other "predefined_type"))))))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
         (Ty
           (Other "predefined_type")))

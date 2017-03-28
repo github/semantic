@@ -2,64 +2,64 @@
   (ExpressionStatements
     (Class
       (Identifier)
-      (VarAssignment
+      (FieldDecl
         (Other "readonly")
         (Identifier))
-      (VarAssignment
+      (FieldDecl
         (Other "readonly")
         (Identifier))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
+        (Identifier)
         (Other "readonly")
         (Identifier))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
+        (Identifier)
         (Other "readonly")
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
         (Identifier)
-        (Other "type_annotation"
-          (Other "type_reference"
-            (Identifier)))
-        (NumberLiteral))
-      (VarAssignment
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
+        (Identifier)
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
         (Other "readonly")
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (StringLiteral))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
         (NumberLiteral)))))-}

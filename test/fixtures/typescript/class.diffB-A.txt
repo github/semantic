@@ -2,7 +2,7 @@
   (ExpressionStatements
     (Class
       (Identifier)
-    {+(VarAssignment
+    {+(FieldDecl
         (Identifier)
         (NumberLiteral))+}
       (Method

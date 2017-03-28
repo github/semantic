@@ -2,61 +2,61 @@
   (ExpressionStatements
     (Class
       (Identifier)
-      (VarAssignment
+      (FieldDecl
         (Other "readonly")
         (Identifier))
-      (VarAssignment
+      (FieldDecl
         (Other "readonly")
         (Identifier))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
+        (Identifier)
         (Other "readonly")
         (Identifier))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
+        (Identifier)
         (Other "readonly")
         (Identifier)
         (NumberLiteral))
-      (VarAssignment
-        (Other "accessibility_modifier")
+      (FieldDecl
+        (Identifier)
         (Other "readonly")
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Other "readonly")
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Other "readonly")
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
-        (Other "type_annotation"
+        (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
-      (VarAssignment
+      (FieldDecl
         (Identifier)
         (NumberLiteral)))))+}

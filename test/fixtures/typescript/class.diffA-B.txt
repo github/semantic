@@ -23,7 +23,7 @@
             (Identifier)))
         (Return
           (Identifier)))+}
-    {-(VarAssignment
+    {-(FieldDecl
         (Identifier)
         (NumberLiteral))-}
     {-(Method

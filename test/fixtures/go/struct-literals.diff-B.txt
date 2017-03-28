@@ -24,7 +24,8 @@
           (Other "composite_literal"
             (StructTy
               (FieldDecl
-                (Identifier)
+                (Other "identifier_list"
+                  (Identifier))
                 (Identifier)))
             (Pair
               (Identifier)

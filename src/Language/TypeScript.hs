@@ -29,6 +29,7 @@ termAssignment _ category children =
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (Other "variable_declaration", _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
     (Other "trailing_variable_declaration", _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
+    (Other "lexical_declaration", _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
     (VarAssignment, [id, assignment]) -> Just $ S.VarAssignment [id] assignment
     (FieldDecl, _) -> Just $ S.FieldDecl children
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children

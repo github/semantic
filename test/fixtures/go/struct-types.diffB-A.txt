@@ -33,6 +33,7 @@
           (FieldDecl
             (QualifiedIdentifier))
           (FieldDecl
-            (Identifier)
+            (Other "identifier_list"
+              (Identifier))
             (Identifier)
             (StringLiteral)))))))

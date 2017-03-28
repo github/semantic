@@ -1,6 +1,6 @@
 {-(Program
   (Other "lexical_declaration"
-    (Other "variable_declarator"
+    (VarAssignment
       (Identifier)
       (Ty
         (Other "type_query"
