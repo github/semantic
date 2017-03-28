@@ -17,7 +17,6 @@ import Prelude
 import Prologue hiding (toStrict, map, print, show)
 import System.Clock
 import System.Environment
-import System.IO (hPrint, stderr)
 import System.Timeout
 import Text.Regex
 
@@ -156,9 +155,7 @@ safeGitmonIO :: MonadIO m => IO a -> m (Maybe a)
 safeGitmonIO command = liftIO $ timeout gitmonTimeout command `catch` logError
 
 logError :: IOException -> IO (Maybe a)
-logError e = do
-  hPrint stderr e
-  pure Nothing
+logError _ = pure Nothing
 
 procFileAddr :: String
 procFileAddr = "/proc/self/io"
