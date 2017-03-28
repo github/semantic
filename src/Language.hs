@@ -46,6 +46,8 @@ languageForType mediaType = case mediaType of
 toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDeclOrAssignment child = case unwrap child of
   S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment [child'] assignment
+  S.VarDecl _ -> child
+  S.VarAssignment _ _ -> child
   _ -> toVarDecl child
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
@@ -58,7 +60,7 @@ toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c
 toTuple child = pure child
 
 toPublicFieldDefinition :: (HasField fields Category) => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
-toPublicFieldDefinition children = case partition (\x -> category (extract x) == Identifier) children of
+toPublicFieldDefinition children = case break (\x -> category (extract x) == Identifier) children of
   (prev, [identifier, assignment]) -> Just $ S.VarAssignment (prev ++ [identifier]) assignment
   (prev, [identifier]) -> Just $ S.VarDecl children
   _ -> Nothing
