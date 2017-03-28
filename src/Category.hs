@@ -115,6 +115,8 @@ data Category
   | Module
   -- | A namespace in TypeScript.
   | Namespace
+  -- | An interface
+  | Interface
   -- | An import
   | Import
   -- | An export

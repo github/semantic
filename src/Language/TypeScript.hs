@@ -67,6 +67,7 @@ termAssignment _ category children =
     (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
     (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) Nothing [body]
     (Ty, children) -> Just $ S.Ty children
+    (Interface, children) -> toInterface children
     _ -> Nothing
 
 categoryForTypeScriptName :: Text -> Category
@@ -149,4 +150,5 @@ categoryForTypeScriptName = \case
   "template_chars" -> TemplateString
   "module" -> Module
   "ambient_namespace" -> Namespace
+  "interface_declaration" -> Interface
   name -> Other name

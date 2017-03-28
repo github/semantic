@@ -79,6 +79,8 @@ data Syntax a f
   | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
   | Module { moduleId:: f, moduleBody :: [f] }
+  -- | An interface with an identifier, a list of clauses, and a list of declarations..
+  | Interface f [f] [f]
   | Namespace { namespaceId:: f, namespaceBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]

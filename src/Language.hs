@@ -65,3 +65,8 @@ toPublicFieldDefinition children = case break (\x -> category (extract x) == Ide
   (_, [_]) -> Just $ S.VarDecl children
   _ -> Nothing
 
+toInterface :: (HasField fields Category) => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
+toInterface (id : rest) = case break (\x -> category (extract x) == Other "object_type") rest of
+  (clauses, [body]) -> Just $ S.Interface id clauses (toList (unwrap body))
+  _ -> Nothing
+toInterface _ = Nothing
