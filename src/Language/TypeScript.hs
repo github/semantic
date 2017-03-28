@@ -51,6 +51,8 @@ termAssignment _ category children =
     (Method, [ identifier, exprs ]) -> Just $ S.Method identifier Nothing Nothing [] (toList (unwrap exprs))
     (Class, [ identifier, superclass, definitions ]) -> Just $ S.Class identifier (Just superclass) (toList (unwrap definitions))
     (Class, [ identifier, definitions ]) -> Just $ S.Class identifier Nothing (toList (unwrap definitions))
+    (Module, [ identifier, definitions ]) -> Just $ S.Module identifier (toList (unwrap definitions))
+    (Namespace, [ identifier, definitions ]) -> Just $ S.Namespace identifier (toList (unwrap definitions))
     (Import, [ statements, identifier ] ) -> Just $ S.Import identifier (toList (unwrap statements))
     (Import, [ identifier ] ) -> Just $ S.Import identifier []
     (Export, [ statements, identifier] ) -> Just $ S.Export (Just identifier) (toList (unwrap statements))
@@ -145,4 +147,6 @@ categoryForTypeScriptName = \case
   "type_annotation" -> Ty
   "accessibility_modifier" -> Identifier
   "template_chars" -> TemplateString
+  "module" -> Module
+  "ambient_namespace" -> Namespace
   name -> Other name

@@ -113,6 +113,8 @@ data Category
   | MathOperator
   -- | A module
   | Module
+  -- | A namespace in TypeScript.
+  | Namespace
   -- | An import
   | Import
   -- | An export

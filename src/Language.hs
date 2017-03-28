@@ -62,6 +62,6 @@ toTuple child = pure child
 toPublicFieldDefinition :: (HasField fields Category) => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
 toPublicFieldDefinition children = case break (\x -> category (extract x) == Identifier) children of
   (prev, [identifier, assignment]) -> Just $ S.VarAssignment (prev ++ [identifier]) assignment
-  (prev, [identifier]) -> Just $ S.VarDecl children
+  (_, [_]) -> Just $ S.VarDecl children
   _ -> Nothing
 

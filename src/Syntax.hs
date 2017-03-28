@@ -79,6 +79,7 @@ data Syntax a f
   | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
   | Module { moduleId:: f, moduleBody :: [f] }
+  | Namespace { namespaceId:: f, namespaceBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
   | Yield [f]
@@ -148,6 +149,7 @@ instance Listable2 Syntax where
     \/ liftCons5 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
     \/ liftCons2 recur (liftTiers recur) Module
+    \/ liftCons2 recur (liftTiers recur) Namespace
     \/ liftCons2 recur (liftTiers recur) Import
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Export
     \/ liftCons1 (liftTiers recur) Yield

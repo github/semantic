@@ -84,6 +84,7 @@ styleName category = "category-" <> case category of
   C.CommaOperator -> "comma_operator"
   Other string -> string
   C.Module -> "module_statement"
+  C.Namespace -> "namespace"
   C.Import -> "import_statement"
   C.Export -> "export_statement"
   C.AnonymousFunction -> "anonymous_function"

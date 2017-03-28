@@ -1,7 +1,6 @@
 (Program
-{+(Other "module"
+{+(Module
     (Identifier))+}
-{-(ParseError
-    (Identifier)
-    (Identifier))-}
-{-(ExpressionStatements)-})
+{-(Other "ambient_declaration"
+    (Namespace
+      (Identifier)))-})

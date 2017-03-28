@@ -38,6 +38,7 @@ annotatable term = isAnnotatable (unwrap term) term
           S.Method{} -> Annotatable
           S.Function{} -> Annotatable
           S.Module{} -> Annotatable
+          S.Namespace{} -> Annotatable
           _ -> Unannotatable
 
 data Identifiable a = Identifiable a | Unidentifiable a
@@ -53,6 +54,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.VarAssignment{} -> Identifiable
           S.SubscriptAccess{} -> Identifiable
           S.Module{} -> Identifiable
+          S.Namespace{} -> Identifiable
           S.Class{} -> Identifiable
           S.Method{} -> Identifiable
           S.Leaf{} -> Identifiable
@@ -270,6 +272,7 @@ toTermName source term = case unwrap term of
   S.Comment a -> toS a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
+  S.Namespace identifier _ -> toTermName' identifier
   S.Import identifier [] -> termNameFromSource identifier
   S.Import identifier exprs -> termNameFromChildren term exprs <> " from " <> toTermName' identifier
   S.Export Nothing expr -> "{ " <> Text.intercalate ", " (termNameFromSource <$> expr) <> " }"
@@ -434,6 +437,7 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
     C.Module -> "module"
+    C.Namespace -> "namespace"
     C.Import -> "import statement"
     C.Export -> "export statement"
     C.AnonymousFunction -> "anonymous function"

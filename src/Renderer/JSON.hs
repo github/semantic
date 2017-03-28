@@ -131,7 +131,8 @@ syntaxToTermField syntax = case syntax of
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
   S.Method identifier receiver ty parameters definitions -> [ "identifier" .= identifier ] <> [ "receiver" .= receiver ] <> [ "type" .= ty ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
   S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
-  S.Module identifier definitions-> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
+  S.Module identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
+  S.Namespace identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Yield expr -> [ "yieldExpression" .= expr ]

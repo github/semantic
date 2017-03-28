@@ -1,5 +1,4 @@
 {+(Program
-  (ParseError
-    (Identifier)
-    (Identifier))
-  (ExpressionStatements))+}
+  (Other "ambient_declaration"
+    (Namespace
+      (Identifier))))+}

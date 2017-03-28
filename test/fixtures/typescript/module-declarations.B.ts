@@ -1,2 +1,2 @@
-namespace Promise {
+declare namespace Promise {
 }
