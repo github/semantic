@@ -57,7 +57,7 @@ spec =
 
         liftIO $ do
           shouldBe (commitOid commit) object
-          shouldBe (either id gitDir updateData) wd
+          shouldBe (either Just gitDir updateData) (Just wd)
           shouldBe (either id program updateData) "cat-file"
           shouldBe (either Just realIP updateData) (Just "127.0.0.1")
           shouldBe (either Just repoName updateData) (Just "examples/all-languages")

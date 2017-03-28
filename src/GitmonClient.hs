@@ -16,7 +16,6 @@ import Network.Socket.ByteString (sendAll, recv)
 import Prelude
 import Prologue hiding (toStrict, map, print, show)
 import System.Clock
-import System.Directory (getCurrentDirectory)
 import System.Environment
 import System.IO (hPrint, stderr)
 import System.Timeout
@@ -36,7 +35,7 @@ instance ToJSON ProcIO where
   toJSON ProcIO{..} = object [ "read_bytes" .= readBytes, "write_bytes" .= writeBytes ]
 
 
-data ProcessData = ProcessUpdateData { gitDir :: String
+data ProcessData = ProcessUpdateData { gitDir :: Maybe String
                                      , program :: String
                                      , realIP :: Maybe String
                                      , repoName :: Maybe String
@@ -83,8 +82,8 @@ reportGitmon = reportGitmon' SocketFactory { withSocket = withGitmonSocket }
 reportGitmon' :: SocketFactory -> String -> ReaderT LgRepo IO a -> ReaderT LgRepo IO a
 reportGitmon' SocketFactory{..} program gitCommand =
   join . liftIO . withSocket $ \sock -> do
-    (gitDir, realIP, repoName, repoID, userID) <- loadEnvVars
-    void . safeGitmonIO . sendAll sock $ processJSON Update (ProcessUpdateData gitDir program realIP repoName repoID userID "semantic-diff")
+    [gitDir, realIP, repoName, repoID, userID] <- traverse lookupEnv ["GIT_DIR", "GIT_SOCKSTAT_VAR_real_ip", "GIT_SOCKSTAT_VAR_repo_name", "GIT_SOCKSTAT_VAR_repo_id", "GIT_SOCKSTAT_VAR_user_id"]
+    void . safeGitmonIO . sendAll sock $ processJSON Update (ProcessUpdateData gitDir program realIP repoName (readIntFromEnv repoID) (readIntFromEnv userID) "semantic-diff")
     void . safeGitmonIO . sendAll sock $ processJSON Schedule ProcessScheduleData
     gitmonStatus <- safeGitmonIO $ recv sock 1024
 
@@ -125,28 +124,18 @@ reportGitmon' SocketFactory{..} program gitCommand =
         diskWriteBytes = afterDiskWriteBytes - beforeDiskWriteBytes
         resultCode = 0
 
-    loadEnvVars :: IO (String, Maybe String, Maybe String, Maybe Int, Maybe Int)
-    loadEnvVars = do
-      pwd <- getCurrentDirectory `catch` ((\ _ -> pure "") :: IOException -> IO String)
-      gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
-      realIP <- lookupEnv "GIT_SOCKSTAT_VAR_real_ip"
-      repoName <- lookupEnv "GIT_SOCKSTAT_VAR_repo_name"
-      repoID <- lookupEnv "GIT_SOCKSTAT_VAR_repo_id"
-      userID <- lookupEnv "GIT_SOCKSTAT_VAR_user_id"
-      pure (gitDir, realIP, repoName, readIntFromEnv repoID, readIntFromEnv userID)
+    readIntFromEnv :: Maybe String -> Maybe Int
+    readIntFromEnv Nothing = Nothing
+    readIntFromEnv (Just s) = readInt $ matchRegex regex s
       where
-        readIntFromEnv :: Maybe String -> Maybe Int
-        readIntFromEnv Nothing = Nothing
-        readIntFromEnv (Just s) = readInt $ matchRegex regex s
-          where
-            -- | Expected format for userID and repoID is: "uint:123",
-            -- where "uint:" indicates an unsigned integer followed by an integer value.
-            regex :: Regex
-            regex = mkRegexWithOpts "^uint:([0-9]+)$" False True
+        -- | Expected format for userID and repoID is: "uint:123",
+        -- where "uint:" indicates an unsigned integer followed by an integer value.
+        regex :: Regex
+        regex = mkRegexWithOpts "^uint:([0-9]+)$" False True
 
-            readInt :: Maybe [String] -> Maybe Int
-            readInt (Just [s]) = Just (read s :: Int)
-            readInt _ = Nothing
+        readInt :: Maybe [String] -> Maybe Int
+        readInt (Just [s]) = Just (read s :: Int)
+        readInt _ = Nothing
 
 withGitmonSocket :: (Socket -> IO c) -> IO c
 withGitmonSocket = bracket connectSocket close
