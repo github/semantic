@@ -19,6 +19,8 @@ library
   default-language:    Haskell2010
   c-sources:           vendor/tree-sitter-javascript/src/parser.c
                      , vendor/tree-sitter-javascript/src/scanner.c
+  cc-options:          -std=c99 -Os
+
 
 source-repository head
   type:     git
