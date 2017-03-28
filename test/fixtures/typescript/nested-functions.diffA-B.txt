@@ -8,23 +8,24 @@
         (Other "required_parameter"
           (Identifier)))
       (ExpressionStatements
-        (Function
-          (Identifier)
-          (Params
-            (Other "required_parameter"
-              (Identifier))
-            (Other "required_parameter"
-              (Identifier)))
-          (ExpressionStatements
+        (ExpressionStatements
+          (Function
+            (Identifier)
+            (Params
+              (Other "required_parameter"
+                (Identifier))
+              (Other "required_parameter"
+                (Identifier)))
             (ExpressionStatements
-              (FunctionCall
-                (Identifier)
-                (Identifier)
-              { (Identifier)
-              ->(Identifier) }))
-            (ExpressionStatements
-              (FunctionCall
-                (Identifier)
-                (Identifier)
-              { (Identifier)
-              ->(Identifier) }))))))))
+              (ExpressionStatements
+                (FunctionCall
+                  (Identifier)
+                  (Identifier)
+                { (Identifier)
+                ->(Identifier) }))
+              (ExpressionStatements
+                (FunctionCall
+                  (Identifier)
+                  (Identifier)
+                { (Identifier)
+                ->(Identifier) })))))))))
