@@ -19,14 +19,11 @@
       (Identifier)))
   (Export
     (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
+      (Identifier))
     (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
+      (Identifier))
     (VarDecl
-      (Other "variable_declarator"
-        (Identifier))))
+      (Identifier)))
   (Export
     (VarAssignment
       (Identifier)
@@ -35,11 +32,9 @@
       (Identifier)
       (Identifier))
     (VarDecl
-      (Other "variable_declarator"
-        (Identifier)))
+      (Identifier))
     (VarDecl
-      (Other "variable_declarator"
-        (Identifier))))
+      (Identifier)))
   (Export
     (Identifier))
   (Export

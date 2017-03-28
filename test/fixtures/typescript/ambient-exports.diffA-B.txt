@@ -1,0 +1,20 @@
+(Program
+  (Export
+  { (Class
+      (Identifier))
+  ->(Function
+      (Identifier)
+      (Params
+        (Other "required_parameter"
+          (Identifier)
+          (Ty
+            (Other "predefined_type")))
+        (Other "required_parameter"
+          (Identifier)
+          (Ty
+            (Other "predefined_type"))))
+      (ExpressionStatements
+        (Return
+          (Object
+            (Identifier)
+            (Identifier))))) }))

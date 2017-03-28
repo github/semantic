@@ -1,0 +1,80 @@
+(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (FieldDecl
+        (Other "readonly")
+        (Identifier))
+      (FieldDecl
+        (Other "readonly")
+        (Identifier))
+      (FieldDecl
+        (Identifier)
+        (Other "readonly")
+        (Identifier))
+    {+(FieldDecl
+        (Identifier)
+        (Other "readonly")
+        (Identifier)
+        (NumberLiteral))+}
+      (FieldDecl
+        (Identifier)
+        (Other "readonly")
+      { (Identifier)
+      ->(Identifier) }
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+    {-(FieldDecl
+        (Identifier)
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))-}
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+      { (Identifier)
+      ->(Other "readonly") }
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+      { (Identifier)
+      ->(Other "readonly") }
+      { (Other "readonly")
+      ->(Identifier) }
+      { (Identifier)
+      ->(Ty
+          (Other "type_reference"
+            (Identifier))) }
+      { (Ty
+          (Other "type_reference"
+            (Identifier)))
+      ->(NumberLiteral) }
+      {-(StringLiteral)-})
+      (FieldDecl
+      { (Identifier)
+      ->(Identifier) }
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
+      { (NumberLiteral)
+      ->(NumberLiteral) }))))

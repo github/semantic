@@ -241,8 +241,8 @@ toTermName source term = case unwrap term of
       SliceTy -> termNameFromSource base <> toTermName' element
       _ -> toTermName' base <> "[" <> toTermName' element <> "]"
     (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
-  S.VarAssignment varId _ -> toTermName' varId
-  S.VarDecl decl _ -> toTermName' decl
+  S.VarAssignment varId _ -> termNameFromChildren term varId
+  S.VarDecl _ -> termNameFromSource term
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   S.Case expr _ -> termNameFromSource expr
@@ -282,7 +282,7 @@ toTermName source term = case unwrap term of
   S.Continue expr -> maybe "" toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
   S.DefaultCase children -> termNameFromChildren term children
-  S.FieldDecl id expr tag -> termNameFromSource id <> maybe "" (\expr' -> " " <> termNameFromSource expr') expr <> maybe "" ((" " <>) . termNameFromSource) tag
+  S.FieldDecl children -> termNameFromChildren term children
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -381,6 +381,7 @@ instance HasCategory Text where
 
 instance HasCategory Category where
   toCategoryName = \case
+    C.Ty -> "type"
     ArrayLiteral -> "array"
     BooleanOperator -> "boolean operator"
     MathOperator -> "math operator"

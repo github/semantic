@@ -1,0 +1,10 @@
+{+(Program
+  (Other "lexical_declaration"
+    (VarAssignment
+      (Identifier)
+      (Ty
+        (Other "union_type"
+          (Other "type_reference"
+            (Identifier))
+          (Other "type_reference"
+            (Identifier)))))))+}

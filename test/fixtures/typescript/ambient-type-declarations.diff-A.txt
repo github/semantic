@@ -1,0 +1,20 @@
+{-(Program
+  (Other "ambient_declaration"
+    (Other "type_alias_declaration"
+      (Identifier)
+      (Other "union_type"
+        (Other "union_type"
+          (Other "union_type"
+            (Other "predefined_type")
+            (Other "predefined_type"))
+          (Other "type_reference"
+            (Identifier)))
+        (Other "type_reference"
+          (Identifier)
+          (Other "type_arguments"
+            (Other "union_type"
+              (Other "union_type"
+                (Other "predefined_type")
+                (Other "predefined_type"))
+              (Other "type_reference"
+                (Identifier)))))))))-}

@@ -7,11 +7,9 @@
       (TypeDecl
         (Identifier)
         (StructTy
-        { (FieldDecl
-            (Identifier)
-            (Identifier))
-        ->(FieldDecl
+          (FieldDecl
             (Other "identifier_list"
-              (Identifier)
-              (Identifier))
-            (Identifier)) })))))
+            { (Identifier)
+            ->(Identifier) }
+            {+(Identifier)+})
+            (Identifier)))))))

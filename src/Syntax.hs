@@ -27,7 +27,7 @@ data Syntax a f
   -- | An anonymous function has a list of expressions and params.
   | AnonymousFunction { params :: [f], expressions :: [f] }
   -- | A function has a list of expressions.
-  | Function { id :: f, params :: [f], ty :: (Maybe f), expressions :: [f] }
+  | Function { id :: f, params :: [f], ty :: Maybe f, expressions :: [f] }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
   -- | An operator assignment represents expressions with operators like math (e.g x += 1) or conditional (e.g. x ||= 1) assignment.
@@ -41,9 +41,9 @@ data Syntax a f
   -- | An operator can be applied to a list of syntaxes.
   | Operator [f]
   -- | A variable declaration. e.g. var foo;
-  | VarDecl f (Maybe f)
+  | VarDecl [f]
   -- | A variable assignment in a variable declaration. var foo = bar;
-  | VarAssignment { varId :: f, varValue :: f }
+  | VarAssignment { varId :: [f], varValue :: f }
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
@@ -101,7 +101,7 @@ data Syntax a f
   -- | A type declaration has an identifier and a type.
   | TypeDecl f f
   -- | A field declaration with an optional type, and an optional tag.
-  | FieldDecl f (Maybe f) (Maybe f)
+  | FieldDecl [f]
   -- | A type.
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
@@ -125,8 +125,8 @@ instance Listable2 Syntax where
     \/ liftCons2 recur recur MemberAccess
     \/ liftCons3 recur recur (liftTiers recur) MethodCall
     \/ liftCons1 (liftTiers recur) Operator
-    \/ liftCons2 recur (liftTiers recur) VarDecl
-    \/ liftCons2 recur recur VarAssignment
+    \/ liftCons1 (liftTiers recur) VarDecl
+    \/ liftCons2 (liftTiers recur) recur VarAssignment
     \/ liftCons2 recur recur SubscriptAccess
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
     \/ liftCons2 recur (liftTiers recur) Case
@@ -162,7 +162,7 @@ instance Listable2 Syntax where
     \/ liftCons1 (liftTiers recur) BlockStatement
     \/ liftCons2 (liftTiers recur) recur ParameterDecl
     \/ liftCons2 recur recur TypeDecl
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FieldDecl
+    \/ liftCons1 (liftTiers recur) FieldDecl
     \/ liftCons1 (liftTiers recur) Ty
     \/ liftCons2 recur recur Send
     \/ liftCons1 (liftTiers recur) DefaultCase

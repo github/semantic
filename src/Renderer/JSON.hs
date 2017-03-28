@@ -110,7 +110,7 @@ syntaxToTermField syntax = case syntax of
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MethodCall identifier methodIdentifier parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "parameters" .= parameters ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
-  S.VarDecl declaration ty -> [ "declaration" .= declaration ] <> [ "type" .= ty]
+  S.VarDecl children -> childrenFields children
   S.VarAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.SubscriptAccess identifier property -> [ "identifier" .= identifier ] <> [ "property" .= property ]
   S.Switch expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
@@ -149,7 +149,7 @@ syntaxToTermField syntax = case syntax of
   S.ParameterDecl ty field -> [ "type" .= ty ] <> [ "identifier" .= field ]
   S.DefaultCase c -> childrenFields c
   S.TypeDecl id ty -> [ "type" .= ty ] <> [ "identifier" .= id ]
-  S.FieldDecl id ty tag -> [ "type" .= ty ] <> [ "identifier" .= id ] <> [ "tag" .= tag]
+  S.FieldDecl children -> childrenFields children
   S.Ty ty -> [ "type" .= ty ]
   S.Send channel expr -> [ "channel" .= channel ] <> [ "expression" .= expr ]
   where childrenFields c = [ "children" .= c ]

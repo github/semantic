@@ -1,0 +1,13 @@
+{-(Program
+  (Other "lexical_declaration"
+    (VarAssignment
+      (Identifier)
+      (Ty
+        (Other "type_reference"
+          (Identifier)))))
+  (Other "lexical_declaration"
+    (VarAssignment
+      (Identifier)
+      (Ty
+        (Other "type_query"
+          (Identifier))))))-}

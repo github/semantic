@@ -6,6 +6,7 @@ import Info
 import Prologue
 import qualified Syntax as S
 import Term
+import Data.List (partition)
 
 -- | A programming language.
 data Language =
@@ -44,14 +45,24 @@ languageForType mediaType = case mediaType of
 
 toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDeclOrAssignment child = case unwrap child of
-  S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment child' assignment
-  _ -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl child Nothing
+  S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment [child'] assignment
+  S.Indexed [child'] -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child']
+  S.VarDecl _ -> cofree $ setCategory (extract child) VarDecl :< unwrap child
+  S.VarAssignment _ _ -> child
+  _ -> toVarDecl child
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
-toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child Nothing
+toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child]
 
 toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
 toTuple child = pure child
+
+toPublicFieldDefinition :: (HasField fields Category) => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
+toPublicFieldDefinition children = case break (\x -> category (extract x) == Identifier) children of
+  (prev, [identifier, assignment]) -> Just $ S.VarAssignment (prev ++ [identifier]) assignment
+  (prev, [identifier]) -> Just $ S.VarDecl children
+  _ -> Nothing
+

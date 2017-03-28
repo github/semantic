@@ -1,0 +1,88 @@
+{-(Program
+  (Other "ambient_declaration"
+    (Class
+      (Identifier)
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier))))))
+  (Other "ambient_declaration"
+    (Other "ambient_variable"
+      (Other "ambient_binding"
+        (Identifier)
+        (Ty
+          (Other "predefined_type")))))
+  (Other "ambient_declaration"
+    (Other "ambient_function"
+      (Identifier)
+      (Other "call_signature"
+        (Params
+          (Other "required_parameter"
+            (Identifier)
+            (Ty
+              (Other "predefined_type"))))
+        (Ty
+          (Other "predefined_type")))))
+  (Other "ambient_declaration"
+    (Other "ambient_namespace"
+      (Identifier)
+      (Other "ambient_namespace_body"
+        (Other "ambient_function"
+          (Identifier)
+          (Other "call_signature"
+            (Params
+              (Other "required_parameter"
+                (Identifier)
+                (Ty
+                  (Other "predefined_type"))))
+            (Ty
+              (Other "predefined_type"))))
+        (Other "lexical_declaration"
+          (VarAssignment
+            (Identifier)
+            (Ty
+              (Other "predefined_type"))))
+        (Other "interface_declaration"
+          (Identifier)
+          (Other "object_type"
+            (Other "property_signature"
+              (Identifier)
+              (Ty
+                (Other "predefined_type")))))
+        (Other "interface_declaration"
+          (Identifier)
+          (Other "object_type"
+            (Other "property_signature"
+              (Identifier)
+              (Ty
+                (Other "predefined_type")))
+            (Other "property_signature"
+              (Identifier)
+              (Ty
+                (Other "predefined_type")))
+            (Other "property_signature"
+              (Identifier)
+              (Ty
+                (Other "predefined_type"))))))))
+  (Other "ambient_declaration"
+    (Class
+      (Identifier)
+      (Other "ambient_method_declaration"
+        (Identifier)
+        (Other "call_signature"
+          (Params
+            (Other "required_parameter"
+              (Identifier)
+              (Ty
+                (Other "predefined_type"))))))
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "predefined_type")))
+      (Other "ambient_method_declaration"
+        (Identifier)
+        (Other "call_signature"
+          (Params)
+          (Ty
+            (Other "predefined_type")))))))-}

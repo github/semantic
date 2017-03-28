@@ -1,0 +1,87 @@
+(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (FieldDecl
+        (Other "readonly")
+        (Identifier))
+      (FieldDecl
+        (Other "readonly")
+        (Identifier))
+      (FieldDecl
+        (Identifier)
+        (Other "readonly")
+        (Identifier))
+    {+(FieldDecl
+        (Identifier)
+        (Other "readonly")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))+}
+    {+(FieldDecl
+        (Identifier)
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))+}
+    {-(FieldDecl
+        (Identifier)
+        (Other "readonly")
+        (Identifier)
+        (NumberLiteral))-}
+    {-(FieldDecl
+        (Identifier)
+        (Other "readonly")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))-}
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+      { (Other "readonly")
+      ->(Identifier) }
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+      { (Other "readonly")
+      ->(Identifier) }
+      { (Identifier)
+      ->(Other "readonly") }
+      { (Ty
+          (Other "type_reference"
+            (Identifier)))
+      ->(Identifier) }
+      { (NumberLiteral)
+      ->(Ty
+          (Other "type_reference"
+            (Identifier))) }
+      {+(StringLiteral)+})
+      (FieldDecl
+      { (Identifier)
+      ->(Identifier) }
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
+      { (NumberLiteral)
+      ->(NumberLiteral) }))))
