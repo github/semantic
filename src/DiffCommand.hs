@@ -20,6 +20,7 @@ import Arguments
 import Category
 import Data.RandomWalkSimilarity
 import Data.Record
+import GitmonClient
 import Info
 import Diff
 import Interpreter
@@ -102,29 +103,30 @@ blobEntriesToDiff shas = do
   a <- blobEntries (fst shas)
   b <- blobEntries (snd shas)
   pure $ (a \\ b) <> (b \\ a)
-  where blobEntries sha = treeForCommitSha sha >>= treeBlobEntries
+  where blobEntries sha = treeForCommitSha sha >>= treeBlobEntries'
+        treeBlobEntries' tree = reportGitmon "ls-tree" $ treeBlobEntries tree
 
 -- | Returns a Git.Tree for a commit sha
 treeForCommitSha :: String -> ReaderT LgRepo IO (Git.Tree LgRepo)
 treeForCommitSha sha = do
   object <- parseObjOid (toS sha)
-  commit <- lookupCommit object
-  lookupTree (commitTree commit)
+  commit <- reportGitmon "cat-file" $ lookupCommit object
+  reportGitmon "cat-file" $ lookupTree (commitTree commit)
 
 -- | Returns a SourceBlob given a relative file path, and the sha to look up.
-getSourceBlob :: FilePath -> String -> ReaderT LgRepo IO SourceBlob
+getSourceBlob :: FilePath -> String -> ReaderT LgRepo IO Source.SourceBlob
 getSourceBlob path sha = do
   tree <- treeForCommitSha sha
-  entry <- treeEntry tree (toS path)
+  entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
   (bytestring, oid, mode) <- case entry of
     Nothing -> pure (mempty, mempty, Nothing)
     Just (BlobEntry entryOid entryKind) -> do
-      blob <- lookupBlob entryOid
+      blob <- reportGitmon "cat-file" $ lookupBlob entryOid
       s <- blobToByteString blob
       let oid = renderObjOid $ blobOid blob
       pure (s, oid, Just entryKind)
   s <- liftIO $ transcode bytestring
-  pure $ SourceBlob s (toS oid) path (toSourceKind <$> mode)
+  pure $ Source.SourceBlob s (toS oid) path (toSourceKind <$> mode)
   where
     toSourceKind :: Git.BlobKind -> SourceKind
     toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
