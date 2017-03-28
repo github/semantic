@@ -1,0 +1,9 @@
+(Program
+  (Other "lexical_declaration"
+    (VarAssignment
+      (Identifier)
+      (Ty
+        (Other "array_type"
+        {-(Params)-}
+          (Other "type_reference"
+            (Identifier)))))))
