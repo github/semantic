@@ -72,10 +72,34 @@ parse :: Arguments -> IO ByteString
 parse args@Arguments{..} =
   case format of
     SExpression -> renderSExpression args
-    Index -> renderIndex args
-    _ -> renderParseTree args
+    _ -> parse' args
 
   where
+
+    parse' :: Arguments -> IO ByteString
+    parse' args@Arguments{..} = fmap (toS . encode) (render filePaths)
+      where
+        render :: [FilePath] -> IO [ParseJSON]
+        render filePaths =
+          case commitSha of
+            Just commitSha' -> do
+              sourceBlobs' <- sourceBlobs args (T.pack commitSha')
+              for sourceBlobs'
+                (\sourceBlob@SourceBlob{..} -> do
+                  terms' <- conditionalParserWithSource debug path sourceBlob
+                  pure $ case format of
+                            Index -> IndexProgram path (para parseIndexAlgebra terms')
+                            _ -> ParseTreeProgram path (para parseTreeAlgebra terms'))
+
+            Nothing -> traverse (constructParseNodes format) filePaths
+
+    constructParseNodes :: Format -> FilePath -> IO ParseJSON
+    constructParseNodes format filePath = do
+      terms' <- terms debug filePath
+      case format of
+        Index -> return $ IndexProgram filePath (para parseIndexAlgebra terms')
+        _ -> return $ ParseTreeProgram filePath (para parseTreeAlgebra terms')
+
     renderSExpression :: Arguments -> IO ByteString
     renderSExpression args@Arguments{..} =
       case commitSha of
@@ -87,55 +111,12 @@ parse args@Arguments{..} =
           terms' <- sequenceA $ terms debug <$> filePaths
           return $ printTerms TreeOnly terms'
 
-    -- | Constructs a ParseJSON suitable for indexing for each file path.
-    renderIndex :: Arguments -> IO ByteString
-    renderIndex Arguments{..} = fmap (toS . encode) (render filePaths)
-      where
-        render :: [FilePath] -> IO [ParseJSON]
-        render filePaths =
-          case commitSha of
-            Just commitSha' -> do
-              sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-              for sourceBlobs'
-                (\sourceBlob@SourceBlob{..} ->
-                  do terms' <- conditionalParserWithSource debug path sourceBlob
-                     return $ IndexProgram path (para algebra terms'))
+    parseIndexAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
+    parseIndexAlgebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
+      where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
 
-            _ -> traverse constructIndexProgramNodes filePaths
-
-        constructIndexProgramNodes :: FilePath -> IO ParseJSON
-        constructIndexProgramNodes filePath = do
-          terms' <- terms debug filePath
-          return $ IndexProgram filePath (para algebra terms')
-
-
-        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
-        algebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
-          where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
-
-    -- | Constructs a ParseJSON honoring the nested tree structure for each file path.
-    renderParseTree :: Arguments -> IO ByteString
-    renderParseTree Arguments{..} = fmap (toS . encode) (render filePaths)
-      where
-        render :: [FilePath] -> IO [ParseJSON]
-        render filePaths =
-          case commitSha of
-            Just commitSha' -> do
-              sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-              for sourceBlobs'
-                (\sourceBlob@SourceBlob{..} ->
-                  do terms' <- conditionalParserWithSource debug path sourceBlob
-                     return $ ParseTreeProgram path (para algebra terms'))
-
-            Nothing -> traverse constructParseTreeProgramNodes filePaths
-
-        constructParseTreeProgramNodes :: FilePath -> IO ParseJSON
-        constructParseTreeProgramNodes filePath = do
-          terms' <- terms debug filePath
-          return $ ParseTreeProgram filePath (para algebra terms')
-
-        algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
-        algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
+    parseTreeAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
+    parseTreeAlgebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
 
     identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
     identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
