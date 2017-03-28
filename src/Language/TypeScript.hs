@@ -144,4 +144,5 @@ categoryForTypeScriptName = \case
   "variable_declarator" -> VarAssignment
   "type_annotation" -> Ty
   "accessibility_modifier" -> Identifier
+  "template_chars" -> TemplateString
   name -> Other name
