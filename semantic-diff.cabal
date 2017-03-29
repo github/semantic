@@ -32,6 +32,7 @@ library
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
+                     , Data.Syntax.Type
                      , Data.Text.Listable
                      , Diff
                      , DiffCommand
