@@ -103,9 +103,6 @@ parseIndex args@Arguments{..} = fmap (toS . encode) parse'
     parseIndexAlgebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
       where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
 
-    identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
-    identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
-
 parseTree :: Arguments -> IO ByteString
 parseTree args@Arguments{..} = fmap (toS . encode) parse'
   where
@@ -127,8 +124,8 @@ parseTree args@Arguments{..} = fmap (toS . encode) parse'
     parseTreeAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
     parseTreeAlgebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
 
-    identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
-    identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
+identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
+identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
 sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
