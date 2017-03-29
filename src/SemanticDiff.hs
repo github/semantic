@@ -22,7 +22,6 @@ main = do
     Diff -> diff args
     Parse -> case format of
       R.Index -> parseIndex args
-      R.ParseTree -> parseTree args
       R.SExpression -> parseSExpression args
       _ -> parseTree args
   writeToOutput outputPath (text <> "\n")
