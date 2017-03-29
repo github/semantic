@@ -1,6 +1,7 @@
 (Program
   (Method
     (Identifier)
-    (Identifier)
-    (Identifier)
-    (Identifier)))
+    (Params
+      (Identifier)
+      (Identifier)
+      (Identifier))))

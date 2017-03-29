@@ -67,15 +67,15 @@ termAssignment _ category children
     (SingletonMethod, expr : methodName : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
-      -> Just $ S.Method methodName (Just expr) Nothing (toList (unwrap params)) body
+      -> Just $ S.Method methodName (Just expr) [params] body
       | Identifier <- Info.category (extract methodName)
-      -> Just $ S.Method methodName (Just expr) Nothing [] rest
+      -> Just $ S.Method methodName (Just expr) [] rest
     (Method, identifier : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
-      -> Just $ S.Method identifier Nothing Nothing (toList (unwrap params)) body
+      -> Just $ S.Method identifier Nothing [params] body
       | otherwise
-      -> Just $ S.Method identifier Nothing Nothing [] rest
+      -> Just $ S.Method identifier Nothing [] rest
     (Module, constant : body ) -> Just $ S.Module constant body
     (Modifier Rescue, [lhs, rhs] ) -> Just $ S.Rescue [lhs] [rhs]
     (Rescue, exceptions : exceptionVar : rest)

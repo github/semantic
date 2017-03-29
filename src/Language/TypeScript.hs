@@ -50,9 +50,12 @@ termAssignment _ category children =
       , Finally <- Info.category (extract finally)
       -> Just $ S.Try [body] [catch] Nothing (Just finally)
     (ArrayLiteral, _) -> Just $ S.Array Nothing children
-    (Method, [ identifier, params, exprs ]) -> Just $ S.Method identifier Nothing Nothing (toList (unwrap params)) (toList (unwrap exprs))
-    (Method, [ identifier, exprs ]) -> Just $ S.Method identifier Nothing Nothing [] (toList (unwrap exprs))
-    (Class, identifier : rest) -> case Prologue.break (\x -> Info.category (extract x) == Other "class_body") rest of
+    (Method, children) -> case Prologue.break ((== ExpressionStatements) . Info.category . extract) children of
+      (prev, [body]) -> case span ((== Identifier) . Info.category . extract) prev of
+        ([id], [callSignature]) -> Just $ S.Method id Nothing (toList (unwrap callSignature)) (toList (unwrap body))
+        _ -> Nothing -- No identifier found or callSignature found.
+      _ -> Nothing -- No body found.``
+    (Class, identifier : rest) -> case Prologue.break ((== Other "class_body") . Info.category . extract) rest of
       (clauses, [ definitions ]) -> Just $ S.Class identifier clauses (toList (unwrap definitions))
       _ -> Nothing
     (Module, [ identifier, definitions ]) -> Just $ S.Module identifier (toList (unwrap definitions))

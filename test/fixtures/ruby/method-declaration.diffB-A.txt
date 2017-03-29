@@ -2,5 +2,6 @@
   (Method
   { (Identifier)
   ->(Identifier) }
-  {-(Identifier)-}
+  {-(Params
+      (Identifier))-}
   {-(Identifier)-}))

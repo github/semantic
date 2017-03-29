@@ -103,8 +103,8 @@ syntaxToTermField syntax = case syntax of
   Fixed c -> childrenFields c
   S.FunctionCall identifier typeParameters parameters -> [ "identifier" .= identifier ] <> [ "typeArguments" .= typeParameters] <> [ "parameters" .= parameters ]
   S.Ternary expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
-  S.AnonymousFunction parameters c -> [ "parameters" .= parameters ] <> childrenFields c
-  S.Function identifier parameters c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> childrenFields c
+  S.AnonymousFunction callSignature c -> [ "callSignature" .= callSignature ] <> childrenFields c
+  S.Function identifier callSignature c -> [ "identifier" .= identifier ] <> [ "callSignature" .= callSignature ] <> childrenFields c
   S.Assignment assignmentId value -> [ "identifier" .= assignmentId ] <> [ "value" .= value ]
   S.OperatorAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
@@ -129,7 +129,7 @@ syntaxToTermField syntax = case syntax of
   S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "elseExpression" .= elseExpression ] <> [ "finallyExpression" .= finallyExpression ]
   S.Array ty c -> [ "type" .= ty ] <> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
-  S.Method identifier receiver ty parameters definitions -> [ "identifier" .= identifier ] <> [ "receiver" .= receiver ] <> [ "type" .= ty ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
+  S.Method identifier receiver callSignature definitions -> [ "identifier" .= identifier ] <> [ "receiver" .= receiver ] <> [ "callSignature" .= callSignature ] <> [ "definitions" .= definitions ]
   S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
   S.Module identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Namespace identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]

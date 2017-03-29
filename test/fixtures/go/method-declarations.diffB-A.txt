@@ -11,8 +11,9 @@
       { (Identifier)
       ->(Identifier) }
         (Identifier)))
-    (Identifier)
-    (ParameterDecl
-    { (Identifier)
-    ->(Identifier) }
-      (Identifier))))
+    (Args
+      (ParameterDecl
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)))
+    (Identifier)))

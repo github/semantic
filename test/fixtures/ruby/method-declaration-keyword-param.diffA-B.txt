@@ -1,6 +1,8 @@
 (Program
   (Method
     (Identifier)
-  {+(KeywordParameter
-      (Identifier)
-      (Identifier))+}))
+  { (Params)
+  ->(Params
+      (KeywordParameter
+        (Identifier)
+        (Identifier))) }))

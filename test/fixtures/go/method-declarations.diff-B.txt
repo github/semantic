@@ -10,7 +10,8 @@
       (ParameterDecl
         (Identifier)
         (Identifier)))
-    (Identifier)
-    (ParameterDecl
-      (Identifier)
-      (Identifier))))-}
+    (Args
+      (ParameterDecl
+        (Identifier)
+        (Identifier)))
+    (Identifier)))-}

@@ -7,18 +7,21 @@
     (Method
     { (Identifier)
     ->(Identifier) }
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))
     (Method
     { (Identifier)
     ->(Identifier) }
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))
     (Method
     { (Identifier)
     ->(Identifier) }
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))))

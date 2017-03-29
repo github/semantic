@@ -6,16 +6,19 @@
       (NumberLiteral))
     (Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))
     (Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))
     (Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))))-}

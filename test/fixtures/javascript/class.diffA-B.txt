@@ -3,17 +3,20 @@
     (Identifier)
   {+(Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))+}
   {+(Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))+}
   {+(Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))+}
   {-(Assignment
@@ -21,16 +24,19 @@
       (NumberLiteral))-}
   {-(Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))-}
   {-(Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))-}
   {-(Method
       (Identifier)
-      (Identifier)
+      (Params
+        (Identifier))
       (Return
         (Identifier)))-}))

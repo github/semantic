@@ -3,8 +3,9 @@
     (Object
       (Method
         (Identifier)
-        (Identifier)
-        (Identifier)
+        (Params
+          (Identifier)
+          (Identifier))
         (Return
           (MathOperator
             (Identifier)
