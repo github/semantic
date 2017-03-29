@@ -109,7 +109,7 @@ testParse :: FilePath -> FilePath -> Expectation
 testParse path expectedOutput = do
   source <- readAndTranscodeFile path
   let blob = sourceBlob source path
-  term <- conditionalParserWithSource False path blob
+  term <- parserForType (toS (takeExtension path)) blob
   let actual = (Verbatim . stripWhitespace) $ printTerm term 0 TreeOnly
   expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
   actual `shouldBe` expected

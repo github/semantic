@@ -71,24 +71,23 @@ instance ToJSON ParseJSON where
 parse :: Arguments -> IO ByteString
 parse args@Arguments{..} =
   case format of
-    SExpression -> renderSExpression args
-    _ -> parse' args
+    SExpression -> renderSExpression (termSourceTextDecorator debug) args
+    _ -> parse' (termSourceTextDecorator debug) args
 
   where
-    renderSExpression :: Arguments -> IO ByteString
-    renderSExpression args@Arguments{..} =
+    renderSExpression :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> Arguments -> IO ByteString
+    renderSExpression decorator args@Arguments{..} =
       case commitSha of
         Just commitSha' -> do
           sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-          terms' <- traverse (\sourceBlob@SourceBlob{..} -> conditionalParserWithSource debug path sourceBlob) sourceBlobs'
+          terms' <- for sourceBlobs' (\sourceBlob@SourceBlob{..} -> parseWithDecorator (decorator source) path sourceBlob)
           return $ printTerms TreeOnly terms'
         Nothing -> do
-          terms' <- sequenceA $ terms debug <$> filePaths
+          terms' <- sequenceA $ terms decorator <$> filePaths
           return $ printTerms TreeOnly terms'
 
-
-    parse' :: Arguments -> IO ByteString
-    parse' args@Arguments{..} = fmap (toS . encode) (render filePaths)
+    parse' :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> Arguments -> IO ByteString
+    parse' decorator args@Arguments{..} = fmap (toS . encode) (render filePaths)
       where
         render :: [FilePath] -> IO [ParseJSON]
         render filePaths =
@@ -97,16 +96,16 @@ parse args@Arguments{..} =
               sourceBlobs' <- sourceBlobs args (T.pack commitSha')
               for sourceBlobs'
                 (\sourceBlob@SourceBlob{..} -> do
-                  terms' <- conditionalParserWithSource debug path sourceBlob
+                  terms' <- parseWithDecorator (decorator source) path sourceBlob
                   pure $ case format of
                             Index -> IndexProgram path (para parseIndexAlgebra terms')
                             _ -> ParseTreeProgram path (para parseTreeAlgebra terms'))
 
-            Nothing -> traverse (constructParseNodes format) filePaths
+            Nothing -> traverse (constructParseNodes decorator format) filePaths
 
-    constructParseNodes :: Format -> FilePath -> IO ParseJSON
-    constructParseNodes format filePath = do
-      terms' <- terms debug filePath
+    constructParseNodes :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> Format -> FilePath -> IO ParseJSON
+    constructParseNodes decorator format filePath = do
+      terms' <- terms decorator filePath
       case format of
         Index -> return $ IndexProgram filePath (para parseIndexAlgebra terms')
         _ -> return $ ParseTreeProgram filePath (para parseTreeAlgebra terms')
@@ -122,17 +121,14 @@ parse args@Arguments{..} =
     identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
     -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
-    terms :: Bool -> FilePath -> IO (SyntaxTerm Text '[(Maybe SourceText), Range, Category, SourceSpan])
-    terms debug filePath = do
+    terms :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> FilePath -> IO (SyntaxTerm Text '[(Maybe SourceText), Range, Category, SourceSpan])
+    terms decorator filePath = do
       source <- readAndTranscodeFile filePath
-      parser filePath $ sourceBlob' filePath source
+      parseWithDecorator (decorator source) filePath $ sourceBlob' filePath source
 
       where
         sourceBlob' :: FilePath -> Source -> SourceBlob
         sourceBlob' filePath source = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
-
-        parser :: FilePath -> Parser (Syntax Text) (Record '[(Maybe SourceText), Range, Category, SourceSpan])
-        parser = conditionalParserWithSource debug
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
 sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
@@ -165,8 +161,8 @@ sourceBlobs Arguments{..} commitSha' = do
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
 -- | Return a parser that decorates with the source text.
-conditionalParserWithSource :: Bool -> FilePath -> Parser (Syntax Text) (Record '[(Maybe SourceText), Range, Category, SourceSpan])
-conditionalParserWithSource debug path blob = decorateTerm (termSourceDecorator debug (source blob)) <$> parserForType (toS (takeExtension path)) blob
+parseWithDecorator :: TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field -> FilePath -> Parser (Syntax Text) (Record '[field, Range, Category, SourceSpan])
+parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
@@ -186,8 +182,8 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Term decorator extracting the source text for a term.
-termSourceDecorator :: (HasField fields Range) => Bool -> Source -> TermDecorator f fields (Maybe SourceText)
-termSourceDecorator debug source c = if debug then Just . SourceText . toText $ Source.slice range' source else Nothing
+termSourceTextDecorator :: (Functor f, HasField fields Range) => Bool -> Source -> TermDecorator f fields (Maybe SourceText)
+termSourceTextDecorator debug source c = if debug then Just . SourceText . toText $ Source.slice range' source else Nothing
  where range' = byteRange $ headF c
 
 -- | A fallback parser that treats a file simply as rows of strings.
