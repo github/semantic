@@ -66,19 +66,10 @@ instance ToJSON ParseJSON where
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
 parseSExpression :: Arguments -> IO ByteString
-parseSExpression args@Arguments{..} =
-  case commitSha of
-    Just commitSha' -> do
-      -- | No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
-      terms <- traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob) =<< sourceBlobs args
-      return $ printTerms TreeOnly terms
-    Nothing -> do
-      terms <- for filePaths
-                 (\filePath -> do
-                   source <- readAndTranscodeFile filePath
-                   let sourceBlob = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
-                   parseWithDecorator (termSourceTextDecorator False source) filePath sourceBlob)
-      return $ printTerms TreeOnly terms
+parseSExpression =
+  -- No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
+  return . printTerms TreeOnly <=< parse <=< sourceBlobs
+  where parse = traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob)
 
 parseIndex :: Arguments -> IO ByteString
 parseIndex args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args
