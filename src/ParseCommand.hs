@@ -100,8 +100,7 @@ parseIndex args@Arguments{..} = fmap (toS . encode) $ case commitSha of
   _ -> buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobsFromPaths filePaths
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
-    algebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
-      where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
+    algebra (annotation :< syntax) = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) : (Prologue.snd =<< toList syntax)
 
 parseTree :: Arguments -> IO ByteString
 parseTree args@Arguments{..} = fmap (toS . encode) $ case commitSha of
