@@ -28,42 +28,44 @@ import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 
-data ParseJSON =
-    ParseTreeProgramNode
-    { category :: Text
-    , sourceRange :: Range
-    , sourceText :: Maybe SourceText
-    , sourceSpan :: SourceSpan
-    , identifier :: Maybe Text
-    , children :: [ParseJSON]
-    }
-  | ParseTreeProgram
-    { filePath :: FilePath
-    , programNode :: ParseJSON
-    }
-  | IndexProgramNode
-    { category :: Text
-    , sourceRange :: Range
-    , sourceText :: Maybe SourceText
-    , sourceSpan :: SourceSpan
-    , identifier :: Maybe Text
-    }
-  | IndexProgram
-    { filePath :: FilePath
-    , programNodes :: [ParseJSON]
-    } deriving (Show, Generic)
+data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: ParseNode } deriving (Show)
 
-instance ToJSON ParseJSON where
-  toJSON ParseTreeProgramNode{..} = object
-    $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan, "children" .= children ]
-    <> [ "sourceText" .= sourceText | isJust sourceText ]
-    <> [ "identifier" .= identifier | isJust identifier ]
-  toJSON ParseTreeProgram{..} = object [ "filePath" .= filePath, "programNode" .= programNode ]
-  toJSON IndexProgramNode{..} = object
-    $ [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan]
-    <> [ "sourceText" .= sourceText | isJust sourceText ]
-    <> [ "identifier" .= identifier | isJust identifier ]
-  toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
+instance ToJSON ParseTreeFile where
+  toJSON ParseTreeFile{..} = object [ "filePath" .= parseTreeFilePath, "programNode" .= node ]
+
+
+data IndexFile = IndexFile { indexFilePath :: FilePath, nodes :: [ParseNode] } deriving (Show)
+
+instance ToJSON IndexFile where
+  toJSON IndexFile{..} = object [ "filePath" .= indexFilePath, "programNodes" .= nodes ]
+
+
+data ParseNode = ParseNode
+  { category' :: Text
+  , sourceRange' :: Range
+  , sourceText' :: Maybe SourceText
+  , sourceSpan' :: SourceSpan
+  , identifier' :: Maybe Text
+  , children' :: Maybe [ParseNode]
+  }
+  deriving (Show)
+
+instance ToJSON ParseNode where
+  toJSON ParseNode{..} =
+    object
+    $  [ "category" .= category', "sourceRange" .= sourceRange', "sourceSpan" .= sourceSpan' ]
+    <> [ "sourceText" .= sourceText' | isJust sourceText' ]
+    <> [ "identifier" .= identifier' | isJust identifier' ]
+    <> [ "children"   .= children'   | isJust children'   ]
+
+-- ($)   :: (a ->   b) ->   a ->   b
+-- (<$>) :: (a ->   b) -> f a -> f b
+-- (=<<) :: (a -> m b) -> m a -> m b
+--
+-- liftA, liftA2, liftM,
+--
+-- (.)   :: (b ->   c) -> (a ->   b) -> (a ->   c)
+-- (<=<) :: (b -> m c) -> (a -> m b) -> (a -> m c)
 
 parseSExpression :: Arguments -> IO ByteString
 parseSExpression =
@@ -72,23 +74,23 @@ parseSExpression =
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob)
 
 parseIndex :: Arguments -> IO ByteString
-parseIndex args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args
+parseIndex args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes IndexFile algebra (termSourceTextDecorator debug) =<< sourceBlobs args
   where
-    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
-    algebra (annotation :< syntax) = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) : (Prologue.snd =<< toList syntax)
+    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseNode]) -> [ParseNode]
+    algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
 parseTree :: Arguments -> IO ByteString
-parseTree args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes ParseTreeProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args
+parseTree args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes ParseTreeFile algebra (termSourceTextDecorator debug) =<< sourceBlobs args
   where
-    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
-    algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
+    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseNode) -> ParseNode
+    algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
 
 buildProgramNodes
-  :: (FilePath -> nodes -> ParseJSON)
+  :: (FilePath -> nodes -> b)
   -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
   -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] (Maybe SourceText))
   -> [SourceBlob]
-  -> IO [ParseJSON]
+  -> IO [b]
 buildProgramNodes programNodeConstructor algebra termDecorator sourceBlobs =
   for sourceBlobs
     (\sourceBlob@SourceBlob{..} -> do
