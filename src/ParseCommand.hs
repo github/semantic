@@ -71,7 +71,8 @@ instance ToJSON ParseJSON where
 parse :: Arguments -> IO ByteString
 parse args@Arguments{..} =
   case format of
-    SExpression -> renderSExpression (termSourceTextDecorator debug) args
+    -- | No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
+    SExpression -> renderSExpression (termSourceTextDecorator False) args
     _ -> parse' (termSourceTextDecorator debug) args
 
   where
