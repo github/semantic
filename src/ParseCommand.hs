@@ -41,22 +41,22 @@ instance ToJSON IndexFile where
 
 
 data ParseNode = ParseNode
-  { category' :: Text
-  , sourceRange' :: Range
-  , sourceText' :: Maybe SourceText
-  , sourceSpan' :: SourceSpan
-  , identifier' :: Maybe Text
-  , children' :: Maybe [ParseNode]
+  { category :: Text
+  , sourceRange :: Range
+  , sourceText :: Maybe SourceText
+  , sourceSpan :: SourceSpan
+  , identifier :: Maybe Text
+  , children :: Maybe [ParseNode]
   }
   deriving (Show)
 
 instance ToJSON ParseNode where
   toJSON ParseNode{..} =
     object
-    $  [ "category" .= category', "sourceRange" .= sourceRange', "sourceSpan" .= sourceSpan' ]
-    <> [ "sourceText" .= sourceText' | isJust sourceText' ]
-    <> [ "identifier" .= identifier' | isJust identifier' ]
-    <> [ "children"   .= children'   | isJust children'   ]
+    $  [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan ]
+    <> [ "sourceText" .= sourceText | isJust sourceText ]
+    <> [ "identifier" .= identifier | isJust identifier ]
+    <> [ "children"   .= children   | isJust children   ]
 
 
 parseSExpression :: Arguments -> IO ByteString
