@@ -92,20 +92,19 @@ sourceBlobsFromPaths filePaths =
                   source <- readAndTranscodeFile filePath
                   pure $ Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob))
 
+-- | For the given sha, git repo path, and file paths, retrieves the source blobs.
+sourceBlobsFromSha :: [Char] -> [Char] -> [FilePath] -> IO [SourceBlob]
+sourceBlobsFromSha commitSha gitDir filePaths = do
+  maybeBlobs <- withRepository lgFactory gitDir $ do
+    repo   <- getRepository
+    object <- parseObjOid (toS commitSha)
+    commit <- lookupCommit object
+    tree   <- lookupTree (commitTree commit)
+    lift $ runReaderT (traverse (toSourceBlob tree) filePaths) repo
 
+  pure $ catMaybes maybeBlobs
 
   where
-    sourceBlobsFromSha :: [Char] -> IO [SourceBlob]
-    sourceBlobsFromSha commitSha' = do
-      maybeBlobs <- withRepository lgFactory gitDir $ do
-        repo   <- getRepository
-        object <- parseObjOid (toS commitSha')
-        commit <- lookupCommit object
-        tree   <- lookupTree (commitTree commit)
-        lift $ runReaderT (traverse (toSourceBlob tree) filePaths) repo
-
-      pure $ catMaybes maybeBlobs
-
     toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO (Maybe SourceBlob)
     toSourceBlob tree filePath = do
       entry <- treeEntry tree (toS filePath)
