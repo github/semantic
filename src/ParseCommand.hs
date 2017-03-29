@@ -80,19 +80,6 @@ parseSExpression args@Arguments{..} =
                    parseWithDecorator (termSourceTextDecorator False source) filePath sourceBlob)
       return $ printTerms TreeOnly terms
 
-buildProgramNodes :: Traversable t1 => (FilePath -> t -> b) -> (CofreeF (Syntax Text) (Record '[field, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[field, Range, Category, SourceSpan]), t) -> t) -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field) -> t1 SourceBlob -> IO (t1 b)
-buildProgramNodes programNodeConstructor algebra termDecorator sourceBlobs =
-  for sourceBlobs
-    (\sourceBlob@SourceBlob{..} -> do
-      terms <- parseWithDecorator (termDecorator source) path sourceBlob
-      pure $ programNodeConstructor path (para algebra terms))
-
-sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
-sourceBlobsFromPaths filePaths =
-  for filePaths (\filePath -> do
-                  source <- readAndTranscodeFile filePath
-                  pure $ Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob))
-
 parseIndex :: Arguments -> IO ByteString
 parseIndex args@Arguments{..} = fmap (toS . encode) $ case commitSha of
   Just commitSha' -> buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args (T.pack commitSha')
@@ -108,6 +95,19 @@ parseTree args@Arguments{..} = fmap (toS . encode) $ case commitSha of
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
     algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
+
+buildProgramNodes :: Traversable t1 => (FilePath -> t -> b) -> (CofreeF (Syntax Text) (Record '[field, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[field, Range, Category, SourceSpan]), t) -> t) -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field) -> t1 SourceBlob -> IO (t1 b)
+buildProgramNodes programNodeConstructor algebra termDecorator sourceBlobs =
+  for sourceBlobs
+    (\sourceBlob@SourceBlob{..} -> do
+      terms <- parseWithDecorator (termDecorator source) path sourceBlob
+      pure $ programNodeConstructor path (para algebra terms))
+
+sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
+sourceBlobsFromPaths filePaths =
+  for filePaths (\filePath -> do
+                  source <- readAndTranscodeFile filePath
+                  pure $ Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob))
 
 identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
