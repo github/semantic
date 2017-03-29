@@ -111,21 +111,11 @@ parseTree args@Arguments{..} = fmap (toS . encode) parse'
   where
     parse' =
       case commitSha of
-        Just commitSha' -> do
-          sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-          for sourceBlobs'
-            (\sourceBlob@SourceBlob{..} -> do
-              terms' <- parseWithDecorator (termSourceTextDecorator debug source) path sourceBlob
-              pure $ ParseTreeProgram path (para parseTreeAlgebra terms'))
-        _ -> for filePaths
-              (\filePath -> do
-                source <- readAndTranscodeFile filePath
-                let sourceBlob = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
-                terms <- parseWithDecorator (termSourceTextDecorator debug source) filePath sourceBlob
-                pure $ ParseTreeProgram filePath (para parseTreeAlgebra terms))
+        Just commitSha' -> buildProgramNodes ParseTreeProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args (T.pack commitSha')
+        _ -> buildProgramNodes ParseTreeProgram algebra (termSourceTextDecorator debug) =<< sourceBlobsFromPaths filePaths
 
-    parseTreeAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
-    parseTreeAlgebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
+    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
+    algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
 
 identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
