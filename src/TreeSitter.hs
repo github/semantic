@@ -83,7 +83,7 @@ assignTerm language source annotation children allChildren =
     Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children allChildren
   where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
-        assignTermByLanguage = \case
+        assignTermByLanguage language = case language of
           JavaScript -> JS.termAssignment
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
@@ -131,12 +131,13 @@ defaultTermAssignment source category children allChildren
 
 
 categoryForLanguageProductionName :: Language -> Text -> Category
-categoryForLanguageProductionName = withDefaults . \case
-  JavaScript -> JS.categoryForJavaScriptProductionName
-  C -> C.categoryForCProductionName
-  Ruby -> Ruby.categoryForRubyName
-  Language.Go -> Go.categoryForGoName
-  _ -> Other
-  where withDefaults productionMap = \case
+categoryForLanguageProductionName = withDefaults . byLanguage
+  where withDefaults productionMap name = case name of
           "ERROR" -> ParseError
           s -> productionMap s
+        byLanguage language = case language of
+          JavaScript -> JS.categoryForJavaScriptProductionName
+          C -> C.categoryForCProductionName
+          Ruby -> Ruby.categoryForRubyName
+          Language.Go -> Go.categoryForGoName
+          _ -> Other
