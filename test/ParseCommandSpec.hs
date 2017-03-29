@@ -11,8 +11,8 @@ import ParseCommand
 import Renderer
 
 spec :: Spec
-spec = parallel $ do
-  context "parse" $ do
+spec = parallel $
+  context "parse" $
     prop "all valid formats should produce output" . forAll (isParseFormat `filterT` tiers) $
       \format ->
         case format of
