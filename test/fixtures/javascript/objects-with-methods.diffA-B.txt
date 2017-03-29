@@ -5,8 +5,10 @@
       { (Identifier)
       ->(Identifier) }
         (Params
-          (Identifier)
-          (Identifier))
+          (Other "required_parameter"
+            (Identifier))
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (MathOperator
             (Identifier)

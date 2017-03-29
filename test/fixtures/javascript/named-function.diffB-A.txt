@@ -4,8 +4,10 @@
   ->(Identifier) }
   { (Params)
   ->(Params
-      (Identifier)
-      (Identifier)) }
+      (Other "required_parameter"
+        (Identifier))
+      (Other "required_parameter"
+        (Identifier))) }
   {+(ExpressionStatements
       (Identifier))+}
   {-(Return

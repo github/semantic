@@ -1,13 +1,14 @@
 {+(Program
-  (Function
-    (Identifier)
-    (Params)
-    (VarDecl
-      (VarAssignment
-        (Identifier)
-        (NumberLiteral)))
-    (ExpressionStatements
-      (Yield
-        (MathOperator
+  (ExpressionStatements
+    (Function
+      (Identifier)
+      (Params)
+      (Other "variable_declaration"
+        (VarAssignment
           (Identifier)
-          (Other "++"))))))+}
+          (NumberLiteral)))
+      (ExpressionStatements
+        (Yield
+          (MathOperator
+            (Identifier)
+            (Other "++")))))))+}

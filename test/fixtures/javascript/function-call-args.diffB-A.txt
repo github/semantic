@@ -7,9 +7,11 @@
     ->(StringLiteral) }
       (Function
         (Params
-        { (Identifier)
-        ->(Identifier) }
-          (Identifier))
+          (Other "required_parameter"
+          { (Identifier)
+          ->(Identifier) })
+          (Other "required_parameter"
+            (Identifier)))
         (ExpressionStatements
           (FunctionCall
             (Identifier)

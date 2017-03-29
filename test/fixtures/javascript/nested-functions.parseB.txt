@@ -1,21 +1,27 @@
 (Program
-  (Function
-    (Identifier)
-    (Params
-      (Identifier)
-      (Identifier))
+  (ExpressionStatements
     (Function
       (Identifier)
       (Params
-        (Identifier)
-        (Identifier))
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier)
-          (Identifier)
+        (Other "required_parameter"
+          (Identifier))
+        (Other "required_parameter"
           (Identifier)))
       (ExpressionStatements
-        (FunctionCall
+        (Function
           (Identifier)
-          (Identifier)
-          (Identifier))))))
+          (Params
+            (Other "required_parameter"
+              (Identifier))
+            (Other "required_parameter"
+              (Identifier)))
+          (ExpressionStatements
+            (FunctionCall
+              (Identifier)
+              (Identifier)
+              (Identifier)))
+          (ExpressionStatements
+            (FunctionCall
+              (Identifier)
+              (Identifier)
+              (Identifier))))))))

@@ -6,7 +6,8 @@
     ->(Identifier) }
       (Function
         (Params
-          (Identifier))
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (MemberAccess
           { (Identifier)

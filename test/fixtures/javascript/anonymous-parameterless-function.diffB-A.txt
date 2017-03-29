@@ -1,6 +1,7 @@
 (Program
-  (Function
-    (Params)
-    (Return
-    { (StringLiteral)
-    ->(StringLiteral) })))
+  (ExpressionStatements
+    (Function
+      (Params)
+      (Return
+      { (StringLiteral)
+      ->(StringLiteral) }))))

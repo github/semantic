@@ -1,5 +1,5 @@
 (Program
-  (VarDecl
+  (Other "variable_declaration"
     (VarDecl
       (Identifier))
     (VarAssignment

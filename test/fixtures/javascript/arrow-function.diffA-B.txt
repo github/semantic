@@ -2,8 +2,10 @@
   (ExpressionStatements
     (Function
       (Params
-        (Identifier)
-        (Identifier))
+        (Other "required_parameter"
+          (Identifier))
+        (Other "required_parameter"
+          (Identifier)))
       (Return
       { (Identifier)
       ->(Identifier) }))))

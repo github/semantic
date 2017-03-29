@@ -1,11 +1,12 @@
 {-(Program
-  (Function
-    (Identifier)
-    (Params)
-    (VarDecl
-      (VarAssignment
-        (Identifier)
-        (NumberLiteral)))
-    (ExpressionStatements
-      (Yield
-        (Identifier)))))-}
+  (ExpressionStatements
+    (Function
+      (Identifier)
+      (Params)
+      (Other "variable_declaration"
+        (VarAssignment
+          (Identifier)
+          (NumberLiteral)))
+      (ExpressionStatements
+        (Yield
+          (Identifier))))))-}
