@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (ExpressionStatements
       (Other "label_statement"
       { (Identifier)

@@ -4,27 +4,31 @@
       (Identifier))
     (Function
       (Identifier)
+      (Args)
       (ParseError
         (FunctionCall
           (Identifier))))
     (Function
       (Identifier)
-      (ParameterDecl
+      (Args
+        (ParameterDecl
+          (Identifier)
+          (Identifier))
         (Identifier)
-        (Identifier))
-      (Identifier)
-      (Identifier)
-      (ParameterDecl
         (Identifier)
-        (Identifier))
+        (ParameterDecl
+          (Identifier)
+          (Identifier)))
       (Identifier))
     (Function
       (Identifier)
+      (Args)
       (Args
         (Identifier)
         (Identifier)))
     (Function
       (Identifier)
+      (Args)
       (Args
         (ParameterDecl
           (Identifier)

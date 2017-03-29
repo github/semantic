@@ -4,9 +4,9 @@
       (Identifier)
       (Identifier)
       (Function
-        (Identifier)
-        (ExpressionStatements
-          (Return
-            (MemberAccess
-              (Identifier)
-              (Identifier))))))))+}
+        (Params
+          (Identifier))
+        (Return
+          (MemberAccess
+            (Identifier)
+            (Identifier)))))))+}

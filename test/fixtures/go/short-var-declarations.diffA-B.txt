@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (VarDecl
       (Other "expression_list"
       { (Identifier)

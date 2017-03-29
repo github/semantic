@@ -2,10 +2,11 @@
   (Function
   { (Identifier)
   ->(Identifier) }
-  {-(Identifier)-}
-  {-(Identifier)-}
-    (ExpressionStatements
-    {+(Return
-        (Boolean))+}
-    {-(ExpressionStatements
-        (Identifier))-})))
+  { (Params
+      (Identifier)
+      (Identifier))
+  ->(Params) }
+  {+(Return
+      (Boolean))+}
+  {-(ExpressionStatements
+      (Identifier))-}))

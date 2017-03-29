@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (VarDecl
       (Other "expression_list"
         (Identifier))
@@ -10,8 +11,10 @@
         (Operator
           (Other "composite_literal"
             (Identifier)
-          (Pair
-            { (Identifier) -> (Identifier) }
+            (Pair
+            { (Identifier)
+            ->(Identifier) }
             { (FunctionCall
-              (Identifier)
-              (QualifiedIdentifier)) -> (Identifier) })))))))
+                (Identifier)
+                (QualifiedIdentifier))
+            ->(Identifier) })))))))

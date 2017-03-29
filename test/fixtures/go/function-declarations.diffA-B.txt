@@ -4,6 +4,7 @@
       (Identifier))
     (Function
       (Identifier)
+      (Args)
       (ParseError
         (FunctionCall
         { (Identifier)
@@ -11,24 +12,27 @@
     (Function
     { (Identifier)
     ->(Identifier) }
-      (ParameterDecl
+      (Args
+        (ParameterDecl
+          (Identifier)
+          (Identifier))
         (Identifier)
-        (Identifier))
-      (Identifier)
-      (Identifier)
-      (ParameterDecl
         (Identifier)
-        (Identifier))
+        (ParameterDecl
+          (Identifier)
+          (Identifier)))
       (Identifier))
     (Function
     { (Identifier)
     ->(Identifier) }
+      (Args)
       (Args
         (Identifier)
         (Identifier)))
     (Function
     { (Identifier)
     ->(Identifier) }
+      (Args)
       (Args
         (ParameterDecl
           (Identifier)

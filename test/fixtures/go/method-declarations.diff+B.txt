@@ -2,7 +2,8 @@
   (Module
     (Identifier))
   (Function
-    (Identifier))
+    (Identifier)
+    (Args))
   (Method
     (Identifier)
     (Args

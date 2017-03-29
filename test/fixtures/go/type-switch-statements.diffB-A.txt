@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (Switch
     { (Identifier)
     ->(Identifier) }

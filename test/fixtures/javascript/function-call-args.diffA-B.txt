@@ -6,19 +6,18 @@
     { (StringLiteral)
     ->(StringLiteral) }
       (Function
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }
+        (Params
+        {-(Identifier)-}
+          (Identifier)
+        {+(Identifier)+})
         (ExpressionStatements
-          (ExpressionStatements
-            (FunctionCall
-              (Identifier)
-              (Identifier)
-            { (Identifier)
-            ->(Identifier) }))
-          (Return
+          (FunctionCall
+            (Identifier)
+            (Identifier)
           { (Identifier)
-          ->(Identifier) })))
+          ->(Identifier) }))
+        (Return
+        { (Identifier)
+        ->(Identifier) }))
     { (Boolean)
     ->(Boolean) })))

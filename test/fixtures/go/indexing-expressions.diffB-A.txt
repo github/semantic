@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
   {+(IndexExpression
       (Identifier)
       (NumberLiteral))+}

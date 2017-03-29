@@ -40,10 +40,10 @@
   (Export
     (Function
       (Identifier)
-      (ExpressionStatements)))
+      (Params)))
   (Export
     (Function
-      (ExpressionStatements)))
+      (Params)))
   (Export
     (Other "export_specifier"
       (Identifier)

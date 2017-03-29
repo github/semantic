@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (Assignment
       (Other "expression_list"
         (Identifier))

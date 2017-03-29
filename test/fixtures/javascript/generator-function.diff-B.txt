@@ -1,9 +1,11 @@
 {-(Program
   (Function
     (Identifier)
-    (Identifier)
-    (Identifier)
+    (Params
+      (Identifier)
+      (Identifier))
     (ExpressionStatements
-      (ExpressionStatements (Yield))
-      (ExpressionStatements (Yield
-        (Identifier))))))-}
+      (Yield))
+    (ExpressionStatements
+      (Yield
+        (Identifier)))))-}

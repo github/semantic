@@ -1,8 +1,8 @@
 {-(Program
   (Function
     (Identifier)
-    (Identifier)
-    (Identifier)
+    (Params
+      (Identifier)
+      (Identifier))
     (ExpressionStatements
-      (ExpressionStatements
-        (Identifier)))))-}
+      (Identifier))))-}

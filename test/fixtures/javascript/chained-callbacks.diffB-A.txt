@@ -5,11 +5,11 @@
     { (Identifier)
     ->(Identifier) }
       (Function
-        (Identifier)
-        (ExpressionStatements
-          (Return
-            (MemberAccess
-            { (Identifier)
-            ->(Identifier) }
-            { (Identifier)
-            ->(Identifier) })))))))
+        (Params
+          (Identifier))
+        (Return
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }))))))

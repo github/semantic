@@ -1,6 +1,6 @@
 {-(Program
   (Function
     (Identifier)
-    (ExpressionStatements
-      (Return
-        (Boolean)))))-}
+    (Params)
+    (Return
+      (Boolean))))-}

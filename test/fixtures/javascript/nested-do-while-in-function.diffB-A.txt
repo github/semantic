@@ -1,15 +1,15 @@
 (Program
   (Function
     (Identifier)
-    (Identifier)
-    (Identifier)
-    (ExpressionStatements
-      (DoWhile
+    (Params
+      (Identifier)
+      (Identifier))
+    (DoWhile
+      (ExpressionStatements
         (ExpressionStatements
-          (ExpressionStatements
-            (FunctionCall
-              (Identifier)
-            { (Identifier)
-            ->(Identifier) })))
-      { (Identifier)
-      ->(Identifier) }))))
+          (FunctionCall
+            (Identifier)
+          { (Identifier)
+          ->(Identifier) })))
+    { (Identifier)
+    ->(Identifier) })))
