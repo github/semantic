@@ -22,9 +22,6 @@ spec = parallel $ do
           Index -> do
             output <- parseIndex $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
             output `shouldNotBe` ""
-          ParseTree -> do
-            output <- parseTree $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
-            output `shouldNotBe` ""
           _ -> do
             output <- parseTree $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
             output `shouldNotBe` ""
