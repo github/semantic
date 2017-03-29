@@ -74,7 +74,7 @@ termAssignment _ category children =
     _ -> Nothing
 
 categoryForTypeScriptName :: Text -> Category
-categoryForTypeScriptName = \case
+categoryForTypeScriptName category = case category of
   "object" -> Object
   "expression_statement" -> ExpressionStatements
   "trailing_expression_statement" -> ExpressionStatements
