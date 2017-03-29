@@ -69,9 +69,8 @@ parseSExpression :: Arguments -> IO ByteString
 parseSExpression args@Arguments{..} =
   case commitSha of
     Just commitSha' -> do
-      sourceBlobs' <- sourceBlobs args (T.pack commitSha')
       -- | No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
-      terms <- for sourceBlobs' (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob)
+      terms <- traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob) =<< sourceBlobs args (T.pack commitSha')
       return $ printTerms TreeOnly terms
     Nothing -> do
       terms <- for filePaths
