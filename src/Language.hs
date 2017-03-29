@@ -35,10 +35,10 @@ languageForType :: Text -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> Just C
     ".c" -> Just C
-    ".js" -> Just JavaScript
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
     ".go" -> Just Language.Go
+    ".js" -> Just TypeScript
     ".ts" -> Just TypeScript
     _ -> Nothing
 
