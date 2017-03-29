@@ -84,10 +84,7 @@ buildProgramNodes
   -> [SourceBlob]
   -> IO [b]
 buildProgramNodes programNodeConstructor algebra termDecorator sourceBlobs =
-  for sourceBlobs
-    (\sourceBlob@SourceBlob{..} -> do
-      terms <- parseWithDecorator (termDecorator source) path sourceBlob
-      pure $ programNodeConstructor path (para algebra terms))
+  for sourceBlobs (\sourceBlob@SourceBlob{..} -> pure . programNodeConstructor path . para algebra =<< parseWithDecorator (termDecorator source) path sourceBlob)
 
 sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
 sourceBlobsFromPaths filePaths =
