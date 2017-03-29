@@ -21,7 +21,6 @@ import Syntax
 import System.FilePath
 import Term
 import TreeSitter
-import Renderer
 import Renderer.JSON()
 import Renderer.SExpression
 import Text.Parser.TreeSitter.C
@@ -66,70 +65,70 @@ instance ToJSON ParseJSON where
     <> [ "identifier" .= identifier | isJust identifier ]
   toJSON IndexProgram{..} = object [ "filePath" .= filePath, "programNodes" .= programNodes ]
 
+parseSExpression :: Arguments -> IO ByteString
+parseSExpression args@Arguments{..} =
+  case commitSha of
+    Just commitSha' -> do
+      sourceBlobs' <- sourceBlobs args (T.pack commitSha')
+      -- | No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
+      terms <- for sourceBlobs' (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob)
+      return $ printTerms TreeOnly terms
+    Nothing -> do
+      terms <- for filePaths
+                 (\filePath -> do
+                   source <- readAndTranscodeFile filePath
+                   let sourceBlob = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
+                   parseWithDecorator (termSourceTextDecorator False source) filePath sourceBlob)
+      return $ printTerms TreeOnly terms
 
--- | Parses filePaths into two possible formats: SExpression or JSON.
-parse :: Arguments -> IO ByteString
-parse args@Arguments{..} =
-  case format of
-    -- | No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
-    SExpression -> renderSExpression (termSourceTextDecorator False) args
-    _ -> parse' (termSourceTextDecorator debug) args
-
+parseIndex :: Arguments -> IO ByteString
+parseIndex args@Arguments{..} = fmap (toS . encode) parse'
   where
-    renderSExpression :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> Arguments -> IO ByteString
-    renderSExpression decorator args@Arguments{..} =
+    parse' =
       case commitSha of
         Just commitSha' -> do
           sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-          terms' <- for sourceBlobs' (\sourceBlob@SourceBlob{..} -> parseWithDecorator (decorator source) path sourceBlob)
-          return $ printTerms TreeOnly terms'
-        Nothing -> do
-          terms' <- sequenceA $ terms decorator <$> filePaths
-          return $ printTerms TreeOnly terms'
-
-    parse' :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> Arguments -> IO ByteString
-    parse' decorator args@Arguments{..} = fmap (toS . encode) (render filePaths)
-      where
-        render :: [FilePath] -> IO [ParseJSON]
-        render filePaths =
-          case commitSha of
-            Just commitSha' -> do
-              sourceBlobs' <- sourceBlobs args (T.pack commitSha')
-              for sourceBlobs'
-                (\sourceBlob@SourceBlob{..} -> do
-                  terms' <- parseWithDecorator (decorator source) path sourceBlob
-                  pure $ case format of
-                            Index -> IndexProgram path (para parseIndexAlgebra terms')
-                            _ -> ParseTreeProgram path (para parseTreeAlgebra terms'))
-
-            Nothing -> traverse (constructParseNodes decorator format) filePaths
-
-    constructParseNodes :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> Format -> FilePath -> IO ParseJSON
-    constructParseNodes decorator format filePath = do
-      terms' <- terms decorator filePath
-      case format of
-        Index -> return $ IndexProgram filePath (para parseIndexAlgebra terms')
-        _ -> return $ ParseTreeProgram filePath (para parseTreeAlgebra terms')
+          for sourceBlobs'
+            (\sourceBlob@SourceBlob{..} -> do
+              terms <- parseWithDecorator (termSourceTextDecorator debug source) path sourceBlob
+              pure $ IndexProgram path (para parseIndexAlgebra terms))
+        _ -> for filePaths
+              (\filePath -> do
+                source <- readAndTranscodeFile filePath
+                let sourceBlob = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
+                terms <- parseWithDecorator (termSourceTextDecorator debug source) filePath sourceBlob
+                pure $ IndexProgram filePath (para parseIndexAlgebra terms))
 
     parseIndexAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
     parseIndexAlgebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
       where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
+
+    identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
+    identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
+
+parseTree :: Arguments -> IO ByteString
+parseTree args@Arguments{..} = fmap (toS . encode) parse'
+  where
+    parse' =
+      case commitSha of
+        Just commitSha' -> do
+          sourceBlobs' <- sourceBlobs args (T.pack commitSha')
+          for sourceBlobs'
+            (\sourceBlob@SourceBlob{..} -> do
+              terms' <- parseWithDecorator (termSourceTextDecorator debug source) path sourceBlob
+              pure $ ParseTreeProgram path (para parseTreeAlgebra terms'))
+        _ -> for filePaths
+              (\filePath -> do
+                source <- readAndTranscodeFile filePath
+                let sourceBlob = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
+                terms <- parseWithDecorator (termSourceTextDecorator debug source) filePath sourceBlob
+                pure $ ParseTreeProgram filePath (para parseTreeAlgebra terms))
 
     parseTreeAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
     parseTreeAlgebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
 
     identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
     identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
-
-    -- | Returns syntax terms decorated with DefaultFields and SourceText. This is in IO because we read the file to extract the source text. SourceText is added to each term's annotation.
-    terms :: (Source -> TermDecorator (Syntax Text) ('[Range, Category, SourceSpan]) (Maybe SourceText)) -> FilePath -> IO (SyntaxTerm Text '[(Maybe SourceText), Range, Category, SourceSpan])
-    terms decorator filePath = do
-      source <- readAndTranscodeFile filePath
-      parseWithDecorator (decorator source) filePath $ sourceBlob' filePath source
-
-      where
-        sourceBlob' :: FilePath -> Source -> SourceBlob
-        sourceBlob' filePath source = Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob)
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
 sourceBlobs :: Arguments -> Text -> IO [SourceBlob]

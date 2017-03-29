@@ -20,7 +20,11 @@ main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
   text <- case runMode of
     Diff -> diff args
-    Parse -> parse args
+    Parse -> case format of
+      R.Index -> parseIndex args
+      R.ParseTree -> parseTree args
+      R.SExpression -> parseSExpression args
+      _ -> parseTree args
   writeToOutput outputPath (text <> "\n")
 
 -- | A parser for the application's command-line arguments.
