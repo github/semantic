@@ -67,6 +67,7 @@ library
                      , FDoc.Term
                      , FDoc.RecursionSchemes
                      , FDoc.NatExample
+                     , GitmonClient
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , aeson-pretty
@@ -109,8 +110,11 @@ library
                      , go
                      , ruby
                      , javascript
+                     , network
+                     , clock
+                     , yaml
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase, StrictData
+  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, StrictData
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -j
   ghc-prof-options: -fprof-auto
 
@@ -151,6 +155,7 @@ test-suite test
                      , Data.RandomWalkSimilarity.Spec
                      , DiffSpec
                      , SummarySpec
+                     , GitmonClientSpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , RangeSpec
@@ -170,6 +175,7 @@ test-suite test
                      , deepseq
                      , filepath
                      , gitlib
+                     , gitlib-libgit2
                      , Glob
                      , hspec >= 2.4.1
                      , hspec-core
@@ -177,11 +183,14 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
+                     , network
                      , protolude
                      , containers
                      , recursion-schemes >= 4.1
+                     , regex-compat
                      , semantic-diff
                      , text >= 1.2.1.3
+                     , unordered-containers
                      , these
                      , vector
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++

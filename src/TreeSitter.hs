@@ -18,6 +18,7 @@ import Source
 import qualified Syntax
 import Foreign
 import Foreign.C.String (peekCString)
+import Foreign.Marshal.Array (allocaArray)
 import Data.Text.Foreign (withCStringLen)
 import qualified Syntax as S
 import Term
@@ -41,39 +42,40 @@ treeSitterParser language grammar blob = do
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
-documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
-  ts_document_root_node_p document root
-  toTerm root (totalRange source) source
-  where toTerm node range source = do
-          name <- ts_node_p_name node document
-          name <- peekCString name
-          count <- ts_node_p_named_child_count node
+documentToTerm language document SourceBlob{..} = do
+  root <- alloca (\ rootPtr -> do
+    ts_document_root_node_p document rootPtr
+    peek rootPtr)
+  toTerm root source
+  where toTerm :: Node -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
+        toTerm node source = do
+          name <- peekCString (nodeType node)
 
-          let getChild getter parentNode n childNode = do
-                _ <- getter parentNode n childNode
-                let childRange = nodeRange childNode
-                toTerm childNode childRange (slice (offsetRange childRange (negate (start range))) source)
+          children <- getChildren (fromIntegral (nodeNamedChildCount node)) copyNamed
+          let allChildren = getChildren (fromIntegral (nodeChildCount node)) copyAll
 
-          children <- filter isNonEmpty <$> traverse (alloca . getChild ts_node_p_named_child node) (take (fromIntegral count) [0..])
+          assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
+          where getChildren count copy = do
+                  nodes <- allocaArray count $ \ childNodesPtr -> do
+                    _ <- with (nodeTSNode node) (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
+                    peekArray count childNodesPtr
+                  children <- traverse childNodeToTerm nodes
+                  return $! filter isNonEmpty children
+                childNodeToTerm childNode = toTerm childNode (slice (offsetRange (nodeRange childNode) (negate (start range))) source)
+                range = nodeRange node
+        copyNamed = ts_node_copy_named_child_nodes document
+        copyAll = ts_node_copy_child_nodes document
 
-          let startPos = SourcePos (1 + (fromIntegral $! ts_node_p_start_point_row node)) (1 + (fromIntegral $! ts_node_p_start_point_column node))
-          let endPos = SourcePos (1 + (fromIntegral $! ts_node_p_end_point_row node)) (1 + (fromIntegral $! ts_node_p_end_point_column node))
-          let sourceSpan = SourceSpan { spanStart = startPos , spanEnd = endPos }
-
-          allChildrenCount <- ts_node_p_child_count node
-          let allChildren = filter isNonEmpty <$> traverse (alloca . getChild ts_node_p_child node) (take (fromIntegral allChildrenCount) [0..])
-
-          -- Note: The strict application here is semantically important.
-          -- Without it, we may not evaluate the value until after we’ve exited
-          -- the scope that `node` was allocated within, meaning `alloca` will
-          -- free it & other stack data may overwrite it.
-          range `seq` sourceSpan `seq` assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
 
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
 
-nodeRange :: Ptr Node -> Range
-nodeRange node = Range { start = fromIntegral (ts_node_p_start_byte node), end = fromIntegral (ts_node_p_end_byte node) }
+nodeRange :: Node -> Range
+nodeRange Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
+
+nodeSpan :: Node -> SourceSpan
+nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` SourceSpan (pointPos nodeStartPoint) (pointPos nodeEndPoint)
+  where pointPos TSPoint{..} = pointRow `seq` pointColumn `seq` SourcePos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
 
 assignTerm :: Language -> Source -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren =
@@ -81,7 +83,7 @@ assignTerm language source annotation children allChildren =
     Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children allChildren
   where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
-        assignTermByLanguage = \case
+        assignTermByLanguage language = case language of
           JavaScript -> JS.termAssignment
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
@@ -129,12 +131,13 @@ defaultTermAssignment source category children allChildren
 
 
 categoryForLanguageProductionName :: Language -> Text -> Category
-categoryForLanguageProductionName = withDefaults . \case
-  JavaScript -> JS.categoryForJavaScriptProductionName
-  C -> C.categoryForCProductionName
-  Ruby -> Ruby.categoryForRubyName
-  Language.Go -> Go.categoryForGoName
-  _ -> Other
-  where withDefaults productionMap = \case
+categoryForLanguageProductionName = withDefaults . byLanguage
+  where withDefaults productionMap name = case name of
           "ERROR" -> ParseError
           s -> productionMap s
+        byLanguage language = case language of
+          JavaScript -> JS.categoryForJavaScriptProductionName
+          C -> C.categoryForCProductionName
+          Ruby -> Ruby.categoryForRubyName
+          Language.Go -> Go.categoryForGoName
+          _ -> Other
