@@ -58,25 +58,29 @@ instance ToJSON ParseNode where
     <> [ "identifier" .= identifier | isJust identifier ]
     <> [ "children"   .= children   | isJust children   ]
 
-
+-- | Parses file contents into an SExpression format for the provided arguments.
 parseSExpression :: Arguments -> IO ByteString
 parseSExpression =
   -- No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
-  return . printTerms TreeOnly <=< parse <=< sourceBlobs
+  return . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob)
 
+-- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
-parseIndex args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes IndexFile algebra (termSourceTextDecorator debug) =<< sourceBlobs args
+parseIndex args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes IndexFile algebra (termSourceTextDecorator debug) =<< sourceBlobsFromArgs args
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseNode]) -> [ParseNode]
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
+-- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
-parseTree args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes ParseTreeFile algebra (termSourceTextDecorator debug) =<< sourceBlobs args
+parseTree args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes ParseTreeFile algebra (termSourceTextDecorator debug) =<< sourceBlobsFromArgs args
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseNode) -> ParseNode
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
 
+-- | Function context for constructing parse nodes given a parse node constructor, an algebra (for a paramorphism), a function that takes a file's source and returns a term decorator, and a list of source blobs.
+-- This function is general over b such that b represents IndexFile or ParseTreeFile.
 buildProgramNodes
   :: (FilePath -> nodes -> b)
   -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
@@ -86,6 +90,7 @@ buildProgramNodes
 buildProgramNodes programNodeConstructor algebra termDecorator sourceBlobs =
   for sourceBlobs (\sourceBlob@SourceBlob{..} -> pure . programNodeConstructor path . para algebra =<< parseWithDecorator (termDecorator source) path sourceBlob)
 
+-- | For the given absolute file paths, retrieves their source blobs.
 sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
 sourceBlobsFromPaths filePaths =
   for filePaths (\filePath -> do
@@ -132,6 +137,7 @@ sourceBlobsFromArgs Arguments{..} =
   case commitSha of
     Just commitSha' -> sourceBlobsFromSha commitSha' gitDir filePaths
     _ -> sourceBlobsFromPaths filePaths
+
 -- | Return a parser that decorates with the source text.
 parseWithDecorator :: TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field -> FilePath -> Parser (Syntax Text) (Record '[field, Range, Category, SourceSpan])
 parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
