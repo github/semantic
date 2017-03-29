@@ -95,12 +95,6 @@ sourceBlobsFromPaths filePaths =
 identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
--- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
-sourceBlobs :: Arguments -> IO [SourceBlob]
-sourceBlobs Arguments{..} =
-  case commitSha of
-    Just commitSha' -> sourceBlobsFromSha commitSha'
-    _ -> sourceBlobsFromPaths filePaths
 
   where
     sourceBlobsFromSha :: [Char] -> IO [SourceBlob]
@@ -131,6 +125,12 @@ sourceBlobs Arguments{..} =
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
+-- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
+sourceBlobsFromArgs :: Arguments -> IO [SourceBlob]
+sourceBlobsFromArgs Arguments{..} =
+  case commitSha of
+    Just commitSha' -> sourceBlobsFromSha commitSha' gitDir filePaths
+    _ -> sourceBlobsFromPaths filePaths
 -- | Return a parser that decorates with the source text.
 parseWithDecorator :: TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field -> FilePath -> Parser (Syntax Text) (Record '[field, Range, Category, SourceSpan])
 parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
