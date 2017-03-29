@@ -6,9 +6,8 @@
           (Identifier))
         (Other "required_parameter"
           (Identifier)))
-      (ExpressionStatements
-        (Return
-          (MathOperator
-            (Identifier)
-            (Other "*")
-            (Identifier)))))))+}
+      (Return
+        (MathOperator
+          (Identifier)
+          (Other "*")
+          (Identifier))))))+}

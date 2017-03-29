@@ -7,6 +7,7 @@ import Source
 import Language
 import qualified Syntax as S
 import Term
+import Data.List (span)
 
 termAssignment
   :: Source -- ^ The source of the term.
@@ -66,9 +67,13 @@ termAssignment _ category children =
     (For, _)
       | Just (exprs, body) <- unsnoc children
       -> Just $ S.For exprs [body]
-    (Function, [ body ]) -> Just $ S.AnonymousFunction [] [body]
-    (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
-    (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) Nothing [body]
+    (Function, children) -> case Prologue.break ((== ExpressionStatements) . Info.category . extract) children of
+      (inits, [body]) ->
+        case span ((== Identifier) . Info.category . extract) inits of
+          ([id], [callSignature]) -> Just $ S.Function id (toList (unwrap callSignature)) (toList (unwrap body))
+          ([], [callSignature]) -> Just $ S.AnonymousFunction (toList (unwrap callSignature)) (toList (unwrap body))
+          _ -> Nothing -- More than 1 identifier found or no call signature found
+      _ -> Nothing -- No body found.
     (Ty, children) -> Just $ S.Ty children
     (Interface, children) -> toInterface children
     _ -> Nothing

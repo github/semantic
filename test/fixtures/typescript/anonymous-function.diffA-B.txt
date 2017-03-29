@@ -8,12 +8,11 @@
           (Identifier))
       {+(Other "required_parameter"
           (Identifier))+})
-      (ExpressionStatements
-        (Return
-          (MathOperator
-          { (Identifier)
-          ->(Identifier) }
-          { (Other "+")
-          ->(Other "*") }
-          { (Identifier)
-          ->(Identifier) }))))))
+      (Return
+        (MathOperator
+        { (Identifier)
+        ->(Identifier) }
+        { (Other "+")
+        ->(Other "*") }
+        { (Identifier)
+        ->(Identifier) })))))

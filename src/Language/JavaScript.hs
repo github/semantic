@@ -58,8 +58,8 @@ termAssignment _ category children
       | Just (exprs, body) <- unsnoc children
       -> Just $ S.For exprs [body]
     (Function, [ body ]) -> Just $ S.AnonymousFunction [] [body]
-    (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
-    (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) Nothing [body]
+    (Function, [ params, body ]) -> Just $ S.AnonymousFunction [params] (toList (unwrap body))
+    (Function, [ id, params, body ]) -> Just $ S.Function id [params] (toList (unwrap body))
     _ -> Nothing
 
 categoryForJavaScriptProductionName :: Text -> Category

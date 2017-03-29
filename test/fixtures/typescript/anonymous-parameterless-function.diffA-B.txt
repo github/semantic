@@ -2,7 +2,6 @@
   (ExpressionStatements
     (Function
       (Params)
-      (ExpressionStatements
-        (Return
-        { (StringLiteral)
-        ->(StringLiteral) })))))
+      (Return
+      { (StringLiteral)
+      ->(StringLiteral) }))))

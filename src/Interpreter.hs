@@ -95,10 +95,9 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
              <*> maybeLinearly tyA tyB
              <*> byRWS paramsA paramsB
              <*> byRWS expressionsA expressionsB
-  (S.Function idA paramsA tyA bodyA, S.Function idB paramsB tyB bodyB) -> Just $
+  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $
     S.Function <$> linearly idA idB
                <*> byRWS paramsA paramsB
-               <*> maybeLinearly tyA tyB
                <*> byRWS bodyA bodyB
   _ -> Nothing
   where

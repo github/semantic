@@ -11,8 +11,7 @@
           (Identifier)
           (Ty
             (Other "predefined_type"))))
-      (ExpressionStatements
-        (Return
-          (Object
-            (Identifier)
-            (Identifier)))))))-}
+      (Return
+        (Object
+          (Identifier)
+          (Identifier))))))-}

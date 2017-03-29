@@ -11,11 +11,10 @@
           (Other "required_parameter"
             (Identifier)))
         (ExpressionStatements
-          (ExpressionStatements
-            (FunctionCall
-              (Identifier)
-              (Identifier)
-              (Identifier)))
-          (Return
-            (Identifier))))
+          (FunctionCall
+            (Identifier)
+            (Identifier)
+            (Identifier)))
+        (Return
+          (Identifier)))
       (Boolean))))-}

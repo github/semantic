@@ -7,5 +7,4 @@
       (Other "required_parameter"
         (Identifier)))
     (ExpressionStatements
-      (ExpressionStatements
-        (Identifier)))))-}
+      (Identifier))))-}

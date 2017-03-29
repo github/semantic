@@ -1,1 +1,1 @@
-function(arg1, arg2) { arg2; };
+function<A>(arg1, arg2): string { arg2; };

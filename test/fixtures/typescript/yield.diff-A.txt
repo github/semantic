@@ -2,11 +2,11 @@
   (ExpressionStatements
     (Function
       (Identifier)
+      (Params)
+      (Other "variable_declaration"
+        (VarAssignment
+          (Identifier)
+          (NumberLiteral)))
       (ExpressionStatements
-        (Other "variable_declaration"
-          (VarAssignment
-            (Identifier)
-            (NumberLiteral)))
-        (ExpressionStatements
-          (Yield
-            (Identifier)))))))-}
+        (Yield
+          (Identifier))))))-}

@@ -1,11 +1,22 @@
 (Program
   (Function
     (Params
+    {+(Other "required_parameter"
+        (Identifier))+}
+    {+(Other "required_parameter"
+        (Identifier))+}
+    {-(Other "type_parameter"
+        (Identifier))-})
+  { (Params
       (Other "required_parameter"
         (Identifier))
       (Other "required_parameter"
         (Identifier)))
+  ->(Ty
+      (Other "type_reference"
+        (Identifier))) }
+  {-(Ty
+      (Other "predefined_type"))-}
     (ExpressionStatements
-      (ExpressionStatements
-      { (Identifier)
-      ->(Identifier) }))))
+    { (Identifier)
+    ->(Identifier) })))

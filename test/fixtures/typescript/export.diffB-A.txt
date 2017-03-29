@@ -56,65 +56,51 @@
   (Export
   { (Identifier)
   ->(Identifier) })
-{+(Export
+{-(Export
     (Function
-      (Params)
-      (ExpressionStatements)))+}
+      (Identifier)
+      (Params)))-}
   (Export
     (Function
+      (Params)))
+{+(Export
+    (Function
+      (Identifier)
+      (Params)))+}
+  (Export
+    (Other "export_specifier"
     { (Identifier)
     ->(Identifier) }
-      (Params)
-    { (ExpressionStatements)
-    ->(ExpressionStatements) }))
+    { (Identifier)
+    ->(Identifier) }))
   (Export
-  {-(Function
-      (Params)
-      (ExpressionStatements))-}
-  {+(Other "export_specifier"
-      (Identifier)
-      (Identifier))+})
-{+(Export
-    (StringLiteral))+}
-{+(Export
-    (StringLiteral)
+  { (StringLiteral)
+  ->(StringLiteral) })
+  (Export
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Other "export_specifier"
-      (Identifier))
+    { (Identifier)
+    ->(Identifier) })
     (Other "export_specifier"
-      (Identifier))
+    { (Identifier)
+    ->(Identifier) })
     (Other "export_specifier"
-      (Identifier)))+}
-{+(Export
-    (StringLiteral)
+    { (Identifier)
+    ->(Identifier) }))
+  (Export
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Other "export_specifier"
-      (Identifier)
-      (Identifier))
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) })
     (Other "export_specifier"
-      (Identifier)
-      (Identifier))
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) })
     (Other "export_specifier"
-      (Identifier)))+}
-{-(Export
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier)))-}
-{-(Export
-    (StringLiteral))-}
-{-(Export
-    (StringLiteral)
-    (Other "export_specifier"
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)))-}
-{-(Export
-    (StringLiteral)
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)))-})
+    { (Identifier)
+    ->(Identifier) })))

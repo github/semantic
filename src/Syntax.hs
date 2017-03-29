@@ -26,8 +26,8 @@ data Syntax a f
   | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
   -- | An anonymous function has a list of expressions and params.
   | AnonymousFunction { params :: [f], expressions :: [f] }
-  -- | A function has a list of expressions.
-  | Function { id :: f, params :: [f], ty :: Maybe f, expressions :: [f] }
+  -- | A function has an identifier, possible type arguments, params, a possible type, and list of expressions.
+  | Function { id :: f, params :: [f], expressions :: [f] }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
   -- | An operator assignment represents expressions with operators like math (e.g x += 1) or conditional (e.g. x ||= 1) assignment.
@@ -122,7 +122,7 @@ instance Listable2 Syntax where
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FunctionCall
     \/ liftCons2 recur (liftTiers recur) Ternary
     \/ liftCons2 (liftTiers recur) (liftTiers recur) AnonymousFunction
-    \/ liftCons4 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Function
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Function
     \/ liftCons2 recur recur Assignment
     \/ liftCons2 recur recur OperatorAssignment
     \/ liftCons2 recur recur MemberAccess

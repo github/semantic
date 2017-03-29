@@ -7,11 +7,10 @@
           (Identifier))
         (Other "required_parameter"
           (Identifier)))
-      (ExpressionStatements
-        (DoWhile
+      (DoWhile
+        (ExpressionStatements
           (ExpressionStatements
-            (ExpressionStatements
-              (FunctionCall
-                (Identifier)
-                (Identifier))))
-          (Identifier))))))-}
+            (FunctionCall
+              (Identifier)
+              (Identifier))))
+        (Identifier)))))-}

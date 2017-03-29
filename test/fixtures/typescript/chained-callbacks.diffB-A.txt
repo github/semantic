@@ -8,10 +8,9 @@
         (Params
           (Other "required_parameter"
             (Identifier)))
-        (ExpressionStatements
-          (Return
-            (MemberAccess
-            { (Identifier)
-            ->(Identifier) }
-            { (Identifier)
-            ->(Identifier) })))))))
+        (Return
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }))))))

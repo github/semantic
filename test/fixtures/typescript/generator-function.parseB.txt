@@ -1,13 +1,13 @@
 (Program
   (Function
     (Identifier)
-    (Other "required_parameter"
-      (Identifier))
-    (Other "required_parameter"
-      (Identifier))
+    (Params
+      (Other "required_parameter"
+        (Identifier))
+      (Other "required_parameter"
+        (Identifier)))
     (ExpressionStatements
-      (ExpressionStatements
-        (Yield))
-      (ExpressionStatements
-        (Yield
-          (Identifier))))))
+      (Yield))
+    (ExpressionStatements
+      (Yield
+        (Identifier)))))

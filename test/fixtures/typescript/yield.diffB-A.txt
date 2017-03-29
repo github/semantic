@@ -2,14 +2,14 @@
   (ExpressionStatements
     (Function
       (Identifier)
+      (Params)
+      (Other "variable_declaration"
+        (VarAssignment
+          (Identifier)
+          (NumberLiteral)))
       (ExpressionStatements
-        (Other "variable_declaration"
-          (VarAssignment
+        (Yield
+        { (MathOperator
             (Identifier)
-            (NumberLiteral)))
-        (ExpressionStatements
-          (Yield
-          { (MathOperator
-              (Identifier)
-              (Other "++"))
-          ->(Identifier) }))))))
+            (Other "++"))
+        ->(Identifier) })))))
