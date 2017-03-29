@@ -110,7 +110,7 @@ library
                      , clock
                      , yaml
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase, StrictData
+  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, StrictData
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -j
   ghc-prof-options: -fprof-auto
 

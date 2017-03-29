@@ -33,7 +33,7 @@ data Annotatable a = Annotatable a | Unannotatable a
 
 annotatable :: SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
 annotatable term = isAnnotatable (unwrap term) term
-  where isAnnotatable = \case
+  where isAnnotatable syntax = case syntax of
           S.Class{} -> Annotatable
           S.Method{} -> Annotatable
           S.Function{} -> Annotatable
@@ -46,7 +46,7 @@ data Identifiable a = Identifiable a | Unidentifiable a
 
 identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
 identifiable term = isIdentifiable (unwrap term) term
-  where isIdentifiable = \case
+  where isIdentifiable syntax = case syntax of
           S.FunctionCall{} -> Identifiable
           S.MethodCall{} -> Identifiable
           S.Function{} -> Identifiable
@@ -142,15 +142,15 @@ diffToDiffSummaries sources = para $ \diff ->
 
 -- Flattens a patch of diff infos into a list of docs, one for every 'LeafInfo' or `ErrorInfo` it contains.
 jsonDocSummaries :: Patch DiffInfo -> [JSONSummary Doc SourceSpans]
-jsonDocSummaries = \case
-  p@(Replace i1 i2) -> zipWith (\a b ->
+jsonDocSummaries patch = case patch of
+  Replace i1 i2 -> zipWith (\a b ->
     JSONSummary
      {
-      info = info (prefixWithPatch p This a) <+> "with" <+> info b
+      info = info (prefixWithPatch patch This a) <+> "with" <+> info b
     , span = SourceSpans $ These (span a) (span b)
     }) (toLeafInfos i1) (toLeafInfos i2)
-  p@(Insert info) -> prefixWithPatch p That <$> toLeafInfos info
-  p@(Delete info) -> prefixWithPatch p This <$> toLeafInfos info
+  Insert info -> prefixWithPatch patch That <$> toLeafInfos info
+  Delete info -> prefixWithPatch patch This <$> toLeafInfos info
 
 -- Prefixes a given doc with the type of patch it represents.
 prefixWithPatch :: Patch DiffInfo -> (SourceSpan -> These SourceSpan SourceSpan) -> JSONSummary Doc SourceSpan -> JSONSummary Doc SourceSpans
@@ -161,7 +161,7 @@ prefixWithPatch patch constructor = prefixWithThe (patchToPrefix patch)
         info = prefix <+> info jsonSummary
       , span = SourceSpans $ constructor (span jsonSummary)
       }
-    patchToPrefix = \case
+    patchToPrefix patch = case patch of
       (Replace _ _) -> "Replaced"
       (Insert _) -> "Added"
       (Delete _) -> "Deleted"
@@ -386,7 +386,7 @@ instance HasCategory Text where
   toCategoryName = identity
 
 instance HasCategory Category where
-  toCategoryName = \case
+  toCategoryName category = case category of
     C.Ty -> "type"
     ArrayLiteral -> "array"
     BooleanOperator -> "boolean operator"

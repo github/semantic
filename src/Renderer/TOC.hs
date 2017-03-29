@@ -109,7 +109,7 @@ toTOCSummaries patch = case afterOrBefore patch of
         _ -> NotSummarizable
 
 flattenPatch :: Patch DiffInfo -> [Patch DiffInfo]
-flattenPatch = \case
+flattenPatch patch = case patch of
   Replace i1 i2 -> zipWith Replace (toLeafInfos' i1) (toLeafInfos' i2)
   Insert info -> Insert <$> toLeafInfos' info
   Delete info -> Delete <$> toLeafInfos' info
@@ -133,7 +133,7 @@ mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm dif
 
 summarizable :: ComonadCofree (Syntax t) w => w a -> SummarizableTerm (w a)
 summarizable term = go (unwrap term) term
-  where go = \case
+  where go syntax = case syntax of
           S.Method{} -> SummarizableTerm
           S.Function{} -> SummarizableTerm
           _ -> NotSummarizableTerm
@@ -143,7 +143,7 @@ toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
   Just diffInfo -> toJSONSummaries' diffInfo
   Nothing -> panic "No diff"
   where
-    toJSONSummaries' = \case
+    toJSONSummaries' diffInfo = case diffInfo of
       ErrorInfo{..} -> pure $ ErrorSummary termName infoSpan
       BranchInfo{..} -> branches >>= toJSONSummaries'
       LeafInfo{..} -> case parentInfo of
@@ -183,6 +183,6 @@ toTermName parentOffset parentSource term = case unwrap term of
 
 -- The user-facing category name
 toCategoryName :: Category -> Text
-toCategoryName = \case
+toCategoryName category = case category of
   C.SingletonMethod -> "Method"
   c -> show c

@@ -96,7 +96,7 @@ termAssignment _ category children
     withRecord record syntax = cofree (record :< syntax)
 
 categoryForRubyName :: Text -> Category
-categoryForRubyName = \case
+categoryForRubyName name = case name of
   "argument_list_with_parens" -> Args
   "argument_list" -> Args
   "argument_pair" -> ArgumentPair

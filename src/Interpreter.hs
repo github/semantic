@@ -40,7 +40,7 @@ runSteps algorithm = case runStep algorithm of
 runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
         => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
         -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
-runStep = \case
+runStep step = case step of
   Return a -> Left a
   algorithm `Then` cont -> Right $ decompose algorithm >>= cont
 
@@ -49,7 +49,7 @@ runStep = \case
 decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
           => AlgorithmF (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The step in an algorithm to decompose into its next steps.
           -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The sequence of next steps to undertake to continue the algorithm.
-decompose = \case
+decompose step = case step of
   Diff t1 t2 -> algorithmWithTerms t1 t2
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
     Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
