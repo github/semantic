@@ -70,7 +70,7 @@ parseSExpression args@Arguments{..} =
   case commitSha of
     Just commitSha' -> do
       -- | No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
-      terms <- traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob) =<< sourceBlobs args (T.pack commitSha')
+      terms <- traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob) =<< sourceBlobs args
       return $ printTerms TreeOnly terms
     Nothing -> do
       terms <- for filePaths
@@ -81,17 +81,13 @@ parseSExpression args@Arguments{..} =
       return $ printTerms TreeOnly terms
 
 parseIndex :: Arguments -> IO ByteString
-parseIndex args@Arguments{..} = fmap (toS . encode) $ case commitSha of
-  Just commitSha' -> buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args (T.pack commitSha')
-  _ -> buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobsFromPaths filePaths
+parseIndex args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
     algebra (annotation :< syntax) = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) : (Prologue.snd =<< toList syntax)
 
 parseTree :: Arguments -> IO ByteString
-parseTree args@Arguments{..} = fmap (toS . encode) $ case commitSha of
-  Just commitSha' -> buildProgramNodes ParseTreeProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args (T.pack commitSha')
-  _ -> buildProgramNodes ParseTreeProgram algebra (termSourceTextDecorator debug) =<< sourceBlobsFromPaths filePaths
+parseTree args@Arguments{..} = fmap (toS . encode) $ buildProgramNodes ParseTreeProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
     algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
@@ -118,18 +114,24 @@ identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Reco
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
-sourceBlobs :: Arguments -> Text -> IO [SourceBlob]
-sourceBlobs Arguments{..} commitSha' = do
-  maybeBlobs <- withRepository lgFactory gitDir $ do
-    repo   <- getRepository
-    object <- parseObjOid commitSha'
-    commit <- lookupCommit object
-    tree   <- lookupTree (commitTree commit)
-    lift $ runReaderT (traverse (toSourceBlob tree) filePaths) repo
-
-  pure $ catMaybes maybeBlobs
+sourceBlobs :: Arguments -> IO [SourceBlob]
+sourceBlobs Arguments{..} =
+  case commitSha of
+    Just commitSha' -> sourceBlobsFromSha commitSha'
+    _ -> sourceBlobsFromPaths filePaths
 
   where
+    sourceBlobsFromSha :: [Char] -> IO [SourceBlob]
+    sourceBlobsFromSha commitSha' = do
+      maybeBlobs <- withRepository lgFactory gitDir $ do
+        repo   <- getRepository
+        object <- parseObjOid (toS commitSha')
+        commit <- lookupCommit object
+        tree   <- lookupTree (commitTree commit)
+        lift $ runReaderT (traverse (toSourceBlob tree) filePaths) repo
+
+      pure $ catMaybes maybeBlobs
+
     toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO (Maybe SourceBlob)
     toSourceBlob tree filePath = do
       entry <- treeEntry tree (toS filePath)
