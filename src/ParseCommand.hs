@@ -58,14 +58,6 @@ instance ToJSON ParseNode where
     <> [ "identifier" .= identifier' | isJust identifier' ]
     <> [ "children"   .= children'   | isJust children'   ]
 
--- ($)   :: (a ->   b) ->   a ->   b
--- (<$>) :: (a ->   b) -> f a -> f b
--- (=<<) :: (a -> m b) -> m a -> m b
---
--- liftA, liftA2, liftM,
---
--- (.)   :: (b ->   c) -> (a ->   b) -> (a ->   c)
--- (<=<) :: (b -> m c) -> (a -> m b) -> (a -> m c)
 
 parseSExpression :: Arguments -> IO ByteString
 parseSExpression =
