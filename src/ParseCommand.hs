@@ -96,7 +96,12 @@ parseTree args@Arguments{..} = fmap (toS . encode) $ case commitSha of
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseJSON) -> ParseJSON
     algebra (annotation :< syntax) = ParseTreeProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Prologue.snd <$> toList syntax)
 
-buildProgramNodes :: Traversable t1 => (FilePath -> t -> b) -> (CofreeF (Syntax Text) (Record '[field, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[field, Range, Category, SourceSpan]), t) -> t) -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field) -> t1 SourceBlob -> IO (t1 b)
+buildProgramNodes
+  :: (FilePath -> nodes -> ParseJSON)
+  -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
+  -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] (Maybe SourceText))
+  -> [SourceBlob]
+  -> IO [ParseJSON]
 buildProgramNodes programNodeConstructor algebra termDecorator sourceBlobs =
   for sourceBlobs
     (\sourceBlob@SourceBlob{..} -> do
