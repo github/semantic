@@ -99,11 +99,11 @@ parseIndex args@Arguments{..} = fmap (toS . encode) parse'
   where
     parse' =
       case commitSha of
-        Just commitSha' -> buildProgramNodes IndexProgram parseIndexAlgebra (termSourceTextDecorator debug) =<< sourceBlobs args (T.pack commitSha')
-        _ -> buildProgramNodes IndexProgram parseIndexAlgebra (termSourceTextDecorator debug) =<< sourceBlobsFromPaths filePaths
+        Just commitSha' -> buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobs args (T.pack commitSha')
+        _ -> buildProgramNodes IndexProgram algebra (termSourceTextDecorator debug) =<< sourceBlobsFromPaths filePaths
 
-    parseIndexAlgebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
-    parseIndexAlgebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
+    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseJSON]) -> [ParseJSON]
+    algebra (annotation :< syntax) = indexProgramNode annotation : (Prologue.snd =<< toList syntax)
       where indexProgramNode annotation = IndexProgramNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax))
 
 parseTree :: Arguments -> IO ByteString
