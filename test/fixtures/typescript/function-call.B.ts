@@ -1,1 +1,1 @@
-someFunction(arg1, "arg3");
+someFunction<B>(arg1, "arg3");

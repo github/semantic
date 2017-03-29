@@ -2,5 +2,8 @@
   (ExpressionStatements
     (FunctionCall
       (Identifier)
+      (Other "type_arguments"
+        (Other "type_reference"
+          (Identifier)))
       (Identifier)
       (StringLiteral))))+}
