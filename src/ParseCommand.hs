@@ -92,8 +92,6 @@ sourceBlobsFromPaths filePaths =
                   source <- readAndTranscodeFile filePath
                   pure $ Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob))
 
-identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
-identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 
   where
@@ -124,6 +122,10 @@ identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
         toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
+
+-- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
+identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
+identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
 sourceBlobsFromArgs :: Arguments -> IO [SourceBlob]
