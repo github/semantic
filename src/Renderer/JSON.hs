@@ -129,7 +129,7 @@ syntaxToTermField syntax = case syntax of
   S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "elseExpression" .= elseExpression ] <> [ "finallyExpression" .= finallyExpression ]
   S.Array ty c -> [ "type" .= ty ] <> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
-  S.Method identifier receiver callSignature definitions -> [ "identifier" .= identifier ] <> [ "receiver" .= receiver ] <> [ "callSignature" .= callSignature ] <> [ "definitions" .= definitions ]
+  S.Method clauses identifier receiver callSignature definitions -> [ "clauses" .= clauses ] <> [ "identifier" .= identifier ] <> [ "receiver" .= receiver ] <> [ "callSignature" .= callSignature ] <> [ "definitions" .= definitions ]
   S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
   S.Module identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Namespace identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]

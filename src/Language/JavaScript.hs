@@ -43,8 +43,8 @@ termAssignment _ category children
       , Finally <- Info.category (extract finally)
       -> Just $ S.Try [body] [catch] Nothing (Just finally)
     (ArrayLiteral, _) -> Just $ S.Array Nothing children
-    (Method, [ identifier, params, exprs ]) -> Just $ S.Method identifier Nothing [params] (toList (unwrap exprs))
-    (Method, [ identifier, exprs ]) -> Just $ S.Method identifier Nothing [] (toList (unwrap exprs))
+    (Method, [ identifier, params, exprs ]) -> Just $ S.Method [] identifier Nothing [params] (toList (unwrap exprs))
+    (Method, [ identifier, exprs ]) -> Just $ S.Method [] identifier Nothing [] (toList (unwrap exprs))
     (Class, [ identifier, superclass, definitions ]) -> Just $ S.Class identifier [superclass] (toList (unwrap definitions))
     (Class, [ identifier, definitions ]) -> Just $ S.Class identifier [] (toList (unwrap definitions))
     (Import, [ statements, identifier ] ) -> Just $ S.Import identifier (toList (unwrap statements))

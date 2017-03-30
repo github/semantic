@@ -166,8 +166,8 @@ termToDiffInfo source term = case unwrap term of
 toTermName :: forall leaf fields. DefaultFields fields => Int -> Source -> SyntaxTerm leaf fields -> Text
 toTermName parentOffset parentSource term = case unwrap term of
   S.Function identifier _ _ -> toTermName' identifier
-  S.Method identifier Nothing _ _ -> toTermName' identifier
-  S.Method identifier (Just receiver) _ _ -> case unwrap receiver of
+  S.Method _ identifier Nothing _ _ -> toTermName' identifier
+  S.Method _ identifier (Just receiver) _ _ -> case unwrap receiver of
     S.Indexed [receiverParams] -> case unwrap receiverParams of
       S.ParameterDecl (Just ty) _ -> "(" <> toTermName' ty <> ") " <> toTermName' identifier
       _ -> toMethodNameWithReceiver receiver identifier

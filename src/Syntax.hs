@@ -76,7 +76,7 @@ data Syntax a f
   -- | A class with an identifier, superclass, and a list of definitions.
   | Class f [f] [f]
   -- | A method definition with an identifier, optional receiver, optional type arguments, params, optional return type, and a list of expressions.
-  | Method f (Maybe f) [f] [f]
+  | Method [f] f (Maybe f) [f] [f]
   -- | An if statement with an expression and maybe more expression clauses.
   | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
@@ -127,7 +127,7 @@ maybeIdentifier syntax = case syntax of
   Function f _ _ -> Just f
   FunctionCall f _ _ -> Just f
   Import f _ -> Just f
-  Method f _ _ _ -> Just f
+  Method _ f _ _ _ -> Just f
   MethodCall _ f _ _ -> Just f
   Module f _ -> Just f
   OperatorAssignment f _ -> Just f
@@ -172,7 +172,7 @@ instance Listable2 Syntax where
     \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
-    \/ liftCons4 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
+    \/ liftCons5 (liftTiers recur) recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
     \/ liftCons2 recur (liftTiers recur) Module
     \/ liftCons2 recur (liftTiers recur) Namespace

@@ -7,7 +7,6 @@ import Source
 import Language
 import qualified Syntax as S
 import Term
-import Data.List (span)
 
 termAssignment
   :: Source -- ^ The source of the term.
@@ -51,8 +50,8 @@ termAssignment _ category children =
       -> Just $ S.Try [body] [catch] Nothing (Just finally)
     (ArrayLiteral, _) -> Just $ S.Array Nothing children
     (Method, children) -> case Prologue.break ((== ExpressionStatements) . Info.category . extract) children of
-      (prev, [body]) -> case span ((== Identifier) . Info.category . extract) prev of
-        ([id], [callSignature]) -> Just $ S.Method id Nothing (toList (unwrap callSignature)) (toList (unwrap body))
+      (prev, [body]) -> case Prologue.break ((== Identifier) . Info.category . extract) prev of
+        (prev, [id, callSignature]) -> Just $ S.Method prev id Nothing (toList (unwrap callSignature)) (toList (unwrap body))
         _ -> Nothing -- No identifier found or callSignature found.
       _ -> Nothing -- No body found.``
     (Class, identifier : rest) -> case Prologue.break ((== Other "class_body") . Info.category . extract) rest of
@@ -71,11 +70,10 @@ termAssignment _ category children =
       | Just (exprs, body) <- unsnoc children
       -> Just $ S.For exprs [body]
     (Function, children) -> case Prologue.break ((== ExpressionStatements) . Info.category . extract) children of
-      (inits, [body]) ->
-        case span ((== Identifier) . Info.category . extract) inits of
-          ([id], [callSignature]) -> Just $ S.Function id (toList (unwrap callSignature)) (toList (unwrap body))
-          ([], [callSignature]) -> Just $ S.AnonymousFunction (toList (unwrap callSignature)) (toList (unwrap body))
-          _ -> Nothing -- More than 1 identifier found or no call signature found
+      (inits, [body]) -> case inits of
+        [id, callSignature] -> Just $ S.Function id (toList (unwrap callSignature)) (toList (unwrap body))
+        [callSignature] -> Just $ S.AnonymousFunction (toList (unwrap callSignature)) (toList (unwrap body))
+        _ -> Nothing -- More than 1 identifier found or no call signature found
       _ -> Nothing -- No body found.
     (Ty, children) -> Just $ S.Ty children
     (Interface, children) -> toInterface children
@@ -157,7 +155,6 @@ categoryForTypeScriptName category = case category of
   "public_field_definition" -> FieldDecl
   "variable_declarator" -> VarAssignment
   "type_annotation" -> Ty
-  "accessibility_modifier" -> Identifier
   "template_chars" -> TemplateString
   "module" -> Module
   "ambient_namespace" -> Namespace
