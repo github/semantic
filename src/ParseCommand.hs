@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, TypeOperators, ScopedTypeVariables #-}
 module ParseCommand where
 
 import Arguments
@@ -86,13 +86,19 @@ parseDecorator False = const . const Nothing
 -- | Function context for constructing parse nodes given a parse node constructor, an algebra (for a paramorphism), a function that takes a file's source and returns a term decorator, and a list of source blobs.
 -- This function is general over b such that b represents IndexFile or ParseTreeFile.
 buildParseNodes
-  :: (FilePath -> nodes -> b)
+  :: forall nodes b. (FilePath -> nodes -> b)
   -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
   -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] (Maybe SourceText))
   -> [SourceBlob]
   -> IO [b]
 buildParseNodes programNodeConstructor algebra termDecorator sourceBlobs =
-  for sourceBlobs (\sourceBlob@SourceBlob{..} -> pure . programNodeConstructor path . para algebra =<< parseWithDecorator (termDecorator source) path sourceBlob)
+  for sourceBlobs buildParseNode
+  where
+    buildParseNode :: SourceBlob -> IO b
+    buildParseNode sourceBlob@SourceBlob{..} = do
+      parsedTerm <- parseWithDecorator (termDecorator source) path sourceBlob
+      let parseNode = para algebra parsedTerm
+      pure $ programNodeConstructor path parseNode
 
 -- | For the given absolute file paths, retrieves their source blobs.
 sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
