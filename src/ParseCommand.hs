@@ -1,12 +1,16 @@
-{-# LANGUAGE DataKinds, TypeOperators, DeriveAnyClass #-}
+{-# LANGUAGE DataKinds, TypeOperators, ScopedTypeVariables #-}
 module ParseCommand where
 
 import Arguments
 import Category
-import Data.Aeson (ToJSON, encode)
+import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Record
 import qualified Data.Text as T
-import qualified Data.ByteString as B
+import Git.Blob
+import Git.Libgit2
+import Git.Repository
+import Git.Types
+import qualified Git
 import Info
 import Language
 import Language.Markdown
@@ -17,7 +21,6 @@ import Syntax
 import System.FilePath
 import Term
 import TreeSitter
-import Renderer
 import Renderer.JSON()
 import Renderer.SExpression
 import Text.Parser.TreeSitter.C
@@ -25,37 +28,129 @@ import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 
-data ParseJSON = ParseJSON
+data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: ParseNode } deriving (Show)
+
+instance ToJSON ParseTreeFile where
+  toJSON ParseTreeFile{..} = object [ "filePath" .= parseTreeFilePath, "programNode" .= node ]
+
+
+data IndexFile = IndexFile { indexFilePath :: FilePath, nodes :: [ParseNode] } deriving (Show)
+
+instance ToJSON IndexFile where
+  toJSON IndexFile{..} = object [ "filePath" .= indexFilePath, "programNodes" .= nodes ]
+
+
+data ParseNode = ParseNode
   { category :: Text
-  , range :: Range
-  , text :: SourceText
-  , children :: [ParseJSON]
-  } deriving (Show, Generic, ToJSON)
+  , sourceRange :: Range
+  , sourceText :: Maybe SourceText
+  , sourceSpan :: SourceSpan
+  , identifier :: Maybe Text
+  , children :: Maybe [ParseNode]
+  }
+  deriving (Show)
 
-parse :: Arguments -> IO ByteString
-parse Arguments{..} = do
-  sources <- traverse readAndTranscodeFile filePaths
-  terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
-  pure $! toByteString terms
+instance ToJSON ParseNode where
+  toJSON ParseNode{..} =
+    object
+    $  [ "category" .= category, "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan ]
+    <> [ "sourceText" .= sourceText | isJust sourceText ]
+    <> [ "identifier" .= identifier | isJust identifier ]
+    <> [ "children"   .= children   | isJust children   ]
+
+-- | Parses file contents into an SExpression format for the provided arguments.
+parseSExpression :: Arguments -> IO ByteString
+parseSExpression =
+  pure . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
+  where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
+
+-- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
+parseIndex :: Arguments -> IO ByteString
+parseIndex args@Arguments{..} = fmap (toS . encode) $ buildParseNodes IndexFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
   where
-    sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
-    parsers = parserWithSource <$> filePaths
-    toByteString terms = case format of
-      SExpression -> printTerms TreeOnly terms
-      _ -> B.intercalate "\n" (toS . encode . cata algebra <$> terms) <> "\n"
+    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseNode]) -> [ParseNode]
+    algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
-    algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
-    algebra term = case term of
-      (annotation :< Leaf _) -> ParseJSON (category' annotation) (range' annotation) (text' annotation) []
-      (annotation :< syntax) -> ParseJSON (category' annotation) (range' annotation) (text' annotation) (toList syntax)
+-- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
+parseTree :: Arguments -> IO ByteString
+parseTree args@Arguments{..} = fmap (toS . encode) $ buildParseNodes ParseTreeFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
+  where
+    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseNode) -> ParseNode
+    algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
+
+-- | Determines the term decorator to use when parsing.
+parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
+parseDecorator True = termSourceTextDecorator
+parseDecorator False = const . const Nothing
+
+-- | Function context for constructing parse nodes given a parse node constructor, an algebra (for a paramorphism), a function that takes a file's source and returns a term decorator, and a list of source blobs.
+-- This function is general over b such that b represents IndexFile or ParseTreeFile.
+buildParseNodes
+  :: forall nodes b. (FilePath -> nodes -> b)
+  -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
+  -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] (Maybe SourceText))
+  -> [SourceBlob]
+  -> IO [b]
+buildParseNodes programNodeConstructor algebra termDecorator sourceBlobs =
+  for sourceBlobs buildParseNode
+  where
+    buildParseNode :: SourceBlob -> IO b
+    buildParseNode sourceBlob@SourceBlob{..} = do
+      parsedTerm <- parseWithDecorator (termDecorator source) path sourceBlob
+      let parseNode = para algebra parsedTerm
+      pure $ programNodeConstructor path parseNode
+
+-- | For the given absolute file paths, retrieves their source blobs.
+sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
+sourceBlobsFromPaths filePaths =
+  for filePaths (\filePath -> do
+                  source <- readAndTranscodeFile filePath
+                  pure $ Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob))
+
+-- | For the given sha, git repo path, and file paths, retrieves the source blobs.
+sourceBlobsFromSha :: [Char] -> [Char] -> [FilePath] -> IO [SourceBlob]
+sourceBlobsFromSha commitSha gitDir filePaths = do
+  maybeBlobs <- withRepository lgFactory gitDir $ do
+    repo   <- getRepository
+    object <- parseObjOid (toS commitSha)
+    commit <- lookupCommit object
+    tree   <- lookupTree (commitTree commit)
+    lift $ runReaderT (traverse (toSourceBlob tree) filePaths) repo
+
+  pure $ catMaybes maybeBlobs
+
+  where
+    toSourceBlob :: Git.Tree LgRepo -> FilePath -> ReaderT LgRepo IO (Maybe SourceBlob)
+    toSourceBlob tree filePath = do
+      entry <- treeEntry tree (toS filePath)
+      case entry of
+        Just (BlobEntry entryOid entryKind) -> do
+          blob <- lookupBlob entryOid
+          bytestring <- blobToByteString blob
+          let oid = renderObjOid $ blobOid blob
+          s <- liftIO $ transcode bytestring
+          pure . Just $ SourceBlob s (toS oid) filePath (Just (toSourceKind entryKind))
+        _ -> pure Nothing
       where
-        category' = toS . Info.category
-        range' = byteRange
-        text' = Info.sourceText
+        toSourceKind :: Git.BlobKind -> SourceKind
+        toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
+        toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
+        toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
--- | Return a parser that decorates with the source text.
-parserWithSource :: FilePath -> Parser (Syntax Text) (Record '[SourceText, Range, Category, SourceSpan])
-parserWithSource path blob = decorateTerm (termSourceDecorator (source blob)) <$> parserForType (toS (takeExtension path)) blob
+-- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
+identifierFor :: StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan])) -> Maybe T.Text
+identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
+
+-- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
+sourceBlobsFromArgs :: Arguments -> IO [SourceBlob]
+sourceBlobsFromArgs Arguments{..} =
+  case commitSha of
+    Just commitSha' -> sourceBlobsFromSha commitSha' gitDir filePaths
+    _ -> sourceBlobsFromPaths filePaths
+
+-- | Return a parser incorporating the provided TermDecorator.
+parseWithDecorator :: TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field -> FilePath -> Parser (Syntax Text) (Record '[field, Range, Category, SourceSpan])
+parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
@@ -75,9 +170,9 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Term decorator extracting the source text for a term.
-termSourceDecorator :: (HasField fields Range) => Source -> TermDecorator f fields SourceText
-termSourceDecorator source c = SourceText . toText $ Source.slice range' source
- where range' = byteRange $ headF c
+termSourceTextDecorator :: (Functor f, HasField fields Range) => Source -> TermDecorator f fields (Maybe SourceText)
+termSourceTextDecorator source term = Just . SourceText . toText $ Source.slice range' source
+ where range' = byteRange $ headF term
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])

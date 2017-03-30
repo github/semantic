@@ -20,7 +20,10 @@ main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
   text <- case runMode of
     Diff -> diff args
-    Parse -> parse args
+    Parse -> case format of
+      R.Index -> parseIndex args
+      R.SExpression -> parseSExpression args
+      _ -> parseTree args
   writeToOutput outputPath (text <> "\n")
 
 -- | A parser for the application's command-line arguments.
@@ -36,12 +39,15 @@ argumentsParser = info (version <*> helper <*> argumentsP)
       <|> flag' R.Split (long "split" <> help "output a split diff")
       <|> flag' R.Summary (long "summary" <> help "output a diff summary")
       <|> flag' R.SExpression (long "sexpression" <> help "output an s-expression diff tree")
-      <|> flag' R.TOC (long "toc" <> help "output a table of contents diff summary"))
+      <|> flag' R.TOC (long "toc" <> help "output a table of contents diff summary")
+      <|> flag' R.Index (long "index" <> help "output indexable JSON parse output")
+      <|> flag' R.ParseTree (long "parse-tree" <> help "output JSON parse tree structure"))
       <*> optional (option auto (long "timeout" <> help "timeout for per-file diffs in seconds, defaults to 7 seconds"))
       <*> optional (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaults to stdout if unspecified"))
+      <*> optional (strOption (long "commit" <> short 'c' <> help "single commit entry for parsing"))
       <*> switch (long "no-index" <> help "compare two paths on the filesystem")
       <*> some (argument (eitherReader parseShasAndFiles) (metavar "SHA_A..SHAB FILES..."))
-      <*> switch (long "development" <> short 'd' <> help "set development mode which prevents timeout behavior by default")
+      <*> switch (long "debug" <> short 'd' <> help "set debug mode for parsing which outputs sourcetext for each syntax node")
       <*> flag Diff Parse (long "parse" <> short 'p' <> help "parses a source file without diffing")
       where
         parseShasAndFiles :: String -> Either String ExtraArg
