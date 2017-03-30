@@ -138,7 +138,7 @@ sourceBlobsFromArgs Arguments{..} =
     Just commitSha' -> sourceBlobsFromSha commitSha' gitDir filePaths
     _ -> sourceBlobsFromPaths filePaths
 
--- | Return a parser that decorates with the source text.
+-- | Return a parser incorporating the provided TermDecorator.
 parseWithDecorator :: TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field -> FilePath -> Parser (Syntax Text) (Record '[field, Range, Category, SourceSpan])
 parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
 
