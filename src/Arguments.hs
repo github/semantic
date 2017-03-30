@@ -30,9 +30,10 @@ data CmdLineOptions = CmdLineOptions
   { outputFormat :: R.Format
   , maybeTimeout :: Maybe Float
   , outputFilePath :: Maybe FilePath
+  , commitSha' :: Maybe String
   , noIndex :: Bool
   , extraArgs :: [ExtraArg]
-  , developmentMode' :: Bool
+  , debug' :: Bool
   , runMode' :: RunMode
   }
 
@@ -43,11 +44,12 @@ data Arguments = Arguments
   , format :: R.Format
   , timeoutInMicroseconds :: Int
   , outputPath :: Maybe FilePath
+  , commitSha :: Maybe String
   , diffMode :: DiffMode
   , runMode :: RunMode
   , shaRange :: Both (Maybe String)
   , filePaths :: [FilePath]
-  , developmentMode :: Bool
+  , debug :: Bool
   } deriving (Show)
 
 -- | Returns Arguments for the program from parsed command line arguments.
@@ -68,13 +70,14 @@ programArguments CmdLineOptions{..} = do
     , format = outputFormat
     , timeoutInMicroseconds = maybe defaultTimeout toMicroseconds maybeTimeout
     , outputPath = outputPath
+    , commitSha = commitSha'
     , diffMode = case (noIndex, filePaths) of
       (True, [fileA, fileB]) -> PathDiff (both fileA fileB)
       (_, _) -> CommitDiff
     , runMode = runMode'
     , shaRange = fetchShas extraArgs
     , filePaths = filePaths
-    , developmentMode = developmentMode'
+    , debug = debug'
     }
   where
     fetchPaths :: [ExtraArg] -> [FilePath]
@@ -101,11 +104,12 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , format = format
   , timeoutInMicroseconds = defaultTimeout
   , outputPath = Nothing
+  , commitSha = Nothing
   , diffMode = CommitDiff
   , runMode = Diff
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
-  , developmentMode = False
+  , debug = False
   }
 
 diffPathsArgs :: FilePath -> Both FilePath -> R.Format -> Arguments
@@ -115,11 +119,12 @@ diffPathsArgs gitDir paths format = Arguments
   , format = format
   , timeoutInMicroseconds = defaultTimeout
   , outputPath = Nothing
+  , commitSha = Nothing
   , diffMode = PathDiff paths
   , runMode = Diff
   , shaRange = both Nothing Nothing
   , filePaths = []
-  , developmentMode = False
+  , debug = False
   }
 
 parseArgs :: [String] -> R.Format -> Arguments
@@ -129,11 +134,12 @@ parseArgs filePaths format = Arguments
   , format = format
   , timeoutInMicroseconds = defaultTimeout
   , outputPath = Nothing
+  , commitSha = Nothing
   , diffMode = CommitDiff
   , runMode = Parse
   , shaRange = both Nothing Nothing
   , filePaths = filePaths
-  , developmentMode = False
+  , debug = False
   }
 
 -- | 7 seconds
