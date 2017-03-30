@@ -1,3 +1,4 @@
-interface Promise {
-	
+interface IResult<T> {
+  type: 'result'
+  readonly result: T
 }

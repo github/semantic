@@ -1,5 +1,21 @@
 (Program
-{+(Interface
-    (Identifier))+}
-{-(Module
-    (Identifier))-})
+  (Interface
+  { (Identifier)
+  ->(Identifier) }
+  {+(Other "type_parameters"
+      (Other "type_parameter"
+        (Identifier)))+}
+    (Other "property_signature"
+      (Identifier)
+      (Ty
+        (Other "literal_type"
+        { (StringLiteral)
+        ->(StringLiteral) })))
+    (Other "property_signature"
+      (Other "readonly")
+    { (Identifier)
+    ->(Identifier) }
+      (Ty
+        (Other "type_reference"
+        { (Identifier)
+        ->(Identifier) })))))
