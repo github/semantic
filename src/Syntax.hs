@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
 module Syntax where
 
 import Data.Aeson
@@ -111,6 +111,28 @@ data Syntax a f
   | Send f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
 
+
+extractLeafValue :: forall b leaf. Syntax leaf b -> Maybe leaf
+extractLeafValue syntax = case syntax of
+  Leaf a -> Just a
+  _ -> Nothing
+
+maybeIdentifier :: forall leaf identifier. Syntax leaf identifier -> Maybe identifier
+maybeIdentifier syntax = case syntax of
+  Assignment f _ -> Just f
+  Class f _ _ -> Just f
+  Export f _ -> f
+  Function f _ _ _ -> Just f
+  FunctionCall f _ -> Just f
+  Import f _ -> Just f
+  Method f _ _ _ _ -> Just f
+  MethodCall _ f _ -> Just f
+  Module f _ -> Just f
+  OperatorAssignment f _ -> Just f
+  SubscriptAccess f _  -> Just f
+  TypeDecl f _ -> Just f
+  VarAssignment f _ -> Just f
+  _ -> Nothing
 
 -- Instances
 
