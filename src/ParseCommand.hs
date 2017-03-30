@@ -66,17 +66,22 @@ parseSExpression =
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
-parseIndex args@Arguments{..} = fmap (toS . encode) $ buildParseNodes IndexFile algebra (termSourceTextDecorator debug) =<< sourceBlobsFromArgs args
+parseIndex args@Arguments{..} = fmap (toS . encode) $ buildParseNodes IndexFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseNode]) -> [ParseNode]
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
-parseTree args@Arguments{..} = fmap (toS . encode) $ buildParseNodes ParseTreeFile algebra (termSourceTextDecorator debug) =<< sourceBlobsFromArgs args
+parseTree args@Arguments{..} = fmap (toS . encode) $ buildParseNodes ParseTreeFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
   where
     algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseNode) -> ParseNode
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
+
+-- | Determines the term decorator to use when parsing.
+parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
+parseDecorator True = termSourceTextDecorator
+parseDecorator False = const . const Nothing
 
 -- | Function context for constructing parse nodes given a parse node constructor, an algebra (for a paramorphism), a function that takes a file's source and returns a term decorator, and a list of source blobs.
 -- This function is general over b such that b represents IndexFile or ParseTreeFile.
@@ -159,9 +164,9 @@ decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) 
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Term decorator extracting the source text for a term.
-termSourceTextDecorator :: (Functor f, HasField fields Range) => Bool -> Source -> TermDecorator f fields (Maybe SourceText)
-termSourceTextDecorator debug source c = if debug then Just . SourceText . toText $ Source.slice range' source else Nothing
- where range' = byteRange $ headF c
+termSourceTextDecorator :: (Functor f, HasField fields Range) => Source -> TermDecorator f fields (Maybe SourceText)
+termSourceTextDecorator source term = Just . SourceText . toText $ Source.slice range' source
+ where range' = byteRange $ headF term
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
