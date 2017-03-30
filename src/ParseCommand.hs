@@ -61,7 +61,7 @@ instance ToJSON ParseNode where
 -- | Parses file contents into an SExpression format for the provided arguments.
 parseSExpression :: Arguments -> IO ByteString
 parseSExpression =
-  return . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
+  pure . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
