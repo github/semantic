@@ -15,7 +15,7 @@ import Diff
 type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
 
 -- | The available types of diff rendering.
-data Format = Split | Patch | JSON | Summary | SExpression | TOC
+data Format = Split | Patch | JSON | Summary | SExpression | TOC | Index | ParseTree
   deriving (Show)
 
 data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value])) | SExpressionOutput ByteString | TOCOutput (Map Text (Map Text [Value]))
