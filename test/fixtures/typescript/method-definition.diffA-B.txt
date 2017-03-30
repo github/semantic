@@ -1,0 +1,13 @@
+(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (Method
+        (Other "accessibility_modifier")
+      {+(Other "readonly")+}
+        (Identifier)
+        (Params)
+        (Ty
+        { (Other "type_reference"
+            (Identifier))
+        ->(Other "predefined_type") })))))
