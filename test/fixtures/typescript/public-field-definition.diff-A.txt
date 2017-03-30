@@ -9,16 +9,16 @@
         (Other "readonly")
         (Identifier))
       (FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier))
       (FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (NumberLiteral))
       (FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (Ty

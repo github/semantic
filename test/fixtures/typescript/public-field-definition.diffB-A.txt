@@ -9,16 +9,16 @@
         (Other "readonly")
         (Identifier))
       (FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier))
     {+(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (NumberLiteral))+}
       (FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
       { (Identifier)
       ->(Identifier) }
@@ -27,7 +27,7 @@
             (Identifier)))
         (NumberLiteral))
     {-(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Identifier)
         (Ty
           (Other "type_reference"
@@ -46,7 +46,7 @@
             (Identifier)))
         (NumberLiteral))
       (FieldDecl
-      { (Identifier)
+      { (Other "accessibility_modifier")
       ->(Other "readonly") }
         (Identifier)
         (Ty
@@ -70,7 +70,7 @@
         (Identifier)
         (NumberLiteral))+}
     {-(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (Ty

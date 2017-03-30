@@ -9,11 +9,11 @@
         (Other "readonly")
         (Identifier))
       (FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier))
     {+(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (Ty
@@ -21,19 +21,19 @@
             (Identifier)))
         (NumberLiteral))+}
     {+(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Identifier)
         (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))+}
     {-(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (NumberLiteral))-}
     {-(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (Ty
@@ -54,35 +54,36 @@
         (NumberLiteral))
       (FieldDecl
       { (Other "readonly")
-      ->(Identifier) }
+      ->(Other "accessibility_modifier") }
         (Identifier)
         (Ty
           (Other "type_reference"
             (Identifier)))
         (NumberLiteral))
     {+(FieldDecl
-        (Identifier)
+        (Other "accessibility_modifier")
         (Other "readonly")
         (Identifier)
         (Ty
           (Other "type_reference"
             (Identifier)))
         (StringLiteral))+}
-      (FieldDecl
-      { (Other "readonly")
-      ->(Identifier) }
-      { (Identifier)
-      ->(Ty
-          (Other "type_reference"
-            (Identifier))) }
-      { (Ty
+    {+(FieldDecl
+        (Identifier)
+        (Ty
           (Other "type_reference"
             (Identifier)))
-      ->(NumberLiteral) }
-      {-(NumberLiteral)-})
+        (NumberLiteral))+}
     {+(FieldDecl
         (Identifier)
         (NumberLiteral))+}
+    {-(FieldDecl
+        (Other "readonly")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))-}
     {-(FieldDecl
         (Identifier)
         (Ty
