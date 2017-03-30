@@ -61,9 +61,8 @@ instance ToJSON ParseNode where
 -- | Parses file contents into an SExpression format for the provided arguments.
 parseSExpression :: Arguments -> IO ByteString
 parseSExpression =
-  -- No matter if debugging is enabled or not, SExpression output cannot show source text, so the termSourceTextDecorator is disabled by default.
   return . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
-  where parse = traverse (\sourceBlob@SourceBlob{..} -> parseWithDecorator (termSourceTextDecorator False source) path sourceBlob)
+  where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
