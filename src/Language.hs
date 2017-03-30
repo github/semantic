@@ -40,6 +40,7 @@ languageForType mediaType = case mediaType of
     ".go" -> Just Language.Go
     ".js" -> Just TypeScript
     ".ts" -> Just TypeScript
+    ".tsx" -> Just TypeScript
     _ -> Nothing
 
 toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
