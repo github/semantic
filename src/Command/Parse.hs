@@ -155,14 +155,17 @@ parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForTyp
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
-parserForType mediaType = case languageForType mediaType of
-  Just C -> treeSitterParser C tree_sitter_c
-  Just JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
-  Just TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
-  Just Markdown -> cmarkParser
-  Just Ruby -> treeSitterParser Ruby tree_sitter_ruby
-  Just Language.Go -> treeSitterParser Language.Go tree_sitter_go
-  _ -> lineByLineParser
+parserForType mediaType = maybe lineByLineParser parserForLanguage (languageForType mediaType)
+
+-- | Select a parser for a given Language.
+parserForLanguage :: Language -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+parserForLanguage language = case language of
+  C -> treeSitterParser C tree_sitter_c
+  JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
+  TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
+  Markdown -> cmarkParser
+  Ruby -> treeSitterParser Ruby tree_sitter_ruby
+  Language.Go -> treeSitterParser Language.Go tree_sitter_go
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
 decorateTerm :: (Functor f) => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
