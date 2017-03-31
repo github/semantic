@@ -24,7 +24,7 @@ import GitmonClient
 import Info
 import Diff
 import Interpreter
-import ParseCommand (parserForFilepath)
+import Command.Parse (parserForFilepath)
 import Parser
 import Patch
 import Renderer

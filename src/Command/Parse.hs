@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, TypeOperators, ScopedTypeVariables #-}
-module ParseCommand where
+module Command.Parse where
 
 import Arguments
 import Category

@@ -18,6 +18,7 @@ library
                      , Arguments
                      , Category
                      , Command.Diff
+                     , Command.Parse
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
@@ -37,7 +38,6 @@ library
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
-                     , ParseCommand
                      , Parser
                      , Patch
                      , Paths_semantic_diff
@@ -148,6 +148,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
                      , Command.Diff.Spec
+                     , Command.Parse.Spec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , DiffSpec
@@ -161,7 +162,6 @@ test-suite test
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
-                     , ParseCommandSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , array

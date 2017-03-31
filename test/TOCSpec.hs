@@ -4,6 +4,7 @@ module TOCSpec where
 import Data.Aeson
 import Category as C
 import Command.Diff
+import Command.Parse
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
@@ -12,7 +13,6 @@ import Data.String
 import Diff
 import Info
 import Interpreter
-import ParseCommand
 import Patch
 import Prologue hiding (fst, snd)
 import Renderer

@@ -3,6 +3,7 @@ module IntegrationSpec where
 
 import Category as C
 import Command.Diff
+import Command.Parse
 import Data.Functor.Both
 import Data.Record
 import qualified Data.Text as T
@@ -11,7 +12,6 @@ import Data.Text.Encoding (decodeUtf8)
 import GHC.Show (Show(..))
 import Data.List (union, concat, transpose)
 import Info
-import ParseCommand
 import Prologue hiding (fst, snd)
 import Renderer
 import Renderer.SExpression as Renderer
