@@ -3,7 +3,6 @@ module Renderer
 ( Renderer
 , Output(..)
 , concatOutputs
-, toSummaryKey
 , Format(..)
 ) where
 
@@ -42,17 +41,6 @@ data Format = Split | Patch | JSON | Summary | SExpression | TOC | Index | Parse
 
 data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value])) | SExpressionOutput ByteString | TOCOutput (Map Text (Map Text [Value]))
   deriving (Show)
-
--- Returns a key representing the filename. If the filenames are different,
--- return 'before -> after'.
-toSummaryKey :: Both FilePath -> Text
-toSummaryKey = runBothWith $ \before after ->
-  toS $ case (before, after) of
-    ("", after) -> after
-    (before, "") -> before
-    (before, after) | before == after -> after
-    (before, after) | not (null before) && not (null after) -> before <> " -> " <> after
-    (_, _) -> mempty
 
 -- Concatenates a list of 'Output' depending on the output type.
 -- For JSON, each file output is merged since they're uniquely keyed by filename.
