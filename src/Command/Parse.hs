@@ -70,14 +70,20 @@ type RAlgebra t a = Base t (t, a) -> a
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
-parseIndex args@Arguments{..} = fmap (toS . encode) $ buildParseNodes IndexFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
+parseIndex args@Arguments{..} = do
+  blobs <- sourceBlobsFromArgs args
+  nodes <- for blobs (buildParseNodes IndexFile algebra (parseDecorator debug))
+  pure (toS (encode nodes))
   where
     algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) [ParseNode]
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
-parseTree args@Arguments{..} = fmap (toS . encode) $ buildParseNodes ParseTreeFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
+parseTree args@Arguments{..} = do
+  blobs <- sourceBlobsFromArgs args
+  nodes <- for blobs (buildParseNodes ParseTreeFile algebra (parseDecorator debug))
+  pure (toS (encode nodes))
   where
     algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) ParseNode
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
@@ -93,16 +99,12 @@ buildParseNodes
   :: forall nodes b. (FilePath -> nodes -> b)
   -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
   -> (Source -> TermDecorator (Syntax Text) DefaultFields (Maybe SourceText))
-  -> [SourceBlob]
-  -> IO [b]
-buildParseNodes programNodeConstructor algebra termDecorator sourceBlobs =
-  for sourceBlobs buildParseNode
-  where
-    buildParseNode :: SourceBlob -> IO b
-    buildParseNode sourceBlob@SourceBlob{..} = do
-      parsedTerm <- parseWithDecorator (termDecorator source) path sourceBlob
-      let parseNode = para algebra parsedTerm
-      pure $ programNodeConstructor path parseNode
+  -> SourceBlob
+  -> IO b
+buildParseNodes programNodeConstructor algebra termDecorator sourceBlob@SourceBlob{..} = do
+  parsedTerm <- parseWithDecorator (termDecorator source) path sourceBlob
+  let parseNode = para algebra parsedTerm
+  pure $ programNodeConstructor path parseNode
 
 -- | For the given absolute file paths, retrieves their source blobs.
 sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
