@@ -1,0 +1,6 @@
+(Program
+{+(Module
+    (Identifier))+}
+{-(Other "ambient_declaration"
+    (Namespace
+      (Identifier)))-})

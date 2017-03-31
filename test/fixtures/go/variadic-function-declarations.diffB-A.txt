@@ -2,22 +2,26 @@
   (Module
     (Identifier))
   (Function
-    (Identifier))
-  (Function
-  { (Identifier)
-  ->(Identifier) }
-    (ParameterDecl
-      (PointerTy
-        (Identifier))
-      (Identifier)))
-  (Function
-  { (Identifier)
-  ->(Identifier) }
-    (ParameterDecl
-      (Identifier)))
-  (Function
-  { (Identifier)
-  ->(Identifier) }
     (Identifier)
-    (ParameterDecl
-      (Identifier))))
+    (Args))
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+    (Args
+      (ParameterDecl
+        (PointerTy
+          (Identifier))
+        (Identifier))))
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+    (Args
+      (ParameterDecl
+        (Identifier))))
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+    (Args
+      (Identifier)
+      (ParameterDecl
+        (Identifier)))))

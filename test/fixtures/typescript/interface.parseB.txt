@@ -1,0 +1,14 @@
+(Program
+  (Interface
+    (Identifier)
+    (Other "property_signature"
+      (Identifier)
+      (Ty
+        (Other "literal_type"
+          (StringLiteral))))
+    (Other "property_signature"
+      (Other "readonly")
+      (Identifier)
+      (Ty
+        (Other "type_reference"
+          (Identifier))))))

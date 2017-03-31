@@ -4,16 +4,22 @@
       (Identifier)
       (Method
         (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier)))
       (Method
         (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier)))
       (Method
         (Identifier)
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier))))))

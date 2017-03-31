@@ -3,15 +3,14 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (Other "type_declaration"
       (TypeDecl
         (Identifier)
         (StructTy
-        { (FieldDecl
+          (FieldDecl
             (Other "identifier_list"
-              (Identifier)
-              (Identifier))
-            (Identifier))
-        ->(FieldDecl
-            (Identifier)
-            (Identifier)) })))))
+            { (Identifier)
+            ->(Identifier) }
+            {-(Identifier)-})
+            (Identifier)))))))

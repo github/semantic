@@ -1,8 +1,10 @@
 {+(Program
   (ExpressionStatements
     (Function
-      (Identifier)
-      (Identifier)
-      (ExpressionStatements
-        (Return
-          (Identifier))))))+}
+      (Params
+        (Other "required_parameter"
+          (Identifier))
+        (Other "required_parameter"
+          (Identifier)))
+      (Return
+        (Identifier)))))+}

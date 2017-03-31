@@ -2,13 +2,15 @@
   (ExpressionStatements
     (Function
       (Identifier)
-      (Identifier)
-      (Identifier)
-      (ExpressionStatements
-        (DoWhile
+      (Params
+        (Other "required_parameter"
+          (Identifier))
+        (Other "required_parameter"
+          (Identifier)))
+      (DoWhile
+        (ExpressionStatements
           (ExpressionStatements
-            (ExpressionStatements
-              (FunctionCall
-                (Identifier)
-                (Identifier))))
-          (Identifier))))))+}
+            (FunctionCall
+              (Identifier)
+              (Identifier))))
+        (Identifier)))))+}

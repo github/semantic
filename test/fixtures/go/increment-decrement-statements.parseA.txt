@@ -3,5 +3,6 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (IncrementStatement)
     (DecrementStatement)))

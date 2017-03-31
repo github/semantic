@@ -24,8 +24,8 @@ termAssignment _ category children
       -> Just $ S.Indexed $ a : rest
     (FunctionCall, member : args)
       | S.MemberAccess target method <- unwrap member
-      -> Just $ S.MethodCall target method (toList . unwrap =<< args)
-    (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
+      -> Just $ S.MethodCall target method [] (toList . unwrap =<< args)
+    (FunctionCall, function : args) -> Just $ S.FunctionCall function [] (toList . unwrap =<< args)
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (VarDecl, _) -> Just . S.Indexed $ toVarDeclOrAssignment <$> children
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
@@ -43,10 +43,10 @@ termAssignment _ category children
       , Finally <- Info.category (extract finally)
       -> Just $ S.Try [body] [catch] Nothing (Just finally)
     (ArrayLiteral, _) -> Just $ S.Array Nothing children
-    (Method, [ identifier, params, exprs ]) -> Just $ S.Method identifier Nothing Nothing (toList (unwrap params)) (toList (unwrap exprs))
-    (Method, [ identifier, exprs ]) -> Just $ S.Method identifier Nothing Nothing [] (toList (unwrap exprs))
-    (Class, [ identifier, superclass, definitions ]) -> Just $ S.Class identifier (Just superclass) (toList (unwrap definitions))
-    (Class, [ identifier, definitions ]) -> Just $ S.Class identifier Nothing (toList (unwrap definitions))
+    (Method, [ identifier, params, exprs ]) -> Just $ S.Method [] identifier Nothing [params] (toList (unwrap exprs))
+    (Method, [ identifier, exprs ]) -> Just $ S.Method [] identifier Nothing [] (toList (unwrap exprs))
+    (Class, [ identifier, superclass, definitions ]) -> Just $ S.Class identifier [superclass] (toList (unwrap definitions))
+    (Class, [ identifier, definitions ]) -> Just $ S.Class identifier [] (toList (unwrap definitions))
     (Import, [ statements, identifier ] ) -> Just $ S.Import identifier (toList (unwrap statements))
     (Import, [ identifier ] ) -> Just $ S.Import identifier []
     (Export, [ statements, identifier] ) -> Just $ S.Export (Just identifier) (toList (unwrap statements))
@@ -58,8 +58,8 @@ termAssignment _ category children
       | Just (exprs, body) <- unsnoc children
       -> Just $ S.For exprs [body]
     (Function, [ body ]) -> Just $ S.AnonymousFunction [] [body]
-    (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
-    (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) Nothing [body]
+    (Function, [ params, body ]) -> Just $ S.AnonymousFunction [params] (toList (unwrap body))
+    (Function, [ id, params, body ]) -> Just $ S.Function id [params] (toList (unwrap body))
     _ -> Nothing
 
 categoryForJavaScriptProductionName :: Text -> Category
@@ -113,6 +113,7 @@ categoryForJavaScriptProductionName name = case name of
   "subscript_access" -> SubscriptAccess
   "regex" -> Regex
   "template_string" -> TemplateString
+  "template_chars" -> TemplateString
   "lexical_declaration" -> VarDecl
   "variable_declaration" -> VarDecl
   "trailing_variable_declaration" -> VarDecl
@@ -140,4 +141,5 @@ categoryForJavaScriptProductionName name = case name of
   "break_statement" -> Break
   "continue_statement" -> Continue
   "yield_expression" -> Yield
+  "variable_declarator" -> VarAssignment
   _ -> Other name

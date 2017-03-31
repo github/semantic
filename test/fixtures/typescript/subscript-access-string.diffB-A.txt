@@ -1,0 +1,6 @@
+(Program
+  (ExpressionStatements
+    (SubscriptAccess
+      (Identifier)
+    { (StringLiteral)
+    ->(StringLiteral) })))

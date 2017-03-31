@@ -69,8 +69,9 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
     Just $ Indexed <$> byRWS a b
   (S.Module idA a, S.Module idB b) ->
     Just $ S.Module <$> linearly idA idB <*> byRWS a b
-  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> Just $
+  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> Just $
     S.FunctionCall <$> linearly identifierA identifierB
+                   <*> byRWS typeParamsA typeParamsB
                    <*> byRWS argsA argsB
   (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
     S.Switch <$> byRWS exprA exprB
@@ -84,20 +85,19 @@ algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap
   (Array tyA a, Array tyB b) -> Just $
     Array <$> maybeLinearly tyA tyB
           <*> byRWS a b
-  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> Just $
+  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> Just $
     S.Class <$> linearly identifierA identifierB
-            <*> maybeLinearly paramsA paramsB
+            <*> byRWS clausesA clausesB
             <*> byRWS expressionsA expressionsB
-  (S.Method identifierA receiverA tyA paramsA expressionsA, S.Method identifierB receiverB tyB paramsB expressionsB) -> Just $
-    S.Method <$> linearly identifierA identifierB
+  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> Just $
+    S.Method <$> byRWS clausesA clausesB
+             <*> linearly identifierA identifierB
              <*> maybeLinearly receiverA receiverB
-             <*> maybeLinearly tyA tyB
              <*> byRWS paramsA paramsB
              <*> byRWS expressionsA expressionsB
-  (S.Function idA paramsA tyA bodyA, S.Function idB paramsB tyB bodyB) -> Just $
+  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $
     S.Function <$> linearly idA idB
                <*> byRWS paramsA paramsB
-               <*> maybeLinearly tyA tyB
                <*> byRWS bodyA bodyB
   _ -> Nothing
   where

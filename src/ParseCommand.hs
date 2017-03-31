@@ -27,6 +27,7 @@ import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
+import Text.Parser.TreeSitter.TypeScript
 
 data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: ParseNode } deriving (Show)
 
@@ -157,6 +158,7 @@ parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceS
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C tree_sitter_c
   Just JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
+  Just TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
   Just Markdown -> cmarkParser
   Just Ruby -> treeSitterParser Ruby tree_sitter_ruby
   Just Language.Go -> treeSitterParser Language.Go tree_sitter_go

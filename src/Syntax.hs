@@ -1,6 +1,8 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, DataKinds, KindSignatures #-}
 module Syntax where
 
+import Data.Record
+import qualified Info
 import Data.Aeson
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
@@ -21,13 +23,13 @@ data Syntax a f
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
   | Fixed [f]
   -- | A function call has an identifier where f is a (Leaf a) and a list of arguments.
-  | FunctionCall f [f]
+  | FunctionCall f [f] [f]
   -- | A ternary has a condition, a true case and a false case
   | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
   -- | An anonymous function has a list of expressions and params.
   | AnonymousFunction { params :: [f], expressions :: [f] }
-  -- | A function has a list of expressions.
-  | Function { id :: f, params :: [f], ty :: (Maybe f), expressions :: [f] }
+  -- | A function has an identifier, possible type arguments, params, a possible type, and list of expressions.
+  | Function { id :: f, params :: [f], expressions :: [f] }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
   -- | An operator assignment represents expressions with operators like math (e.g x += 1) or conditional (e.g. x ||= 1) assignment.
@@ -37,13 +39,13 @@ data Syntax a f
   | MemberAccess { memberId :: f, property :: f }
   -- | A method call consisting of its target, the method name, and the parameters passed to the method.
   -- | e.g. in Javascript console.log('hello') represents a method call.
-  | MethodCall { targetId :: f, methodId :: f, methodParams :: [f] }
+  | MethodCall { targetId :: f, methodId :: f, typeArgs :: [f], methodParams :: [f] }
   -- | An operator can be applied to a list of syntaxes.
   | Operator [f]
   -- | A variable declaration. e.g. var foo;
-  | VarDecl f (Maybe f)
+  | VarDecl [f]
   -- | A variable assignment in a variable declaration. var foo = bar;
-  | VarAssignment { varId :: f, varValue :: f }
+  | VarAssignment { varId :: [f], varValue :: f }
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
@@ -72,13 +74,16 @@ data Syntax a f
   -- | An array literal with list of children.
   | Array (Maybe f) [f]
   -- | A class with an identifier, superclass, and a list of definitions.
-  | Class f (Maybe f) [f]
-  -- | A method definition with an identifier, optional receiver, optional return type, params, and a list of expressions.
-  | Method f (Maybe f) (Maybe f) [f] [f]
+  | Class f [f] [f]
+  -- | A method definition with an identifier, optional receiver, optional type arguments, params, optional return type, and a list of expressions.
+  | Method [f] f (Maybe f) [f] [f]
   -- | An if statement with an expression and maybe more expression clauses.
   | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
   | Module { moduleId:: f, moduleBody :: [f] }
+  -- | An interface with an identifier, a list of clauses, and a list of declarations..
+  | Interface f [f] [f]
+  | Namespace { namespaceId:: f, namespaceBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
   | Yield [f]
@@ -101,7 +106,7 @@ data Syntax a f
   -- | A type declaration has an identifier and a type.
   | TypeDecl f f
   -- | A field declaration with an optional type, and an optional tag.
-  | FieldDecl f (Maybe f) (Maybe f)
+  | FieldDecl [f]
   -- | A type.
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
@@ -114,21 +119,21 @@ extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
 
-maybeIdentifier :: forall leaf identifier. Syntax leaf identifier -> Maybe identifier
+maybeIdentifier :: forall leaf (fields :: [*]). (HasField fields Info.Category) => Syntax leaf (Cofree (Syntax leaf) (Record fields)) -> Maybe (Cofree (Syntax leaf) (Record fields))
 maybeIdentifier syntax = case syntax of
   Assignment f _ -> Just f
   Class f _ _ -> Just f
   Export f _ -> f
-  Function f _ _ _ -> Just f
-  FunctionCall f _ -> Just f
+  Function f _ _ -> Just f
+  FunctionCall f _ _ -> Just f
   Import f _ -> Just f
-  Method f _ _ _ _ -> Just f
-  MethodCall _ f _ -> Just f
+  Method _ f _ _ _ -> Just f
+  MethodCall _ f _ _ -> Just f
   Module f _ -> Just f
   OperatorAssignment f _ -> Just f
   SubscriptAccess f _  -> Just f
   TypeDecl f _ -> Just f
-  VarAssignment f _ -> Just f
+  VarAssignment f _ -> find ((== Info.Identifier) . Info.category . extract) f
   _ -> Nothing
 
 -- Instances
@@ -138,17 +143,17 @@ instance Listable2 Syntax where
     =  liftCons1 leaf Leaf
     \/ liftCons1 (liftTiers recur) Indexed
     \/ liftCons1 (liftTiers recur) Fixed
-    \/ liftCons2 recur (liftTiers recur) FunctionCall
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FunctionCall
     \/ liftCons2 recur (liftTiers recur) Ternary
     \/ liftCons2 (liftTiers recur) (liftTiers recur) AnonymousFunction
-    \/ liftCons4 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Function
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Function
     \/ liftCons2 recur recur Assignment
     \/ liftCons2 recur recur OperatorAssignment
     \/ liftCons2 recur recur MemberAccess
-    \/ liftCons3 recur recur (liftTiers recur) MethodCall
+    \/ liftCons4 recur recur (liftTiers recur) (liftTiers recur) MethodCall
     \/ liftCons1 (liftTiers recur) Operator
-    \/ liftCons2 recur (liftTiers recur) VarDecl
-    \/ liftCons2 recur recur VarAssignment
+    \/ liftCons1 (liftTiers recur) VarDecl
+    \/ liftCons2 (liftTiers recur) recur VarAssignment
     \/ liftCons2 recur recur SubscriptAccess
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
     \/ liftCons2 recur (liftTiers recur) Case
@@ -167,9 +172,10 @@ instance Listable2 Syntax where
     \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
-    \/ liftCons5 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
+    \/ liftCons5 (liftTiers recur) recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
     \/ liftCons2 recur (liftTiers recur) Module
+    \/ liftCons2 recur (liftTiers recur) Namespace
     \/ liftCons2 recur (liftTiers recur) Import
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Export
     \/ liftCons1 (liftTiers recur) Yield
@@ -184,7 +190,7 @@ instance Listable2 Syntax where
     \/ liftCons1 (liftTiers recur) BlockStatement
     \/ liftCons2 (liftTiers recur) recur ParameterDecl
     \/ liftCons2 recur recur TypeDecl
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FieldDecl
+    \/ liftCons1 (liftTiers recur) FieldDecl
     \/ liftCons1 (liftTiers recur) Ty
     \/ liftCons2 recur recur Send
     \/ liftCons1 (liftTiers recur) DefaultCase

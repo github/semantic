@@ -1,5 +1,6 @@
 (Program
   (Method
     (Identifier)
-    (Identifier)
-  {-(HashSplatParameter)-}))
+    (Params
+      (Identifier)
+    {-(HashSplatParameter)-})))

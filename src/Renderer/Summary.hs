@@ -38,6 +38,8 @@ annotatable term = isAnnotatable (unwrap term) term
           S.Method{} -> Annotatable
           S.Function{} -> Annotatable
           S.Module{} -> Annotatable
+          S.Namespace{} -> Annotatable
+          S.Interface{} -> Annotatable
           _ -> Unannotatable
 
 data Identifiable a = Identifiable a | Unidentifiable a
@@ -53,6 +55,8 @@ identifiable term = isIdentifiable (unwrap term) term
           S.VarAssignment{} -> Identifiable
           S.SubscriptAccess{} -> Identifiable
           S.Module{} -> Identifiable
+          S.Namespace{} -> Identifiable
+          S.Interface{} -> Identifiable
           S.Class{} -> Identifiable
           S.Method{} -> Identifiable
           S.Leaf{} -> Identifiable
@@ -214,9 +218,9 @@ toTermName source term = case unwrap term of
   S.Indexed children -> maybe "branch" sconcat (nonEmpty (intersperse ", " (toTermName' <$> children)))
   Leaf leaf -> toS leaf
   S.Assignment identifier _ -> toTermName' identifier
-  S.Function identifier _ _ _ -> toTermName' identifier
+  S.Function identifier _ _ -> toTermName' identifier
   S.ParameterDecl _ _ -> termNameFromSource term
-  S.FunctionCall i args -> case unwrap i of
+  S.FunctionCall i _ args -> case unwrap i of
     S.AnonymousFunction params _ ->
       -- Omit a function call's arguments if it's arguments match the underlying
       -- anonymous function's arguments.
@@ -229,7 +233,7 @@ toTermName source term = case unwrap term of
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
     (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
     (_, _) -> toTermName' base <> "." <> toTermName' property
-  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> paramsToArgNames methodParams
+  S.MethodCall targetId methodId _ methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> paramsToArgNames methodParams
     where sep = case unwrap targetId of
             S.FunctionCall{} -> "()."
             _ -> "."
@@ -241,8 +245,8 @@ toTermName source term = case unwrap term of
       SliceTy -> termNameFromSource base <> toTermName' element
       _ -> toTermName' base <> "[" <> toTermName' element <> "]"
     (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
-  S.VarAssignment varId _ -> toTermName' varId
-  S.VarDecl decl _ -> toTermName' decl
+  S.VarAssignment varId _ -> termNameFromChildren term varId
+  S.VarDecl _ -> termNameFromSource term
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   S.Case expr _ -> termNameFromSource expr
@@ -265,11 +269,13 @@ toTermName source term = case unwrap term of
   S.Select clauses -> termNameFromChildren term clauses
   S.Array ty _ -> maybe (termNameFromSource term) termNameFromSource ty
   S.Class identifier _ _ -> toTermName' identifier
-  S.Method identifier (Just receiver) _ args _ -> termNameFromSource receiver <> "." <> toTermName' identifier <> paramsToArgNames args
-  S.Method identifier Nothing _ args _ -> toTermName' identifier <> paramsToArgNames args
+  S.Method _ identifier (Just receiver) args _ -> termNameFromSource receiver <> "." <> toTermName' identifier <> paramsToArgNames args
+  S.Method _ identifier Nothing args _ -> toTermName' identifier <> paramsToArgNames args
   S.Comment a -> toS a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
+  S.Namespace identifier _ -> toTermName' identifier
+  S.Interface identifier _ _ -> toTermName' identifier
   S.Import identifier [] -> termNameFromSource identifier
   S.Import identifier exprs -> termNameFromChildren term exprs <> " from " <> toTermName' identifier
   S.Export Nothing expr -> "{ " <> Text.intercalate ", " (termNameFromSource <$> expr) <> " }"
@@ -282,7 +288,7 @@ toTermName source term = case unwrap term of
   S.Continue expr -> maybe "" toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
   S.DefaultCase children -> termNameFromChildren term children
-  S.FieldDecl id expr tag -> termNameFromSource id <> maybe "" (\expr' -> " " <> termNameFromSource expr') expr <> maybe "" ((" " <>) . termNameFromSource) tag
+  S.FieldDecl children -> termNameFromChildren term children
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -381,6 +387,7 @@ instance HasCategory Text where
 
 instance HasCategory Category where
   toCategoryName category = case category of
+    C.Ty -> "type"
     ArrayLiteral -> "array"
     BooleanOperator -> "boolean operator"
     MathOperator -> "math operator"
@@ -433,6 +440,8 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
     C.Module -> "module"
+    C.Namespace -> "namespace"
+    C.Interface -> "interface"
     C.Import -> "import statement"
     C.Export -> "export statement"
     C.AnonymousFunction -> "anonymous function"

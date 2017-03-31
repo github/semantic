@@ -2,19 +2,23 @@
   (Module
     (Identifier))
   (Function
-    (Identifier))
+    (Identifier)
+    (Args))
   (Function
     (Identifier)
-    (ParameterDecl
-      (PointerTy
-        (Identifier))
-      (Identifier)))
+    (Args
+      (ParameterDecl
+        (PointerTy
+          (Identifier))
+        (Identifier))))
   (Function
     (Identifier)
-    (ParameterDecl
-      (Identifier)))
+    (Args
+      (ParameterDecl
+        (Identifier))))
   (Function
     (Identifier)
-    (Identifier)
-    (ParameterDecl
-      (Identifier))))-}
+    (Args
+      (Identifier)
+      (ParameterDecl
+        (Identifier)))))-}

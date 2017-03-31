@@ -1,0 +1,4 @@
+(Program
+  (ExpressionStatements
+  { (Regex)
+  ->(Regex) }))

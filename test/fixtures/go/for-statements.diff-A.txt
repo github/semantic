@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (For
       (ExpressionStatements
         (FunctionCall

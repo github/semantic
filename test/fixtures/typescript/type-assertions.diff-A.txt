@@ -1,0 +1,6 @@
+{-(Program
+  (ExpressionStatements
+    (Other "type_assertion"
+      (Other "type_arguments"
+        (Other "predefined_type"))
+      (Identifier))))-}

@@ -1,5 +1,11 @@
-(Program(VarDecl(VarAssignment(Other"destructuring_pattern"(Object(Assignment{
-    (Identifier)->(Identifier)
-}{
-    (NumberLiteral)->(NumberLiteral)
-})))(Identifier))))
+(Program
+  (Other "variable_declaration"
+    (VarAssignment
+      (Other "destructuring_pattern"
+        (Object
+          (Other "assignment_pattern"
+          { (Identifier)
+          ->(Identifier) }
+          { (NumberLiteral)
+          ->(NumberLiteral) })))
+      (Identifier))))

@@ -1,0 +1,1 @@
+function anotherFunction() { return false; };

@@ -1,0 +1,9 @@
+{-(Program
+  (DoWhile
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier)
+          (Identifier)
+          (Identifier))))
+    (Boolean)))-}

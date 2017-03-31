@@ -2,22 +2,30 @@
   (ExpressionStatements
     (Class
       (Identifier)
-      {+(Assignment(Identifier)(NumberLiteral))+}
+    {+(FieldDecl
+        (Identifier)
+        (NumberLiteral))+}
       (Method
       { (Identifier)
       ->(Identifier) }
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier)))
       (Method
       { (Identifier)
       ->(Identifier) }
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier)))
       (Method
       { (Identifier)
       ->(Identifier) }
-        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
         (Return
           (Identifier))))))

@@ -3,17 +3,18 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
   {+(IndexExpression
       (Identifier)
       (NumberLiteral))+}
-  { (Slice
-      (Identifier)
-      (NumberLiteral))
-  ->(Slice
-      (Identifier)) }
+  {+(Slice
+      (Identifier))+}
   {+(Slice
       (Identifier)
       (NumberLiteral))+}
+  {-(Slice
+      (Identifier)
+      (NumberLiteral))-}
   {-(Slice
       (Identifier)
       (NumberLiteral))-}

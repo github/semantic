@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (Other "type_declaration"
       (TypeDecl
         (Identifier)
@@ -29,6 +30,7 @@
           (FieldDecl
             (QualifiedIdentifier))
           (FieldDecl
-            (Identifier)
+            (Other "identifier_list"
+              (Identifier))
             (Identifier)
             (StringLiteral)))))))-}

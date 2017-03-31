@@ -4,15 +4,15 @@
   { (Other "<=>")
   ->(Other "==") }
     (Identifier))
+{+(Binary
+    (Identifier)
+    (Other "!=")
+    (Identifier))+}
   (Binary
     (Identifier)
   { (Other "=~")
-  ->(Other "!=") }
+  ->(Other "===") }
     (Identifier))
-{+(Binary
-    (Identifier)
-    (Other "===")
-    (Identifier))+}
 {-(Assignment
     (Identifier)
     (Unary
