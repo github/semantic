@@ -171,7 +171,7 @@ renderDiff args = case format args of
   SExpression -> (SExpressionOutput .) . sExpression TreeOnly
   JSON -> (JSONOutput .) . json
   Summary -> (SummaryOutput .) . summary
-  TOC -> toc
+  TOC -> (TOCOutput .) . toc
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, arguments and two source blobs.
 printDiff :: (ToJSON (Record fields), NFData (Record fields), HasDefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO ByteString

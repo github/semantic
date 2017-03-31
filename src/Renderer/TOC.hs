@@ -13,7 +13,6 @@ import Prologue
 import Range
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
-import Renderer
 import Source hiding (null)
 import Syntax as S
 import Term
@@ -51,8 +50,8 @@ data Summarizable = Summarizable { summarizableCategory :: Category, summarizabl
 
 data SummarizableTerm a = SummarizableTerm a | NotSummarizableTerm a
 
-toc :: (HasDefaultFields fields) => Renderer (Record fields)
-toc blobs diff = TOCOutput $ Map.fromList [
+toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text (Map Text [Value])
+toc blobs diff = Map.fromList [
     ("changes", changes),
     ("errors", errors)
   ]
@@ -62,6 +61,17 @@ toc blobs diff = TOCOutput $ Map.fromList [
     (errors', changes') = List.partition isErrorSummary summaries
     summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffTOC blobs diff
+
+    -- Returns a key representing the filename. If the filenames are different,
+    -- return 'before -> after'.
+    toSummaryKey :: Both FilePath -> Text
+    toSummaryKey = runBothWith $ \before after ->
+      toS $ case (before, after) of
+        ("", after) -> after
+        (before, "") -> before
+        (before, after) | before == after -> after
+        (before, after) | not (null before) && not (null after) -> before <> " -> " <> after
+        (_, _) -> mempty
 
 diffTOC :: (StringConv leaf Text, HasDefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
 diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
