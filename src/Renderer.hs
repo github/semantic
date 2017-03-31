@@ -25,7 +25,7 @@ data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields Text
   PatchRenderer :: HasField fields Range => DiffRenderer fields Text
   JSONDiffRenderer :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => DiffRenderer fields (Map Text Value)
-  SummaryRenderer :: DiffRenderer fields (Map Text (Map Text [Value]))
+  SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields (Map Text (Map Text [Value]))
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: DiffRenderer fields (Map Text (Map Text [Value]))
 
