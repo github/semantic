@@ -79,12 +79,9 @@ parseRoot construct combine args@Arguments{..} = do
     pure $! construct path (para algebra parsedTerm))
   where algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
         decorator = parseDecorator debug
-        makeNode annotation syntax = ParseNode
-          (toS (Info.category annotation))
-          (byteRange annotation)
-          (rhead annotation)
-          (Info.sourceSpan annotation)
-          (identifierFor syntax)
+        makeNode :: Record (Maybe SourceText ': DefaultFields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': DefaultFields))) -> ParseNode
+        makeNode (head :. range :. category :. sourceSpan :. Nil) syntax =
+          ParseNode (toS category) range head sourceSpan (identifierFor syntax)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
