@@ -41,8 +41,8 @@ runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path -> do
     source <- readAndTranscodeFile path
     yield (sourceBlob source path)
-  ReadFilesAtSHAs gitDir paths sha1 sha2 -> do
-    blobs <- withRepository lgFactory gitDir $ do
+  ReadFilesAtSHAs gitDir paths sha1 sha2 ->
+    withRepository lgFactory gitDir $ do
       -- repo <- getRepository
       -- for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
 
@@ -59,8 +59,7 @@ runCommand = iterFreerA $ \ command yield -> case command of
       -- let _ = (a \\ b) <> (b \\ a)
 
       liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
-      pure blobs
-    yield blobs
+      liftIO $ yield blobs
 
   where treeForSha sha = do
           obj <- parseObjOid (toS sha)
