@@ -26,7 +26,7 @@ data CommandF f where
   ReadFile :: FilePath -> CommandF SourceBlob
   ReadFilesAtSHAs :: FilePath -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
 
-  Parse :: SourceBlob -> Language -> CommandF (Term (Syntax Text) (Record '[Range, Category, SourceSpan]))
+  Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record '[Range, Category, SourceSpan]))
 
   -- read the list of files changed between a pair of SHAs
 
@@ -88,4 +88,4 @@ runCommand = iterFreerA $ \ command yield -> case command of
           toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
           toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
-  Parse blob language -> parserForLanguage language blob >>= yield
+  Parse language blob -> parserForLanguage language blob >>= yield
