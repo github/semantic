@@ -169,7 +169,7 @@ renderDiff args = case format args of
   Split -> (SplitOutput .) . split
   Patch -> (PatchOutput .) . patch
   SExpression -> (SExpressionOutput .) . sExpression TreeOnly
-  JSON -> json
+  JSON -> (JSONOutput .) . json
   Summary -> (SummaryOutput .) . summary
   TOC -> toc
 
