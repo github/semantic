@@ -74,8 +74,11 @@ type RAlgebra t a = Base t (t, a) -> a
 parseRoot :: (FilePath -> (f ParseNode) -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> Arguments -> IO [root]
 parseRoot construct combine args@Arguments{..} = do
   blobs <- sourceBlobsFromArgs args
-  for blobs (buildParseNodes construct algebra (parseDecorator debug))
+  for blobs (\ sourceBlob@SourceBlob{..} -> do
+    parsedTerm <- parseWithDecorator (decorator source) path sourceBlob
+    pure $! construct path (para algebra parsedTerm))
   where algebra (annotation :< syntax) = parseNodeForTermF (annotation :< (Prologue.fst <$> syntax)) `combine` toList (Prologue.snd <$> syntax)
+        decorator = parseDecorator debug
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
@@ -99,19 +102,6 @@ parseNodeForTermF (annotation :< syntax) = ParseNode
 parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
 parseDecorator True = termSourceTextDecorator
 parseDecorator False = const . const Nothing
-
--- | Function context for constructing parse nodes given a parse node constructor, an algebra (for a paramorphism), a function that takes a file's source and returns a term decorator, and a list of source blobs.
--- This function is general over b such that b represents IndexFile or ParseTreeFile.
-buildParseNodes
-  :: forall f b. (FilePath -> f ParseNode -> b)
-  -> (RAlgebra (Cofree (Syntax Text) (Record (Maybe SourceText ': DefaultFields))) (f ParseNode))
-  -> (Source -> TermDecorator (Syntax Text) DefaultFields (Maybe SourceText))
-  -> SourceBlob
-  -> IO b
-buildParseNodes programNodeConstructor algebra termDecorator sourceBlob@SourceBlob{..} = do
-  parsedTerm <- parseWithDecorator (termDecorator source) path sourceBlob
-  let parseNode = para algebra parsedTerm
-  pure $ programNodeConstructor path parseNode
 
 -- | For the given absolute file paths, retrieves their source blobs.
 sourceBlobsFromPaths :: [FilePath] -> IO [SourceBlob]
