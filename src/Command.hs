@@ -9,6 +9,7 @@ import Control.Monad.Free.Freer
 import Data.Record
 import Data.String
 import Debug.Trace (traceEventIO)
+import Diff
 import Info
 import qualified Git
 import Git.Blob
@@ -28,9 +29,10 @@ data CommandF f where
 
   Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
+  Diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> CommandF (Diff (Syntax Text) (Record DefaultFields))
+
   -- read the list of files changed between a pair of SHAs
 
-  -- diff a pair of terms
   -- render a term
   -- render a diff
 
