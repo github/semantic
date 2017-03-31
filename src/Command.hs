@@ -6,6 +6,7 @@ module Command
 import Command.Diff as C
 import Command.Parse as C
 import Control.Monad.Free.Freer
+import Data.List ((\\))
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
@@ -32,8 +33,6 @@ data CommandF f where
   Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
   Diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> CommandF (Diff (Syntax Text) (Record DefaultFields))
-
-  -- read the list of files changed between a pair of SHAs
 
   -- render a term
   -- render a diff
@@ -63,12 +62,16 @@ runCommand = iterFreerA $ \ command yield -> case command of
       tree1 <- treeForSha sha1
       tree2 <- treeForSha sha2
 
+      paths <- case paths of
+        (_ : _) -> pure paths
+        [] -> do
+          a <- pathsForTree tree1
+          b <- pathsForTree tree2
+
+          pure $! (a \\ b) <> (b \\ a)
+
       blobs <- for paths $ \ path -> (,) <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
 
-      -- a <- blobsForSha sha1
-      -- b <- blobsForSha sha2
-
-      -- let _ = (a \\ b) <> (b \\ a)
 
       liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
       liftIO $ yield blobs
@@ -87,9 +90,10 @@ runCommand = iterFreerA $ \ command yield -> case command of
                 let oid = renderObjOid $ blobOid blob
                 pure $! SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))
               _ -> pure $! emptySourceBlob path
-          -- blobsForSha sha = do
-          --   tree <- treeForSha sha
-          --   reportGitmon "ls-tree" $ treeBlobEntries tree
+          pathsForTree tree = do
+            blobEntries <- reportGitmon "ls-tree" $ treeBlobEntries tree
+            return $! fmap (\ (p, _, _) -> toS p) blobEntries
+
           toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
           toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
           toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
