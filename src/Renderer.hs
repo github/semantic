@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs #-}
 module Renderer
 ( Renderer
 , Output(..)
@@ -6,16 +7,30 @@ module Renderer
 , Format(..)
 ) where
 
-import Data.Aeson (Value, encode)
+import Data.Aeson (ToJSON, Value, encode)
 import Data.Functor.Both
 import Data.Map as Map hiding (null)
 import Data.Text.Encoding (encodeUtf8)
 import qualified Data.ByteString as B
 import Data.Functor.Listable
+import Data.Record
+import Info
 import Prologue
 import Source (SourceBlob)
 import Syntax
 import Diff
+
+data DiffRenderer fields output where
+  SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields Text
+  PatchRenderer :: HasField fields Range => DiffRenderer fields Text
+  JSONDiffRenderer :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => DiffRenderer fields (Map Text Value)
+  SummaryRenderer :: DiffRenderer fields (Map Text (Map Text [Value]))
+  SExpressionDiffRenderer :: DiffRenderer fields ByteString
+  ToCRenderer :: DiffRenderer fields (Map Text (Map Text [Value]))
+
+data TermRenderer a where
+  JSONTermRenderer :: TermRenderer (Map Text Value)
+  SExpressionTermRenderer :: TermRenderer ByteString
 
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
