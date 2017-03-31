@@ -68,24 +68,23 @@ parseSExpression =
 
 type RAlgebra t a = Base t (t, a) -> a
 
+parseRoot :: (FilePath -> nodes -> root) -> (RAlgebra (Term (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan])) nodes) -> Arguments -> IO [root]
+parseRoot construct algebra args@Arguments{..} = do
+  blobs <- sourceBlobsFromArgs args
+  for blobs (buildParseNodes construct algebra (parseDecorator debug))
+
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
-parseIndex args@Arguments{..} = do
-  blobs <- sourceBlobsFromArgs args
-  nodes <- for blobs (buildParseNodes IndexFile algebra (parseDecorator debug))
-  pure (toS (encode nodes))
+parseIndex = fmap (toS . encode) . parseRoot IndexFile algebra
   where
-    algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) [ParseNode]
+    algebra :: RAlgebra (Term (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan])) [ParseNode]
     algebra (annotation :< syntax) = ParseNode (toS (Info.category annotation)) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
-parseTree args@Arguments{..} = do
-  blobs <- sourceBlobsFromArgs args
-  nodes <- for blobs (buildParseNodes ParseTreeFile algebra (parseDecorator debug))
-  pure (toS (encode nodes))
+parseTree = fmap (toS . encode) . parseRoot ParseTreeFile algebra
   where
-    algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) ParseNode
+    algebra :: RAlgebra (Term (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan])) ParseNode
     algebra (annotation :< syntax) = ParseNode (toS (Info.category annotation)) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
 
 -- | Determines the term decorator to use when parsing.
