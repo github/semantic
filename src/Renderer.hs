@@ -1,6 +1,8 @@
 {-# LANGUAGE GADTs #-}
 module Renderer
-( Renderer
+( DiffRenderer(..)
+, runDiffRenderer
+, Renderer
 , Output(..)
 , concatOutputs
 , Format(..)
