@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DataKinds, GADTs #-}
 module Command
 ( module C
 ) where
@@ -6,24 +6,30 @@ module Command
 import Command.Diff as C
 import Command.Parse as C
 import Control.Monad.Free.Freer
+import Data.Record
 import Data.String
 import Debug.Trace (traceEventIO)
+import Info
 import qualified Git
 import Git.Blob
 import Git.Libgit2
 import Git.Repository
 import Git.Types
 import GitmonClient
+import Language
 import Prologue
 import Source
+import Syntax
+import Term
 
 data CommandF f where
   ReadFile :: FilePath -> CommandF SourceBlob
   ReadFilesAtSHAs :: FilePath -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
 
+  Parse :: SourceBlob -> Language -> CommandF (Term (Syntax Text) (Record '[Range, Category, SourceSpan]))
 
-  -- read a list of files from git
   -- read the list of files changed between a pair of SHAs
+
   -- parse source in some language
   -- diff a pair of terms
   -- render a term
