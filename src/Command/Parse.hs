@@ -4,6 +4,7 @@ module Command.Parse where
 import Arguments
 import Category
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
+import Data.Functor.Foldable hiding (Nil)
 import Data.Record
 import qualified Data.Text as T
 import Git.Blob
@@ -65,18 +66,20 @@ parseSExpression =
   pure . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
 
+type RAlgebra t a = Base t (t, a) -> a
+
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
 parseIndex args@Arguments{..} = fmap (toS . encode) $ buildParseNodes IndexFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
   where
-    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), [ParseNode]) -> [ParseNode]
+    algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) [ParseNode]
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
 parseTree args@Arguments{..} = fmap (toS . encode) $ buildParseNodes ParseTreeFile algebra (parseDecorator debug) =<< sourceBlobsFromArgs args
   where
-    algebra :: StringConv leaf T.Text => TermF (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]) (Term (Syntax leaf) (Record '[(Maybe SourceText), Range, Category, SourceSpan]), ParseNode) -> ParseNode
+    algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) ParseNode
     algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
 
 -- | Determines the term decorator to use when parsing.
