@@ -8,7 +8,7 @@ import Prologue
 import Diff
 import Patch
 import Term
-import Info (category, byteRange)
+import Info (DefaultFields, category, byteRange)
 import Range
 import Syntax as S
 import Category as C

@@ -1,6 +1,7 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GeneralizedNewtypeDeriving #-}
 module Info
-( Range(..)
+( DefaultFields
+, Range(..)
 , byteRange
 , setCharacterRange
 , Category(..)
@@ -21,6 +22,9 @@ import Category
 import Range
 import SourceSpan
 import Data.Aeson
+
+-- | A type alias for HasField constraints commonly used throughout semantic-diff.
+type DefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields SourceSpan)
 
 newtype SourceText = SourceText { unText :: Text }
   deriving (Show, ToJSON)
