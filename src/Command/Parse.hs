@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Command.Parse where
 
 import Arguments
@@ -201,3 +201,15 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
 parserForFilepath = parserForType . toS . takeExtension
+
+
+data RoseF a b = RoseF a [b]
+  deriving (Eq, Functor, Show)
+
+type instance Base (Rose a) = RoseF a
+
+instance Recursive (Rose a) where
+  project (Rose a tree) = RoseF a tree
+
+instance Corecursive (Rose a) where
+  embed (RoseF a tree) = Rose a tree
