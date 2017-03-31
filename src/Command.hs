@@ -75,9 +75,9 @@ runCommand = iterFreerA $ \ command yield -> case command of
               let oid = renderObjOid $ blobOid blob
               pure $! SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))
             _ -> pure $! emptySourceBlob path
-        blobsForSha sha = do
-          tree <- treeForSha sha
-          reportGitmon "ls-tree" $ treeBlobEntries tree
+        -- blobsForSha sha = do
+        --   tree <- treeForSha sha
+        --   reportGitmon "ls-tree" $ treeBlobEntries tree
         toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
