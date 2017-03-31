@@ -2,8 +2,7 @@
 module IntegrationSpec where
 
 import Category as C
-import Command.Diff
-import Command.Parse
+import Command
 import Data.Functor.Both
 import Data.Record
 import qualified Data.Text as T

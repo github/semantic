@@ -2,8 +2,7 @@
 module SemanticDiff (main) where
 
 import Arguments
-import Command.Diff
-import Command.Parse
+import Command
 import Prologue hiding (fst, snd)
 import Data.String
 import Data.Functor.Both
