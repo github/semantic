@@ -1,4 +1,10 @@
-module Renderer (Renderer, Output(..), concatOutputs, toSummaryKey, Format(..)) where
+module Renderer
+( Renderer
+, Output(..)
+, concatOutputs
+, toSummaryKey
+, Format(..)
+) where
 
 import Data.Aeson (Value, encode)
 import Data.Functor.Both
