@@ -71,7 +71,7 @@ parseSExpression =
 
 type RAlgebra t a = Base t (t, a) -> a
 
-parseRoot :: (FilePath -> (f ParseNode) -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> Arguments -> IO [root]
+parseRoot :: (FilePath -> f ParseNode -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> Arguments -> IO [root]
 parseRoot construct combine args@Arguments{..} = do
   blobs <- sourceBlobsFromArgs args
   for blobs (\ sourceBlob@SourceBlob{..} -> do
