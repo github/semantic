@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GeneralizedNewtypeDeriving #-}
 module Info
-( HasDefaultFields
+( DefaultFields
+, HasDefaultFields
 , Range(..)
 , byteRange
 , setCharacterRange
@@ -22,6 +23,9 @@ import Category
 import Range
 import SourceSpan
 import Data.Aeson
+
+-- | The default set of fields produced by our parsers.
+type DefaultFields = '[ Range, Category, SourceSpan ]
 
 -- | A type alias for HasField constraints commonly used throughout semantic-diff.
 type HasDefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields SourceSpan)
