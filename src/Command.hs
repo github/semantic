@@ -6,11 +6,13 @@ module Command
 import Command.Diff as C
 import Command.Parse as C
 import Control.Monad.Free.Freer
+import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
 import Debug.Trace (traceEventIO)
 import Diff
 import Info
+import Interpreter
 import qualified Git
 import Git.Blob
 import Git.Libgit2
@@ -93,3 +95,11 @@ runCommand = iterFreerA $ \ command yield -> case command of
           toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
   Parse language blob -> parserForLanguage language blob >>= yield
+
+  Diff term1 term2 ->
+    yield (stripDiff (diffTerms (decorate term1) (decorate term2)))
+    where decorate = defaultFeatureVectorDecorator getLabel
+          getLabel :: TermF (Syntax Text) (Record DefaultFields) a -> (Category, Maybe Text)
+          getLabel (h :< t) = (Info.category h, case t of
+            Leaf s -> Just s
+            _ -> Nothing)
