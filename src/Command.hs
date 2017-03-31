@@ -87,3 +87,5 @@ runCommand = iterFreerA $ \ command yield -> case command of
           toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
           toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
           toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
+
+  Parse blob language -> parserForLanguage language blob >>= yield
