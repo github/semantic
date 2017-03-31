@@ -15,7 +15,12 @@ import Data.Functor.Listable
 import Data.Record
 import Info
 import Prologue
-import Renderer.SExpression
+import Renderer.JSON as R
+import Renderer.Patch as R
+import Renderer.SExpression as R
+import Renderer.Split as R
+import Renderer.Summary as R
+import Renderer.TOC as R
 import Source (SourceBlob)
 import Syntax
 import Diff
@@ -27,6 +32,15 @@ data DiffRenderer fields output where
   SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields (Map Text (Map Text [Value]))
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields (Map Text (Map Text [Value]))
+
+runDiffRenderer :: Both SourceBlob -> Diff (Syntax Text) (Record fields) -> DiffRenderer fields output -> Output
+runDiffRenderer sources diff renderer = case renderer of
+  SplitRenderer -> SplitOutput (R.split sources diff)
+  PatchRenderer -> PatchOutput (R.patch sources diff)
+  JSONDiffRenderer -> JSONOutput (R.json sources diff)
+  SummaryRenderer -> SummaryOutput (R.summary sources diff)
+  SExpressionDiffRenderer format -> SExpressionOutput (R.sExpression format sources diff)
+  ToCRenderer -> TOCOutput (R.toc sources diff)
 
 data TermRenderer fields output where
   JSONTermRenderer :: TermRenderer fields (Map Text Value)
