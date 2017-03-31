@@ -30,7 +30,6 @@ data CommandF f where
 
   -- read the list of files changed between a pair of SHAs
 
-  -- parse source in some language
   -- diff a pair of terms
   -- render a term
   -- render a diff
