@@ -166,7 +166,7 @@ diffFiles parse sourceBlobs = do
 -- | Returns a rendered diff given arguments and two source blobs.
 renderDiff :: (ToJSON (Record fields), NFData (Record fields), HasDefaultFields fields) => Arguments -> Both SourceBlob -> SyntaxDiff Text fields -> Output
 renderDiff args = case format args of
-  Split -> split
+  Split -> (SplitOutput .) . split
   Patch -> patch
   SExpression -> (SExpressionOutput .) . sExpression TreeOnly
   JSON -> json
