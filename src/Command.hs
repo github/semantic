@@ -42,6 +42,9 @@ data CommandF f where
 
 type Command = Freer CommandF
 
+
+-- Evaluation
+
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path -> do
