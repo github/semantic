@@ -10,8 +10,8 @@ import qualified Syntax as S
 termAssignment
   :: Source -- ^ The source of the term.
   -> Category -- ^ The category for the term.
-  -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
-  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in Maybe.
+  -> [ SyntaxTerm Text DefaultFields ] -- ^ The child nodes of the term.
+  -> Maybe (S.Syntax Text (SyntaxTerm Text DefaultFields)) -- ^ The resulting term, in Maybe.
 termAssignment source category children = case (category, children) of
   (Module, [moduleName]) -> Just $ S.Module moduleName []
   (Import, [importName]) -> Just $ S.Import importName []

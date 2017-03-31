@@ -68,13 +68,13 @@ fetchDiffs args@Arguments{..} = do
     fetchDiff args <$> paths
   pure $ uncurry (renderDiff args) <$> diffs
 
-fetchDiff :: Arguments -> FilePath -> IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
+fetchDiff :: Arguments -> FilePath -> IO (Both SourceBlob, SyntaxDiff Text DefaultFields)
 fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
   go args filepath
   where
-    go :: Arguments -> FilePath -> ReaderT LgRepo IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
+    go :: Arguments -> FilePath -> ReaderT LgRepo IO (Both SourceBlob, SyntaxDiff Text DefaultFields)
     go Arguments{..} filepath = do
       liftIO $ traceEventIO ("START fetchDiff: " <> filepath)
       sourcesAndOids <- sequence $ traverse (getSourceBlob filepath) <$> shaRange

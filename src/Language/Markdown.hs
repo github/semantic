@@ -10,9 +10,9 @@ import Prologue
 import Source
 import Syntax
 
-cmarkParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+cmarkParser :: Parser (Syntax Text) (Record DefaultFields)
 cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) (rangeToSourceSpan source $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
-  where toTerm :: Range -> SourceSpan -> Node -> Cofree (Syntax Text) (Record '[Range, Category, SourceSpan])
+  where toTerm :: Range -> SourceSpan -> Node -> Cofree (Syntax Text) (Record DefaultFields)
         toTerm within withinSpan (Node position t children) =
           let
             range = maybe within (sourceSpanToRange source . toSpan) position

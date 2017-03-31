@@ -89,7 +89,7 @@ parseDecorator False = const . const Nothing
 buildParseNodes
   :: forall nodes b. (FilePath -> nodes -> b)
   -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
-  -> (Source -> TermDecorator (Syntax Text) '[Range, Category, SourceSpan] (Maybe SourceText))
+  -> (Source -> TermDecorator (Syntax Text) DefaultFields (Maybe SourceText))
   -> [SourceBlob]
   -> IO [b]
 buildParseNodes programNodeConstructor algebra termDecorator sourceBlobs =
@@ -150,15 +150,15 @@ sourceBlobsFromArgs Arguments{..} =
     _ -> sourceBlobsFromPaths filePaths
 
 -- | Return a parser incorporating the provided TermDecorator.
-parseWithDecorator :: TermDecorator (Syntax Text) '[Range, Category, SourceSpan] field -> FilePath -> Parser (Syntax Text) (Record '[field, Range, Category, SourceSpan])
+parseWithDecorator :: TermDecorator (Syntax Text) DefaultFields field -> FilePath -> Parser (Syntax Text) (Record '[field, Range, Category, SourceSpan])
 parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+parserForType :: Text -> Parser (Syntax Text) (Record DefaultFields)
 parserForType mediaType = maybe lineByLineParser parserForLanguage (languageForType mediaType)
 
 -- | Select a parser for a given Language.
-parserForLanguage :: Language -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+parserForLanguage :: Language -> Parser (Syntax Text) (Record DefaultFields)
 parserForLanguage language = case language of
   C -> treeSitterParser C tree_sitter_c
   JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
@@ -180,7 +180,7 @@ termSourceTextDecorator source term = Just . SourceText . toText $ Source.slice 
  where range' = byteRange $ headF term
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
 lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
@@ -192,5 +192,5 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
       (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+parserForFilepath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
 parserForFilepath = parserForType . toS . takeExtension

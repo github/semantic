@@ -26,7 +26,7 @@ data CommandF f where
   ReadFile :: FilePath -> CommandF SourceBlob
   ReadFilesAtSHAs :: FilePath -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
 
-  Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record '[Range, Category, SourceSpan]))
+  Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
   -- read the list of files changed between a pair of SHAs
 
