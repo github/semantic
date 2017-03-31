@@ -16,6 +16,7 @@ import Data.Functor.Listable
 import Data.Record
 import Info
 import Prologue
+import Renderer.SExpression
 import Source (SourceBlob)
 import Syntax
 import Diff
@@ -25,12 +26,12 @@ data DiffRenderer fields output where
   PatchRenderer :: HasField fields Range => DiffRenderer fields Text
   JSONDiffRenderer :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => DiffRenderer fields (Map Text Value)
   SummaryRenderer :: DiffRenderer fields (Map Text (Map Text [Value]))
-  SExpressionDiffRenderer :: DiffRenderer fields ByteString
+  SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: DiffRenderer fields (Map Text (Map Text [Value]))
 
-data TermRenderer a where
-  JSONTermRenderer :: TermRenderer (Map Text Value)
-  SExpressionTermRenderer :: TermRenderer ByteString
+data TermRenderer fields a where
+  JSONTermRenderer :: TermRenderer fields (Map Text Value)
+  SExpressionTermRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> TermRenderer fields ByteString
 
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
