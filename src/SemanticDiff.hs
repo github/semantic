@@ -2,6 +2,7 @@
 module SemanticDiff (main) where
 
 import Arguments
+import Command.Diff
 import Prologue hiding (fst, snd)
 import Data.String
 import Data.Functor.Both
@@ -11,7 +12,6 @@ import Options.Applicative hiding (action)
 import qualified Paths_semantic_diff as Library (version)
 import qualified Renderer as R
 import Development.GitRev
-import DiffCommand
 import ParseCommand
 import qualified Data.ByteString as B
 

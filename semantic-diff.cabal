@@ -17,6 +17,7 @@ library
                      , Alignment
                      , Arguments
                      , Category
+                     , Command.Diff
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
@@ -27,7 +28,6 @@ library
                      , Data.Record
                      , Data.Text.Listable
                      , Diff
-                     , DiffCommand
                      , Info
                      , Interpreter
                      , Language
@@ -147,6 +147,7 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
+                     , Command.Diff.Spec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , DiffSpec
@@ -160,7 +161,6 @@ test-suite test
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
-                     , DiffCommandSpec
                      , ParseCommandSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson

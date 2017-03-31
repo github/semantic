@@ -3,13 +3,13 @@ module TOCSpec where
 
 import Data.Aeson
 import Category as C
+import Command.Diff
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
 import Diff
-import DiffCommand
 import Info
 import Interpreter
 import ParseCommand

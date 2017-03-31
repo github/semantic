@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
-module DiffCommand where
+module Command.Diff where
 
 import Data.Aeson hiding (json)
 import Data.Functor.Both as Both

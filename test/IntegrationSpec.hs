@@ -2,6 +2,7 @@
 module IntegrationSpec where
 
 import Category as C
+import Command.Diff
 import Data.Functor.Both
 import Data.Record
 import qualified Data.Text as T
@@ -15,7 +16,6 @@ import Prologue hiding (fst, snd)
 import Renderer
 import Renderer.SExpression as Renderer
 import Source
-import DiffCommand
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)

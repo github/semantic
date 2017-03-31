@@ -1,5 +1,6 @@
-module DiffCommandSpec where
+module Command.Diff.Spec where
 
+import Command.Diff
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Maybe
@@ -14,7 +15,6 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Map
 import qualified Data.Vector as V
 import Arguments
-import DiffCommand
 import Renderer
 import qualified Git.Types as Git
 
