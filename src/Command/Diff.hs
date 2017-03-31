@@ -167,7 +167,7 @@ diffFiles parse sourceBlobs = do
 renderDiff :: (ToJSON (Record fields), NFData (Record fields), HasDefaultFields fields) => Arguments -> Both SourceBlob -> SyntaxDiff Text fields -> Output
 renderDiff args = case format args of
   Split -> (SplitOutput .) . split
-  Patch -> patch
+  Patch -> (PatchOutput .) . patch
   SExpression -> (SExpressionOutput .) . sExpression TreeOnly
   JSON -> json
   Summary -> summary

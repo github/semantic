@@ -16,9 +16,9 @@ import Diff
 import Patch
 import Prologue hiding (fst, snd)
 import Range
-import Renderer
 import qualified Source
 import Source hiding (break, length, null)
+import Syntax
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
@@ -26,8 +26,8 @@ truncatePatch :: Both SourceBlob -> Text
 truncatePatch blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: HasField fields Range => Renderer (Record fields)
-patch blobs diff = PatchOutput $ if not (Text.null text) && Text.last text /= '\n'
+patch :: HasField fields Range => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Text
+patch blobs diff = if not (Text.null text) && Text.last text /= '\n'
   then text <> "\n\\ No newline at end of file\n"
   else text
   where text = header blobs <> mconcat (showHunk blobs <$> hunks diff blobs)
