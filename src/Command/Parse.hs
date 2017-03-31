@@ -32,6 +32,9 @@ import Text.Parser.TreeSitter.TypeScript
 
 data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: ParseNode } deriving (Show)
 
+data Rose a = Rose a [Rose a]
+  deriving (Eq, Show)
+
 instance ToJSON ParseTreeFile where
   toJSON ParseTreeFile{..} = object [ "filePath" .= parseTreeFilePath, "programNode" .= node ]
 
