@@ -76,7 +76,7 @@ parseIndex args@Arguments{..} = do
   pure (toS (encode nodes))
   where
     algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) [ParseNode]
-    algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
+    algebra (annotation :< syntax) = ParseNode (toS (Info.category annotation)) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) Nothing : (Prologue.snd =<< toList syntax)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
@@ -86,7 +86,7 @@ parseTree args@Arguments{..} = do
   pure (toS (encode nodes))
   where
     algebra :: StringConv leaf T.Text => RAlgebra (Term (Syntax leaf) (Record '[Maybe SourceText, Range, Category, SourceSpan])) ParseNode
-    algebra (annotation :< syntax) = ParseNode ((toS . Info.category) annotation) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
+    algebra (annotation :< syntax) = ParseNode (toS (Info.category annotation)) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor (Prologue.fst <$> syntax)) (Just (Prologue.snd <$> toList syntax))
 
 -- | Determines the term decorator to use when parsing.
 parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
