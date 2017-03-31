@@ -36,8 +36,8 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields (Map Text (Map Text [Value]))
 
-runDiffRenderer :: Both SourceBlob -> Diff (Syntax Text) (Record fields) -> DiffRenderer fields output -> Output
-runDiffRenderer sources diff renderer = case renderer of
+runDiffRenderer :: DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Output
+runDiffRenderer renderer sources diff = case renderer of
   SplitRenderer -> SplitOutput (R.split sources diff)
   PatchRenderer -> PatchOutput (R.patch sources diff)
   JSONDiffRenderer -> JSONOutput (R.json sources diff)
@@ -45,8 +45,8 @@ runDiffRenderer sources diff renderer = case renderer of
   SExpressionDiffRenderer format -> SExpressionOutput (R.sExpression format sources diff)
   ToCRenderer -> TOCOutput (R.toc sources diff)
 
-runDiffRenderer' :: Both SourceBlob -> Diff (Syntax Text) (Record fields) -> DiffRenderer fields output -> output
-runDiffRenderer' sources diff renderer = case renderer of
+runDiffRenderer' :: DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output
+runDiffRenderer' renderer sources diff = case renderer of
   SplitRenderer -> R.split sources diff
   PatchRenderer -> R.patch sources diff
   JSONDiffRenderer -> R.json sources diff

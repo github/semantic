@@ -6,6 +6,7 @@ module Command
 import Command.Diff as C
 import Command.Parse as C
 import Control.Monad.Free.Freer
+import Data.Functor.Both
 import Data.List ((\\))
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -22,6 +23,7 @@ import Git.Types
 import GitmonClient
 import Language
 import Prologue
+import Renderer
 import Source
 import Syntax
 import Term
@@ -34,8 +36,9 @@ data CommandF f where
 
   Diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> CommandF (Diff (Syntax Text) (Record DefaultFields))
 
+  RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
+
   -- render a term
-  -- render a diff
 
   -- parallelize diffs of a list of paths + git shas
   -- explicit gitmon effects/events
@@ -107,3 +110,6 @@ runCommand = iterFreerA $ \ command yield -> case command of
           getLabel (h :< t) = (Info.category h, case t of
             Leaf s -> Just s
             _ -> Nothing)
+
+  RenderDiff renderer blob1 blob2 diff ->
+    yield (runDiffRenderer' renderer (both blob1 blob2) diff)
