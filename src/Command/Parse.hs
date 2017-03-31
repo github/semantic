@@ -97,7 +97,7 @@ parseDecorator False = const . const Nothing
 -- This function is general over b such that b represents IndexFile or ParseTreeFile.
 buildParseNodes
   :: forall nodes b. (FilePath -> nodes -> b)
-  -> (CofreeF (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]) (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan]), nodes) -> nodes)
+  -> (RAlgebra (Cofree (Syntax Text) (Record '[Maybe SourceText, Range, Category, SourceSpan])) nodes)
   -> (Source -> TermDecorator (Syntax Text) DefaultFields (Maybe SourceText))
   -> SourceBlob
   -> IO b
