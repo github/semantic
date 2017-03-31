@@ -170,7 +170,7 @@ renderDiff args = case format args of
   Patch -> (PatchOutput .) . patch
   SExpression -> (SExpressionOutput .) . sExpression TreeOnly
   JSON -> json
-  Summary -> summary
+  Summary -> (SummaryOutput .) . summary
   TOC -> toc
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, arguments and two source blobs.

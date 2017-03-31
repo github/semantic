@@ -25,7 +25,6 @@ import qualified Text.PrettyPrint.Leijen.Text as P
 import Data.Aeson
 import SourceSpan
 import Source hiding (null)
-import Renderer
 import qualified Data.Map as Map
 import qualified Data.List as List
 
@@ -101,8 +100,8 @@ data DiffSummary a = DiffSummary {
   parentAnnotation :: [Either (Category, Text) (Category, Text)]
 } deriving (Eq, Functor, Show, Generic)
 
-summary :: (HasDefaultFields fields) => Renderer (Record fields)
-summary blobs diff = SummaryOutput $ Map.fromList [
+summary :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text (Map Text [Value])
+summary blobs diff = Map.fromList [
     ("changes", changes),
     ("errors", errors)
   ]
@@ -112,6 +111,17 @@ summary blobs diff = SummaryOutput $ Map.fromList [
     (errors', changes') = List.partition isErrorSummary summaries
     summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffSummaries blobs diff
+
+    -- Returns a key representing the filename. If the filenames are different,
+    -- return 'before -> after'.
+    toSummaryKey :: Both FilePath -> Text
+    toSummaryKey = runBothWith $ \before after ->
+      toS $ case (before, after) of
+        ("", after) -> after
+        (before, "") -> before
+        (before, after) | before == after -> after
+        (before, after) | not (null before) && not (null after) -> before <> " -> " <> after
+        (_, _) -> mempty
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
 diffSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary Text SourceSpans]
