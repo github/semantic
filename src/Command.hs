@@ -67,23 +67,23 @@ runCommand = iterFreerA $ \ command yield -> case command of
       liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
       liftIO $ yield blobs
 
-  where treeForSha sha = do
-          obj <- parseObjOid (toS sha)
-          commit <- reportGitmon "cat-file" $ lookupCommit obj
-          reportGitmon "cat-file" $ lookupTree (commitTree commit)
-        blobForPathInTree path tree = do
-          entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
-          case entry of
-            Just (BlobEntry entryOid entryKind) -> do
-              blob <- reportGitmon "cat-file" $ lookupBlob entryOid
-              contents <- blobToByteString blob
-              transcoded <- liftIO $ transcode contents
-              let oid = renderObjOid $ blobOid blob
-              pure $! SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))
-            _ -> pure $! emptySourceBlob path
-        -- blobsForSha sha = do
-        --   tree <- treeForSha sha
-        --   reportGitmon "ls-tree" $ treeBlobEntries tree
-        toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
-        toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
-        toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
+    where treeForSha sha = do
+            obj <- parseObjOid (toS sha)
+            commit <- reportGitmon "cat-file" $ lookupCommit obj
+            reportGitmon "cat-file" $ lookupTree (commitTree commit)
+          blobForPathInTree path tree = do
+            entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
+            case entry of
+              Just (BlobEntry entryOid entryKind) -> do
+                blob <- reportGitmon "cat-file" $ lookupBlob entryOid
+                contents <- blobToByteString blob
+                transcoded <- liftIO $ transcode contents
+                let oid = renderObjOid $ blobOid blob
+                pure $! SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))
+              _ -> pure $! emptySourceBlob path
+          -- blobsForSha sha = do
+          --   tree <- treeForSha sha
+          --   reportGitmon "ls-tree" $ treeBlobEntries tree
+          toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
+          toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
+          toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
