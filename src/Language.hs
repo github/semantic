@@ -10,24 +10,11 @@ import Term
 -- | A programming language.
 data Language =
       C
-    | CoffeeScript
-    | CPlusPlus
-    | CSharp
-    | CSS
-    | Haskell
-    | HTML
-    | Java
+    | Go
     | JavaScript
     | Markdown
-    | ObjectiveC
-    | Perl
-    | PHP
-    | Python
-    | R
     | Ruby
-    | Swift
     | TypeScript
-    | Go
     deriving (Show)
 
 -- | Returns a Language based on the file extension (including the ".").
