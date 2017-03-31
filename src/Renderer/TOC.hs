@@ -51,7 +51,7 @@ data Summarizable = Summarizable { summarizableCategory :: Category, summarizabl
 
 data SummarizableTerm a = SummarizableTerm a | NotSummarizableTerm a
 
-toc :: (DefaultFields fields) => Renderer (Record fields)
+toc :: (HasDefaultFields fields) => Renderer (Record fields)
 toc blobs diff = TOCOutput $ Map.fromList [
     ("changes", changes),
     ("errors", errors)
@@ -63,7 +63,7 @@ toc blobs diff = TOCOutput $ Map.fromList [
     summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffTOC blobs diff
 
-diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
+diffTOC :: (StringConv leaf Text, HasDefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
 diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
@@ -83,7 +83,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
           (Summarizable catA nameA _ _, Summarizable catB nameB _ _) -> catA == catB && toLower nameA == toLower nameB
           (_, _) -> False
 
-    diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
+    diffToTOCSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
       let
         diff' = free (Prologue.fst <$> diff)
@@ -118,7 +118,7 @@ toLeafInfos' :: DiffInfo -> [DiffInfo]
 toLeafInfos' BranchInfo{..} = branches >>= toLeafInfos'
 toLeafInfos' leaf = [leaf]
 
-mapToInSummarizable :: forall leaf fields. DefaultFields fields => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
+mapToInSummarizable :: forall leaf fields. HasDefaultFields fields => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
 mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm diff) of
   (_, Just diff') -> mapToInSummarizable' (Both.snd sources) diff' <$> children
   (Just diff', _) -> mapToInSummarizable' (Both.fst sources) diff' <$> children
@@ -150,7 +150,7 @@ toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
         NotSummarizable -> []
         _ -> pure $ JSONSummary parentInfo
 
-termToDiffInfo :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: forall leaf fields. (StringConv leaf Text, HasDefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo source term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
@@ -163,7 +163,7 @@ termToDiffInfo source term = case unwrap term of
     termToDiffInfo' = termToDiffInfo source
     toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
-toTermName :: forall leaf fields. DefaultFields fields => Int -> Source -> SyntaxTerm leaf fields -> Text
+toTermName :: forall leaf fields. HasDefaultFields fields => Int -> Source -> SyntaxTerm leaf fields -> Text
 toTermName parentOffset parentSource term = case unwrap term of
   S.Function identifier _ _ -> toTermName' identifier
   S.Method _ identifier Nothing _ _ -> toTermName' identifier

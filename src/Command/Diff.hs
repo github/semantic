@@ -164,7 +164,7 @@ diffFiles parse sourceBlobs = do
       _ -> Nothing)
 
 -- | Returns a rendered diff given arguments and two source blobs.
-renderDiff :: (ToJSON (Record fields), NFData (Record fields), DefaultFields fields) => Arguments -> Both SourceBlob -> SyntaxDiff Text fields -> Output
+renderDiff :: (ToJSON (Record fields), NFData (Record fields), HasDefaultFields fields) => Arguments -> Both SourceBlob -> SyntaxDiff Text fields -> Output
 renderDiff args = case format args of
   Split -> split
   Patch -> patch
@@ -174,7 +174,7 @@ renderDiff args = case format args of
   TOC -> toc
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, arguments and two source blobs.
-printDiff :: (ToJSON (Record fields), NFData (Record fields), DefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO ByteString
+printDiff :: (ToJSON (Record fields), NFData (Record fields), HasDefaultFields fields) => Parser (Syntax Text) (Record fields) -> Arguments -> Both SourceBlob -> IO ByteString
 printDiff parser args sources = do
   diff <- diffFiles parser sources
   pure $! concatOutputs [renderDiff args sources diff]
