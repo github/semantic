@@ -72,7 +72,7 @@ fetchDiff :: Arguments -> FilePath -> IO (Both SourceBlob, SyntaxDiff Text '[Ran
 fetchDiff args@Arguments{..} filepath = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
-  lift $ runReaderT (go args filepath) repo
+  go args filepath
   where
     go :: Arguments -> FilePath -> ReaderT LgRepo IO (Both SourceBlob, SyntaxDiff Text '[Range, Category, SourceSpan])
     go Arguments{..} filepath = do
@@ -90,7 +90,7 @@ pathsToDiff :: Arguments -> Both String -> IO [FilePath]
 pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
-  lift $ runReaderT (go shas) repo
+  go shas
   where
     go :: Both String -> ReaderT LgRepo IO [FilePath]
     go shas = do
