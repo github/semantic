@@ -2,6 +2,7 @@
 module Renderer
 ( DiffRenderer(..)
 , runDiffRenderer
+, runDiffRenderer'
 , Renderer
 , Output(..)
 , concatOutputs
@@ -43,6 +44,15 @@ runDiffRenderer sources diff renderer = case renderer of
   SummaryRenderer -> SummaryOutput (R.summary sources diff)
   SExpressionDiffRenderer format -> SExpressionOutput (R.sExpression format sources diff)
   ToCRenderer -> TOCOutput (R.toc sources diff)
+
+runDiffRenderer' :: Both SourceBlob -> Diff (Syntax Text) (Record fields) -> DiffRenderer fields output -> output
+runDiffRenderer' sources diff renderer = case renderer of
+  SplitRenderer -> R.split sources diff
+  PatchRenderer -> R.patch sources diff
+  JSONDiffRenderer -> R.json sources diff
+  SummaryRenderer -> R.summary sources diff
+  SExpressionDiffRenderer format -> R.sExpression format sources diff
+  ToCRenderer -> R.toc sources diff
 
 data TermRenderer fields output where
   JSONTermRenderer :: TermRenderer fields (Map Text Value)
