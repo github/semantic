@@ -17,6 +17,7 @@ library
                      , Alignment
                      , Arguments
                      , Category
+                     , Command
                      , Command.Diff
                      , Command.Parse
                      , Data.Align.Generic
