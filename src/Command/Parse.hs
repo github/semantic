@@ -77,8 +77,14 @@ parseRoot construct combine args@Arguments{..} = do
   for blobs (\ sourceBlob@SourceBlob{..} -> do
     parsedTerm <- parseWithDecorator (decorator source) path sourceBlob
     pure $! construct path (para algebra parsedTerm))
-  where algebra (annotation :< syntax) = parseNodeForTermF (annotation :< (Prologue.fst <$> syntax)) `combine` toList (Prologue.snd <$> syntax)
+  where algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
         decorator = parseDecorator debug
+        makeNode annotation syntax = ParseNode
+          (toS (Info.category annotation))
+          (byteRange annotation)
+          (rhead annotation)
+          (Info.sourceSpan annotation)
+          (identifierFor syntax)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
@@ -87,16 +93,6 @@ parseIndex = fmap (toS . encode) . parseRoot IndexFile (\ node siblings -> node 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
 parseTree = fmap (toS . encode) . parseRoot ParseTreeFile Rose
-
-type Unroll t = Base t t
-
-parseNodeForTermF :: Unroll (Term (Syntax Text) (Record (Maybe SourceText ': DefaultFields))) -> ParseNode
-parseNodeForTermF (annotation :< syntax) = ParseNode
-  (toS (Info.category annotation))
-  (byteRange annotation)
-  (rhead annotation)
-  (Info.sourceSpan annotation)
-  (identifierFor syntax)
 
 -- | Determines the term decorator to use when parsing.
 parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
