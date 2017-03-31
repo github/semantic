@@ -168,7 +168,7 @@ renderDiff :: (ToJSON (Record fields), NFData (Record fields), HasDefaultFields 
 renderDiff args = case format args of
   Split -> split
   Patch -> patch
-  SExpression -> sExpression TreeOnly
+  SExpression -> (SExpressionOutput .) . sExpression TreeOnly
   JSON -> json
   Summary -> summary
   TOC -> toc
