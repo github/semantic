@@ -29,7 +29,7 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: DiffRenderer fields (Map Text (Map Text [Value]))
 
-data TermRenderer fields a where
+data TermRenderer fields output where
   JSONTermRenderer :: TermRenderer fields (Map Text Value)
   SExpressionTermRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> TermRenderer fields ByteString
 
