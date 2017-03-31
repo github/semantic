@@ -71,20 +71,19 @@ parseSExpression =
 
 type RAlgebra t a = Base t (t, a) -> a
 
-parseRoot :: (FilePath -> (f ParseNode) -> root) -> RAlgebra (Term (Syntax Text) (Record (Maybe SourceText ': DefaultFields))) (f ParseNode) -> Arguments -> IO [root]
-parseRoot construct algebra args@Arguments{..} = do
+parseRoot :: (FilePath -> (f ParseNode) -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> Arguments -> IO [root]
+parseRoot construct combine args@Arguments{..} = do
   blobs <- sourceBlobsFromArgs args
   for blobs (buildParseNodes construct algebra (parseDecorator debug))
+  where algebra (annotation :< syntax) = parseNodeForTermF (annotation :< (Prologue.fst <$> syntax)) `combine` toList (Prologue.snd <$> syntax)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
-parseIndex = fmap (toS . encode) . parseRoot IndexFile (\ (annotation :< syntax) ->
-  parseNodeForTermF (annotation :< (Prologue.fst <$> syntax)) : (Prologue.snd =<< toList syntax))
+parseIndex = fmap (toS . encode) . parseRoot IndexFile (\ node siblings -> node : concat siblings)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
 parseTree :: Arguments -> IO ByteString
-parseTree = fmap (toS . encode) . parseRoot ParseTreeFile (\ (annotation :< syntax) ->
-  Rose (parseNodeForTermF (annotation :< (Prologue.fst <$> syntax))) (Prologue.snd <$> toList syntax))
+parseTree = fmap (toS . encode) . parseRoot ParseTreeFile Rose
 
 type Unroll t = Base t t
 
