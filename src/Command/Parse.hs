@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Command.Parse where
 
 import Arguments
@@ -82,6 +82,10 @@ parseRoot construct combine args@Arguments{..} = do
         makeNode :: Record (Maybe SourceText ': DefaultFields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': DefaultFields))) -> ParseNode
         makeNode (head :. range :. category :. sourceSpan :. Nil) syntax =
           ParseNode (toS category) range head sourceSpan (identifierFor syntax)
+
+data TermProjection (fields :: [*]) output where
+  Index :: Maybe Source -> TermProjection fields [ParseNode]
+  ParseTree :: Maybe Source -> TermProjection fields (Rose ParseNode)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
