@@ -16,6 +16,7 @@ import Data.Text.Encoding (encodeUtf8)
 import qualified Data.ByteString as B
 import Data.Functor.Listable
 import Data.Record
+import Diff
 import Info
 import Prologue
 import Renderer.JSON as R
@@ -26,7 +27,6 @@ import Renderer.Summary as R
 import Renderer.TOC as R
 import Source (SourceBlob)
 import Syntax
-import Diff
 
 data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields Text
