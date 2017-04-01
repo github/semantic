@@ -46,13 +46,13 @@ runDiffRenderer renderer sources diff = case renderer of
   ToCRenderer -> TOCOutput (R.toc sources diff)
 
 runDiffRenderer' :: DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output
-runDiffRenderer' renderer sources diff = case renderer of
-  SplitRenderer -> R.split sources diff
-  PatchRenderer -> R.patch sources diff
-  JSONDiffRenderer -> R.json sources diff
-  SummaryRenderer -> R.summary sources diff
-  SExpressionDiffRenderer format -> R.sExpression format sources diff
-  ToCRenderer -> R.toc sources diff
+runDiffRenderer' renderer = case renderer of
+  SplitRenderer -> R.split
+  PatchRenderer -> R.patch
+  JSONDiffRenderer -> R.json
+  SummaryRenderer -> R.summary
+  SExpressionDiffRenderer format -> R.sExpression format
+  ToCRenderer -> R.toc
 
 data TermRenderer fields output where
   JSONTermRenderer :: TermRenderer fields (Map Text Value)
