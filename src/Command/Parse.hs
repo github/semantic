@@ -87,6 +87,18 @@ data TermProjection (fields :: [*]) output where
   Index :: Maybe Source -> TermProjection fields [ParseNode]
   ParseTree :: Maybe Source -> TermProjection fields (Rose ParseNode)
 
+runTermProjection :: HasDefaultFields fields => TermProjection fields output -> Term (Syntax Text) (Record fields) -> output
+runTermProjection projection term = para algebra (decorateTerm decorator term)
+  where algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
+        (combine, source) = case projection of
+          Index source -> (flatten, source)
+          ParseTree source -> (Rose, source)
+        flatten node siblings = node : concat siblings
+        decorator = maybe (const Nothing) termSourceTextDecorator source
+        makeNode annotation syntax =
+          ParseNode (toS (Info.category annotation)) (byteRange annotation) (rhead annotation) (Info.sourceSpan annotation) (identifierFor syntax)
+
+
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
 parseIndex :: Arguments -> IO ByteString
 parseIndex = fmap (toS . encode) . parseRoot IndexFile (\ node siblings -> node : concat siblings)
