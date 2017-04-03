@@ -150,7 +150,7 @@ sourceBlobsFromSha commitSha gitDir filePaths = do
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
 -- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
-identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category) => StringConv leaf T.Text => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe T.Text
+identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, StringConv leaf T.Text) => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe T.Text
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
