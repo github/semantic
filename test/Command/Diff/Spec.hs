@@ -1,10 +1,12 @@
 module Command.Diff.Spec where
 
-import Command.Diff
+import Command
 import Data.Aeson
 import Data.Aeson.Types
-import Data.Maybe
 import Data.Functor.Both
+import Data.Map as Map
+import Data.Maybe
+import Info
 import Prelude
 import Prologue (($), fmap, (.), pure, for, panic)
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
@@ -12,53 +14,47 @@ import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Data.Text.Lazy as T
 import qualified Data.ByteString.Lazy as BL
-import Data.Map
 import qualified Data.Vector as V
 import Arguments
-import Renderer
+import Renderer hiding (errors)
 import qualified Git.Types as Git
 
 spec :: Spec
 spec = parallel $ do
-  context "diff" $ do
-    prop "all formats should produce output for file paths" $
-      \format -> do
-        output <- diff $ diffPathsArgs "" (both "test/fixtures/ruby/and-or.A.rb" "test/fixtures/ruby/and-or.B.rb") format
-        output `shouldNotBe` ""
-
-    prop "all formats should produce output for commit range" $
-      \format -> do
-        output <- diff $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] format
-        output `shouldNotBe` ""
-
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do
-      (errors, summaries) <- fetchDiffsOutput summaryText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.Summary
+      (errors, summaries) <- fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.SummaryRenderer
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
 
     it "generates toc summaries for two shas" $ do
-      (errors, summaries) <- fetchDiffsOutput termText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.TOC
+      (errors, summaries) <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.ToCRenderer
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
     it "generates toc summaries for two shas inferring paths" $ do
-      (errors, summaries) <- fetchDiffsOutput termText $ args "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [] Renderer.TOC
+      (errors, summaries) <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [] Renderer.ToCRenderer
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
     it "errors with bad shas" $
-      fetchDiffsOutput summaryText (args "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] Renderer.Summary)
+      fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] Renderer.SummaryRenderer
         `shouldThrow` (== Git.BackendError "Could not lookup dead: Object not found - no match for prefix (dead000000000000000000000000000000000000)")
 
     it "errors with bad repo path" $
-      fetchDiffsOutput summaryText (args "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.Summary)
+      fetchDiffsOutput summaryText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.SummaryRenderer
         `shouldThrow` errorCall "Could not open repository \"test/fixtures/git/examples/not-a-repo.git\""
 
-fetchDiffsOutput :: (Object -> Text) -> Arguments -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
-fetchDiffsOutput f arguments = do
-  diffs <- fetchDiffs arguments
-  let json = fromJust . decode . BL.fromStrict $ concatOutputs diffs
+fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [FilePath] -> DiffRenderer DefaultFields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
+fetchDiffsOutput f gitDir sha1 sha2 filePaths renderer = do
+  results <- fmap encode . runCommand $ do
+    blobs <- readFilesAtSHAs gitDir [] filePaths sha1 sha2
+    diffs <- for blobs $ \ blobs -> do
+      terms <- for blobs parseBlob
+      diff' <- runBothWith diff terms
+      return (blobs, diff')
+    renderDiffs renderer diffs
+  let json = fromJust (decode results)
   pure (errors json, summaries f json)
 
 -- Diff Summaries payloads look like this:
