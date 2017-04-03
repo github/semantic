@@ -29,19 +29,6 @@ import Source
 import Syntax
 import Term
 
-data CommandF f where
-  ReadFile :: FilePath -> CommandF SourceBlob
-  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
-
-  Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
-
-  Diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> CommandF (Diff (Syntax Text) (Record DefaultFields))
-
-  RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
-
-  -- parallelize diffs of a list of paths + git shas
-  -- alternateObjectDirs??
-
 type Command = Freer CommandF
 
 
@@ -72,6 +59,23 @@ runCommand = iterFreerA $ \ command yield -> case command of
   Parse language blob -> runParse language blob >>= yield
   Diff term1 term2 -> yield (runDiff term1 term2)
   RenderDiff renderer blob1 blob2 diff -> yield (runRenderDiff renderer blob1 blob2 diff)
+
+
+-- Implementation details
+
+data CommandF f where
+  ReadFile :: FilePath -> CommandF SourceBlob
+  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
+
+  Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
+
+  Diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> CommandF (Diff (Syntax Text) (Record DefaultFields))
+
+  RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
+
+  -- parallelize diffs of a list of paths + git shas
+  -- alternateObjectDirs??
+
 
 runReadFile :: FilePath -> IO SourceBlob
 runReadFile path = do
