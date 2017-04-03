@@ -50,64 +50,72 @@ type Command = Freer CommandF
 
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
-  ReadFile path -> do
-    source <- readAndTranscodeFile path
-    yield (sourceBlob source path)
-  ReadFilesAtSHAs gitDir paths sha1 sha2 ->
-    withRepository lgFactory gitDir $ do
-      -- repo <- getRepository
-      -- for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
+  ReadFile path -> runReadFile path >>= yield
+  ReadFilesAtSHAs gitDir paths sha1 sha2 -> runReadFilesAtSHAs gitDir paths sha1 sha2 >>= yield
+  Parse language blob -> runParse language blob >>= yield
+  Diff term1 term2 -> yield (runDiff term1 term2)
+  RenderDiff renderer blob1 blob2 diff -> yield (runRenderDiff renderer blob1 blob2 diff)
 
-      liftIO $ traceEventIO ("START readFilesAtSHAs: " <> show paths)
+runReadFile :: FilePath -> IO SourceBlob
+runReadFile path = do
+  source <- readAndTranscodeFile path
+  return (sourceBlob source path)
 
-      tree1 <- treeForSha sha1
-      tree2 <- treeForSha sha2
+runReadFilesAtSHAs :: FilePath -> [FilePath] -> String -> String -> IO [(SourceBlob, SourceBlob)]
+runReadFilesAtSHAs gitDir paths sha1 sha2 = withRepository lgFactory gitDir $ do
+  -- repo <- getRepository
+  -- for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
 
-      paths <- case paths of
-        (_ : _) -> pure paths
-        [] -> do
-          a <- pathsForTree tree1
-          b <- pathsForTree tree2
+  liftIO $ traceEventIO ("START readFilesAtSHAs: " <> show paths)
 
-          pure $! (a \\ b) <> (b \\ a)
+  tree1 <- treeForSha sha1
+  tree2 <- treeForSha sha2
 
-      blobs <- for paths $ \ path -> (,) <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
+  paths <- case paths of
+    (_ : _) -> pure paths
+    [] -> do
+      a <- pathsForTree tree1
+      b <- pathsForTree tree2
+
+      pure $! (a \\ b) <> (b \\ a)
+
+  blobs <- for paths $ \ path -> (,) <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
 
 
-      liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
-      liftIO $ yield blobs
+  liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
+  return blobs
+  where treeForSha sha = do
+          obj <- parseObjOid (toS sha)
+          commit <- reportGitmon "cat-file" $ lookupCommit obj
+          reportGitmon "cat-file" $ lookupTree (commitTree commit)
+        blobForPathInTree path tree = do
+          entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
+          case entry of
+            Just (BlobEntry entryOid entryKind) -> do
+              blob <- reportGitmon "cat-file" $ lookupBlob entryOid
+              contents <- blobToByteString blob
+              transcoded <- liftIO $ transcode contents
+              let oid = renderObjOid $ blobOid blob
+              pure $! SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))
+            _ -> pure $! emptySourceBlob path
+        pathsForTree tree = do
+          blobEntries <- reportGitmon "ls-tree" $ treeBlobEntries tree
+          return $! fmap (\ (p, _, _) -> toS p) blobEntries
 
-    where treeForSha sha = do
-            obj <- parseObjOid (toS sha)
-            commit <- reportGitmon "cat-file" $ lookupCommit obj
-            reportGitmon "cat-file" $ lookupTree (commitTree commit)
-          blobForPathInTree path tree = do
-            entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
-            case entry of
-              Just (BlobEntry entryOid entryKind) -> do
-                blob <- reportGitmon "cat-file" $ lookupBlob entryOid
-                contents <- blobToByteString blob
-                transcoded <- liftIO $ transcode contents
-                let oid = renderObjOid $ blobOid blob
-                pure $! SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))
-              _ -> pure $! emptySourceBlob path
-          pathsForTree tree = do
-            blobEntries <- reportGitmon "ls-tree" $ treeBlobEntries tree
-            return $! fmap (\ (p, _, _) -> toS p) blobEntries
+        toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
+        toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
+        toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
-          toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
-          toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
-          toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
+runParse :: Language -> SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
+runParse language blob = parserForLanguage language blob
 
-  Parse language blob -> parserForLanguage language blob >>= yield
+runDiff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> Diff (Syntax Text) (Record DefaultFields)
+runDiff term1 term2 = stripDiff (diffTerms (decorate term1) (decorate term2))
+  where decorate = defaultFeatureVectorDecorator getLabel
+        getLabel :: TermF (Syntax Text) (Record DefaultFields) a -> (Category, Maybe Text)
+        getLabel (h :< t) = (Info.category h, case t of
+          Leaf s -> Just s
+          _ -> Nothing)
 
-  Diff term1 term2 ->
-    yield (stripDiff (diffTerms (decorate term1) (decorate term2)))
-    where decorate = defaultFeatureVectorDecorator getLabel
-          getLabel :: TermF (Syntax Text) (Record DefaultFields) a -> (Category, Maybe Text)
-          getLabel (h :< t) = (Info.category h, case t of
-            Leaf s -> Just s
-            _ -> Nothing)
-
-  RenderDiff renderer blob1 blob2 diff ->
-    yield (runDiffRenderer' renderer (both blob1 blob2) diff)
+runRenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> output
+runRenderDiff renderer blob1 blob2 diff = runDiffRenderer' renderer (both blob1 blob2) diff
