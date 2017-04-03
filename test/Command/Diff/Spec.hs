@@ -11,11 +11,8 @@ import Prelude
 import Prologue (($), fmap, (.), pure, for, panic)
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
-import Test.Hspec.LeanCheck
 import Data.Text.Lazy as T
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.Vector as V
-import Arguments
 import Renderer hiding (errors)
 import qualified Git.Types as Git
 
