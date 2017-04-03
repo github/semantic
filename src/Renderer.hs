@@ -4,6 +4,7 @@ module Renderer
 , runDiffRenderer
 , Format(..)
 , Summaries(..)
+, File(..)
 ) where
 
 import Data.Aeson (ToJSON, Value)
@@ -24,8 +25,8 @@ import Source (SourceBlob)
 import Syntax
 
 data DiffRenderer fields output where
-  SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields Text
-  PatchRenderer :: HasField fields Range => DiffRenderer fields Text
+  SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields File
+  PatchRenderer :: HasField fields Range => DiffRenderer fields File
   JSONDiffRenderer :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => DiffRenderer fields (Map Text Value)
   SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
@@ -33,8 +34,8 @@ data DiffRenderer fields output where
 
 runDiffRenderer :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runDiffRenderer renderer = foldMap . uncurry $ case renderer of
-  SplitRenderer -> R.split
-  PatchRenderer -> R.patch
+  SplitRenderer -> (File .) . R.split
+  PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
   SummaryRenderer -> (Summaries .) . R.summary
   SExpressionDiffRenderer format -> R.sExpression format
@@ -51,6 +52,12 @@ instance Monoid Summaries where
   mempty = Summaries mempty
   mappend = (Summaries .) . (Map.unionWith (Map.unionWith (<>)) `on` unSummaries)
 
+newtype File = File { unFile :: Text }
+  deriving Show
+
+instance Monoid File where
+  mempty = File mempty
+  mappend (File a) (File b) = File (a <> "\n" <> b)
 
 instance Listable Format where
   tiers = cons0 Split
