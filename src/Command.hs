@@ -72,6 +72,7 @@ renderDiff renderer blob1 blob2 diff = RenderDiff renderer blob1 blob2 diff `The
 
 -- Evaluation
 
+-- | Run the passed command and return its results in IO.
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path -> runReadFile path >>= yield
