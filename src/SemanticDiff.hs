@@ -2,24 +2,38 @@
 module SemanticDiff (main) where
 
 import Arguments
-import Command.Diff
+import Command
 import Command.Parse
-import Prologue hiding (fst, snd)
-import Data.String
-import Data.Functor.Both
-import Data.Version (showVersion)
-import Text.Regex
-import Options.Applicative hiding (action)
-import qualified Paths_semantic_diff as Library (version)
-import qualified Renderer as R
 import Development.GitRev
 import qualified Data.ByteString as B
+import Data.Functor.Both
+import Data.String
+import Data.Version (showVersion)
+import Options.Applicative hiding (action)
+import qualified Paths_semantic_diff as Library (version)
+import Prologue hiding (fst, snd, readFile)
+import qualified Renderer as R
+import qualified Renderer.SExpression as R
+import Text.Regex
 
 main :: IO ()
 main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
   text <- case runMode of
-    Diff -> diff args
+    Diff -> runCommand $ case diffMode of
+      PathDiff paths -> do
+        Join (blob1, blob2) <- traverse readFile paths
+        Join (term1, term2) <- traverse parseBlob (both blob1 blob2)
+        diff' <- diff term1 term2
+        let render = case format of
+              R.Split -> renderDiffOutput R.SplitRenderer
+              R.Patch -> renderDiffOutput R.PatchRenderer
+              R.JSON -> renderDiffOutput R.JSONDiffRenderer
+              R.Summary -> renderDiffOutput R.SummaryRenderer
+              R.SExpression -> renderDiffOutput (R.SExpressionDiffRenderer R.TreeOnly)
+              R.TOC -> renderDiffOutput R.ToCRenderer
+        rendered <- render blob1 blob2 diff'
+        return $! R.concatOutputs [rendered]
     Parse -> case format of
       R.Index -> parseIndex args
       R.SExpression -> parseSExpression args
