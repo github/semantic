@@ -7,7 +7,7 @@ module Command
 , parse
 , parseBlob
 , diff
-, renderDiff
+, renderDiffs
 -- Evaluation
 , runCommand
 ) where
@@ -72,8 +72,8 @@ diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (
 diff term1 term2 = Diff term1 term2 `Then` return
 
 -- | Render a diff using the specified renderer.
-renderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> Command output
-renderDiff renderer blob1 blob2 diff = RenderDiff renderer blob1 blob2 diff `Then` return
+renderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> Command output
+renderDiffs renderer diffs = RenderDiffs renderer diffs `Then` return
 
 
 -- Evaluation
@@ -85,7 +85,7 @@ runCommand = iterFreerA $ \ command yield -> case command of
   ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 -> runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 >>= yield
   Parse language blob -> runParse language blob >>= yield
   Diff term1 term2 -> yield (runDiff term1 term2)
-  RenderDiff renderer blob1 blob2 diff -> yield (runRenderDiff renderer blob1 blob2 diff)
+  RenderDiffs renderer diffs -> yield (runRenderDiffs renderer diffs)
 
 
 -- Implementation details
@@ -98,7 +98,7 @@ data CommandF f where
 
   Diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> CommandF (Diff (Syntax Text) (Record fields))
 
-  RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
+  RenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> CommandF output
 
   -- TODO: parallelize diffs of a list of paths + git shas?
 
@@ -163,5 +163,5 @@ runDiff term1 term2 = stripDiff (diffTerms (decorate term1) (decorate term2))
           Leaf s -> Just s
           _ -> Nothing)
 
-runRenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> output
-runRenderDiff renderer = (runDiffRenderer renderer .) . both
+runRenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
+runRenderDiffs = runDiffRenderer

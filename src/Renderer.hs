@@ -31,8 +31,8 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
 
-runDiffRenderer' :: DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output
-runDiffRenderer' renderer = case renderer of
+runDiffRenderer :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
+runDiffRenderer renderer = foldMap . uncurry $ case renderer of
   SplitRenderer -> R.split
   PatchRenderer -> R.patch
   JSONDiffRenderer -> R.json
