@@ -3,7 +3,7 @@ module TOCSpec where
 
 import Data.Aeson
 import Category as C
-import Command.Diff
+import Command
 import Command.Parse
 import Data.Functor.Both
 import Data.Functor.Listable
@@ -122,10 +122,10 @@ type Diff' = SyntaxDiff String DefaultFields
 type Term' = SyntaxTerm String DefaultFields
 
 diffOutput :: Both SourceBlob -> IO ByteString
-diffOutput sourceBlobs = do
-  let parser = parserForFilepath (path (fst sourceBlobs))
-  diff <- diffFiles parser sourceBlobs
-  pure $ concatOutputs [TOCOutput (toc sourceBlobs diff)]
+diffOutput blobs = runCommand $ do
+  terms <- for blobs parseBlob
+  diff' <- runBothWith diff terms
+  toS . encode . unSummaries <$> renderDiffs ToCRenderer [ (blobs, diff') ]
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
@@ -188,9 +188,9 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   _ -> False
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
-testDiff sourceBlobs = diffFiles parser sourceBlobs
-  where
-    parser = parserForFilepath (path . fst $ sourceBlobs)
+testDiff blobs = runCommand $ do
+  terms <- for blobs parseBlob
+  runBothWith diff terms
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do
