@@ -5,6 +5,7 @@ module Command
 , readFile
 , readFilesAtSHAs
 , parse
+, parseBlob
 , diff
 , renderDiff
 , renderDiffOutput
@@ -35,6 +36,7 @@ import Prologue hiding (readFile)
 import Renderer
 import Source
 import Syntax
+import System.FilePath
 import Term
 
 
@@ -61,6 +63,10 @@ readFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = ReadFilesAtSHAs git
 -- | Parse a blob in a given language.
 parse :: Maybe Language -> SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
 parse language blob = Parse language blob `Then` return
+
+-- | Parse a blob in the language selected for its file extension.
+parseBlob :: SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
+parseBlob blob = parse (languageForType (takeExtension (path blob))) blob
 
 -- | Diff two terms.
 diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> Command (Diff (Syntax Text) (Record fields))
