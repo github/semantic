@@ -58,7 +58,7 @@ readFilesAtSHAs
 readFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 `Then` return
 
 -- | Parse a blob in a given language.
-parse :: Language -> SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
+parse :: Maybe Language -> SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
 parse language blob = Parse language blob `Then` return
 
 -- | Diff two terms.
@@ -88,7 +88,7 @@ data CommandF f where
   ReadFile :: FilePath -> CommandF SourceBlob
   ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
 
-  Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
+  Parse :: Maybe Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
   Diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> CommandF (Diff (Syntax Text) (Record fields))
 
@@ -146,8 +146,8 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
-runParse :: Language -> SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-runParse = parserForLanguage
+runParse :: Maybe Language -> SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
+runParse language = maybe lineByLineParser parserForLanguage language
 
 runDiff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> Diff (Syntax Text) (Record fields)
 runDiff term1 term2 = stripDiff (diffTerms (decorate term1) (decorate term2))
