@@ -192,6 +192,9 @@ termSourceTextDecorator source (ann :< _) = Just (SourceText (toText (Source.sli
 newtype Identifier = Identifier Text
   deriving (Eq, Show, ToJSON)
 
+identifierDecorator :: (HasField fields Category, StringConv leaf Text) => TermDecorator (Syntax leaf) fields (Maybe Identifier)
+identifierDecorator = fmap (Command.Parse.Identifier . toS) . extractLeafValue . unwrap <=< maybeIdentifier . tailF
+
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
 lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
