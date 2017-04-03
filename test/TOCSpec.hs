@@ -3,7 +3,8 @@ module TOCSpec where
 
 import Data.Aeson
 import Category as C
-import Command
+import Command.Diff
+import Command.Parse
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
@@ -124,7 +125,7 @@ diffOutput :: Both SourceBlob -> IO ByteString
 diffOutput sourceBlobs = do
   let parser = parserForFilepath (path (fst sourceBlobs))
   diff <- diffFiles parser sourceBlobs
-  pure $ concatOutputs [toc sourceBlobs diff]
+  pure $ concatOutputs [TOCOutput (toc sourceBlobs diff)]
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)

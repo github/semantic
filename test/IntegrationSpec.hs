@@ -2,7 +2,8 @@
 module IntegrationSpec where
 
 import Category as C
-import Command
+import Command.Diff
+import Command.Parse
 import Data.Functor.Both
 import Data.Record
 import qualified Data.Text as T
@@ -39,7 +40,7 @@ spec = parallel $ do
       examples <- runIO $ examples directory
       traverse_ runTest examples
     runTest ParseExample{..} = it ("parses " <> file) $ testParse file parseOutput
-    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
+    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff ((SExpressionOutput .) . Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
