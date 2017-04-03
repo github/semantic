@@ -30,6 +30,7 @@ main = do
             R.Summary -> fmap encodeSummaries . renderDiffs R.SummaryRenderer
             R.SExpression -> renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
             R.TOC -> fmap encodeSummaries . renderDiffs R.ToCRenderer
+            _ -> fmap encodeText . renderDiffs R.PatchRenderer
       diffs <- case diffMode of
         PathDiff paths -> do
           blobs <- traverse readFile paths
