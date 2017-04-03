@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Command.Parse where
 
 import Arguments
@@ -189,6 +189,9 @@ type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fi
 termSourceTextDecorator :: (Functor f, HasField fields Range) => Source -> TermDecorator f fields (Maybe SourceText)
 termSourceTextDecorator source term = Just . SourceText . toText $ Source.slice range' source
  where range' = byteRange $ headF term
+
+newtype Identifier = Identifier Text
+  deriving (Eq, Show, ToJSON)
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
