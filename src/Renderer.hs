@@ -37,20 +37,13 @@ runDiffRenderer renderer = foldMap . uncurry $ case renderer of
   SplitRenderer -> (File .) . R.split
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
-  SummaryRenderer -> (Summaries .) . R.summary
+  SummaryRenderer -> R.summary
   SExpressionDiffRenderer format -> R.sExpression format
-  ToCRenderer -> (Summaries .) . R.toc
+  ToCRenderer -> R.toc
 
 -- | The available types of diff rendering.
 data Format = Split | Patch | JSON | Summary | SExpression | TOC | Index | ParseTree
   deriving (Show)
-
-newtype Summaries = Summaries { unSummaries :: Map Text (Map Text [Value]) }
-  deriving Show
-
-instance Monoid Summaries where
-  mempty = Summaries mempty
-  mappend = (Summaries .) . (Map.unionWith (Map.unionWith (<>)) `on` unSummaries)
 
 newtype File = File { unFile :: Text }
   deriving Show

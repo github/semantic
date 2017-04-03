@@ -51,7 +51,7 @@ main = do
   writeToOutput outputPath (text <> "\n")
   where encodeText = encodeUtf8 . R.unFile
         encodeJSON = toS . encode
-        encodeSummaries = toS . encode . R.unSummaries
+        encodeSummaries = toS . encode
 
 -- | A parser for the application's command-line arguments.
 argumentsParser :: ParserInfo CmdLineOptions

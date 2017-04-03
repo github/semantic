@@ -11,6 +11,7 @@ import Diff
 import Info
 import Prologue
 import Range
+import Renderer.Summary (Summaries(..))
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Source hiding (null)
@@ -50,11 +51,8 @@ data Summarizable = Summarizable { summarizableCategory :: Category, summarizabl
 
 data SummarizableTerm a = SummarizableTerm a | NotSummarizableTerm a
 
-toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text (Map Text [Value])
-toc blobs diff = Map.fromList [
-    ("changes", changes),
-    ("errors", errors)
-  ]
+toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+toc blobs diff = Summaries changes errors
   where
     changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
     errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')

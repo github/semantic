@@ -125,7 +125,7 @@ diffOutput :: Both SourceBlob -> IO ByteString
 diffOutput blobs = runCommand $ do
   terms <- for blobs parseBlob
   diff' <- runBothWith diff terms
-  toS . encode . unSummaries <$> renderDiffs ToCRenderer [ (blobs, diff') ]
+  toS . encode <$> renderDiffs ToCRenderer [ (blobs, diff') ]
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)

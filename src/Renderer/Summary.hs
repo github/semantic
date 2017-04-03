@@ -2,7 +2,7 @@
 -- {-# OPTIONS_GHC -funbox-strict-fields #-}
 {-# OPTIONS_GHC -Wno-deprecations #-}
 -- Disabling deprecation warnings due to pattern match against RescueModifier.
-module Renderer.Summary (summary, diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
+module Renderer.Summary (Summaries(..), summary, diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 
 import Prologue
 import Diff
@@ -27,6 +27,16 @@ import SourceSpan
 import Source hiding (null)
 import qualified Data.Map as Map
 import qualified Data.List as List
+
+data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
+  deriving Show
+
+instance Monoid Summaries where
+  mempty = Summaries mempty mempty
+  mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+
+instance ToJSON Summaries where
+  toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
 data Annotatable a = Annotatable a | Unannotatable a
 
@@ -100,11 +110,8 @@ data DiffSummary a = DiffSummary {
   parentAnnotation :: [Either (Category, Text) (Category, Text)]
 } deriving (Eq, Functor, Show, Generic)
 
-summary :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text (Map Text [Value])
-summary blobs diff = Map.fromList [
-    ("changes", changes),
-    ("errors", errors)
-  ]
+summary :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+summary blobs diff = Summaries changes errors
   where
     changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
     errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')
