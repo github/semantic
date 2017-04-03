@@ -7,6 +7,7 @@ module Renderer
 , Output(..)
 , concatOutputs
 , Format(..)
+, Summaries(..)
 ) where
 
 import Data.Aeson (ToJSON, Value, encode)
@@ -63,6 +64,13 @@ data Format = Split | Patch | JSON | Summary | SExpression | TOC | Index | Parse
 
 data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value])) | SExpressionOutput ByteString | TOCOutput (Map Text (Map Text [Value]))
   deriving (Show)
+
+newtype Summaries = Summaries { unSummaries :: Map Text (Map Text [Value]) }
+  deriving Show
+
+instance Monoid Summaries where
+  mempty = Summaries mempty
+  mappend = (Summaries .) . (Map.unionWith (Map.unionWith (<>)) `on` unSummaries)
 
 -- Concatenates a list of 'Output' depending on the output type.
 -- For JSON, each file output is merged since they're uniquely keyed by filename.
