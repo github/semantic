@@ -14,26 +14,28 @@ import qualified Paths_semantic_diff as Library (version)
 import Prologue hiding (fst, snd, readFile)
 import qualified Renderer as R
 import qualified Renderer.SExpression as R
+import Source
 import Text.Regex
 
 main :: IO ()
 main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
   text <- case runMode of
-    Diff -> runCommand $ case diffMode of
-      PathDiff paths -> do
-        Join (blob1, blob2) <- traverse readFile paths
-        Join (term1, term2) <- traverse parseBlob (both blob1 blob2)
-        diff' <- diff term1 term2
-        let render = case format of
-              R.Split -> renderDiffOutput R.SplitRenderer
-              R.Patch -> renderDiffOutput R.PatchRenderer
-              R.JSON -> renderDiffOutput R.JSONDiffRenderer
-              R.Summary -> renderDiffOutput R.SummaryRenderer
-              R.SExpression -> renderDiffOutput (R.SExpressionDiffRenderer R.TreeOnly)
-              R.TOC -> renderDiffOutput R.ToCRenderer
-        rendered <- render blob1 blob2 diff'
-        return $! R.concatOutputs [rendered]
+    Diff -> runCommand $ do
+      let render = case format of
+            R.Split -> renderDiffOutput R.SplitRenderer
+            R.Patch -> renderDiffOutput R.PatchRenderer
+            R.JSON -> renderDiffOutput R.JSONDiffRenderer
+            R.Summary -> renderDiffOutput R.SummaryRenderer
+            R.SExpression -> renderDiffOutput (R.SExpressionDiffRenderer R.TreeOnly)
+            R.TOC -> renderDiffOutput R.ToCRenderer
+      case diffMode of
+        PathDiff paths -> do
+          Join (blob1, blob2) <- traverse readFile paths
+          Join (term1, term2) <- traverse parseBlob (both blob1 blob2)
+          diff' <- diff term1 term2
+          rendered <- render blob1 blob2 diff'
+          return $! R.concatOutputs [rendered]
     Parse -> case format of
       R.Index -> parseIndex args
       R.SExpression -> parseSExpression args
