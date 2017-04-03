@@ -96,6 +96,7 @@ library
                      , recursion-schemes
                      , regex-compat
                      , semigroups
+                     , split
                      , text >= 1.2.1.3
                      , text-icu
                      , these
