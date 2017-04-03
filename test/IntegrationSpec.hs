@@ -12,8 +12,8 @@ import Data.Text.Encoding (decodeUtf8)
 import Diff
 import GHC.Show (Show(..))
 import Info
+import Patch
 import Prologue hiding (fst, snd, readFile)
-import Renderer
 import Renderer.SExpression as Renderer
 import Source
 import Syntax
@@ -120,18 +120,20 @@ testParse path expectedOutput = do
 testDiff :: (Both SourceBlob -> Diff (Syntax Text) (Record DefaultFields) -> ByteString) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths expectedOutput = do
   (blobs, diff') <- runCommand $ do
-    blobs <- for paths readFile
+    blobs <- for paths readFile'
     terms <- for blobs parseBlob
-    diff' <- runBothWith diff terms
+    diff' <- case runJoin (nullBlob <$> blobs) of
+      (True, False) -> return (pure (Delete (fst terms)))
+      (False, True) -> return (pure (Insert (snd terms)))
+      _ -> runBothWith diff terms
     return (blobs, diff')
   let diffOutput = renderer blobs diff'
   let actual = Verbatim (stripWhitespace diffOutput)
   expected <- Verbatim . stripWhitespace <$> B.readFile expectedOutput
   actual `shouldBe` expected
   where
-    parser = parserForFilepath filePath
-    readAndTranscodeFile' path | Prologue.null path = pure Source.empty
-                               | otherwise = readAndTranscodeFile path
+    readFile' path | Prologue.null path = pure (emptySourceBlob filePath)
+                   | otherwise = readFile path
     filePath = if fst paths /= "" then fst paths else snd paths
 
 stripWhitespace :: ByteString -> ByteString
