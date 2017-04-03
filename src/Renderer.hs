@@ -3,6 +3,7 @@ module Renderer
 ( DiffRenderer(..)
 , runDiffRenderer
 , Format(..)
+, ParseFormat(..)
 , Summaries(..)
 , File(..)
 ) where
@@ -42,7 +43,10 @@ runDiffRenderer renderer = foldMap . uncurry $ case renderer of
   ToCRenderer -> R.toc
 
 -- | The available types of diff rendering.
-data Format = Split | Patch | JSON | Summary | SExpression | TOC | Index | ParseTree
+data Format = Split | Patch | JSON | Summary | SExpression | TOC
+  deriving (Show)
+
+data ParseFormat = JSONTree | JSONIndex | SExpressionTree
   deriving (Show)
 
 newtype File = File { unFile :: Text }
@@ -59,3 +63,8 @@ instance Listable Format where
        \/ cons0 Summary
        \/ cons0 SExpression
        \/ cons0 TOC
+
+instance Listable ParseFormat where
+  tiers = cons0 JSONTree
+       \/ cons0 JSONIndex
+       \/ cons0 SExpressionTree

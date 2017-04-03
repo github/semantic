@@ -1,34 +1,25 @@
 module Command.Parse.Spec where
 
 import Command.Parse
-import Data.Functor.Listable
 import Prelude
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
-import Test.LeanCheck
 import Arguments
 import Renderer
 
 spec :: Spec
-spec = parallel $
-  context "parse" $
-    prop "all valid formats should produce output" . forAll (isParseFormat `filterT` tiers) $
+spec = parallel $ do
+  context "parse" $ do
+    prop "all valid formats should produce output" $
       \format ->
         case format of
-          SExpression -> do
+          SExpressionTree -> do
             output <- parseSExpression $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
             output `shouldNotBe` ""
-          Index -> do
+          JSONIndex -> do
             output <- parseIndex $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
             output `shouldNotBe` ""
-          _ -> do
+          JSONTree -> do
             output <- parseTree $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
             output `shouldNotBe` ""
-
-isParseFormat :: Format -> Bool
-isParseFormat a | Index <- a = True
-                | ParseTree <- a = True
-                | JSON <- a = True
-                | SExpression <- a = True
-                | otherwise = False

@@ -65,15 +65,15 @@ parseNodeToJSONFields ParseNode{..} =
   <> [ "identifier" .= identifier | isJust identifier ]
 
 -- | Parses file contents into an SExpression format for the provided arguments.
-parseSExpression :: Arguments -> IO ByteString
+parseSExpression :: ParseArguments -> IO ByteString
 parseSExpression =
   pure . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
 
 type RAlgebra t a = Base t (t, a) -> a
 
-parseRoot :: (FilePath -> f ParseNode -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> Arguments -> IO [root]
-parseRoot construct combine args@Arguments{..} = do
+parseRoot :: (FilePath -> f ParseNode -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> ParseArguments -> IO [root]
+parseRoot construct combine args@ParseArguments{..} = do
   blobs <- sourceBlobsFromArgs args
   for blobs (\ sourceBlob@SourceBlob{..} -> do
     parsedTerm <- parseWithDecorator (decorator source) path sourceBlob
@@ -85,11 +85,11 @@ parseRoot construct combine args@Arguments{..} = do
           ParseNode (toS category) range head sourceSpan (identifierFor syntax)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
-parseIndex :: Arguments -> IO ByteString
+parseIndex :: ParseArguments -> IO ByteString
 parseIndex = fmap (toS . encode) . parseRoot IndexFile (\ node siblings -> node : concat siblings)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
-parseTree :: Arguments -> IO ByteString
+parseTree :: ParseArguments -> IO ByteString
 parseTree = fmap (toS . encode) . parseRoot ParseTreeFile Rose
 
 -- | Determines the term decorator to use when parsing.
@@ -139,11 +139,11 @@ identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, 
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
-sourceBlobsFromArgs :: Arguments -> IO [SourceBlob]
-sourceBlobsFromArgs Arguments{..} =
-  case commitSha of
-    Just commitSha' -> sourceBlobsFromSha commitSha' gitDir filePaths
-    _ -> sourceBlobsFromPaths filePaths
+sourceBlobsFromArgs :: ParseArguments -> IO [SourceBlob]
+sourceBlobsFromArgs ParseArguments{..} =
+  case parseMode of
+    ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
+    ParsePaths paths -> sourceBlobsFromPaths paths
 
 -- | Return a parser incorporating the provided TermDecorator.
 parseWithDecorator :: TermDecorator (Syntax Text) DefaultFields field -> FilePath -> Parser (Syntax Text) (Record (field ': DefaultFields))
