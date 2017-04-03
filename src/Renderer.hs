@@ -3,9 +3,6 @@ module Renderer
 ( DiffRenderer(..)
 , runDiffRenderer
 , runDiffRenderer'
-, TermRenderer(..)
-, runTermRenderer
-, runTermRenderer'
 , Renderer
 , Output(..)
 , concatOutputs
@@ -30,7 +27,6 @@ import Renderer.Summary as R
 import Renderer.TOC as R
 import Source (SourceBlob)
 import Syntax
-import Term
 
 data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields Text
@@ -57,20 +53,6 @@ runDiffRenderer' renderer = case renderer of
   SummaryRenderer -> R.summary
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> R.toc
-
-data TermRenderer fields output where
-  JSONTermRenderer :: TermRenderer fields (Map Text Value)
-  SExpressionTermRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> TermRenderer fields ByteString
-
-runTermRenderer :: TermRenderer fields output -> Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Output
-runTermRenderer renderer debug = case renderer of
-  JSONTermRenderer -> undefined --buildParseNodes ParseTreeFile parseNodesAlgebra
-  SExpressionTermRenderer format -> undefined
-
-runTermRenderer' :: TermRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
-runTermRenderer' renderer = case renderer of
-  JSONTermRenderer -> undefined
-  SExpressionTermRenderer format -> undefined
 
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output

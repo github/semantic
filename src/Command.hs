@@ -37,7 +37,6 @@ data CommandF f where
   Diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> CommandF (Diff (Syntax Text) (Record DefaultFields))
 
   RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
-  RenderTerm :: TermRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> CommandF output
 
   -- parallelize diffs of a list of paths + git shas
   -- explicit gitmon effects/events
@@ -112,6 +111,3 @@ runCommand = iterFreerA $ \ command yield -> case command of
 
   RenderDiff renderer blob1 blob2 diff ->
     yield (runDiffRenderer' renderer (both blob1 blob2) diff)
-
-  RenderTerm renderer blob term ->
-    yield (runTermRenderer' renderer blob term)
