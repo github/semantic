@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, DataKinds, KindSignatures #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
 import Data.Record
@@ -114,12 +114,12 @@ data Syntax a f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
 
 
-extractLeafValue :: forall b leaf. Syntax leaf b -> Maybe leaf
+extractLeafValue :: Syntax leaf b -> Maybe leaf
 extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
 
-maybeIdentifier :: forall leaf (fields :: [*]). (HasField fields Info.Category) => Syntax leaf (Cofree (Syntax leaf) (Record fields)) -> Maybe (Cofree (Syntax leaf) (Record fields))
+maybeIdentifier :: HasField fields Info.Category => Syntax leaf (Cofree (Syntax leaf) (Record fields)) -> Maybe (Cofree (Syntax leaf) (Record fields))
 maybeIdentifier syntax = case syntax of
   Assignment f _ -> Just f
   Class f _ _ -> Just f
