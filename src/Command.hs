@@ -18,6 +18,7 @@ import Interpreter
 import qualified Git
 import Git.Blob
 import Git.Libgit2
+import Git.Libgit2.Backend
 import Git.Repository
 import Git.Types
 import GitmonClient
@@ -30,7 +31,7 @@ import Term
 
 data CommandF f where
   ReadFile :: FilePath -> CommandF SourceBlob
-  ReadFilesAtSHAs :: FilePath -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
+  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
 
   Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
@@ -39,8 +40,6 @@ data CommandF f where
   RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
 
   -- parallelize diffs of a list of paths + git shas
-  -- explicit gitmon effects/events
-  -- tracing events (traceEventIO & friends) for event logs
   -- alternateObjectDirs??
 
 type Command = Freer CommandF
@@ -51,7 +50,7 @@ type Command = Freer CommandF
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path -> runReadFile path >>= yield
-  ReadFilesAtSHAs gitDir paths sha1 sha2 -> runReadFilesAtSHAs gitDir paths sha1 sha2 >>= yield
+  ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 -> runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 >>= yield
   Parse language blob -> runParse language blob >>= yield
   Diff term1 term2 -> yield (runDiff term1 term2)
   RenderDiff renderer blob1 blob2 diff -> yield (runRenderDiff renderer blob1 blob2 diff)
@@ -61,10 +60,10 @@ runReadFile path = do
   source <- readAndTranscodeFile path
   return (sourceBlob source path)
 
-runReadFilesAtSHAs :: FilePath -> [FilePath] -> String -> String -> IO [(SourceBlob, SourceBlob)]
-runReadFilesAtSHAs gitDir paths sha1 sha2 = withRepository lgFactory gitDir $ do
-  -- repo <- getRepository
-  -- for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
+runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> IO [(SourceBlob, SourceBlob)]
+runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository lgFactory gitDir $ do
+  repo <- getRepository
+  for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
 
   liftIO $ traceEventIO ("START readFilesAtSHAs: " <> show paths)
 
