@@ -1,10 +1,17 @@
 {-# LANGUAGE DataKinds, GADTs #-}
 module Command
-( module C
+( Command
+-- Constructors
+, readFile
+, readFilesAtSHAs
+, parse
+, diff
+, renderDiff
+-- Evaluation
+, runCommand
 ) where
 
-import Command.Diff as C
-import Command.Parse as C
+import Command.Parse
 import Control.Monad.Free.Freer
 import Data.Functor.Both
 import Data.List ((\\))
@@ -23,7 +30,7 @@ import Git.Repository
 import Git.Types
 import GitmonClient
 import Language
-import Prologue
+import Prologue hiding (readFile)
 import Renderer
 import Source
 import Syntax
