@@ -122,7 +122,6 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
 
   blobs <- for paths $ \ path -> (,) <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
 
-
   liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
   return blobs
   where treeForSha sha = do
