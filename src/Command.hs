@@ -62,7 +62,7 @@ parse :: Language -> SourceBlob -> Command (Term (Syntax Text) (Record DefaultFi
 parse language blob = Parse language blob `Then` return
 
 -- | Diff two terms.
-diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> Command (Diff (Syntax Text) (Record DefaultFields))
+diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> Command (Diff (Syntax Text) (Record fields))
 diff term1 term2 = Diff term1 term2 `Then` return
 
 -- | Render a diff using the specified renderer.
@@ -90,7 +90,7 @@ data CommandF f where
 
   Parse :: Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
-  Diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> CommandF (Diff (Syntax Text) (Record DefaultFields))
+  Diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> CommandF (Diff (Syntax Text) (Record fields))
 
   RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
 
@@ -150,10 +150,10 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
 runParse :: Language -> SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
 runParse = parserForLanguage
 
-runDiff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> Diff (Syntax Text) (Record DefaultFields)
+runDiff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> Diff (Syntax Text) (Record fields)
 runDiff term1 term2 = stripDiff (diffTerms (decorate term1) (decorate term2))
   where decorate = defaultFeatureVectorDecorator getLabel
-        getLabel :: TermF (Syntax Text) (Record DefaultFields) a -> (Category, Maybe Text)
+        getLabel :: HasField fields Category => TermF (Syntax Text) (Record fields) a -> (Category, Maybe Text)
         getLabel (h :< t) = (Info.category h, case t of
           Leaf s -> Just s
           _ -> Nothing)
