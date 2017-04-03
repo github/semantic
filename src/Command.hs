@@ -74,7 +74,6 @@ data CommandF f where
   RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
 
   -- parallelize diffs of a list of paths + git shas
-  -- alternateObjectDirs??
 
 
 runReadFile :: FilePath -> IO SourceBlob
