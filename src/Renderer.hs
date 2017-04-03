@@ -33,9 +33,9 @@ data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields Text
   PatchRenderer :: HasField fields Range => DiffRenderer fields Text
   JSONDiffRenderer :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => DiffRenderer fields (Map Text Value)
-  SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields (Map Text (Map Text [Value]))
+  SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
-  ToCRenderer :: HasDefaultFields fields => DiffRenderer fields (Map Text (Map Text [Value]))
+  ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
 
 runDiffRenderer :: DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Output
 runDiffRenderer renderer = case renderer of
@@ -51,9 +51,9 @@ runDiffRenderer' renderer = case renderer of
   SplitRenderer -> R.split
   PatchRenderer -> R.patch
   JSONDiffRenderer -> R.json
-  SummaryRenderer -> R.summary
+  SummaryRenderer -> (Summaries .) . R.summary
   SExpressionDiffRenderer format -> R.sExpression format
-  ToCRenderer -> R.toc
+  ToCRenderer -> (Summaries .) . R.toc
 
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
@@ -86,9 +86,7 @@ concatOutputs list | isJSON list = toS . encode $ concatJSON list
 concatOutputs list | isSummary list = toS . encode $ concatSummaries list
   where
     concatSummaries :: [Output] -> Map Text (Map Text [Value])
-    concatSummaries (SummaryOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
-    concatSummaries (TOCOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
-    concatSummaries _ = mempty
+    concatSummaries = unSummaries . foldMap toSummaries
 concatOutputs list | isByteString list = B.intercalate "\n" (toByteString <$> list)
 concatOutputs list | isText list = B.intercalate "\n" (encodeUtf8 . toText <$> list)
 concatOutputs _ = mempty
@@ -111,6 +109,11 @@ toText :: Output -> Text
 toText (SplitOutput text) = text
 toText (PatchOutput text) = text
 toText _ = mempty
+
+toSummaries :: Output -> Summaries
+toSummaries (SummaryOutput s) = Summaries s
+toSummaries (TOCOutput s) = Summaries s
+toSummaries _ = mempty
 
 isByteString :: [Output] -> Bool
 isByteString (SExpressionOutput _ : _) = True

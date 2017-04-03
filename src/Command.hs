@@ -83,9 +83,9 @@ renderDiffOutput renderer blob1 blob2 diff = fmap output (renderDiff renderer bl
           SplitRenderer -> SplitOutput
           PatchRenderer -> PatchOutput
           JSONDiffRenderer -> JSONOutput
-          SummaryRenderer -> SummaryOutput
+          SummaryRenderer -> SummaryOutput . unSummaries
           SExpressionDiffRenderer _ -> SExpressionOutput
-          ToCRenderer -> TOCOutput
+          ToCRenderer -> TOCOutput . unSummaries
 
 
 -- Evaluation
