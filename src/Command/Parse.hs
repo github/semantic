@@ -7,6 +7,7 @@ import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson.Types (Pair)
 import Data.Functor.Foldable hiding (Nil)
 import Data.Record
+import Data.String
 import qualified Data.Text as T
 import Git.Blob
 import Git.Libgit2
@@ -104,7 +105,7 @@ sourceBlobsFromPaths filePaths =
                   pure $ Source.SourceBlob source mempty filePath (Just Source.defaultPlainBlob))
 
 -- | For the given sha, git repo path, and file paths, retrieves the source blobs.
-sourceBlobsFromSha :: [Char] -> [Char] -> [FilePath] -> IO [SourceBlob]
+sourceBlobsFromSha :: String -> String -> [FilePath] -> IO [SourceBlob]
 sourceBlobsFromSha commitSha gitDir filePaths = do
   maybeBlobs <- withRepository lgFactory gitDir $ do
     repo   <- getRepository
@@ -134,7 +135,7 @@ sourceBlobsFromSha commitSha gitDir filePaths = do
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
 -- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
-identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, StringConv leaf T.Text) => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe T.Text
+identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, StringConv leaf Text) => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe Text
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 -- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
@@ -149,7 +150,7 @@ parseWithDecorator :: TermDecorator (Syntax Text) DefaultFields field -> FilePat
 parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: Text -> Parser (Syntax Text) (Record DefaultFields)
+parserForType :: String -> Parser (Syntax Text) (Record DefaultFields)
 parserForType mediaType = maybe lineByLineParser parserForLanguage (languageForType mediaType)
 
 -- | Select a parser for a given Language.
