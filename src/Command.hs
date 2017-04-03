@@ -36,23 +36,36 @@ import Source
 import Syntax
 import Term
 
+
+-- | High-level commands encapsulating the work done to perform a diff or parse operation.
 type Command = Freer CommandF
 
 
 -- Constructors
 
+-- | Read a regular file into a SourceBlob.
 readFile :: FilePath -> Command SourceBlob
 readFile path = ReadFile path `Then` return
 
-readFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> Command [(SourceBlob, SourceBlob)]
+-- | Read a list of files at the states corresponding to the given shas.
+readFilesAtSHAs
+  :: FilePath -- ^ GIT_DIR
+  -> [FilePath] -- ^ GIT_ALTERNATE_OBJECT_DIRECTORIES
+  -> [FilePath] -- ^ Specific paths to diff. If empty, diff all changed paths.
+  -> String -- ^ The commit sha for the before state.
+  -> String -- ^ The commit sha for the after state.
+  -> Command [(SourceBlob, SourceBlob)] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
 readFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 `Then` return
 
+-- | Parse a blob in a given language.
 parse :: Language -> SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
 parse language blob = Parse language blob `Then` return
 
+-- | Diff two terms.
 diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> Command (Diff (Syntax Text) (Record DefaultFields))
 diff term1 term2 = Diff term1 term2 `Then` return
 
+-- | Render a diff using the specified renderer.
 renderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> Command output
 renderDiff renderer blob1 blob2 diff = RenderDiff renderer blob1 blob2 diff `Then` return
 
