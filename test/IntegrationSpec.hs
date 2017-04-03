@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module IntegrationSpec where
 
-import Category as C
 import Command.Diff
 import Command.Parse
 import Data.Functor.Both
