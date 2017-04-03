@@ -40,9 +40,9 @@ main = do
         CommitDiff -> do
           blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) (fst shaRange)) (fromMaybe (toS nullOid) (snd shaRange))
           for blobPairs $ \ blobs -> do
-            terms <- traverse parseBlob (Join blobs)
+            terms <- traverse parseBlob blobs
             diff' <- runBothWith diff terms
-            return (Join blobs, diff')
+            return (blobs, diff')
       render diffs
     Parse -> case format of
       R.Index -> parseIndex args

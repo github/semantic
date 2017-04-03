@@ -56,7 +56,7 @@ readFilesAtSHAs
   -> [FilePath] -- ^ Specific paths to diff. If empty, diff all changed paths.
   -> String -- ^ The commit sha for the before state.
   -> String -- ^ The commit sha for the after state.
-  -> Command [(SourceBlob, SourceBlob)] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
+  -> Command [Both SourceBlob] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
 readFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 `Then` return
 
 -- | Parse a blob in a given language.
@@ -92,7 +92,7 @@ runCommand = iterFreerA $ \ command yield -> case command of
 
 data CommandF f where
   ReadFile :: FilePath -> CommandF SourceBlob
-  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [(SourceBlob, SourceBlob)]
+  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [Both SourceBlob]
 
   Parse :: Maybe Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
@@ -108,7 +108,7 @@ runReadFile path = do
   source <- readAndTranscodeFile path
   return (sourceBlob source path)
 
-runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> IO [(SourceBlob, SourceBlob)]
+runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> IO [Both SourceBlob]
 runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
@@ -126,7 +126,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
 
       pure $! (a \\ b) <> (b \\ a)
 
-  blobs <- for paths $ \ path -> (,) <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
+  blobs <- for paths $ \ path -> both <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
 
   liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
   return blobs
