@@ -5,6 +5,7 @@ import Arguments
 import Command
 import Command.Parse
 import Development.GitRev
+import Data.Aeson
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.String
@@ -23,24 +24,33 @@ main = do
   text <- case runMode of
     Diff -> runCommand $ do
       let render = case format of
-            R.Split -> renderDiffOutput R.SplitRenderer
-            R.Patch -> renderDiffOutput R.PatchRenderer
-            R.JSON -> renderDiffOutput R.JSONDiffRenderer
-            R.Summary -> renderDiffOutput R.SummaryRenderer
-            R.SExpression -> renderDiffOutput (R.SExpressionDiffRenderer R.TreeOnly)
-            R.TOC -> renderDiffOutput R.ToCRenderer
-      case diffMode of
+            R.Split -> fmap encodeText . renderDiffs R.SplitRenderer
+            R.Patch -> fmap encodeText . renderDiffs R.PatchRenderer
+            R.JSON -> fmap encodeJSON . renderDiffs R.JSONDiffRenderer
+            R.Summary -> fmap encodeSummaries . renderDiffs R.SummaryRenderer
+            R.SExpression -> renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
+            R.TOC -> fmap encodeSummaries . renderDiffs R.ToCRenderer
+      diffs <- case diffMode of
         PathDiff paths -> do
-          Join (blob1, blob2) <- traverse readFile paths
-          Join (term1, term2) <- traverse parseBlob (both blob1 blob2)
-          diff' <- diff term1 term2
-          rendered <- render blob1 blob2 diff'
-          return $! R.concatOutputs [rendered]
+          blobs <- traverse readFile paths
+          terms <- traverse parseBlob blobs
+          diff' <- runBothWith diff terms
+          return [(blobs, diff')]
+        CommitDiff -> do
+          blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) (fst shaRange)) (fromMaybe (toS nullOid) (snd shaRange))
+          for blobPairs $ \ blobs -> do
+            terms <- traverse parseBlob (Join blobs)
+            diff' <- runBothWith diff terms
+            return (Join blobs, diff')
+      render diffs
     Parse -> case format of
       R.Index -> parseIndex args
       R.SExpression -> parseSExpression args
       _ -> parseTree args
   writeToOutput outputPath (text <> "\n")
+  where encodeText = encodeUtf8 . R.unFile
+        encodeJSON = toS . encode
+        encodeSummaries = toS . encode . R.unSummaries
 
 -- | A parser for the application's command-line arguments.
 argumentsParser :: ParserInfo CmdLineOptions
