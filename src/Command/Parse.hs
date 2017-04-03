@@ -187,8 +187,7 @@ type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fi
 
 -- | Term decorator extracting the source text for a term.
 termSourceTextDecorator :: (Functor f, HasField fields Range) => Source -> TermDecorator f fields (Maybe SourceText)
-termSourceTextDecorator source term = Just . SourceText . toText $ Source.slice range' source
- where range' = byteRange $ headF term
+termSourceTextDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
 
 newtype Identifier = Identifier Text
   deriving (Eq, Show, ToJSON)
