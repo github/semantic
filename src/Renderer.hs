@@ -2,19 +2,13 @@
 module Renderer
 ( DiffRenderer(..)
 , runDiffRenderer
-, runDiffRenderer'
-, Renderer
-, Output(..)
-, concatOutputs
 , Format(..)
 , Summaries(..)
 ) where
 
-import Data.Aeson (ToJSON, Value, encode)
+import Data.Aeson (ToJSON, Value)
 import Data.Functor.Both
 import Data.Map as Map hiding (null)
-import Data.Text.Encoding (encodeUtf8)
-import qualified Data.ByteString as B
 import Data.Functor.Listable
 import Data.Record
 import Diff
@@ -37,15 +31,6 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
 
-runDiffRenderer :: DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Output
-runDiffRenderer renderer = case renderer of
-  SplitRenderer -> (SplitOutput .) . R.split
-  PatchRenderer -> (PatchOutput .) . R.patch
-  JSONDiffRenderer -> (JSONOutput .) . R.json
-  SummaryRenderer -> (SummaryOutput .) . R.summary
-  SExpressionDiffRenderer format -> (SExpressionOutput .) . R.sExpression format
-  ToCRenderer -> (TOCOutput .) . R.toc
-
 runDiffRenderer' :: DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output
 runDiffRenderer' renderer = case renderer of
   SplitRenderer -> R.split
@@ -55,14 +40,8 @@ runDiffRenderer' renderer = case renderer of
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> (Summaries .) . R.toc
 
--- | A function that will render a diff, given the two source blobs.
-type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
-
 -- | The available types of diff rendering.
 data Format = Split | Patch | JSON | Summary | SExpression | TOC | Index | ParseTree
-  deriving (Show)
-
-data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value])) | SExpressionOutput ByteString | TOCOutput (Map Text (Map Text [Value]))
   deriving (Show)
 
 newtype Summaries = Summaries { unSummaries :: Map Text (Map Text [Value]) }
@@ -71,57 +50,6 @@ newtype Summaries = Summaries { unSummaries :: Map Text (Map Text [Value]) }
 instance Monoid Summaries where
   mempty = Summaries mempty
   mappend = (Summaries .) . (Map.unionWith (Map.unionWith (<>)) `on` unSummaries)
-
--- Concatenates a list of 'Output' depending on the output type.
--- For JSON, each file output is merged since they're uniquely keyed by filename.
--- For Summaries, each file output is merged into one 'Object' consisting of lists of
--- changes and errors.
--- Split and Patch output is appended together with newlines.
-concatOutputs :: [Output] -> ByteString
-concatOutputs list | isJSON list = toS . encode $ concatJSON list
-  where
-    concatJSON :: [Output] -> Map Text Value
-    concatJSON (JSONOutput hash : rest) = Map.union hash (concatJSON rest)
-    concatJSON _ = mempty
-concatOutputs list | isSummary list = toS . encode $ concatSummaries list
-  where
-    concatSummaries :: [Output] -> Map Text (Map Text [Value])
-    concatSummaries = unSummaries . foldMap toSummaries
-concatOutputs list | isByteString list = B.intercalate "\n" (toByteString <$> list)
-concatOutputs list | isText list = B.intercalate "\n" (encodeUtf8 . toText <$> list)
-concatOutputs _ = mempty
-
-isJSON :: [Output] -> Bool
-isJSON (JSONOutput _ : _) = True
-isJSON _ = False
-
-isSummary :: [Output] -> Bool
-isSummary (SummaryOutput _ : _) = True
-isSummary (TOCOutput _ : _) = True
-isSummary _ = False
-
-isText :: [Output] -> Bool
-isText (SplitOutput _ : _) = True
-isText (PatchOutput _ : _) = True
-isText _ = False
-
-toText :: Output -> Text
-toText (SplitOutput text) = text
-toText (PatchOutput text) = text
-toText _ = mempty
-
-toSummaries :: Output -> Summaries
-toSummaries (SummaryOutput s) = Summaries s
-toSummaries (TOCOutput s) = Summaries s
-toSummaries _ = mempty
-
-isByteString :: [Output] -> Bool
-isByteString (SExpressionOutput _ : _) = True
-isByteString _ = False
-
-toByteString :: Output -> ByteString
-toByteString (SExpressionOutput text) = text
-toByteString _ = B.empty
 
 
 instance Listable Format where
