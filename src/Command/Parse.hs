@@ -180,10 +180,10 @@ parserForLanguage language = case language of
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
 decorateTerm :: (Functor f) => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
-decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) :. headF term) :< tailF term)
+decorateTerm decorator = cata $ \ term -> cofree ((decorator term :. headF term) :< tailF term)
 
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
-type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
+type TermDecorator f fields field = TermF f (Record fields) (Term f (Record (field ': fields))) -> field
 
 -- | Term decorator extracting the source text for a term.
 termSourceTextDecorator :: (Functor f, HasField fields Range) => Source -> TermDecorator f fields (Maybe SourceText)
