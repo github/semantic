@@ -38,7 +38,6 @@ data CommandF f where
 
   RenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> CommandF output
   RenderTerm :: TermRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> CommandF output
-  -- render a term
 
   -- parallelize diffs of a list of paths + git shas
   -- explicit gitmon effects/events
