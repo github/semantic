@@ -106,7 +106,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
         toSourceKind (Git.SymlinkBlob mode) = Source.SymlinkBlob mode
 
 runParse :: Language -> SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-runParse language blob = parserForLanguage language blob
+runParse = parserForLanguage
 
 runDiff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> Diff (Syntax Text) (Record DefaultFields)
 runDiff term1 term2 = stripDiff (diffTerms (decorate term1) (decorate term2))
@@ -117,4 +117,4 @@ runDiff term1 term2 = stripDiff (diffTerms (decorate term1) (decorate term2))
           _ -> Nothing)
 
 runRenderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> output
-runRenderDiff renderer blob1 blob2 diff = runDiffRenderer' renderer (both blob1 blob2) diff
+runRenderDiff renderer = (runDiffRenderer' renderer .) . both
