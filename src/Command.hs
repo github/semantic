@@ -7,6 +7,7 @@ module Command
 , parse
 , diff
 , renderDiff
+, renderDiffOutput
 -- Evaluation
 , runCommand
 ) where
@@ -68,6 +69,17 @@ diff term1 term2 = Diff term1 term2 `Then` return
 -- | Render a diff using the specified renderer.
 renderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> Command output
 renderDiff renderer blob1 blob2 diff = RenderDiff renderer blob1 blob2 diff `Then` return
+
+-- | Render a diff using the specified renderer, wrapping the result up in Output.
+renderDiffOutput :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> Command Output
+renderDiffOutput renderer blob1 blob2 diff = fmap output (renderDiff renderer blob1 blob2 diff)
+  where output = case renderer of
+          SplitRenderer -> SplitOutput
+          PatchRenderer -> PatchOutput
+          JSONDiffRenderer -> JSONOutput
+          SummaryRenderer -> SummaryOutput
+          SExpressionDiffRenderer _ -> SExpressionOutput
+          ToCRenderer -> TOCOutput
 
 
 -- Evaluation
