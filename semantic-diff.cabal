@@ -116,7 +116,7 @@ library
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -j
   ghc-prof-options: -fprof-auto
 
-executable semantic-diff
+executable semantic
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O2 -pgml=script/g++
