@@ -45,6 +45,24 @@ data CommandF f where
 type Command = Freer CommandF
 
 
+-- Constructors
+
+readFile :: FilePath -> Command SourceBlob
+readFile path = ReadFile path `Then` return
+
+readFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> Command [(SourceBlob, SourceBlob)]
+readFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 `Then` return
+
+parse :: Language -> SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
+parse language blob = Parse language blob `Then` return
+
+diff :: Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record DefaultFields) -> Command (Diff (Syntax Text) (Record DefaultFields))
+diff term1 term2 = Diff term1 term2 `Then` return
+
+renderDiff :: DiffRenderer fields output -> SourceBlob -> SourceBlob -> Diff (Syntax Text) (Record fields) -> Command output
+renderDiff renderer blob1 blob2 diff = RenderDiff renderer blob1 blob2 diff `Then` return
+
+
 -- Evaluation
 
 runCommand :: Command a -> IO a
