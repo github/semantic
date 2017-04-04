@@ -139,7 +139,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
 
       pure $! (a \\ b) <> (b \\ a)
 
-  blobs <- for paths $ \ path -> (((,) path) .) . both <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
+  blobs <- for paths $ \ path -> ((,) path .) . both <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
 
   liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
   return blobs
