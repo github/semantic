@@ -3,6 +3,7 @@ module Command.Diff.Spec where
 import Command
 import Data.Aeson
 import Data.Aeson.Types
+import Data.Functor.Both
 import Data.Map as Map
 import Data.Maybe
 import Data.Text.Lazy as T
@@ -45,7 +46,7 @@ spec = parallel $ do
 fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [FilePath] -> DiffRenderer DefaultFields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f gitDir sha1 sha2 filePaths renderer = do
   results <- fmap encode . runCommand $ do
-    blobs <- readFilesAtSHAs gitDir [] filePaths sha1 sha2
+    blobs <- readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
     diffs <- for blobs . uncurry $ \ path blobs -> do
       terms <- traverse (traverse parseBlob) blobs
       Just diff' <- maybeDiff terms

@@ -58,10 +58,9 @@ readFilesAtSHAs
   :: FilePath -- ^ GIT_DIR
   -> [FilePath] -- ^ GIT_ALTERNATE_OBJECT_DIRECTORIES
   -> [FilePath] -- ^ Specific paths to diff. If empty, diff all changed paths.
-  -> String -- ^ The commit sha for the before state.
-  -> String -- ^ The commit sha for the after state.
+  -> Both String -- ^ The commit shas for the before & after states.
   -> Command [(FilePath, Both (Maybe SourceBlob))] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
-readFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 `Then` return
+readFilesAtSHAs gitDir alternateObjectDirs paths shas = ReadFilesAtSHAs gitDir alternateObjectDirs paths shas `Then` return
 
 -- | Parse a blob in a given language.
 parse :: Maybe Language -> SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
@@ -94,7 +93,7 @@ renderDiffs renderer diffs = RenderDiffs renderer diffs `Then` return
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path -> runReadFile path >>= yield
-  ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 -> runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 >>= yield
+  ReadFilesAtSHAs gitDir alternateObjectDirs paths shas -> runReadFilesAtSHAs gitDir alternateObjectDirs paths shas >>= yield
   Parse language blob -> runParse language blob >>= yield
   Diff terms -> yield (runDiff terms)
   RenderDiffs renderer diffs -> yield (runRenderDiffs renderer diffs)
@@ -104,7 +103,7 @@ runCommand = iterFreerA $ \ command yield -> case command of
 
 data CommandF f where
   ReadFile :: FilePath -> CommandF (Maybe SourceBlob)
-  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [(FilePath, Both (Maybe SourceBlob))]
+  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> CommandF [(FilePath, Both (Maybe SourceBlob))]
 
   Parse :: Maybe Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
@@ -121,14 +120,14 @@ runReadFile path = do
   source <- traverse transcode raw
   return (flip sourceBlob path <$> source)
 
-runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> IO [(FilePath, Both (Maybe SourceBlob))]
-runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository lgFactory gitDir $ do
+runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> IO [(FilePath, Both (Maybe SourceBlob))]
+runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
 
   liftIO $ traceEventIO ("START readFilesAtSHAs: " <> show paths)
 
-  trees <- traverse treeForSha (both sha1 sha2)
+  trees <- traverse treeForSha shas
 
   paths <- case paths of
     (_ : _) -> pure paths

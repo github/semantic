@@ -38,7 +38,7 @@ main = do
           diff' <- maybeDiff terms
           return [(fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')]
         CommitDiff -> do
-          blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) (fst shaRange)) (fromMaybe (toS nullOid) (snd shaRange))
+          blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) <$> shaRange)
           for blobPairs . uncurry $ \ path blobs -> do
             terms <- traverse (traverse parseBlob) blobs
             diff' <- maybeDiff terms
