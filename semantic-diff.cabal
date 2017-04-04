@@ -67,7 +67,6 @@ library
                      , aeson
                      , aeson-pretty
                      , array
-                     , async-pool
                      , bifunctors
                      , blaze-html
                      , blaze-markup
