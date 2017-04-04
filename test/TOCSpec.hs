@@ -4,7 +4,6 @@ module TOCSpec where
 import Data.Aeson
 import Category as C
 import Command
-import Command.Parse
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
