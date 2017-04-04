@@ -72,15 +72,15 @@ parseBlob :: SourceBlob -> Command (Term (Syntax Text) (Record DefaultFields))
 parseBlob blob = parse (languageForType (takeExtension (path blob))) blob
 
 -- | Diff two terms.
-diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> Command (Diff (Syntax Text) (Record fields))
-diff term1 term2 = Diff term1 term2 `Then` return
+diff :: HasField fields Category => Both (Term (Syntax Text) (Record fields)) -> Command (Diff (Syntax Text) (Record fields))
+diff terms = Diff terms `Then` return
 
 -- | Diff two terms, producing an insertion/deletion when one is missing and Nothing when both are missing.
-maybeDiff :: HasField fields Category => Maybe (Term (Syntax Text) (Record fields)) -> Maybe (Term (Syntax Text) (Record fields)) -> Command (Maybe (Diff (Syntax Text) (Record fields)))
-maybeDiff term1 term2 = case (term1, term2) of
+maybeDiff :: HasField fields Category => Both (Maybe (Term (Syntax Text) (Record fields))) -> Command (Maybe (Diff (Syntax Text) (Record fields)))
+maybeDiff terms = case runJoin terms of
   (Just term1, Nothing) -> return (Just (pure (Delete term1)))
   (Nothing, Just term2) -> return (Just (pure (Insert term2)))
-  (Just term1, Just term2) -> Just <$> diff term1 term2
+  (Just term1, Just term2) -> Just <$> diff (both term1 term2)
   (Nothing, Nothing) -> return Nothing
 
 -- | Render a diff using the specified renderer.
@@ -96,7 +96,7 @@ runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path -> runReadFile path >>= yield
   ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 -> runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 >>= yield
   Parse language blob -> runParse language blob >>= yield
-  Diff term1 term2 -> yield (runDiff term1 term2)
+  Diff terms -> yield (runDiff terms)
   RenderDiffs renderer diffs -> yield (runRenderDiffs renderer diffs)
 
 
@@ -108,7 +108,7 @@ data CommandF f where
 
   Parse :: Maybe Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
-  Diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> CommandF (Diff (Syntax Text) (Record fields))
+  Diff :: HasField fields Category => Both (Term (Syntax Text) (Record fields)) -> CommandF (Diff (Syntax Text) (Record fields))
 
   RenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> CommandF output
 
@@ -165,8 +165,8 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
 runParse :: Maybe Language -> SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
 runParse = maybe lineByLineParser parserForLanguage
 
-runDiff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> Diff (Syntax Text) (Record fields)
-runDiff term1 term2 = stripDiff (diffTerms (decorate term1) (decorate term2))
+runDiff :: HasField fields Category => Both (Term (Syntax Text) (Record fields)) -> Diff (Syntax Text) (Record fields)
+runDiff terms = stripDiff (runBothWith diffTerms (fmap decorate terms))
   where decorate = defaultFeatureVectorDecorator getLabel
         getLabel :: HasField fields Category => TermF (Syntax Text) (Record fields) a -> (Category, Maybe Text)
         getLabel (h :< t) = (Info.category h, case t of

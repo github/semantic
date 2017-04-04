@@ -35,13 +35,13 @@ main = do
         PathDiff paths -> do
           blobs <- traverse readFile paths
           terms <- traverse (traverse parseBlob) blobs
-          diff' <- runBothWith maybeDiff terms
+          diff' <- maybeDiff terms
           return [(fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')]
         CommitDiff -> do
           blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) (fst shaRange)) (fromMaybe (toS nullOid) (snd shaRange))
           for blobPairs . uncurry $ \ path blobs -> do
             terms <- traverse (traverse parseBlob) blobs
-            diff' <- runBothWith maybeDiff terms
+            diff' <- maybeDiff terms
             return (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
       render (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
     Parse -> case format of

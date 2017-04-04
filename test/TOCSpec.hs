@@ -123,7 +123,7 @@ type Term' = SyntaxTerm String DefaultFields
 diffOutput :: Both SourceBlob -> IO ByteString
 diffOutput blobs = runCommand $ do
   terms <- for blobs parseBlob
-  diff' <- runBothWith diff terms
+  diff' <- diff terms
   toS . encode <$> renderDiffs ToCRenderer [ (blobs, diff') ]
 
 numTocSummaries :: Diff' -> Int
@@ -189,7 +189,7 @@ isMethodOrFunction a = case runCofree (unListableF a) of
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
 testDiff blobs = runCommand $ do
   terms <- for blobs parseBlob
-  runBothWith diff terms
+  diff terms
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do

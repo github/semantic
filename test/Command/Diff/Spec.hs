@@ -3,7 +3,6 @@ module Command.Diff.Spec where
 import Command
 import Data.Aeson
 import Data.Aeson.Types
-import Data.Functor.Both
 import Data.Map as Map
 import Data.Maybe
 import Data.Text.Lazy as T
@@ -49,7 +48,7 @@ fetchDiffsOutput f gitDir sha1 sha2 filePaths renderer = do
     blobs <- readFilesAtSHAs gitDir [] filePaths sha1 sha2
     diffs <- for blobs . uncurry $ \ path blobs -> do
       terms <- traverse (traverse parseBlob) blobs
-      Just diff' <- runBothWith maybeDiff terms
+      Just diff' <- maybeDiff terms
       return (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
     renderDiffs renderer diffs
   let json = fromJust (decode results)

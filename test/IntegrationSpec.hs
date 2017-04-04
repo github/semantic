@@ -121,7 +121,7 @@ testDiff renderer paths expectedOutput = do
   (blobs, diff') <- runCommand $ do
     blobs <- traverse readFile paths
     terms <- traverse (traverse parseBlob) blobs
-    Just diff' <- runBothWith maybeDiff terms
+    Just diff' <- maybeDiff terms
     return (fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')
   let diffOutput = renderer blobs diff'
   let actual = Verbatim (stripWhitespace diffOutput)
