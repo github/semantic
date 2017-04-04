@@ -18,6 +18,7 @@ import Command.Parse
 import qualified Control.Concurrent.Async.Pool as Async
 import Control.Exception (catch)
 import Control.Monad.Free.Freer
+import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Data.ByteString as B
 import Data.Functor.Both
@@ -108,6 +109,7 @@ runCommand = iterFreerA $ \ command yield -> case command of
   Concurrently ts f -> do
     results <- Async.withTaskGroup numCapabilities $ \ group -> Async.runTask group $ traverse (Async.task . runCommand . f) ts
     yield results
+  LiftIO io -> io >>= yield
 
 
 -- Implementation details
@@ -123,6 +125,8 @@ data CommandF f where
   RenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> CommandF output
 
   Concurrently :: Traversable t => t a -> (a -> Command b) -> CommandF (t b)
+
+  LiftIO :: IO a -> CommandF a
 
 
 runReadFile :: FilePath -> IO (Maybe SourceBlob)
@@ -185,3 +189,7 @@ runDiff terms = stripDiff (runBothWith diffTerms (fmap decorate terms))
 
 runRenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runRenderDiffs = runDiffRenderer
+
+
+instance MonadIO Command where
+  liftIO io = LiftIO io `Then` return
