@@ -34,16 +34,16 @@ main = do
       diffs <- case diffMode of
         PathDiff paths -> do
           blobs <- traverse readFile paths
-          terms <- traverse parseBlob blobs
-          diff' <- runBothWith diff terms
-          return [(blobs, diff')]
+          terms <- traverse (traverse parseBlob) blobs
+          diff' <- runBothWith maybeDiff terms
+          return [(fromMaybe <$> (emptySourceBlob <$> paths) <*> blobs, diff')]
         CommitDiff -> do
           blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) (fst shaRange)) (fromMaybe (toS nullOid) (snd shaRange))
-          for blobPairs $ \ blobs -> do
-            terms <- traverse parseBlob blobs
-            diff' <- runBothWith diff terms
-            return (blobs, diff')
-      render diffs
+          for blobPairs . uncurry $ \ path blobs -> do
+            terms <- traverse (traverse parseBlob) blobs
+            diff' <- runBothWith maybeDiff terms
+            return (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
+      render (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
     Parse -> case format of
       R.Index -> parseIndex args
       R.SExpression -> parseSExpression args

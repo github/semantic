@@ -14,7 +14,9 @@ module Command
 ) where
 
 import Command.Parse
+import Control.Exception (catch)
 import Control.Monad.Free.Freer
+import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.List ((\\))
 import Data.RandomWalkSimilarity
@@ -48,7 +50,7 @@ type Command = Freer CommandF
 -- Constructors
 
 -- | Read a regular file into a SourceBlob.
-readFile :: FilePath -> Command SourceBlob
+readFile :: FilePath -> Command (Maybe SourceBlob)
 readFile path = ReadFile path `Then` return
 
 -- | Read a list of files at the states corresponding to the given shas.
@@ -58,7 +60,7 @@ readFilesAtSHAs
   -> [FilePath] -- ^ Specific paths to diff. If empty, diff all changed paths.
   -> String -- ^ The commit sha for the before state.
   -> String -- ^ The commit sha for the after state.
-  -> Command [Both SourceBlob] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
+  -> Command [(FilePath, Both (Maybe SourceBlob))] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
 readFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = ReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 `Then` return
 
 -- | Parse a blob in a given language.
@@ -101,8 +103,8 @@ runCommand = iterFreerA $ \ command yield -> case command of
 -- Implementation details
 
 data CommandF f where
-  ReadFile :: FilePath -> CommandF SourceBlob
-  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [Both SourceBlob]
+  ReadFile :: FilePath -> CommandF (Maybe SourceBlob)
+  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> CommandF [(FilePath, Both (Maybe SourceBlob))]
 
   Parse :: Maybe Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
@@ -113,12 +115,13 @@ data CommandF f where
   -- TODO: parallelize diffs of a list of paths + git shas?
 
 
-runReadFile :: FilePath -> IO SourceBlob
+runReadFile :: FilePath -> IO (Maybe SourceBlob)
 runReadFile path = do
-  source <- readAndTranscodeFile path
-  return (sourceBlob source path)
+  raw <- (Just <$> B.readFile path) `catch` (const (return Nothing) :: IOException -> IO (Maybe ByteString))
+  source <- traverse transcode raw
+  return (flip sourceBlob path <$> source)
 
-runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> IO [Both SourceBlob]
+runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> String -> String -> IO [(FilePath, Both (Maybe SourceBlob))]
 runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository lgFactory gitDir $ do
   repo <- getRepository
   for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
@@ -136,7 +139,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
 
       pure $! (a \\ b) <> (b \\ a)
 
-  blobs <- for paths $ \ path -> both <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
+  blobs <- for paths $ \ path -> (((,) path) .) . both <$> blobForPathInTree path tree1 <*> blobForPathInTree path tree2
 
   liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
   return blobs
@@ -152,8 +155,8 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths sha1 sha2 = withRepository l
               contents <- blobToByteString blob
               transcoded <- liftIO $ transcode contents
               let oid = renderObjOid $ blobOid blob
-              pure $! SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))
-            _ -> pure $! emptySourceBlob path
+              pure (Just (SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))))
+            _ -> pure Nothing
         pathsForTree tree = do
           blobEntries <- reportGitmon "ls-tree" $ treeBlobEntries tree
           return $! fmap (\ (p, _, _) -> toS p) blobEntries
