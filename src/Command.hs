@@ -7,6 +7,7 @@ module Command
 , parse
 , parseBlob
 , diff
+, maybeDiff
 , renderDiffs
 -- Evaluation
 , runCommand
@@ -31,6 +32,7 @@ import Git.Repository
 import Git.Types
 import GitmonClient
 import Language
+import Patch
 import Prologue hiding (readFile)
 import Renderer
 import Source
@@ -70,6 +72,14 @@ parseBlob blob = parse (languageForType (takeExtension (path blob))) blob
 -- | Diff two terms.
 diff :: HasField fields Category => Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields) -> Command (Diff (Syntax Text) (Record fields))
 diff term1 term2 = Diff term1 term2 `Then` return
+
+-- | Diff two terms, producing an insertion/deletion when one is missing and Nothing when both are missing.
+maybeDiff :: HasField fields Category => Maybe (Term (Syntax Text) (Record fields)) -> Maybe (Term (Syntax Text) (Record fields)) -> Command (Maybe (Diff (Syntax Text) (Record fields)))
+maybeDiff term1 term2 = case (term1, term2) of
+  (Just term1, Nothing) -> return (Just (pure (Delete term1)))
+  (Nothing, Just term2) -> return (Just (pure (Insert term2)))
+  (Just term1, Just term2) -> Just <$> diff term1 term2
+  (Nothing, Nothing) -> return Nothing
 
 -- | Render a diff using the specified renderer.
 renderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> Command output
