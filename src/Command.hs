@@ -73,7 +73,7 @@ parseBlob blob = parse (languageForType (takeExtension (path blob))) blob
 
 -- | Diff two terms.
 diff :: HasField fields Category => Both (Term (Syntax Text) (Record fields)) -> Command (Diff (Syntax Text) (Record fields))
-diff terms = Diff terms `Then` return
+diff terms = Diff (terms `using` parTraversable rpar) `Then` return
 
 -- | Diff two terms, producing an insertion/deletion when one is missing and Nothing when both are missing.
 maybeDiff :: HasField fields Category => Both (Maybe (Term (Syntax Text) (Record fields))) -> Command (Maybe (Diff (Syntax Text) (Record fields)))
