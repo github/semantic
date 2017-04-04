@@ -112,8 +112,6 @@ data CommandF f where
 
   RenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> CommandF output
 
-  -- TODO: parallelize diffs of a list of paths + git shas?
-
 
 runReadFile :: FilePath -> IO (Maybe SourceBlob)
 runReadFile path = do
