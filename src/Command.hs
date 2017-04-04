@@ -16,6 +16,7 @@ module Command
 import Command.Parse
 import Control.Exception (catch)
 import Control.Monad.Free.Freer
+import Control.Parallel.Strategies
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.List ((\\))
@@ -83,8 +84,8 @@ maybeDiff terms = case runJoin terms of
   (Nothing, Nothing) -> return Nothing
 
 -- | Render a diff using the specified renderer.
-renderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> Command output
-renderDiffs renderer diffs = RenderDiffs renderer diffs `Then` return
+renderDiffs :: (NFData (Record fields), Monoid output) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> Command output
+renderDiffs renderer diffs = RenderDiffs renderer (diffs `using` parTraversable (parTuple2 r0 rdeepseq)) `Then` return
 
 
 -- Evaluation

@@ -89,6 +89,7 @@ library
                      , MonadRandom
                      , mtl
                      , optparse-applicative
+                     , parallel
                      , pointed
                      , protolude
                      , recursion-schemes
