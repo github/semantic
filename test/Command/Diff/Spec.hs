@@ -6,15 +6,16 @@ import Data.Aeson.Types
 import Data.Functor.Both
 import Data.Map as Map
 import Data.Maybe
+import Data.Text.Lazy as T
+import qualified Data.Vector as V
+import qualified Git.Types as Git
 import Info
 import Prelude
 import Prologue (($), fmap, (.), pure, for, panic)
+import Renderer hiding (errors)
+import Source
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
-import Data.Text.Lazy as T
-import qualified Data.Vector as V
-import Renderer hiding (errors)
-import qualified Git.Types as Git
 
 spec :: Spec
 spec = parallel $ do
@@ -46,10 +47,10 @@ fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [FilePat
 fetchDiffsOutput f gitDir sha1 sha2 filePaths renderer = do
   results <- fmap encode . runCommand $ do
     blobs <- readFilesAtSHAs gitDir [] filePaths sha1 sha2
-    diffs <- for blobs $ \ blobs -> do
-      terms <- for blobs parseBlob
-      diff' <- runBothWith diff terms
-      return (blobs, diff')
+    diffs <- for blobs . uncurry $ \ path blobs -> do
+      terms <- traverse (traverse parseBlob) blobs
+      Just diff' <- runBothWith maybeDiff terms
+      return (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
     renderDiffs renderer diffs
   let json = fromJust (decode results)
   pure (errors json, summaries f json)

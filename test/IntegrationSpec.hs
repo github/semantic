@@ -120,21 +120,14 @@ testParse path expectedOutput = do
 testDiff :: (Both SourceBlob -> Diff (Syntax Text) (Record DefaultFields) -> ByteString) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths expectedOutput = do
   (blobs, diff') <- runCommand $ do
-    blobs <- for paths readFile'
-    terms <- for blobs parseBlob
-    diff' <- case runJoin (nullBlob <$> blobs) of
-      (True, False) -> return (pure (Delete (fst terms)))
-      (False, True) -> return (pure (Insert (snd terms)))
-      _ -> runBothWith diff terms
-    return (blobs, diff')
+    blobs <- traverse readFile paths
+    terms <- traverse (traverse parseBlob) blobs
+    Just diff' <- runBothWith maybeDiff terms
+    return (fromMaybe <$> (emptySourceBlob <$> paths) <*> blobs, diff')
   let diffOutput = renderer blobs diff'
   let actual = Verbatim (stripWhitespace diffOutput)
   expected <- Verbatim . stripWhitespace <$> B.readFile expectedOutput
   actual `shouldBe` expected
-  where
-    readFile' path | Prologue.null path = pure (emptySourceBlob filePath)
-                   | otherwise = readFile path
-    filePath = if fst paths /= "" then fst paths else snd paths
 
 stripWhitespace :: ByteString -> ByteString
 stripWhitespace = B.foldl' go B.empty
