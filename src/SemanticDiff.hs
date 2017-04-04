@@ -12,7 +12,7 @@ import Data.String
 import Data.Version (showVersion)
 import Options.Applicative hiding (action)
 import qualified Paths_semantic_diff as Library (version)
-import Prologue hiding (fst, snd, readFile)
+import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Renderer as R
 import qualified Renderer.SExpression as R
 import Source
@@ -39,8 +39,8 @@ main = do
           return [(fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')]
         CommitDiff -> do
           blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) <$> shaRange)
-          for blobPairs . uncurry $ \ path blobs -> do
-            terms <- traverse (traverse parseBlob) blobs
+          concurrently blobPairs . uncurry $ \ path blobs -> do
+            terms <- concurrently blobs (traverse parseBlob)
             diff' <- maybeDiff terms
             return (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
       render (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)

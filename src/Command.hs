@@ -9,11 +9,13 @@ module Command
 , diff
 , maybeDiff
 , renderDiffs
+, concurrently
 -- Evaluation
 , runCommand
 ) where
 
 import Command.Parse
+import qualified Control.Concurrent.Async.Pool as Async
 import Control.Exception (catch)
 import Control.Monad.Free.Freer
 import Control.Parallel.Strategies
@@ -27,6 +29,7 @@ import Debug.Trace (traceEventIO)
 import Diff
 import Info
 import Interpreter
+import GHC.Conc (numCapabilities)
 import qualified Git
 import Git.Blob
 import Git.Libgit2
@@ -36,7 +39,7 @@ import Git.Types
 import GitmonClient
 import Language
 import Patch
-import Prologue hiding (readFile)
+import Prologue hiding (concurrently, Concurrently, readFile)
 import Renderer
 import Source
 import Syntax
@@ -87,6 +90,10 @@ maybeDiff terms = case runJoin terms of
 renderDiffs :: (NFData (Record fields), Monoid output) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> Command output
 renderDiffs renderer diffs = RenderDiffs renderer (diffs `using` parTraversable (parTuple2 r0 rdeepseq)) `Then` return
 
+-- | Run a function over each element of a Traversable concurrently.
+concurrently :: Traversable t => t a -> (a -> Command b) -> Command (t b)
+concurrently ts f = Concurrently ts f `Then` return
+
 
 -- Evaluation
 
@@ -98,6 +105,9 @@ runCommand = iterFreerA $ \ command yield -> case command of
   Parse language blob -> runParse language blob >>= yield
   Diff terms -> yield (runDiff terms)
   RenderDiffs renderer diffs -> yield (runRenderDiffs renderer diffs)
+  Concurrently ts f -> do
+    results <- Async.withTaskGroup numCapabilities $ \ group -> Async.runTask group $ traverse (Async.task . runCommand . f) ts
+    yield results
 
 
 -- Implementation details
@@ -111,6 +121,8 @@ data CommandF f where
   Diff :: HasField fields Category => Both (Term (Syntax Text) (Record fields)) -> CommandF (Diff (Syntax Text) (Record fields))
 
   RenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> CommandF output
+
+  Concurrently :: Traversable t => t a -> (a -> Command b) -> CommandF (t b)
 
 
 runReadFile :: FilePath -> IO (Maybe SourceBlob)
