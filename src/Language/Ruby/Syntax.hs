@@ -26,14 +26,14 @@ type Syntax = Union
 type Assignment symbol = Freer (AssignmentF symbol)
 
 data AssignmentF symbol a where
-  Rule :: symbol -> AssignmentF symbol a
+  Rule :: symbol -> a -> AssignmentF symbol a
   Content :: AssignmentF symbol ByteString
   Children :: AssignmentF symbol [a]
   Child :: AssignmentF symbol a
   And :: a -> a -> AssignmentF symbol a
 
-rule :: symbol -> Assignment symbol a
-rule symbol = Rule symbol `Then` return
+rule :: symbol -> Assignment symbol a -> Assignment symbol a
+rule symbol = wrap . Rule symbol
 
 content :: Assignment symbol ByteString
 content = Content `Then` return
@@ -55,13 +55,13 @@ data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias |
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe ()))
-assignment = foldr (>>) (pure Nothing) <$> (rule Program <> children)
+assignment = foldr (>>) (pure Nothing) <$> (rule Program children)
 
 comment :: Assignment Grammar (Program Syntax a)
-comment = wrapU . Comment.Comment <$> (rule Comment <> content)
+comment = wrapU . Comment.Comment <$> (rule Comment content)
 
 if' :: Assignment Grammar (Program Syntax a)
-if' = rule If <> (wrapU <$> (Statement.If <$> child <*> child <*> child))
+if' = rule If (wrapU <$> (Statement.If <$> child <*> child <*> child))
 
 
 instance Semigroup (Assignment symbol a) where
