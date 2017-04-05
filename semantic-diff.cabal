@@ -45,6 +45,7 @@ library
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
+                     , Language.Ruby.Syntax
                      , ParseCommand
                      , Parser
                      , Patch
