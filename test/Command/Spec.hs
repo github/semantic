@@ -1,15 +1,12 @@
 module Command.Spec where
 
 import Command
-import Data.Bifunctor
 import Data.Functor.Both
-import Data.Functor.Foldable
 import Data.String
 import Language
 import Prologue hiding (readFile)
 import Source
 import Syntax
-import System.FilePath
 import Test.Hspec
 
 spec :: Spec
