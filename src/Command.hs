@@ -136,10 +136,7 @@ runReadFile path = do
   return (flip sourceBlob path <$> source)
 
 runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> IO [(FilePath, Both (Maybe SourceBlob))]
-runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = withRepository lgFactory gitDir $ do
-  repo <- getRepository
-  for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
-
+runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = runGit $ do
   liftIO $ traceEventIO ("START readFilesAtSHAs: " <> show paths)
 
   trees <- traverse treeForSha shas
@@ -171,6 +168,11 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = withRepository lgFact
         pathsForTree tree = do
           blobEntries <- reportGitmon "ls-tree" $ treeBlobEntries tree
           return $! fmap (\ (p, _, _) -> toS p) blobEntries
+
+        runGit action = withRepository lgFactory gitDir $ do
+          repo <- getRepository
+          for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
+          action
 
         toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
