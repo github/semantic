@@ -3,9 +3,11 @@ module Command.Spec where
 import Command
 import Data.Bifunctor
 import Data.Functor.Both
+import Data.Functor.Foldable
 import Data.String
 import Prologue hiding (readFile)
 import Source
+import Syntax
 import System.FilePath
 import Test.Hspec
 
@@ -32,6 +34,11 @@ spec = parallel $ do
     it "returns entries for missing paths" $ do
       blobs <- runCommand (readFilesAtSHAs repoPath [] ["this file should not exist"] (shas methodsFixture))
       blobs `shouldBe` [("this file should not exist", pure Nothing)]
+
+  describe "parse" $ do
+    it "parses line by line if not given a language" $ do
+      term <- runCommand (parse Nothing methodsBlob)
+      fmap (const ()) term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
 
   where repoPath = "test/fixtures/git/examples/all-languages.git"
         methodsFixture = Fixture
