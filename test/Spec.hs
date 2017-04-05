@@ -2,6 +2,7 @@ module Main where
 
 import Prologue
 import qualified AlignmentSpec
+import qualified Command.Spec
 import qualified Command.Diff.Spec
 import qualified Command.Parse.Spec
 import qualified Data.Mergeable.Spec
@@ -23,6 +24,7 @@ main :: IO ()
 main = do
   hspec . parallel $ do
     describe "Alignment" AlignmentSpec.spec
+    describe "Command" Command.Spec.spec
     describe "Command.Diff" Command.Diff.Spec.spec
     describe "Command.Parse" Command.Parse.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
