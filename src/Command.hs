@@ -135,16 +135,15 @@ runReadFile path = do
   return (flip sourceBlob path <$> source)
 
 runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> IO [(FilePath, Both (Maybe SourceBlob))]
-runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = runGit $ do
-  trees <- traverse treeForSha shas
-
+runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = do
   paths <- case paths of
-    (_ : _) -> pure paths
-    [] -> do
+    [] -> runGit $ do
+      trees <- traverse treeForSha shas
       paths <- traverse pathsForTree trees
       pure $! runBothWith (\\) paths <> runBothWith (flip (\\)) paths
+    _ -> pure paths
 
-  blobsForPathsInTrees trees paths
+  Async.withTaskGroup numCapabilities (\ group -> Async.runTask group (traverse (Async.task . runGit . blobsForPath) paths))
   where treeForSha sha = do
           obj <- parseObjOid (toS sha)
           commit <- reportGitmon "cat-file" $ lookupCommit obj
@@ -163,12 +162,15 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = runGit $ do
           blobEntries <- reportGitmon "ls-tree" $ treeBlobEntries tree
           return $! fmap (\ (p, _, _) -> toS p) blobEntries
 
+        runGit :: ReaderT LgRepo IO a -> IO a
         runGit action = withRepository lgFactory gitDir $ do
           repo <- getRepository
           for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
           action
 
-        blobsForPathsInTrees trees = traverse $ \ path -> (,) path <$> traverse (blobForPathInTree path) trees
+        blobsForPath path = do
+          trees <- traverse treeForSha shas
+          (,) path <$> traverse (blobForPathInTree path) trees
 
         toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
