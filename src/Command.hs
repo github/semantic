@@ -144,7 +144,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = runGit $ do
       paths <- traverse pathsForTree trees
       pure $! runBothWith (\\) paths <> runBothWith (flip (\\)) paths
 
-  for paths $ \ path -> (,) path <$> traverse (blobForPathInTree path) trees
+  blobsForPathsInTrees trees paths
   where treeForSha sha = do
           obj <- parseObjOid (toS sha)
           commit <- reportGitmon "cat-file" $ lookupCommit obj
@@ -167,6 +167,8 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = runGit $ do
           repo <- getRepository
           for_ alternateObjectDirs (liftIO . odbBackendAddPath repo . toS)
           action
+
+        blobsForPathsInTrees trees = traverse $ \ path -> (,) path <$> traverse (blobForPathInTree path) trees
 
         toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
