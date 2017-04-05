@@ -26,7 +26,6 @@ import Data.List ((\\))
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
-import Debug.Trace (traceEventIO)
 import Diff
 import Info
 import Interpreter
@@ -137,8 +136,6 @@ runReadFile path = do
 
 runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> IO [(FilePath, Both (Maybe SourceBlob))]
 runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = runGit $ do
-  liftIO $ traceEventIO ("START readFilesAtSHAs: " <> show paths)
-
   trees <- traverse treeForSha shas
 
   paths <- case paths of
@@ -147,10 +144,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = runGit $ do
       paths <- traverse pathsForTree trees
       pure $! runBothWith (\\) paths <> runBothWith (flip (\\)) paths
 
-  blobs <- for paths $ \ path -> (,) path <$> traverse (blobForPathInTree path) trees
-
-  liftIO $! traceEventIO ("END readFilesAtSHAs: " <> show paths)
-  return blobs
+  for paths $ \ path -> (,) path <$> traverse (blobForPathInTree path) trees
   where treeForSha sha = do
           obj <- parseObjOid (toS sha)
           commit <- reportGitmon "cat-file" $ lookupCommit obj
