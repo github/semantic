@@ -27,9 +27,7 @@ main :: IO ()
 main = do
   gitDir <- findGitDir
   alternates <- findAlternates
-  args@Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
-  print args
-
+  Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
   text <- case programMode of
     Diff DiffArguments{..} -> runCommand $ do
       let render = case diffFormat of
