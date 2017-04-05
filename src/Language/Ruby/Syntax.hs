@@ -52,6 +52,9 @@ data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias |
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe ()))
 assignment = foldr (>>) (return Nothing) <$> rule Program
+comment :: Assignment Grammar (Program Syntax a)
+comment = wrapU . Comment.Comment <$> (rule Comment <> content)
+
 
 instance Semigroup (Assignment symbol a) where
   a <> b = And a b `Then` identity
