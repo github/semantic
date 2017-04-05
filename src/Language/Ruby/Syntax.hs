@@ -20,18 +20,17 @@ type Syntax = Union
   , Statement.Yield
   ]
 
--- | Parse a node with the specified symbol. Produces a list of subnodes.
-rule :: symbol -> Assignment symbol [a]
-rule sym = Rule sym `Then` return
-
-
-data AssignmentF symbol a where
-  Rule :: symbol -> AssignmentF symbol [a]
-
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
 type Assignment symbol = Freer (AssignmentF symbol)
+
+data AssignmentF symbol a where
+  Rule :: symbol -> AssignmentF symbol a
+  And :: a -> a -> AssignmentF symbol a
+
+rule :: symbol -> Assignment symbol a
+rule symbol = Rule symbol `Then` return
 
 
 -- | A program in some syntax functor, over which we can perform analyses.
@@ -45,3 +44,6 @@ data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias |
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe ()))
 assignment = foldr (>>) (return Nothing) <$> rule Program
+
+instance Semigroup (Assignment symbol a) where
+  a <> b = And a b `Then` identity
