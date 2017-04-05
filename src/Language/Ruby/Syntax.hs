@@ -10,7 +10,7 @@ import qualified Data.Syntax.Statement as Statement
 import Prologue
 
 -- | The type of Ruby syntax.
-type Ruby = Union
+type Syntax = Union
   '[Comment.Comment
   , Declaration.Class
   , Declaration.Method
@@ -42,5 +42,5 @@ type Program = Freer
 data Grammar = Program | Uninterpreted
 
 -- | Assignment onto a program in Ruby’s syntax.
-assignment :: Assignment Grammar (Program Ruby (Maybe ()))
+assignment :: Assignment Grammar (Program Syntax (Maybe ()))
 assignment = foldr (>>) (return Nothing) <$> rule Program
