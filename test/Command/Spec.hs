@@ -11,3 +11,7 @@ spec = parallel $ do
     it "returns a blob for extant files" $ do
       blob <- runCommand (readFile "semantic-diff.cabal")
       fmap path blob `shouldBe` Just "semantic-diff.cabal"
+
+    it "returns Nothing for absent files" $ do
+      blob <- runCommand (readFile "this file should not exist")
+      blob `shouldBe` Nothing
