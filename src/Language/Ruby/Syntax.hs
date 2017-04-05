@@ -38,7 +38,7 @@ rule symbol = Rule symbol `Then` return
 content :: Assignment symbol ByteString
 content = Content `Then` return
 
-children :: Assignment symbol [Assignment symbol a]
+children :: Assignment symbol [a]
 children = Children `Then` return
 
 child :: Assignment symbol a
