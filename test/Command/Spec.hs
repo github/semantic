@@ -5,6 +5,7 @@ import Data.Bifunctor
 import Data.Functor.Both
 import Data.Functor.Foldable
 import Data.String
+import Language
 import Prologue hiding (readFile)
 import Source
 import Syntax
@@ -39,6 +40,10 @@ spec = parallel $ do
     it "parses line by line if not given a language" $ do
       term <- runCommand (parse Nothing methodsBlob)
       fmap (const ()) term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
+
+    it "parses in the specified language" $ do
+      term <- runCommand (parse (Just Ruby) methodsBlob)
+      fmap (const ()) term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
 
   where repoPath = "test/fixtures/git/examples/all-languages.git"
         methodsFixture = Fixture
