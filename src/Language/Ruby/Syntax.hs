@@ -42,6 +42,6 @@ type Program = Freer
 data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment
   deriving (Enum, Eq, Ord, Show)
 
--- | Assignment onto a program in Ruby’s syntax.
+-- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe ()))
 assignment = foldr (>>) (return Nothing) <$> rule Program
