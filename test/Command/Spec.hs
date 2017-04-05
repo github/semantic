@@ -34,4 +34,8 @@ spec = parallel $ do
       blobs <- runCommand (readFilesAtSHAs repoPath [] [] (shas methodsFixture))
       blobs `shouldBe` expectedBlobs methodsFixture
 
+    it "returns entries for missing paths" $ do
+      blobs <- runCommand (readFilesAtSHAs repoPath [] ["this file should not exist"] (shas methodsFixture))
+      blobs `shouldBe` [("this file should not exist", pure Nothing)]
+
 data Fixture = Fixture { shas :: Both String, expectedBlobs :: [(FilePath, Both (Maybe SourceBlob))] }
