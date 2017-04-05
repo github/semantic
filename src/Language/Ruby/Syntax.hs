@@ -40,6 +40,7 @@ type Program = Freer
 
 -- | Statically-known rules corresponding to symbols in the grammar.
 data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment
+  deriving (Enum, Eq, Ord, Show)
 
 -- | Assignment onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe ()))
