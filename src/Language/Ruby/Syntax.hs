@@ -27,10 +27,14 @@ type Assignment symbol = Freer (AssignmentF symbol)
 
 data AssignmentF symbol a where
   Rule :: symbol -> AssignmentF symbol a
+  Content :: AssignmentF symbol ByteString
   And :: a -> a -> AssignmentF symbol a
 
 rule :: symbol -> Assignment symbol a
 rule symbol = Rule symbol `Then` return
+
+content :: Assignment symbol ByteString
+content = Content `Then` return
 
 
 -- | A program in some syntax functor, over which we can perform analyses.
