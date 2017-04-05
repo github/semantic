@@ -39,8 +39,8 @@ type Program = Freer
 
 
 -- | Statically-known rules corresponding to symbols in the grammar.
-data Rule = ProgramRule | UninterpretedRule
+data Grammar = Program | Uninterpreted
 
 -- | Assignment onto a program in Ruby’s syntax.
-assignment :: Assignment Rule (Program Ruby (Maybe ()))
-assignment = foldr (>>) (return Nothing) <$> rule ProgramRule
+assignment :: Assignment Grammar (Program Ruby (Maybe ()))
+assignment = foldr (>>) (return Nothing) <$> rule Program
