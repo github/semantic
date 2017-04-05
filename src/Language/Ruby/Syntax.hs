@@ -39,7 +39,7 @@ type Program = Freer
 
 
 -- | Statically-known rules corresponding to symbols in the grammar.
-data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment
+data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment | True' | False'
   deriving (Enum, Eq, Ord, Show)
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
