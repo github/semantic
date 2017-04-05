@@ -2,15 +2,18 @@
   (Module
     (Identifier))
   (Function
-    (Identifier))
+    (Identifier)
+    (Args))
   (Function
   { (Identifier)
   ->(Identifier) }
+    (Args)
     (FunctionCall
       (Identifier)))
   (Function
   { (Identifier)
   ->(Identifier) }
+    (Args)
     (FunctionCall
       (Identifier))
     (FunctionCall
@@ -18,6 +21,7 @@
   (Function
   { (Identifier)
   ->(Identifier) }
+    (Args)
     (FunctionCall
       (Identifier))
     (FunctionCall

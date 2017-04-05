@@ -1,6 +1,9 @@
 {-(Program
-    (VarDecl
+  (Other "variable_declaration"
     (VarAssignment
-    (Other"destructuring_pattern"
-      (Object
-        (Assignment (Identifier) (NumberLiteral)))) (Identifier))))-}
+      (Other "destructuring_pattern"
+        (Object
+          (Other "assignment_pattern"
+            (Identifier)
+            (NumberLiteral))))
+      (Identifier))))-}

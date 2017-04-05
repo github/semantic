@@ -3,10 +3,12 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (Other "type_declaration"
       (TypeDecl
         (Identifier)
         (StructTy
           (FieldDecl
-            (Identifier)
+            (Other "identifier_list"
+              (Identifier))
             (Identifier)))))))

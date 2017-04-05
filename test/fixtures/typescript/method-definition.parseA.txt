@@ -1,0 +1,11 @@
+(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (Method
+        (Other "accessibility_modifier")
+        (Identifier)
+        (Params)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))))))

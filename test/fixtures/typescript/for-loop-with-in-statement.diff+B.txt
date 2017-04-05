@@ -1,0 +1,22 @@
+{+(Program
+  (For
+    (BooleanOperator
+      (Operator
+        (Identifier)
+        (Other "in")
+        (Identifier))
+      (Other "&&")
+      (Assignment
+        (Identifier)
+        (NumberLiteral)))
+    (RelationalOperator
+      (Identifier)
+      (Other "<")
+      (Identifier))
+    (MathOperator
+      (Identifier)
+      (Other "++"))
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))))+}

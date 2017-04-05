@@ -15,26 +15,16 @@ termAssignment
 termAssignment source category children = case (category, children) of
   (Module, [moduleName]) -> Just $ S.Module moduleName []
   (Import, [importName]) -> Just $ S.Import importName []
-  (Function, [id, params, block]) -> Just $ S.Function id (toList (unwrap params)) Nothing (toList (unwrap block))
-  (Function, [id, params, ty, block]) -> Just $ S.Function id (toList (unwrap params)) (Just ty) (toList (unwrap block))
+  (Function, [id, params, block]) -> Just $ S.Function id [params] (toList (unwrap block))
+  (Function, [id, params, ty, block]) -> Just $ S.Function id [params, ty] (toList (unwrap block))
   (For, [body]) | Other "block" <- Info.category (extract body) -> Just $ S.For [] (toList (unwrap body))
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> Just $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> Just $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
   (TypeDecl, [identifier, ty]) -> Just $ S.TypeDecl identifier ty
   (StructTy, _) -> Just (S.Ty children)
-  (FieldDecl, [idList])
-    | [ident] <- toList (unwrap idList)
-    -> Just (S.FieldDecl ident Nothing Nothing)
-  (FieldDecl, [idList, ty])
-    | [ident] <- toList (unwrap idList)
-    -> Just $ case Info.category (extract ty) of
-      StringLiteral -> S.FieldDecl ident Nothing (Just ty)
-      _ -> S.FieldDecl ident (Just ty) Nothing
-  (FieldDecl, [idList, ty, tag])
-    | [ident] <- toList (unwrap idList)
-    -> Just (S.FieldDecl ident (Just ty) (Just tag))
+  (FieldDecl, _) -> Just (S.FieldDecl children)
   (ParameterDecl, param : ty) -> Just $ S.ParameterDecl (listToMaybe ty) param
-  (Assignment, [identifier, expression]) -> Just $ S.VarAssignment identifier expression
+  (Assignment, [identifier, expression]) -> Just $ S.VarAssignment [identifier] expression
   (Select, _) -> Just $ S.Select (children >>= toList . unwrap)
   (Go, [expr]) -> Just $ S.Go expr
   (Defer, [expr]) -> Just $ S.Defer expr
@@ -54,9 +44,9 @@ termAssignment source category children = case (category, children) of
   (TypeAssertion, [a, b]) -> Just $ S.TypeAssertion a b
   (TypeConversion, [a, b]) -> Just $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
-  (VarAssignment, [identifier, expression]) -> Just $ S.VarAssignment identifier expression
-  (VarDecl, [idList, ty]) | Identifier <- Info.category (extract ty) -> Just $ S.VarDecl idList (Just ty)
-  (FunctionCall, id : rest) -> Just $ S.FunctionCall id rest
+  (VarAssignment, [identifier, expression]) -> Just $ S.VarAssignment [identifier] expression
+  (VarDecl, children) -> Just $ S.VarDecl children
+  (FunctionCall, id : rest) -> Just $ S.FunctionCall id [] rest
   (AnonymousFunction, [params, _, body])
     | [params'] <- toList (unwrap params)
     -> Just $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
@@ -68,11 +58,11 @@ termAssignment source category children = case (category, children) of
   (IncrementStatement, _) -> Just $ S.Leaf (toText source)
   (DecrementStatement, _) -> Just $ S.Leaf (toText source)
   (QualifiedIdentifier, _) -> Just $ S.Leaf (toText source)
-  (Method, [receiverParams, name, body]) -> Just (S.Method name (Just receiverParams) Nothing [] (toList (unwrap body)))
+  (Method, [receiverParams, name, body]) -> Just (S.Method [] name (Just receiverParams) [] (toList (unwrap body)))
   (Method, [receiverParams, name, params, body])
-    -> Just (S.Method name (Just receiverParams) Nothing (toList (unwrap params)) (toList (unwrap body)))
+    -> Just (S.Method [] name (Just receiverParams) [params] (toList (unwrap body)))
   (Method, [receiverParams, name, params, ty, body])
-    -> Just (S.Method name (Just receiverParams) (Just ty) (toList (unwrap params)) (toList (unwrap body)))
+    -> Just (S.Method [] name (Just receiverParams) [params, ty] (toList (unwrap body)))
   _ -> Nothing
 
 categoryForGoName :: Text -> Category

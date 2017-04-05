@@ -113,6 +113,10 @@ data Category
   | MathOperator
   -- | A module
   | Module
+  -- | A namespace in TypeScript.
+  | Namespace
+  -- | An interface
+  | Interface
   -- | An import
   | Import
   -- | An export
@@ -228,6 +232,8 @@ data Category
   | Modifier Category
   -- | A singleton method declaration, e.g. `def self.foo;end` in Ruby
   | SingletonMethod
+  -- | An arbitrary type annotation.
+  | Ty
   deriving (Eq, Generic, Ord, Show, NFData)
 
 {-# DEPRECATED RescueModifier "Deprecated; use Modifier Rescue instead." #-}

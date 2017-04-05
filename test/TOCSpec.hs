@@ -134,14 +134,14 @@ numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC 
 programWithChange :: Term' -> Diff'
 programWithChange body = free $ Free (pure programInfo :< Indexed [ function' ])
   where
-    function' = free $ Free (pure functionInfo :< S.Function name' [] Nothing [ free $ Pure (Insert body) ] )
+    function' = free $ Free (pure functionInfo :< S.Function name' [] [ free $ Pure (Insert body) ] )
     name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = free $ Free (pure programInfo :< Indexed [ function', term' ])
   where
-    function' = free $ Free (pure functionInfo :< S.Function name' [] Nothing [] )
+    function' = free $ Free (pure functionInfo :< S.Function name' [] [] )
     name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
     term' = free $ Pure (Insert term)
 
@@ -158,7 +158,7 @@ programOf :: Patch Term' -> Diff'
 programOf patch = free $ Free (pure programInfo :< Indexed [ free $ Pure patch ])
 
 functionOf :: String -> Term' -> Term'
-functionOf name body = cofree $ functionInfo :< S.Function name' [] Nothing [body]
+functionOf name body = cofree $ functionInfo :< S.Function name' [] [body]
   where
     name' = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
 

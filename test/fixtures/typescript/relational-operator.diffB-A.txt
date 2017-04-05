@@ -1,0 +1,7 @@
+(Program
+  (ExpressionStatements
+    (RelationalOperator
+      (Identifier)
+    { (Other "<=")
+    ->(Other "<") }
+      (Identifier))))

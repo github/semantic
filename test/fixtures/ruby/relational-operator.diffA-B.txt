@@ -4,16 +4,19 @@
   { (Other "==")
   ->(Other "<=>") }
     (Identifier))
-  (Binary
+{+(Binary
     (Identifier)
-  { (Other "!=")
-  ->(Other "=~") }
-    (Identifier))
+    (Other "=~")
+    (Identifier))+}
 {+(Assignment
     (Identifier)
     (Unary
       (Other "!")
       (Identifier)))+}
+{-(Binary
+    (Identifier)
+    (Other "!=")
+    (Identifier))-}
 {-(Binary
     (Identifier)
     (Other "===")

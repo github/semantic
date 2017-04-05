@@ -1,0 +1,21 @@
+(Program
+  (ExpressionStatements
+  {+(CommaOperator
+      (Assignment
+        (Identifier)
+        (NumberLiteral))
+      (Assignment
+        (Identifier)
+        (NumberLiteral)))+}
+  {-(Assignment
+      (Identifier)
+      (Object
+        (Pair
+          (Identifier)
+          (CommaOperator
+            (NumberLiteral)
+            (MathOperator
+              (NumberLiteral)
+              (Other "+")
+              (NumberLiteral))
+            (NumberLiteral)))))-}))

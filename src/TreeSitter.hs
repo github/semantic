@@ -11,6 +11,7 @@ import Language
 import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.JavaScript as JS
+import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import Parser
 import Range
@@ -66,7 +67,6 @@ documentToTerm language document SourceBlob{..} = do
         copyNamed = ts_node_copy_named_child_nodes document
         copyAll = ts_node_copy_child_nodes document
 
-
 isNonEmpty :: HasField fields Category => SyntaxTerm Text fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
 
@@ -88,6 +88,7 @@ assignTerm language source annotation children allChildren =
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
           Ruby -> Ruby.termAssignment
+          TypeScript -> TS.termAssignment
           _ -> \ _ _ _ -> Nothing
 
 defaultTermAssignment :: Source -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
@@ -132,12 +133,15 @@ defaultTermAssignment source category children allChildren
 
 categoryForLanguageProductionName :: Language -> Text -> Category
 categoryForLanguageProductionName = withDefaults . byLanguage
-  where withDefaults productionMap name = case name of
-          "ERROR" -> ParseError
-          s -> productionMap s
-        byLanguage language = case language of
-          JavaScript -> JS.categoryForJavaScriptProductionName
-          C -> C.categoryForCProductionName
-          Ruby -> Ruby.categoryForRubyName
-          Language.Go -> Go.categoryForGoName
-          _ -> Other
+  where
+    withDefaults productionMap name = case name of
+      "ERROR" -> ParseError
+      s -> productionMap s
+      
+    byLanguage language = case language of
+      JavaScript -> JS.categoryForJavaScriptProductionName
+      C -> C.categoryForCProductionName
+      Ruby -> Ruby.categoryForRubyName
+      Language.Go -> Go.categoryForGoName
+      TypeScript -> TS.categoryForTypeScriptName
+      _ -> Other

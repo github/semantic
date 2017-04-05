@@ -41,18 +41,18 @@ termAssignment _ category children
           _ -> S.Try body rescues Nothing Nothing
     (Class, constant : superclass : body)
       | Superclass <- Info.category (extract superclass)
-      -> Just $ S.Class constant (Just superclass) body
-    (Class, constant : rest) -> Just $ S.Class constant Nothing rest
-    (SingletonClass, identifier : rest) -> Just $ S.Class identifier Nothing rest
+      -> Just $ S.Class constant [superclass] body
+    (Class, constant : rest) -> Just $ S.Class constant [] rest
+    (SingletonClass, identifier : rest) -> Just $ S.Class identifier [] rest
     (Case, _) -> Just $ uncurry S.Switch (Prologue.break ((== When) . Info.category . extract) children)
     (When, expr : body) -> Just $ S.Case expr body
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (MethodCall, fn : args)
       | MemberAccess <- Info.category (extract fn)
       , [target, method] <- toList (unwrap fn)
-      -> Just $ S.MethodCall target method (toList . unwrap =<< args)
+      -> Just $ S.MethodCall target method [] (toList . unwrap =<< args)
       | otherwise
-      -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
+      -> Just $ S.FunctionCall fn [] (toList . unwrap =<< args)
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
     (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
@@ -67,15 +67,15 @@ termAssignment _ category children
     (SingletonMethod, expr : methodName : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
-      -> Just $ S.Method methodName (Just expr) Nothing (toList (unwrap params)) body
+      -> Just $ S.Method [] methodName (Just expr) [params] body
       | Identifier <- Info.category (extract methodName)
-      -> Just $ S.Method methodName (Just expr) Nothing [] rest
+      -> Just $ S.Method [] methodName (Just expr) [] rest
     (Method, identifier : rest)
       | params : body <- rest
       , Params <- Info.category (extract params)
-      -> Just $ S.Method identifier Nothing Nothing (toList (unwrap params)) body
+      -> Just $ S.Method [] identifier Nothing [params] body
       | otherwise
-      -> Just $ S.Method identifier Nothing Nothing [] rest
+      -> Just $ S.Method [] identifier Nothing [] rest
     (Module, constant : body ) -> Just $ S.Module constant body
     (Modifier Rescue, [lhs, rhs] ) -> Just $ S.Rescue [lhs] [rhs]
     (Rescue, exceptions : exceptionVar : rest)

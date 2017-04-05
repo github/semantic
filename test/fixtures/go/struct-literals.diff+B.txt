@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (Other "const_declaration"
       (VarAssignment
         (Other "identifier_list"
@@ -24,7 +25,8 @@
           (Other "composite_literal"
             (StructTy
               (FieldDecl
-                (Identifier)
+                (Other "identifier_list"
+                  (Identifier))
                 (Identifier)))
             (Pair
               (Identifier)

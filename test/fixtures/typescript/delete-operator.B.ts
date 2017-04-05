@@ -1,0 +1,1 @@
+delete thing.prop

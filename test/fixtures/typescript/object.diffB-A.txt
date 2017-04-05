@@ -1,0 +1,12 @@
+(Program
+  (ExpressionStatements
+    (Object
+      (Pair
+        (StringLiteral)
+        (StringLiteral))
+    {-(Pair
+        (StringLiteral)
+        (StringLiteral))-}
+    {-(Pair
+        (StringLiteral)
+        (StringLiteral))-})))

@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (Other "var_declaration"
       (VarAssignment
         (Other "identifier_list"

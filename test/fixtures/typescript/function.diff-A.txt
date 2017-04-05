@@ -1,0 +1,14 @@
+{-(Program
+  (Function
+    (Other "type_parameters"
+      (Other "type_parameter"
+        (Identifier)))
+    (Params
+      (Other "required_parameter"
+        (Identifier))
+      (Other "required_parameter"
+        (Identifier)))
+    (Ty
+      (Other "predefined_type"))
+    (ExpressionStatements
+      (Identifier))))-}

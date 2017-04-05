@@ -1,5 +1,6 @@
 {-(Program
   (Method
     (Identifier)
-    (Identifier)
+    (Params
+      (Identifier))
     (Identifier)))-}

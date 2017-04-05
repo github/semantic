@@ -1,10 +1,49 @@
 (Program
   (ExpressionStatements
-    (Class (Identifier)
-      {+(Method(Identifier)(Identifier)(Return(Identifier)))+}
-      { +(Method(Identifier)(Identifier)(Return(Identifier)))+ }
-      { +(Method(Identifier)(Identifier)(Return(Identifier)))+ }
-      { -(Assignment(Identifier)(NumberLiteral))- }
-      { -(Method(Identifier)(Identifier)(Return(Identifier)))- }
-      { -(Method(Identifier)(Identifier)(Return(Identifier)))- }
-      { -(Method(Identifier)(Identifier)(Return(Identifier)))- })))
+    (Class
+      (Identifier)
+    {+(Method
+        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (Identifier)))+}
+    {+(Method
+        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (Identifier)))+}
+    {+(Method
+        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (Identifier)))+}
+    {-(FieldDecl
+        (Identifier)
+        (NumberLiteral))-}
+    {-(Method
+        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (Identifier)))-}
+    {-(Method
+        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (Identifier)))-}
+    {-(Method
+        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (Identifier)))-})))

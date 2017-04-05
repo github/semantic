@@ -1,0 +1,12 @@
+{+(Program
+  (Function
+    (Params
+      (Other "required_parameter"
+        (Identifier))
+      (Other "required_parameter"
+        (Identifier)))
+    (Ty
+      (Other "type_reference"
+        (Identifier)))
+    (ExpressionStatements
+      (Identifier))))+}

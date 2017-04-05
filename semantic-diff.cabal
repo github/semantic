@@ -41,6 +41,7 @@ library
                      , Language
                      , Language.C
                      , Language.JavaScript
+                     , Language.TypeScript
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
@@ -112,6 +113,7 @@ library
                      , go
                      , ruby
                      , javascript
+                     , typescript
                      , network
                      , clock
                      , yaml

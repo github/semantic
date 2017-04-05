@@ -1,0 +1,15 @@
+(Program
+  (Try
+    (ExpressionStatements
+      (ExpressionStatements
+        (Identifier)))
+    (Catch
+      (ExpressionStatements
+        (ExpressionStatements
+        { (Identifier)
+        ->(Identifier) })))
+    (Finally
+      (ExpressionStatements
+        (ExpressionStatements
+        { (Identifier)
+        ->(Identifier) })))))

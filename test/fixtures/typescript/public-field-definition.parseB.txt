@@ -1,0 +1,65 @@
+(Program
+  (ExpressionStatements
+    (Class
+      (Identifier)
+      (FieldDecl
+        (Other "readonly")
+        (Identifier))
+      (FieldDecl
+        (Other "readonly")
+        (Identifier))
+      (FieldDecl
+        (Other "accessibility_modifier")
+        (Other "readonly")
+        (Identifier))
+      (FieldDecl
+        (Other "accessibility_modifier")
+        (Other "readonly")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Other "accessibility_modifier")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Other "accessibility_modifier")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Other "accessibility_modifier")
+        (Other "readonly")
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (StringLiteral))
+      (FieldDecl
+        (Identifier)
+        (Ty
+          (Other "type_reference"
+            (Identifier)))
+        (NumberLiteral))
+      (FieldDecl
+        (Identifier)
+        (NumberLiteral)))))

@@ -1,0 +1,14 @@
+(Program
+  (If
+  { (Identifier)
+  ->(MemberAccess
+      (Identifier)
+      (Identifier)) }
+    (ExpressionStatements
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier)
+        { (Identifier)
+        ->(Identifier) }))
+    {+(ExpressionStatements
+        (Identifier))+})))

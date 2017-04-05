@@ -101,16 +101,16 @@ syntaxToTermField syntax = case syntax of
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
-  S.FunctionCall identifier parameters -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ]
+  S.FunctionCall identifier typeParameters parameters -> [ "identifier" .= identifier ] <> [ "typeArguments" .= typeParameters] <> [ "parameters" .= parameters ]
   S.Ternary expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
-  S.AnonymousFunction parameters c -> [ "parameters" .= parameters ] <> childrenFields c
-  S.Function identifier parameters ty c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "type" .= ty ] <> childrenFields c
+  S.AnonymousFunction callSignature c -> [ "callSignature" .= callSignature ] <> childrenFields c
+  S.Function identifier callSignature c -> [ "identifier" .= identifier ] <> [ "callSignature" .= callSignature ] <> childrenFields c
   S.Assignment assignmentId value -> [ "identifier" .= assignmentId ] <> [ "value" .= value ]
   S.OperatorAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
-  S.MethodCall identifier methodIdentifier parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "parameters" .= parameters ]
+  S.MethodCall identifier methodIdentifier typeParameters parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "typeParameters" .= typeParameters ] <> [ "parameters" .= parameters ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
-  S.VarDecl declaration ty -> [ "declaration" .= declaration ] <> [ "type" .= ty]
+  S.VarDecl children -> childrenFields children
   S.VarAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.SubscriptAccess identifier property -> [ "identifier" .= identifier ] <> [ "property" .= property ]
   S.Switch expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
@@ -129,9 +129,11 @@ syntaxToTermField syntax = case syntax of
   S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "elseExpression" .= elseExpression ] <> [ "finallyExpression" .= finallyExpression ]
   S.Array ty c -> [ "type" .= ty ] <> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
-  S.Method identifier receiver ty parameters definitions -> [ "identifier" .= identifier ] <> [ "receiver" .= receiver ] <> [ "type" .= ty ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
+  S.Method clauses identifier receiver callSignature definitions -> [ "clauses" .= clauses ] <> [ "identifier" .= identifier ] <> [ "receiver" .= receiver ] <> [ "callSignature" .= callSignature ] <> [ "definitions" .= definitions ]
   S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
-  S.Module identifier definitions-> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
+  S.Module identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
+  S.Namespace identifier definitions -> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
+  S.Interface identifier clauses definitions -> [ "identifier" .= identifier ] <> [ "clauses" .= clauses ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
@@ -149,7 +151,7 @@ syntaxToTermField syntax = case syntax of
   S.ParameterDecl ty field -> [ "type" .= ty ] <> [ "identifier" .= field ]
   S.DefaultCase c -> childrenFields c
   S.TypeDecl id ty -> [ "type" .= ty ] <> [ "identifier" .= id ]
-  S.FieldDecl id ty tag -> [ "type" .= ty ] <> [ "identifier" .= id ] <> [ "tag" .= tag]
+  S.FieldDecl children -> childrenFields children
   S.Ty ty -> [ "type" .= ty ]
   S.Send channel expr -> [ "channel" .= channel ] <> [ "expression" .= expr ]
   where childrenFields c = [ "children" .= c ]

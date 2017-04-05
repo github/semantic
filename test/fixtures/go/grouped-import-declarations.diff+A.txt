@@ -3,6 +3,7 @@
     (Identifier))
   (Function
     (Identifier)
+    (Args)
     (TypeConversion
       (Identifier)
       (StringLiteral)

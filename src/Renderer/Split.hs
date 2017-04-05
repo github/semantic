@@ -84,6 +84,8 @@ styleName category = "category-" <> case category of
   C.CommaOperator -> "comma_operator"
   Other string -> string
   C.Module -> "module_statement"
+  C.Namespace -> "namespace"
+  C.Interface -> "interface"
   C.Import -> "import_statement"
   C.Export -> "export_statement"
   C.AnonymousFunction -> "anonymous_function"
@@ -149,6 +151,7 @@ styleName category = "category-" <> case category of
   C.FieldDeclarations -> "field_declarations"
   C.RuneLiteral -> "rune_literal"
   C.Modifier c -> styleName c <> "_modifier"
+  C.Ty -> "type"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

@@ -5,11 +5,12 @@
     { (Identifier)
     ->(Identifier) }
       (Function
-        (Identifier)
-        (ExpressionStatements
-          (Return
-            (MemberAccess
-            { (Identifier)
-            ->(Identifier) }
-            { (Identifier)
-            ->(Identifier) })))))))
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }))))))
