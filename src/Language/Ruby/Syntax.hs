@@ -50,7 +50,7 @@ type Program = Freer
 
 
 -- | Statically-known rules corresponding to symbols in the grammar.
-data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment | True' | False'
+data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment | True' | False' | If
   deriving (Enum, Eq, Ord, Show)
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -58,6 +58,9 @@ assignment :: Assignment Grammar (Program Syntax (Maybe ()))
 assignment = foldr (>>) (return Nothing) <$> rule Program
 comment :: Assignment Grammar (Program Syntax a)
 comment = wrapU . Comment.Comment <$> (rule Comment <> content)
+
+if' :: Assignment Grammar (Program Syntax a)
+if' = rule If <> (wrapU <$> (Statement.If <$> child <*> child <*> child))
 
 
 instance Semigroup (Assignment symbol a) where
