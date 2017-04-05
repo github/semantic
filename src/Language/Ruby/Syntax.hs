@@ -29,6 +29,7 @@ data AssignmentF symbol a where
   Rule :: symbol -> AssignmentF symbol a
   Content :: AssignmentF symbol ByteString
   Children :: AssignmentF symbol [a]
+  Child :: AssignmentF symbol a
   And :: a -> a -> AssignmentF symbol a
 
 rule :: symbol -> Assignment symbol a
@@ -39,6 +40,9 @@ content = Content `Then` return
 
 children :: Assignment symbol [Assignment symbol a]
 children = Children `Then` return
+
+child :: Assignment symbol a
+child = Child `Then` return
 
 
 -- | A program in some syntax functor, over which we can perform analyses.
