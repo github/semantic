@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module Language.Ruby where
 
-import Data.Functor.Union
 import Data.List (partition)
 import Info
 import Prologue
@@ -9,8 +8,6 @@ import Source hiding (null)
 import Language
 import qualified Syntax as S
 import Term
-
-type Ruby = Union '[]
 
 termAssignment
   :: Source -- ^ The source of the term.
