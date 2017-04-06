@@ -3,6 +3,7 @@ module Language.Ruby.Syntax where
 
 import Control.Monad.Free.Freer
 import Data.Functor.Union
+import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
@@ -18,6 +19,7 @@ type Syntax = Union
   , Statement.If
   , Statement.Return
   , Statement.Yield
+  , Syntax.Identifier
   ]
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
