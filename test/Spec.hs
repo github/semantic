@@ -8,6 +8,7 @@ import qualified DiffSpec
 import qualified SummarySpec
 import qualified GitmonClientSpec
 import qualified InterpreterSpec
+import qualified Language.Ruby.Syntax.Spec
 import qualified PatchOutputSpec
 import qualified RangeSpec
 import qualified SES.Myers.Spec
@@ -28,6 +29,7 @@ main = do
     describe "Diff" DiffSpec.spec
     describe "Summary" SummarySpec.spec
     describe "Interpreter" InterpreterSpec.spec
+    describe "Language.Ruby.Syntax" Language.Ruby.Syntax.Spec.spec
     describe "PatchOutput" PatchOutputSpec.spec
     describe "Range" RangeSpec.spec
     describe "SES.Myers" SES.Myers.Spec.spec

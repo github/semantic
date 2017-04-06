@@ -162,6 +162,7 @@ test-suite test
                      , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec
+                     , Language.Ruby.Syntax.Spec
                      , PatchOutputSpec
                      , RangeSpec
                      , SES.Myers.Spec
