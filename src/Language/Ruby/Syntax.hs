@@ -28,7 +28,7 @@ type Assignment symbol = Freer (AssignmentF symbol)
 data AssignmentF symbol a where
   Rule :: symbol -> a -> AssignmentF symbol a
   Content :: AssignmentF symbol ByteString
-  Children :: AssignmentF symbol [a]
+  Children :: Assignment symbol a -> AssignmentF symbol [a]
   Child :: AssignmentF symbol a
 
 rule :: symbol -> Assignment symbol a -> Assignment symbol a
@@ -37,8 +37,8 @@ rule symbol = wrap . Rule symbol
 content :: Assignment symbol ByteString
 content = Content `Then` return
 
-children :: Assignment symbol [a]
-children = Children `Then` return
+children :: Assignment symbol a -> Assignment symbol [a]
+children forEach = Children forEach `Then` return
 
 child :: Assignment symbol a
 child = Child `Then` return
@@ -53,8 +53,9 @@ data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias |
   deriving (Enum, Eq, Ord, Show)
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment Grammar (Program Syntax (Maybe ()))
-assignment = foldr (>>) (pure Nothing) <$> (rule Program children)
+assignment :: Assignment Grammar (Program Syntax (Maybe a))
+assignment = foldr (>>) (pure Nothing) <$> rule Program (children declaration)
+  where declaration = comment
 
 comment :: Assignment Grammar (Program Syntax a)
 comment = wrapU . Comment.Comment <$> (rule Comment content)
