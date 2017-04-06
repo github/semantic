@@ -57,7 +57,7 @@ data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias |
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe a))
-assignment = foldr (>>) (pure Nothing) <$> rule Program (children declaration)
+assignment = foldr (>>) (pure Nothing) <$> rule Program (children (many declaration))
   where declaration = comment <|> class' <|> method
         class' = rule Class (wrapU <$> (Declaration.Class <$> constant <*> pure [] <*> declaration))
         constant = rule Constant (wrapU <$> (Syntax.Identifier <$> content))
