@@ -50,7 +50,7 @@ type Program = Freer
 
 
 -- | Statically-known rules corresponding to symbols in the grammar.
-data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment | True' | False' | If | Return | Yield | Break | Next | Redo | Retry | IfModifier | UnlessModifier | WhileModifier | UntilModifier | RescueModifier | While | Until | For | Do
+data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment | True' | False' | Return | Yield | Break | Next | Redo | Retry | IfModifier | UnlessModifier | WhileModifier | UntilModifier | RescueModifier | While | Until | For | Do | Case | When | Pattern | If | Unless | Elsif | Else | Begin | Ensure | Rescue | Exceptions | ExceptionVariable | ElementReference | ScopeResolution | Call | MethodCall | ArgumentList | ArgumentListWithParens | SplatArgument | HashSplatArgument | BlockArgument | Class
   deriving (Enum, Eq, Ord, Show)
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
