@@ -35,3 +35,21 @@ instance GShow1 [] where gliftShowsPrec = liftShowsPrec
 instance GShow1 Maybe where gliftShowsPrec = liftShowsPrec
 instance Show a => GShow1 ((,) a) where gliftShowsPrec = liftShowsPrec
 instance Show a => GShow1 (Either a) where gliftShowsPrec = liftShowsPrec
+
+
+-- Generics
+
+instance GShow1 U1 where
+  gliftShowsPrec _ _ _ _ = identity
+
+instance GShow1 Par1 where
+  gliftShowsPrec sp _ d (Par1 a) = sp d a
+
+instance Show c => GShow1 (K1 i c) where
+  gliftShowsPrec _ _ d (K1 a) = showsPrec d a
+
+instance Show1 f => GShow1 (Rec1 f) where
+  gliftShowsPrec sp sl d (Rec1 a) = liftShowsPrec sp sl d a
+
+instance GShow1 f => GShow1 (M1 D c f) where
+  gliftShowsPrec sp sl d (M1 a) = gliftShowsPrec sp sl d a
