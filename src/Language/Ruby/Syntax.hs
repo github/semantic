@@ -31,12 +31,15 @@ data AssignmentF symbol a where
   Children :: Assignment symbol a -> AssignmentF symbol [a]
   Fail :: AssignmentF symbol a
 
+-- | Match a node with the given symbol and apply a rule to it to parse it.
 rule :: symbol -> Assignment symbol a -> Assignment symbol a
 rule symbol = wrap . Rule symbol
 
+-- | A rule to produce a node’s content as a ByteString.
 content :: Assignment symbol ByteString
 content = Content `Then` return
 
+-- | Match a node by applying an assignment to its children.
 children :: Assignment symbol a -> Assignment symbol [a]
 children forEach = Children forEach `Then` return
 
