@@ -94,6 +94,7 @@ stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
               Just (rest, x) -> let (rest', xs) = forEach rest in (rest', x : xs)
               Nothing -> (rest, [])
     Alt a b -> yield a nodes <|> yield b nodes
+    -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
     Fail -> Nothing) . fmap ((Just .) . flip (,))
 
 
