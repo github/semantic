@@ -71,3 +71,6 @@ data Rose a = Rose a [Rose a]
 -- | A node in the input AST. We only concern ourselves with its symbol (considered as an element of 'grammar') and content.
 data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
 
+-- | An abstract syntax tree.
+type AST grammar = Rose (Node grammar)
+
