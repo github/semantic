@@ -29,6 +29,7 @@ data AssignmentF symbol a where
   Rule :: symbol -> a -> AssignmentF symbol a
   Content :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol [a]
+  Fail :: AssignmentF symbol a
 
 rule :: symbol -> Assignment symbol a -> Assignment symbol a
 rule symbol = wrap . Rule symbol
