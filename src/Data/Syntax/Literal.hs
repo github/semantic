@@ -11,7 +11,7 @@ import Prologue
 -- Boolean
 
 newtype Boolean a = Boolean Bool
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
@@ -21,7 +21,7 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | A literal integer of unspecified width. No particular base is implied.
 newtype Integer a = Integer { integerContent :: ByteString }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
@@ -34,7 +34,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [Union '[InterpolationElement, TextElement] a] }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 String where liftEq = genericLiftEq
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
@@ -43,7 +43,7 @@ instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 InterpolationElement where liftEq = genericLiftEq
 instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
@@ -51,14 +51,14 @@ instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: ByteString }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 
 newtype Symbol a = SymbolLiteral { symbolContent :: ByteString }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
@@ -69,21 +69,21 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 -- Collections
 
 newtype ArrayLiteral a = ArrayLiteral { arrayElements :: [Union '[Identity, Comment] a] }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 ArrayLiteral where liftEq = genericLiftEq
 instance Show1 ArrayLiteral where liftShowsPrec = genericLiftShowsPrec
 
 
 newtype HashLiteral a = HashLiteral { hashElements :: [Union '[KeyValue, Comment] a] }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 HashLiteral where liftEq = genericLiftEq
 instance Show1 HashLiteral where liftShowsPrec = genericLiftShowsPrec
 
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
-  deriving (Eq, Generic1, Show)
+  deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
