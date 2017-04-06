@@ -29,7 +29,6 @@ data AssignmentF symbol a where
   Rule :: symbol -> a -> AssignmentF symbol a
   Content :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol [a]
-  Child :: AssignmentF symbol a
 
 rule :: symbol -> Assignment symbol a -> Assignment symbol a
 rule symbol = wrap . Rule symbol
@@ -39,9 +38,6 @@ content = Content `Then` return
 
 children :: Assignment symbol a -> Assignment symbol [a]
 children forEach = Children forEach `Then` return
-
-child :: Assignment symbol a
-child = Child `Then` return
 
 
 -- | A program in some syntax functor, over which we can perform analyses.
@@ -61,7 +57,10 @@ comment :: Assignment Grammar (Program Syntax a)
 comment = wrapU . Comment.Comment <$> (rule Comment content)
 
 if' :: Assignment Grammar (Program Syntax a)
-if' = rule If (wrapU <$> (Statement.If <$> child <*> child <*> child))
+if' = rule If (wrapU <$> (Statement.If <$> expr <*> expr <*> expr))
+
+expr :: Assignment Grammar (Program Syntax a)
+expr = if'
 
 
 -- | A rose tree.
