@@ -1,6 +1,7 @@
 module Data.Syntax where
 
 import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Show.Generic
 import GHC.Generics
 import Prologue
 
@@ -10,11 +11,13 @@ newtype Leaf a = Leaf { leafContent :: ByteString }
   deriving (Eq, Generic1, Show)
 
 instance Eq1 Leaf where liftEq = genericLiftEq
+instance Show1 Leaf where liftShowsPrec = genericLiftShowsPrec
 
 newtype Branch a = Branch { branchElements :: [a] }
   deriving (Eq, Generic1, Show)
 
 instance Eq1 Branch where liftEq = genericLiftEq
+instance Show1 Branch where liftShowsPrec = genericLiftShowsPrec
 
 
 -- Common
@@ -24,3 +27,4 @@ newtype Identifier a = Identifier ByteString
   deriving (Eq, Generic1, Show)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
+instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
