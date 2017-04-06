@@ -58,3 +58,6 @@ instance GShow1 f => GShow1 (M1 D c f) where
 instance (GShow1 f, GShow1 g) => GShow1 (f :+: g) where
   gliftShowsPrec sp sl d (L1 l) = gliftShowsPrec sp sl d l
   gliftShowsPrec sp sl d (R1 r) = gliftShowsPrec sp sl d r
+
+instance (GShow1 f, GShow1 g) => GShow1 (f :*: g) where
+  gliftShowsPrec sp sl d (a :*: b) = gliftShowsPrec sp sl d a . showChar ' ' . gliftShowsPrec sp sl d b
