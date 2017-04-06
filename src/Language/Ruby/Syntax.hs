@@ -30,7 +30,7 @@ type Assignment symbol = Freer (AssignmentF symbol)
 data AssignmentF symbol a where
   Rule :: symbol -> a -> AssignmentF symbol a
   Content :: AssignmentF symbol ByteString
-  Children :: Assignment symbol a -> AssignmentF symbol [a]
+  Children :: a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
   Fail :: AssignmentF symbol a
 
@@ -43,8 +43,8 @@ content :: Assignment symbol ByteString
 content = Content `Then` return
 
 -- | Match a node by applying an assignment to its children.
-children :: Assignment symbol a -> Assignment symbol [a]
-children forEach = Children forEach `Then` return
+children :: Assignment symbol a -> Assignment symbol a
+children forEach = Children forEach `Then` identity
 
 
 -- | A program in some syntax functor, over which we can perform analyses.
@@ -97,10 +97,7 @@ stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
       else
         Nothing
     Content -> yield nodeContent rest
-    Children each -> yield (snd (forEach children)) rest
-      where forEach rest = case stepAssignment each rest of
-              Just (rest, x) -> let (rest', xs) = forEach rest in (rest', x : xs)
-              Nothing -> (rest, [])
+    Children each -> fmap (first (const rest)) (yield each children)
     Alt a b -> yield a nodes <|> yield b nodes
     -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
     Fail -> Nothing) . fmap ((Just .) . flip (,))
