@@ -44,6 +44,14 @@ instance {-# OVERLAPPABLE #-} InUnion fs f => InUnion (g ': fs) f where
   proj _ = Nothing
 
 
+instance (Foldable f, Foldable (Union fs)) => Foldable (Union (f ': fs)) where
+  foldMap f (Here r) = foldMap f r
+  foldMap f (There t) = foldMap f t
+
+instance Foldable (Union '[]) where
+  foldMap _ _ = mempty
+
+
 instance (Eq (f a), Eq (Union fs a)) => Eq (Union (f ': fs) a) where
   Here f1 == Here f2 = f1 == f2
   There fs1 == There fs2 = fs1 == fs2
