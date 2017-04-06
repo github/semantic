@@ -27,3 +27,11 @@ genericLiftShowsPrec sp sl d = gliftShowsPrec sp sl d . from1
 -- | A suitable implementation of Show1’s liftShowsPrec for Generic1 types.
 genericLiftShowList :: (Generic1 f, GShow1 (Rep1 f)) => (Int -> a -> ShowS) -> ([a] -> ShowS) -> [f a] -> ShowS
 genericLiftShowList sp sl = gliftShowList sp sl . map from1
+
+
+-- Show1 instances
+
+instance GShow1 [] where gliftShowsPrec = liftShowsPrec
+instance GShow1 Maybe where gliftShowsPrec = liftShowsPrec
+instance Show a => GShow1 ((,) a) where gliftShowsPrec = liftShowsPrec
+instance Show a => GShow1 (Either a) where gliftShowsPrec = liftShowsPrec
