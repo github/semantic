@@ -65,3 +65,6 @@ instance (Eq1 f, Eq1 (Union fs)) => Eq1 (Union (f ': fs)) where
   liftEq eq (Here f) (Here g) = liftEq eq f g
   liftEq eq (There f) (There g) = liftEq eq f g
   liftEq _ _ _ = False
+
+instance Eq1 (Union '[]) where
+  liftEq _ _ _ = False -- We can never get here anyway.
