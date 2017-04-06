@@ -9,3 +9,10 @@ newtype Leaf a = Leaf { leafContent :: ByteString }
 
 newtype Branch a = Branch { branchElements :: [a] }
   deriving (Eq, Show)
+
+
+-- Common
+
+-- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
+newtype Identifier a = Identifier ByteString
+  deriving (Eq, Show)
