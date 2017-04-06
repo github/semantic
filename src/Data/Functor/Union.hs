@@ -68,3 +68,10 @@ instance (Eq1 f, Eq1 (Union fs)) => Eq1 (Union (f ': fs)) where
 
 instance Eq1 (Union '[]) where
   liftEq _ _ _ = False -- We can never get here anyway.
+
+instance (Show1 f, Show1 (Union fs)) => Show1 (Union (f ': fs)) where
+  liftShowsPrec sp sl d (Here f) = showsUnaryWith (liftShowsPrec sp sl) "Here" d f
+  liftShowsPrec sp sl d (There f) = showsUnaryWith (liftShowsPrec sp sl) "There" d f
+
+instance Show1 (Union '[]) where
+  liftShowsPrec _ _ _ _ = identity
