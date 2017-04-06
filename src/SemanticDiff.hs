@@ -97,12 +97,12 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
       <$> ( DiffArguments
-            <$> (flag R.Patch R.Patch (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-            <|> flag' R.JSON (long "json" <> help "Output a json diff")
-            <|> flag' R.Split (long "split" <> help "Output a split diff")
-            <|> flag' R.Summary (long "summary" <> help "Output a diff summary")
-            <|> flag' R.SExpression (long "sexpression" <> help "Output an s-expression diff tree")
-            <|> flag' R.TOC (long "toc" <> help "Output a table of contents diff summary"))
+            <$> (  flag R.Patch R.Patch (long "patch" <> help "Output a patch(1)-compatible diff (default)")
+               <|> flag' R.JSON (long "json" <> help "Output a json diff")
+               <|> flag' R.Split (long "split" <> help "Output a split diff")
+               <|> flag' R.Summary (long "summary" <> help "Output a diff summary")
+               <|> flag' R.SExpression (long "sexpression" <> help "Output an s-expression diff tree")
+               <|> flag' R.TOC (long "toc" <> help "Output a table of contents diff summary") )
             <*> (  DiffPaths
                   <$> argument str (metavar "FILE_A")
                   <*> argument str (metavar "FILE_B")
@@ -116,8 +116,9 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
       <$> ( ParseArguments
-            <$> (  flag R.SExpressionTree R.SExpressionTree (long "sexpression" <> help "Output s-expression formatted parse trees (default)")
-               <|> flag' R.JSONTree (long "json" <> help "Output JSON formatted parse trees"))
+            <$> (  flag R.SExpressionTree R.SExpressionTree (long "sexpression" <> help "Output s-expression parse trees (default)")
+               <|> flag' R.JSONTree (long "json" <> help "Output JSON parse trees")
+               <|> flag' R.JSONIndex (long "index" <> help "Output JSON parse trees in index format") )
             <*> (  ParsePaths
                   <$> some (argument str (metavar "FILES..."))
                <|> ParseCommit
