@@ -74,3 +74,18 @@ data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
 -- | An abstract syntax tree.
 type AST grammar = Rose (Node grammar)
 
+stepAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
+stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
+  [] -> Nothing
+  Rose Node{..} children : rest -> case assignment of
+    Rule symbol subRule ->
+      if symbol == nodeSymbol then
+        yield subRule nodes
+      else
+        Nothing
+    Content -> yield nodeContent rest
+    Children each -> yield (snd (forEach children)) rest
+      where forEach rest = case stepAssignment each rest of
+              Just (rest, x) -> let (rest', xs) = forEach rest in (rest', x : xs)
+              Nothing -> (rest, [])
+    Fail -> Nothing) . fmap ((Just .) . flip (,))
