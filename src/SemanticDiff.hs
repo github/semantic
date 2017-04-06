@@ -13,6 +13,7 @@ import Development.GitRev
 import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy as BL
 import qualified Paths_semantic_diff as Library (version)
 import qualified Renderer as R
 import qualified Renderer.SExpression as R
@@ -56,12 +57,12 @@ main = do
       R.JSONIndex -> parseIndex args'
       R.SExpressionTree -> parseSExpression args'
   outputPath <- getOutputPath outputFilePath
-  writeToOutput outputPath (text <> "\n")
+  writeToOutput outputPath text
 
   where
     encodeText = encodeUtf8 . R.unFile
-    encodeJSON = toS . encode
-    encodeSummaries = toS . encode
+    encodeJSON = toS . (<> "\n") . encode
+    encodeSummaries = toS . (<> "\n") . encode
 
     findGitDir = do
       pwd <- getCurrentDirectory
