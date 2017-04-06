@@ -7,7 +7,7 @@ import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
-import Prologue
+import Prologue hiding (Alt)
 
 -- | The type of Ruby syntax.
 type Syntax = Union
@@ -29,6 +29,7 @@ data AssignmentF symbol a where
   Rule :: symbol -> a -> AssignmentF symbol a
   Content :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol [a]
+  Alt :: a -> a -> AssignmentF symbol a
   Fail :: AssignmentF symbol a
 
 -- | Match a node with the given symbol and apply a rule to it to parse it.
@@ -92,4 +93,10 @@ stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
       where forEach rest = case stepAssignment each rest of
               Just (rest, x) -> let (rest', xs) = forEach rest in (rest', x : xs)
               Nothing -> (rest, [])
+    Alt a b -> yield a nodes <|> yield b nodes
     Fail -> Nothing) . fmap ((Just .) . flip (,))
+
+
+instance Alternative (Assignment symbol) where
+  empty = Fail `Then` return
+  (<|>) = (wrap .) . Alt
