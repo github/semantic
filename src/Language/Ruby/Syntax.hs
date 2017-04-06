@@ -30,7 +30,6 @@ data AssignmentF symbol a where
   Content :: AssignmentF symbol ByteString
   Children :: AssignmentF symbol [a]
   Child :: AssignmentF symbol a
-  And :: a -> a -> AssignmentF symbol a
 
 rule :: symbol -> Assignment symbol a -> Assignment symbol a
 rule symbol = wrap . Rule symbol
@@ -64,5 +63,3 @@ if' :: Assignment Grammar (Program Syntax a)
 if' = rule If (wrapU <$> (Statement.If <$> child <*> child <*> child))
 
 
-instance Semigroup (Assignment symbol a) where
-  a <> b = And a b `Then` identity
