@@ -68,3 +68,6 @@ if' = rule If (wrapU <$> (Statement.If <$> child <*> child <*> child))
 data Rose a = Rose a [Rose a]
   deriving (Eq, Functor, Show)
 
+-- | A node in the input AST. We only concern ourselves with its symbol (considered as an element of 'grammar') and content.
+data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
+
