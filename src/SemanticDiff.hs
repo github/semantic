@@ -13,7 +13,6 @@ import Development.GitRev
 import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
 import qualified Paths_semantic_diff as Library (version)
 import qualified Renderer as R
 import qualified Renderer.SExpression as R
