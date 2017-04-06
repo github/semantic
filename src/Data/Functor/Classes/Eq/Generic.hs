@@ -45,8 +45,8 @@ instance GEq1 Par1 where
 instance Eq c => GEq1 (K1 i c) where
   gliftEq _ (K1 a) (K1 b) = a == b
 
-instance GEq1 f => GEq1 (Rec1 f) where
-  gliftEq f (Rec1 a) (Rec1 b) = gliftEq f a b
+instance Eq1 f => GEq1 (Rec1 f) where
+  gliftEq f (Rec1 a) (Rec1 b) = liftEq f a b
 
 instance GEq1 f => GEq1 (M1 i c f) where
   gliftEq f (M1 a) (M1 b) = gliftEq f a b
