@@ -64,3 +64,7 @@ if' :: Assignment Grammar (Program Syntax a)
 if' = rule If (wrapU <$> (Statement.If <$> child <*> child <*> child))
 
 
+-- | A rose tree.
+data Rose a = Rose a [Rose a]
+  deriving (Eq, Functor, Show)
+
