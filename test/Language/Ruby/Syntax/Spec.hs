@@ -9,5 +9,5 @@ import Test.Hspec
 spec :: Spec
 spec = do
   describe "stepAssignment" $ do
-    it "should match a comment" $ do
+    it "matches nodes" $ do
       stepAssignment comment [Rose (Node Comment "hello") []] `shouldBe` Just ([], wrapU (Comment.Comment "hello") :: Program Syntax ())
