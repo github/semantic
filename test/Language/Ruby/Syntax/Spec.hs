@@ -14,3 +14,6 @@ spec = do
 
     it "attempts multiple alternatives" $ do
       stepAssignment (if' <|> comment) [Rose (Node Comment "hello") []] `shouldBe` Just ([], wrapU (Comment.Comment "hello") :: Program Syntax ())
+
+    it "matches in sequence" $ do
+      stepAssignment ((,) <$> comment <*> comment) [Rose (Node Comment "hello") [], Rose (Node Comment "world") []] `shouldBe` Just ([], (wrapU (Comment.Comment "hello"), wrapU (Comment.Comment "world")) :: (Program Syntax (), Program Syntax ()))
