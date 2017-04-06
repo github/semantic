@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeOperators #-}
 module Data.Functor.Classes.Eq.Generic
-( genericLiftEq
+( Eq1(..)
+, genericLiftEq
 , gliftEq
 ) where
 
