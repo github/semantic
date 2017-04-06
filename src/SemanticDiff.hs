@@ -48,10 +48,10 @@ main = do
       R.Index -> parseIndex args
       R.SExpression -> parseSExpression args
       _ -> parseTree args
-  writeToOutput outputPath (text <> "\n")
+  writeToOutput outputPath text
   where encodeText = encodeUtf8 . R.unFile
-        encodeJSON = toS . encode
-        encodeSummaries = toS . encode
+        encodeJSON = toS . (<> "\n") . encode
+        encodeSummaries = toS . (<> "\n") . encode
 
 -- | A parser for the application's command-line arguments.
 argumentsParser :: ParserInfo CmdLineOptions
