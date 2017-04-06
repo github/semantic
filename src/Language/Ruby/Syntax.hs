@@ -77,6 +77,7 @@ data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
 -- | An abstract syntax tree.
 type AST grammar = Rose (Node grammar)
 
+-- | Small-step evaluation of an assignment from a grammar onto a syntax.
 stepAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
 stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
   [] -> Nothing
