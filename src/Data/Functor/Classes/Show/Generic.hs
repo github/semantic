@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Data.Functor.Classes.Show.Generic
 ( Show1(..)
 , genericLiftShowsPrec
@@ -53,3 +54,7 @@ instance Show1 f => GShow1 (Rec1 f) where
 
 instance GShow1 f => GShow1 (M1 D c f) where
   gliftShowsPrec sp sl d (M1 a) = gliftShowsPrec sp sl d a
+
+instance (GShow1 f, GShow1 g) => GShow1 (f :+: g) where
+  gliftShowsPrec sp sl d (L1 l) = gliftShowsPrec sp sl d l
+  gliftShowsPrec sp sl d (R1 r) = gliftShowsPrec sp sl d r
