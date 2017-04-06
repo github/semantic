@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, PolyKinds, TypeFamilies, TypeOperators #-}
 module Data.Functor.Union where
 
+import Data.Functor.Classes
 import Data.Kind
 import GHC.Show
 import Prologue
@@ -59,3 +60,8 @@ instance (Show (f a), Show (Union fs a)) => Show (Union (f ': fs) a) where
 
 instance Show (Union '[] a) where
   showsPrec _ _ = identity
+
+instance (Eq1 f, Eq1 (Union fs)) => Eq1 (Union (f ': fs)) where
+  liftEq eq (Here f) (Here g) = liftEq eq f g
+  liftEq eq (There f) (There g) = liftEq eq f g
+  liftEq _ _ _ = False
