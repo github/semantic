@@ -28,6 +28,9 @@ spec = do
     it "produces the node’s content" $
       snd <$> runAssignment content [ Rose (Node () "hi") [] ] `shouldBe` Just "hi"
 
+    it "advances past the current node" $
+      fst <$> runAssignment content [ Rose (Node () "hi") [] ] `shouldBe` Just []
+
   describe "children" $ do
     it "advances past the current node" $
       fst <$> runAssignment (children (pure (Out ""))) [ast Red "a" []] `shouldBe` Just []
