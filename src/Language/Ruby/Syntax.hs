@@ -41,7 +41,7 @@ declaration = comment <|> class' <|> method
 
 class' :: Assignment Grammar (Program Syntax a)
 class' = wrapU <$  rule Class
-               <*> children (Declaration.Class <$> constant <*> pure [] <*> declaration)
+               <*> children (Declaration.Class <$> constant <*> pure [] <*> many declaration)
 
 constant :: Assignment Grammar (Program Syntax a)
 constant = wrapU . Syntax.Identifier <$ rule Constant <*> content

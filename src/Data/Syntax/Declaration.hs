@@ -23,7 +23,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we distinguish class/instance methods?
 
 
-data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classScope :: !a }
+data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classScope :: ![a] }
   deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 Class where liftEq = genericLiftEq
