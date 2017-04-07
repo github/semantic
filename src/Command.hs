@@ -22,7 +22,7 @@ import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Data.ByteString as B
 import Data.Functor.Both
-import Data.List ((\\))
+import Data.List ((\\), nub)
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
@@ -138,9 +138,9 @@ runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> IO 
 runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = do
   paths <- case paths of
     [] -> runGit $ do
-      trees <- traverse treeForSha shas
-      paths <- traverse pathsForTree trees
-      pure $! runBothWith (\\) paths <> runBothWith (flip (\\)) paths
+      trees <- for shas treeForSha
+      paths <- for trees (reportGitmon "ls-tree" . treeBlobEntries)
+      pure . nub $! (\ (p, _, _) -> toS p) <$> runBothWith (\\) paths <> runBothWith (flip (\\)) paths
     _ -> pure paths
 
   Async.withTaskGroup numCapabilities (\ group -> Async.runTask group (traverse (Async.task . runGit . blobsForPath) paths))
@@ -158,9 +158,6 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = do
               let oid = renderObjOid $ blobOid blob
               pure (Just (SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))))
             _ -> pure Nothing
-        pathsForTree tree = do
-          blobEntries <- reportGitmon "ls-tree" $ treeBlobEntries tree
-          return $! fmap (\ (p, _, _) -> toS p) blobEntries
 
         runGit :: ReaderT LgRepo IO a -> IO a
         runGit action = withRepository lgFactory gitDir $ do
