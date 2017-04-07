@@ -1,6 +1,7 @@
-module Language.Ruby.Syntax.Spec where
+module Data.Syntax.Assignment.Spec where
 
 import Data.Functor.Union
+import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
 import Language.Ruby.Syntax
 import Prologue

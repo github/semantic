@@ -160,11 +160,11 @@ test-suite test
   other-modules:       AlignmentSpec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
+                     , Data.Syntax.Assignment.Spec
                      , DiffSpec
                      , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec
-                     , Language.Ruby.Syntax.Spec
                      , PatchOutputSpec
                      , RangeSpec
                      , SES.Myers.Spec

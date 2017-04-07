@@ -4,11 +4,11 @@ import Prologue
 import qualified AlignmentSpec
 import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
+import qualified Data.Syntax.Assignment.Spec
 import qualified DiffSpec
 import qualified SummarySpec
 import qualified GitmonClientSpec
 import qualified InterpreterSpec
-import qualified Language.Ruby.Syntax.Spec
 import qualified PatchOutputSpec
 import qualified RangeSpec
 import qualified SES.Myers.Spec
@@ -26,10 +26,10 @@ main = do
     describe "Alignment" AlignmentSpec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
+    describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec
     describe "Diff" DiffSpec.spec
     describe "Summary" SummarySpec.spec
     describe "Interpreter" InterpreterSpec.spec
-    describe "Language.Ruby.Syntax" Language.Ruby.Syntax.Spec.spec
     describe "PatchOutput" PatchOutputSpec.spec
     describe "Range" RangeSpec.spec
     describe "SES.Myers" SES.Myers.Spec.spec

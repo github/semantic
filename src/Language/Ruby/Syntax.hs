@@ -24,7 +24,6 @@ type Syntax = Union
   ]
 
 
-
 -- | A program in some syntax functor, over which we can perform analyses.
 type Program = Freer
 
