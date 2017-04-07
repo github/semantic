@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, DataKinds, TypeOperators #-}
-module RWS (RWS.run) where
+module RWS (rws) where
 
 import Prologue
 import Control.Monad.Effect
@@ -13,6 +13,7 @@ import Info
 import SES
 import qualified Data.Functor.Both as Both
 import Data.Functor.Classes.Eq.Generic
+import Data.RandomWalkSimilarity (FeatureVector)
 
 import Data.KdTree.Static hiding (toList)
 import qualified Data.IntMap as IntMap
@@ -35,8 +36,11 @@ data UnmappedTerm f fields = UnmappedTerm {
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index Int | None
 
-rws :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e [These (Term f (Record fields)) (Term f (Record fields))]
-rws = do
+rws :: (HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f) => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -> t (Term f (Record fields)) -> t (Term f (Record fields)) -> RWSEditScript f fields
+rws editDistance canCompare as bs = RWS.run editDistance canCompare as bs rws'
+
+rws' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e [These (Term f (Record fields)) (Term f (Record fields))]
+rws' = do
   sesDiffs <- ses'
   (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs' sesDiffs
   (diffs, remaining) <- findNearestNeighoursToDiff' allDiffs featureAs featureBs
@@ -80,11 +84,9 @@ data RWS f fields result where
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
 
-type FeatureVector = Array Int Double
-
 type RWSEditScript f fields = [These (Term f (Record fields)) (Term f (Record fields))]
 
-run :: (Eq1 f, Functor f, HasField fields Category, HasField fields FeatureVector, Foldable t)
+run :: (Eq1 f, Functor f, HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t)
     => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
     -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
     -> t (Term f (Record fields))
