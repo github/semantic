@@ -6,10 +6,6 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "rule" $ do
-    it "matches nodes" $
-      runAssignment red [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
-
   describe "Applicative" $ do
     it "matches in sequence" $
       runAssignment ((,) <$> red <*> red) [ast Red "hello" [], ast Red "world" []] `shouldBe` Just ([], (Out "hello", Out "world"))
@@ -23,6 +19,10 @@ spec = do
 
     it "matches one-or-more repetitions against one or more input nodes" $
       runAssignment (some red) [ast Red "hello" []] `shouldBe` Just ([], [Out "hello"])
+
+  describe "rule" $ do
+    it "matches nodes with the same symbol" $
+      runAssignment red [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
   describe "children" $ do
     it "advances past the current node" $
