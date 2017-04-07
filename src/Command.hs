@@ -22,7 +22,7 @@ import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Data.ByteString as B
 import Data.Functor.Both
-import Data.List ((\\))
+import Data.List ((\\), nub)
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
@@ -140,7 +140,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = do
     [] -> runGit $ do
       trees <- for shas treeForSha
       paths <- for trees (reportGitmon "ls-tree" . treeBlobEntries)
-      pure $! (\ (p, _, _) -> toS p) <$> runBothWith (\\) paths <> runBothWith (flip (\\)) paths
+      pure . nub $! (\ (p, _, _) -> toS p) <$> runBothWith (\\) paths <> runBothWith (flip (\\)) paths
     _ -> pure paths
 
   Async.withTaskGroup numCapabilities (\ group -> Async.runTask group (traverse (Async.task . runGit . blobsForPath) paths))
