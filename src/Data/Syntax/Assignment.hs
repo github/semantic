@@ -1,5 +1,15 @@
 {-# LANGUAGE GADTs #-}
-module Data.Syntax.Assignment where
+module Data.Syntax.Assignment
+( Assignment
+, rule
+, content
+, children
+, Rose(..)
+, Node(..)
+, AST
+, assignAll
+, runAssignment
+) where
 
 import Control.Monad.Free.Freer
 import Prologue hiding (Alt)
