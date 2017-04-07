@@ -16,7 +16,9 @@ data AssignmentF symbol a where
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
 
--- | Match a node with the given symbol and apply a rule to it to parse it.
+-- | Zero-width match of a node with the given symbol.
+--
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (rule A *> b)' is fine, but 'many (rule A)' is not.
 rule :: symbol -> Assignment symbol ()
 rule symbol = Rule symbol `Then` return
 
