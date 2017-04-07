@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 module Data.RWS (rws) where
 
 import Prologue
@@ -21,9 +21,10 @@ rws editDistance canCompare as bs = undefined
 
 
 
-data RwsF a b result where
+data RwsF f fields result where
   RWS :: RwsF a b (EditScript a b)
   SES :: RwsF a b (EditScript a b)
+  EraseFeatureVector :: forall a b f fields. RwsF a b (EditScript (Term f (Record fields)) (Term f (Record fields)))
 
 data EditGraph a b = EditGraph { as :: !(Array Int a), bs :: !(Array Int b) }
   deriving (Eq, Show)
@@ -36,8 +37,8 @@ newtype RwsState a b = RwsState { unRwsState :: (Int, a, b) }
 
 type Rws a b = Freer (Step a b)
 
-runRWS :: HasCallStack => EditGraph a b -> Rws a b (EditScript a b)
-runRWS (EditGraph as bs)
+runRWS :: HasCallStack => (a -> a) -> EditGraph a a -> Rws a a (EditScript a a)
+runRWS eraseFeatureVector (EditGraph as bs)
   | null as = return $ That . eraseFeatureVector <$> toList bs
   | null bs = return $ This . eraseFeatureVector <$> toList as
 
@@ -45,7 +46,7 @@ type FeatureVector = Array Int Double
 
 type EditScript a b = [These a b]
 
-eraseFeatureVector :: Term f (Record fields) -> Term f (Record fields)
+eraseFeatureVector :: (Functor f, HasField fields (Maybe FeatureVector)) => Term f (Record fields) -> Term f (Record fields)
 eraseFeatureVector term = let record :< functor = runCofree term in
   cofree (setFeatureVector record Nothing :< functor)
 
