@@ -24,6 +24,9 @@ spec = do
     it "matches nodes with the same symbol" $
       runAssignment red [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
+    it "does not advance past the current node" $
+      fst <$> runAssignment (rule ()) [ Rose (Node () "hi") [] ] `shouldBe` Just [ Rose (Node () "hi") [] ]
+
   describe "content" $ do
     it "produces the node’s content" $
       snd <$> runAssignment content [ Rose (Node () "hi") [] ] `shouldBe` Just "hi"
