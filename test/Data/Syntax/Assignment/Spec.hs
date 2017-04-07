@@ -26,6 +26,9 @@ spec = do
     it "advances past the current node" $
       fst <$> runAssignment (children (pure (Out ""))) [ast Red "a" []] `shouldBe` Just []
 
+    it "matches if its subrule matches" $
+      () <$ runAssignment (children red) [ast Blue "b" [ast Red "a" []]] `shouldBe` Just ()
+
 ast :: Grammar -> ByteString -> [AST Grammar] -> AST Grammar
 ast g s c = Rose (Node g s) c
 
