@@ -28,6 +28,7 @@ library
                      , Data.RandomWalkSimilarity
                      , Data.Record
                      , Data.Syntax
+                     , Data.Syntax.Assignment
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
