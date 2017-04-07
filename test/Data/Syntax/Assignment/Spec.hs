@@ -10,11 +10,12 @@ spec = do
     it "matches nodes" $
       runAssignment red [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
-    it "attempts multiple alternatives" $
-      runAssignment (green <|> red) [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
-
     it "matches in sequence" $
       runAssignment ((,) <$> red <*> red) [ast Red "hello" [], ast Red "world" []] `shouldBe` Just ([], (Out "hello", Out "world"))
+
+  describe "Alternative" $ do
+    it "attempts multiple alternatives" $
+      runAssignment (green <|> red) [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
     it "matches repetitions" $
       runAssignment (many red) [ast Red "colourless" [], ast Red "green" [], ast Red "ideas" [], ast Red "sleep" [], ast Red "furiously" []] `shouldBe` Just ([], [Out "colourless", Out "green", Out "ideas", Out "sleep", Out "furiously"])
