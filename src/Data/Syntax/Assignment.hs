@@ -10,15 +10,15 @@ import Prologue hiding (Alt)
 type Assignment symbol = Freer (AssignmentF symbol)
 
 data AssignmentF symbol a where
-  Rule :: symbol -> a -> AssignmentF symbol a
+  Rule :: symbol -> AssignmentF symbol ()
   Content :: AssignmentF symbol ByteString
   Children :: a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
 
 -- | Match a node with the given symbol and apply a rule to it to parse it.
-rule :: symbol -> Assignment symbol a -> Assignment symbol a
-rule symbol = wrap . Rule symbol
+rule :: symbol -> Assignment symbol ()
+rule symbol = Rule symbol `Then` return
 
 -- | A rule to produce a node’s content as a ByteString.
 content :: Assignment symbol ByteString
@@ -46,9 +46,9 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) 
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
   (assignment, Rose Node{..} children : rest) -> case assignment of
-    Rule symbol subRule ->
+    Rule symbol ->
       if symbol == nodeSymbol then
-        yield subRule nodes
+        yield () nodes
       else
         Nothing
     Content -> yield nodeContent rest

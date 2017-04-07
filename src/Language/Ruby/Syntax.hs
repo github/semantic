@@ -34,19 +34,26 @@ data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias |
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe a))
-assignment = foldr (>>) (pure Nothing) <$> rule Program (children (many declaration))
-  where declaration = comment <|> class' <|> method
-        class' = rule Class (wrapU <$> (Declaration.Class <$> constant <*> pure [] <*> declaration))
-        constant = rule Constant (wrapU <$> (Syntax.Identifier <$> content))
-        identifier = rule Identifier (wrapU <$> (Syntax.Identifier <$> content))
-        method = rule Method (wrapU <$> (Declaration.Method <$> identifier <*> pure [] <*> statement))
+assignment = foldr (>>) (pure Nothing) <$ rule Program <*> children (many declaration)
+  where declaration :: Assignment Grammar (Program Syntax a)
+        declaration = comment <|> class' <|> method
+        class' :: Assignment Grammar (Program Syntax a)
+        class' = rule Class
+              *> children (wrapU <$> (Declaration.Class <$> constant <*> pure [] <*> declaration))
+        constant :: Assignment Grammar (Program Syntax a)
+        constant = wrapU . Syntax.Identifier <$ rule Constant <*> content
+        identifier :: Assignment Grammar (Program Syntax a)
+        identifier = wrapU . Syntax.Identifier <$ rule Identifier <*> content
+        method :: Assignment Grammar (Program Syntax a)
+        method = rule Method *> (wrapU <$> (Declaration.Method <$> identifier <*> pure [] <*> statement))
+        statement :: Assignment Grammar (Program Syntax a)
         statement = expr
 
 comment :: Assignment Grammar (Program Syntax a)
-comment = wrapU . Comment.Comment <$> (rule Comment content)
+comment = wrapU . Comment.Comment <$ rule Comment <*> content
 
 if' :: Assignment Grammar (Program Syntax a)
-if' = rule If (wrapU <$> (Statement.If <$> expr <*> expr <*> expr))
+if' = rule If *> children (wrapU <$> (Statement.If <$> expr <*> expr <*> expr))
 
 expr :: Assignment Grammar (Program Syntax a)
 expr = if'
