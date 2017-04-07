@@ -3,16 +3,15 @@ module TOCSpec where
 
 import Data.Aeson
 import Category as C
+import Command
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
 import Diff
-import DiffCommand
 import Info
 import Interpreter
-import ParseCommand
 import Patch
 import Prologue hiding (fst, snd)
 import Renderer
@@ -118,14 +117,14 @@ spec = parallel $ do
       output <- diffOutput sourceBlobs
       output `shouldBe` "{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}"
 
-type Diff' = SyntaxDiff String '[Range, Category, SourceSpan]
-type Term' = SyntaxTerm String '[Range, Category, SourceSpan]
+type Diff' = SyntaxDiff String DefaultFields
+type Term' = SyntaxTerm String DefaultFields
 
 diffOutput :: Both SourceBlob -> IO ByteString
-diffOutput sourceBlobs = do
-  let parser = parserForFilepath (path (fst sourceBlobs))
-  diff <- diffFiles parser sourceBlobs
-  pure $ concatOutputs [toc sourceBlobs diff]
+diffOutput blobs = runCommand $ do
+  terms <- for blobs parseBlob
+  diff' <- diff terms
+  toS . encode <$> renderDiffs ToCRenderer [ (blobs, diff') ]
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
@@ -162,14 +161,14 @@ functionOf name body = cofree $ functionInfo :< S.Function name' [] [body]
   where
     name' = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
 
-programInfo :: Record '[Range, Category, SourceSpan]
+programInfo :: Record DefaultFields
 programInfo = Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
 
-functionInfo :: Record '[Range, Category, SourceSpan]
+functionInfo :: Record DefaultFields
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
-isMeaningfulTerm :: ListableF (Term (Syntax leaf)) (Record '[Range, Category, SourceSpan]) -> Bool
+isMeaningfulTerm :: ListableF (Term (Syntax leaf)) (Record DefaultFields) -> Bool
 isMeaningfulTerm a = case runCofree (unListableF a) of
   (_ :< S.Indexed _) -> False
   (_ :< S.Fixed _) -> False
@@ -178,7 +177,7 @@ isMeaningfulTerm a = case runCofree (unListableF a) of
   _ -> True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
-isMethodOrFunction :: ListableF (Term (Syntax leaf)) (Record '[Range, Category, SourceSpan]) -> Bool
+isMethodOrFunction :: ListableF (Term (Syntax leaf)) (Record DefaultFields) -> Bool
 isMethodOrFunction a = case runCofree (unListableF a) of
   (_ :< S.Method{}) -> True
   (_ :< S.Function{}) -> True
@@ -187,10 +186,10 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   (a :< _) | getField a == C.SingletonMethod -> True
   _ -> False
 
-testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record '[Range, Category, SourceSpan]))
-testDiff sourceBlobs = diffFiles parser sourceBlobs
-  where
-    parser = parserForFilepath (path . fst $ sourceBlobs)
+testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
+testDiff blobs = runCommand $ do
+  terms <- for blobs parseBlob
+  diff terms
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do

@@ -1,5 +1,6 @@
-module ParseCommandSpec where
+module Command.Parse.Spec where
 
+import Command.Parse
 import Data.Functor.Listable
 import Prelude
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
@@ -7,7 +8,6 @@ import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
 import Arguments
-import ParseCommand
 import Renderer
 
 spec :: Spec

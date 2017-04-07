@@ -29,7 +29,7 @@ import SourceSpan
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
+treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record DefaultFields)
 treeSitterParser language grammar blob = do
   document <- ts_document_new
   ts_document_set_language document grammar
@@ -42,13 +42,13 @@ treeSitterParser language grammar blob = do
 
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
+documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record DefaultFields)
 documentToTerm language document SourceBlob{..} = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
     peek rootPtr)
   toTerm root source
-  where toTerm :: Node -> Source -> IO (Term (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan]))
+  where toTerm :: Node -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
         toTerm node source = do
           name <- peekCString (nodeType node)
 
@@ -77,7 +77,7 @@ nodeSpan :: Node -> SourceSpan
 nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` SourceSpan (pointPos nodeStartPoint) (pointPos nodeEndPoint)
   where pointPos TSPoint{..} = pointRow `seq` pointColumn `seq` SourcePos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
 
-assignTerm :: Language -> Source -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
+assignTerm :: Language -> Source -> Record DefaultFields -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren =
   cofree . (annotation :<) <$> case assignTermByLanguage language source (category annotation) children of
     Just a -> pure a
@@ -91,7 +91,7 @@ assignTerm language source annotation children allChildren =
           TypeScript -> TS.termAssignment
           _ -> \ _ _ _ -> Nothing
 
-defaultTermAssignment :: Source -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
+defaultTermAssignment :: Source -> Category -> [ SyntaxTerm Text DefaultFields ] -> IO [ SyntaxTerm Text DefaultFields ] -> IO (S.Syntax Text (SyntaxTerm Text DefaultFields))
 defaultTermAssignment source category children allChildren
   | category `elem` operatorCategories = S.Operator <$> allChildren
   | otherwise = pure $! case (category, children) of
@@ -137,7 +137,7 @@ categoryForLanguageProductionName = withDefaults . byLanguage
     withDefaults productionMap name = case name of
       "ERROR" -> ParseError
       s -> productionMap s
-      
+
     byLanguage language = case language of
       JavaScript -> JS.categoryForJavaScriptProductionName
       C -> C.categoryForCProductionName

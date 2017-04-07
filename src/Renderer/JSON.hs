@@ -9,12 +9,13 @@ import Alignment
 import Category
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
+import Data.Functor.Both
 import Data.Record
 import qualified Data.Text as T
 import Data.These
 import Data.Vector as Vector hiding (toList)
+import Diff
 import Info
-import Renderer
 import Source
 import SplitDiff
 import Syntax as S
@@ -22,8 +23,8 @@ import Term
 import qualified Data.Map as Map
 
 -- | Render a diff to a string representing its JSON.
-json :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => Renderer (Record fields)
-json blobs diff = JSONOutput $ Map.fromList [
+json :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
+json blobs diff = Map.fromList [
   ("rows", toJSON (annotateRows (alignDiff (source <$> blobs) diff))),
   ("oids", toJSON (oid <$> blobs)),
   ("paths", toJSON (path <$> blobs)) ]
