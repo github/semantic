@@ -32,10 +32,10 @@ data Out = Out ByteString
   deriving (Eq, Show)
 
 red :: Assignment Grammar Out
-red = rule Red (Out <$> content)
+red = Out <$ rule Red <*> content
 
 green :: Assignment Grammar Out
-green = rule Green (Out <$> content)
+green = Out <$ rule Green <*> content
 
 blue :: Assignment Grammar Out
-blue = rule Blue (Out <$> content)
+blue = Out <$ rule Blue <*> content
