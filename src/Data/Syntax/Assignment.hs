@@ -40,7 +40,7 @@ data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
 -- | An abstract syntax tree.
 type AST grammar = Rose (Node grammar)
 
--- | Small-step evaluation of an assignment from a grammar onto a syntax.
+-- | Run an assignment of nodes in a grammar onto terms in a syntax.
 stepAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
 stepAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
