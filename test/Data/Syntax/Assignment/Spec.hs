@@ -22,6 +22,10 @@ spec = do
     it "matches one-or-more repetitions against one or more input nodes" $
       runAssignment (some red) [ast Red "hello" []] `shouldBe` Just ([], [Out "hello"])
 
+  describe "children" $ do
+    it "advances past the current node" $
+      fst <$> runAssignment (children (pure (Out ""))) [ast Red "a" []] `shouldBe` Just []
+
 ast :: Grammar -> ByteString -> [AST Grammar] -> AST Grammar
 ast g s c = Rose (Node g s) c
 
