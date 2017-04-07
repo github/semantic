@@ -41,8 +41,8 @@ data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
 type AST grammar = Rose (Node grammar)
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-stepAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
-stepAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) of
+runAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
+runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
   (assignment, Rose Node{..} children : rest) -> case assignment of
