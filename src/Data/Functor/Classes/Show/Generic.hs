@@ -56,7 +56,7 @@ instance GShow1 f => GShow1 (M1 D c f) where
   gliftShowsPrec sp sl d (M1 a) = gliftShowsPrec sp sl d a
 
 instance (Constructor c, GShow1 f) => GShow1 (M1 C c f) where
-  gliftShowsPrec sp sl d m = gliftShowsPrec sp sl d (unM1 m)
+  gliftShowsPrec sp sl d m = showsUnaryWith (gliftShowsPrec sp sl) (conName m) d (unM1 m)
 
 instance GShow1 f => GShow1 (M1 S c f) where
   gliftShowsPrec sp sl d (M1 a) = gliftShowsPrec sp sl d a
