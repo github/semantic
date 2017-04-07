@@ -30,6 +30,13 @@ data UnmappedTerm f fields = UnmappedTerm {
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index Int | None
 
+rws = do
+  ses <- ses' as bs
+  (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs ses
+  nearestNeighbours <- findNearestNeighoursToDiff allDiffs (minimumTermIndex featureAs, toMap featureAs, toMap featureBs)
+  remaining <- deleteRemaining nearestNeighbours mappedDiffs
+  insertMapped remaining
+
 
 data RWS f (fields :: [*]) result where
   -- RWS :: RWS a b (EditScript a b)
@@ -78,10 +85,6 @@ eraseFeatureVector term = let record :< functor = runCofree term in
 
 setFeatureVector :: HasField fields (Maybe FeatureVector) => Record fields -> Maybe FeatureVector -> Record fields
 setFeatureVector = setField
-
-
-
-
 
 data EditGraph a b = EditGraph { as :: !(Array Int a), bs :: !(Array Int b) }
   deriving (Eq, Show)
