@@ -36,18 +36,18 @@ data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias |
 assignment :: Assignment Grammar (Program Syntax (Maybe a))
 assignment = foldr (>>) (pure Nothing) <$ rule Program <*> children (many declaration)
   where declaration = comment <|> class' <|> method
-        class' = rule Class
-              *> children (wrapU <$> (Declaration.Class <$> constant <*> pure [] <*> declaration))
+        class' = wrapU <$  rule Class
+                       <*> children (Declaration.Class <$> constant <*> pure [] <*> declaration)
         constant = wrapU . Syntax.Identifier <$ rule Constant <*> content
         identifier = wrapU . Syntax.Identifier <$ rule Identifier <*> content
-        method = rule Method *> (wrapU <$> (Declaration.Method <$> identifier <*> pure [] <*> statement))
+        method = wrapU <$ rule Method <*> (Declaration.Method <$> identifier <*> pure [] <*> statement)
         statement = expr
 
 comment :: Assignment Grammar (Program Syntax a)
 comment = wrapU . Comment.Comment <$ rule Comment <*> content
 
 if' :: Assignment Grammar (Program Syntax a)
-if' = rule If *> children (wrapU <$> (Statement.If <$> expr <*> expr <*> expr))
+if' = wrapU <$ rule If <*> children (Statement.If <$> expr <*> expr <*> expr)
 
 expr :: Assignment Grammar (Program Syntax a)
 expr = if'
