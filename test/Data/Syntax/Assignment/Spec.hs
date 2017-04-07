@@ -1,9 +1,6 @@
 module Data.Syntax.Assignment.Spec where
 
-import Data.Functor.Union
 import Data.Syntax.Assignment
-import qualified Data.Syntax.Comment as Comment
-import Language.Ruby.Syntax
 import Prologue
 import Test.Hspec
 
@@ -11,19 +8,34 @@ spec :: Spec
 spec = do
   describe "stepAssignment" $ do
     it "matches nodes" $
-      stepAssignment comment [ast Comment "hello" []] `shouldBe` Just ([], wrapU (Comment.Comment "hello") :: Program Syntax ())
+      stepAssignment red [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
     it "attempts multiple alternatives" $
-      stepAssignment (if' <|> comment) [ast Comment "hello" []] `shouldBe` Just ([], wrapU (Comment.Comment "hello") :: Program Syntax ())
+      stepAssignment (green <|> red) [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
     it "matches in sequence" $
-      stepAssignment ((,) <$> comment <*> comment) [ast Comment "hello" [], ast Comment "world" []] `shouldBe` Just ([], (wrapU (Comment.Comment "hello"), wrapU (Comment.Comment "world")) :: (Program Syntax (), Program Syntax ()))
+      stepAssignment ((,) <$> red <*> red) [ast Red "hello" [], ast Red "world" []] `shouldBe` Just ([], (Out "hello", Out "world"))
 
     it "matches repetitions" $
-      stepAssignment (many comment) [ast Comment "colourless" [], ast Comment "green" [], ast Comment "ideas" [], ast Comment "sleep" [], ast Comment "furiously" []] `shouldBe` Just ([], [wrapU (Comment.Comment "colourless"), wrapU (Comment.Comment "green"), wrapU (Comment.Comment "ideas"), wrapU (Comment.Comment "sleep"), wrapU (Comment.Comment "furiously")] :: [Program Syntax ()])
+      stepAssignment (many red) [ast Red "colourless" [], ast Red "green" [], ast Red "ideas" [], ast Red "sleep" [], ast Red "furiously" []] `shouldBe` Just ([], [Out "colourless", Out "green", Out "ideas", Out "sleep", Out "furiously"])
 
     it "matches one-or-more repetitions against one or more input nodes" $
-      stepAssignment (some comment) [ast Comment "hello" []] `shouldBe` Just ([], [wrapU (Comment.Comment "hello")] :: [Program Syntax ()])
+      stepAssignment (some red) [ast Red "hello" []] `shouldBe` Just ([], [Out "hello"])
 
 ast :: Grammar -> ByteString -> [AST Grammar] -> AST Grammar
 ast g s c = Rose (Node g s) c
+
+data Grammar = Red | Green | Blue
+  deriving (Eq, Show)
+
+data Out = Out ByteString
+  deriving (Eq, Show)
+
+red :: Assignment Grammar Out
+red = rule Red (Out <$> content)
+
+green :: Assignment Grammar Out
+green = rule Green (Out <$> content)
+
+blue :: Assignment Grammar Out
+blue = rule Blue (Out <$> content)
