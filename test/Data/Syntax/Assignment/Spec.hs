@@ -10,6 +10,7 @@ spec = do
     it "matches nodes" $
       runAssignment red [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
+  describe "Applicative" $ do
     it "matches in sequence" $
       runAssignment ((,) <$> red <*> red) [ast Red "hello" [], ast Red "world" []] `shouldBe` Just ([], (Out "hello", Out "world"))
 
