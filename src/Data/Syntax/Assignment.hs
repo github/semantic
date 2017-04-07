@@ -12,7 +12,9 @@ module Data.Syntax.Assignment
 ) where
 
 import Control.Monad.Free.Freer
+import Data.Functor.Classes
 import Prologue hiding (Alt)
+import Text.Show
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -77,3 +79,11 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) 
 instance Alternative (Assignment symbol) where
   empty = Empty `Then` return
   (<|>) = (wrap .) . Alt
+
+instance Show symbol => Show1 (AssignmentF symbol) where
+  liftShowsPrec sp _ d a = case a of
+    Rule s -> showsUnaryWith showsPrec "Rule" d s
+    Content -> showString "Content"
+    Children a -> showsUnaryWith sp "Children" d a
+    Alt a b -> showsBinaryWith sp sp "Alt" d a b
+    Empty -> showString "Empty"
