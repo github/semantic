@@ -49,5 +49,5 @@ eraseFeatureVector :: Term f (Record fields) -> Term f (Record fields)
 eraseFeatureVector term = let record :< functor = runCofree term in
   cofree (setFeatureVector record Nothing :< functor)
 
-setFeatureVector :: Record fields -> Maybe FeatureVector -> Record fields
+setFeatureVector :: HasField fields (Maybe FeatureVector) => Record fields -> Maybe FeatureVector -> Record fields
 setFeatureVector = setField
