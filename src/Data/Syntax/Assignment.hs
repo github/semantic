@@ -42,6 +42,10 @@ data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
 -- | An abstract syntax tree.
 type AST grammar = Rose (Node grammar)
 
+-- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
+assignAll :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe a
+assignAll = (fmap snd .) . runAssignment
+
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
 runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) of
