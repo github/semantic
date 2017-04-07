@@ -51,6 +51,7 @@ library
                      , Renderer.SExpression
                      , Renderer.TOC
                      , SemanticDiff
+                     , RWS
                      , SES
                      , SES.Myers
                      , Source
@@ -77,6 +78,7 @@ library
                      , containers
                      , directory
                      , dlist
+                     , effects
                      , filepath
                      , free
                      , freer-cofreer
