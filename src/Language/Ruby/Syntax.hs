@@ -32,7 +32,7 @@ data AssignmentF symbol a where
   Content :: AssignmentF symbol ByteString
   Children :: a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
-  Fail :: AssignmentF symbol a
+  Empty :: AssignmentF symbol a
 
 -- | Match a node with the given symbol and apply a rule to it to parse it.
 rule :: symbol -> Assignment symbol a -> Assignment symbol a
@@ -105,5 +105,5 @@ stepAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes)
 
 
 instance Alternative (Assignment symbol) where
-  empty = Fail `Then` return
+  empty = Empty `Then` return
   (<|>) = (wrap .) . Alt
