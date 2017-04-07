@@ -82,8 +82,8 @@ instance Alternative (Assignment symbol) where
 
 instance Show symbol => Show1 (AssignmentF symbol) where
   liftShowsPrec sp _ d a = case a of
-    Rule s -> showsUnaryWith showsPrec "Rule" d s
-    Content -> showString "Content"
+    Rule s -> showsUnaryWith showsPrec "Rule" d s . showChar ' ' . sp d ()
+    Content -> showString "Content" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith sp "Children" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
