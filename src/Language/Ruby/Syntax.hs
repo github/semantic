@@ -89,7 +89,7 @@ type AST grammar = Rose (Node grammar)
 -- | Small-step evaluation of an assignment from a grammar onto a syntax.
 stepAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
 stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
-  [] -> Nothing
+  [] -> Nothing -- FIXME: Nullability
   Rose Node{..} children : rest -> case assignment of
     Rule symbol subRule ->
       if symbol == nodeSymbol then
