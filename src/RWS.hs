@@ -13,6 +13,9 @@ import Info
 import SES
 import Data.Functor.Classes.Eq.Generic
 
+import qualified Data.IntMap as IntMap
+import Data.Semigroup (Min(..), Option(..))
+
 -- rws :: (GAlign f, Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
 --     => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
 --     -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
@@ -31,11 +34,15 @@ data UnmappedTerm f fields = UnmappedTerm {
 data TermOrIndexOrNone term = Term term | Index Int | None
 
 rws = do
-  ses <- ses' as bs
-  (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs ses
+  sesDiffs <- ses'
+  (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs' sesDiffs
   nearestNeighbours <- findNearestNeighoursToDiff allDiffs (minimumTermIndex featureAs, toMap featureAs, toMap featureBs)
   remaining <- deleteRemaining nearestNeighbours mappedDiffs
   insertMapped remaining
+
+ses' = send SES
+
+genFeaturizedTermsAndDiffs' = send . GenFeaturizedTermsAndDiffs
 
 
 data RWS f (fields :: [*]) result where
@@ -85,6 +92,10 @@ eraseFeatureVector term = let record :< functor = runCofree term in
 
 setFeatureVector :: HasField fields (Maybe FeatureVector) => Record fields -> Maybe FeatureVector -> Record fields
 setFeatureVector = setField
+
+minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
+
+toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
 data EditGraph a b = EditGraph { as :: !(Array Int a), bs :: !(Array Int b) }
   deriving (Eq, Show)
