@@ -40,7 +40,8 @@ assignment = foldr (>>) (pure Nothing) <$ rule Program <*> children (many declar
                        <*> children (Declaration.Class <$> constant <*> pure [] <*> declaration)
         constant = wrapU . Syntax.Identifier <$ rule Constant <*> content
         identifier = wrapU . Syntax.Identifier <$ rule Identifier <*> content
-        method = wrapU <$ rule Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statement)
+        method = wrapU <$  rule Method
+                       <*> children (Declaration.Method <$> identifier <*> pure [] <*> statement)
         statement = expr
 
 comment :: Assignment Grammar (Program Syntax a)
