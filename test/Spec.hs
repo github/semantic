@@ -20,8 +20,8 @@ import qualified IntegrationSpec
 import Test.Hspec
 
 main :: IO ()
-main = do
-  hspec . parallel $ do
+main = hspec $ do
+  parallel $ do
     describe "Alignment" AlignmentSpec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
@@ -38,4 +38,4 @@ main = do
     describe "ParseCommand" ParseCommandSpec.spec
     describe "Integration" IntegrationSpec.spec
 
-  hspec $ describe "GitmonClient" GitmonClientSpec.spec
+  describe "GitmonClient" GitmonClientSpec.spec
