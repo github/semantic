@@ -2,6 +2,9 @@ module Main where
 
 import Prologue
 import qualified AlignmentSpec
+import qualified Command.Spec
+import qualified Command.Diff.Spec
+import qualified Command.Parse.Spec
 import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Data.Syntax.Assignment.Spec
@@ -15,8 +18,6 @@ import qualified SES.Myers.Spec
 import qualified SourceSpec
 import qualified TermSpec
 import qualified TOCSpec
-import qualified DiffCommandSpec
-import qualified ParseCommandSpec
 import qualified IntegrationSpec
 import Test.Hspec
 
@@ -24,6 +25,9 @@ main :: IO ()
 main = do
   hspec . parallel $ do
     describe "Alignment" AlignmentSpec.spec
+    describe "Command" Command.Spec.spec
+    describe "Command.Diff" Command.Diff.Spec.spec
+    describe "Command.Parse" Command.Parse.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
     describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec
@@ -36,8 +40,6 @@ main = do
     describe "Source" SourceSpec.spec
     describe "Term" TermSpec.spec
     describe "TOC" TOCSpec.spec
-    describe "DiffCommand" DiffCommandSpec.spec
-    describe "ParseCommand" ParseCommandSpec.spec
     describe "Integration" IntegrationSpec.spec
 
   hspec $ describe "GitmonClient" GitmonClientSpec.spec

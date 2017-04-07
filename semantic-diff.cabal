@@ -17,6 +17,8 @@ library
                      , Alignment
                      , Arguments
                      , Category
+                     , Command
+                     , Command.Parse
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
@@ -37,7 +39,6 @@ library
                      , Data.Syntax.Type
                      , Data.Text.Listable
                      , Diff
-                     , DiffCommand
                      , Info
                      , Interpreter
                      , Language
@@ -48,7 +49,6 @@ library
                      , Language.Go
                      , Language.Ruby
                      , Language.Ruby.Syntax
-                     , ParseCommand
                      , Parser
                      , Patch
                      , Paths_semantic_diff
@@ -101,11 +101,13 @@ library
                      , MonadRandom
                      , mtl
                      , optparse-applicative
+                     , parallel
                      , pointed
                      , protolude
                      , recursion-schemes
                      , regex-compat
                      , semigroups
+                     , split
                      , text >= 1.2.1.3
                      , text-icu
                      , these
@@ -158,6 +160,9 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
+                     , Command.Spec
+                     , Command.Diff.Spec
+                     , Command.Parse.Spec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec
@@ -172,8 +177,6 @@ test-suite test
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
-                     , DiffCommandSpec
-                     , ParseCommandSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , array
