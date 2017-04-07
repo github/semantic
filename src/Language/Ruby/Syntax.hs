@@ -89,7 +89,6 @@ type AST grammar = Rose (Node grammar)
 -- | Small-step evaluation of an assignment from a grammar onto a syntax.
 stepAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
 stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
-  [] -> Nothing -- FIXME: Nullability
   Rose Node{..} children : rest -> case assignment of
     Rule symbol subRule ->
       if symbol == nodeSymbol then
@@ -100,7 +99,12 @@ stepAssignment = iterFreer (\ assignment yield nodes -> case nodes of
     Children each -> fmap (first (const rest)) (yield each children)
     Alt a b -> yield a nodes <|> yield b nodes
     -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
-    Fail -> Nothing) . fmap ((Just .) . flip (,))
+    Fail -> Nothing
+  -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input.
+  [] -> case assignment of
+    Alt a b -> yield a [] <|> yield b []
+    _ -> Nothing)
+  . fmap ((Just .) . flip (,))
 
 
 instance Alternative (Assignment symbol) where
