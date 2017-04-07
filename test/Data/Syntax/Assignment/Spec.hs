@@ -29,6 +29,9 @@ spec = do
     it "matches if its subrule matches" $
       () <$ runAssignment (children red) [ast Blue "b" [ast Red "a" []]] `shouldBe` Just ()
 
+    it "does not match if its subrule does not match" $
+      runAssignment (children red) [ast Blue "b" [ast Green "a" []]] `shouldBe` Nothing
+
 ast :: Grammar -> ByteString -> [AST Grammar] -> AST Grammar
 ast g s c = Rose (Node g s) c
 
