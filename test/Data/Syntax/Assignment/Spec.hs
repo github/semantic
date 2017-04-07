@@ -6,7 +6,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "runAssignment" $ do
+  describe "rule" $ do
     it "matches nodes" $
       runAssignment red [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
