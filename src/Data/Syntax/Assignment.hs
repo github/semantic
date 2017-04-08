@@ -70,7 +70,7 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) 
       else
         Nothing
     Content -> yield nodeContent rest
-    Children each -> fmap (first (const rest)) (yield each children)
+    Children childAssignment -> first (const rest) <$> yield childAssignment children
     _ -> Nothing
   _ -> Nothing)
   . fmap ((Just .) . flip (,))
