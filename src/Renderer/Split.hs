@@ -10,10 +10,10 @@ import Data.Functor.Both
 import Data.Record
 import qualified Data.Text.Lazy as TL
 import Data.These
+import Diff
 import Info
 import Prologue hiding (div, head, fst, snd, link, (<>))
 import qualified Prologue
-import Renderer
 import Source
 import SplitDiff
 import Syntax
@@ -161,8 +161,8 @@ splitPatchToClassName patch = stringValue $ "patch " <> case patch of
   SplitReplace _ -> "replace"
 
 -- | Render a diff as an HTML split diff.
-split :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-split blobs diff = SplitOutput . TL.toStrict . renderHtml
+split :: (HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Text
+split blobs diff = TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body

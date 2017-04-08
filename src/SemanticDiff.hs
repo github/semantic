@@ -2,29 +2,56 @@
 module SemanticDiff (main) where
 
 import Arguments
-import Prologue hiding (fst, snd)
-import Data.String
+import Command
+import Command.Parse
+import Development.GitRev
+import Data.Aeson
+import qualified Data.ByteString as B
 import Data.Functor.Both
+import Data.String
 import Data.Version (showVersion)
-import Text.Regex
 import Options.Applicative hiding (action)
 import qualified Paths_semantic_diff as Library (version)
+import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Renderer as R
-import Development.GitRev
-import DiffCommand
-import ParseCommand
-import qualified Data.ByteString as B
+import qualified Renderer.SExpression as R
+import Source
+import Text.Regex
 
 main :: IO ()
 main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
   text <- case runMode of
-    Diff -> diff args
+    Diff -> runCommand $ do
+      let render = case format of
+            R.Split -> fmap encodeText . renderDiffs R.SplitRenderer
+            R.Patch -> fmap encodeText . renderDiffs R.PatchRenderer
+            R.JSON -> fmap encodeJSON . renderDiffs R.JSONDiffRenderer
+            R.Summary -> fmap encodeSummaries . renderDiffs R.SummaryRenderer
+            R.SExpression -> renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
+            R.TOC -> fmap encodeSummaries . renderDiffs R.ToCRenderer
+            _ -> fmap encodeText . renderDiffs R.PatchRenderer
+      diffs <- case diffMode of
+        PathDiff paths -> do
+          blobs <- traverse readFile paths
+          terms <- traverse (traverse parseBlob) blobs
+          diff' <- maybeDiff terms
+          return [(fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')]
+        CommitDiff -> do
+          blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs filePaths (fromMaybe (toS nullOid) <$> shaRange)
+          concurrently blobPairs . uncurry $ \ path blobs -> do
+            terms <- concurrently blobs (traverse parseBlob)
+            diff' <- maybeDiff terms
+            return (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
+      render (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
     Parse -> case format of
       R.Index -> parseIndex args
       R.SExpression -> parseSExpression args
       _ -> parseTree args
-  writeToOutput outputPath (text <> "\n")
+  writeToOutput outputPath text
+  where encodeText = encodeUtf8 . R.unFile
+        encodeJSON = toS . (<> "\n") . encode
+        encodeSummaries = toS . (<> "\n") . encode
 
 -- | A parser for the application's command-line arguments.
 argumentsParser :: ParserInfo CmdLineOptions

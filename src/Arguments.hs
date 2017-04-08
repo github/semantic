@@ -3,7 +3,7 @@ module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..),
 
 import Data.Functor.Both
 import Data.Maybe
-import Data.Text
+import Data.List.Split
 import Prologue hiding ((<>))
 import Prelude
 import System.Environment
@@ -40,7 +40,7 @@ data CmdLineOptions = CmdLineOptions
 -- | Arguments for the program (includes command line, environment, and defaults).
 data Arguments = Arguments
   { gitDir :: FilePath
-  , alternateObjectDirs :: [Text]
+  , alternateObjectDirs :: [FilePath]
   , format :: R.Format
   , timeoutInMicroseconds :: Int
   , outputPath :: Maybe FilePath
@@ -59,7 +59,7 @@ programArguments CmdLineOptions{..} = do
   gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
   outputPath <- getOutputPath outputFilePath
-  let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
+  let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [FilePath]) of
                               (Left _) -> []
                               (Right objectDirs) -> objectDirs
 
@@ -149,5 +149,5 @@ defaultTimeout = 7 * 1000000
 toMicroseconds :: Float -> Int
 toMicroseconds num = floor $ num * 1000000
 
-parseObjectDirs :: Text -> [Text]
-parseObjectDirs = split (== ':')
+parseObjectDirs :: FilePath -> [FilePath]
+parseObjectDirs = splitWhen (== ':')

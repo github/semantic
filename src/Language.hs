@@ -2,6 +2,7 @@
 module Language where
 
 import Data.Record
+import Data.String
 import Info
 import Prologue
 import qualified Syntax as S
@@ -10,28 +11,15 @@ import Term
 -- | A programming language.
 data Language =
       C
-    | CoffeeScript
-    | CPlusPlus
-    | CSharp
-    | CSS
-    | Haskell
-    | HTML
-    | Java
+    | Go
     | JavaScript
     | Markdown
-    | ObjectiveC
-    | Perl
-    | PHP
-    | Python
-    | R
     | Ruby
-    | Swift
     | TypeScript
-    | Go
     deriving (Show)
 
 -- | Returns a Language based on the file extension (including the ".").
-languageForType :: Text -> Maybe Language
+languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> Just C
     ".c" -> Just C

@@ -2,21 +2,22 @@
 module Renderer.SExpression (sExpression, printTerm, printTerms, SExpressionFormat(..)) where
 
 import Data.Bifunctor.Join
-import Data.Record
 import Data.ByteString hiding (foldr, spanEnd)
+import Data.Functor.Both
+import Data.Record
 import Prologue hiding (replicate, encodeUtf8)
 import Category as C
 import Diff
-import Renderer
 import Patch
 import Info
+import Source
 import Syntax
 import Term
 
 data SExpressionFormat = TreeOnly | TreeAndRanges
 
-sExpression :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Record fields)
-sExpression format _ diff = SExpressionOutput $ printDiff diff 0 format
+sExpression :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> ByteString
+sExpression format _ diff = printDiff diff 0 format
 
 printDiff :: (HasField fields Category, HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> Int -> SExpressionFormat -> ByteString
 printDiff diff level format = case runFree diff of
