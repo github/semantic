@@ -44,7 +44,7 @@ spec = do
     it "does not match if its subrule does not match" $
       runAssignment (children red) [ast Blue "b" [ast Green "a" []]] `shouldBe` Nothing
 
-ast :: Grammar -> ByteString -> [AST Grammar] -> AST Grammar
+ast :: grammar -> ByteString -> [AST grammar] -> AST grammar
 ast g s c = Rose (Node g s) c
 
 data Grammar = Red | Green | Blue
