@@ -2,7 +2,7 @@
 module SemanticDiff (main) where
 
 import Arguments
-import Command hiding (diff, parse)
+import Command
 import Command.Parse
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
@@ -27,8 +27,8 @@ main = do
   Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
   outputPath <- getOutputPath outputFilePath
   text <- case programMode of
-    Diff args -> diff args
-    Parse args -> parse args
+    Diff args -> runDiff args
+    Parse args -> runParse args
   writeToOutput outputPath text
 
   where
@@ -50,8 +50,8 @@ main = do
     writeToOutput :: Maybe FilePath -> ByteString -> IO ()
     writeToOutput = maybe B.putStr B.writeFile
 
-diff :: DiffArguments -> IO ByteString
-diff DiffArguments{..} = runCommand $ do
+runDiff :: DiffArguments -> IO ByteString
+runDiff DiffArguments{..} = runCommand $ do
   diffs <- case diffMode of
     DiffPaths pathA pathB -> do
       let paths = both pathA pathB
@@ -67,8 +67,8 @@ diff DiffArguments{..} = runCommand $ do
         pure (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
   encodeDiff (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
 
-parse :: ParseArguments -> IO ByteString
-parse ParseArguments{..} = do
+runParse :: ParseArguments -> IO ByteString
+runParse ParseArguments{..} = do
   blobs <- case parseMode of
     ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
     ParsePaths paths -> sourceBlobsFromPaths paths
@@ -90,12 +90,12 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
       <$> ( DiffArguments
-            <$> (  flag patch patch (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-               <|> flag' split (long "split" <> help "Output a split diff")
-               <|> flag' json (long "json" <> help "Output a json diff")
-               <|> flag' summary (long "summary" <> help "Output a diff summary")
-               <|> flag' sExpression (long "sexpression" <> help "Output an s-expression diff tree")
-               <|> flag' toc (long "toc" <> help "Output a table of contents diff summary") )
+            <$> (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
+               <|> flag' splitDiff (long "split" <> help "Output a split diff")
+               <|> flag' jsonDiff (long "json" <> help "Output a json diff")
+               <|> flag' summaryDiff (long "summary" <> help "Output a diff summary")
+               <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
+               <|> flag' tocDiff (long "toc" <> help "Output a table of contents diff summary") )
             <*> (  DiffPaths
                   <$> argument str (metavar "FILE_A")
                   <*> argument str (metavar "FILE_B")
@@ -109,9 +109,9 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
       <$> ( ParseArguments
-            <$> (  flag parseSExpression parseSExpression (long "sexpression" <> help "Output s-expression parse trees (default)")
-               <|> flag' parseTree (long "json" <> help "Output JSON parse trees")
-               <|> flag' parseIndex (long "index" <> help "Output JSON parse trees in index format") )
+            <$> (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
+               <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees")
+               <|> flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") )
             <*> (  ParsePaths
                   <$> some (argument str (metavar "FILES..."))
                <|> ParseCommit

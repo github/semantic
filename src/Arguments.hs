@@ -44,7 +44,7 @@ instance Show DiffArguments where
 
 instance Show ParseArguments where
   showsPrec d ParseArguments{..} = showParen (d >= 10) $ showString "ParseArguments "
-    -- . showsPrec 10 (renderParseTree []) . showChar ' '
+    -- . showsPrec 10 (renderParseTree False []) . showChar ' '
     . showsPrec 10 parseMode . showChar ' '
     . showsPrec 10 debug . showChar ' '
     . showsPrec 10 gitDir . showChar ' '

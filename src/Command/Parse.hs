@@ -31,8 +31,6 @@ import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 
-type ParseTreeRenderer = Bool -> [SourceBlob] -> IO ByteString
-
 data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: Rose ParseNode } deriving (Show)
 
 data Rose a = Rose a [Rose a]
@@ -66,8 +64,8 @@ parseNodeToJSONFields ParseNode{..} =
   <> [ "identifier" .= identifier | isJust identifier ]
 
 -- | Parses file contents into an SExpression format for the provided arguments.
-parseSExpression :: Bool -> [SourceBlob] -> IO ByteString
-parseSExpression _ blobs =
+sExpressionParseTree :: Bool -> [SourceBlob] -> IO ByteString
+sExpressionParseTree _ blobs =
   pure . printTerms TreeOnly =<< parse blobs
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
 
@@ -84,12 +82,12 @@ parseRoot debug construct combine blobs = for blobs (\ sourceBlob@SourceBlob{..}
           ParseNode (toS category) range head sourceSpan (identifierFor syntax)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
-parseIndex :: Bool -> [SourceBlob] -> IO ByteString
-parseIndex debug = fmap (toS . encode) . parseRoot debug IndexFile (\ node siblings -> node : concat siblings)
+jsonIndexParseTree :: Bool -> [SourceBlob] -> IO ByteString
+jsonIndexParseTree debug = fmap (toS . encode) . parseRoot debug IndexFile (\ node siblings -> node : concat siblings)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
-parseTree :: Bool -> [SourceBlob] -> IO ByteString
-parseTree debug = fmap (toS . encode) . parseRoot debug ParseTreeFile Rose
+jsonParseTree :: Bool -> [SourceBlob] -> IO ByteString
+jsonParseTree debug = fmap (toS . encode) . parseRoot debug ParseTreeFile Rose
 
 -- | Determines the term decorator to use when parsing.
 parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))

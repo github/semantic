@@ -10,12 +10,12 @@ module Command
 , maybeDiff
 , renderDiffs
 , concurrently
-, patch
-, split
-, json
-, summary
-, sExpression
-, toc
+, patchDiff
+, splitDiff
+, jsonDiff
+, summaryDiff
+, sExpressionDiff
+, tocDiff
 , DiffEncoder
 , ParseTreeRenderer
 -- Evaluation
@@ -201,25 +201,27 @@ runRenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBl
 runRenderDiffs = runDiffRenderer
 
 
+type ParseTreeRenderer = Bool -> [SourceBlob] -> IO ByteString
+
 type DiffEncoder = [(Both SourceBlob, Diff (Syntax Text) (Record DefaultFields))] -> Command ByteString
 
-patch :: DiffEncoder
-patch = fmap encodeText . renderDiffs R.PatchRenderer
+patchDiff :: DiffEncoder
+patchDiff = fmap encodeText . renderDiffs R.PatchRenderer
 
-split :: DiffEncoder
-split = fmap encodeText . renderDiffs R.SplitRenderer
+splitDiff :: DiffEncoder
+splitDiff = fmap encodeText . renderDiffs R.SplitRenderer
 
-json :: DiffEncoder
-json = fmap encodeJSON . renderDiffs R.JSONDiffRenderer
+jsonDiff :: DiffEncoder
+jsonDiff = fmap encodeJSON . renderDiffs R.JSONDiffRenderer
 
-summary :: DiffEncoder
-summary = fmap encodeSummaries . renderDiffs R.SummaryRenderer
+summaryDiff :: DiffEncoder
+summaryDiff = fmap encodeSummaries . renderDiffs R.SummaryRenderer
 
-sExpression :: DiffEncoder
-sExpression = renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
+sExpressionDiff :: DiffEncoder
+sExpressionDiff = renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
 
-toc :: DiffEncoder
-toc = fmap encodeSummaries . renderDiffs R.ToCRenderer
+tocDiff :: DiffEncoder
+tocDiff = fmap encodeSummaries . renderDiffs R.ToCRenderer
 
 encodeJSON :: Map Text Value -> ByteString
 encodeJSON = toS . (<> "\n") . encode

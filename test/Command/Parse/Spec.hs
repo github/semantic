@@ -10,11 +10,11 @@ spec :: Spec
 spec = parallel . context "parse" $ do
     let blobs = sourceBlobsFromPaths ["test/fixtures/ruby/and-or.A.rb"]
     it "should produce s-expression trees" $ do
-      output <- parseSExpression False =<< blobs
+      output <- sExpressionParseTree False =<< blobs
       output `shouldNotBe` ""
     it "should produce JSON trees" $ do
-      output <- parseTree False =<< blobs
+      output <- jsonParseTree False =<< blobs
       output `shouldNotBe` ""
     it "should produce JSON index" $ do
-      output <- parseIndex False =<< blobs
+      output <- jsonIndexParseTree False =<< blobs
       output `shouldNotBe` ""
