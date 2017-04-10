@@ -16,7 +16,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
-data Match with a = Switch { matchSubject :: !a, matchPatterns :: ![with a] }
+data Match with a = Match { matchSubject :: !a, matchPatterns :: ![with a] }
   deriving (Eq, Foldable, Generic1, Show)
 
 instance Eq1 with => Eq1 (Match with) where liftEq = genericLiftEq
