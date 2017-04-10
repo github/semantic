@@ -30,7 +30,7 @@ main = hspec $ do
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
     describe "Diff" DiffSpec.spec
-    describe "Summary" SummarySpec.spfffec
+    describe "Summary" SummarySpec.spec
     describe "Interpreter" InterpreterSpec.spec
     describe "PatchOutput" PatchOutputSpec.spec
     describe "Range" RangeSpec.spec
