@@ -46,6 +46,13 @@ spec = do
     it "does not match if its subrule does not match" $
       runAssignment (children red) [ast Blue "b" [ast Green "a" []]] `shouldBe` Nothing
 
+    it "matches nested children" $ do
+      runAssignment
+        (rule 'A' *> children (rule 'B' *> children (rule 'C' *> content)))
+        [ ast 'A' "" [ ast 'B' "" [ ast 'C' "1" [] ] ] ]
+      `shouldBe`
+        Just ([], "1")
+
 ast :: grammar -> ByteString -> [AST grammar] -> AST grammar
 ast g s c = Rose (Node g s) c
 
