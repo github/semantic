@@ -53,6 +53,15 @@ spec = do
       `shouldBe`
         Just ([], "1")
 
+    it "continues after children" $ do
+      runAssignment
+        (many (rule 'A' *> children (rule 'B' *> content)
+           <|> rule 'C' *> content))
+        [ ast 'A' "" [ ast 'B' "B" [] ]
+        , ast 'C' "C" [] ]
+      `shouldBe`
+        Just ([], ["B", "C"])
+
 ast :: grammar -> ByteString -> [AST grammar] -> AST grammar
 ast g s c = Rose (Node g s) c
 
