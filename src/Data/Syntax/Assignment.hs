@@ -66,9 +66,7 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) 
   (assignment, Rose Node{..} children : rest) -> case assignment of
     Rule symbol -> guard (symbol == nodeSymbol) >> yield () nodes
     Content -> yield nodeContent rest
-    Children childAssignment -> do
-      (_, a) <- runAssignment childAssignment children
-      yield a rest
+    Children childAssignment -> assignAll childAssignment children >>= flip yield rest
     _ -> Nothing
   _ -> Nothing)
   . fmap ((Just .) . flip (,))
