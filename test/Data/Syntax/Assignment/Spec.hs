@@ -1,5 +1,6 @@
 module Data.Syntax.Assignment.Spec where
 
+import Data.ByteString.Char8 (words)
 import Data.Syntax.Assignment
 import Prologue
 import Test.Hspec
@@ -15,7 +16,8 @@ spec = do
       runAssignment (green <|> red) [ast Red "hello" []] `shouldBe` Just ([], Out "hello")
 
     it "matches repetitions" $
-      runAssignment (many red) [ast Red "colourless" [], ast Red "green" [], ast Red "ideas" [], ast Red "sleep" [], ast Red "furiously" []] `shouldBe` Just ([], [Out "colourless", Out "green", Out "ideas", Out "sleep", Out "furiously"])
+      let w = words "colourless green ideas sleep furiously" in
+      runAssignment (many red) (flip (ast Red) [] <$> w) `shouldBe` Just ([], Out <$> w)
 
     it "matches one-or-more repetitions against one or more input nodes" $
       runAssignment (some red) [ast Red "hello" []] `shouldBe` Just ([], [Out "hello"])
