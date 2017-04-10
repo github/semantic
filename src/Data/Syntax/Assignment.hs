@@ -24,7 +24,7 @@ type Assignment symbol = Freer (AssignmentF symbol)
 data AssignmentF symbol a where
   Rule :: symbol -> AssignmentF symbol ()
   Content :: AssignmentF symbol ByteString
-  Children :: a -> AssignmentF symbol a
+  Children :: Assignment symbol a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
 
@@ -40,7 +40,7 @@ content = Content `Then` return
 
 -- | Match a node by applying an assignment to its children.
 children :: Assignment symbol a -> Assignment symbol a
-children forEach = Children forEach `Then` identity
+children forEach = Children forEach `Then` return
 
 
 -- | A rose tree.
@@ -66,7 +66,9 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) 
   (assignment, Rose Node{..} children : rest) -> case assignment of
     Rule symbol -> guard (symbol == nodeSymbol) >> yield () nodes
     Content -> yield nodeContent rest
-    Children childAssignment -> first (const rest) <$> yield childAssignment children
+    Children childAssignment -> do
+      (_, a) <- runAssignment childAssignment children
+      yield a rest
     _ -> Nothing
   _ -> Nothing)
   . fmap ((Just .) . flip (,))
@@ -77,9 +79,9 @@ instance Alternative (Assignment symbol) where
   (<|>) = (wrap .) . Alt
 
 instance Show symbol => Show1 (AssignmentF symbol) where
-  liftShowsPrec sp _ d a = case a of
+  liftShowsPrec sp sl d a = case a of
     Rule s -> showsUnaryWith showsPrec "Rule" d s . showChar ' ' . sp d ()
     Content -> showString "Content" . showChar ' ' . sp d ""
-    Children a -> showsUnaryWith sp "Children" d a
+    Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
