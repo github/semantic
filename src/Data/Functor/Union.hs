@@ -1,5 +1,9 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, PolyKinds, TypeFamilies, TypeOperators #-}
-module Data.Functor.Union where
+module Data.Functor.Union
+( Union
+, wrapU
+, unwrapU
+) where
 
 import Data.Functor.Classes
 import Data.Kind
