@@ -21,8 +21,8 @@ import qualified IntegrationSpec
 import Test.Hspec
 
 main :: IO ()
-main = do
-  hspec . parallel $ do
+main = hspec $ do
+  parallel $ do
     describe "Alignment" AlignmentSpec.spec
     describe "Command" Command.Spec.spec
     describe "Command.Diff" Command.Diff.Spec.spec
@@ -40,4 +40,5 @@ main = do
     describe "TOC" TOCSpec.spec
     describe "Integration" IntegrationSpec.spec
 
-  hspec $ describe "GitmonClient" GitmonClientSpec.spec
+
+  describe "GitmonClient" GitmonClientSpec.spec
