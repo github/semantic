@@ -29,6 +29,7 @@ main = do
   alternates <- findAlternates
   Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
   text <- case programMode of
+
     Diff DiffArguments{..} -> runCommand $ do
       let render = case diffFormat of
             R.Split -> fmap encodeText . renderDiffs R.SplitRenderer
@@ -51,10 +52,17 @@ main = do
             diff' <- maybeDiff terms
             pure (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
       render (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
-    Parse args'@ParseArguments{..} -> case parseFormat of
-      R.JSONTree -> parseTree args'
-      R.JSONIndex -> parseIndex args'
-      R.SExpressionTree -> parseSExpression args'
+
+    Parse ParseArguments{..} -> do
+      let renderTree = case parseFormat of
+            R.JSONTree -> parseTree debug
+            R.JSONIndex -> parseIndex debug
+            R.SExpressionTree -> parseSExpression
+      blobs <- case parseMode of
+        ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
+        ParsePaths paths -> sourceBlobsFromPaths paths
+      renderTree blobs
+
   outputPath <- getOutputPath outputFilePath
   writeToOutput outputPath text
 

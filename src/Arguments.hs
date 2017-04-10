@@ -47,12 +47,3 @@ args gitDir sha1 sha2 paths format = Arguments
       }
   , outputFilePath = Nothing
   }
-
-parseArgs :: [String] -> R.ParseFormat -> ParseArguments
-parseArgs paths format = ParseArguments
-  { parseFormat = format
-  , parseMode = ParsePaths paths
-  , debug = False
-  , gitDir = ""
-  , alternateObjectDirs = []
-  }
