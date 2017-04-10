@@ -62,6 +62,14 @@ spec = do
       `shouldBe`
         Just ([], ["B", "C"])
 
+    it "matches multiple nested children" $ do
+      runAssignment
+        (rule 'A' *> children (many (rule 'B' *> children (rule 'C' *> content))))
+        [ ast 'A' "" [ ast 'B' "" [ ast 'C' "1" [] ]
+                     , ast 'B' "" [ ast 'C' "2" [] ] ] ]
+      `shouldBe`
+        Just ([], ["1", "2"])
+
 ast :: grammar -> ByteString -> [AST grammar] -> AST grammar
 ast g s c = Rose (Node g s) c
 
