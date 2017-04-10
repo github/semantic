@@ -2,9 +2,8 @@
 module SemanticDiff (main) where
 
 import Arguments
-import Command
+import Command hiding (diff, parse)
 import Command.Parse
-import Data.Aeson
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.String
@@ -14,8 +13,6 @@ import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
-import qualified Renderer as R
-import qualified Renderer.SExpression as R
 import Source
 import System.Directory
 import System.Environment
@@ -28,49 +25,13 @@ main = do
   gitDir <- findGitDir
   alternates <- findAlternates
   Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
-  text <- case programMode of
-
-    Diff DiffArguments{..} -> runCommand $ do
-      let render = case diffFormat of
-            R.Split -> fmap encodeText . renderDiffs R.SplitRenderer
-            R.Patch -> fmap encodeText . renderDiffs R.PatchRenderer
-            R.JSON -> fmap encodeJSON . renderDiffs R.JSONDiffRenderer
-            R.Summary -> fmap encodeSummaries . renderDiffs R.SummaryRenderer
-            R.SExpression -> renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
-            R.TOC -> fmap encodeSummaries . renderDiffs R.ToCRenderer
-      diffs <- case diffMode of
-        DiffPaths pathA pathB -> do
-          let paths = both pathA pathB
-          blobs <- traverse readFile paths
-          terms <- traverse (traverse parseBlob) blobs
-          diff' <- maybeDiff terms
-          pure [(fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')]
-        DiffCommits sha1 sha2 paths -> do
-          blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
-          concurrently blobPairs . uncurry $ \ path blobs -> do
-            terms <- concurrently blobs (traverse parseBlob)
-            diff' <- maybeDiff terms
-            pure (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
-      render (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
-
-    Parse ParseArguments{..} -> do
-      let renderTree = case parseFormat of
-            R.JSONTree -> parseTree debug
-            R.JSONIndex -> parseIndex debug
-            R.SExpressionTree -> parseSExpression
-      blobs <- case parseMode of
-        ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
-        ParsePaths paths -> sourceBlobsFromPaths paths
-      renderTree blobs
-
   outputPath <- getOutputPath outputFilePath
+  text <- case programMode of
+    Diff args -> diff args
+    Parse args -> parse args
   writeToOutput outputPath text
 
   where
-    encodeText = encodeUtf8 . R.unFile
-    encodeJSON = toS . (<> "\n") . encode
-    encodeSummaries = toS . (<> "\n") . encode
-
     findGitDir = do
       pwd <- getCurrentDirectory
       fromMaybe pwd <$> lookupEnv "GIT_DIR"
@@ -89,6 +50,30 @@ main = do
     writeToOutput :: Maybe FilePath -> ByteString -> IO ()
     writeToOutput = maybe B.putStr B.writeFile
 
+diff :: DiffArguments -> IO ByteString
+diff DiffArguments{..} = runCommand $ do
+  diffs <- case diffMode of
+    DiffPaths pathA pathB -> do
+      let paths = both pathA pathB
+      blobs <- traverse readFile paths
+      terms <- traverse (traverse parseBlob) blobs
+      diff' <- maybeDiff terms
+      pure [(fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')]
+    DiffCommits sha1 sha2 paths -> do
+      blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
+      concurrently blobPairs . uncurry $ \ path blobs -> do
+        terms <- concurrently blobs (traverse parseBlob)
+        diff' <- maybeDiff terms
+        pure (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
+  encodeDiff (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
+
+parse :: ParseArguments -> IO ByteString
+parse ParseArguments{..} = do
+  blobs <- case parseMode of
+    ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
+    ParsePaths paths -> sourceBlobsFromPaths paths
+  renderParseTree debug blobs
+
 -- | A parser for the application's command-line arguments.
 arguments :: FilePath -> [FilePath] -> ParserInfo Arguments
 arguments gitDir alternates = info (version <*> helper <*> argumentsParser) description
@@ -105,12 +90,12 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
       <$> ( DiffArguments
-            <$> (  flag R.Patch R.Patch (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-               <|> flag' R.JSON (long "json" <> help "Output a json diff")
-               <|> flag' R.Split (long "split" <> help "Output a split diff")
-               <|> flag' R.Summary (long "summary" <> help "Output a diff summary")
-               <|> flag' R.SExpression (long "sexpression" <> help "Output an s-expression diff tree")
-               <|> flag' R.TOC (long "toc" <> help "Output a table of contents diff summary") )
+            <$> (  flag patch patch (long "patch" <> help "Output a patch(1)-compatible diff (default)")
+               <|> flag' split (long "split" <> help "Output a split diff")
+               <|> flag' json (long "json" <> help "Output a json diff")
+               <|> flag' summary (long "summary" <> help "Output a diff summary")
+               <|> flag' sExpression (long "sexpression" <> help "Output an s-expression diff tree")
+               <|> flag' toc (long "toc" <> help "Output a table of contents diff summary") )
             <*> (  DiffPaths
                   <$> argument str (metavar "FILE_A")
                   <*> argument str (metavar "FILE_B")
@@ -124,9 +109,9 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
       <$> ( ParseArguments
-            <$> (  flag R.SExpressionTree R.SExpressionTree (long "sexpression" <> help "Output s-expression parse trees (default)")
-               <|> flag' R.JSONTree (long "json" <> help "Output JSON parse trees")
-               <|> flag' R.JSONIndex (long "index" <> help "Output JSON parse trees in index format") )
+            <$> (  flag parseSExpression parseSExpression (long "sexpression" <> help "Output s-expression parse trees (default)")
+               <|> flag' parseTree (long "json" <> help "Output JSON parse trees")
+               <|> flag' parseIndex (long "index" <> help "Output JSON parse trees in index format") )
             <*> (  ParsePaths
                   <$> some (argument str (metavar "FILES..."))
                <|> ParseCommit

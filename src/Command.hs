@@ -10,6 +10,14 @@ module Command
 , maybeDiff
 , renderDiffs
 , concurrently
+, patch
+, split
+, json
+, summary
+, sExpression
+, toc
+, DiffEncoder
+, ParseTreeRenderer
 -- Evaluation
 , runCommand
 ) where
@@ -20,15 +28,15 @@ import Control.Exception (catch)
 import Control.Monad.Free.Freer
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
+import Data.Aeson hiding (json)
 import qualified Data.ByteString as B
 import Data.Functor.Both
+import Data.Functor.Classes
 import Data.List ((\\), nub)
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
 import Diff
-import Info
-import Interpreter
 import GHC.Conc (numCapabilities)
 import qualified Git
 import Git.Blob
@@ -37,14 +45,19 @@ import Git.Libgit2.Backend
 import Git.Repository
 import Git.Types
 import GitmonClient
+import Info
+import Interpreter
 import Language
 import Patch
 import Prologue hiding (concurrently, Concurrently, readFile)
+import qualified Renderer as R
+import qualified Renderer.SExpression as R
 import Renderer
 import Source
 import Syntax
 import System.FilePath
 import Term
+import Text.Show
 
 
 -- | High-level commands encapsulating the work done to perform a diff or parse operation.
@@ -188,5 +201,47 @@ runRenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBl
 runRenderDiffs = runDiffRenderer
 
 
+type DiffEncoder = [(Both SourceBlob, Diff (Syntax Text) (Record DefaultFields))] -> Command ByteString
+
+patch :: DiffEncoder
+patch = fmap encodeText . renderDiffs R.PatchRenderer
+
+split :: DiffEncoder
+split = fmap encodeText . renderDiffs R.SplitRenderer
+
+json :: DiffEncoder
+json = fmap encodeJSON . renderDiffs R.JSONDiffRenderer
+
+summary :: DiffEncoder
+summary = fmap encodeSummaries . renderDiffs R.SummaryRenderer
+
+sExpression :: DiffEncoder
+sExpression = renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
+
+toc :: DiffEncoder
+toc = fmap encodeSummaries . renderDiffs R.ToCRenderer
+
+encodeJSON :: Map Text Value -> ByteString
+encodeJSON = toS . (<> "\n") . encode
+
+encodeText :: File -> ByteString
+encodeText = encodeUtf8 . R.unFile
+
+encodeSummaries :: Summaries -> ByteString
+encodeSummaries = toS . (<> "\n") . encode
+
+
 instance MonadIO Command where
   liftIO io = LiftIO io `Then` return
+
+instance Show1 CommandF where
+  liftShowsPrec sp sl d command = case command of
+    ReadFile path -> showsUnaryWith showsPrec "ReadFile" d path
+    ReadFilesAtSHAs gitDir alternates paths shas -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHAs" d gitDir alternates paths shas
+      where showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
+              showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
+    Parse language _ -> showsBinaryWith showsPrec (const showChar) "Parse" d language '_'
+    Diff _ -> showsUnaryWith (const showChar) "Diff" d '_'
+    RenderDiffs renderer _ -> showsBinaryWith showsPrec (const showChar) "RenderDiffs" d renderer '_'
+    Concurrently commands f -> showsBinaryWith (liftShowsPrec sp sl) (const showChar) "Concurrently" d (traverse f commands) '_'
+    LiftIO _ -> showsUnaryWith (const showChar) "LiftIO" d '_'

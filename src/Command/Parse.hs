@@ -31,6 +31,8 @@ import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 
+type ParseTreeRenderer = Bool -> [SourceBlob] -> IO ByteString
+
 data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: Rose ParseNode } deriving (Show)
 
 data Rose a = Rose a [Rose a]
@@ -64,8 +66,8 @@ parseNodeToJSONFields ParseNode{..} =
   <> [ "identifier" .= identifier | isJust identifier ]
 
 -- | Parses file contents into an SExpression format for the provided arguments.
-parseSExpression :: [SourceBlob] -> IO ByteString
-parseSExpression blobs =
+parseSExpression :: Bool -> [SourceBlob] -> IO ByteString
+parseSExpression _ blobs =
   pure . printTerms TreeOnly =<< parse blobs
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
 

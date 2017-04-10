@@ -2,48 +2,50 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module Arguments where
 
+import Command
 import Data.Maybe
-import Prologue hiding ((<>))
 import Prelude
-import qualified Renderer as R
+
 
 data DiffMode = DiffCommits String String [FilePath] | DiffPaths FilePath FilePath
-  deriving (Show)
+  deriving Show
 
 data DiffArguments = DiffArguments
-  { diffFormat :: R.Format
+  { encodeDiff :: DiffEncoder
   , diffMode :: DiffMode
   , gitDir :: FilePath
   , alternateObjectDirs :: [FilePath] }
-  deriving (Show)
 
 data ParseMode = ParseCommit String [FilePath] | ParsePaths [FilePath]
-  deriving (Show)
+  deriving Show
 
 data ParseArguments = ParseArguments
-  { parseFormat :: R.ParseFormat
+  { renderParseTree :: ParseTreeRenderer
   , parseMode :: ParseMode
   , debug :: Bool
   , gitDir :: FilePath
   , alternateObjectDirs :: [FilePath] }
-  deriving (Show)
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
-  deriving (Show)
+  deriving Show
 
 data Arguments = Arguments
   { programMode :: ProgramMode
   , outputFilePath :: Maybe FilePath
-  } deriving (Show)
+  } deriving Show
 
--- | Quickly assemble an Arguments data record with defaults.
-args :: FilePath -> String -> String -> [String] -> R.Format -> Arguments
-args gitDir sha1 sha2 paths format = Arguments
-  { programMode = Diff DiffArguments
-      { diffFormat = format
-      , diffMode = DiffCommits sha1 sha2 paths
-      , gitDir = gitDir
-      , alternateObjectDirs = []
-      }
-  , outputFilePath = Nothing
-  }
+
+instance Show DiffArguments where
+  showsPrec d DiffArguments{..} = showParen (d >= 10) $ showString "DiffArguments "
+    . showsPrec 10 (encodeDiff []) . showChar ' '
+    . showsPrec 10 diffMode . showChar ' '
+    . showsPrec 10 gitDir . showChar ' '
+    . showsPrec 10 alternateObjectDirs
+
+instance Show ParseArguments where
+  showsPrec d ParseArguments{..} = showParen (d >= 10) $ showString "ParseArguments "
+    -- . showsPrec 10 (renderParseTree []) . showChar ' '
+    . showsPrec 10 parseMode . showChar ' '
+    . showsPrec 10 debug . showChar ' '
+    . showsPrec 10 gitDir . showChar ' '
+    . showsPrec 10 alternateObjectDirs

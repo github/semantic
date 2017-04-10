@@ -2,16 +2,15 @@
 module Renderer
 ( DiffRenderer(..)
 , runDiffRenderer
-, Format(..)
-, ParseFormat(..)
 , Summaries(..)
 , File(..)
 ) where
 
 import Data.Aeson (ToJSON, Value)
 import Data.Functor.Both
+import Data.Functor.Classes
+import Text.Show
 import Data.Map as Map hiding (null)
-import Data.Functor.Listable
 import Data.Record
 import Diff
 import Info
@@ -33,6 +32,7 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
 
+
 runDiffRenderer :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runDiffRenderer renderer = foldMap . uncurry $ case renderer of
   SplitRenderer -> (File .) . R.split
@@ -42,29 +42,17 @@ runDiffRenderer renderer = foldMap . uncurry $ case renderer of
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> R.toc
 
--- | The available types of diff rendering.
-data Format = Split | Patch | JSON | Summary | SExpression | TOC
-  deriving (Show)
-
-data ParseFormat = JSONTree | JSONIndex | SExpressionTree
-  deriving (Show)
-
 newtype File = File { unFile :: Text }
   deriving Show
+
+instance Show (DiffRenderer fields output) where
+  showsPrec _ SplitRenderer = showString "SplitRenderer"
+  showsPrec _ PatchRenderer = showString "PatchRenderer"
+  showsPrec _ JSONDiffRenderer = showString "JSONDiffRenderer"
+  showsPrec _ SummaryRenderer = showString "SummaryRenderer"
+  showsPrec d (SExpressionDiffRenderer format) = showsUnaryWith showsPrec "SExpressionDiffRenderer" d format
+  showsPrec _ ToCRenderer = showString "ToCRenderer"
 
 instance Monoid File where
   mempty = File mempty
   mappend (File a) (File b) = File (a <> "\n" <> b)
-
-instance Listable Format where
-  tiers = cons0 Split
-       \/ cons0 Patch
-       \/ cons0 JSON
-       \/ cons0 Summary
-       \/ cons0 SExpression
-       \/ cons0 TOC
-
-instance Listable ParseFormat where
-  tiers = cons0 JSONTree
-       \/ cons0 JSONIndex
-       \/ cons0 SExpressionTree
