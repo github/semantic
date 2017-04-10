@@ -62,7 +62,7 @@ instance (Eq (f a), Eq (Union fs a)) => Eq (Union (f ': fs) a) where
   _ == _ = False
 
 instance Eq (Union '[] a) where
-  _ == _ = True
+  _ == _ = False
 
 
 instance (Show (f a), Show (Union fs a)) => Show (Union (f ': fs) a) where
