@@ -25,7 +25,6 @@ main = do
   gitDir <- findGitDir
   alternates <- findAlternates
   args@Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
-  print args
   outputPath <- getOutputPath outputFilePath
   text <- case programMode of
     Diff args -> runDiff args
