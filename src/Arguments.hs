@@ -1,5 +1,5 @@
-{-# OPTIONS_GHC -funbox-strict-fields #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
 import Command
@@ -14,7 +14,8 @@ data DiffArguments = DiffArguments
   { encodeDiff :: DiffEncoder
   , diffMode :: DiffMode
   , gitDir :: FilePath
-  , alternateObjectDirs :: [FilePath] }
+  , alternateObjectDirs :: [FilePath]
+  } deriving Show
 
 data ParseMode = ParseCommit String [FilePath] | ParsePaths [FilePath]
   deriving Show
@@ -24,7 +25,8 @@ data ParseArguments = ParseArguments
   , parseMode :: ParseMode
   , debug :: Bool
   , gitDir :: FilePath
-  , alternateObjectDirs :: [FilePath] }
+  , alternateObjectDirs :: [FilePath]
+  } deriving Show
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
@@ -33,19 +35,3 @@ data Arguments = Arguments
   { programMode :: ProgramMode
   , outputFilePath :: Maybe FilePath
   } deriving Show
-
-
-instance Show DiffArguments where
-  showsPrec d DiffArguments{..} = showParen (d >= 10) $ showString "DiffArguments "
-    . showsPrec 10 (encodeDiff []) . showChar ' '
-    . showsPrec 10 diffMode . showChar ' '
-    . showsPrec 10 gitDir . showChar ' '
-    . showsPrec 10 alternateObjectDirs
-
-instance Show ParseArguments where
-  showsPrec d ParseArguments{..} = showParen (d >= 10) $ showString "ParseArguments "
-    -- . showsPrec 10 (renderParseTree False []) . showChar ' '
-    . showsPrec 10 parseMode . showChar ' '
-    . showsPrec 10 debug . showChar ' '
-    . showsPrec 10 gitDir . showChar ' '
-    . showsPrec 10 alternateObjectDirs

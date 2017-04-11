@@ -18,6 +18,7 @@ import qualified SourceSpec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified IntegrationSpec
+import qualified SemanticSpec
 import Test.Hspec
 
 main :: IO ()
@@ -37,6 +38,7 @@ main = hspec $ do
     describe "SES.Myers" SES.Myers.Spec.spec
     describe "Source" SourceSpec.spec
     describe "Term" TermSpec.spec
+    describe "Semantic" SemanticSpec.spec
     describe "TOC" TOCSpec.spec
     describe "Integration" IntegrationSpec.spec
 

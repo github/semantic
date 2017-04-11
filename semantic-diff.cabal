@@ -50,7 +50,7 @@ library
                      , Renderer.Summary
                      , Renderer.SExpression
                      , Renderer.TOC
-                     , SemanticDiff
+                     , Semantic
                      , SES
                      , SES.Myers
                      , Source
@@ -138,6 +138,7 @@ test-suite test
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , DiffSpec
+                     , SemanticSpec
                      , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec

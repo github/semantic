@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module SemanticDiff (main) where
+module Semantic (main, runDiff, runParse) where
 
 import Arguments
 import Command
@@ -24,7 +24,8 @@ main :: IO ()
 main = do
   gitDir <- findGitDir
   alternates <- findAlternates
-  Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
+  args@Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
+  print args
   outputPath <- getOutputPath outputFilePath
   text <- case programMode of
     Diff args -> runDiff args

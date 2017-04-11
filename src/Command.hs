@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Command
 ( Command
 -- Constructors
@@ -32,6 +33,7 @@ import Data.Aeson hiding (json)
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Classes
+import Data.Functor.Listable
 import Data.List ((\\), nub)
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -232,6 +234,26 @@ encodeText = encodeUtf8 . R.unFile
 encodeSummaries :: Summaries -> ByteString
 encodeSummaries = toS . (<> "\n") . encode
 
+
+instance Show ParseTreeRenderer where
+  showsPrec d _ = showParen (d >= 10) $ showString "ParseTreeRenderer "
+
+instance Listable ParseTreeRenderer where
+  tiers = cons0 jsonParseTree
+       \/ cons0 jsonIndexParseTree
+       \/ cons0 sExpressionParseTree
+
+instance Show DiffEncoder where
+  showsPrec d encodeDiff = showParen (d >= 10) $ showString "DiffEncoder "
+    . showsPrec 10 (encodeDiff []) . showChar ' '
+
+instance Listable DiffEncoder where
+  tiers = cons0 patchDiff
+       \/ cons0 splitDiff
+       \/ cons0 jsonDiff
+       \/ cons0 summaryDiff
+       \/ cons0 sExpressionDiff
+       \/ cons0 tocDiff
 
 instance MonadIO Command where
   liftIO io = LiftIO io `Then` return
