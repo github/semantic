@@ -1,21 +1,21 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module IntegrationSpec where
 
-import Category as C
+import Command
+import Command.Parse
 import Data.Functor.Both
+import Data.List (union, concat, transpose)
 import Data.Record
 import qualified Data.Text as T
 import qualified Data.ByteString as B
 import Data.Text.Encoding (decodeUtf8)
+import Diff
 import GHC.Show (Show(..))
-import Data.List (union, concat, transpose)
 import Info
-import ParseCommand
-import Prologue hiding (fst, snd)
-import Renderer
+import Prologue hiding (fst, snd, readFile)
 import Renderer.SExpression as Renderer
 import Source
-import DiffCommand
+import Syntax
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)
@@ -116,20 +116,17 @@ testParse path expectedOutput = do
   expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
-testDiff :: Renderer (Record '[Range, Category, SourceSpan]) -> Both FilePath -> FilePath -> Expectation
+testDiff :: (Both SourceBlob -> Diff (Syntax Text) (Record DefaultFields) -> ByteString) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths expectedOutput = do
-  sources <- traverse readAndTranscodeFile' paths
-  diff <- diffFiles parser (sourceBlobs sources)
-  let diffOutput = renderer (sourceBlobs sources) diff
-  let actual = (Verbatim . stripWhitespace. concatOutputs . pure) diffOutput
-  expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
+  (blobs, diff') <- runCommand $ do
+    blobs <- traverse readFile paths
+    terms <- traverse (traverse parseBlob) blobs
+    Just diff' <- maybeDiff terms
+    return (fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')
+  let diffOutput = renderer blobs diff'
+  let actual = Verbatim (stripWhitespace diffOutput)
+  expected <- Verbatim . stripWhitespace <$> B.readFile expectedOutput
   actual `shouldBe` expected
-  where
-    parser = parserForFilepath filePath
-    sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
-    readAndTranscodeFile' path | Prologue.null path = pure Source.empty
-                               | otherwise = readAndTranscodeFile path
-    filePath = if fst paths /= "" then fst paths else snd paths
 
 stripWhitespace :: ByteString -> ByteString
 stripWhitespace = B.foldl' go B.empty

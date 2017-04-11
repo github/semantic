@@ -65,6 +65,9 @@ defaultPlainBlob = PlainBlob 0o100644
 emptySourceBlob :: FilePath -> SourceBlob
 emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothing
 
+nullBlob :: SourceBlob -> Bool
+nullBlob SourceBlob{..} = oid == nullOid || Source.null source
+
 sourceBlob :: Source -> FilePath -> SourceBlob
 sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
 

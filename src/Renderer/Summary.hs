@@ -2,13 +2,13 @@
 -- {-# OPTIONS_GHC -funbox-strict-fields #-}
 {-# OPTIONS_GHC -Wno-deprecations #-}
 -- Disabling deprecation warnings due to pattern match against RescueModifier.
-module Renderer.Summary (summary, diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
+module Renderer.Summary (Summaries(..), summary, diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 
 import Prologue
 import Diff
 import Patch
 import Term
-import Info (category, byteRange)
+import Info (HasDefaultFields, category, byteRange)
 import Range
 import Syntax as S
 import Category as C
@@ -25,9 +25,18 @@ import qualified Text.PrettyPrint.Leijen.Text as P
 import Data.Aeson
 import SourceSpan
 import Source hiding (null)
-import Renderer
 import qualified Data.Map as Map
 import qualified Data.List as List
+
+data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
+  deriving Show
+
+instance Monoid Summaries where
+  mempty = Summaries mempty mempty
+  mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+
+instance ToJSON Summaries where
+  toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
 data Annotatable a = Annotatable a | Unannotatable a
 
@@ -101,11 +110,8 @@ data DiffSummary a = DiffSummary {
   parentAnnotation :: [Either (Category, Text) (Category, Text)]
 } deriving (Eq, Functor, Show, Generic)
 
-summary :: (DefaultFields fields) => Renderer (Record fields)
-summary blobs diff = SummaryOutput $ Map.fromList [
-    ("changes", changes),
-    ("errors", errors)
-  ]
+summary :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+summary blobs diff = Summaries changes errors
   where
     changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
     errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')
@@ -113,8 +119,19 @@ summary blobs diff = SummaryOutput $ Map.fromList [
     summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffSummaries blobs diff
 
+    -- Returns a key representing the filename. If the filenames are different,
+    -- return 'before -> after'.
+    toSummaryKey :: Both FilePath -> Text
+    toSummaryKey = runBothWith $ \before after ->
+      toS $ case (before, after) of
+        ("", after) -> after
+        (before, "") -> before
+        (before, after) | before == after -> after
+        (before, after) | not (null before) && not (null after) -> before <> " -> " <> after
+        (_, _) -> mempty
+
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary Text SourceSpans]
+diffSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary Text SourceSpans]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 -- Takes a 'DiffSummary DiffInfo' and returns a list of JSON Summaries whose text summaries represent the LeafInfo summaries of the 'DiffSummary'.
@@ -124,7 +141,7 @@ summaryToTexts DiffSummary{..} = appendParentContexts <$> jsonDocSummaries diffS
           jsonSummary { info = show $ info jsonSummary <+> parentContexts parentAnnotation }
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
-diffToDiffSummaries :: (StringConv leaf Text, DefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
+diffToDiffSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let
     diff' = free (Prologue.fst <$> diff)
@@ -204,7 +221,7 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
         vowels = Text.singleton <$> ("aeiouAEIOU" :: [Char])
 
 -- Returns a text representing a specific term given a source and a term.
-toTermName :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source -> SyntaxTerm leaf fields -> Text
+toTermName :: forall leaf fields. (StringConv leaf Text, HasDefaultFields fields) => Source -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.Send _ _ -> termNameFromSource term
   S.Ty _ -> termNameFromSource term
@@ -344,7 +361,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-termToDiffInfo :: (StringConv leaf Text, DefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: (StringConv leaf Text, HasDefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term) BFixed
@@ -361,7 +378,7 @@ termToDiffInfo blob term = case unwrap term of
 -- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.
 -- | For a DiffSummary with a parentAnnotation, we append the next annotatable term to the extant parentAnnotation.
 -- | If a DiffSummary already has a parentAnnotation, and a (grand) parentAnnotation, then we return the summary without modification.
-appendSummary :: (StringConv leaf Text, DefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
+appendSummary :: (StringConv leaf Text, HasDefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 appendSummary source term summary =
   case (parentAnnotation summary, identifiable term, annotatable term) of
     ([], Identifiable _, _) -> appendParentAnnotation Left
