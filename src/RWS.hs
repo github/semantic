@@ -45,7 +45,7 @@ rws' = do
   (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs' sesDiffs
   (diffs, remaining) <- findNearestNeighoursToDiff' allDiffs featureAs featureBs
   diffs' <- deleteRemaining' diffs remaining
-  rwsDiffs <- insertMapped' diffs' mappedDiffs
+  rwsDiffs <- insertMapped' mappedDiffs diffs'
   pure (fmap snd rwsDiffs)
 
 ses' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e (RWSEditScript f fields)
@@ -106,13 +106,18 @@ run editDistance canCompare as bs = relay pure (\m k -> case m of
 
 type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 
-insertMapped :: Foldable t => [(These Int Int, Diff f fields)] -> t (These Int Int, Diff f fields) -> [(These Int Int, Diff f fields)]
-insertMapped = foldl' (\into (i, mappedTerm) -> insertDiff (i, mappedTerm) into)
+insertMapped :: Foldable t => t (These Int Int, Diff f fields) -> [(These Int Int, Diff f fields)] -> [(These Int Int, Diff f fields)]
+insertMapped diffs into = foldl' (\into (i, mappedTerm) -> insertDiff (i, mappedTerm) into) into diffs
 
-deleteRemaining diffs unmappedAs = foldl' (\into (i, deletion) ->
-    insertDiff (This i, deletion) into)
-  diffs
-  ((termIndex &&& This . term) <$> unmappedAs)
+deleteRemaining :: (Traversable t)
+                => [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
+                -> t (RWS.UnmappedTerm f fields)
+                -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
+deleteRemaining diffs unmappedAs =
+  foldl'
+    (\into (i, deletion) -> insertDiff (This i, deletion) into)
+    diffs
+    ((termIndex &&& This . term) <$> unmappedAs)
 
 -- | Inserts an index and diff pair into a list of indices and diffs.
 insertDiff :: (These Int Int, These (Term f (Record fields)) (Term f (Record fields))) -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))] -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
