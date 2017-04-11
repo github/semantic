@@ -114,13 +114,12 @@ deleteRemaining :: (Traversable t)
                 -> t (RWS.UnmappedTerm f fields)
                 -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
 deleteRemaining diffs unmappedAs =
-  foldl'
-    (\into (i, deletion) -> insertDiff (This i, deletion) into)
-    diffs
-    ((termIndex &&& This . term) <$> unmappedAs)
+  foldr insertDiff diffs ((This . termIndex &&& This . term) <$> unmappedAs)
 
 -- | Inserts an index and diff pair into a list of indices and diffs.
-insertDiff :: (These Int Int, These (Term f (Record fields)) (Term f (Record fields))) -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))] -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
+insertDiff :: (These Int Int, These (Term f (Record fields)) (Term f (Record fields)))
+           -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
+           -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
 insertDiff inserted [] = [ inserted ]
 insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
   (These i1 i2, These j1 j2) -> if i1 <= j1 && i2 <= j2 then a : b : rest else b : insertDiff a rest
