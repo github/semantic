@@ -1,4 +1,6 @@
-module Text.Parser.TreeSitter.Ruby where
+module Text.Parser.TreeSitter.Ruby
+( tree_sitter_ruby
+) where
 
 import Foreign.Ptr
 import Text.Parser.TreeSitter
