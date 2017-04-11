@@ -2,7 +2,7 @@
 module RWS (rws) where
 
 import Prologue
-import Control.Monad.Effect
+import Control.Monad.Effect as Eff
 import Control.Monad.Effect.Internal as I
 import Data.Record
 import Data.These
@@ -37,7 +37,7 @@ data UnmappedTerm f fields = UnmappedTerm {
 data TermOrIndexOrNone term = Term term | Index Int | None
 
 rws :: (HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f) => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -> t (Term f (Record fields)) -> t (Term f (Record fields)) -> RWSEditScript f fields
-rws editDistance canCompare as bs = RWS.run editDistance canCompare as bs rws'
+rws editDistance canCompare as bs = Eff.run $ RWS.run editDistance canCompare as bs rws'
 
 rws' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e [These (Term f (Record fields)) (Term f (Record fields))]
 rws' = do
@@ -91,22 +91,18 @@ run :: (Eq1 f, Functor f, HasField fields Category, HasField fields (Maybe Featu
     -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
     -> t (Term f (Record fields))
     -> t (Term f (Record fields))
-    -> Eff '[RWS f fields] (RWSEditScript f fields)
-    -> RWSEditScript f fields
-run _ _ _ _ (Val x) = x
-run editDistance canCompare as bs (E u q) = case decompose u of
-  Right SES ->
-    let sesDiffs = ses (gliftEq (==) `on` fmap category) as bs in
-      run' (apply q sesDiffs)
-  Right (GenFeaturizedTermsAndDiffs sesDiffs) ->
-    run' . apply q $ evalState (genFeaturizedTermsAndDiffs sesDiffs) (0, 0)
-  Right (FindNearestNeighoursToDiff allDiffs featureAs featureBs) ->
-    run' . apply q $ findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
-  Right (DeleteRemaining allDiffs remainingDiffs) ->
-    run' . apply q $ deleteRemaining allDiffs remainingDiffs
-  Right (InsertMapped allDiffs mappedDiffs) ->
-    run' . apply q $ insertMapped allDiffs mappedDiffs
-  where run' = RWS.run editDistance canCompare as bs
+    -> Eff (RWS f fields ': e) (RWSEditScript f fields)
+    -> Eff e (RWSEditScript f fields)
+run editDistance canCompare as bs = relay pure (\m k -> case m of
+  SES -> k $ ses (gliftEq (==) `on` fmap category) as bs
+  (GenFeaturizedTermsAndDiffs sesDiffs) ->
+    k $ evalState (genFeaturizedTermsAndDiffs sesDiffs) (0, 0)
+  (FindNearestNeighoursToDiff allDiffs featureAs featureBs) ->
+    k $ findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
+  (DeleteRemaining allDiffs remainingDiffs) ->
+    k $ deleteRemaining allDiffs remainingDiffs
+  (InsertMapped allDiffs mappedDiffs) ->
+    k $ insertMapped allDiffs mappedDiffs)
 
 type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 
