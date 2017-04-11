@@ -93,16 +93,16 @@ run :: (Eq1 f, Functor f, HasField fields Category, HasField fields (Maybe Featu
     -> t (Term f (Record fields))
     -> Eff (RWS f fields ': e) (RWSEditScript f fields)
     -> Eff e (RWSEditScript f fields)
-run editDistance canCompare as bs = relay pure (\m q -> case m of
-  SES -> q $ ses (gliftEq (==) `on` fmap category) as bs
+run editDistance canCompare as bs = relay pure (\m q -> q $ case m of
+  SES -> ses (gliftEq (==) `on` fmap category) as bs
   (GenFeaturizedTermsAndDiffs sesDiffs) ->
-    q $ genFeaturizedTermsAndDiffs sesDiffs
+    genFeaturizedTermsAndDiffs sesDiffs
   (FindNearestNeighoursToDiff allDiffs featureAs featureBs) ->
-    q $ findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
+    findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
   (DeleteRemaining allDiffs remainingDiffs) ->
-    q $ deleteRemaining allDiffs remainingDiffs
+    deleteRemaining allDiffs remainingDiffs
   (InsertMapped allDiffs mappedDiffs) ->
-    q $ insertMapped allDiffs mappedDiffs)
+    insertMapped allDiffs mappedDiffs)
 
 type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 
