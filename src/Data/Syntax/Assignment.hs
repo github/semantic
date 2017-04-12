@@ -5,6 +5,7 @@ module Data.Syntax.Assignment
 , content
 , children
 , Rose(..)
+, RoseF(..)
 , Node(..)
 , AST
 , assignAll
