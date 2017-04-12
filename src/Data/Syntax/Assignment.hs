@@ -89,7 +89,7 @@ instance Show symbol => Show1 (AssignmentF symbol) where
 type instance Base (Rose a) = RoseF a
 
 data RoseF a f = RoseF a [f]
-  deriving (Eq, Functor, Show)
+  deriving (Eq, Foldable, Functor, Show, Traversable)
 
 instance Recursive (Rose a) where project (Rose a as) = RoseF a as
 instance Corecursive (Rose a) where embed (RoseF a as) = Rose a as
