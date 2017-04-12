@@ -7,12 +7,14 @@ module TreeSitter
 import Prologue hiding (Constructor)
 import Category
 import Data.Record
+import qualified Data.Syntax.Assignment as A
 import Language
 import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.JavaScript as JS
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
+import qualified Language.Ruby.Syntax as Ruby
 import Parser
 import Range
 import Source
@@ -25,6 +27,7 @@ import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
+import qualified Text.Parser.TreeSitter.Ruby as Ruby
 import SourceSpan
 import Info
 
@@ -39,6 +42,25 @@ treeSitterParser language grammar blob = do
     term <- documentToTerm language document blob
     ts_document_free document
     pure term
+
+
+parseRubyToAST :: Source -> IO (A.AST Ruby.Grammar)
+parseRubyToAST source = do
+  document <- ts_document_new
+  ts_document_set_language document Ruby.tree_sitter_ruby
+  root <- withCStringLen (toText source) $ \ (source, len) -> do
+    ts_document_set_input_string_with_length document source len
+    ts_document_parse document
+    alloca (\ rootPtr -> do
+      ts_document_root_node_p document rootPtr
+      peek rootPtr)
+
+  ast <- toAST root source
+
+  ts_document_free document
+  pure ast
+  where toAST Node{..} source = do
+          pure $ A.Rose (A.Node (toEnum (fromIntegral nodeSymbol)) "") []
 
 
 -- | Return a parser for a tree sitter language & document.
