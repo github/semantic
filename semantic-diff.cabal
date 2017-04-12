@@ -46,6 +46,7 @@ library
                      , Language.JavaScript
                      , Language.Markdown
                      , Language.Go
+                     , Language.Go.Syntax
                      , Language.Ruby
                      , Language.Ruby.Syntax
                      , Language.TypeScript
