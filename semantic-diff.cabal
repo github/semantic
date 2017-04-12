@@ -44,11 +44,12 @@ library
                      , Language
                      , Language.C
                      , Language.JavaScript
-                     , Language.TypeScript
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
                      , Language.Ruby.Syntax
+                     , Language.TypeScript
+                     , Language.TypeScript.Syntax
                      , Parser
                      , Patch
                      , Paths_semantic_diff
