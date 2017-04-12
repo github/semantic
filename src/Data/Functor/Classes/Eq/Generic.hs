@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeOperators #-}
 module Data.Functor.Classes.Eq.Generic
-( genericLiftEq
+( Eq1(..)
+, genericLiftEq
 , gliftEq
 ) where
 
@@ -44,8 +45,8 @@ instance GEq1 Par1 where
 instance Eq c => GEq1 (K1 i c) where
   gliftEq _ (K1 a) (K1 b) = a == b
 
-instance GEq1 f => GEq1 (Rec1 f) where
-  gliftEq f (Rec1 a) (Rec1 b) = gliftEq f a b
+instance Eq1 f => GEq1 (Rec1 f) where
+  gliftEq f (Rec1 a) (Rec1 b) = liftEq f a b
 
 instance GEq1 f => GEq1 (M1 i c f) where
   gliftEq f (M1 a) (M1 b) = gliftEq f a b
@@ -59,5 +60,5 @@ instance (GEq1 f, GEq1 g) => GEq1 (f :+: g) where
 instance (GEq1 f, GEq1 g) => GEq1 (f :*: g) where
   gliftEq f (a1 :*: b1) (a2 :*: b2) = gliftEq f a1 a2 && gliftEq f b1 b2
 
-instance (GEq1 f, GEq1 g) => GEq1 (f :.: g) where
-  gliftEq f (Comp1 a) (Comp1 b) = gliftEq (gliftEq f) a b
+instance (Eq1 f, GEq1 g) => GEq1 (f :.: g) where
+  gliftEq f (Comp1 a) (Comp1 b) = liftEq (gliftEq f) a b
