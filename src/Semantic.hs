@@ -79,7 +79,7 @@ arguments :: FilePath -> [FilePath] -> ParserInfo Arguments
 arguments gitDir alternates = info (version <*> helper <*> argumentsParser) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
-    versionString = "semantic-diff version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
+    versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
     description = fullDesc <> progDesc "Set the GIT_DIR environment variable to specify a different git repository. Set GIT_ALTERNATE_OBJECT_DIRECTORIES to specify location of alternates."
                            <> header "semantic -- Parse and diff semantically"
 
