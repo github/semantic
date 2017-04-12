@@ -57,17 +57,19 @@ parseRubyToAST source = do
       ts_document_root_node_p document rootPtr
       peek rootPtr)
 
-  ast <- anaM (uncurry toAST) (root, source)
+  ast <- anaM toAST (0, source, root)
 
   ts_document_free document
   pure ast
-  where toAST :: Node -> Source -> IO (A.RoseF (A.Node Ruby.Grammar) (Node, Source))
-        toAST node@Node{..} source = do
+  where toAST :: (Int, Source, Node) -> IO (A.RoseF (A.Node Ruby.Grammar) (Int, Source, Node))
+        toAST (offset, source, node@Node{..}) = do
+          let range = nodeRange node
+          let sliced = Source.slice (offsetRange range (negate offset)) source
           let count = fromIntegral nodeChildCount
           children <- allocaArray count $ \ childNodesPtr -> do
             _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
             peekArray count childNodesPtr
-          pure $ A.RoseF (A.Node (toEnum (fromIntegral nodeSymbol)) (Source.sourceText (Source.slice (nodeRange node) source))) (flip (,) source <$> children)
+          pure $ A.RoseF (A.Node (toEnum (fromIntegral nodeSymbol)) (Source.sourceText sliced)) ((,,) (start range) sliced <$> children)
 
         anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
         anaM g = a where a = pure . embed <=< traverse a <=< g
