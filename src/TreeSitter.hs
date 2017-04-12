@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module TreeSitter
 ( treeSitterParser
+, parseRubyToAST
 , defaultTermAssignment
 ) where
 
