@@ -22,11 +22,21 @@ library
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
+                     , Data.Functor.Classes.Show.Generic
                      , Data.Functor.Listable
+                     , Data.Functor.Union
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.RandomWalkSimilarity
                      , Data.Record
+                     , Data.Syntax
+                     , Data.Syntax.Assignment
+                     , Data.Syntax.Comment
+                     , Data.Syntax.Declaration
+                     , Data.Syntax.Expression
+                     , Data.Syntax.Literal
+                     , Data.Syntax.Statement
+                     , Data.Syntax.Type
                      , Data.Text.Listable
                      , Diff
                      , Info
@@ -38,6 +48,7 @@ library
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
+                     , Language.Ruby.Syntax
                      , Parser
                      , Patch
                      , Paths_semantic_diff
@@ -137,6 +148,7 @@ test-suite test
                      , Command.Parse.Spec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
+                     , Data.Syntax.Assignment.Spec
                      , DiffSpec
                      , SemanticSpec
                      , SummarySpec
