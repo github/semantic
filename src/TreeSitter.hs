@@ -7,6 +7,7 @@ module TreeSitter
 
 import Prologue hiding (Constructor)
 import Category
+import Data.Functor.Foldable hiding (Nil)
 import Data.Record
 import qualified Data.Syntax.Assignment as A
 import Language
@@ -56,12 +57,16 @@ parseRubyToAST source = do
       ts_document_root_node_p document rootPtr
       peek rootPtr)
 
-  ast <- toAST root source
+  ast <- anaM (uncurry toAST) (root, source)
 
   ts_document_free document
   pure ast
-  where toAST Node{..} source = do
-          pure $ A.Rose (A.Node (toEnum (fromIntegral nodeSymbol)) "") []
+  where toAST :: Node -> Source -> IO (A.RoseF (A.Node Ruby.Grammar) (Node, Source))
+        toAST Node{..} source = do
+          pure $ A.RoseF (A.Node (toEnum (fromIntegral nodeSymbol)) (Source.sourceText source)) []
+
+        anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
+        anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 -- | Return a parser for a tree sitter language & document.
