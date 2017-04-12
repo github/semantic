@@ -63,8 +63,13 @@ findNearestNeighoursToDiff' :: (RWS f fields :< e)
                             -> Eff e ([(These Int Int, Diff f fields)], UnmappedTerms f fields)
 findNearestNeighoursToDiff' diffs as bs = send (FindNearestNeighoursToDiff diffs as bs)
 
+deleteRemaining' :: (RWS f fields :< e)
+                 => [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
+                 -> UnmappedTerms f fields
+                 -> Eff e [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
 deleteRemaining' diffs remaining = send (DeleteRemaining diffs remaining)
 
+insertMapped' :: (RWS f fields :< e) => [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))] -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))] -> Eff e [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
 insertMapped' diffs mappedDiffs = send (InsertMapped diffs mappedDiffs)
 
 
@@ -96,7 +101,7 @@ run :: (Eq1 f, Functor f, HasField fields Category, HasField fields (Maybe Featu
 run editDistance canCompare as bs = relay pure (\m q -> q $ case m of
   SES -> ses (gliftEq (==) `on` fmap category) as bs
   (GenFeaturizedTermsAndDiffs sesDiffs) ->
-    genFeaturizedTermsAndDiffs sesDiffs
+    evalState (genFeaturizedTermsAndDiffs sesDiffs) (0, 0)
   (FindNearestNeighoursToDiff allDiffs featureAs featureBs) ->
     findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
   (DeleteRemaining allDiffs remainingDiffs) ->
@@ -192,6 +197,7 @@ findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b)
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These i j, These a b)
 
+isInMoveBounds :: Int -> Int -> Bool
 isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 
 -- | Finds the most-similar unmapped term to the passed-in term, if any.
@@ -208,16 +214,13 @@ nearestUnmapped
   -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
 nearestUnmapped editDistance canCompare unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable editDistance canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
 
+editDistanceIfComparable :: Bounded t => (These a b -> t) -> (a -> b -> Bool) -> a -> b -> t
 editDistanceIfComparable editDistance canCompare a b = if canCompare a b
   then editDistance (These a b)
   else maxBound
 
-defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
-defaultD = 15
--- | How many of the most similar terms to consider, to rule out false positives.
+defaultL, defaultMoveBound :: Int
 defaultL = 2
-defaultP = 2
-defaultQ = 3
 defaultMoveBound = 2
 
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
@@ -232,18 +235,38 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
-genFeaturizedTermsAndDiffs :: (Functor f, HasField fields (Maybe FeatureVector)) => RWSEditScript f fields -> ([UnmappedTerm f fields], [UnmappedTerm f fields], [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))], [TermOrIndexOrNone (UnmappedTerm f fields)])
-genFeaturizedTermsAndDiffs sesDiffs = (featurizedAs, featurizedBs, countersAndDiffs, allDiffs)
+-- genFeaturizedTermsAndDiffs :: (Functor f, HasField fields (Maybe FeatureVector)) => RWSEditScript f fields -> ([UnmappedTerm f fields], [UnmappedTerm f fields], [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))], [TermOrIndexOrNone (UnmappedTerm f fields)])
+-- genFeaturizedTermsAndDiffs sesDiffs = (featurizedAs, featurizedBs, countersAndDiffs, allDiffs)
+--   where
+--    (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) = foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff ->
+--       case diff of
+--         This term ->
+--           (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
+--         That term ->
+--           (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
+--         These a b ->
+--           (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, These a b), allDiffs <> pure (Index counterA))
+--       ) ([], [], 0, 0, [], []) sesDiffs
+genFeaturizedTermsAndDiffs :: (Functor f, HasField fields (Maybe FeatureVector)) => RWSEditScript f fields -> State (Int, Int) ([UnmappedTerm f fields], [UnmappedTerm f fields], [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))], [TermOrIndexOrNone (UnmappedTerm f fields)])
+genFeaturizedTermsAndDiffs sesDiffs = go
   where
-   (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) = foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff ->
-      case diff of
-        This term ->
-          (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
-        That term ->
-          (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
-        These a b ->
-          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, These a b), allDiffs <> pure (Index counterA))
-      ) ([], [], 0, 0, [], []) sesDiffs
+    go = case sesDiffs of
+      [] -> pure ([], [], [], [])
+      (diff : diffs) -> do
+        (counterA, counterB) <- get
+        case diff of
+          This term -> do
+            put (succ counterA, counterB)
+            (as, bs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs diffs
+            pure (featurize counterA term : as, bs, mappedDiffs, None : allDiffs )
+          That term -> do
+            put (counterA, succ counterB)
+            (as, bs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs diffs
+            pure (as, featurize counterB term : bs, mappedDiffs, Term (featurize counterB term) : allDiffs)
+          These a b -> do
+            put (succ counterA, succ counterB)
+            (as, bs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs diffs
+            pure (as, bs, (These counterA counterB, These a b) : mappedDiffs, Index counterA : allDiffs)
 
 featurize :: (HasField fields (Maybe FeatureVector), Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
 featurize index term = UnmappedTerm index (let Just v = getField (extract term) in v) (eraseFeatureVector term)
@@ -255,13 +278,16 @@ eraseFeatureVector term = let record :< functor = runCofree term in
 setFeatureVector :: HasField fields (Maybe FeatureVector) => Record fields -> Maybe FeatureVector -> Record fields
 setFeatureVector = setField
 
+minimumTermIndex :: [RWS.UnmappedTerm f fields] -> Int
 minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
 
+toMap :: [UnmappedTerm f fields] -> IntMap (UnmappedTerm f fields)
 toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
+toKdTree :: [UnmappedTerm f fields] -> KdTree Double (UnmappedTerm f fields)
 toKdTree = build (elems . feature)
 
-data EditGraph a b = EditGraph { as :: !(Array Int a), bs :: !(Array Int b) }
+data EditGraph a b = EditGraph { as :: Array Int a, bs :: Array Int b }
   deriving (Eq, Show)
 
 -- data Step a b result where
