@@ -36,8 +36,8 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment Grammar (Program Syntax (Maybe a))
-assignment = foldr (>>) (pure Nothing) <$ rule Program <*> children (many declaration)
+assignment :: Assignment Grammar [Program Syntax a]
+assignment = rule Program *> children (many declaration)
 
 declaration :: Assignment Grammar (Program Syntax a)
 declaration = comment <|> class' <|> method
