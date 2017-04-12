@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
 , rule
@@ -13,6 +13,7 @@ module Data.Syntax.Assignment
 
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
+import Data.Functor.Foldable
 import Prologue hiding (Alt)
 import Text.Show
 
@@ -83,3 +84,11 @@ instance Show symbol => Show1 (AssignmentF symbol) where
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
+
+type instance Base (Rose a) = RoseF a
+
+data RoseF a f = RoseF a [f]
+  deriving (Eq, Functor, Show)
+
+instance Recursive (Rose a) where project (Rose a as) = RoseF a as
+instance Corecursive (Rose a) where embed (RoseF a as) = Rose a as
