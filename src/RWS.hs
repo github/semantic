@@ -112,14 +112,14 @@ run editDistance canCompare as bs = relay pure (\m q -> q $ case m of
 type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 
 insertMapped :: Foldable t => t (These Int Int, Diff f fields) -> [(These Int Int, Diff f fields)] -> [(These Int Int, Diff f fields)]
-insertMapped diffs into = foldl' (\into (i, mappedTerm) -> insertDiff (i, mappedTerm) into) into diffs
+insertMapped diffs into = foldl' (flip insertDiff) into diffs
 
 deleteRemaining :: (Traversable t)
                 => [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
                 -> t (RWS.UnmappedTerm f fields)
                 -> [(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))]
 deleteRemaining diffs unmappedAs =
-  foldr insertDiff diffs ((This . termIndex &&& This . term) <$> unmappedAs)
+  foldl' (flip insertDiff) diffs ((This . termIndex &&& This . term) <$> unmappedAs)
 
 -- | Inserts an index and diff pair into a list of indices and diffs.
 insertDiff :: (These Int Int, These (Term f (Record fields)) (Term f (Record fields)))
@@ -155,10 +155,12 @@ findNearestNeighboursToDiff :: (These (Term f (Record fields)) (Term f (Record f
                            -> [UnmappedTerm f fields]
                            -> [UnmappedTerm f fields]
                            -> ([(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))], UnmappedTerms f fields)
-findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs =
-  let
-    (diffs, (_, remaining, _)) = traverse (findNearestNeighbourToDiff' editDistance canCompare (toKdTree <$> Both.both featureAs featureBs)) allDiffs & fmap catMaybes & (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs)) in
-  (diffs, remaining)
+findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs = (diffs, remaining)
+  where
+    (diffs, (_, remaining, _)) =
+      traverse (findNearestNeighbourToDiff' editDistance canCompare (toKdTree <$> Both.both featureAs featureBs)) allDiffs &
+      fmap catMaybes &
+      (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
 findNearestNeighbourToDiff' :: (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
