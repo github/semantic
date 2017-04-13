@@ -19,13 +19,6 @@ import Data.KdTree.Static hiding (toList)
 import qualified Data.IntMap as IntMap
 import Data.Semigroup (Min(..), Option(..))
 
--- rws :: (GAlign f, Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
---     => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
---     -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
---     -> [Term f (Record fields)] -- ^ The list of old terms.
---     -> [Term f (Record fields)] -- ^ The list of new terms.
---     -> [These (Term f (Record fields)) (Term f (Record fields))] -- ^ The resulting list of similarity-matched diffs.
--- rws editDistance canCompare as bs = undefined
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
     termIndex :: Int -- ^ The index of the term within its root term.
@@ -36,11 +29,13 @@ data UnmappedTerm f fields = UnmappedTerm {
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index Int | None
 
-rws :: (HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f) => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -> t (Term f (Record fields)) -> t (Term f (Record fields)) -> RWSEditScript f fields
-rws editDistance canCompare as bs = Eff.run $ RWS.run editDistance canCompare as bs rws'
-
-rws' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e [These (Term f (Record fields)) (Term f (Record fields))]
-rws' = do
+rws :: (HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f)
+    => (These (Term f (Record fields)) (Term f (Record fields)) -> Int)
+    -> (Term f (Record fields) -> Term f (Record fields) -> Bool)
+    -> t (Term f (Record fields))
+    -> t (Term f (Record fields))
+    -> RWSEditScript f fields
+rws editDistance canCompare as bs = Eff.run . RWS.run editDistance canCompare as bs $ do
   sesDiffs <- ses'
   (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs' sesDiffs
   (diffs, remaining) <- findNearestNeighoursToDiff' allDiffs featureAs featureBs
