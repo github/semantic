@@ -31,6 +31,9 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 
+-- | Empty syntax, with essentially no-op semantics.
+--
+--   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
   deriving (Eq, Foldable, Generic1, Show)
 
