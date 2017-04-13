@@ -81,6 +81,7 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, dropWhi
     Children childAssignment -> assignAll childAssignment children >>= flip yield rest
     _ -> Error ["No rule to match " <> show node]
   (Rule symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
+  (Content, []) -> Error [ "Expected leaf node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
   . fmap ((Result .) . flip (,))
 
