@@ -19,7 +19,12 @@ type Syntax = Union
   '[Comment.Comment
   , Declaration.Class
   , Declaration.Method
+  , Literal.Array
   , Literal.Boolean
+  , Literal.Hash
+  , Literal.Integer
+  , Literal.String
+  , Literal.Symbol
   , Statement.If
   , Statement.Return
   , Statement.Yield
