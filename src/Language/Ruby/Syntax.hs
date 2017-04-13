@@ -55,7 +55,7 @@ identifier = wrapU . Syntax.Identifier <$ rule Identifier <*> content
 
 method :: Assignment Grammar (Program (Maybe a))
 method = wrapU <$  rule Method
-               <*> children (Declaration.Method <$> identifier <*> pure [] <*> pure (return Nothing))
+               <*> children (Declaration.Method <$> identifier <*> pure [] <*> (statement <|> pure (wrapU Syntax.Empty)))
 
 statement :: Assignment Grammar (Program a)
 statement  =  rule Return *> children (wrapU . Statement.Return <$> expr <|> pure (wrapU Syntax.Empty))
