@@ -74,4 +74,8 @@ if' :: Assignment Grammar (Program a)
 if' = wrapU <$ rule If <*> children (Statement.If <$> expr <*> expr <*> expr)
 
 expr :: Assignment Grammar (Program a)
-expr = if'
+expr = if' <|> literal
+
+literal :: Assignment Grammar (Program a)
+literal  =  wrapU (Literal.Boolean Prologue.True) <$ rule Language.Ruby.Syntax.True <* content
+        <|> wrapU (Literal.Boolean Prologue.False) <$ rule Language.Ruby.Syntax.False <* content
