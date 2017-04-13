@@ -82,6 +82,7 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, skipAno
     _ -> Error ["No rule to match " <> show node]
   (Rule symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
   (Content, []) -> Error [ "Expected leaf node but got end of input." ]
+  (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
   . fmap ((Result .) . flip (,))
   where skipAnonymous = dropWhile ((/= Regular) . symbolType . nodeSymbol . roseValue)
