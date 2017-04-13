@@ -68,11 +68,11 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 -- Collections
 
-newtype ArrayLiteral a = ArrayLiteral { arrayElements :: [Union '[Identity, Comment] a] }
+newtype Array a = Array { arrayElements :: [Union '[Identity, Comment] a] }
   deriving (Eq, Foldable, Generic1, Show)
 
-instance Eq1 ArrayLiteral where liftEq = genericLiftEq
-instance Show1 ArrayLiteral where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Array where liftEq = genericLiftEq
+instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 
 newtype HashLiteral a = HashLiteral { hashElements :: [Union '[KeyValue, Comment] a] }
