@@ -1,3 +1,3 @@
 module Main (main)
 where
-import SemanticDiff (main)
+import Semantic (main)

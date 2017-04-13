@@ -1,34 +1,20 @@
 module Command.Parse.Spec where
 
 import Command.Parse
-import Data.Functor.Listable
+import Control.Monad
 import Prelude
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
-import Test.Hspec.LeanCheck
-import Test.LeanCheck
-import Arguments
-import Renderer
 
 spec :: Spec
-spec = parallel $
-  context "parse" $
-    prop "all valid formats should produce output" . forAll (isParseFormat `filterT` tiers) $
-      \format ->
-        case format of
-          SExpression -> do
-            output <- parseSExpression $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
-            output `shouldNotBe` ""
-          Index -> do
-            output <- parseIndex $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
-            output `shouldNotBe` ""
-          _ -> do
-            output <- parseTree $ parseArgs ["test/fixtures/ruby/and-or.A.rb"] format
-            output `shouldNotBe` ""
-
-isParseFormat :: Format -> Bool
-isParseFormat a | Index <- a = True
-                | ParseTree <- a = True
-                | JSON <- a = True
-                | SExpression <- a = True
-                | otherwise = False
+spec = parallel . context "parse" $ do
+    let blobs = sourceBlobsFromPaths ["test/fixtures/ruby/and-or.A.rb"]
+    it "should produce s-expression trees" $ do
+      output <- sExpressionParseTree False =<< blobs
+      output `shouldNotBe` ""
+    it "should produce JSON trees" $ do
+      output <- jsonParseTree False =<< blobs
+      output `shouldNotBe` ""
+    it "should produce JSON index" $ do
+      output <- jsonIndexParseTree False =<< blobs
+      output `shouldNotBe` ""
