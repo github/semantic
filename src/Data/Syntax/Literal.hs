@@ -75,11 +75,11 @@ instance Eq1 Array where liftEq = genericLiftEq
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 
-newtype HashLiteral a = HashLiteral { hashElements :: [Union '[KeyValue, Comment] a] }
+newtype Hash a = Hash { hashElements :: [Union '[KeyValue, Comment] a] }
   deriving (Eq, Foldable, Generic1, Show)
 
-instance Eq1 HashLiteral where liftEq = genericLiftEq
-instance Show1 HashLiteral where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Hash where liftEq = genericLiftEq
+instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
