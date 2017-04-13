@@ -4,6 +4,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
 import Prologue
+import Text.Show
 
 -- Undifferentiated
 
@@ -28,3 +29,10 @@ newtype Identifier a = Identifier ByteString
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
+
+
+data Empty a = Empty
+  deriving (Eq, Foldable, Generic1, Show)
+
+instance Eq1 Empty where liftEq _ _ _ = True
+instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
