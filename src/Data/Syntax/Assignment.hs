@@ -16,7 +16,7 @@ import Control.Monad.Free.Freer
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Prologue hiding (Alt)
-import Text.Show
+import Text.Show hiding (show)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -63,23 +63,24 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe a
+assignAll :: (Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result a
 assignAll assignment nodes = case runAssignment assignment nodes of
-  Just ([], a) -> Just a
-  _ -> Nothing
+  Result ([], a) -> Result a
+  Result (c:_, _) -> Error ["Expected end of input, but got: " <> show c]
+  Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
+runAssignment :: (Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result ([AST grammar], a)
 runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
-  (assignment, Rose Node{..} children : rest) -> case assignment of
+  (assignment, node@(Rose Node{..} children) : rest) -> case assignment of
     Rule symbol -> guard (symbol == nodeSymbol) >> yield () nodes
     Content -> yield nodeContent rest
     Children childAssignment -> assignAll childAssignment children >>= flip yield rest
-    _ -> Nothing
-  _ -> Nothing)
-  . fmap ((Just .) . flip (,))
+    _ -> Error ["No rule to match " <> show node]
+  _ -> Error ["No rule to match at end of input."])
+  . fmap ((Result .) . flip (,))
 
 
 instance Alternative (Assignment symbol) where
