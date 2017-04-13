@@ -7,6 +7,7 @@ import qualified Command.Diff.Spec
 import qualified Command.Parse.Spec
 import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
+import qualified Data.Syntax.Assignment.Spec
 import qualified DiffSpec
 import qualified SummarySpec
 import qualified GitmonClientSpec
@@ -18,6 +19,7 @@ import qualified SourceSpec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified IntegrationSpec
+import qualified SemanticSpec
 import Test.Hspec
 
 main :: IO ()
@@ -29,6 +31,7 @@ main = hspec $ do
     describe "Command.Parse" Command.Parse.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
+    describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec
     describe "Diff" DiffSpec.spec
     describe "Summary" SummarySpec.spec
     describe "Interpreter" InterpreterSpec.spec
@@ -37,6 +40,7 @@ main = hspec $ do
     describe "SES.Myers" SES.Myers.Spec.spec
     describe "Source" SourceSpec.spec
     describe "Term" TermSpec.spec
+    describe "Semantic" SemanticSpec.spec
     describe "TOC" TOCSpec.spec
     describe "Integration" IntegrationSpec.spec
 

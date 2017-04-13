@@ -1,5 +1,5 @@
 name:                semantic-diff
-version:             0.2.0
+version:             0.3.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
 homepage:            http://github.com/github/semantic-diff#readme
@@ -22,11 +22,21 @@ library
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
+                     , Data.Functor.Classes.Show.Generic
                      , Data.Functor.Listable
+                     , Data.Functor.Union
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.RandomWalkSimilarity
                      , Data.Record
+                     , Data.Syntax
+                     , Data.Syntax.Assignment
+                     , Data.Syntax.Comment
+                     , Data.Syntax.Declaration
+                     , Data.Syntax.Expression
+                     , Data.Syntax.Literal
+                     , Data.Syntax.Statement
+                     , Data.Syntax.Type
                      , Data.Text.Listable
                      , Diff
                      , Info
@@ -38,6 +48,7 @@ library
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
+                     , Language.Ruby.Syntax
                      , Parser
                      , Patch
                      , Paths_semantic_diff
@@ -50,8 +61,8 @@ library
                      , Renderer.Summary
                      , Renderer.SExpression
                      , Renderer.TOC
-                     , SemanticDiff
                      , RWS
+                     , Semantic
                      , SES
                      , SES.Myers
                      , Source
@@ -118,7 +129,7 @@ library
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -j
   ghc-prof-options: -fprof-auto
 
-executable semantic-diff
+executable semantic
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O2 -pgml=script/g++
@@ -126,23 +137,6 @@ executable semantic-diff
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
                      , semantic-diff
-  default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
-
-benchmark semantic-diff-bench
-  type:                exitcode-stdio-1.0
-  main-is:             Main.hs
-  hs-source-dirs:      bench
-  other-modules:       SemanticDiffPar
-  build-depends:       base
-                     , criterion
-                     , directory
-                     , leancheck
-                     , monad-par
-                     , mtl
-                     , semantic-diff
-                     , text >= 1.2.1.3
-  ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O2 -static -pgml=script/g++
   default-language:    Haskell2010
   default-extensions:  FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
 
@@ -156,7 +150,9 @@ test-suite test
                      , Command.Parse.Spec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
+                     , Data.Syntax.Assignment.Spec
                      , DiffSpec
+                     , SemanticSpec
                      , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec

@@ -288,32 +288,3 @@ toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
 toKdTree :: [UnmappedTerm f fields] -> KdTree Double (UnmappedTerm f fields)
 toKdTree = build (elems . feature)
-
-data EditGraph a b = EditGraph { as :: Array Int a, bs :: Array Int b }
-  deriving (Eq, Show)
-
--- data Step a b result where
---   M :: HasCallStack => RwsF a b c -> Step a b c
---   S :: State (RwsState a b) c -> Step a b c
-
--- newtype RwsState a b = RwsState { unRwsState :: (Int, a, b) }
-
--- type Rws a b = Freer (Step a b)
-
--- runRWS :: HasCallStack => (a -> a) -> EditGraph a a -> Rws a a c -> c
--- runRWS eraseFeatureVector graph@(EditGraph as bs)
---   | null as, null bs = []
---   | null as = That . eraseFeatureVector <$> toList bs
---   | null bs = This . eraseFeatureVector <$> toList as
---   | otherwise = evalState (go step) (emptyStateForGraph graph)
---
--- emptyStateForGraph :: EditGraph a b -> RwsState a b
--- emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
---   RwsState (listArray (Diagonal (negate m), Diagonal n) (repeat (0, [])))
---
--- eraseFeatureVector :: (Functor f, HasField fields (Maybe FeatureVector)) => Term f (Record fields) -> Term f (Record fields)
--- eraseFeatureVector term = let record :< functor = runCofree term in
---   cofree (setFeatureVector record Nothing :< functor)
---
--- setFeatureVector :: HasField fields (Maybe FeatureVector) => Record fields -> Maybe FeatureVector -> Record fields
--- setFeatureVector = setField
