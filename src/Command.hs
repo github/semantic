@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Command
 ( Command
 -- Constructors
@@ -10,6 +11,14 @@ module Command
 , maybeDiff
 , renderDiffs
 , concurrently
+, patchDiff
+, splitDiff
+, jsonDiff
+, summaryDiff
+, sExpressionDiff
+, tocDiff
+, DiffEncoder
+, ParseTreeRenderer
 -- Evaluation
 , runCommand
 ) where
@@ -20,15 +29,16 @@ import Control.Exception (catch)
 import Control.Monad.Free.Freer
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
+import Data.Aeson hiding (json)
 import qualified Data.ByteString as B
 import Data.Functor.Both
+import Data.Functor.Classes
+import Data.Functor.Listable
 import Data.List ((\\), nub)
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
 import Diff
-import Info
-import Interpreter
 import GHC.Conc (numCapabilities)
 import qualified Git
 import Git.Blob
@@ -37,14 +47,19 @@ import Git.Libgit2.Backend
 import Git.Repository
 import Git.Types
 import GitmonClient
+import Info
+import Interpreter
 import Language
 import Patch
 import Prologue hiding (concurrently, Concurrently, readFile)
+import qualified Renderer as R
+import qualified Renderer.SExpression as R
 import Renderer
 import Source
 import Syntax
 import System.FilePath
 import Term
+import Text.Show
 
 
 -- | High-level commands encapsulating the work done to perform a diff or parse operation.
@@ -188,5 +203,69 @@ runRenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBl
 runRenderDiffs = runDiffRenderer
 
 
+type ParseTreeRenderer = Bool -> [SourceBlob] -> IO ByteString
+
+type DiffEncoder = [(Both SourceBlob, Diff (Syntax Text) (Record DefaultFields))] -> Command ByteString
+
+patchDiff :: DiffEncoder
+patchDiff = fmap encodeText . renderDiffs R.PatchRenderer
+
+splitDiff :: DiffEncoder
+splitDiff = fmap encodeText . renderDiffs R.SplitRenderer
+
+jsonDiff :: DiffEncoder
+jsonDiff = fmap encodeJSON . renderDiffs R.JSONDiffRenderer
+
+summaryDiff :: DiffEncoder
+summaryDiff = fmap encodeSummaries . renderDiffs R.SummaryRenderer
+
+sExpressionDiff :: DiffEncoder
+sExpressionDiff = renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
+
+tocDiff :: DiffEncoder
+tocDiff = fmap encodeSummaries . renderDiffs R.ToCRenderer
+
+encodeJSON :: Map Text Value -> ByteString
+encodeJSON = toS . (<> "\n") . encode
+
+encodeText :: File -> ByteString
+encodeText = encodeUtf8 . R.unFile
+
+encodeSummaries :: Summaries -> ByteString
+encodeSummaries = toS . (<> "\n") . encode
+
+
+instance Show ParseTreeRenderer where
+  showsPrec d _ = showParen (d >= 10) $ showString "ParseTreeRenderer "
+
+instance Listable ParseTreeRenderer where
+  tiers = cons0 jsonParseTree
+       \/ cons0 jsonIndexParseTree
+       \/ cons0 sExpressionParseTree
+
+instance Show DiffEncoder where
+  showsPrec d encodeDiff = showParen (d >= 10) $ showString "DiffEncoder "
+    . showsPrec 10 (encodeDiff []) . showChar ' '
+
+instance Listable DiffEncoder where
+  tiers = cons0 patchDiff
+       \/ cons0 splitDiff
+       \/ cons0 jsonDiff
+       \/ cons0 summaryDiff
+       \/ cons0 sExpressionDiff
+       \/ cons0 tocDiff
+
 instance MonadIO Command where
   liftIO io = LiftIO io `Then` return
+
+instance Show1 CommandF where
+  liftShowsPrec sp sl d command = case command of
+    ReadFile path -> showsUnaryWith showsPrec "ReadFile" d path
+    ReadFilesAtSHAs gitDir alternates paths shas -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHAs" d gitDir alternates paths shas
+      where showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
+              showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
+    Parse language _ -> showsBinaryWith showsPrec (const showChar) "Parse" d language '_'
+    Diff _ -> showsUnaryWith (const showChar) "Diff" d '_'
+    RenderDiffs renderer _ -> showsBinaryWith showsPrec (const showChar) "RenderDiffs" d renderer '_'
+    Concurrently commands f -> showsBinaryWith (liftShowsPrec sp sl) (const showChar) "Concurrently" d (traverse f commands) '_'
+    LiftIO _ -> showsUnaryWith (const showChar) "LiftIO" d '_'
