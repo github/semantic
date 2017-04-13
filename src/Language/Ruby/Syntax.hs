@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, TemplateHaskell #-}
 module Language.Ruby.Syntax where
 
-import Control.Monad.Free.Freer
+import Control.Monad.Free.Freer hiding (Return)
 import Data.Functor.Union
 import Data.Syntax.Assignment
 import qualified Data.Syntax as Syntax
@@ -57,7 +57,9 @@ method = wrapU <$  rule Method
                <*> children (Declaration.Method <$> identifier <*> pure [] <*> pure (return Nothing))
 
 statement :: Assignment Grammar (Program Syntax a)
-statement = expr
+statement  =  wrapU <$ rule Return <*> children (Statement.Return <$> expr)
+          <|> wrapU <$ rule Yield <*> children (Statement.Yield <$> expr)
+          <|> expr
 
 comment :: Assignment Grammar (Program Syntax a)
 comment = wrapU . Comment.Comment <$ rule Comment <*> content
