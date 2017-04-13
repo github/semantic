@@ -23,6 +23,7 @@ type Syntax = Union
   , Statement.If
   , Statement.Return
   , Statement.Yield
+  , Syntax.Empty
   , Syntax.Identifier
   ]
 
@@ -57,8 +58,8 @@ method = wrapU <$  rule Method
                <*> children (Declaration.Method <$> identifier <*> pure [] <*> pure (return Nothing))
 
 statement :: Assignment Grammar (Program a)
-statement  =  wrapU <$ rule Return <*> children (Statement.Return <$> expr)
-          <|> wrapU <$ rule Yield <*> children (Statement.Yield <$> expr)
+statement  =  rule Return *> children (wrapU . Statement.Return <$> expr <|> pure (wrapU Syntax.Empty))
+          <|> rule Yield *> children (wrapU . Statement.Yield <$> expr <|> pure (wrapU Syntax.Empty))
           <|> expr
 
 comment :: Assignment Grammar (Program a)
