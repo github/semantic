@@ -66,8 +66,9 @@ data Result a = Result a | Error [Text]
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result a
 assignAll assignment nodes = case runAssignment assignment nodes of
-  Result ([], a) -> Result a
-  Result (c:_, _) -> Error ["Expected end of input, but got: " <> show c]
+  Result (rest, a) -> case dropAnonymous rest of
+    [] -> Result a
+    c:_ -> Error ["Expected end of input, but got: " <> show c]
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
