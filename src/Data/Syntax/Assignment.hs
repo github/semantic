@@ -56,6 +56,12 @@ data Node grammar = Node { nodeSymbol :: grammar, nodeContent :: ByteString }
 -- | An abstract syntax tree.
 type AST grammar = Rose (Node grammar)
 
+
+-- | The result of assignment, possibly containing an error.
+data Result a = Result a | Error [Text]
+  deriving (Eq, Foldable, Functor, Show, Traversable)
+
+
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe a
 assignAll assignment nodes = case runAssignment assignment nodes of
@@ -95,3 +101,21 @@ data RoseF a f = RoseF a [f]
 
 instance Recursive (Rose a) where project (Rose a as) = RoseF a as
 instance Corecursive (Rose a) where embed (RoseF a as) = Rose a as
+
+instance Applicative Result where
+  pure = Result
+  Error a <*> Error b = Error (a <> b)
+  Error a <*> _ = Error a
+  _ <*> Error b = Error b
+  Result f <*> Result a = Result (f a)
+
+instance Alternative Result where
+  empty = Error []
+  Result a <|> _ = Result a
+  _ <|> Result b = Result b
+  Error a <|> Error b = Error (a <> b)
+
+instance Monad Result where
+  return = pure
+  Error a >>= _ = Error a
+  Result a >>= f = f a
