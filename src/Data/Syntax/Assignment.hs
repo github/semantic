@@ -72,7 +72,7 @@ assignAll assignment nodes = case runAssignment assignment nodes of
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result ([AST grammar], a)
-runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, skipAnonymous nodes) of
+runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
   (assignment, node@(Rose Node{..} children) : rest) -> case assignment of
@@ -85,7 +85,9 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, skipAno
   (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
   . fmap ((Result .) . flip (,))
-  where skipAnonymous = dropWhile ((/= Regular) . symbolType . nodeSymbol . roseValue)
+
+dropAnonymous :: Symbol grammar => [AST grammar] -> [AST grammar]
+dropAnonymous = dropWhile ((/= Regular) . symbolType . nodeSymbol . roseValue)
 
 
 instance Alternative (Assignment symbol) where
