@@ -36,13 +36,13 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment Grammar [Program Syntax a]
+assignment :: Assignment Grammar [Program Syntax (Maybe a)]
 assignment = rule Program *> children (many declaration)
 
-declaration :: Assignment Grammar (Program Syntax a)
+declaration :: Assignment Grammar (Program Syntax (Maybe a))
 declaration = comment <|> class' <|> method
 
-class' :: Assignment Grammar (Program Syntax a)
+class' :: Assignment Grammar (Program Syntax (Maybe a))
 class' = wrapU <$  rule Class
                <*> children (Declaration.Class <$> constant <*> pure [] <*> many declaration)
 
@@ -52,9 +52,9 @@ constant = wrapU . Syntax.Identifier <$ rule Constant <*> content
 identifier :: Assignment Grammar (Program Syntax a)
 identifier = wrapU . Syntax.Identifier <$ rule Identifier <*> content
 
-method :: Assignment Grammar (Program Syntax a)
+method :: Assignment Grammar (Program Syntax (Maybe a))
 method = wrapU <$  rule Method
-               <*> children (Declaration.Method <$> identifier <*> pure [] <*> statement)
+               <*> children (Declaration.Method <$> identifier <*> pure [] <*> pure (return Nothing))
 
 statement :: Assignment Grammar (Program Syntax a)
 statement = expr
