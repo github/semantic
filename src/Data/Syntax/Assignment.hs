@@ -58,7 +58,9 @@ type AST grammar = Rose (Node grammar)
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe a
-assignAll = (fmap snd .) . runAssignment
+assignAll assignment nodes = case runAssignment assignment nodes of
+  Just ([], a) -> Just a
+  _ -> Nothing
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: Eq grammar => Assignment grammar a -> [AST grammar] -> Maybe ([AST grammar], a)
