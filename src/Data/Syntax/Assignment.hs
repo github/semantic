@@ -46,7 +46,7 @@ children forEach = Children forEach `Then` return
 
 
 -- | A rose tree.
-data Rose a = Rose a [Rose a]
+data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
   deriving (Eq, Functor, Show)
 
 -- | A node in the input AST. We only concern ourselves with its symbol (considered as an element of 'grammar') and content.
