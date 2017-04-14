@@ -43,41 +43,13 @@ rws editDistance canCompare as bs = Eff.run . RWS.run editDistance canCompare as
   rwsDiffs <- insertMapped' mappedDiffs diffs'
   pure (fmap snd rwsDiffs)
 
-ses' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e (RWSEditScript f fields)
-ses' = send SES
-
-genFeaturizedTermsAndDiffs' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e)
-                            => RWSEditScript f fields
-                            -> Eff e ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-genFeaturizedTermsAndDiffs' = send . GenFeaturizedTermsAndDiffs
-
-findNearestNeighoursToDiff' :: (RWS f fields :< e)
-                            => [TermOrIndexOrNone (UnmappedTerm f fields)]
-                            -> [UnmappedTerm f fields]
-                            -> [UnmappedTerm f fields]
-                            -> Eff e ([MappedDiff f fields], UnmappedTerms f fields)
-findNearestNeighoursToDiff' diffs as bs = send (FindNearestNeighoursToDiff diffs as bs)
-
-deleteRemaining' :: (RWS f fields :< e)
-                 => [MappedDiff f fields]
-                 -> UnmappedTerms f fields
-                 -> Eff e [MappedDiff f fields]
-deleteRemaining' diffs remaining = send (DeleteRemaining diffs remaining)
-
-insertMapped' :: (RWS f fields :< e)
-              => [MappedDiff f fields]
-              -> [MappedDiff f fields]
-              -> Eff e [MappedDiff f fields]
-insertMapped' diffs mappedDiffs = send (InsertMapped diffs mappedDiffs)
-
-
 data RWS f fields result where
-
   SES :: RWS f fields (RWSEditScript f fields)
 
   GenFeaturizedTermsAndDiffs :: HasField fields (Maybe FeatureVector)
                              => RWSEditScript f fields
-                             -> RWS f fields ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
+                             -> RWS f fields
+                                ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
 
   FindNearestNeighoursToDiff :: [TermOrIndexOrNone (UnmappedTerm f fields)]
                              -> [UnmappedTerm f fields]
@@ -95,6 +67,7 @@ type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
 
 type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 
+-- A Diff paired with both its indices
 type MappedDiff f fields = (These Int Int, Diff f fields)
 
 type RWSEditScript f fields = [Diff f fields]
@@ -282,3 +255,33 @@ toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
 toKdTree :: [UnmappedTerm f fields] -> KdTree Double (UnmappedTerm f fields)
 toKdTree = build (elems . feature)
+
+-- Effect constructors
+
+ses' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e (RWSEditScript f fields)
+ses' = send SES
+
+genFeaturizedTermsAndDiffs' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e)
+                            => RWSEditScript f fields
+                            -> Eff e ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
+genFeaturizedTermsAndDiffs' = send . GenFeaturizedTermsAndDiffs
+
+findNearestNeighoursToDiff' :: (RWS f fields :< e)
+                            => [TermOrIndexOrNone (UnmappedTerm f fields)]
+                            -> [UnmappedTerm f fields]
+                            -> [UnmappedTerm f fields]
+                            -> Eff e ([MappedDiff f fields], UnmappedTerms f fields)
+findNearestNeighoursToDiff' diffs as bs = send (FindNearestNeighoursToDiff diffs as bs)
+
+deleteRemaining' :: (RWS f fields :< e)
+                 => [MappedDiff f fields]
+                 -> UnmappedTerms f fields
+                 -> Eff e [MappedDiff f fields]
+deleteRemaining' diffs remaining = send (DeleteRemaining diffs remaining)
+
+insertMapped' :: (RWS f fields :< e)
+              => [MappedDiff f fields]
+              -> [MappedDiff f fields]
+              -> Eff e [MappedDiff f fields]
+insertMapped' diffs mappedDiffs = send (InsertMapped diffs mappedDiffs)
+
