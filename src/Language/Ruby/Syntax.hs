@@ -10,7 +10,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Language.Haskell.TH
-import Prologue
+import Prologue hiding (optional)
 import Text.Parser.TreeSitter.Language
 import Text.Parser.TreeSitter.Ruby
 
@@ -63,8 +63,8 @@ method = wrapU <$  rule Method
                <*> children (Declaration.Method <$> identifier <*> pure [] <*> (wrapU <$> many statement))
 
 statement :: Assignment Grammar (Program a)
-statement  =  rule Return *> children (wrapU . Statement.Return <$> expr <|> pure (wrapU []))
-          <|> rule Yield *> children (wrapU . Statement.Yield <$> expr <|> pure (wrapU []))
+statement  =  wrapU . Statement.Return <$ rule Return <*> children (optional expr)
+          <|> wrapU . Statement.Yield <$ rule Yield <*> children (optional expr)
           <|> expr
 
 comment :: Assignment Grammar (Program a)
@@ -79,3 +79,6 @@ expr = if' <|> literal
 literal :: Assignment Grammar (Program a)
 literal  =  wrapU (Literal.Boolean Prologue.True) <$ rule Language.Ruby.Syntax.True <* content
         <|> wrapU (Literal.Boolean Prologue.False) <$ rule Language.Ruby.Syntax.False <* content
+
+optional :: Assignment Grammar (Program a) -> Assignment Grammar (Program a)
+optional a = a <|> pure (wrapU [])
