@@ -16,6 +16,7 @@ module Data.Syntax.Assignment
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
 import Data.Functor.Foldable
+import Data.Text (unpack)
 import Prologue hiding (Alt)
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
@@ -61,7 +62,7 @@ type AST grammar = Rose (Node grammar)
 
 -- | The result of assignment, possibly containing an error.
 data Result a = Result a | Error [Text]
-  deriving (Eq, Foldable, Functor, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Traversable)
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
@@ -111,6 +112,13 @@ data RoseF a f = RoseF a [f]
 
 instance Recursive (Rose a) where project (Rose a as) = RoseF a as
 instance Corecursive (Rose a) where embed (RoseF a as) = Rose a as
+
+instance Show1 Result where
+  liftShowsPrec _ _ d (Error es) = showsUnaryWith (const (foldr ((.) . (showString . unpack)) identity)) "Error" d es
+  liftShowsPrec sp _ d (Result a) = showsUnaryWith sp "Result" d a
+
+instance Show a => Show (Result a) where
+  showsPrec = showsPrec1
 
 instance Applicative Result where
   pure = Result
