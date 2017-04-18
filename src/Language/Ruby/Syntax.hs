@@ -3,8 +3,8 @@ module Language.Ruby.Syntax where
 
 import Control.Monad.Free.Freer hiding (Return)
 import Data.Functor.Union
-import Data.Syntax.Assignment
 import qualified Data.Syntax as Syntax
+import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
