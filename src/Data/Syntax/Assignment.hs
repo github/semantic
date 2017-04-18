@@ -8,6 +8,7 @@ module Data.Syntax.Assignment
 , RoseF(..)
 , Node(..)
 , AST
+, Result(..)
 , assignAll
 , runAssignment
 ) where
