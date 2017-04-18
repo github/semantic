@@ -28,8 +28,8 @@ type Syntax = Union
   , Statement.If
   , Statement.Return
   , Statement.Yield
-  , Syntax.Empty
   , Syntax.Identifier
+  , []
   ]
 
 
@@ -60,18 +60,18 @@ identifier = wrapU . Syntax.Identifier <$ rule Identifier <*> content
 
 method :: Assignment Grammar (Program (Maybe a))
 method = wrapU <$  rule Method
-               <*> children (Declaration.Method <$> identifier <*> pure [] <*> (statement <|> pure (wrapU Syntax.Empty)))
+               <*> children (Declaration.Method <$> identifier <*> pure [] <*> (wrapU <$> many statement))
 
 statement :: Assignment Grammar (Program a)
-statement  =  rule Return *> children (wrapU . Statement.Return <$> expr <|> pure (wrapU Syntax.Empty))
-          <|> rule Yield *> children (wrapU . Statement.Yield <$> expr <|> pure (wrapU Syntax.Empty))
+statement  =  rule Return *> children (wrapU . Statement.Return <$> expr <|> pure (wrapU []))
+          <|> rule Yield *> children (wrapU . Statement.Yield <$> expr <|> pure (wrapU []))
           <|> expr
 
 comment :: Assignment Grammar (Program a)
 comment = wrapU . Comment.Comment <$ rule Comment <*> content
 
 if' :: Assignment Grammar (Program a)
-if' = wrapU <$ rule If <*> children (Statement.If <$> expr <*> expr <*> expr)
+if' = wrapU <$ rule If <*> children (Statement.If <$> statement <*> (wrapU <$> many statement) <*> (wrapU <$> many statement))
 
 expr :: Assignment Grammar (Program a)
 expr = if' <|> literal
