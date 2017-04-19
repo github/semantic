@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
-, rule
+, symbol
 , content
 , children
 , Rose(..)
@@ -27,7 +27,7 @@ import Text.Show hiding (show)
 type Assignment symbol = Freer (AssignmentF symbol)
 
 data AssignmentF symbol a where
-  Rule :: symbol -> AssignmentF symbol ()
+  Symbol :: symbol -> AssignmentF symbol ()
   Content :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
@@ -36,8 +36,8 @@ data AssignmentF symbol a where
 -- | Zero-width match of a node with the given symbol.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (rule A *> b)' is fine, but 'many (rule A)' is not.
-rule :: symbol -> Assignment symbol ()
-rule symbol = Rule symbol `Then` return
+symbol :: symbol -> Assignment symbol ()
+symbol s = Symbol s `Then` return
 
 -- | A rule to produce a node’s content as a ByteString.
 content :: Assignment symbol ByteString
@@ -77,13 +77,13 @@ assignAll assignment nodes = case runAssignment assignment nodes of
 runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result ([AST grammar], a)
 runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-  (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Rule `Alt` Rule `Alt` Rule is inefficient, should build and match against an IntMap instead.
+  (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
   (assignment, node@(Rose Node{..} children) : rest) -> case assignment of
-    Rule symbol -> guard (symbol == nodeSymbol) >> yield () nodes
+    Symbol symbol -> guard (symbol == nodeSymbol) >> yield () nodes
     Content -> yield nodeContent rest
     Children childAssignment -> assignAll childAssignment children >>= flip yield rest
     _ -> Error ["No rule to match " <> show node]
-  (Rule symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
+  (Symbol symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
   (Content, []) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
@@ -99,7 +99,7 @@ instance Alternative (Assignment symbol) where
 
 instance Show symbol => Show1 (AssignmentF symbol) where
   liftShowsPrec sp sl d a = case a of
-    Rule s -> showsUnaryWith showsPrec "Rule" d s . showChar ' ' . sp d ()
+    Symbol s -> showsUnaryWith showsPrec "Symbol" d s . showChar ' ' . sp d ()
     Content -> showString "Content" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b

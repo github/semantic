@@ -44,43 +44,43 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar [Term Syntax ()]
-assignment = rule Program *> children (many declaration)
+assignment = symbol Program *> children (many declaration)
 
 declaration :: Assignment Grammar (Term Syntax ())
 declaration = comment <|> class' <|> method
 
 class' :: Assignment Grammar (Term Syntax ())
-class' = term () <$  rule Class
+class' = term () <$  symbol Class
                  <*> children (Declaration.Class <$> constant <*> pure [] <*> many declaration)
 
 constant :: Assignment Grammar (Term Syntax ())
-constant = term () . Syntax.Identifier <$ rule Constant <*> content
+constant = term () . Syntax.Identifier <$ symbol Constant <*> content
 
 identifier :: Assignment Grammar (Term Syntax ())
-identifier = term () . Syntax.Identifier <$ rule Identifier <*> content
+identifier = term () . Syntax.Identifier <$ symbol Identifier <*> content
 
 method :: Assignment Grammar (Term Syntax ())
-method = term () <$  rule Method
+method = term () <$  symbol Method
                  <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term () <$> many statement))
 
 statement :: Assignment Grammar (Term Syntax ())
-statement  =  term () . Statement.Return <$ rule Return <*> children (optional expr)
-          <|> term () . Statement.Yield <$ rule Yield <*> children (optional expr)
+statement  =  term () . Statement.Return <$ symbol Return <*> children (optional expr)
+          <|> term () . Statement.Yield <$ symbol Yield <*> children (optional expr)
           <|> expr
 
 comment :: Assignment Grammar (Term Syntax ())
-comment = term () . Comment.Comment <$ rule Comment <*> content
+comment = term () . Comment.Comment <$ symbol Comment <*> content
 
 if' :: Assignment Grammar (Term Syntax ())
 if' = go If
-  where go symbol = term () <$ rule symbol <*> children (Statement.If <$> statement <*> (term () <$> many statement) <*> (go Elsif <|> term () <$ rule Else <*> children (many statement)))
+  where go s = term () <$ symbol s <*> children (Statement.If <$> statement <*> (term () <$> many statement) <*> (go Elsif <|> term () <$ symbol Else <*> children (many statement)))
 
 expr :: Assignment Grammar (Term Syntax ())
 expr = if' <|> literal
 
 literal :: Assignment Grammar (Term Syntax ())
-literal  =  term () Literal.true <$ rule Language.Ruby.Syntax.True <* content
-        <|> term () Literal.false <$ rule Language.Ruby.Syntax.False <* content
+literal  =  term () Literal.true <$ symbol Language.Ruby.Syntax.True <* content
+        <|> term () Literal.false <$ symbol Language.Ruby.Syntax.False <* content
 
 optional :: Assignment Grammar (Term Syntax ()) -> Assignment Grammar (Term Syntax ())
 optional a = a <|> pure (() `term` [])

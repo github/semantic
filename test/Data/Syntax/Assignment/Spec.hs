@@ -23,12 +23,12 @@ spec = do
     it "matches one-or-more repetitions against one or more input nodes" $
       runAssignment (some red) [ast Red "hello" []] `shouldBe` Result ([], [Out "hello"])
 
-  describe "rule" $ do
+  describe "symbol" $ do
     it "matches nodes with the same symbol" $
       runAssignment red [ast Red "hello" []] `shouldBe` Result ([], Out "hello")
 
     it "does not advance past the current node" $
-      fst <$> runAssignment (rule Red) [ Rose (Node Red "hi") [] ] `shouldBe` Result [ Rose (Node Red "hi") [] ]
+      fst <$> runAssignment (symbol Red) [ Rose (Node Red "hi") [] ] `shouldBe` Result [ Rose (Node Red "hi") [] ]
 
   describe "content" $ do
     it "produces the node’s content" $
@@ -49,15 +49,15 @@ spec = do
 
     it "matches nested children" $ do
       runAssignment
-        (rule Red *> children (rule Green *> children (rule Blue *> content)))
+        (symbol Red *> children (symbol Green *> children (symbol Blue *> content)))
         [ ast Red "" [ ast Green "" [ ast Blue "1" [] ] ] ]
       `shouldBe`
         Result ([], "1")
 
     it "continues after children" $ do
       runAssignment
-        (many (rule Red *> children (rule Green *> content)
-           <|> rule Blue *> content))
+        (many (symbol Red *> children (symbol Green *> content)
+           <|> symbol Blue *> content))
         [ ast Red "" [ ast Green "B" [] ]
         , ast Blue "C" [] ]
       `shouldBe`
@@ -65,7 +65,7 @@ spec = do
 
     it "matches multiple nested children" $ do
       runAssignment
-        (rule Red *> children (many (rule Green *> children (rule Blue *> content))))
+        (symbol Red *> children (many (symbol Green *> children (symbol Blue *> content))))
         [ ast Red "" [ ast Green "" [ ast Blue "1" [] ]
                      , ast Green "" [ ast Blue "2" [] ] ] ]
       `shouldBe`
@@ -84,10 +84,10 @@ data Out = Out ByteString
   deriving (Eq, Show)
 
 red :: Assignment Grammar Out
-red = Out <$ rule Red <*> content
+red = Out <$ symbol Red <*> content
 
 green :: Assignment Grammar Out
-green = Out <$ rule Green <*> content
+green = Out <$ symbol Green <*> content
 
 blue :: Assignment Grammar Out
-blue = Out <$ rule Blue <*> content
+blue = Out <$ symbol Blue <*> content
