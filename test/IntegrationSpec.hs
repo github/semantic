@@ -2,7 +2,6 @@
 module IntegrationSpec where
 
 import Command
-import Command.Parse
 import Data.Functor.Both
 import Data.List (union, concat, transpose)
 import Data.Record
@@ -110,23 +109,14 @@ normalizeName path = dropExtension $ dropExtension path
 
 testParse :: FilePath -> FilePath -> Expectation
 testParse path expectedOutput = do
-  source <- readFileToUnicode path
-  let blob = sourceBlob source path
-  term <- parserForFilePath path blob
-  let actual = (Verbatim . stripWhitespace) $ printTerm term 0 TreeOnly
-  expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
+  actual <- verbatim <$> parseFile path
+  expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
 testDiff :: (Both SourceBlob -> Diff (Syntax Text) (Record DefaultFields) -> ByteString) -> Both FilePath -> FilePath -> Expectation
 testDiff renderer paths expectedOutput = do
-  (blobs, diff') <- runCommand $ do
-    blobs <- traverse readFile paths
-    terms <- traverse (traverse parseBlob) blobs
-    Just diff' <- maybeDiff terms
-    return (fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')
-  let diffOutput = renderer blobs diff'
-  let actual = Verbatim (stripWhitespace diffOutput)
-  expected <- Verbatim . stripWhitespace <$> B.readFile expectedOutput
+  actual <- verbatim <$> diffPaths paths
+  expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
 stripWhitespace :: ByteString -> ByteString
@@ -140,3 +130,6 @@ newtype Verbatim = Verbatim ByteString
 
 instance Show Verbatim where
   showsPrec _ (Verbatim byteString) = ('\n':) . (T.unpack (decodeUtf8 byteString) ++)
+
+verbatim :: ByteString -> Verbatim
+verbatim = Verbatim . stripWhitespace
