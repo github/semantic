@@ -81,6 +81,7 @@ expr = if' <|> literal
 literal :: Assignment Grammar (Term Syntax ())
 literal  =  term () Literal.true <$ symbol Language.Ruby.Syntax.True <* content
         <|> term () Literal.false <$ symbol Language.Ruby.Syntax.False <* content
+        <|> term () . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> content
 
 optional :: Assignment Grammar (Term Syntax ()) -> Assignment Grammar (Term Syntax ())
 optional a = a <|> pure (() `term` [])
