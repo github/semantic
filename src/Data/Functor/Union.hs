@@ -17,18 +17,18 @@ data Union (ts :: [k -> *]) (a :: k) where
 
 -- | Embed a functor in a union and lift the union into a free monad.
 wrapU :: (MonadFree (Union fs) m, InUnion fs f) => f (m a) -> m a
-wrapU = wrap . emb
+wrapU = wrap . inj
 
--- | Unwrap a cofree comonad and project a functor from the resulting union.
+-- | Unwrap a cofree comonad and prject a functor from the resulting union.
 unwrapU :: (ComonadCofree (Union fs) w, InUnion fs f) => w a -> Maybe (f (w a))
-unwrapU = proj . unwrap
+unwrapU = prj . unwrap
 
 
 -- Classes
 
 class InUnion (fs :: [* -> *]) (f :: * -> *) where
-  emb :: f a -> Union fs a
-  proj :: Union fs a -> Maybe (f a)
+  inj :: f a -> Union fs a
+  prj :: Union fs a -> Maybe (f a)
 
 type family Superset (combine :: [k] -> k -> Constraint) (fs :: [k]) (gs :: [k]) :: Constraint where
   Superset combine fs (g ': gs) = (combine fs g, Superset combine fs gs)
@@ -38,14 +38,14 @@ type family Superset (combine :: [k] -> k -> Constraint) (fs :: [k]) (gs :: [k])
 -- Instances
 
 instance {-# OVERLAPPABLE #-} InUnion (f ': fs) f where
-  emb = Here
-  proj (Here f) = Just f
-  proj _ = Nothing
+  inj = Here
+  prj (Here f) = Just f
+  prj _ = Nothing
 
 instance {-# OVERLAPPABLE #-} InUnion fs f => InUnion (g ': fs) f where
-  emb f = There (emb f)
-  proj (There fs) = proj fs
-  proj _ = Nothing
+  inj f = There (inj f)
+  prj (There fs) = prj fs
+  prj _ = Nothing
 
 
 instance (Foldable f, Foldable (Union fs)) => Foldable (Union (f ': fs)) where
@@ -82,7 +82,7 @@ instance Eq1 (Union '[]) where
   liftEq _ _ _ = False -- We can never get here anyway.
 
 instance (Show1 f, Show1 (Union fs)) => Show1 (Union (f ': fs)) where
-  liftShowsPrec sp sl d (Here f) = showsUnaryWith (liftShowsPrec sp sl) "emb" d f
+  liftShowsPrec sp sl d (Here f) = showsUnaryWith (liftShowsPrec sp sl) "inj" d f
   liftShowsPrec sp sl d (There f) = liftShowsPrec sp sl d f
 
 instance Show1 (Union '[]) where
