@@ -40,7 +40,7 @@ spec = parallel $ do
       examples <- runIO $ examples directory
       traverse_ runTest examples
     runTest ParseExample{..} = it ("parses " <> file) $ testParse file parseOutput
-    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
+    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff (both fileA fileB) diffOutput
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
@@ -113,8 +113,8 @@ testParse path expectedOutput = do
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
-testDiff :: (Both SourceBlob -> Diff (Syntax Text) (Record DefaultFields) -> ByteString) -> Both FilePath -> FilePath -> Expectation
-testDiff renderer paths expectedOutput = do
+testDiff :: Both FilePath -> FilePath -> Expectation
+testDiff paths expectedOutput = do
   actual <- verbatim <$> diffPaths paths
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
