@@ -102,13 +102,13 @@ normalizeName path = dropExtension $ dropExtension path
 
 testParse :: FilePath -> FilePath -> Expectation
 testParse path expectedOutput = do
-  actual <- verbatim <$> parseFile path
+  actual <- verbatim <$> parseFilePath path
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
 testDiff :: Both FilePath -> FilePath -> Expectation
 testDiff paths expectedOutput = do
-  actual <- verbatim <$> diffPaths paths
+  actual <- verbatim <$> diffFilePaths paths
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 

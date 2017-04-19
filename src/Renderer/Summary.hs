@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 -- {-# OPTIONS_GHC -funbox-strict-fields #-}
 {-# OPTIONS_GHC -Wno-deprecations #-}
@@ -34,6 +35,9 @@ data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
 instance Monoid Summaries where
   mempty = Summaries mempty mempty
   mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+
+instance (StringConv Summaries ByteString) where
+  strConv _ = toS . (<> "\n") . encode
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]

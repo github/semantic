@@ -1,9 +1,9 @@
 {-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-deprecations #-}
+-- Disabling deprecation warnings due wanting tests to fail that diff two non-existing files.
 module SpecHelpers
-( diffPaths
-, diffBlobs'
-, parseFile
+( diffFilePaths
+, parseFilePath
 , readFileToUnicode
 , parserForFilePath
 ) where
@@ -24,19 +24,16 @@ import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Renderer.SExpression
 import Source
+import Semantic
 import Syntax
 import System.FilePath
 import Term
 
--- TODO: Write helper functions for parse file and diff files that don't depend on Command.
-
--- testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
-
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffPaths :: Both FilePath -> IO ByteString
-diffPaths paths = do
+diffFilePaths :: Both FilePath -> IO ByteString
+diffFilePaths paths = do
   blobs <- traverse readFileToSourceBlob paths
-  terms' <- traverse (traverse parseBlob) blobs
+  terms' <- traverse (traverse parseBlob') blobs
   let diff = runDiff terms'
   pure $ renderer (fromMaybe . emptySourceBlob <$> paths <*> blobs) diff
   where
@@ -54,35 +51,12 @@ diffPaths paths = do
           Leaf s -> Just s
           _ -> Nothing)
 
--- diffPaths :: Both FilePath -> IO ByteString
--- diffPaths' :: Both FilePath -> IO (Diff (Syntax Text) (Record DefaultFields))
-
--- diffBlobs :: Both SourceBlob -> IO ByteString
-diffBlobs' :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
-diffBlobs' blobs = do
-  terms <- traverse parseBlob blobs
-  pure $ stripDiff (runBothWith diffTerms (fmap decorate terms))
-  where
-    decorate = defaultFeatureVectorDecorator getLabel
-    getLabel :: HasField fields Category => TermF (Syntax Text) (Record fields) a -> (Category, Maybe Text)
-    getLabel (h :< t) = (Info.category h, case t of
-      Leaf s -> Just s
-      _ -> Nothing)
-
--- parsePath :: FilePath -> IO ByteString
--- parsePath' :: FilePath -> IO (Term (Syntax Text) (Record DefaultFields))
--- parseBlob :: SourceBlob -> IO ByteString
--- parseBlob' :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-
 -- | Returns an s-expression parse tree for the specified FilePath.
-parseFile :: FilePath -> IO ByteString
-parseFile path = do
+parseFilePath :: FilePath -> IO ByteString
+parseFilePath path = do
   source <- readFileToUnicode path
-  term <- parseBlob $ sourceBlob source path
+  term <- parseBlob' $ sourceBlob source path
   pure $ printTerm term 0 TreeOnly
-
-parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-parseBlob blob@SourceBlob{..} = parserForFilePath path blob
 
 -- | Read a file to a SourceBlob
 readFileToSourceBlob :: FilePath -> IO (Maybe SourceBlob)
