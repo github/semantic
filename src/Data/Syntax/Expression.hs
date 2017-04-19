@@ -11,3 +11,11 @@ data Call a = Call { callFunction :: a, callParams :: [a] }
 
 instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | Unary boolean negation, like '!x' in many languages.
+data Not a = Not a
+  deriving (Eq, Foldable, Generic1, Show)
+
+instance Eq1 Not where liftEq = genericLiftEq
+instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
