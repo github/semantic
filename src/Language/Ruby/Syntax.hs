@@ -78,8 +78,8 @@ expr :: Assignment Grammar (Program a)
 expr = if' <|> literal
 
 literal :: Assignment Grammar (Program a)
-literal  =  wrapU (Literal.Boolean Prologue.True) <$ rule Language.Ruby.Syntax.True <* content
-        <|> wrapU (Literal.Boolean Prologue.False) <$ rule Language.Ruby.Syntax.False <* content
+literal  =  wrapU Literal.true <$ rule Language.Ruby.Syntax.True <* content
+        <|> wrapU Literal.false <$ rule Language.Ruby.Syntax.False <* content
 
 optional :: Assignment Grammar (Program a) -> Assignment Grammar (Program a)
 optional a = a <|> pure (wrapU [])
