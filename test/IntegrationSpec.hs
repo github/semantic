@@ -1,20 +1,13 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module IntegrationSpec where
 
-import Command
 import Data.Functor.Both
 import Data.List (union, concat, transpose)
-import Data.Record
 import qualified Data.Text as T
 import qualified Data.ByteString as B
 import Data.Text.Encoding (decodeUtf8)
-import Diff
 import GHC.Show (Show(..))
-import Info
 import Prologue hiding (fst, snd, readFile)
-import Renderer.SExpression as Renderer
-import Source
-import Syntax
 import System.FilePath
 import System.FilePath.Glob
 import SpecHelpers

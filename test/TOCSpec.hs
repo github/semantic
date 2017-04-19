@@ -3,7 +3,6 @@ module TOCSpec where
 
 import Data.Aeson
 import Category as C
-import Command
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
@@ -14,7 +13,6 @@ import Info
 import Interpreter
 import Patch
 import Prologue hiding (fst, snd)
-import Renderer
 import Renderer.TOC
 import Source
 import Syntax as S
@@ -110,22 +108,21 @@ spec = parallel $ do
   describe "diffFiles" $ do
     it "encodes to final JSON" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      output <- diffOutput sourceBlobs
+      output <- tocDiffOutput sourceBlobs
       output `shouldBe` "{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}"
 
     it "encodes to final JSON if there are parse errors" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
-      output <- diffOutput sourceBlobs
+      output <- tocDiffOutput sourceBlobs
       output `shouldBe` "{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}"
 
 type Diff' = SyntaxDiff String DefaultFields
 type Term' = SyntaxTerm String DefaultFields
 
-diffOutput :: Both SourceBlob -> IO ByteString
-diffOutput blobs = runCommand $ do
-  terms <- for blobs parseBlob
-  diff' <- diff terms
-  toS . encode <$> renderDiffs ToCRenderer [ (blobs, diff') ]
+tocDiffOutput :: Both SourceBlob -> IO ByteString
+tocDiffOutput blobs = do
+  diff <- diffBlobs' blobs
+  pure . toS . encode $ toc blobs diff
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
@@ -188,9 +185,7 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   _ -> False
 
 testDiff :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
-testDiff blobs = runCommand $ do
-  terms <- for blobs parseBlob
-  diff terms
+testDiff = diffBlobs'
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do

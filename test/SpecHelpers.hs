@@ -2,17 +2,22 @@
 {-# OPTIONS_GHC -Wno-deprecations #-}
 module SpecHelpers
 ( diffPaths
+, diffBlobs'
 , parseFile
 , readFileToUnicode
 , parserForFilePath
 ) where
 
 import Data.Functor.Both
+import Data.RandomWalkSimilarity
 import Data.Record
+import Diff
 import Info
+import Interpreter
 import Language
 import Parser
 import Parser.Language hiding (parserForFilePath)
+import Patch
 import Prologue
 import qualified Data.ByteString as B
 import qualified Data.Text.ICU.Convert as Convert
@@ -20,12 +25,8 @@ import qualified Data.Text.ICU.Detect as Detect
 import Renderer.SExpression
 import Source
 import Syntax
-import Interpreter
-import Data.RandomWalkSimilarity
-import Term
-import Diff
 import System.FilePath
-import Patch
+import Term
 
 -- TODO: Write helper functions for parse file and diff files that don't depend on Command.
 
@@ -52,6 +53,26 @@ diffPaths paths = do
         getLabel (h :< t) = (Info.category h, case t of
           Leaf s -> Just s
           _ -> Nothing)
+
+-- diffPaths :: Both FilePath -> IO ByteString
+-- diffPaths' :: Both FilePath -> IO (Diff (Syntax Text) (Record DefaultFields))
+
+-- diffBlobs :: Both SourceBlob -> IO ByteString
+diffBlobs' :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
+diffBlobs' blobs = do
+  terms <- traverse parseBlob blobs
+  pure $ stripDiff (runBothWith diffTerms (fmap decorate terms))
+  where
+    decorate = defaultFeatureVectorDecorator getLabel
+    getLabel :: HasField fields Category => TermF (Syntax Text) (Record fields) a -> (Category, Maybe Text)
+    getLabel (h :< t) = (Info.category h, case t of
+      Leaf s -> Just s
+      _ -> Nothing)
+
+-- parsePath :: FilePath -> IO ByteString
+-- parsePath' :: FilePath -> IO (Term (Syntax Text) (Record DefaultFields))
+-- parseBlob :: SourceBlob -> IO ByteString
+-- parseBlob' :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFile :: FilePath -> IO ByteString
