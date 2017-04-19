@@ -26,6 +26,8 @@ type Syntax' =
   , Literal.Integer
   , Literal.String
   , Literal.Symbol
+  , Statement.Break
+  , Statement.Continue
   , Statement.If
   , Statement.Return
   , Statement.Yield
@@ -67,6 +69,8 @@ method = term () <$  symbol Method
 statement :: Assignment Grammar (Term Syntax ())
 statement  =  exit Statement.Return Return
           <|> exit Statement.Yield Yield
+          <|> exit Statement.Break Break
+          <|> exit Statement.Continue Next
           <|> expr
   where exit construct sym = term () . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children expr))
 
