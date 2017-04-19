@@ -158,6 +158,7 @@ test-suite test
                      , RangeSpec
                      , SES.Myers.Spec
                      , SourceSpec
+                     , SpecHelpers
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
@@ -185,6 +186,7 @@ test-suite test
                      , regex-compat
                      , semantic-diff
                      , text >= 1.2.1.3
+                     , text-icu
                      , unordered-containers
                      , these
                      , vector

@@ -18,6 +18,7 @@ import Source
 import Syntax
 import System.FilePath
 import System.FilePath.Glob
+import SpecHelpers
 import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)
 import Test.Hspec.Expectations.Pretty
 
@@ -109,9 +110,9 @@ normalizeName path = dropExtension $ dropExtension path
 
 testParse :: FilePath -> FilePath -> Expectation
 testParse path expectedOutput = do
-  source <- readAndTranscodeFile path
+  source <- readFileToUnicode path
   let blob = sourceBlob source path
-  term <- parserForType (toS (takeExtension path)) blob
+  term <- parserForFilePath path blob
   let actual = (Verbatim . stripWhitespace) $ printTerm term 0 TreeOnly
   expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
   actual `shouldBe` expected

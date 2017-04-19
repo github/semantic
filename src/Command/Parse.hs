@@ -1,5 +1,19 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-module Command.Parse where
+module Command.Parse
+(
+-- Render parser trees
+  jsonParseTree
+, jsonIndexParseTree
+, sExpressionParseTree
+-- Parsers
+, parserForLanguage
+, parserForFilePath -- TODO: Remove. Langauge detection should not come from file extension.
+-- Files and transcoding
+, transcode
+, sourceBlobsFromPaths
+-- Git
+, sourceBlobsFromSha
+) where
 
 import Category
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
@@ -7,6 +21,7 @@ import Data.Aeson.Types (Pair)
 import Data.Functor.Foldable hiding (Nil)
 import Data.Record
 import Data.String
+import qualified Data.ByteString as B
 import qualified Data.Text as T
 import Git.Blob
 import Git.Libgit2
@@ -30,6 +45,47 @@ import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
+import System.IO
+import Control.Exception (catch, IOException)
+import qualified Data.Text.ICU.Convert as Convert
+import qualified Data.Text.ICU.Detect as Detect
+
+-- TODO: This doesn't belong in here
+
+-- | Return a parser for a given langauge or the lineByLineParser parser.
+parserForLanguage :: Maybe Language -> Parser (Syntax Text) (Record DefaultFields)
+parserForLanguage Nothing = lineByLineParser
+parserForLanguage (Just language) = case language of
+  C -> treeSitterParser C tree_sitter_c
+  JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
+  TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
+  Markdown -> cmarkParser
+  Ruby -> treeSitterParser Ruby tree_sitter_ruby
+  Language.Go -> treeSitterParser Language.Go tree_sitter_go
+
+-- | Return a parser based on the file extension (including the ".").
+-- | TODO: Remove.
+parserForType :: String -> Parser (Syntax Text) (Record DefaultFields)
+parserForType = parserForLanguage . languageForType
+
+-- | Return the parser that should be used for a given path.
+-- | TODO: Remove.
+parserForFilePath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
+parserForFilePath = parserForType . toS . takeExtension
+
+-- | A fallback parser that treats a file simply as rows of strings.
+lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
+lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
+  (leaves, _) -> cofree <$> leaves
+  where
+    lines = actualLines source
+    root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
+    sourceRange = Source.totalRange source
+    leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
+    annotateLeaves (accum, charIndex) line =
+      (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
+
+
 
 data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: Rose ParseNode } deriving (Show)
 
@@ -67,9 +123,7 @@ parseNodeToJSONFields ParseNode{..} =
 sExpressionParseTree :: Bool -> [SourceBlob] -> IO ByteString
 sExpressionParseTree _ blobs =
   pure . printTerms TreeOnly =<< parse blobs
-  where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
-
-type RAlgebra t a = Base t (t, a) -> a
+  where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForFilePath path sourceBlob)
 
 parseRoot :: Bool -> (FilePath -> f ParseNode -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> [SourceBlob] -> IO [root]
 parseRoot debug construct combine blobs = for blobs (\ sourceBlob@SourceBlob{..} -> do
@@ -137,21 +191,7 @@ identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
 
 -- | Return a parser incorporating the provided TermDecorator.
 parseWithDecorator :: TermDecorator (Syntax Text) DefaultFields field -> FilePath -> Parser (Syntax Text) (Record (field ': DefaultFields))
-parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForType (toS (takeExtension path)) blob
-
--- | Return a parser based on the file extension (including the ".").
-parserForType :: String -> Parser (Syntax Text) (Record DefaultFields)
-parserForType mediaType = maybe lineByLineParser parserForLanguage (languageForType mediaType)
-
--- | Select a parser for a given Language.
-parserForLanguage :: Language -> Parser (Syntax Text) (Record DefaultFields)
-parserForLanguage language = case language of
-  C -> treeSitterParser C tree_sitter_c
-  JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
-  TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
-  Markdown -> cmarkParser
-  Ruby -> treeSitterParser Ruby tree_sitter_ruby
-  Language.Go -> treeSitterParser Language.Go tree_sitter_go
+parseWithDecorator decorator path blob = decorateTerm decorator <$> parserForFilePath path blob
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
 decorateTerm :: (Functor f) => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
@@ -167,24 +207,32 @@ termSourceTextDecorator source (ann :< _) = Just (SourceText (toText (Source.sli
 newtype Identifier = Identifier Text
   deriving (Eq, Show, ToJSON)
 
-identifierDecorator :: (HasField fields Category, StringConv leaf Text) => TermDecorator (Syntax leaf) fields (Maybe Identifier)
-identifierDecorator = fmap (Command.Parse.Identifier . toS) . extractLeafValue . unwrap <=< maybeIdentifier . tailF
+-- | Read the file and convert it to Unicode.
+readAndTranscodeFile :: FilePath -> IO Source
+readAndTranscodeFile path = do
+  size <- fileSize path
+  text <- case size of
+    0 -> pure B.empty
+    _ -> B.readFile path
+  transcode text
 
--- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
-lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
-  (leaves, _) -> cofree <$> leaves
-  where
-    lines = actualLines source
-    root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
-    sourceRange = Source.totalRange source
-    leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
-    annotateLeaves (accum, charIndex) line =
-      (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
+-- Based on https://github.com/haskell/bytestring/pull/79/files
+-- Neccessary to be able to handle /dev/null as a file.
+fileSize :: FilePath -> IO Integer
+fileSize f = withBinaryFile f ReadMode $ \h -> do
+  -- hFileSize fails if file is not regular file (like /dev/null). Catch
+  -- exception and return 0 in that case.
+  filesz <- catch (hFileSize h) useZeroIfNotRegularFile
+  pure $ fromIntegral filesz `max` 0
+  where useZeroIfNotRegularFile :: IOException -> IO Integer
+        useZeroIfNotRegularFile _ = pure 0
 
--- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
-parserForFilepath = parserForType . toS . takeExtension
+-- | Transcode a file to a unicode source.
+transcode :: B.ByteString -> IO Source
+transcode text = fromText <$> do
+  match <- Detect.detectCharset text
+  converter <- Convert.open match Nothing
+  pure $ Convert.toUnicode converter text
 
 
 data RoseF a b = RoseF a [b]

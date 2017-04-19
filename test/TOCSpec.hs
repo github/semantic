@@ -19,6 +19,7 @@ import Renderer.TOC
 import Source
 import Syntax as S
 import Term
+import SpecHelpers
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
@@ -193,7 +194,7 @@ testDiff blobs = runCommand $ do
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths paths = do
-  sources <- traverse (readAndTranscodeFile . ("test/fixtures/toc/" <>)) paths
+  sources <- traverse (readFileToUnicode . ("test/fixtures/toc/" <>)) paths
   pure $ SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
