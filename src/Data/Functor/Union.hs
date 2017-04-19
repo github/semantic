@@ -3,6 +3,7 @@ module Data.Functor.Union
 ( Union
 , wrapU
 , unwrapU
+, InUnion(..)
 ) where
 
 import Data.Functor.Classes
