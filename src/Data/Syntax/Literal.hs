@@ -13,6 +13,12 @@ import Prologue
 newtype Boolean a = Boolean Bool
   deriving (Eq, Foldable, Generic1, Show)
 
+true :: Boolean a
+true = Boolean True
+
+false :: Boolean a
+false = Boolean False
+
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
