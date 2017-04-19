@@ -23,6 +23,7 @@ module Command
 , runCommand
 ) where
 
+import Command.Files
 import Command.Parse
 import qualified Control.Concurrent.Async.Pool as Async
 import Control.Exception (catch)
@@ -51,6 +52,7 @@ import Info
 import Interpreter
 import Language
 import Patch
+import Parser.Language
 import Prologue hiding (concurrently, Concurrently, readFile)
 import qualified Renderer as R
 import qualified Renderer.SExpression as R

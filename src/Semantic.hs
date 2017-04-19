@@ -3,6 +3,8 @@ module Semantic (main, runDiff, runParse) where
 
 import Arguments
 import Command
+import Command.Files
+import Command.Git
 import Command.Parse
 import Data.Functor.Both
 import Data.List.Split (splitWhen)

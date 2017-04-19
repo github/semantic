@@ -1,5 +1,6 @@
 module Command.Parse.Spec where
 
+import Command.Files
 import Command.Parse
 import Control.Monad
 import Prelude
