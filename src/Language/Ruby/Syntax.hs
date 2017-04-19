@@ -78,6 +78,7 @@ statement  =  exit Statement.Return Return
           <|> if'
           <|> ifModifier
           <|> unless
+          <|> unlessModifier
           <|> literal
   where exit construct sym = term . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children statement))
 
@@ -93,6 +94,9 @@ ifModifier = term <$ symbol IfModifier <*> children (flip Statement.If <$> state
 
 unless :: Assignment Grammar (Term Syntax ())
 unless = term <$ symbol Unless <*> children (Statement.If <$> (term . Expression.Not <$> statement) <*> (term <$> many statement) <*> optional (term <$ symbol Else <*> children (many statement)))
+
+unlessModifier :: Assignment Grammar (Term Syntax ())
+unlessModifier = term <$ symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> (term . Expression.Not <$> statement) <*> pure (term Syntax.Empty))
 
 literal :: Assignment Grammar (Term Syntax ())
 literal  =  term Literal.true <$ symbol Language.Ruby.Syntax.True <* source
