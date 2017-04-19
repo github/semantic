@@ -29,6 +29,7 @@ type Syntax' =
   , Statement.If
   , Statement.Return
   , Statement.Yield
+  , Syntax.Empty
   , Syntax.Identifier
   , []
   ]
@@ -84,4 +85,4 @@ literal  =  term () Literal.true <$ symbol Language.Ruby.Syntax.True <* content
         <|> term () . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> content
 
 optional :: Assignment Grammar (Term Syntax ()) -> Assignment Grammar (Term Syntax ())
-optional a = a <|> pure (() `term` [])
+optional a = a <|> pure (() `term` Syntax.Empty)
