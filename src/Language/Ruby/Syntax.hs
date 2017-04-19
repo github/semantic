@@ -86,13 +86,13 @@ comment = term . Comment.Comment <$ symbol Comment <*> source
 
 if' :: Assignment Grammar (Term Syntax ())
 if' = go If
-  where go s = term <$ symbol s <*> children (Statement.If <$> statement <*> (term <$> many statement) <*> (go Elsif <|> term <$ symbol Else <*> children (many statement)))
+  where go s = term <$ symbol s <*> children (Statement.If <$> statement <*> (term <$> many statement) <*> optional (go Elsif <|> term <$ symbol Else <*> children (many statement)))
 
 ifModifier :: Assignment Grammar (Term Syntax ())
 ifModifier = term <$ symbol IfModifier <*> children (flip Statement.If <$> statement <*> statement <*> pure (term Syntax.Empty))
 
 unless :: Assignment Grammar (Term Syntax ())
-unless = term <$ symbol Unless <*> children (Statement.If <$> (term . Expression.Not <$> statement) <*> (term <$> many statement) <*> (term <$ symbol Else <*> children (many statement)))
+unless = term <$ symbol Unless <*> children (Statement.If <$> (term . Expression.Not <$> statement) <*> (term <$> many statement) <*> optional (term <$ symbol Else <*> children (many statement)))
 
 literal :: Assignment Grammar (Term Syntax ())
 literal  =  term Literal.true <$ symbol Language.Ruby.Syntax.True <* source
