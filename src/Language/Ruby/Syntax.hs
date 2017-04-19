@@ -65,8 +65,8 @@ method = term () <$  symbol Method
                  <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term () <$> many statement))
 
 statement :: Assignment Grammar (Term Syntax ())
-statement  =  term () . Statement.Return <$ symbol Return <*> children (optional expr)
-          <|> term () . Statement.Yield <$ symbol Yield <*> children (optional expr)
+statement  =  term () . Statement.Return <$ symbol Return <*> children (optional (symbol ArgumentList *> children expr))
+          <|> term () . Statement.Yield <$ symbol Yield <*> children (optional (symbol ArgumentList *> children expr))
           <|> expr
 
 comment :: Assignment Grammar (Term Syntax ())
