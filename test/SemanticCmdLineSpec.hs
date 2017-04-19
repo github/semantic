@@ -1,8 +1,8 @@
-module SemanticSpec where
+module SemanticCmdLineSpec where
 
 import Prologue
 import Arguments
-import Semantic
+import SemanticCmdLine
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck

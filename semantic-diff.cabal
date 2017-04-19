@@ -64,7 +64,7 @@ library
                      , Renderer.Summary
                      , Renderer.SExpression
                      , Renderer.TOC
-                     , Semantic
+                     , SemanticCmdLine
                      , SES
                      , SES.Myers
                      , Source
@@ -153,7 +153,7 @@ test-suite test
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec
                      , DiffSpec
-                     , SemanticSpec
+                     , SemanticCmdLineSpec
                      , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec

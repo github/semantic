@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Semantic (main, runDiff, runParse) where
+module SemanticCmdLine (main, runDiff, runParse) where
 
 import Arguments
 import Command
