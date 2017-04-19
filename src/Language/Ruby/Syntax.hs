@@ -57,10 +57,10 @@ class' = term <$  symbol Class
               <*> children (Declaration.Class <$> constant <*> pure [] <*> many declaration)
 
 constant :: Assignment Grammar (Term Syntax ())
-constant = term . Syntax.Identifier <$ symbol Constant <*> content
+constant = term . Syntax.Identifier <$ symbol Constant <*> source
 
 identifier :: Assignment Grammar (Term Syntax ())
-identifier = term . Syntax.Identifier <$ symbol Identifier <*> content
+identifier = term . Syntax.Identifier <$ symbol Identifier <*> source
 
 method :: Assignment Grammar (Term Syntax ())
 method = term <$  symbol Method
@@ -75,7 +75,7 @@ statement  =  exit Statement.Return Return
   where exit construct sym = term . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children expr))
 
 comment :: Assignment Grammar (Term Syntax ())
-comment = term . Comment.Comment <$ symbol Comment <*> content
+comment = term . Comment.Comment <$ symbol Comment <*> source
 
 if' :: Assignment Grammar (Term Syntax ())
 if' = go If
@@ -85,9 +85,9 @@ expr :: Assignment Grammar (Term Syntax ())
 expr = if' <|> literal
 
 literal :: Assignment Grammar (Term Syntax ())
-literal  =  term Literal.true <$ symbol Language.Ruby.Syntax.True <* content
-        <|> term Literal.false <$ symbol Language.Ruby.Syntax.False <* content
-        <|> term . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> content
+literal  =  term Literal.true <$ symbol Language.Ruby.Syntax.True <* source
+        <|> term Literal.false <$ symbol Language.Ruby.Syntax.False <* source
+        <|> term . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> source
 
 optional :: Assignment Grammar (Term Syntax ()) -> Assignment Grammar (Term Syntax ())
 optional a = a <|> pure (term Syntax.Empty)

@@ -30,12 +30,12 @@ spec = do
     it "does not advance past the current node" $
       fst <$> runAssignment (symbol Red) [ Rose (Node Red "hi") [] ] `shouldBe` Result [ Rose (Node Red "hi") [] ]
 
-  describe "content" $ do
-    it "produces the node’s content" $
-      snd <$> runAssignment content [ Rose (Node Red "hi") [] ] `shouldBe` Result "hi"
+  describe "source" $ do
+    it "produces the node’s source" $
+      snd <$> runAssignment source [ Rose (Node Red "hi") [] ] `shouldBe` Result "hi"
 
     it "advances past the current node" $
-      fst <$> runAssignment content [ Rose (Node Red "hi") [] ] `shouldBe` Result []
+      fst <$> runAssignment source [ Rose (Node Red "hi") [] ] `shouldBe` Result []
 
   describe "children" $ do
     it "advances past the current node" $
@@ -49,15 +49,15 @@ spec = do
 
     it "matches nested children" $ do
       runAssignment
-        (symbol Red *> children (symbol Green *> children (symbol Blue *> content)))
+        (symbol Red *> children (symbol Green *> children (symbol Blue *> source)))
         [ ast Red "" [ ast Green "" [ ast Blue "1" [] ] ] ]
       `shouldBe`
         Result ([], "1")
 
     it "continues after children" $ do
       runAssignment
-        (many (symbol Red *> children (symbol Green *> content)
-           <|> symbol Blue *> content))
+        (many (symbol Red *> children (symbol Green *> source)
+           <|> symbol Blue *> source))
         [ ast Red "" [ ast Green "B" [] ]
         , ast Blue "C" [] ]
       `shouldBe`
@@ -65,7 +65,7 @@ spec = do
 
     it "matches multiple nested children" $ do
       runAssignment
-        (symbol Red *> children (many (symbol Green *> children (symbol Blue *> content))))
+        (symbol Red *> children (many (symbol Green *> children (symbol Blue *> source))))
         [ ast Red "" [ ast Green "" [ ast Blue "1" [] ]
                      , ast Green "" [ ast Blue "2" [] ] ] ]
       `shouldBe`
@@ -84,10 +84,10 @@ data Out = Out ByteString
   deriving (Eq, Show)
 
 red :: Assignment Grammar Out
-red = Out <$ symbol Red <*> content
+red = Out <$ symbol Red <*> source
 
 green :: Assignment Grammar Out
-green = Out <$ symbol Green <*> content
+green = Out <$ symbol Green <*> source
 
 blue :: Assignment Grammar Out
-blue = Out <$ symbol Blue <*> content
+blue = Out <$ symbol Blue <*> source
