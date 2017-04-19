@@ -6,10 +6,11 @@ import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Language.Haskell.TH
-import Prologue hiding (optional)
+import Prologue hiding (optional, unless)
 import Term
 import Text.Parser.TreeSitter.Language
 import Text.Parser.TreeSitter.Ruby
@@ -20,6 +21,7 @@ type Syntax' =
   '[Comment.Comment
   , Declaration.Class
   , Declaration.Method
+  , Expression.Not
   , Literal.Array
   , Literal.Boolean
   , Literal.Hash
@@ -75,6 +77,7 @@ statement  =  exit Statement.Return Return
           <|> exit Statement.Continue Next
           <|> if'
           <|> ifModifier
+          <|> unless
           <|> expr
   where exit construct sym = term . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children expr))
 
@@ -87,6 +90,9 @@ if' = go If
 
 ifModifier :: Assignment Grammar (Term Syntax ())
 ifModifier = term <$ symbol IfModifier <*> children (flip Statement.If <$> statement <*> expr <*> pure (term Syntax.Empty))
+
+unless :: Assignment Grammar (Term Syntax ())
+unless = term <$ symbol Unless <*> children (Statement.If <$> (term . Expression.Not <$> statement) <*> (term <$> many statement) <*> (term <$ symbol Else <*> children (many statement)))
 
 expr :: Assignment Grammar (Term Syntax ())
 expr = literal
