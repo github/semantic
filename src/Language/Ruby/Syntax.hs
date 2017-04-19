@@ -33,9 +33,9 @@ type Syntax =
 
 
 -- | A program in some syntax functor, over which we can perform analyses.
-type Program = Cofree (Union Syntax) ()
+type Term = Cofree (Union Syntax) ()
 
-term :: InUnion Syntax f => () -> f Program -> Program
+term :: InUnion Syntax f => () -> f Term -> Term
 term a f = cofree $ a :< inj f
 
 
@@ -44,44 +44,44 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment Grammar [Program]
+assignment :: Assignment Grammar [Term]
 assignment = rule Program *> children (many declaration)
 
-declaration :: Assignment Grammar Program
+declaration :: Assignment Grammar Term
 declaration = comment <|> class' <|> method
 
-class' :: Assignment Grammar Program
+class' :: Assignment Grammar Term
 class' = term () <$  rule Class
                  <*> children (Declaration.Class <$> constant <*> pure [] <*> many declaration)
 
-constant :: Assignment Grammar Program
+constant :: Assignment Grammar Term
 constant = term () . Syntax.Identifier <$ rule Constant <*> content
 
-identifier :: Assignment Grammar Program
+identifier :: Assignment Grammar Term
 identifier = term () . Syntax.Identifier <$ rule Identifier <*> content
 
-method :: Assignment Grammar Program
+method :: Assignment Grammar Term
 method = term () <$  rule Method
                  <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term () <$> many statement))
 
-statement :: Assignment Grammar Program
+statement :: Assignment Grammar Term
 statement  =  term () . Statement.Return <$ rule Return <*> children (optional expr)
           <|> term () . Statement.Yield <$ rule Yield <*> children (optional expr)
           <|> expr
 
-comment :: Assignment Grammar Program
+comment :: Assignment Grammar Term
 comment = term () . Comment.Comment <$ rule Comment <*> content
 
-if' :: Assignment Grammar Program
+if' :: Assignment Grammar Term
 if' = go If
   where go symbol = term () <$ rule symbol <*> children (Statement.If <$> statement <*> (term () <$> many statement) <*> (go Elsif <|> term () <$ rule Else <*> children (many statement)))
 
-expr :: Assignment Grammar Program
+expr :: Assignment Grammar Term
 expr = if' <|> literal
 
-literal :: Assignment Grammar Program
+literal :: Assignment Grammar Term
 literal  =  term () Literal.true <$ rule Language.Ruby.Syntax.True <* content
         <|> term () Literal.false <$ rule Language.Ruby.Syntax.False <* content
 
-optional :: Assignment Grammar Program -> Assignment Grammar Program
+optional :: Assignment Grammar Term -> Assignment Grammar Term
 optional a = a <|> pure (() `term` [])
