@@ -54,8 +54,9 @@ declaration = comment <|> class' <|> method
 
 class' :: Assignment Grammar (Term Syntax ())
 class' = term <$  symbol Class
-              <*> children (Declaration.Class <$> constant <*> (superclass <|> pure []) <*> many declaration)
+              <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
   where superclass = pure <$ symbol Superclass <*> children constant
+        scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
 constant :: Assignment Grammar (Term Syntax ())
 constant = term . Syntax.Identifier <$ symbol Constant <*> source
