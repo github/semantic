@@ -73,6 +73,8 @@ statement  =  exit Statement.Return Return
           <|> exit Statement.Yield Yield
           <|> exit Statement.Break Break
           <|> exit Statement.Continue Next
+          <|> if'
+          <|> ifModifier
           <|> expr
   where exit construct sym = term . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children expr))
 
@@ -83,8 +85,11 @@ if' :: Assignment Grammar (Term Syntax ())
 if' = go If
   where go s = term <$ symbol s <*> children (Statement.If <$> statement <*> (term <$> many statement) <*> (go Elsif <|> term <$ symbol Else <*> children (many statement)))
 
+ifModifier :: Assignment Grammar (Term Syntax ())
+ifModifier = term <$ symbol IfModifier <*> children (flip Statement.If <$> statement <*> expr <*> pure (term Syntax.Empty))
+
 expr :: Assignment Grammar (Term Syntax ())
-expr = if' <|> literal
+expr = literal
 
 literal :: Assignment Grammar (Term Syntax ())
 literal  =  term Literal.true <$ symbol Language.Ruby.Syntax.True <* source
