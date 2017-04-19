@@ -71,7 +71,7 @@ comment :: Assignment Grammar (Program a)
 comment = wrapU . Comment.Comment <$ rule Comment <*> content
 
 if' :: Assignment Grammar (Program a)
-if' = wrapU <$ rule If <*> children (Statement.If <$> statement <*> (wrapU <$> many statement) <*> (wrapU <$> many statement))
+if' = wrapU <$ rule If <*> children (Statement.If <$> statement <*> (wrapU <$> many statement) <*> (wrapU <$ rule Else <*> children (many statement)))
 
 expr :: Assignment Grammar (Program a)
 expr = if' <|> literal
