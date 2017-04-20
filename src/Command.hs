@@ -18,13 +18,12 @@ module Command
 , sExpressionDiff
 , tocDiff
 , DiffEncoder
-, ParseTreeRenderer
+-- , ParseTreeEncoder
 -- Evaluation
 , runCommand
 ) where
 
 import Command.Files
-import Command.Parse
 import qualified Control.Concurrent.Async.Pool as Async
 import Control.Exception (catch)
 import Control.Monad.Free.Freer
@@ -205,7 +204,7 @@ runRenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBl
 runRenderDiffs = runDiffRenderer
 
 
-type ParseTreeRenderer = Bool -> [SourceBlob] -> IO ByteString
+-- type ParseTreeEncoder = Bool -> [Term (Syntax Text) (Record DefaultFields)] -> Command ByteString
 
 type DiffEncoder = [(Both SourceBlob, Diff (Syntax Text) (Record DefaultFields))] -> Command ByteString
 
@@ -236,14 +235,14 @@ encodeText = encodeUtf8 . R.unFile
 encodeSummaries :: Summaries -> ByteString
 encodeSummaries = toS . (<> "\n") . encode
 
-
-instance Show ParseTreeRenderer where
-  showsPrec d _ = showParen (d >= 10) $ showString "ParseTreeRenderer "
-
-instance Listable ParseTreeRenderer where
-  tiers = cons0 jsonParseTree
-       \/ cons0 jsonIndexParseTree
-       \/ cons0 sExpressionParseTree
+--
+-- instance Show ParseTreeEncoder where
+--   showsPrec d _ = showParen (d >= 10) $ showString "ParseTreeEncoder "
+-- --
+-- instance Listable ParseTreeEncoder where
+--   tiers = cons0 jsonParseTree
+--        \/ cons0 jsonIndexParseTree
+--        \/ cons0 sExpressionParseTree
 
 instance Show DiffEncoder where
   showsPrec d encodeDiff = showParen (d >= 10) $ showString "DiffEncoder "

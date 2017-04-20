@@ -16,11 +16,14 @@ import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
 import Source
+import Renderer
+import Renderer.SExpression
 import System.Directory
 import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 import Text.Regex
+import qualified Semantic (parseBlobs)
 
 main :: IO ()
 main = do
@@ -74,7 +77,9 @@ runParse ParseArguments{..} = do
   blobs <- case parseMode of
     ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
     ParsePaths paths -> sourceBlobsFromPaths paths
-  renderParseTree debug blobs
+  Semantic.parseBlobs parseTreeFormat blobs
+  -- toS $ runParseTreeRenderer renderParseTree blobs
+  -- renderParseTree debug blobs
 
 -- | A parser for the application's command-line arguments.
 arguments :: FilePath -> [FilePath] -> ParserInfo Arguments
@@ -111,9 +116,9 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
       <$> ( ParseArguments
-            <$> (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
-               <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees")
-               <|> flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") )
+            <$> (  flag (SExpressionParseTreeRenderer TreeOnly) (SExpressionParseTreeRenderer TreeOnly) (long "sexpression" <> help "Output s-expression parse trees (default)") )
+              --  <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees")
+              --  <|> flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") )
             <*> (  ParsePaths
                   <$> some (argument str (metavar "FILES..."))
                <|> ParseCommit

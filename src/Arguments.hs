@@ -1,10 +1,11 @@
-{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
 import Command
 import Data.Maybe
 import Prelude
+import Renderer
 
 
 data DiffMode = DiffCommits String String [FilePath] | DiffPaths FilePath FilePath
@@ -21,7 +22,7 @@ data ParseMode = ParseCommit String [FilePath] | ParsePaths [FilePath]
   deriving Show
 
 data ParseArguments = ParseArguments
-  { renderParseTree :: ParseTreeRenderer
+  { parseTreeFormat :: DefaultParseTreeRenderer
   , parseMode :: ParseMode
   , debug :: Bool
   , gitDir :: FilePath

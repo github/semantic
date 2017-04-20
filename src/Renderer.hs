@@ -2,6 +2,9 @@
 module Renderer
 ( DiffRenderer(..)
 , runDiffRenderer
+, DefaultParseTreeRenderer
+, ParseTreeRenderer(..)
+, runParseTreeRenderer
 , Summaries(..)
 , File(..)
 ) where
@@ -23,6 +26,8 @@ import Renderer.Summary as R
 import Renderer.TOC as R
 import Source (SourceBlob)
 import Syntax
+import Term
+import Data.Functor.Listable
 
 data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields File
@@ -41,6 +46,18 @@ runDiffRenderer renderer = foldMap . uncurry $ case renderer of
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> R.toc
 
+
+type DefaultParseTreeRenderer = ParseTreeRenderer DefaultFields ByteString
+
+data ParseTreeRenderer fields output where
+  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
+
+runParseTreeRenderer :: Monoid output => ParseTreeRenderer fields output -> [Term (Syntax Text) (Record fields)] -> output
+runParseTreeRenderer renderer = foldMap $ case renderer of
+  SExpressionParseTreeRenderer format -> printTerm format
+  where
+    printTerm format term = R.printTerm term 0 format
+
 newtype File = File { unFile :: Text }
   deriving Show
 
@@ -52,6 +69,12 @@ instance Show (DiffRenderer fields output) where
   showsPrec d (SExpressionDiffRenderer format) = showsUnaryWith showsPrec "SExpressionDiffRenderer" d format
   showsPrec _ ToCRenderer = showString "ToCRenderer"
 
+instance Show (ParseTreeRenderer fields output) where
+  showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
+
 instance Monoid File where
   mempty = File mempty
   mappend (File a) (File b) = File (a <> "\n" <> b)
+
+instance Listable DefaultParseTreeRenderer where
+  tiers = cons0 (SExpressionParseTreeRenderer TreeOnly)

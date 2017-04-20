@@ -12,6 +12,7 @@ import Prologue
 import Renderer
 import Source
 import Syntax
+import Control.Parallel.Strategies
 import Term
 
 
@@ -25,17 +26,17 @@ import Term
 diffBlobs :: (Monoid output, StringConv output ByteString) => DiffRenderer DefaultFields output -> [Both SourceBlob] -> IO ByteString
 diffBlobs renderer blobs = do
   diffs <- traverse go blobs
-  pure . toS $ runDiffRenderer renderer diffs
+  pure . toS $ runDiffRenderer renderer (diffs `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
       diff <- diffBlobs' blobPair
       pure (blobPair, diff)
 
--- | Diff a pair of blobs
+-- | Diff a pair of blobs.
 diffBlobs' :: Both SourceBlob -> IO (Diff (Syntax Text) (Record DefaultFields))
 diffBlobs' blobs = do
   terms <- traverse parseBlob' blobs
-  pure $ stripDiff (runBothWith diffTerms (fmap decorate terms))
+  pure $ stripDiff (runBothWith diffTerms (fmap decorate (terms `using` parTraversable rdeepseq)))
   where
     decorate = defaultFeatureVectorDecorator getLabel
     getLabel :: HasField fields Category => TermF (Syntax Text) (Record fields) a -> (Category, Maybe Text)
@@ -43,8 +44,11 @@ diffBlobs' blobs = do
       Leaf s -> Just s
       _ -> Nothing)
 
--- TODO
--- parseBlob :: SourceBlob -> IO ByteString
+-- | Parse a list of blobs and use the specified renderer to produce ByteString output.
+parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
+parseBlobs renderer blobs = do
+  terms <- traverse parseBlob' blobs
+  pure . toS $ runParseTreeRenderer renderer (terms `using` parTraversable rdeepseq)
 
 -- | Parse a SourceBlob.
 parseBlob' :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
