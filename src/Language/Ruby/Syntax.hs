@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, TemplateHaskell #-}
 module Language.Ruby.Syntax where
 
 import Control.Monad.Free.Freer
@@ -9,7 +9,10 @@ import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import Language.Haskell.TH
 import Prologue
+import Text.Parser.TreeSitter.Language
+import Text.Parser.TreeSitter.Ruby
 
 -- | The type of Ruby syntax.
 type Syntax = Union
@@ -29,8 +32,8 @@ type Program = Freer
 
 
 -- | Statically-known rules corresponding to symbols in the grammar.
-data Grammar = Program | Uninterpreted | BeginBlock | EndBlock | Undef | Alias | Comment | True' | False' | Return | Yield | Break | Next | Redo | Retry | IfModifier | UnlessModifier | WhileModifier | UntilModifier | RescueModifier | While | Until | For | Do | Case | When | Pattern | If | Unless | Elsif | Else | Begin | Ensure | Rescue | Exceptions | ExceptionVariable | ElementReference | ScopeResolution | Call | MethodCall | ArgumentList | ArgumentListWithParens | SplatArgument | HashSplatArgument | BlockArgument | Class | Constant | Method | Identifier
-  deriving (Enum, Eq, Ord, Show)
+mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby
+
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Grammar (Program Syntax (Maybe a))
