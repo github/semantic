@@ -44,11 +44,13 @@ library
                      , Language
                      , Language.C
                      , Language.JavaScript
-                     , Language.TypeScript
                      , Language.Markdown
                      , Language.Go
+                     , Language.Go.Syntax
                      , Language.Ruby
                      , Language.Ruby.Syntax
+                     , Language.TypeScript
+                     , Language.TypeScript.Syntax
                      , Parser
                      , Patch
                      , Paths_semantic_diff
@@ -110,6 +112,7 @@ library
                      , regex-compat
                      , semigroups
                      , split
+                     , template-haskell
                      , text >= 1.2.1.3
                      , text-icu
                      , these
