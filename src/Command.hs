@@ -11,13 +11,13 @@ module Command
 , maybeDiff
 , renderDiffs
 , concurrently
-, patchDiff
-, splitDiff
-, jsonDiff
-, summaryDiff
-, sExpressionDiff
-, tocDiff
-, DiffEncoder
+-- , patchDiff
+-- , splitDiff
+-- , jsonDiff
+-- , summaryDiff
+-- , sExpressionDiff
+-- , tocDiff
+-- , DiffEncoder
 -- , ParseTreeEncoder
 -- Evaluation
 , runCommand
@@ -103,7 +103,7 @@ maybeDiff terms = case runJoin terms of
   (Nothing, Nothing) -> return Nothing
 
 -- | Render a diff using the specified renderer.
-renderDiffs :: (NFData (Record fields), Monoid output) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> Command output
+renderDiffs :: (NFData (Record fields), Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> Command output
 renderDiffs renderer diffs = RenderDiffs renderer (diffs `using` parTraversable (parTuple2 r0 rdeepseq)) `Then` return
 
 -- | Run a function over each element of a Traversable concurrently.
@@ -137,7 +137,7 @@ data CommandF f where
 
   Diff :: HasField fields Category => Both (Term (Syntax Text) (Record fields)) -> CommandF (Diff (Syntax Text) (Record fields))
 
-  RenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> CommandF output
+  RenderDiffs :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> CommandF output
 
   Concurrently :: Traversable t => t a -> (a -> Command b) -> CommandF (t b)
 
@@ -200,40 +200,40 @@ runDiff terms = stripDiff (runBothWith diffTerms (fmap decorate terms))
           Leaf s -> Just s
           _ -> Nothing)
 
-runRenderDiffs :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
+runRenderDiffs :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runRenderDiffs = runDiffRenderer
 
 
 -- type ParseTreeEncoder = Bool -> [Term (Syntax Text) (Record DefaultFields)] -> Command ByteString
 
-type DiffEncoder = [(Both SourceBlob, Diff (Syntax Text) (Record DefaultFields))] -> Command ByteString
+-- type DiffEncoder = [(Both SourceBlob, Diff (Syntax Text) (Record DefaultFields))] -> Command ByteString
 
-patchDiff :: DiffEncoder
-patchDiff = fmap encodeText . renderDiffs R.PatchRenderer
+-- patchDiff :: DiffEncoder
+-- patchDiff = fmap encodeText . renderDiffs R.PatchRenderer
+--
+-- splitDiff :: DiffEncoder
+-- splitDiff = fmap encodeText . renderDiffs R.SplitRenderer
+--
+-- jsonDiff :: DiffEncoder
+-- jsonDiff = fmap encodeJSON . renderDiffs R.JSONDiffRenderer
 
-splitDiff :: DiffEncoder
-splitDiff = fmap encodeText . renderDiffs R.SplitRenderer
+-- summaryDiff :: DiffEncoder
+-- summaryDiff = fmap encodeSummaries . renderDiffs R.SummaryRenderer
 
-jsonDiff :: DiffEncoder
-jsonDiff = fmap encodeJSON . renderDiffs R.JSONDiffRenderer
+-- sExpressionDiff :: DiffEncoder
+-- sExpressionDiff = renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
 
-summaryDiff :: DiffEncoder
-summaryDiff = fmap encodeSummaries . renderDiffs R.SummaryRenderer
+-- tocDiff :: DiffEncoder
+-- tocDiff = fmap encodeSummaries . renderDiffs R.ToCRenderer
 
-sExpressionDiff :: DiffEncoder
-sExpressionDiff = renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
+-- encodeJSON :: Map Text Value -> ByteString
+-- encodeJSON = toS . (<> "\n") . encode
+--
+-- encodeText :: File -> ByteString
+-- encodeText = encodeUtf8 . R.unFile
 
-tocDiff :: DiffEncoder
-tocDiff = fmap encodeSummaries . renderDiffs R.ToCRenderer
-
-encodeJSON :: Map Text Value -> ByteString
-encodeJSON = toS . (<> "\n") . encode
-
-encodeText :: File -> ByteString
-encodeText = encodeUtf8 . R.unFile
-
-encodeSummaries :: Summaries -> ByteString
-encodeSummaries = toS . (<> "\n") . encode
+-- encodeSummaries :: Summaries -> ByteString
+-- encodeSummaries = toS . (<> "\n") . encode
 
 --
 -- instance Show ParseTreeEncoder where
@@ -244,17 +244,18 @@ encodeSummaries = toS . (<> "\n") . encode
 --        \/ cons0 jsonIndexParseTree
 --        \/ cons0 sExpressionParseTree
 
-instance Show DiffEncoder where
-  showsPrec d encodeDiff = showParen (d >= 10) $ showString "DiffEncoder "
-    . showsPrec 10 (encodeDiff []) . showChar ' '
+-- instance Show DiffEncoder where
+--   showsPrec d encodeDiff = showParen (d >= 10) $ showString "DiffEncoder "
+--     . showsPrec 10 (encodeDiff []) . showChar ' '
 
-instance Listable DiffEncoder where
-  tiers = cons0 patchDiff
-       \/ cons0 splitDiff
-       \/ cons0 jsonDiff
-       \/ cons0 summaryDiff
-       \/ cons0 sExpressionDiff
-       \/ cons0 tocDiff
+-- instance Listable DiffEncoder where
+  -- tiers = cons0
+--   tiers = cons0 patchDiff
+--        \/ cons0 splitDiff
+--        \/ cons0 jsonDiff
+--        \/ cons0 summaryDiff
+--        \/ cons0 sExpressionDiff
+--        \/ cons0 tocDiff
 
 instance MonadIO Command where
   liftIO io = LiftIO io `Then` return

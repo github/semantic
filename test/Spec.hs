@@ -4,7 +4,6 @@ import Prologue
 import qualified AlignmentSpec
 import qualified Command.Spec
 import qualified Command.Diff.Spec
-import qualified Command.Parse.Spec
 import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Data.Syntax.Assignment.Spec
@@ -28,7 +27,6 @@ main = hspec $ do
     describe "Alignment" AlignmentSpec.spec
     describe "Command" Command.Spec.spec
     describe "Command.Diff" Command.Diff.Spec.spec
-    describe "Command.Parse" Command.Parse.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
     describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec

@@ -1,5 +1,11 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, OverloadedStrings #-}
-module Renderer.SExpression (sExpression, printTerm, printTerms, SExpressionFormat(..)) where
+module Renderer.SExpression
+( sExpression
+, sExpressionParseTree
+, printTerm
+, printTerms
+, SExpressionFormat(..)
+) where
 
 import Data.Bifunctor.Join
 import Data.ByteString hiding (foldr, spanEnd)
@@ -17,8 +23,13 @@ import Term
 data SExpressionFormat = TreeOnly | TreeAndRanges
   deriving (Show)
 
+-- | ByteString SExpression formatted diff.
 sExpression :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> ByteString
 sExpression format _ diff = printDiff diff 0 format
+
+-- | ByteString SExpression formatted term.
+sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> SourceBlob -> Term (Syntax Text) (Record fields) -> ByteString
+sExpressionParseTree format _ term = printTerm term 0 format
 
 printDiff :: (HasField fields Category, HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> Int -> SExpressionFormat -> ByteString
 printDiff diff level format = case runFree diff of

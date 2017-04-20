@@ -5,7 +5,6 @@ import Arguments
 import Command
 import Command.Files
 import Command.Git
-import Command.Parse
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.String
@@ -17,7 +16,7 @@ import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
 import Source
 import Renderer
-import Renderer.SExpression
+-- import Renderer.SExpression
 import System.Directory
 import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
@@ -35,7 +34,6 @@ main = do
     Diff args -> runDiff args
     Parse args -> runParse args
   writeToOutput outputPath text
-
   where
     findGitDir = do
       pwd <- getCurrentDirectory
@@ -70,16 +68,14 @@ runDiff DiffArguments{..} = runCommand $ do
         terms <- concurrently blobs (traverse parseBlob)
         diff' <- maybeDiff terms
         pure (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
-  encodeDiff (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
+  pure . toS $ runDiffRenderer diffRenderer (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do
   blobs <- case parseMode of
     ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
     ParsePaths paths -> sourceBlobsFromPaths paths
-  Semantic.parseBlobs parseTreeFormat blobs
-  -- toS $ runParseTreeRenderer renderParseTree blobs
-  -- renderParseTree debug blobs
+  Semantic.parseBlobs parseTreeRenderer blobs
 
 -- | A parser for the application's command-line arguments.
 arguments :: FilePath -> [FilePath] -> ParserInfo Arguments
@@ -96,27 +92,25 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
-      <$> ( DiffArguments
-            <$> (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-               <|> flag' splitDiff (long "split" <> help "Output a split diff")
-               <|> flag' jsonDiff (long "json" <> help "Output a json diff")
-               <|> flag' summaryDiff (long "summary" <> help "Output a diff summary")
-               <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
-               <|> flag' tocDiff (long "toc" <> help "Output a table of contents diff summary") )
-            <*> (  DiffPaths
-                  <$> argument str (metavar "FILE_A")
-                  <*> argument str (metavar "FILE_B")
-               <|> DiffCommits
-                  <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
-                  <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
-                  <*> many (argument str (metavar "FILES...")) )
-            <*> pure gitDir
-            <*> pure alternates )
+      <$> ( (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
+           <|> flag' splitDiff (long "split" <> help "Output a split diff")
+           <|> flag' jsonDiff (long "json" <> help "Output a json diff")
+           <|> flag' summaryDiff (long "summary" <> help "Output a diff summary")
+           <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
+           <|> flag' tocDiff (long "toc" <> help "Output a table of contents diff summary") )
+          <*> (  DiffPaths
+                <$> argument str (metavar "FILE_A")
+                <*> argument str (metavar "FILE_B")
+             <|> DiffCommits
+                <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
+                <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
+                <*> many (argument str (metavar "FILES...")) )
+          <*> pure gitDir
+          <*> pure alternates )
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
-      <$> ( ParseArguments
-            <$> (  flag (SExpressionParseTreeRenderer TreeOnly) (SExpressionParseTreeRenderer TreeOnly) (long "sexpression" <> help "Output s-expression parse trees (default)") )
+      <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)") )
               --  <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees")
               --  <|> flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") )
             <*> (  ParsePaths

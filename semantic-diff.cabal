@@ -20,7 +20,6 @@ library
                      , Command
                      , Command.Files
                      , Command.Git
-                     , Command.Parse
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
@@ -149,7 +148,6 @@ test-suite test
   other-modules:       AlignmentSpec
                      , Command.Spec
                      , Command.Diff.Spec
-                     , Command.Parse.Spec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec

@@ -1,11 +1,14 @@
 module Command.Spec where
 
 import Command
+import Command.Files
 import Data.Functor.Both
 import Data.String
 import Language
 import Prologue hiding (readFile)
 import Source
+import Renderer.JSON
+import Renderer.SExpression
 import Syntax
 import Test.Hspec
 
@@ -41,6 +44,21 @@ spec = parallel $ do
     it "parses in the specified language" $ do
       term <- runCommand (parse (Just Ruby) methodsBlob)
       fmap (const ()) term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
+
+    -- TODO
+    -- let blobs = sourceBlobsFromPaths ["test/fixtures/ruby/and-or.A.rb"]
+    -- it "should produce s-expression trees" $ do
+    --   blobs <- sourceBlobsFromPaths ["test/fixtures/ruby/and-or.A.rb"]
+    --   let output = foldMap (sExpressionParseTree TreeOnly) blobs
+    --   output `shouldNotBe` ""
+
+    -- it "should produce JSON trees" $ do
+    --   output <- jsonParseTree False =<< blobs
+    --   output `shouldNotBe` ""
+    --
+    -- it "should produce JSON index" $ do
+    --   output <- jsonIndexParseTree False =<< blobs
+    --   output `shouldNotBe` ""
 
   where repoPath = "test/fixtures/git/examples/all-languages.git"
         methodsFixture = Fixture
