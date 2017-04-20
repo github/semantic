@@ -6,8 +6,6 @@ module Data.Syntax.Assignment
 , children
 , Rose(..)
 , RoseF(..)
-, Node(..)
-, AST
 , Result(..)
 , assignAll
 , runAssignment
@@ -52,13 +50,6 @@ children forEach = Children forEach `Then` return
 data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
   deriving (Eq, Functor, Show)
 
--- | A node in the input AST. We only concern ourselves with its symbol (considered as an element of 'grammar') and source.
-data Node grammar = Node { nodeSymbol :: grammar, nodeSource :: ByteString }
-  deriving (Eq, Show)
-
--- | An abstract syntax tree.
-type AST grammar = Rose (Node grammar)
-
 
 -- | The result of assignment, possibly containing an error.
 data Result a = Result a | Error [Text]
@@ -66,7 +57,7 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result a
+assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [Rose grammar] -> Result a
 assignAll assignment nodes = case runAssignment assignment nodes of
   Result (rest, a) -> case dropAnonymous rest of
     [] -> Result a
@@ -74,13 +65,13 @@ assignAll assignment nodes = case runAssignment assignment nodes of
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result ([AST grammar], a)
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [Rose grammar] -> Result ([Rose grammar], a)
 runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (assignment, node@(Rose Node{..} children) : rest) -> case assignment of
+  (assignment, node@(Rose nodeSymbol children) : rest) -> case assignment of
     Symbol symbol -> guard (symbol == nodeSymbol) >> yield () nodes
-    Source -> yield nodeSource rest
+    Source -> yield "" rest
     Children childAssignment -> assignAll childAssignment children >>= flip yield rest
     _ -> Error ["No rule to match " <> show node]
   (Symbol symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
@@ -89,8 +80,8 @@ runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, dropAno
   _ -> Error ["No rule to match at end of input."])
   . fmap ((Result .) . flip (,))
 
-dropAnonymous :: Symbol grammar => [AST grammar] -> [AST grammar]
-dropAnonymous = dropWhile ((/= Regular) . symbolType . nodeSymbol . roseValue)
+dropAnonymous :: Symbol grammar => [Rose grammar] -> [Rose grammar]
+dropAnonymous = dropWhile ((/= Regular) . symbolType . roseValue)
 
 
 instance Alternative (Assignment symbol) where
