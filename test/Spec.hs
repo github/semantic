@@ -2,8 +2,7 @@ module Main where
 
 import Prologue
 import qualified AlignmentSpec
-import qualified Command.Spec
-import qualified Command.Diff.Spec
+import qualified CommandSpec
 import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Data.Syntax.Assignment.Spec
@@ -25,8 +24,7 @@ main :: IO ()
 main = hspec $ do
   parallel $ do
     describe "Alignment" AlignmentSpec.spec
-    describe "Command" Command.Spec.spec
-    describe "Command.Diff" Command.Diff.Spec.spec
+    describe "Command" CommandSpec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
     describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec

@@ -1,6 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE ScopedTypeVariables #-}
--- {-# OPTIONS_GHC -funbox-strict-fields #-}
+{-# LANGUAGE MultiParamTypeClasses, ScopedTypeVariables  #-}
 {-# OPTIONS_GHC -Wno-deprecations #-}
 -- Disabling deprecation warnings due to pattern match against RescueModifier.
 module Renderer.Summary (Summaries(..), summary, diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where

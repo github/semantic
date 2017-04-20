@@ -28,7 +28,7 @@ import Data.Aeson
 type DefaultFields = '[ Range, Category, SourceSpan ]
 
 -- | A type alias for HasField constraints commonly used throughout semantic-diff.
-type HasDefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields SourceSpan)
+type HasDefaultFields fields = (HasField fields Range, HasField fields Category, HasField fields SourceSpan)
 
 newtype SourceText = SourceText { unText :: Text }
   deriving (Show, ToJSON)

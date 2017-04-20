@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes, ViewPatterns #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
@@ -20,7 +20,6 @@ data DiffArguments where
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
     } -> DiffArguments
-  -- deriving Show
 
 patchDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
 patchDiff = DiffArguments PatchRenderer
@@ -52,15 +51,36 @@ data ParseArguments where
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
     } -> ParseArguments
-     -- deriving Show
 
 sExpressionParseTree :: ParseMode -> Bool -> FilePath -> [FilePath] -> ParseArguments
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
+jsonParseTree :: ParseMode -> Bool -> FilePath -> [FilePath] -> ParseArguments
+jsonParseTree = ParseArguments JSONParseTreeRenderer
+
+jsonIndexParseTree :: ParseMode -> Bool -> FilePath -> [FilePath] -> ParseArguments
+jsonIndexParseTree = ParseArguments JSONIndexParseTreeRenderer
+
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
-  -- deriving Show
+  deriving Show
 
 data Arguments = Arguments
   { programMode :: ProgramMode
   , outputFilePath :: Maybe FilePath
-  } -- deriving Show
+  } deriving Show
+
+
+instance Show DiffArguments where
+  showsPrec d (DiffArguments renderer mode gitDir alternateObjectDirs) = showParen (d >= 10) $ showString "DiffArguments "
+    . showString "diffRenderer = " . shows renderer . showString ", "
+    . showString "diffMode = " . shows mode . showString ", "
+    . showString "gitDir = " . shows gitDir . showString ", "
+    . showString "alternateObjectDirs = " . shows alternateObjectDirs
+
+instance Show ParseArguments where
+  showsPrec d (ParseArguments renderer mode debug gitDir alternateObjectDirs) = showParen (d >= 10) $ showString "ParseArguments "
+    . showString "parseTreeRenderer = " . shows renderer . showString ", "
+    . showString "parseMode = " . shows mode . showString ", "
+    . showString "debug = " . shows debug . showString ", "
+    . showString "gitDir = " . shows gitDir . showString ", "
+    . showString "alternateObjectDirs = " . shows alternateObjectDirs

@@ -55,8 +55,9 @@ diffFilePaths paths = do
 parseFilePath :: FilePath -> IO ByteString
 parseFilePath path = do
   source <- readFileToUnicode path
-  term <- parseBlob' $ sourceBlob source path
-  pure $ printTerm term 0 TreeOnly
+  let blob = sourceBlob source path
+  term <- parseBlob' blob
+  pure $ sExpressionParseTree TreeOnly blob term
 
 -- | Read a file to a SourceBlob
 readFileToSourceBlob :: FilePath -> IO (Maybe SourceBlob)

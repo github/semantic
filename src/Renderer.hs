@@ -27,7 +27,6 @@ import Renderer.TOC as R
 import Source (SourceBlob)
 import Syntax
 import Term
-import Data.Functor.Listable
 
 
 data DiffRenderer fields output where
@@ -49,13 +48,14 @@ runDiffRenderer renderer = foldMap . uncurry $ case renderer of
 
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  -- JSONParseTreeRenderer :: ParseTreeRenderer ParseTreeFile
+  JSONParseTreeRenderer :: HasDefaultFields fields => ParseTreeRenderer fields Value
+  JSONIndexParseTreeRenderer :: HasDefaultFields fields => ParseTreeRenderer fields Value
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer renderer = foldMap . uncurry $ case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
-  -- where
-  --   printTerm format term = R.printTerm term 0 format
+  JSONParseTreeRenderer -> R.jsonParseTree False
+  JSONIndexParseTreeRenderer -> R.jsonIndexParseTree False
 
 newtype File = File { unFile :: Text }
   deriving Show
@@ -73,12 +73,14 @@ instance Show (DiffRenderer fields output) where
 
 instance Show (ParseTreeRenderer fields output) where
   showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
---   showsPrec _ JSONParseTreeRenderer = showString "JSONParseTreeRenderer"
+  showsPrec _ JSONParseTreeRenderer = showString "JSONParseTreeRenderer"
+  showsPrec _ JSONIndexParseTreeRenderer = showString "JSONIndexParseTreeRenderer"
 
 instance Monoid File where
   mempty = File mempty
   mappend (File a) (File b) = File (a <> "\n" <> b)
 
--- instance Listable ParseTreeRenderer where
+-- instance Listable (ParseTreeRenderer DefaultFields output) where
+  -- tiers = cons0 (SExpressionParseTreeRenderer TreeOnly)
   -- tiers = cons0 (SExpressionParseTreeRenderer TreeOnly)
       --  \/ cons0 JSONParseTreeRenderer

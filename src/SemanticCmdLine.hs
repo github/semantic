@@ -16,7 +16,6 @@ import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
 import Source
 import Renderer
--- import Renderer.SExpression
 import System.Directory
 import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
@@ -98,29 +97,29 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
            <|> flag' summaryDiff (long "summary" <> help "Output a diff summary")
            <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
            <|> flag' tocDiff (long "toc" <> help "Output a table of contents diff summary") )
-          <*> (  DiffPaths
-                <$> argument str (metavar "FILE_A")
-                <*> argument str (metavar "FILE_B")
-             <|> DiffCommits
-                <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
-                <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
-                <*> many (argument str (metavar "FILES...")) )
-          <*> pure gitDir
-          <*> pure alternates )
+         <*> (  DiffPaths
+               <$> argument str (metavar "FILE_A")
+               <*> argument str (metavar "FILE_B")
+            <|> DiffCommits
+               <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
+               <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
+               <*> many (argument str (metavar "FILES...")) )
+         <*> pure gitDir
+         <*> pure alternates )
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
-      <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)") )
-              --  <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees")
-              --  <|> flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") )
-            <*> (  ParsePaths
-                  <$> some (argument str (metavar "FILES..."))
-               <|> ParseCommit
-                  <$> option (eitherReader parseSha) (long "sha" <> metavar "SHA" <> help "Commit SHA")
-                  <*> some (argument str (metavar "FILES...")) )
-            <*> switch (long "debug")
-            <*> pure gitDir
-            <*> pure alternates )
+      <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
+           <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees")
+           <|> flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") )
+         <*> (  ParsePaths
+               <$> some (argument str (metavar "FILES..."))
+            <|> ParseCommit
+               <$> option (eitherReader parseSha) (long "sha" <> metavar "SHA" <> help "Commit SHA")
+               <*> some (argument str (metavar "FILES...")) )
+         <*> switch (long "debug")
+         <*> pure gitDir
+         <*> pure alternates )
 
     parseSha :: String -> Either String String
     parseSha s = case matchRegex regex s of

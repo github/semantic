@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Semantic where
 
+import Control.Parallel.Strategies
 import Data.Functor.Both
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -12,7 +13,6 @@ import Prologue
 import Renderer
 import Source
 import Syntax
-import Control.Parallel.Strategies
 import Term
 
 
@@ -48,11 +48,11 @@ diffBlobs' blobs = do
 parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
 parseBlobs renderer blobs = do
   terms <- traverse go blobs
-  pure . toS $ runParseTreeRenderer renderer terms
+  pure . toS $ runParseTreeRenderer renderer (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
-      terms <- parseBlob' blob
-      pure (blob, terms)
+      term <- parseBlob' blob
+      pure (blob, term)
 
 -- | Parse a SourceBlob.
 parseBlob' :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))

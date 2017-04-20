@@ -11,14 +11,6 @@ module Command
 , maybeDiff
 , renderDiffs
 , concurrently
--- , patchDiff
--- , splitDiff
--- , jsonDiff
--- , summaryDiff
--- , sExpressionDiff
--- , tocDiff
--- , DiffEncoder
--- , ParseTreeEncoder
 -- Evaluation
 , runCommand
 ) where
@@ -29,11 +21,9 @@ import Control.Exception (catch)
 import Control.Monad.Free.Freer
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
-import Data.Aeson hiding (json)
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Classes
-import Data.Functor.Listable
 import Data.List ((\\), nub)
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -53,8 +43,6 @@ import Language
 import Patch
 import Parser.Language
 import Prologue hiding (concurrently, Concurrently, readFile)
-import qualified Renderer as R
-import qualified Renderer.SExpression as R
 import Renderer
 import Source
 import Syntax
@@ -203,59 +191,6 @@ runDiff terms = stripDiff (runBothWith diffTerms (fmap decorate terms))
 runRenderDiffs :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runRenderDiffs = runDiffRenderer
 
-
--- type ParseTreeEncoder = Bool -> [Term (Syntax Text) (Record DefaultFields)] -> Command ByteString
-
--- type DiffEncoder = [(Both SourceBlob, Diff (Syntax Text) (Record DefaultFields))] -> Command ByteString
-
--- patchDiff :: DiffEncoder
--- patchDiff = fmap encodeText . renderDiffs R.PatchRenderer
---
--- splitDiff :: DiffEncoder
--- splitDiff = fmap encodeText . renderDiffs R.SplitRenderer
---
--- jsonDiff :: DiffEncoder
--- jsonDiff = fmap encodeJSON . renderDiffs R.JSONDiffRenderer
-
--- summaryDiff :: DiffEncoder
--- summaryDiff = fmap encodeSummaries . renderDiffs R.SummaryRenderer
-
--- sExpressionDiff :: DiffEncoder
--- sExpressionDiff = renderDiffs (R.SExpressionDiffRenderer R.TreeOnly)
-
--- tocDiff :: DiffEncoder
--- tocDiff = fmap encodeSummaries . renderDiffs R.ToCRenderer
-
--- encodeJSON :: Map Text Value -> ByteString
--- encodeJSON = toS . (<> "\n") . encode
---
--- encodeText :: File -> ByteString
--- encodeText = encodeUtf8 . R.unFile
-
--- encodeSummaries :: Summaries -> ByteString
--- encodeSummaries = toS . (<> "\n") . encode
-
---
--- instance Show ParseTreeEncoder where
---   showsPrec d _ = showParen (d >= 10) $ showString "ParseTreeEncoder "
--- --
--- instance Listable ParseTreeEncoder where
---   tiers = cons0 jsonParseTree
---        \/ cons0 jsonIndexParseTree
---        \/ cons0 sExpressionParseTree
-
--- instance Show DiffEncoder where
---   showsPrec d encodeDiff = showParen (d >= 10) $ showString "DiffEncoder "
---     . showsPrec 10 (encodeDiff []) . showChar ' '
-
--- instance Listable DiffEncoder where
-  -- tiers = cons0
---   tiers = cons0 patchDiff
---        \/ cons0 splitDiff
---        \/ cons0 jsonDiff
---        \/ cons0 summaryDiff
---        \/ cons0 sExpressionDiff
---        \/ cons0 tocDiff
 
 instance MonadIO Command where
   liftIO io = LiftIO io `Then` return

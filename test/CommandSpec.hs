@@ -1,24 +1,56 @@
-module Command.Diff.Spec where
+module CommandSpec where
 
 import Command
 import Data.Aeson
-import Data.Aeson.Types
+import Data.Aeson.Types hiding (parse)
 import Data.Functor.Both
-import Data.Map as Map
+import Data.Map
 import Data.Maybe
-import Data.Text.Lazy as T
+import Data.String
+import Info (DefaultFields)
+import Language
+import Prologue hiding (readFile, toList)
 import qualified Data.Vector as V
 import qualified Git.Types as Git
-import Info
-import Prelude
-import Prologue (($), fmap, (.), pure, for, panic)
 import Renderer hiding (errors)
 import Source
+import Syntax
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 
 spec :: Spec
 spec = parallel $ do
+  describe "readFile" $ do
+    it "returns a blob for extant files" $ do
+      blob <- runCommand (readFile "semantic-diff.cabal")
+      fmap path blob `shouldBe` Just "semantic-diff.cabal"
+
+    it "returns Nothing for absent files" $ do
+      blob <- runCommand (readFile "this file should not exist")
+      blob `shouldBe` Nothing
+
+  describe "readFilesAtSHAs" $ do
+    it "returns blobs for the specified paths" $ do
+      blobs <- runCommand (readFilesAtSHAs repoPath [] ["methods.rb"] (shas methodsFixture))
+      blobs `shouldBe` expectedBlobs methodsFixture
+
+    it "returns blobs for all paths if none are specified" $ do
+      blobs <- runCommand (readFilesAtSHAs repoPath [] [] (shas methodsFixture))
+      blobs `shouldBe` expectedBlobs methodsFixture
+
+    it "returns entries for missing paths" $ do
+      blobs <- runCommand (readFilesAtSHAs repoPath [] ["this file should not exist"] (shas methodsFixture))
+      blobs `shouldBe` [("this file should not exist", pure Nothing)]
+
+  describe "parse" $ do
+    it "parses line by line if not given a language" $ do
+      term <- runCommand (parse Nothing methodsBlob)
+      void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
+
+    it "parses in the specified language" $ do
+      term <- runCommand (parse (Just Ruby) methodsBlob)
+      void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
+
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do
       (errors, summaries) <- fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.SummaryRenderer
@@ -42,6 +74,14 @@ spec = parallel $ do
     it "errors with bad repo path" $
       fetchDiffsOutput summaryText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] Renderer.SummaryRenderer
         `shouldThrow` errorCall "Could not open repository \"test/fixtures/git/examples/not-a-repo.git\""
+
+  where repoPath = "test/fixtures/git/examples/all-languages.git"
+        methodsFixture = Fixture
+          (both "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe")
+          [ ("methods.rb", both Nothing (Just methodsBlob)) ]
+        methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob)
+
+data Fixture = Fixture { shas :: Both String, expectedBlobs :: [(FilePath, Both (Maybe SourceBlob))] }
 
 fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [FilePath] -> DiffRenderer DefaultFields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f gitDir sha1 sha2 filePaths renderer = do
