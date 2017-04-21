@@ -19,6 +19,7 @@ import Data.Text (unpack)
 import Range
 import Prologue hiding (Alt)
 import Source (Source())
+import SourceSpan
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
@@ -60,7 +61,7 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose (Record '[grammar, Range])] -> Result a
+assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose (Record '[grammar, Range, SourceSpan])] -> Result a
 assignAll assignment source nodes = case runAssignment assignment source nodes of
   Result (rest, a) -> case dropAnonymous rest of
     [] -> Result a
@@ -68,7 +69,7 @@ assignAll assignment source nodes = case runAssignment assignment source nodes o
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose (Record '[grammar, Range])] -> Result ([Rose (Record '[grammar, Range])], a)
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose (Record '[grammar, Range, SourceSpan])] -> Result ([Rose (Record '[grammar, Range, SourceSpan])], a)
 runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a source nodes <|> yield b source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
@@ -85,7 +86,7 @@ runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, 
   _ -> Error ["No rule to match at end of input."])
   . fmap (\ a _ rest -> Result (rest, a))
 
-dropAnonymous :: Symbol grammar => [Rose (Record '[grammar, Range])] -> [Rose (Record '[grammar, Range])]
+dropAnonymous :: Symbol grammar => [Rose (Record '[grammar, Range, SourceSpan])] -> [Rose (Record '[grammar, Range, SourceSpan])]
 dropAnonymous = dropWhile ((/= Regular) . symbolType . rhead . roseValue)
 
 
