@@ -7,7 +7,9 @@ module Semantic
 , parserForLanguage
 ) where
 
+import qualified Control.Concurrent.Async as Async
 import Control.Parallel.Strategies
+import Debug.Trace
 import Data.Functor.Both
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -32,10 +34,6 @@ import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 
--- import qualified Control.Concurrent.Async.Pool as Async
--- import GHC.Conc (numCapabilities)
-import qualified Control.Concurrent.Async as Async
-import Debug.Trace
 
 -- TODO: Shouldn't need to depend on System.FilePath in here, but is currently
 -- the way we do language detection.
@@ -56,13 +54,18 @@ diffBlobs renderer blobs = do
   traceEventIO "diffing some blobs"
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
-  toS <$> runDiffRenderer renderer (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> renderAsync (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
       traceEventIO ("diffing: " <> show (path <$> blobPair))
       diff <- diffBlobs' blobPair
       traceEventIO ("diffing done: " <> show (path <$> blobPair))
       pure (blobPair, diff)
+
+renderAsync :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
+renderAsync f diffs = do
+  outputs <- Async.mapConcurrently (pure . uncurry f) diffs
+  pure $ mconcat (outputs `using` parTraversable rseq)
 
 -- | Diff a pair of SourceBlobs.
 diffBlobs' :: Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record DefaultFields)))
@@ -85,7 +88,7 @@ diffBlobs' blobs = do
 parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
 parseBlobs renderer blobs = do
   terms <- traverse go blobs
-  toS <$> runParseTreeRenderer renderer (terms `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> renderAsync (resolveParseTreeRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
       term <- parseBlob blob

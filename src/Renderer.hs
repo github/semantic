@@ -1,8 +1,10 @@
 {-# LANGUAGE GADTs, MultiParamTypeClasses  #-}
 module Renderer
 ( DiffRenderer(..)
+, resolveDiffRenderer
 , runDiffRenderer
 , ParseTreeRenderer(..)
+, resolveParseTreeRenderer
 , runParseTreeRenderer
 , Summaries(..)
 , File(..)
@@ -27,8 +29,6 @@ import Source (SourceBlob)
 import Syntax
 import Term
 
-import Control.Parallel.Strategies
-import qualified Control.Concurrent.Async as Async
 
 data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields File
@@ -38,8 +38,8 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
 
-runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> IO output
-runDiffRenderer renderer = renderAsync $ case renderer of
+resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output)
+resolveDiffRenderer renderer = case renderer of
   SplitRenderer -> (File .) . R.split
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
@@ -47,11 +47,8 @@ runDiffRenderer renderer = renderAsync $ case renderer of
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> R.toc
 
-  where
-    renderAsync :: (Monoid output, StringConv output ByteString) => (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output) -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> IO output
-    renderAsync f diffs = do
-      outputs <- Async.mapConcurrently (pure . uncurry f) diffs
-      pure $ mconcat (outputs `using` parTraversable rseq)
+runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
+runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 
 
 data ParseTreeRenderer fields output where
@@ -59,17 +56,15 @@ data ParseTreeRenderer fields output where
   JSONParseTreeRenderer :: HasDefaultFields fields => ParseTreeRenderer fields Value
   JSONIndexParseTreeRenderer :: HasDefaultFields fields => ParseTreeRenderer fields Value
 
-runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> IO output
-runParseTreeRenderer renderer = renderAsync $ case renderer of
+resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> (SourceBlob -> Term (Syntax Text) (Record fields) -> output)
+resolveParseTreeRenderer renderer = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
   JSONParseTreeRenderer -> R.jsonParseTree False
   JSONIndexParseTreeRenderer -> R.jsonIndexParseTree False
 
-  where
-    renderAsync :: (Monoid output, StringConv output ByteString) => (SourceBlob -> Term (Syntax Text) (Record fields) -> output) -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> IO output
-    renderAsync f terms = do
-      outputs <- Async.mapConcurrently (pure . uncurry f) terms
-      pure $ mconcat (outputs `using` parTraversable rseq)
+runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
+runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
+
 
 newtype File = File { unFile :: Text }
   deriving Show
