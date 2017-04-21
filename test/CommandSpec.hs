@@ -3,7 +3,7 @@ module CommandSpec where
 import Command
 import Data.Aeson
 import Data.Aeson.Types hiding (parse)
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Data.Map
 import Data.Maybe
 import Data.String
@@ -30,6 +30,15 @@ spec = parallel $ do
       blob <- runCommand (readFile "this file should not exist")
       nullBlob blob `shouldBe` True
 
+  describe "readFilesAtSHA" $ do
+    it "returns blobs for the specified paths" $ do
+      blobs <- runCommand (readFilesAtSHA repoPath [] ["methods.rb"] (Both.snd (shas methodsFixture)))
+      blobs `shouldBe` [methodsBlob]
+
+    it "returns emptySourceBlob if path doesn't exist at sha" $ do
+      blobs <- runCommand (readFilesAtSHA repoPath [] ["methods.rb"] (Both.fst (shas methodsFixture)))
+      nonExistentBlob <$> blobs `shouldBe` [True]
+
   describe "readFilesAtSHAs" $ do
     it "returns blobs for the specified paths" $ do
       blobs <- runCommand (readFilesAtSHAs repoPath [] ["methods.rb"] (shas methodsFixture))
@@ -44,14 +53,15 @@ spec = parallel $ do
       let b = emptySourceBlob "this file should not exist"
       blobs `shouldBe` [both b b]
 
-  describe "parse" $ do
-    it "parses line by line if not given a language" $ do
-      term <- runCommand (parse Nothing methodsBlob)
-      void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
-
-    it "parses in the specified language" $ do
-      term <- runCommand (parse (Just Ruby) methodsBlob)
-      void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
+  -- TODO: Port these to SemanticSpec for testing parse
+  -- describe "parse" $ do
+  --   it "parses line by line if not given a language" $ do
+  --     term <- runCommand (parse Nothing methodsBlob)
+  --     void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
+  --
+  --   it "parses in the specified language" $ do
+  --     term <- runCommand (parse (Just Ruby) methodsBlob)
+  --     void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
 
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do

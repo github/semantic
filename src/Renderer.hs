@@ -2,7 +2,6 @@
 module Renderer
 ( DiffRenderer(..)
 , runDiffRenderer
--- , DefaultParseTreeRenderer
 , ParseTreeRenderer(..)
 , runParseTreeRenderer
 , Summaries(..)
@@ -79,8 +78,3 @@ instance Show (ParseTreeRenderer fields output) where
 instance Monoid File where
   mempty = File mempty
   mappend (File a) (File b) = File (a <> "\n" <> b)
-
--- instance Listable (ParseTreeRenderer DefaultFields output) where
-  -- tiers = cons0 (SExpressionParseTreeRenderer TreeOnly)
-  -- tiers = cons0 (SExpressionParseTreeRenderer TreeOnly)
-      --  \/ cons0 JSONParseTreeRenderer

@@ -1,5 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, MultiParamTypeClasses  #-}
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
@@ -28,6 +27,10 @@ import Source
 import SplitDiff
 import Syntax as S
 import Term
+
+-- |
+-- | Diffs
+-- |
 
 -- | Render a diff to a string representing its JSON.
 json :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
@@ -168,7 +171,10 @@ syntaxToTermField syntax = case syntax of
   where childrenFields c = [ "children" .= c ]
 
 
---
+-- |
+-- | Parse Trees
+-- |
+
 data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: Rose ParseNode } deriving (Show)
 
 data Rose a = Rose a [Rose a]

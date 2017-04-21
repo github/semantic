@@ -107,24 +107,19 @@ spec = parallel $ do
       let summary = JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
 
-  describe "diffFiles" $ do
-    it "encodes to final JSON" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      output <- tocDiffOutput sourceBlobs
+  describe "diff with ToCRenderer" $ do
+    it "produces JSON output" $ do
+      blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
+      output <- diffBlobs ToCRenderer [blobs]
       output `shouldBe` "{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n"
 
-    it "encodes to final JSON if there are parse errors" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
-      output <- tocDiffOutput sourceBlobs
+    it "produces JSON output if there are parse errors" $ do
+      blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
+      output <- diffBlobs ToCRenderer [blobs]
       output `shouldBe` "{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n"
 
 type Diff' = SyntaxDiff String DefaultFields
 type Term' = SyntaxTerm String DefaultFields
-
-tocDiffOutput :: Both SourceBlob -> IO ByteString
-tocDiffOutput blobs = diffBlobs ToCRenderer [blobs]
-  -- diff <- diffBlobs' blobs
-  -- pure . toS . encode $ toc blobs diff
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)

@@ -3,8 +3,6 @@ module SemanticCmdLine (main, runDiff, runParse) where
 
 import Arguments
 import Command
-import Command.Files
-import Command.Git
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.String
@@ -59,9 +57,9 @@ runDiff DiffArguments{..} = do
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do
-  blobs <- case parseMode of
-    ParseCommit sha paths -> sourceBlobsFromSha sha gitDir paths
-    ParsePaths paths -> sourceBlobsFromPaths paths
+  blobs <- runCommand $ case parseMode of
+    ParsePaths paths -> traverse readFile paths
+    ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
   Semantic.parseBlobs parseTreeRenderer blobs
 
 -- | A parser for the application's command-line arguments.
