@@ -16,6 +16,7 @@ import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Text (unpack)
 import Prologue hiding (Alt)
+import Source (Source())
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
@@ -57,28 +58,30 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [Rose grammar] -> Result a
-assignAll assignment nodes = case runAssignment assignment nodes of
+assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose grammar] -> Result a
+assignAll assignment source nodes = case runAssignment assignment source nodes of
   Result (rest, a) -> case dropAnonymous rest of
     [] -> Result a
     c:_ -> Error ["Expected end of input, but got: " <> show c]
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [Rose grammar] -> Result ([Rose grammar], a)
-runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, dropAnonymous nodes) of
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose grammar] -> Result ([Rose grammar], a)
+runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-  (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
+  (Alt a b, nodes) -> yield a source nodes <|> yield b source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
   (assignment, node@(Rose nodeSymbol children) : rest) -> case assignment of
-    Symbol symbol -> guard (symbol == nodeSymbol) >> yield () nodes
-    Source -> yield "" rest
-    Children childAssignment -> assignAll childAssignment children >>= flip yield rest
+    Symbol symbol -> guard (symbol == nodeSymbol) >> yield () source nodes
+    Source -> yield "" source rest
+    Children childAssignment -> do
+      c <- assignAll childAssignment source children
+      yield c source rest
     _ -> Error ["No rule to match " <> show node]
   (Symbol symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
   (Source, []) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
-  . fmap ((Result .) . flip (,))
+  . fmap (\ a _ rest -> Result (rest, a))
 
 dropAnonymous :: Symbol grammar => [Rose grammar] -> [Rose grammar]
 dropAnonymous = dropWhile ((/= Regular) . symbolType . roseValue)
