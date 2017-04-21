@@ -4,6 +4,7 @@ module Semantic
 , diffBlobs'
 , parseBlobs
 , parseBlob
+, parserForLanguage
 ) where
 
 import Control.Parallel.Strategies
@@ -13,7 +14,6 @@ import Data.Record
 import Diff
 import Info
 import Interpreter
-import Parser.Language
 import Prologue
 import Renderer
 import Source
@@ -21,6 +21,20 @@ import Syntax
 import Patch
 import Term
 
+import Parser
+import Language
+import qualified Data.Text as T
+import Language.Markdown
+import TreeSitter
+import Text.Parser.TreeSitter.C
+import Text.Parser.TreeSitter.Go
+import Text.Parser.TreeSitter.JavaScript
+import Text.Parser.TreeSitter.Ruby
+import Text.Parser.TreeSitter.TypeScript
+
+-- TODO: Shouldn't need to depend on System.FilePath in here, but is currently
+-- the way we do language detection.
+import System.FilePath
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -72,3 +86,34 @@ parseBlobs renderer blobs = do
 -- | Parse a SourceBlob.
 parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
 parseBlob blob@SourceBlob{..} = parserForFilePath path blob
+
+-- | Return a parser for a given langauge or the lineByLineParser parser.
+parserForLanguage :: Maybe Language -> Parser (Syntax Text) (Record DefaultFields)
+parserForLanguage Nothing = lineByLineParser
+parserForLanguage (Just language) = case language of
+  C -> treeSitterParser C tree_sitter_c
+  JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
+  TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
+  Markdown -> cmarkParser
+  Ruby -> treeSitterParser Ruby tree_sitter_ruby
+  Language.Go -> treeSitterParser Language.Go tree_sitter_go
+
+
+-- | Internal
+
+-- | Return a parser based on the FilePath's extension (including the ".").
+-- | TODO: Remove this.
+parserForFilePath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
+parserForFilePath = parserForLanguage . languageForType . toS . takeExtension
+
+-- | A fallback parser that treats a file simply as rows of strings.
+lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
+lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
+  (leaves, _) -> cofree <$> leaves
+  where
+    lines = actualLines source
+    root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
+    sourceRange = Source.totalRange source
+    leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
+    annotateLeaves (accum, charIndex) line =
+      (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)

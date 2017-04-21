@@ -51,7 +51,6 @@ library
                      , Language.Ruby
                      , Language.Ruby.Syntax
                      , Parser
-                     , Parser.Language
                      , Patch
                      , Paths_semantic_diff
                      , Prologue

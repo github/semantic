@@ -11,7 +11,6 @@ import Data.Record
 import Info
 import Language
 import Parser
-import Parser.Language hiding (parserForFilePath)
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.Text.ICU.Convert as Convert
