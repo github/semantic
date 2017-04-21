@@ -46,7 +46,7 @@ treeSitterParser language grammar blob = do
     pure term
 
 
-parseRubyToAST :: Source -> IO (A.Rose Ruby.Grammar)
+parseRubyToAST :: Source -> IO (Source, A.Rose Ruby.Grammar)
 parseRubyToAST source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
@@ -60,7 +60,7 @@ parseRubyToAST source = do
   ast <- anaM toAST root
 
   ts_document_free document
-  pure ast
+  pure (source, ast)
   where toAST :: Node -> IO (A.RoseF Ruby.Grammar Node)
         toAST Node{..} = do
           let count = fromIntegral nodeChildCount
