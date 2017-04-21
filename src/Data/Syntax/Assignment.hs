@@ -92,33 +92,34 @@ assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node gram
 assignAll assignment = assignAllFrom assignment 0
 
 assignAllFrom :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Int -> Source -> [AST grammar] -> Result a
-assignAllFrom assignment offset source nodes = case runAssignment assignment offset source nodes of
-  Result (_, _, rest, a) -> case dropAnonymous rest of
+assignAllFrom assignment offset source nodes = case runAssignment assignment $ AssignmentState offset source nodes of
+  Result (AssignmentState _ _ rest, a) -> case dropAnonymous rest of
     [] -> Result a
     c:_ -> Error ["Expected end of input, but got: " <> show c]
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Int -> Source -> [AST grammar] -> Result (Int, Source, [AST grammar], a)
-runAssignment = iterFreer (\ assignment yield offset source nodes -> case (assignment, dropAnonymous nodes) of
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+runAssignment = iterFreer (\ assignment yield state@(AssignmentState offset source nodes) -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-  (Alt a b, nodes) -> yield a offset source nodes <|> yield b offset source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
+  (Alt a b, _) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
   (assignment, subtree@(Rose node@(_ :. range :. _) children) : rest) -> case assignment of
-    Get -> yield node offset source nodes
-    Source -> yield (sourceText (slice (offsetRange range (negate offset)) source)) (Info.end range) (Source.drop (Info.end range - offset) source) rest
+    Get -> yield node state
+    Source -> yield (sourceText (slice (offsetRange range (negate offset)) source)) $ AssignmentState (Info.end range) (Source.drop (Info.end range - offset) source) rest
     Children childAssignment -> do
       c <- assignAllFrom childAssignment offset source children
-      yield c (Info.end range) (Source.drop (Info.end range - offset) source) rest
+      yield c $ AssignmentState (Info.end range) (Source.drop (Info.end range - offset) source) rest
     _ -> Error ["No rule to match " <> show subtree]
   (Get, []) -> Error [ "Expected node but got end of input." ]
   (Source, []) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
-  . fmap (\ a offset source nodes -> Result (offset, source, nodes, a))
+  . fmap (\ a state -> Result (state, a))
 
 dropAnonymous :: Symbol grammar => [AST grammar] -> [AST grammar]
 dropAnonymous = dropWhile ((/= Regular) . symbolType . rhead . roseValue)
 
+data AssignmentState grammar = AssignmentState Int Source [AST grammar]
 
 instance Alternative (Assignment symbol) where
   empty = Empty `Then` return
