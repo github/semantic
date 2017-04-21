@@ -3,6 +3,7 @@ module Semantic
 ( diffBlobs
 , diffBlobs'
 , parseBlobs
+, parseBlob
 ) where
 
 import Control.Parallel.Strategies

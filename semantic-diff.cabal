@@ -151,6 +151,7 @@ test-suite test
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec
                      , DiffSpec
+                     , SemanticSpec
                      , SemanticCmdLineSpec
                      , SummarySpec
                      , GitmonClientSpec

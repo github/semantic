@@ -8,14 +8,12 @@ import Data.Map
 import Data.Maybe
 import Data.String
 import Info (DefaultFields)
-import Language
 import Prologue hiding (readFile, toList)
 import qualified Data.Vector as V
 import qualified Git.Types as Git
 import Renderer hiding (errors)
 import Source
 import Semantic
-import Syntax
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 
@@ -52,16 +50,6 @@ spec = parallel $ do
       blobs <- runCommand (readFilesAtSHAs repoPath [] ["this file should not exist"] (shas methodsFixture))
       let b = emptySourceBlob "this file should not exist"
       blobs `shouldBe` [both b b]
-
-  -- TODO: Port these to SemanticSpec for testing parse
-  -- describe "parse" $ do
-  --   it "parses line by line if not given a language" $ do
-  --     term <- runCommand (parse Nothing methodsBlob)
-  --     void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
-  --
-  --   it "parses in the specified language" $ do
-  --     term <- runCommand (parse (Just Ruby) methodsBlob)
-  --     void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
 
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do
