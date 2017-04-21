@@ -114,7 +114,7 @@ runAssignment = iterFreer (\ assignment yield offset source nodes -> case (assig
   (Source, []) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
-  . fmap (\ a offset source rest -> Result (offset, source, rest, a))
+  . fmap (\ a offset source nodes -> Result (offset, source, nodes, a))
 
 dropAnonymous :: Symbol grammar => [AST grammar] -> [AST grammar]
 dropAnonymous = dropWhile ((/= Regular) . symbolType . rhead . roseValue)
