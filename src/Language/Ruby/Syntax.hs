@@ -2,6 +2,7 @@
 module Language.Ruby.Syntax where
 
 import Data.Functor.Union
+import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
@@ -9,6 +10,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Info
 import Language.Haskell.TH
 import Prologue hiding (optional, unless)
 import Term
@@ -102,6 +104,10 @@ literal :: Assignment Grammar (Term Syntax ())
 literal  =  term () Literal.true <$ symbol Language.Ruby.Syntax.True <* source
         <|> term () Literal.false <$ symbol Language.Ruby.Syntax.False <* source
         <|> term () . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> source
+
+-- | Assignment of the current node’s annotation.
+annotation :: Assignment grammar (Record '[ Info.Range, Info.SourceSpan ])
+annotation = (:.) <$> range <*> ((:. Data.Record.Nil) <$> sourceSpan)
 
 optional :: Assignment Grammar (Term Syntax ()) -> Assignment Grammar (Term Syntax ())
 optional a = a <|> pure (term () Syntax.Empty)
