@@ -24,7 +24,7 @@ import Data.Text (unpack)
 import qualified Info
 import Prologue hiding (Alt, get)
 import Range (offsetRange)
-import Source (Source(), slice, sourceText)
+import Source (Source(), drop, slice, sourceText)
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
@@ -105,10 +105,10 @@ runAssignment = iterFreer (\ assignment yield offset source nodes -> case (assig
   (Alt a b, nodes) -> yield a offset source nodes <|> yield b offset source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
   (assignment, subtree@(Rose node@(_ :. range :. _) children) : rest) -> case assignment of
     Get -> yield node offset source nodes
-    Source -> yield (sourceText (slice (offsetRange range offset) source)) offset source rest
+    Source -> yield (sourceText (slice (offsetRange range (negate offset)) source)) (Info.end range) (Source.drop (Info.end range - offset) source) rest
     Children childAssignment -> do
       c <- assignAllFrom childAssignment offset source children
-      yield c offset source rest
+      yield c (Info.end range) (Source.drop (Info.end range - offset) source) rest
     _ -> Error ["No rule to match " <> show subtree]
   (Get, []) -> Error [ "Expected node but got end of input." ]
   (Source, []) -> Error [ "Expected leaf node but got end of input." ]
