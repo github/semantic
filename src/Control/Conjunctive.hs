@@ -18,11 +18,3 @@ class Alternative f => Conjunctive f where
   a &> b = identity <$ a <&> b
 
   {-# MINIMAL (<&>) | liftC2 #-}
-
--- | Conjunctive and Applicative coincide for types with one field like Maybe.
-instance Conjunctive Maybe where
-  (<&>) = (<*>)
-
--- | For types with multiple fields, Conjunctive acts as the intersection instead of the cartesian product.
-instance Conjunctive [] where
-  liftC2 = zipWith
