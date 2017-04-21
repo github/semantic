@@ -32,6 +32,7 @@ import Text.Show hiding (show)
 type Assignment symbol = Freer (AssignmentF symbol)
 
 data AssignmentF symbol a where
+  Get :: AssignmentF symbol symbol
   Symbol :: symbol -> AssignmentF symbol ()
   Range :: AssignmentF symbol Info.Range
   SourceSpan :: AssignmentF symbol Info.SourceSpan
@@ -95,6 +96,7 @@ runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, 
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a source nodes <|> yield b source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
   (assignment, node@(Rose (nodeSymbol :. range :. sourceSpan :. Nil) children) : rest) -> case assignment of
+    Get -> yield nodeSymbol source nodes
     Symbol symbol -> guard (symbol == nodeSymbol) >> yield () source nodes
     Range -> yield range source nodes
     SourceSpan -> yield sourceSpan source nodes
@@ -103,6 +105,7 @@ runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, 
       c <- assignAll childAssignment source children
       yield c source rest
     _ -> Error ["No rule to match " <> show node]
+  (Get, []) -> Error [ "Expected node but got end of input." ]
   (Symbol symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
   (Range, []) -> Error [ "Expected node with range but got end of input." ]
   (SourceSpan, []) -> Error [ "Expected node with source span but got end of input." ]
@@ -121,6 +124,7 @@ instance Alternative (Assignment symbol) where
 
 instance Show symbol => Show1 (AssignmentF symbol) where
   liftShowsPrec sp sl d a = case a of
+    Get -> showString "Get"
     Symbol s -> showsUnaryWith showsPrec "Symbol" d s . showChar ' ' . sp d ()
     Range -> showString "Range" . showChar ' ' . sp d (Info.Range 0 0)
     SourceSpan -> showString "SourceSpan" . showChar ' ' . sp d (Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0))
