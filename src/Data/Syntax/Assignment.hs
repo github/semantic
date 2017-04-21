@@ -104,12 +104,12 @@ runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node 
 runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (assignment, AssignmentState offset source (subtree@(Rose node@(_ :. range :. _) children) : rest)) -> case assignment of
+  (assignment, AssignmentState offset source (subtree@(Rose node@(_ :. range :. _) children) : _)) -> case assignment of
     Get -> yield node state
-    Source -> yield (sourceText (slice (offsetRange range (negate offset)) source)) $ AssignmentState (Info.end range) (Source.drop (Info.end range - offset) source) rest
+    Source -> yield (sourceText (slice (offsetRange range (negate offset)) source)) (advanceState state)
     Children childAssignment -> do
       c <- assignAllFrom childAssignment offset source children
-      yield c $ AssignmentState (Info.end range) (Source.drop (Info.end range - offset) source) rest
+      yield c (advanceState state)
     _ -> Error ["No rule to match " <> show subtree]
   (Get, AssignmentState _ _ []) -> Error [ "Expected node but got end of input." ]
   (Source, AssignmentState _ _ []) -> Error [ "Expected leaf node but got end of input." ]
@@ -119,6 +119,11 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
 dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
+
+advanceState :: AssignmentState grammar -> AssignmentState grammar
+advanceState state@AssignmentState{..}
+  | Rose (_ :. range :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  | otherwise = state
 
 data AssignmentState grammar = AssignmentState { stateOffset :: Int, stateSource :: Source, stateNodes :: [AST grammar] }
   deriving (Eq, Show)
