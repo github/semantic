@@ -46,6 +46,9 @@ treeSitterParser language grammar blob = do
     pure term
 
 
+-- | Parse Ruby to AST. Intended for use in ghci, e.g.:
+--
+--   > Source.readAndTranscodeFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST >>= pure . uncurry (assignAll assignment) . second pure
 parseRubyToAST :: Source -> IO (Source, A.Rose Ruby.Grammar)
 parseRubyToAST source = do
   document <- ts_document_new
