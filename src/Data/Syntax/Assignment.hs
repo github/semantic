@@ -39,7 +39,7 @@ data AssignmentF symbol a where
 
 -- | Zero-width match of a node with the given symbol.
 --
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (rule A *> b)' is fine, but 'many (rule A)' is not.
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
 symbol :: symbol -> Assignment symbol ()
 symbol s = Symbol s `Then` return
 
