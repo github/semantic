@@ -39,8 +39,8 @@ type Syntax' =
   ]
 
 
-term :: InUnion Syntax' f => f (Term Syntax ()) -> Term Syntax ()
-term f = cofree $ () :< inj f
+term :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
+term a f = cofree $ a :< inj f
 
 
 -- | Statically-known rules corresponding to symbols in the grammar.
@@ -55,20 +55,20 @@ declaration :: Assignment Grammar (Term Syntax ())
 declaration = comment <|> class' <|> method
 
 class' :: Assignment Grammar (Term Syntax ())
-class' = term <$  symbol Class
-              <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
+class' = term () <$  symbol Class
+                 <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
   where superclass = pure <$ symbol Superclass <*> children constant
         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
 constant :: Assignment Grammar (Term Syntax ())
-constant = term . Syntax.Identifier <$ symbol Constant <*> source
+constant = term () . Syntax.Identifier <$ symbol Constant <*> source
 
 identifier :: Assignment Grammar (Term Syntax ())
-identifier = term . Syntax.Identifier <$ symbol Identifier <*> source
+identifier = term () . Syntax.Identifier <$ symbol Identifier <*> source
 
 method :: Assignment Grammar (Term Syntax ())
-method = term <$  symbol Method
-              <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term <$> many statement))
+method = term () <$  symbol Method
+                 <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term () <$> many statement))
 
 statement :: Assignment Grammar (Term Syntax ())
 statement  =  exit Statement.Return Return
@@ -80,28 +80,28 @@ statement  =  exit Statement.Return Return
           <|> unless
           <|> unlessModifier
           <|> literal
-  where exit construct sym = term . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children statement))
+  where exit construct sym = term () . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children statement))
 
 comment :: Assignment Grammar (Term Syntax ())
-comment = term . Comment.Comment <$ symbol Comment <*> source
+comment = term () . Comment.Comment <$ symbol Comment <*> source
 
 if' :: Assignment Grammar (Term Syntax ())
 if' = go If
-  where go s = term <$ symbol s <*> children (Statement.If <$> statement <*> (term <$> many statement) <*> optional (go Elsif <|> term <$ symbol Else <*> children (many statement)))
+  where go s = term () <$ symbol s <*> children (Statement.If <$> statement <*> (term () <$> many statement) <*> optional (go Elsif <|> term () <$ symbol Else <*> children (many statement)))
 
 ifModifier :: Assignment Grammar (Term Syntax ())
-ifModifier = term <$ symbol IfModifier <*> children (flip Statement.If <$> statement <*> statement <*> pure (term Syntax.Empty))
+ifModifier = term () <$ symbol IfModifier <*> children (flip Statement.If <$> statement <*> statement <*> pure (term () Syntax.Empty))
 
 unless :: Assignment Grammar (Term Syntax ())
-unless = term <$ symbol Unless <*> children (Statement.If <$> (term . Expression.Not <$> statement) <*> (term <$> many statement) <*> optional (term <$ symbol Else <*> children (many statement)))
+unless = term () <$ symbol Unless <*> children (Statement.If <$> (term () . Expression.Not <$> statement) <*> (term () <$> many statement) <*> optional (term () <$ symbol Else <*> children (many statement)))
 
 unlessModifier :: Assignment Grammar (Term Syntax ())
-unlessModifier = term <$ symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> (term . Expression.Not <$> statement) <*> pure (term Syntax.Empty))
+unlessModifier = term () <$ symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> (term () . Expression.Not <$> statement) <*> pure (term () Syntax.Empty))
 
 literal :: Assignment Grammar (Term Syntax ())
-literal  =  term Literal.true <$ symbol Language.Ruby.Syntax.True <* source
-        <|> term Literal.false <$ symbol Language.Ruby.Syntax.False <* source
-        <|> term . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> source
+literal  =  term () Literal.true <$ symbol Language.Ruby.Syntax.True <* source
+        <|> term () Literal.false <$ symbol Language.Ruby.Syntax.False <* source
+        <|> term () . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> source
 
 optional :: Assignment Grammar (Term Syntax ()) -> Assignment Grammar (Term Syntax ())
-optional a = a <|> pure (term Syntax.Empty)
+optional a = a <|> pure (term () Syntax.Empty)
