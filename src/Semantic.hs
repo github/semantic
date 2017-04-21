@@ -32,6 +32,11 @@ import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 
+-- import qualified Control.Concurrent.Async.Pool as Async
+-- import GHC.Conc (numCapabilities)
+import qualified Control.Concurrent.Async as Async
+import Debug.Trace
+
 -- TODO: Shouldn't need to depend on System.FilePath in here, but is currently
 -- the way we do language detection.
 import System.FilePath
@@ -48,18 +53,21 @@ import System.FilePath
 -- | Diff a list of SourceBlob pairs and produce a ByteString using the specified renderer.
 diffBlobs :: (Monoid output, StringConv output ByteString) => DiffRenderer DefaultFields output -> [Both SourceBlob] -> IO ByteString
 diffBlobs renderer blobs = do
-  diffs <- traverse go blobs
+  traceEventIO "diffing some blobs"
+  diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
   pure . toS $ runDiffRenderer renderer (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
+      traceEventIO ("diffing: " <> show (path <$> blobPair))
       diff <- diffBlobs' blobPair
+      traceEventIO ("diffing done: " <> show (path <$> blobPair))
       pure (blobPair, diff)
 
 -- | Diff a pair of SourceBlobs.
 diffBlobs' :: Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record DefaultFields)))
 diffBlobs' blobs = do
-  terms <- traverse parseBlob blobs
+  terms <- Async.mapConcurrently parseBlob blobs
   case (runJoin blobs, runJoin terms) of
     ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> pure Nothing
                             | nonExistentBlob right -> pure . pure . pure $ Delete a
