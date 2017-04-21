@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
 , symbol
@@ -14,6 +14,7 @@ module Data.Syntax.Assignment
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
 import Data.Functor.Foldable
+import Data.Record
 import Data.Text (unpack)
 import Prologue hiding (Alt)
 import Source (Source())
@@ -58,7 +59,7 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose grammar] -> Result a
+assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose (Record '[grammar])] -> Result a
 assignAll assignment source nodes = case runAssignment assignment source nodes of
   Result (rest, a) -> case dropAnonymous rest of
     [] -> Result a
@@ -66,11 +67,11 @@ assignAll assignment source nodes = case runAssignment assignment source nodes o
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose grammar] -> Result ([Rose grammar], a)
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [Rose (Record '[grammar])] -> Result ([Rose (Record '[grammar])], a)
 runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a source nodes <|> yield b source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (assignment, node@(Rose nodeSymbol children) : rest) -> case assignment of
+  (assignment, node@(Rose (nodeSymbol :. _) children) : rest) -> case assignment of
     Symbol symbol -> guard (symbol == nodeSymbol) >> yield () source nodes
     Source -> yield "" source rest
     Children childAssignment -> do
@@ -83,8 +84,8 @@ runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, 
   _ -> Error ["No rule to match at end of input."])
   . fmap (\ a _ rest -> Result (rest, a))
 
-dropAnonymous :: Symbol grammar => [Rose grammar] -> [Rose grammar]
-dropAnonymous = dropWhile ((/= Regular) . symbolType . roseValue)
+dropAnonymous :: Symbol grammar => [Rose (Record '[grammar])] -> [Rose (Record '[grammar])]
+dropAnonymous = dropWhile ((/= Regular) . symbolType . rhead . roseValue)
 
 
 instance Alternative (Assignment symbol) where

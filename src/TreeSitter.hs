@@ -49,7 +49,7 @@ treeSitterParser language grammar blob = do
 -- | Parse Ruby to AST. Intended for use in ghci, e.g.:
 --
 --   > Source.readAndTranscodeFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST >>= pure . uncurry (assignAll assignment) . second pure
-parseRubyToAST :: Source -> IO (Source, A.Rose Ruby.Grammar)
+parseRubyToAST :: Source -> IO (Source, A.Rose (Record '[Ruby.Grammar]))
 parseRubyToAST source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
@@ -64,13 +64,13 @@ parseRubyToAST source = do
 
   ts_document_free document
   pure (source, ast)
-  where toAST :: Node -> IO (A.RoseF Ruby.Grammar Node)
+  where toAST :: Node -> IO (A.RoseF (Record '[Ruby.Grammar]) Node)
         toAST Node{..} = do
           let count = fromIntegral nodeChildCount
           children <- allocaArray count $ \ childNodesPtr -> do
             _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
             peekArray count childNodesPtr
-          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol)) children
+          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. Nil) children
 
         anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
         anaM g = a where a = pure . embed <=< traverse a <=< g
