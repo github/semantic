@@ -19,6 +19,7 @@ library
                      , Category
                      , Command
                      , Command.Parse
+                     , Control.Conjunctive
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
