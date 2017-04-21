@@ -56,7 +56,7 @@ diffBlobs renderer blobs = do
   traceEventIO "diffing some blobs"
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
-  pure . toS $ runDiffRenderer renderer (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> runDiffRenderer renderer (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
       traceEventIO ("diffing: " <> show (path <$> blobPair))
@@ -85,7 +85,7 @@ diffBlobs' blobs = do
 parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
 parseBlobs renderer blobs = do
   terms <- traverse go blobs
-  pure . toS $ runParseTreeRenderer renderer (terms `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> runParseTreeRenderer renderer (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
       term <- parseBlob blob
