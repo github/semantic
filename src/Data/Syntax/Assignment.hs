@@ -89,13 +89,13 @@ data Result a = Result a | Error [Text]
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source -> [AST grammar] -> Result a
 assignAll assignment source nodes = case runAssignment assignment source nodes of
-  Result (rest, a) -> case dropAnonymous rest of
+  Result (_, rest, a) -> case dropAnonymous rest of
     [] -> Result a
     c:_ -> Error ["Expected end of input, but got: " <> show c]
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source -> [AST grammar] -> Result ([AST grammar], a)
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source -> [AST grammar] -> Result (Source, [AST grammar], a)
 runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a source nodes <|> yield b source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
@@ -110,7 +110,7 @@ runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, 
   (Source, []) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
-  . fmap (\ a _ rest -> Result (rest, a))
+  . fmap (\ a source rest -> Result (source, rest, a))
 
 dropAnonymous :: Symbol grammar => [AST grammar] -> [AST grammar]
 dropAnonymous = dropWhile ((/= Regular) . symbolType . rhead . roseValue)
