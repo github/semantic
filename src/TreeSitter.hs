@@ -49,7 +49,7 @@ treeSitterParser language grammar blob = do
 -- | Parse Ruby to AST. Intended for use in ghci, e.g.:
 --
 --   > Source.readAndTranscodeFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST >>= pure . uncurry (assignAll assignment) . second pure
-parseRubyToAST :: Source -> IO (Source, A.Rose (Record '[Ruby.Grammar, Range, SourceSpan]))
+parseRubyToAST :: Source -> IO (Source, A.AST Ruby.Grammar)
 parseRubyToAST source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
@@ -64,7 +64,7 @@ parseRubyToAST source = do
 
   ts_document_free document
   pure (source, ast)
-  where toAST :: Node -> IO (A.RoseF (Record '[Ruby.Grammar, Range, SourceSpan]) Node)
+  where toAST :: Node -> IO (A.RoseF (A.Node Ruby.Grammar) Node)
         toAST node@Node{..} = do
           let count = fromIntegral nodeChildCount
           children <- allocaArray count $ \ childNodesPtr -> do
