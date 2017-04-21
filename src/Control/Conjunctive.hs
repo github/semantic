@@ -16,3 +16,5 @@ class Alternative f => Conjunctive f where
 
   (&>) :: f a -> f b -> f b
   a &> b = identity <$ a <&> b
+
+  {-# MINIMAL (<&>) | liftC2 #-}
