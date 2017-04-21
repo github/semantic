@@ -23,7 +23,8 @@ import Data.Record
 import Data.Text (unpack)
 import qualified Info
 import Prologue hiding (Alt, get)
-import Source (Source())
+import Range (offsetRange)
+import Source (Source(), slice, sourceText)
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
@@ -102,9 +103,9 @@ runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node 
 runAssignment = iterFreer (\ assignment yield offset source nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a offset source nodes <|> yield b offset source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (assignment, subtree@(Rose node children) : rest) -> case assignment of
+  (assignment, subtree@(Rose node@(_ :. range :. _) children) : rest) -> case assignment of
     Get -> yield node offset source nodes
-    Source -> yield "" offset source rest
+    Source -> yield (sourceText (slice (offsetRange range offset) source)) offset source rest
     Children childAssignment -> do
       c <- assignAllFrom childAssignment offset source children
       yield c offset source rest
