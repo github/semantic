@@ -8,7 +8,5 @@ class Alternative f => Conjunctive f where
   (<&>) :: f (a -> b) -> f a -> f b
 
   (<&) :: f a -> f b -> f a
-  a <& b = const <$> a <&> b
 
   (&>) :: f a -> f b -> f b
-  a &> b = identity <$ a <&> b
