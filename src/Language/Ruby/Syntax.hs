@@ -12,7 +12,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Info
 import Language.Haskell.TH
-import Prologue hiding (optional, unless)
+import Prologue hiding (optional, unless, get)
 import Term
 import Text.Parser.TreeSitter.Language
 import Text.Parser.TreeSitter.Ruby
@@ -107,7 +107,7 @@ literal  =  term () Literal.true <$ symbol Language.Ruby.Syntax.True <* source
 
 -- | Assignment of the current node’s annotation.
 annotation :: Assignment (Node Grammar) (Record '[ Info.Range, Info.SourceSpan ])
-annotation = (:.) <$> range <*> ((:. Data.Record.Nil) <$> sourceSpan)
+annotation = rtail <$> get
 
 optional :: Assignment (Node Grammar) (Term Syntax ()) -> Assignment (Node Grammar) (Term Syntax ())
 optional a = a <|> pure (term () Syntax.Empty)
