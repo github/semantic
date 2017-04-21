@@ -33,7 +33,7 @@ spec = parallel $ do
 
     it "summarizes changed methods" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      diff <- diffBlobs' sourceBlobs
+      Just diff <- diffBlobs' sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
         , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
@@ -41,31 +41,31 @@ spec = parallel $ do
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
-      diff <- diffBlobs' sourceBlobs
+      Just diff <- diffBlobs' sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ InSummarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
-      diff <- diffBlobs' sourceBlobs
+      Just diff <- diffBlobs' sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
-      diff <- diffBlobs' sourceBlobs
+      Just diff <- diffBlobs' sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.Method "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
-      diff <- diffBlobs' sourceBlobs
+      Just diff <- diffBlobs' sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
-      diff <- diffBlobs' sourceBlobs
+      Just diff <- diffBlobs' sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 

@@ -14,6 +14,7 @@ import qualified Data.Vector as V
 import qualified Git.Types as Git
 import Renderer hiding (errors)
 import Source
+import Semantic
 import Syntax
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
@@ -23,11 +24,11 @@ spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
       blob <- runCommand (readFile "semantic-diff.cabal")
-      fmap path blob `shouldBe` Just "semantic-diff.cabal"
+      path blob `shouldBe` "semantic-diff.cabal"
 
-    it "returns Nothing for absent files" $ do
+    it "returns a nullBlob for absent files" $ do
       blob <- runCommand (readFile "this file should not exist")
-      blob `shouldBe` Nothing
+      nullBlob blob `shouldBe` True
 
   describe "readFilesAtSHAs" $ do
     it "returns blobs for the specified paths" $ do
@@ -40,7 +41,8 @@ spec = parallel $ do
 
     it "returns entries for missing paths" $ do
       blobs <- runCommand (readFilesAtSHAs repoPath [] ["this file should not exist"] (shas methodsFixture))
-      blobs `shouldBe` [("this file should not exist", pure Nothing)]
+      let b = emptySourceBlob "this file should not exist"
+      blobs `shouldBe` [both b b]
 
   describe "parse" $ do
     it "parses line by line if not given a language" $ do
@@ -78,21 +80,16 @@ spec = parallel $ do
   where repoPath = "test/fixtures/git/examples/all-languages.git"
         methodsFixture = Fixture
           (both "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe")
-          [ ("methods.rb", both Nothing (Just methodsBlob)) ]
+          [ both (emptySourceBlob "methods.rb") methodsBlob ]
         methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob)
 
-data Fixture = Fixture { shas :: Both String, expectedBlobs :: [(FilePath, Both (Maybe SourceBlob))] }
+data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
 
 fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [FilePath] -> DiffRenderer DefaultFields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f gitDir sha1 sha2 filePaths renderer = do
-  results <- fmap encode . runCommand $ do
-    blobs <- readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
-    diffs <- for blobs . uncurry $ \ path blobs -> do
-      terms <- traverse (traverse parseBlob) blobs
-      Just diff' <- maybeDiff terms
-      return (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
-    renderDiffs renderer diffs
-  let json = fromJust (decode results)
+  blobs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
+  results <- Semantic.diffBlobs renderer blobs
+  let json = fromJust (decode (toS results))
   pure (errors json, summaries f json)
 
 -- Diff Summaries payloads look like this:

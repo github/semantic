@@ -38,6 +38,9 @@ emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothi
 nullBlob :: SourceBlob -> Bool
 nullBlob SourceBlob{..} = oid == nullOid || Source.null source
 
+nonExistentBlob :: SourceBlob -> Bool
+nonExistentBlob SourceBlob{..} = isNothing blobKind
+
 sourceBlob :: Source -> FilePath -> SourceBlob
 sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
 

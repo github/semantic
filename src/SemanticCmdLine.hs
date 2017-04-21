@@ -14,14 +14,12 @@ import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
-import Source
-import Renderer
 import System.Directory
 import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 import Text.Regex
-import qualified Semantic (parseBlobs)
+import qualified Semantic (parseBlobs, diffBlobs)
 
 main :: IO ()
 main = do
@@ -53,21 +51,11 @@ main = do
     writeToOutput = maybe B.putStr B.writeFile
 
 runDiff :: DiffArguments -> IO ByteString
-runDiff DiffArguments{..} = runCommand $ do
-  diffs <- case diffMode of
-    DiffPaths pathA pathB -> do
-      let paths = both pathA pathB
-      blobs <- traverse readFile paths
-      terms <- traverse (traverse parseBlob) blobs
-      diff' <- maybeDiff terms
-      pure [(fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')]
-    DiffCommits sha1 sha2 paths -> do
-      blobPairs <- readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
-      concurrently blobPairs . uncurry $ \ path blobs -> do
-        terms <- concurrently blobs (traverse parseBlob)
-        diff' <- maybeDiff terms
-        pure (fromMaybe <$> pure (emptySourceBlob path) <*> blobs, diff')
-  pure . toS $ runDiffRenderer diffRenderer (diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff)
+runDiff DiffArguments{..} = do
+  blobs <- runCommand $ case diffMode of
+   DiffPaths a b -> pure <$> traverse readFile (both a b)
+   DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
+  Semantic.diffBlobs diffRenderer blobs
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do

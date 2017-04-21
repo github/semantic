@@ -58,7 +58,7 @@ type Command = Freer CommandF
 -- Constructors
 
 -- | Read a regular file into a SourceBlob.
-readFile :: FilePath -> Command (Maybe SourceBlob)
+readFile :: FilePath -> Command SourceBlob
 readFile path = ReadFile path `Then` return
 
 -- | Read a list of files at the states corresponding to the given shas.
@@ -67,7 +67,7 @@ readFilesAtSHAs
   -> [FilePath] -- ^ GIT_ALTERNATE_OBJECT_DIRECTORIES
   -> [FilePath] -- ^ Specific paths to diff. If empty, diff all changed paths.
   -> Both String -- ^ The commit shas for the before & after states.
-  -> Command [(FilePath, Both (Maybe SourceBlob))] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
+  -> Command [Both SourceBlob] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
 readFilesAtSHAs gitDir alternateObjectDirs paths shas = ReadFilesAtSHAs gitDir alternateObjectDirs paths shas `Then` return
 
 -- | Parse a blob in a given language.
@@ -118,8 +118,8 @@ runCommand = iterFreerA $ \ command yield -> case command of
 -- Implementation details
 
 data CommandF f where
-  ReadFile :: FilePath -> CommandF (Maybe SourceBlob)
-  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> CommandF [(FilePath, Both (Maybe SourceBlob))]
+  ReadFile :: FilePath -> CommandF SourceBlob
+  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> CommandF [Both SourceBlob]
 
   Parse :: Maybe Language -> SourceBlob -> CommandF (Term (Syntax Text) (Record DefaultFields))
 
@@ -132,13 +132,13 @@ data CommandF f where
   LiftIO :: IO a -> CommandF a
 
 
-runReadFile :: FilePath -> IO (Maybe SourceBlob)
+runReadFile :: FilePath -> IO SourceBlob
 runReadFile path = do
-  raw <- (Just <$> B.readFile path) `catch` (const (return Nothing) :: IOException -> IO (Maybe ByteString))
+  raw <- (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
   source <- traverse transcode raw
-  return (flip sourceBlob path <$> source)
+  pure $ fromMaybe (emptySourceBlob path) (flip sourceBlob path <$> source)
 
-runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> IO [(FilePath, Both (Maybe SourceBlob))]
+runReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> IO [Both SourceBlob]
 runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = do
   paths <- case paths of
     [] -> runGit $ do
@@ -160,8 +160,8 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = do
               contents <- blobToByteString blob
               transcoded <- liftIO $ transcode contents
               let oid = renderObjOid $ blobOid blob
-              pure (Just (SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind))))
-            _ -> pure Nothing
+              pure (SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind)))
+            _ -> pure (emptySourceBlob path)
 
         runGit :: ReaderT LgRepo IO a -> IO a
         runGit action = withRepository lgFactory gitDir $ do
@@ -171,7 +171,7 @@ runReadFilesAtSHAs gitDir alternateObjectDirs paths shas = do
 
         blobsForPath path = do
           trees <- traverse treeForSha shas
-          (,) path <$> traverse (blobForPathInTree path) trees
+          traverse (blobForPathInTree path) trees
 
         toSourceKind (Git.PlainBlob mode) = Source.PlainBlob mode
         toSourceKind (Git.ExecutableBlob mode) = Source.ExecutableBlob mode
