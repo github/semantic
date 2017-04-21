@@ -175,6 +175,7 @@ test-suite test
                      , gitlib
                      , gitlib-libgit2
                      , Glob
+                     , haskell-tree-sitter
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff

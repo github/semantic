@@ -44,6 +44,18 @@ newtype Yield a = Yield a
 instance Eq1 Yield where liftEq = genericLiftEq
 instance Show1 Yield where liftShowsPrec = genericLiftShowsPrec
 
+newtype Break a = Break a
+  deriving (Eq, Foldable, Generic1, Show)
+
+instance Eq1 Break where liftEq = genericLiftEq
+instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
+
+newtype Continue a = Continue a
+  deriving (Eq, Foldable, Generic1, Show)
+
+instance Eq1 Continue where liftEq = genericLiftEq
+instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
+
 
 -- Loops
 
