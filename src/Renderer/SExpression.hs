@@ -15,6 +15,7 @@ import Syntax
 import Term
 
 data SExpressionFormat = TreeOnly | TreeAndRanges
+  deriving (Show)
 
 sExpression :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> ByteString
 sExpression format _ diff = printDiff diff 0 format

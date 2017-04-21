@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Command.Parse where
 
-import Arguments
 import Category
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson.Types (Pair)
@@ -65,19 +64,17 @@ parseNodeToJSONFields ParseNode{..} =
   <> [ "identifier" .= identifier | isJust identifier ]
 
 -- | Parses file contents into an SExpression format for the provided arguments.
-parseSExpression :: Arguments -> IO ByteString
-parseSExpression =
-  pure . printTerms TreeOnly <=< parse <=< sourceBlobsFromArgs
+sExpressionParseTree :: Bool -> [SourceBlob] -> IO ByteString
+sExpressionParseTree _ blobs =
+  pure . printTerms TreeOnly =<< parse blobs
   where parse = traverse (\sourceBlob@SourceBlob{..} -> parserForType (toS (takeExtension path)) sourceBlob)
 
 type RAlgebra t a = Base t (t, a) -> a
 
-parseRoot :: (FilePath -> f ParseNode -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> Arguments -> IO [root]
-parseRoot construct combine args@Arguments{..} = do
-  blobs <- sourceBlobsFromArgs args
-  for blobs (\ sourceBlob@SourceBlob{..} -> do
-    parsedTerm <- parseWithDecorator (decorator source) path sourceBlob
-    pure $! construct path (para algebra parsedTerm))
+parseRoot :: Bool -> (FilePath -> f ParseNode -> root) -> (ParseNode -> [f ParseNode] -> f ParseNode) -> [SourceBlob] -> IO [root]
+parseRoot debug construct combine blobs = for blobs (\ sourceBlob@SourceBlob{..} -> do
+  parsedTerm <- parseWithDecorator (decorator source) path sourceBlob
+  pure $! construct path (para algebra parsedTerm))
   where algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
         decorator = parseDecorator debug
         makeNode :: Record (Maybe SourceText ': DefaultFields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': DefaultFields))) -> ParseNode
@@ -85,12 +82,12 @@ parseRoot construct combine args@Arguments{..} = do
           ParseNode (toS category) range head sourceSpan (identifierFor syntax)
 
 -- | Constructs IndexFile nodes for the provided arguments and encodes them to JSON.
-parseIndex :: Arguments -> IO ByteString
-parseIndex = fmap (toS . encode) . parseRoot IndexFile (\ node siblings -> node : concat siblings)
+jsonIndexParseTree :: Bool -> [SourceBlob] -> IO ByteString
+jsonIndexParseTree debug = fmap (toS . encode) . parseRoot debug IndexFile (\ node siblings -> node : concat siblings)
 
 -- | Constructs ParseTreeFile nodes for the provided arguments and encodes them to JSON.
-parseTree :: Arguments -> IO ByteString
-parseTree = fmap (toS . encode) . parseRoot ParseTreeFile Rose
+jsonParseTree :: Bool -> [SourceBlob] -> IO ByteString
+jsonParseTree debug = fmap (toS . encode) . parseRoot debug ParseTreeFile Rose
 
 -- | Determines the term decorator to use when parsing.
 parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
@@ -137,13 +134,6 @@ sourceBlobsFromSha commitSha gitDir filePaths = do
 -- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
 identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, StringConv leaf Text) => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe Text
 identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
-
--- | For the file paths and commit sha provided, extract only the BlobEntries and represent them as SourceBlobs.
-sourceBlobsFromArgs :: Arguments -> IO [SourceBlob]
-sourceBlobsFromArgs Arguments{..} =
-  case commitSha of
-    Just commitSha' -> sourceBlobsFromSha commitSha' gitDir filePaths
-    _ -> sourceBlobsFromPaths filePaths
 
 -- | Return a parser incorporating the provided TermDecorator.
 parseWithDecorator :: TermDecorator (Syntax Text) DefaultFields field -> FilePath -> Parser (Syntax Text) (Record (field ': DefaultFields))
