@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TemplateHaskell #-}
+{-# LANGUAGE DataKinds, TemplateHaskell, TypeOperators #-}
 module Language.Ruby.Syntax where
 
 import Data.Functor.Union
@@ -10,7 +10,6 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
-import qualified Info
 import Language.Haskell.TH
 import Prologue hiding (optional, unless, get)
 import Term
@@ -41,38 +40,34 @@ type Syntax' =
   ]
 
 
-term :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
-term a f = cofree $ a :< inj f
-
-
 -- | Statically-known rules corresponding to symbols in the grammar.
 mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment (Node Grammar) [Term Syntax ()]
+assignment :: Assignment (Record (Grammar ': fs)) [Term Syntax (Record fs)]
 assignment = symbol Program *> children (many declaration)
 
-declaration :: Assignment (Node Grammar) (Term Syntax ())
+declaration :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
 declaration = comment <|> class' <|> method
 
-class' :: Assignment (Node Grammar) (Term Syntax ())
-class' = term () <$  symbol Class
-                 <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
+class' :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+class' = term <*  symbol Class
+              <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
   where superclass = pure <$ symbol Superclass <*> children constant
         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
-constant :: Assignment (Node Grammar) (Term Syntax ())
-constant = term () . Syntax.Identifier <$ symbol Constant <*> source
+constant :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+constant = term <*> (Syntax.Identifier <$ symbol Constant <*> source)
 
-identifier :: Assignment (Node Grammar) (Term Syntax ())
-identifier = term () . Syntax.Identifier <$ symbol Identifier <*> source
+identifier :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+identifier = term <*> (Syntax.Identifier <$ symbol Identifier <*> source)
 
-method :: Assignment (Node Grammar) (Term Syntax ())
-method = term () <$  symbol Method
-                 <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term () <$> many statement))
+method :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+method = term <*  symbol Method
+              <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term <*> many statement))
 
-statement :: Assignment (Node Grammar) (Term Syntax ())
+statement :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
 statement  =  exit Statement.Return Return
           <|> exit Statement.Yield Yield
           <|> exit Statement.Break Break
@@ -82,32 +77,32 @@ statement  =  exit Statement.Return Return
           <|> unless
           <|> unlessModifier
           <|> literal
-  where exit construct sym = term () . construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children statement))
+  where exit construct sym = term <*> (construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children statement)))
 
-comment :: Assignment (Node Grammar) (Term Syntax ())
-comment = term () . Comment.Comment <$ symbol Comment <*> source
+comment :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+comment = term <*> (Comment.Comment <$ symbol Comment <*> source)
 
-if' :: Assignment (Node Grammar) (Term Syntax ())
+if' :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
 if' = go If
-  where go s = term () <$ symbol s <*> children (Statement.If <$> statement <*> (term () <$> many statement) <*> optional (go Elsif <|> term () <$ symbol Else <*> children (many statement)))
+  where go s = term <* symbol s <*> children (Statement.If <$> statement <*> (term <*> many statement) <*> optional (go Elsif <|> term <* symbol Else <*> children (many statement)))
 
-ifModifier :: Assignment (Node Grammar) (Term Syntax ())
-ifModifier = term () <$ symbol IfModifier <*> children (flip Statement.If <$> statement <*> statement <*> pure (term () Syntax.Empty))
+ifModifier :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+ifModifier = term <* symbol IfModifier <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
 
-unless :: Assignment (Node Grammar) (Term Syntax ())
-unless = term () <$ symbol Unless <*> children (Statement.If <$> (term () . Expression.Not <$> statement) <*> (term () <$> many statement) <*> optional (term () <$ symbol Else <*> children (many statement)))
+unless :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+unless = term <* symbol Unless <*> children (Statement.If <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement) <*> optional (term <* symbol Else <*> children (many statement)))
 
-unlessModifier :: Assignment (Node Grammar) (Term Syntax ())
-unlessModifier = term () <$ symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> (term () . Expression.Not <$> statement) <*> pure (term () Syntax.Empty))
+unlessModifier :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+unlessModifier = term <* symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
 
-literal :: Assignment (Node Grammar) (Term Syntax ())
-literal  =  term () Literal.true <$ symbol Language.Ruby.Syntax.True <* source
-        <|> term () Literal.false <$ symbol Language.Ruby.Syntax.False <* source
-        <|> term () . Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> source
+literal :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+literal  =  term <*> (Literal.true <$ symbol Language.Ruby.Syntax.True <* source)
+        <|> term <*> (Literal.false <$ symbol Language.Ruby.Syntax.False <* source)
+        <|> term <*> (Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> source)
 
 -- | Assignment of the current node’s annotation.
-annotation :: Assignment (Node Grammar) (Record '[ Info.Range, Info.SourceSpan ])
-annotation = rtail <$> get
+term :: InUnion Syntax' f => Assignment (Record (h ': t)) (f (Term Syntax (Record t)) -> Term Syntax (Record t))
+term = (\ a f -> cofree $ rtail a :< inj f) <$> get
 
-optional :: Assignment (Node Grammar) (Term Syntax ()) -> Assignment (Node Grammar) (Term Syntax ())
-optional a = a <|> pure (term () Syntax.Empty)
+optional :: Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs)) -> Assignment (Record (Grammar ': fs)) (Term Syntax (Record fs))
+optional a = a <|> term <*> pure Syntax.Empty
