@@ -29,13 +29,10 @@ import Text.Show hiding (show)
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment symbol = Freer (AssignmentF symbol)
+type Assignment node = Freer (AssignmentF node)
 
-data AssignmentF symbol a where
-  Get :: AssignmentF symbol symbol
-  Symbol :: symbol -> AssignmentF symbol ()
-  Range :: AssignmentF symbol Info.Range
-  SourceSpan :: AssignmentF symbol Info.SourceSpan
+data AssignmentF node a where
+  Get :: AssignmentF node node
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
@@ -44,20 +41,20 @@ data AssignmentF symbol a where
 -- | Zero-width match of a node with the given symbol.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: symbol -> Assignment symbol ()
-symbol s = Symbol s `Then` return
+symbol :: (HasField fields symbol, Eq symbol) => symbol -> Assignment (Record fields) ()
+symbol s = Get `Then` guard . (s ==) . getField
 
 -- | Zero-width production of the current node’s range.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (range *> b)' is fine, but 'many range' is not.
-range :: Assignment symbol Info.Range
-range = Range `Then` return
+range :: HasField fields Info.Range => Assignment (Record fields) Info.Range
+range = Get `Then` return . getField
 
 -- | Zero-width production of the current node’s sourceSpan.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (sourceSpan *> b)' is fine, but 'many sourceSpan' is not.
-sourceSpan :: Assignment symbol Info.SourceSpan
-sourceSpan = SourceSpan `Then` return
+sourceSpan :: HasField fields Info.SourceSpan => Assignment (Record fields) Info.SourceSpan
+sourceSpan = Get `Then` return . getField
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: Assignment symbol ByteString
@@ -83,7 +80,7 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [AST grammar] -> Result a
+assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source -> [AST grammar] -> Result a
 assignAll assignment source nodes = case runAssignment assignment source nodes of
   Result (rest, a) -> case dropAnonymous rest of
     [] -> Result a
@@ -91,24 +88,18 @@ assignAll assignment source nodes = case runAssignment assignment source nodes o
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> Source -> [AST grammar] -> Result ([AST grammar], a)
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source -> [AST grammar] -> Result ([AST grammar], a)
 runAssignment = iterFreer (\ assignment yield source nodes -> case (assignment, dropAnonymous nodes) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, nodes) -> yield a source nodes <|> yield b source nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
   (assignment, node@(Rose (nodeSymbol :. range :. sourceSpan :. Nil) children) : rest) -> case assignment of
-    Get -> yield nodeSymbol source nodes
-    Symbol symbol -> guard (symbol == nodeSymbol) >> yield () source nodes
-    Range -> yield range source nodes
-    SourceSpan -> yield sourceSpan source nodes
+    Get -> yield (nodeSymbol :. range :. sourceSpan :. Nil) source nodes
     Source -> yield "" source rest
     Children childAssignment -> do
       c <- assignAll childAssignment source children
       yield c source rest
     _ -> Error ["No rule to match " <> show node]
   (Get, []) -> Error [ "Expected node but got end of input." ]
-  (Symbol symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
-  (Range, []) -> Error [ "Expected node with range but got end of input." ]
-  (SourceSpan, []) -> Error [ "Expected node with source span but got end of input." ]
   (Source, []) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, []) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
@@ -125,9 +116,6 @@ instance Alternative (Assignment symbol) where
 instance Show symbol => Show1 (AssignmentF symbol) where
   liftShowsPrec sp sl d a = case a of
     Get -> showString "Get"
-    Symbol s -> showsUnaryWith showsPrec "Symbol" d s . showChar ' ' . sp d ()
-    Range -> showString "Range" . showChar ' ' . sp d (Info.Range 0 0)
-    SourceSpan -> showString "SourceSpan" . showChar ' ' . sp d (Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0))
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
