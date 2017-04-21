@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
+, get
 , symbol
 , range
 , sourceSpan
@@ -21,7 +22,7 @@ import Data.Functor.Foldable hiding (Nil)
 import Data.Record
 import Data.Text (unpack)
 import qualified Info
-import Prologue hiding (Alt)
+import Prologue hiding (Alt, get)
 import Source (Source())
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
@@ -37,6 +38,12 @@ data AssignmentF node a where
   Children :: Assignment symbol a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
+
+-- | Zero-width production of the current node.
+--
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (get *> b)' is fine, but 'many get' is not.
+get :: Assignment (Record fields) (Record fields)
+get = Get `Then` return
 
 -- | Zero-width match of a node with the given symbol.
 --
