@@ -7,47 +7,45 @@ module Semantic
 , parserForLanguage
 ) where
 
-import qualified Control.Concurrent.Async as Async
 import Control.Parallel.Strategies
+import qualified Control.Concurrent.Async as Async
+import qualified Data.Text as T
 import Data.Functor.Both
 import Data.RandomWalkSimilarity
 import Data.Record
 import Diff
 import Info
 import Interpreter
+import Language
+import Language.Markdown
+import Parser
+import Patch
 import Prologue
 import Renderer
 import Source
 import Syntax
-import Patch
 import Term
-
-import Parser
-import Language
-import qualified Data.Text as T
-import Language.Markdown
-import TreeSitter
 import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
+import TreeSitter
 
-
--- TODO: Shouldn't need to depend on System.FilePath in here, but is currently
--- the way we do language detection.
+-- TODO: Shouldn't need to depend on System.FilePath in here, but this is
+-- currently the way we do language detection.
 import System.FilePath
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
 -- blobs.
 --
--- Goals:
---   - No knowledge of filesystem or Git
---   - Built in concurrency where appropriate
+-- Design goals:
+--   - No knowledge of the filesystem or Git.
+--   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
--- | Diff a list of SourceBlob pairs and produce a ByteString using the specified renderer.
+-- | Diff a list of SourceBlob pairs to produce ByteString output using the specified renderer.
 diffBlobs :: (Monoid output, StringConv output ByteString) => DiffRenderer DefaultFields output -> [Both SourceBlob] -> IO ByteString
 diffBlobs renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
@@ -57,11 +55,6 @@ diffBlobs renderer blobs = do
     go blobPair = do
       diff <- diffBlobs' blobPair
       pure (blobPair, diff)
-
-renderAsync :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
-renderAsync f diffs = do
-  outputs <- Async.mapConcurrently (pure . uncurry f) diffs
-  pure $ mconcat (outputs `using` parTraversable rseq)
 
 -- | Diff a pair of SourceBlobs.
 diffBlobs' :: Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record DefaultFields)))
@@ -107,6 +100,11 @@ parserForLanguage (Just language) = case language of
 
 
 -- | Internal
+
+renderAsync :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
+renderAsync f diffs = do
+  outputs <- Async.mapConcurrently (pure . uncurry f) diffs
+  pure $ mconcat (outputs `using` parTraversable rseq)
 
 -- | Return a parser based on the FilePath's extension (including the ".").
 -- | TODO: Remove this.
