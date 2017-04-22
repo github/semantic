@@ -44,9 +44,6 @@ printDiff diff level format = case runFree diff of
           | n < 1 = "\n"
           | otherwise = "\n" <> replicate (2 * n) space
 
--- printTerms :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> [Term (Syntax t) (Record fields)] -> ByteString
--- printTerms format terms = foldr (\t acc -> printTerm t 0 format <> acc) "" terms
-
 printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> SExpressionFormat -> ByteString
 printTerm term level format = go term level 0
   where
