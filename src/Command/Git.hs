@@ -44,7 +44,6 @@ readFilesAtSHAs gitDir alternates paths shas = do
       trees <- traverse treeForSha shas
       traverse (blobForPathInTree path) trees
 
-
 runGit :: FilePath -> [FilePath] -> ReaderT LgRepo IO a -> IO a
 runGit gitDir alternates action = withRepository lgFactory gitDir $ do
   repo <- getRepository

@@ -53,14 +53,14 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  JSONParseTreeRenderer :: HasDefaultFields fields => ParseTreeRenderer fields Value
-  JSONIndexParseTreeRenderer :: HasDefaultFields fields => ParseTreeRenderer fields Value
+  JSONParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
+  JSONIndexParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
 
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> (SourceBlob -> Term (Syntax Text) (Record fields) -> output)
 resolveParseTreeRenderer renderer = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
-  JSONParseTreeRenderer -> R.jsonParseTree False
-  JSONIndexParseTreeRenderer -> R.jsonIndexParseTree False
+  JSONParseTreeRenderer debug -> R.jsonParseTree debug
+  JSONIndexParseTreeRenderer debug -> R.jsonIndexParseTree debug
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
@@ -82,8 +82,8 @@ instance Show (DiffRenderer fields output) where
 
 instance Show (ParseTreeRenderer fields output) where
   showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
-  showsPrec _ JSONParseTreeRenderer = showString "JSONParseTreeRenderer"
-  showsPrec _ JSONIndexParseTreeRenderer = showString "JSONIndexParseTreeRenderer"
+  showsPrec d (JSONParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONParseTreeRenderer" d debug
+  showsPrec d (JSONIndexParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONIndexParseTreeRenderer" d debug
 
 instance Monoid File where
   mempty = File mempty

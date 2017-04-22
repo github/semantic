@@ -47,19 +47,18 @@ data ParseArguments where
   ParseArguments :: (Monoid output, StringConv output ByteString) =>
     { parseTreeRenderer :: ParseTreeRenderer DefaultFields output
     , parseMode :: ParseMode
-    , debug :: Bool
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
     } -> ParseArguments
 
-sExpressionParseTree :: ParseMode -> Bool -> FilePath -> [FilePath] -> ParseArguments
+sExpressionParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
-jsonParseTree :: ParseMode -> Bool -> FilePath -> [FilePath] -> ParseArguments
-jsonParseTree = ParseArguments JSONParseTreeRenderer
+jsonParseTree :: Bool -> ParseMode -> FilePath -> [FilePath] -> ParseArguments
+jsonParseTree = ParseArguments . JSONParseTreeRenderer
 
-jsonIndexParseTree :: ParseMode -> Bool -> FilePath -> [FilePath] -> ParseArguments
-jsonIndexParseTree = ParseArguments JSONIndexParseTreeRenderer
+jsonIndexParseTree :: Bool -> ParseMode -> FilePath -> [FilePath] -> ParseArguments
+jsonIndexParseTree = ParseArguments . JSONIndexParseTreeRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
@@ -78,9 +77,8 @@ instance Show DiffArguments where
     . showString "alternateObjectDirs = " . shows alternateObjectDirs
 
 instance Show ParseArguments where
-  showsPrec d (ParseArguments renderer mode debug gitDir alternateObjectDirs) = showParen (d >= 10) $ showString "ParseArguments "
+  showsPrec d (ParseArguments renderer mode gitDir alternateObjectDirs) = showParen (d >= 10) $ showString "ParseArguments "
     . showString "parseTreeRenderer = " . shows renderer . showString ", "
     . showString "parseMode = " . shows mode . showString ", "
-    . showString "debug = " . shows debug . showString ", "
     . showString "gitDir = " . shows gitDir . showString ", "
     . showString "alternateObjectDirs = " . shows alternateObjectDirs
