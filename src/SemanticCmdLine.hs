@@ -24,7 +24,7 @@ main = do
   gitDir <- findGitDir
   alternates <- findAlternates
   Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
-  outputPath <- getOutputPath outputFilePath
+  outputPath <- traverse getOutputPath outputFilePath
   text <- case programMode of
     Diff args -> runDiff args
     Parse args -> runParse args
@@ -33,18 +33,14 @@ main = do
     findGitDir = do
       pwd <- getCurrentDirectory
       fromMaybe pwd <$> lookupEnv "GIT_DIR"
-
     findAlternates = do
       eitherObjectDirs <- try $ splitWhen (== ':') . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
       pure $ case (eitherObjectDirs :: Either IOError [FilePath]) of
               (Left _) -> []
               (Right objectDirs) -> objectDirs
-
-    getOutputPath Nothing = pure Nothing
-    getOutputPath (Just path) = do
+    getOutputPath path = do
       isDir <- doesDirectoryExist path
-      pure . Just $ if isDir then takeFileName path -<.> ".html" else path
-
+      pure $ if isDir then takeFileName path -<.> ".html" else path
     writeToOutput :: Maybe FilePath -> ByteString -> IO ()
     writeToOutput = maybe B.putStr B.writeFile
 
