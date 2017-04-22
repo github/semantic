@@ -9,7 +9,6 @@ module Semantic
 
 import qualified Control.Concurrent.Async as Async
 import Control.Parallel.Strategies
-import Debug.Trace
 import Data.Functor.Both
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -51,15 +50,12 @@ import System.FilePath
 -- | Diff a list of SourceBlob pairs and produce a ByteString using the specified renderer.
 diffBlobs :: (Monoid output, StringConv output ByteString) => DiffRenderer DefaultFields output -> [Both SourceBlob] -> IO ByteString
 diffBlobs renderer blobs = do
-  traceEventIO "diffing some blobs"
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
   toS <$> renderAsync (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
-      traceEventIO ("diffing: " <> show (path <$> blobPair))
       diff <- diffBlobs' blobPair
-      traceEventIO ("diffing done: " <> show (path <$> blobPair))
       pure (blobPair, diff)
 
 renderAsync :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
