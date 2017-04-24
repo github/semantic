@@ -17,21 +17,25 @@ import Control.Monad.Free as X hiding (Free(Free, Pure), unfold, unfoldM)
 import Control.Comonad.Trans.Cofree as X (CofreeF(..), headF, tailF)
 import Control.Monad.Trans.Free as X (FreeF(..))
 import Control.Comonad as X
+import qualified Control.Comonad.Cofree as Cofree
+import qualified Control.Monad.Free as Free
 
 import Control.Arrow ((&&&), (***))
 
-import Data.Functor.Foldable (hylo, cata, para, ana, project, embed)
+import Data.Functor.Foldable (hylo, cata, para, ana)
 
 import Data.Hashable
 
-cofree :: Functor f => CofreeF f a (Cofree f a) -> Cofree f a
-cofree = embed
+cofree :: CofreeF f a (Cofree f a) -> Cofree f a
+cofree (a :< f) = a Cofree.:< f
 
-runCofree :: Functor f => Cofree f a -> CofreeF f a (Cofree f a)
-runCofree = project
+runCofree :: Cofree f a -> CofreeF f a (Cofree f a)
+runCofree (a Cofree.:< f) = a :< f
 
-free :: Functor f => FreeF f a (Free f a) -> Free f a
-free = embed
+free :: FreeF f a (Free f a) -> Free f a
+free (Free f) = Free.Free f
+free (Pure a) = Free.Pure a
 
-runFree :: Functor f => Free f a -> FreeF f a (Free f a)
-runFree = project
+runFree :: Free f a -> FreeF f a (Free f a)
+runFree (Free.Free f) = Free f
+runFree (Free.Pure a) = Pure a
