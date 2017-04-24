@@ -109,29 +109,29 @@ optional :: Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node
 optional a = a <|> term <*> pure Syntax.Empty
 
 
--- | An F-algebra on the base functor of some type 't'.
-type FAlgebra t a = Base t a -> a
+-- | An F-algebra on some carrier functor 'f'.
+type FAlgebra f a = f a -> a
 
--- | An R-algebra on the base functor of some type 't'.
-type RAlgebra t a = Base t (t, a) -> a
+-- | An R-algebra on some carrier functor 'f' of its fixpoint type 't'.
+type RAlgebra f t a = f (t, a) -> a
 
--- | A CV-algebra (Course of Value) on the base functor of some type 't'; an algebra which provides its references upon request.
-type CVAlgebra t a = Base t (Cofree (Base t) a) -> a
+-- | A CV-algebra (Course of Value) on some carrier functor 'f'; an algebra which provides its references upon request.
+type CVAlgebra f a = f (Cofree f a) -> a
 
 -- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
-fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
+fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
 fToR f = f . fmap snd
 
 -- | Promote an RAlgebra into a CVAlgebra (by dropping all values except the most recent).
 --
 --   Note that this is in general O(n), since it must visit each node of the term in order to reconstruct the original term; and thus, a histomorphism performed with the resulting algebra will be O(n²).
-rToCV :: (Functor (Base t), Corecursive t) => RAlgebra t a -> CVAlgebra t a
+rToCV :: (Functor (Base t), Corecursive t) => RAlgebra (Base t) t a -> CVAlgebra (Base t) a
 rToCV r = r . fmap (cata (embed . tailF) &&& extract)
 
 -- | Produce a list of identifiable subterms of a given term.
 --
 --   By “identifiable” we mean terms which have a user-assigned identifier associated with them, & which serve as a declaration rather than a reference; i.e. the declaration of a class or method or binding of a variable are all identifiable terms, but calling a named function or referencing a parameter is not.
-identifiableAlg :: (InUnion fs Declaration.Method, InUnion fs Declaration.Class, Foldable (Union fs), Functor (Union fs)) => RAlgebra (Term (Union fs) a) [Term (Union fs) a]
+identifiableAlg :: (InUnion fs Declaration.Method, InUnion fs Declaration.Class, Foldable (Union fs), Functor (Union fs)) => RAlgebra (Base (Term (Union fs) a)) (Term (Union fs) a) [Term (Union fs) a]
 identifiableAlg c@(_ :< union) = case union of
   _ | Just Declaration.Class{} <- prj union -> cofree (fmap fst c) : foldMap snd union
   _ | Just Declaration.Method{} <- prj union -> cofree (fmap fst c) : foldMap snd union
@@ -140,7 +140,7 @@ identifiableAlg c@(_ :< union) = case union of
 newtype CyclomaticComplexity = CyclomaticComplexity Int
   deriving (Enum, Eq, Num, Ord, Show)
 
-cyclomaticComplexityAlg :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Term (Union fs) a) CyclomaticComplexity
+cyclomaticComplexityAlg :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
 cyclomaticComplexityAlg (_ :< union) = case union of
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
@@ -148,7 +148,7 @@ cyclomaticComplexityAlg (_ :< union) = case union of
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f
-                     => FAlgebra (Term f (Record fs)) a -- ^ An F-algebra on terms.
+                     => FAlgebra (Base (Term f (Record fs))) a -- ^ An F-algebra on terms.
                      -> Term f (Record fs) -- ^ A term to decorate with values produced by the F-algebra.
                      -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the F-algebra.
 decoratorWithAlgebra alg = cata $ \ c@(a :< f) -> cofree $ (alg (fmap (rhead . extract) c) :. a) :< f
