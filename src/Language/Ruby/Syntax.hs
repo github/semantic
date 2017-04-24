@@ -110,7 +110,7 @@ optional a = a <|> term <*> pure Syntax.Empty
 -- | Produce a list of identifiable subterms of a given term.
 --
 --   By “identifiable” we mean terms which have a user-assigned identifier associated with them, & which serve as a declaration rather than a reference; i.e. the declaration of a class or method or binding of a variable are all identifiable terms, but calling a named function or referencing a parameter is not.
-identifiable :: Term Syntax a -> [Term Syntax a]
+identifiable :: (InUnion fs Declaration.Method, InUnion fs Declaration.Class, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) a -> [Term (Union fs) a]
 identifiable = para $ \ c@(_ :< union) -> case union of
   _ | Just Declaration.Class{} <- prj union -> cofree (fmap fst c) : foldMap snd union
   _ | Just Declaration.Method{} <- prj union -> cofree (fmap fst c) : foldMap snd union
