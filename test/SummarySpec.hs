@@ -5,7 +5,7 @@ import Category
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.List (partition)
-import Data.RandomWalkSimilarity
+import RWS
 import Data.Record
 import Data.String
 import Diff

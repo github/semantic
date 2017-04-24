@@ -4,7 +4,7 @@ module Data.RandomWalkSimilarity.Spec where
 import Category
 import Data.Bifunctor
 import Data.Functor.Listable
-import Data.RandomWalkSimilarity
+import RWS
 import Data.Record
 import Data.String
 import Data.These
