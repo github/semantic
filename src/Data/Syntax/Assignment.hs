@@ -148,10 +148,10 @@ advanceState state@AssignmentState{..}
   | otherwise = state
 
 data AssignmentState grammar = AssignmentState
-  { stateOffset :: Int
-  , statePos :: Info.SourcePos
-  , stateSource :: Source.Source
-  , stateNodes :: [AST grammar]
+  { stateOffset :: Int -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: Info.SourcePos -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateSource :: Source.Source -- ^ The remaining Source. Equal to dropping 'stateOffset' bytes off the original input Source.
+  , stateNodes :: [AST grammar] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
