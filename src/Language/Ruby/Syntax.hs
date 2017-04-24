@@ -109,6 +109,10 @@ optional :: Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node
 optional a = a <|> term <*> pure Syntax.Empty
 
 
+-- | An F-algebra on some carrier functor 'f'.
+type FAlgebra f a = f a -> a
+
+
 -- | Produce a list of identifiable subterms of a given term.
 --
 --   By “identifiable” we mean terms which have a user-assigned identifier associated with them, & which serve as a declaration rather than a reference; i.e. the declaration of a class or method or binding of a variable are all identifiable terms, but calling a named function or referencing a parameter is not.
@@ -126,9 +130,6 @@ cyclomaticComplexityAlg (_ :< union) = case union of
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
-
--- | An F-algebra on some carrier functor 'f'.
-type FAlgebra f a = f a -> a
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f
