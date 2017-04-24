@@ -3,6 +3,8 @@ module Data.Syntax.Assignment
 ( Assignment
 , get
 , state
+, Location
+, location
 , symbol
 , range
 , sourceSpan
@@ -24,7 +26,7 @@ import Data.Functor.Foldable hiding (Nil)
 import Data.Record
 import Data.Text (unpack)
 import qualified Info
-import Prologue hiding (Alt, get, state)
+import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
 import qualified Source (Source(..), drop, slice, sourceText)
 import Text.Parser.TreeSitter.Language
@@ -54,6 +56,12 @@ get = Get `Then` return
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (state *> b)' is fine, but 'many state' is not.
 state :: Assignment (Node grammar) (AssignmentState grammar)
 state = State `Then` return
+
+-- | Zero-width production of the current location.
+--
+--   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
+location :: Assignment (Node grammar) Location
+location = rtail <$> get <|> (\ (AssignmentState o p _ _) -> Info.Range o o :. Info.SourceSpan p p :. Nil) <$> state
 
 -- | Zero-width match of a node with the given symbol.
 --
@@ -86,6 +94,8 @@ children forEach = Children forEach `Then` return
 data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
   deriving (Eq, Functor, Show)
 
+-- | A location specified as possibly-empty intervals of bytes and line/column positions.
+type Location = Record '[Info.Range, Info.SourceSpan]
 type Node grammar = Record '[grammar, Info.Range, Info.SourceSpan]
 
 type AST grammar = Rose (Node grammar)
