@@ -147,7 +147,12 @@ advanceState state@AssignmentState{..}
   | Rose (_ :. range :. span :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
-data AssignmentState grammar = AssignmentState { stateOffset :: Int, statePos :: Info.SourcePos, stateSource :: Source.Source, stateNodes :: [AST grammar] }
+data AssignmentState grammar = AssignmentState
+  { stateOffset :: Int
+  , statePos :: Info.SourcePos
+  , stateSource :: Source.Source
+  , stateNodes :: [AST grammar]
+  }
   deriving (Eq, Show)
 
 instance Alternative (Assignment symbol) where
