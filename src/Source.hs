@@ -11,9 +11,13 @@ import Range
 import SourceSpan
 import Test.LeanCheck
 
--- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
-data SourceBlob = SourceBlob { source :: Source, oid :: T.Text, path :: FilePath, blobKind :: Maybe SourceKind }
-  deriving (Show, Eq)
+-- | The source, oid, path, and Maybe SourceKind of a blob.
+data SourceBlob = SourceBlob
+  { source :: Source -- ^ The UTF-8 encoded source text of the blob.
+  , oid :: T.Text -- ^ The Git object ID (SHA-1) of the blob.
+  , path :: FilePath -- ^ The file path to the blob.
+  , blobKind :: Maybe SourceKind -- ^ The kind of blob, Nothing denotes a blob that doesn't exist (e.g. on one side of a diff for adding a new file or deleting a file).
+  } deriving (Show, Eq)
 
 -- | The contents of a source file, represented as a ByteString.
 newtype Source = Source { sourceText :: B.ByteString }

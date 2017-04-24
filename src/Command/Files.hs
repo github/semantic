@@ -11,7 +11,7 @@ import Control.Exception (catch, IOException)
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 
--- | Read a file to a SourceBlob. (NOTE: file contents are converted to uncode.)
+-- | Read a file to a SourceBlob, transcoding to UTF-8 along the way.
 readFile :: FilePath -> IO SourceBlob
 readFile path = do
   -- source <- readFile' path

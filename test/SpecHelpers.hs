@@ -48,14 +48,14 @@ readFileToUnicode path = B.readFile path >>= transcode
 --
 -- NB: This is intentionally duplicated from Parser.Language because our tests
 -- will always need to be able to select language from file extention whereas
--- the semantic project should eventually depend on exernal language detection.
+-- the semantic project should eventually depend on external language detection.
 parserForFilePath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
 parserForFilePath = parserForLanguage . languageForType . toS . takeExtension
 
 -- | Read a file to a SourceBlob.
 --
 -- NB: This is intentionally duplicated from Command.Files because eventually
--- we want to be able to test a core Semantic library that has no knowlege of
+-- we want to be able to test a core Semantic library that has no knowledge of
 -- the filesystem or Git. The tests, however, will still leverage reading files.
 readFile :: FilePath -> IO SourceBlob
 readFile path = do

@@ -60,11 +60,11 @@ diffBlobPairs renderer blobs = do
 diffBlobPair :: Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record DefaultFields)))
 diffBlobPair blobs = do
   terms <- Async.mapConcurrently parseBlob blobs
-  case (runJoin blobs, runJoin terms) of
-    ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> pure Nothing
-                            | nonExistentBlob right -> pure . pure . pure $ Delete a
-                            | nonExistentBlob left -> pure . pure . pure $ Insert b
-                            | otherwise -> pure . pure $ runDiff terms
+  pure $ case (runJoin blobs, runJoin terms) of
+    ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> Nothing
+                            | nonExistentBlob right -> Just . pure $ Delete a
+                            | nonExistentBlob left -> Just . pure $ Insert b
+                            | otherwise -> Just $ runDiff terms
   where
     runDiff terms = stripDiff (runBothWith diffTerms (fmap decorate (terms `using` parTraversable rdeepseq)))
     decorate = defaultFeatureVectorDecorator getLabel
@@ -99,7 +99,7 @@ parserForLanguage (Just language) = case language of
   Language.Go -> treeSitterParser Language.Go tree_sitter_go
 
 
--- | Internal
+-- Internal
 
 renderConcurrently :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
 renderConcurrently f diffs = do

@@ -28,9 +28,9 @@ import SplitDiff
 import Syntax as S
 import Term
 
--- |
--- | Diffs
--- |
+--
+-- Diffs
+--
 
 -- | Render a diff to a string representing its JSON.
 json :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
@@ -171,9 +171,9 @@ syntaxToTermField syntax = case syntax of
   where childrenFields c = [ "children" .= c ]
 
 
--- |
--- | Parse Trees
--- |
+--
+-- Parse Trees
+--
 
 data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: Rose ParseNode } deriving (Show)
 
