@@ -17,7 +17,7 @@ import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 import Text.Regex
-import qualified Semantic (parseBlobs, diffBlobs)
+import qualified Semantic (parseBlobs, diffBlobPairs)
 
 main :: IO ()
 main = do
@@ -49,7 +49,7 @@ runDiff DiffArguments{..} = do
   blobs <- runCommand $ case diffMode of
    DiffPaths a b -> pure <$> traverse readFile (both a b)
    DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
-  Semantic.diffBlobs diffRenderer blobs
+  Semantic.diffBlobPairs diffRenderer blobs
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do

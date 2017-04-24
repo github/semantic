@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Semantic
-( diffBlobs
-, diffBlobs'
+( diffBlobPairs
+, diffBlobPair
 , parseBlobs
 , parseBlob
 , parserForLanguage
@@ -45,19 +45,19 @@ import TreeSitter
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 -- | Diff a list of SourceBlob pairs to produce ByteString output using the specified renderer.
-diffBlobs :: (Monoid output, StringConv output ByteString) => DiffRenderer DefaultFields output -> [Both SourceBlob] -> IO ByteString
-diffBlobs renderer blobs = do
+diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer DefaultFields output -> [Both SourceBlob] -> IO ByteString
+diffBlobPairs renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
   toS <$> renderConcurrently (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
-      diff <- diffBlobs' blobPair
+      diff <- diffBlobPair blobPair
       pure (blobPair, diff)
 
 -- | Diff a pair of SourceBlobs.
-diffBlobs' :: Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record DefaultFields)))
-diffBlobs' blobs = do
+diffBlobPair :: Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record DefaultFields)))
+diffBlobPair blobs = do
   terms <- Async.mapConcurrently parseBlob blobs
   case (runJoin blobs, runJoin terms) of
     ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> pure Nothing

@@ -86,7 +86,7 @@ data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob]
 fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [FilePath] -> DiffRenderer DefaultFields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f gitDir sha1 sha2 filePaths renderer = do
   blobs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
-  results <- Semantic.diffBlobs renderer blobs
+  results <- Semantic.diffBlobPairs renderer blobs
   let json = fromJust (decode (toS results))
   pure (errors json, summaries f json)
 
