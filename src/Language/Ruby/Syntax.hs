@@ -2,7 +2,6 @@
 module Language.Ruby.Syntax where
 
 import Data.Functor.Union
-import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
@@ -120,8 +119,8 @@ identifiable = para $ \ c@(_ :< union) -> case union of
 newtype CyclomaticComplexity = CyclomaticComplexity Int
   deriving (Enum, Eq, Num, Ord, Show)
 
-cyclomaticComplexityDecorator :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record t) -> Term (Union fs) (Record (CyclomaticComplexity ': t))
-cyclomaticComplexityDecorator = cata $ \ (a :< union) -> cofree . (:< union) . (:. a) $ case union of
-  _ | Just Statement.Return{} <- prj union -> succ (sum (rhead . extract <$> union))
-  _ | Just Statement.Yield{} <- prj union -> succ (sum (rhead . extract <$> union))
-  _ -> sum (rhead . extract <$> union)
+cyclomaticComplexity :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) a -> CyclomaticComplexity
+cyclomaticComplexity = cata $ \ (_ :< union) -> case union of
+  _ | Just Statement.Return{} <- prj union -> succ (sum union)
+  _ | Just Statement.Yield{} <- prj union -> succ (sum union)
+  _ -> sum union
