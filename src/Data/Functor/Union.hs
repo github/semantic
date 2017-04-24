@@ -25,6 +25,11 @@ unwrapU :: (ComonadCofree (Union fs) w, InUnion fs f) => w a -> Maybe (f (w a))
 unwrapU = prj . unwrap
 
 
+strengthen :: Union '[f] a -> f a
+strengthen (Here f) = f
+strengthen _ = undefined
+
+
 -- Classes
 
 class InUnion (fs :: [* -> *]) (f :: * -> *) where
