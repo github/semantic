@@ -70,6 +70,14 @@ instance (Functor f, Functor (Union (g ': hs))) => Functor (Union (f ': g ': hs)
   fmap f (There t) = There (fmap f t)
 
 
+instance Traversable f => Traversable (Union '[f]) where
+  traverse f = fmap Here . traverse f . strengthen
+
+instance (Traversable f, Traversable (Union (g ': hs))) => Traversable (Union (f ': g ': hs)) where
+  traverse f (Here r) = Here <$> traverse f r
+  traverse f (There t) = There <$> traverse f t
+
+
 instance (Eq (f a), Eq (Union fs a)) => Eq (Union (f ': fs) a) where
   Here f1 == Here f2 = f1 == f2
   There fs1 == There fs2 = fs1 == fs2
