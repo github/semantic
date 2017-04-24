@@ -131,7 +131,7 @@ fToCV f = f . fmap extract
 --   Note that this is in general O(n), since it must visit each node of the term in order to reconstruct the original term; and thus, a histomorphism performed with the resulting algebra will be O(n²).
 rToCV :: (Functor (Base t), Corecursive t) => RAlgebra (Base t) t a -> CVAlgebra (Base t) a
 rToCV r = r . fmap (cata (embed . tailF) &&& extract)
-{-# DEPRECATED "rToCV is asymptotically inefficient. Suggest refactoring to an FAlgebra or CVAlgebra." #-}
+{-# DEPRECATED rToCV "rToCV is asymptotically inefficient. Suggest refactoring to an FAlgebra or CVAlgebra." #-}
 
 -- | Produce a list of identifiable subterms of a given term.
 --
