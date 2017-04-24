@@ -122,6 +122,7 @@ type CVAlgebra t a = Base t (Cofree (Base t) a) -> a
 fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
 fToR f = f . fmap snd
 
+-- | Promote an RAlgebra into a CVAlgebra (by dropping all values except the most recent).
 rToCV :: (Functor (Base t), Corecursive t) => RAlgebra t a -> CVAlgebra t a
 rToCV r = r . fmap (cata (embed . tailF) &&& extract)
 
