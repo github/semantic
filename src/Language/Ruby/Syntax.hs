@@ -1,7 +1,9 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TemplateHaskell, TypeOperators #-}
 module Language.Ruby.Syntax where
 
+import Data.Functor.Foldable (Base)
 import Data.Functor.Union
+import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
@@ -124,3 +126,8 @@ cyclomaticComplexity = cata $ \ (_ :< union) -> case union of
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
+
+type FAlgebra f a = f a -> a
+
+decoratorWithAlgebra :: Functor f => FAlgebra (Base (Term f (Record fs))) a -> Term f (Record fs) -> Term f (Record (a ': fs))
+decoratorWithAlgebra alg = cata $ \ c@(a :< f) -> cofree $ (alg (fmap (rhead . extract) c) :. a) :< f
