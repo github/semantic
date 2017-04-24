@@ -112,6 +112,9 @@ optional a = a <|> term <*> pure Syntax.Empty
 -- | An F-algebra on some carrier functor 'f'.
 type FAlgebra f a = f a -> a
 
+-- | An R-algebra on the base functor of some type 't'.
+type RAlgebra t a = Base t (t, a) -> a
+
 
 -- | Produce a list of identifiable subterms of a given term.
 --
