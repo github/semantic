@@ -121,8 +121,8 @@ identifiable = para $ \ c@(_ :< union) -> case union of
 newtype CyclomaticComplexity = CyclomaticComplexity Int
   deriving (Enum, Eq, Num, Ord, Show)
 
-cyclomaticComplexity :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) a -> CyclomaticComplexity
-cyclomaticComplexity = cata $ \ (_ :< union) -> case union of
+cyclomaticComplexityAlg :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => TermF (Union fs) a CyclomaticComplexity -> CyclomaticComplexity
+cyclomaticComplexityAlg (_ :< union) = case union of
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
