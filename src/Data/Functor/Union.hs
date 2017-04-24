@@ -62,6 +62,14 @@ instance Foldable (Union '[]) where
   foldMap _ _ = mempty
 
 
+instance Functor f => Functor (Union '[f]) where
+  fmap f = Here . fmap f . strengthen
+
+instance (Functor f, Functor (Union (g ': hs))) => Functor (Union (f ': g ': hs)) where
+  fmap f (Here e) = Here (fmap f e)
+  fmap f (There t) = There (fmap f t)
+
+
 instance (Eq (f a), Eq (Union fs a)) => Eq (Union (f ': fs) a) where
   Here f1 == Here f2 = f1 == f2
   There fs1 == There fs2 = fs1 == fs2
