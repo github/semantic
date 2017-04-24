@@ -96,6 +96,8 @@ data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = Record '[Info.Range, Info.SourceSpan]
+
+-- | The label annotating a node in the AST, specified as the pairing of its symbol and location information.
 type Node grammar = Record '[grammar, Info.Range, Info.SourceSpan]
 
 type AST grammar = Rose (Node grammar)
