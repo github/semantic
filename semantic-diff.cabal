@@ -63,6 +63,7 @@ library
                      , Renderer.Summary
                      , Renderer.SExpression
                      , Renderer.TOC
+                     , RWS
                      , Semantic
                      , SES
                      , SES.Myers
@@ -90,6 +91,7 @@ library
                      , containers
                      , directory
                      , dlist
+                     , effects
                      , filepath
                      , free
                      , freer-cofreer

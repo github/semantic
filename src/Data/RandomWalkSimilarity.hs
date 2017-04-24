@@ -18,7 +18,6 @@ module Data.RandomWalkSimilarity
 import Control.Applicative
 import Control.Monad.Random
 import Control.Monad.State
-import Data.Align.Generic
 import Data.Array
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
@@ -46,7 +45,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields.
-       (GAlign f, Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
+       (Traversable f, Eq1 f, HasField fields Category, HasField fields (Maybe FeatureVector))
     => (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
     -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
     -> [Term f (Record fields)] -- ^ The list of old terms.

@@ -111,7 +111,7 @@ data Result a = Result a | Error [Text]
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
-assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 0 0)
+assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
 
 assignAllFrom :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
 assignAllFrom assignment state = case runAssignment assignment state of
@@ -142,12 +142,19 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
 dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
 
+-- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: AssignmentState grammar -> AssignmentState grammar
 advanceState state@AssignmentState{..}
   | Rose (_ :. range :. span :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
-data AssignmentState grammar = AssignmentState { stateOffset :: Int, statePos :: Info.SourcePos, stateSource :: Source.Source, stateNodes :: [AST grammar] }
+-- | State kept while running 'Assignment's.
+data AssignmentState grammar = AssignmentState
+  { stateOffset :: Int -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: Info.SourcePos -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateSource :: Source.Source -- ^ The remaining Source. Equal to dropping 'stateOffset' bytes off the original input Source.
+  , stateNodes :: [AST grammar] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  }
   deriving (Eq, Show)
 
 instance Alternative (Assignment symbol) where
