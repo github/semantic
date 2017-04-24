@@ -20,7 +20,7 @@ import Diff
 import Info
 import Patch
 import Range
-import Source hiding (break)
+import Source hiding (break, drop, take)
 import SplitDiff
 import Syntax
 import Term
