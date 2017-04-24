@@ -66,7 +66,7 @@ spec = do
         (many (symbol Red *> children (symbol Green *> source)
            <|> symbol Blue *> source))
         (startingState "BC" [ Rose (rec Red 0 1) [ Rose (rec Green 0 1) [] ]
-                                         , Rose (rec Blue 1 2) [] ])
+                            , Rose (rec Blue 1 2) [] ])
       `shouldBe`
         Result (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["B", "C"])
 
@@ -74,7 +74,7 @@ spec = do
       runAssignment
         (symbol Red *> children (many (symbol Green *> children (symbol Blue *> source))))
         (startingState "12" [ Rose (rec Red 0 2) [ Rose (rec Green 0 1) [ Rose (rec Blue 0 1) [] ]
-                                                              , Rose (rec Green 1 2) [ Rose (rec Blue 1 2) [] ] ] ])
+                                                 , Rose (rec Green 1 2) [ Rose (rec Blue 1 2) [] ] ] ])
       `shouldBe`
         Result (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["1", "2"])
 
