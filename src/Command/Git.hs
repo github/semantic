@@ -3,11 +3,10 @@ module Command.Git
 , readFilesAtSHAs
 ) where
 
-import qualified Control.Concurrent.Async.Pool as Async
+import qualified Control.Concurrent.Async as Async
 import Data.Functor.Both
 import Data.String
 import Data.List ((\\), nub)
-import GHC.Conc (numCapabilities)
 import Prologue
 import Git.Blob
 import Git.Libgit2
@@ -35,9 +34,7 @@ readFilesAtSHAs gitDir alternates paths shas = do
       pure . nub $! (\ (p, _, _) -> toS p) <$> runBothWith (\\) paths <> runBothWith (flip (\\)) paths
     _ -> pure paths
 
-  Async.withTaskGroup numCapabilities $
-    \ group -> Async.runTask group $
-      traverse (Async.task . runGit' . blobsForPath) paths
+  Async.mapConcurrently (runGit' . blobsForPath) paths
   where
     runGit' = runGit gitDir alternates
     blobsForPath path = do
