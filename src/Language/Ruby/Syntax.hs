@@ -123,6 +123,8 @@ fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
 fToR f = f . fmap snd
 
 -- | Promote an RAlgebra into a CVAlgebra (by dropping all values except the most recent).
+--
+--   Note that this is in general O(n), since it must visit each node of the term in order to reconstruct the original term; and thus, a histomorphism performed with the resulting algebra will be O(n²).
 rToCV :: (Functor (Base t), Corecursive t) => RAlgebra t a -> CVAlgebra t a
 rToCV r = r . fmap (cata (embed . tailF) &&& extract)
 
