@@ -111,7 +111,7 @@ data Result a = Result a | Error [Text]
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
-assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 0 0)
+assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
 
 assignAllFrom :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
 assignAllFrom assignment state = case runAssignment assignment state of
