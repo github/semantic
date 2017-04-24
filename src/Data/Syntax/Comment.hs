@@ -7,7 +7,7 @@ import Prologue
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: ByteString }
-  deriving (Eq, Foldable, Generic1, Show)
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
