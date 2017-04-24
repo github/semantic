@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes, ViewPatterns #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
