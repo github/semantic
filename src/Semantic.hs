@@ -49,7 +49,7 @@ diffBlobs :: (Monoid output, StringConv output ByteString) => DiffRenderer Defau
 diffBlobs renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
-  toS <$> renderAsync (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> renderConcurrently (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
       diff <- diffBlobs' blobPair
@@ -76,7 +76,7 @@ diffBlobs' blobs = do
 parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
 parseBlobs renderer blobs = do
   terms <- traverse go blobs
-  toS <$> renderAsync (resolveParseTreeRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> renderConcurrently (resolveParseTreeRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
       term <- parseBlob blob
@@ -100,8 +100,8 @@ parserForLanguage (Just language) = case language of
 
 -- | Internal
 
-renderAsync :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
-renderAsync f diffs = do
+renderConcurrently :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
+renderConcurrently f diffs = do
   outputs <- Async.mapConcurrently (pure . uncurry f) diffs
   pure $ mconcat (outputs `using` parTraversable rseq)
 
