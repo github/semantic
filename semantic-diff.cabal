@@ -27,7 +27,6 @@ library
                      , Data.Functor.Union
                      , Data.Mergeable
                      , Data.Mergeable.Generic
-                     , Data.RandomWalkSimilarity
                      , Data.Record
                      , Data.Syntax
                      , Data.Syntax.Assignment
