@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TemplateHaskell, TypeOperators #-}
 module Language.Ruby.Syntax where
 
-import Data.Functor.Foldable (Base)
+import Data.Functor.Foldable (Base, Corecursive(..))
 import Data.Functor.Union
 import Data.Record
 import qualified Data.Syntax as Syntax
@@ -121,6 +121,9 @@ type CVAlgebra t a = Base t (Cofree (Base t) a) -> a
 -- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
 fToR f = f . fmap snd
+
+rToCV :: (Functor (Base t), Corecursive t) => RAlgebra t a -> CVAlgebra t a
+rToCV r = r . fmap (cata (embed . tailF) &&& extract)
 
 -- | Produce a list of identifiable subterms of a given term.
 --
