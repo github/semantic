@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
@@ -20,6 +20,8 @@ data DiffArguments where
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
     } -> DiffArguments
+
+deriving instance Show DiffArguments
 
 patchDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
 patchDiff = DiffArguments PatchRenderer
@@ -51,6 +53,8 @@ data ParseArguments where
     , alternateObjectDirs :: [FilePath]
     } -> ParseArguments
 
+deriving instance Show ParseArguments
+
 sExpressionParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
@@ -67,18 +71,3 @@ data Arguments = Arguments
   { programMode :: ProgramMode
   , outputFilePath :: Maybe FilePath
   } deriving Show
-
-
-instance Show DiffArguments where
-  showsPrec d (DiffArguments renderer mode gitDir alternateObjectDirs) = showParen (d >= 10) $ showString "DiffArguments "
-    . showString "diffRenderer = " . shows renderer . showString ", "
-    . showString "diffMode = " . shows mode . showString ", "
-    . showString "gitDir = " . shows gitDir . showString ", "
-    . showString "alternateObjectDirs = " . shows alternateObjectDirs
-
-instance Show ParseArguments where
-  showsPrec d (ParseArguments renderer mode gitDir alternateObjectDirs) = showParen (d >= 10) $ showString "ParseArguments "
-    . showString "parseTreeRenderer = " . shows renderer . showString ", "
-    . showString "parseMode = " . shows mode . showString ", "
-    . showString "gitDir = " . shows gitDir . showString ", "
-    . showString "alternateObjectDirs = " . shows alternateObjectDirs
