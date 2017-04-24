@@ -132,7 +132,7 @@ type FAlgebra f a = f a -> a
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f
-                     => FAlgebra (Base (Term f (Record fs))) a
-                     -> Term f (Record fs)
-                     -> Term f (Record (a ': fs))
+                     => FAlgebra (Base (Term f (Record fs))) a -- ^ An F-algebra on terms.
+                     -> Term f (Record fs) -- ^ A term to decorate with values produced by the F-algebra.
+                     -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the F-algebra.
 decoratorWithAlgebra alg = cata $ \ c@(a :< f) -> cofree $ (alg (fmap (rhead . extract) c) :. a) :< f
