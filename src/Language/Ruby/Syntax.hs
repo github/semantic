@@ -130,5 +130,6 @@ cyclomaticComplexity = cata $ \ (_ :< union) -> case union of
 -- | An F-algebra on some carrier functor 'f'.
 type FAlgebra f a = f a -> a
 
+-- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f => FAlgebra (Base (Term f (Record fs))) a -> Term f (Record fs) -> Term f (Record (a ': fs))
 decoratorWithAlgebra alg = cata $ \ c@(a :< f) -> cofree $ (alg (fmap (rhead . extract) c) :. a) :< f
