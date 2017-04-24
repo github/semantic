@@ -90,7 +90,7 @@ data Result a = Result a | Error [Text]
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source -> [AST grammar] -> Result a
-assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0
+assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 0 0)
 
 assignAllFrom :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
 assignAllFrom assignment state = case runAssignment assignment state of
@@ -104,16 +104,16 @@ runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node 
 runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (assignment, AssignmentState offset source (subtree@(Rose node@(_ :. range :. _) children) : _)) -> case assignment of
+  (assignment, AssignmentState offset _ source (subtree@(Rose node@(_ :. range :. _) children) : _)) -> case assignment of
     Get -> yield node state
     Source -> yield (sourceText (slice (offsetRange range (negate offset)) source)) (advanceState state)
     Children childAssignment -> do
       c <- assignAllFrom childAssignment state { stateNodes = children }
       yield c (advanceState state)
     _ -> Error ["No rule to match " <> show subtree]
-  (Get, AssignmentState _ _ []) -> Error [ "Expected node but got end of input." ]
-  (Source, AssignmentState _ _ []) -> Error [ "Expected leaf node but got end of input." ]
-  (Children _, AssignmentState _ _ []) -> Error [ "Expected branch node but got end of input." ]
+  (Get, AssignmentState{}) -> Error [ "Expected node but got end of input." ]
+  (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
+  (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
   . fmap (\ a state -> Result (state, a))
 
@@ -122,10 +122,10 @@ dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType 
 
 advanceState :: AssignmentState grammar -> AssignmentState grammar
 advanceState state@AssignmentState{..}
-  | Rose (_ :. range :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  | Rose (_ :. range :. span :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
-data AssignmentState grammar = AssignmentState { stateOffset :: Int, stateSource :: Source, stateNodes :: [AST grammar] }
+data AssignmentState grammar = AssignmentState { stateOffset :: Int, statePos :: Info.SourcePos, stateSource :: Source, stateNodes :: [AST grammar] }
   deriving (Eq, Show)
 
 instance Alternative (Assignment symbol) where
