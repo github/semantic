@@ -122,6 +122,10 @@ type CVAlgebra f a = f (Cofree f a) -> a
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
 fToR f = f . fmap snd
 
+-- | Promote an FAlgebra into a CVAlgebra (by dropping all results except the head).
+fToCV :: Functor f => FAlgebra f a -> CVAlgebra f a
+fToCV f = f . fmap extract
+
 -- | Promote an RAlgebra into a CVAlgebra (by dropping all values except the most recent).
 --
 --   Note that this is in general O(n), since it must visit each node of the term in order to reconstruct the original term; and thus, a histomorphism performed with the resulting algebra will be O(n²).
