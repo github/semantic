@@ -100,6 +100,7 @@ type Location = Record '[Info.Range, Info.SourceSpan]
 -- | The label annotating a node in the AST, specified as the pairing of its symbol and location information.
 type Node grammar = Record '[grammar, Info.Range, Info.SourceSpan]
 
+-- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
 type AST grammar = Rose (Node grammar)
 
 
