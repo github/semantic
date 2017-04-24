@@ -105,3 +105,11 @@ term =  (\ a f -> cofree $ a :< inj f) <$> location
 
 optional :: Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
 optional a = a <|> term <*> pure Syntax.Empty
+
+
+-- | Produce a list of identifiable subterms of a given term.
+--
+--   By “identifiable” we mean terms which have a user-assigned identifier associated with them, & which serve as a declaration rather than a reference; i.e. the declaration of a class or method or binding of a variable are all identifiable terms, but calling a named function or referencing a parameter is not.
+identifiable :: Term Syntax a -> [Term Syntax a]
+identifiable = para $ \ (_ :< union) -> case union of
+  _ -> foldMap snd union
