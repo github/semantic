@@ -115,6 +115,7 @@ type FAlgebra t a = Base t a -> a
 -- | An R-algebra on the base functor of some type 't'.
 type RAlgebra t a = Base t (t, a) -> a
 
+-- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
 fToR f = f . fmap snd
 
