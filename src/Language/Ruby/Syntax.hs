@@ -1,7 +1,8 @@
-{-# LANGUAGE DataKinds, TemplateHaskell, TypeOperators #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TemplateHaskell, TypeOperators #-}
 module Language.Ruby.Syntax where
 
 import Data.Functor.Union
+import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
@@ -115,3 +116,12 @@ identifiable = para $ \ c@(_ :< union) -> case union of
   _ | Just Declaration.Class{} <- prj union -> cofree (fmap fst c) : foldMap snd union
   _ | Just Declaration.Method{} <- prj union -> cofree (fmap fst c) : foldMap snd union
   _ -> foldMap snd union
+
+newtype CyclomaticComplexity = CyclomaticComplexity Int
+  deriving (Enum, Eq, Num, Ord, Show)
+
+cyclomaticComplexityDecorator :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record t) -> Term (Union fs) (Record (CyclomaticComplexity ': t))
+cyclomaticComplexityDecorator = cata $ \ (a :< union) -> cofree . (:< union) . (:. a) $ case union of
+  _ | Just Statement.Return{} <- prj union -> succ (sum (rhead . extract <$> union))
+  _ | Just Statement.Yield{} <- prj union -> succ (sum (rhead . extract <$> union))
+  _ -> sum (rhead . extract <$> union)
