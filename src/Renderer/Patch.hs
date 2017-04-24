@@ -17,7 +17,7 @@ import Patch
 import Prologue hiding (fst, snd)
 import Range
 import qualified Source
-import Source hiding (break, length, null)
+import Source hiding (break, drop, length, null, take)
 import Syntax
 import SplitDiff
 

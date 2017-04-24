@@ -66,9 +66,17 @@ fromText = Source . encodeUtf8
 
 -- | Return a Source that contains a slice of the given Source.
 slice :: Range -> Source -> Source
-slice range = Source . take . drop . sourceText
-  where drop = B.drop (start range)
-        take = B.take (rangeLength range)
+slice range = take . drop
+  where drop = Source.drop (start range)
+        take = Source.take (rangeLength range)
+
+drop :: Int -> Source -> Source
+drop i = Source . drop . sourceText
+  where drop = B.drop i
+
+take :: Int -> Source -> Source
+take i = Source . take . sourceText
+  where take = B.take i
 
 -- | Return the ByteString contained in the Source.
 toText :: Source -> Text
@@ -90,14 +98,14 @@ actualLines = fmap Source . actualLines' . sourceText
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source -> [Range]
-actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
+actualLineRanges range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
 
 -- | Compute the character range given a Source and a SourceSpan.
 sourceSpanToRange :: Source -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sumLengths leadingRanges + column spanStart
-        end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
+        end = start + sumLengths (Prologue.take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
         (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (Source.totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 

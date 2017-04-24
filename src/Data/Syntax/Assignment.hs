@@ -1,43 +1,85 @@
-{-# LANGUAGE GADTs, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
+, get
+, state
+, Location
+, location
 , symbol
+, range
+, sourceSpan
 , source
 , children
 , Rose(..)
 , RoseF(..)
-, Node(..)
+, Node
 , AST
 , Result(..)
 , assignAll
 , runAssignment
+, AssignmentState(..)
 ) where
 
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
-import Data.Functor.Foldable
+import Data.Functor.Foldable hiding (Nil)
+import Data.Record
 import Data.Text (unpack)
-import Prologue hiding (Alt)
+import qualified Info
+import Prologue hiding (Alt, get, Location, state)
+import Range (offsetRange)
+import qualified Source (Source(..), drop, slice, sourceText)
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment symbol = Freer (AssignmentF symbol)
+type Assignment node = Freer (AssignmentF node)
 
-data AssignmentF symbol a where
-  Symbol :: symbol -> AssignmentF symbol ()
+data AssignmentF node a where
+  Get :: AssignmentF node node
+  State :: AssignmentF (Node grammar) (AssignmentState grammar)
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
 
+-- | Zero-width production of the current node.
+--
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (get *> b)' is fine, but 'many get' is not.
+get :: Assignment (Record fields) (Record fields)
+get = Get `Then` return
+
+-- | Zero-width production of the current state.
+--
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (state *> b)' is fine, but 'many state' is not.
+state :: Assignment (Node grammar) (AssignmentState grammar)
+state = State `Then` return
+
+-- | Zero-width production of the current location.
+--
+--   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
+location :: Assignment (Node grammar) Location
+location = rtail <$> get <|> (\ (AssignmentState o p _ _) -> Info.Range o o :. Info.SourceSpan p p :. Nil) <$> state
+
 -- | Zero-width match of a node with the given symbol.
 --
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (rule A *> b)' is fine, but 'many (rule A)' is not.
-symbol :: symbol -> Assignment symbol ()
-symbol s = Symbol s `Then` return
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
+symbol :: (HasField fields symbol, Eq symbol) => symbol -> Assignment (Record fields) ()
+symbol s = Get `Then` guard . (s ==) . getField
+
+-- | Zero-width production of the current node’s range.
+--
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (range *> b)' is fine, but 'many range' is not.
+range :: HasField fields Info.Range => Assignment (Record fields) Info.Range
+range = Get `Then` return . getField
+
+-- | Zero-width production of the current node’s sourceSpan.
+--
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (sourceSpan *> b)' is fine, but 'many sourceSpan' is not.
+sourceSpan :: HasField fields Info.SourceSpan => Assignment (Record fields) Info.SourceSpan
+sourceSpan = Get `Then` return . getField
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: Assignment symbol ByteString
@@ -52,11 +94,13 @@ children forEach = Children forEach `Then` return
 data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
   deriving (Eq, Functor, Show)
 
--- | A node in the input AST. We only concern ourselves with its symbol (considered as an element of 'grammar') and source.
-data Node grammar = Node { nodeSymbol :: grammar, nodeSource :: ByteString }
-  deriving (Eq, Show)
+-- | A location specified as possibly-empty intervals of bytes and line/column positions.
+type Location = Record '[Info.Range, Info.SourceSpan]
 
--- | An abstract syntax tree.
+-- | The label annotating a node in the AST, specified as the pairing of its symbol and location information.
+type Node grammar = Record '[grammar, Info.Range, Info.SourceSpan]
+
+-- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
 type AST grammar = Rose (Node grammar)
 
 
@@ -66,32 +110,52 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result a
-assignAll assignment nodes = case runAssignment assignment nodes of
-  Result (rest, a) -> case dropAnonymous rest of
+assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
+assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
+
+assignAllFrom :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
+assignAllFrom assignment state = case runAssignment assignment state of
+  Result (state, a) -> case stateNodes (dropAnonymous state) of
     [] -> Result a
     c:_ -> Error ["Expected end of input, but got: " <> show c]
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment grammar a -> [AST grammar] -> Result ([AST grammar], a)
-runAssignment = iterFreer (\ assignment yield nodes -> case (assignment, dropAnonymous nodes) of
+runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-  (Alt a b, nodes) -> yield a nodes <|> yield b nodes -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (assignment, node@(Rose Node{..} children) : rest) -> case assignment of
-    Symbol symbol -> guard (symbol == nodeSymbol) >> yield () nodes
-    Source -> yield nodeSource rest
-    Children childAssignment -> assignAll childAssignment children >>= flip yield rest
-    _ -> Error ["No rule to match " <> show node]
-  (Symbol symbol, []) -> Error [ "Expected " <> show symbol <> " but got end of input." ]
-  (Source, []) -> Error [ "Expected leaf node but got end of input." ]
-  (Children _, []) -> Error [ "Expected branch node but got end of input." ]
+  (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
+  (State, state) -> yield state state
+  (assignment, AssignmentState offset _ source (subtree@(Rose node@(_ :. range :. _) children) : _)) -> case assignment of
+    Get -> yield node state
+    Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
+    Children childAssignment -> do
+      c <- assignAllFrom childAssignment state { stateNodes = children }
+      yield c (advanceState state)
+    _ -> Error ["No rule to match " <> show subtree]
+  (Get, AssignmentState{}) -> Error [ "Expected node but got end of input." ]
+  (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
+  (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
-  . fmap ((Result .) . flip (,))
+  . fmap (\ a state -> Result (state, a))
 
-dropAnonymous :: Symbol grammar => [AST grammar] -> [AST grammar]
-dropAnonymous = dropWhile ((/= Regular) . symbolType . nodeSymbol . roseValue)
+dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
+dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
 
+-- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
+advanceState :: AssignmentState grammar -> AssignmentState grammar
+advanceState state@AssignmentState{..}
+  | Rose (_ :. range :. span :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  | otherwise = state
+
+-- | State kept while running 'Assignment's.
+data AssignmentState grammar = AssignmentState
+  { stateOffset :: Int -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: Info.SourcePos -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateSource :: Source.Source -- ^ The remaining Source. Equal to dropping 'stateOffset' bytes off the original input Source.
+  , stateNodes :: [AST grammar] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  }
+  deriving (Eq, Show)
 
 instance Alternative (Assignment symbol) where
   empty = Empty `Then` return
@@ -99,7 +163,8 @@ instance Alternative (Assignment symbol) where
 
 instance Show symbol => Show1 (AssignmentF symbol) where
   liftShowsPrec sp sl d a = case a of
-    Symbol s -> showsUnaryWith showsPrec "Symbol" d s . showChar ' ' . sp d ()
+    Get -> showString "Get"
+    State -> showString "State" . sp d (AssignmentState 0 (Info.SourcePos 0 0) (Source.Source "") [])
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b

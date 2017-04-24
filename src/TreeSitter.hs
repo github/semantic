@@ -46,7 +46,10 @@ treeSitterParser language grammar blob = do
     pure term
 
 
-parseRubyToAST :: Source -> IO (A.AST Ruby.Grammar)
+-- | Parse Ruby to AST. Intended for use in ghci, e.g.:
+--
+--   > Source.readAndTranscodeFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST >>= pure . uncurry (assignAll assignment) . second pure
+parseRubyToAST :: Source -> IO (Source, A.AST Ruby.Grammar)
 parseRubyToAST source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
@@ -57,19 +60,17 @@ parseRubyToAST source = do
       ts_document_root_node_p document rootPtr
       peek rootPtr)
 
-  ast <- anaM toAST (0, source, root)
+  ast <- anaM toAST root
 
   ts_document_free document
-  pure ast
-  where toAST :: (Int, Source, Node) -> IO (A.RoseF (A.Node Ruby.Grammar) (Int, Source, Node))
-        toAST (offset, source, node@Node{..}) = do
-          let range = nodeRange node
-          let sliced = Source.slice (offsetRange range (negate offset)) source
+  pure (source, ast)
+  where toAST :: Node -> IO (A.RoseF (A.Node Ruby.Grammar) Node)
+        toAST node@Node{..} = do
           let count = fromIntegral nodeChildCount
           children <- allocaArray count $ \ childNodesPtr -> do
             _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
             peekArray count childNodesPtr
-          pure $ A.RoseF (A.Node (toEnum (fromIntegral nodeSymbol)) (Source.sourceText sliced)) ((,,) (start range) sliced <$> children)
+          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
 
         anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
         anaM g = a where a = pure . embed <=< traverse a <=< g
