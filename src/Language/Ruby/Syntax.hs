@@ -113,4 +113,5 @@ optional a = a <|> term <*> pure Syntax.Empty
 identifiable :: Term Syntax a -> [Term Syntax a]
 identifiable = para $ \ c@(_ :< union) -> case union of
   _ | Just Declaration.Class{} <- prj union -> cofree (fmap fst c) : foldMap snd union
+  _ | Just Declaration.Method{} <- prj union -> cofree (fmap fst c) : foldMap snd union
   _ -> foldMap snd union
