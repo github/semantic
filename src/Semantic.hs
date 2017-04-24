@@ -13,6 +13,8 @@ import qualified Data.Text as T
 import Data.Functor.Both
 import Data.RandomWalkSimilarity
 import Data.Record
+import Data.String
+import Data.List.Split
 import Diff
 import Info
 import Interpreter
@@ -32,9 +34,6 @@ import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
 
--- TODO: Shouldn't need to depend on System.FilePath in here, but this is
--- currently the way we do language detection.
-import System.FilePath
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -107,9 +106,20 @@ renderAsync f diffs = do
   pure $ mconcat (outputs `using` parTraversable rseq)
 
 -- | Return a parser based on the FilePath's extension (including the ".").
--- | TODO: Remove this.
 parserForFilePath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
 parserForFilePath = parserForLanguage . languageForType . toS . takeExtension
+  where
+    -- System.FilePath defines a more robust version of this, but we don't want
+    -- the core semantic library to have to know anything about filesystems and
+    -- language detection is eventually a job for the calling program.
+    -- See: https://github.com/haskell/filepath/blob/master/System/FilePath/Internal.hs
+    takeExtension :: FilePath -> String
+    takeExtension path =
+      case rest of
+        [] -> ""
+        _ -> ext
+      where
+        (ext : rest) = reverse $ split (keepDelimsL $ whenElt (== '.')) path
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
