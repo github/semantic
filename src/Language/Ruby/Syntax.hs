@@ -127,6 +127,7 @@ cyclomaticComplexity = cata $ \ (_ :< union) -> case union of
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
 
+-- | An F-algebra on some carrier functor 'f'.
 type FAlgebra f a = f a -> a
 
 decoratorWithAlgebra :: Functor f => FAlgebra (Base (Term f (Record fs))) a -> Term f (Record fs) -> Term f (Record (a ': fs))
