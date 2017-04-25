@@ -139,7 +139,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   TODO: Inner functions should not increase parent scope’s complexity.
 cyclomaticComplexityAlg :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
 cyclomaticComplexityAlg (_ :< union) = case union of
-  _ | Just Statement.Method{} <- prj union -> succ (sum union)
+  _ | Just Declaration.Method{} <- prj union -> succ (sum union)
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
