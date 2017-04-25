@@ -124,7 +124,7 @@ newtype Identifier' = Identifier' ByteString
 
 -- | Produce the identifier for a given term, if any.
 --
---   By “identifiable” we mean terms which have a user-assigned identifier associated with them, & which serve as a declaration rather than a reference; i.e. the declaration of a class or method or binding of a variable are all identifiable terms, but calling a named function or referencing a parameter is not.
+--   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
 identifierAlg :: (InUnion fs Syntax.Identifier, InUnion fs Declaration.Method, InUnion fs Declaration.Class, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier')
 identifierAlg (_ :< union) = case union of
   _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier' s)
