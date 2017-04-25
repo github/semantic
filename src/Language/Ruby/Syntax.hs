@@ -135,6 +135,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 -- | Compute the cyclomatic complexity of a (sub)term, measured as the number places where control exits scope, e.g. returns and yields.
 cyclomaticComplexityAlg :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
 cyclomaticComplexityAlg (_ :< union) = case union of
+  _ | Just Statement.Method{} <- prj union -> succ (sum union)
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
