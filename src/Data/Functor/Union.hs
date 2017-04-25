@@ -13,7 +13,9 @@ import Prologue
 
 -- | N-ary union of type constructors.
 data Union (ts :: [k -> *]) (a :: k) where
+  -- | An element of the first type in the union’s list.
   Here :: f a -> Union (f ': ts) a
+  -- | An element of a later type in the union’s list.
   There :: Union ts a -> Union (f ': ts) a
 
 -- | Embed a functor in a union and lift the union into a free monad.
@@ -23,6 +25,11 @@ wrapU = wrap . inj
 -- | Unwrap a cofree comonad and project a functor from the resulting union.
 unwrapU :: (ComonadCofree (Union fs) w, InUnion fs f) => w a -> Maybe (f (w a))
 unwrapU = prj . unwrap
+
+
+strengthen :: Union '[f] a -> f a
+strengthen (Here f) = f
+strengthen _ = panic "strengthening an empty union by some catastrophic failure of typechecking & assumptions"
 
 
 -- Classes
@@ -55,6 +62,22 @@ instance (Foldable f, Foldable (Union fs)) => Foldable (Union (f ': fs)) where
 
 instance Foldable (Union '[]) where
   foldMap _ _ = mempty
+
+
+instance Functor f => Functor (Union '[f]) where
+  fmap f = Here . fmap f . strengthen
+
+instance (Functor f, Functor (Union (g ': hs))) => Functor (Union (f ': g ': hs)) where
+  fmap f (Here e) = Here (fmap f e)
+  fmap f (There t) = There (fmap f t)
+
+
+instance Traversable f => Traversable (Union '[f]) where
+  traverse f = fmap Here . traverse f . strengthen
+
+instance (Traversable f, Traversable (Union (g ': hs))) => Traversable (Union (f ': g ': hs)) where
+  traverse f (Here r) = Here <$> traverse f r
+  traverse f (There t) = There <$> traverse f t
 
 
 instance (Eq (f a), Eq (Union fs a)) => Eq (Union (f ': fs) a) where
