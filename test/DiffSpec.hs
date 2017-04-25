@@ -4,7 +4,7 @@ module DiffSpec where
 import Category
 import Data.Bifunctor.Join
 import Data.Functor.Listable
-import Data.RandomWalkSimilarity
+import RWS
 import Data.String
 import Diff
 import Info

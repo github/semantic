@@ -35,9 +35,9 @@ import Data.Functor.Both
 import Data.Functor.Classes
 import Data.Functor.Listable
 import Data.List ((\\), nub)
-import Data.RandomWalkSimilarity
 import Data.Record
 import Data.String
+import RWS
 import Diff
 import GHC.Conc (numCapabilities)
 import qualified Git
