@@ -137,7 +137,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   TODO: Explicit returns at the end of methods should only count once.
 --   TODO: Anonymous functions should not increase parent scope’s complexity.
 --   TODO: Inner functions should not increase parent scope’s complexity.
-cyclomaticComplexityAlg :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
+cyclomaticComplexityAlg :: (InUnion fs Declaration.Method, InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
 cyclomaticComplexityAlg (_ :< union) = case union of
   _ | Just Declaration.Method{} <- prj union -> succ (sum union)
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
