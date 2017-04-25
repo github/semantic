@@ -14,9 +14,6 @@ import qualified Data.Text.ICU.Detect as Detect
 -- | Read a file to a SourceBlob, transcoding to UTF-8 along the way.
 readFile :: FilePath -> IO SourceBlob
 readFile path = do
-  -- source <- readFile' path
-  -- pure $ sourceBlob source path
-  -- TODO: Do we want to swallow IOExceptions for files that don't exist? I'm not sure this is a good idea.
   source <- (Just <$> readFile' path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
   pure $ fromMaybe (emptySourceBlob path) (flip sourceBlob path <$> source)
   where
