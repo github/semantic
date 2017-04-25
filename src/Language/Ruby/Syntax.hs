@@ -128,6 +128,7 @@ identifiableAlg c@(_ :< union) = case union of
   _ | Just Declaration.Method{} <- prj union -> cofree (fmap fst c) : foldMap snd union
   _ -> foldMap snd union
 
+-- | The cyclomatic complexity of a (sub)term.
 newtype CyclomaticComplexity = CyclomaticComplexity Int
   deriving (Enum, Eq, Num, Ord, Show)
 
