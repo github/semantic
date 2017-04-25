@@ -153,7 +153,7 @@ cyclomaticComplexityAlg (_ :< union) = case union of
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f
-                     => FAlgebra (Base (Term f (Record fs))) a -- ^ An F-algebra on terms.
+                     => RAlgebra (Base (Term f (Record fs))) (Term f (Record fs)) a -- ^ An F-algebra on terms.
                      -> Term f (Record fs) -- ^ A term to decorate with values produced by the F-algebra.
                      -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the F-algebra.
-decoratorWithAlgebra alg = cata $ \ c@(a :< f) -> cofree $ (alg (fmap (rhead . extract) c) :. a) :< f
+decoratorWithAlgebra alg = para $ \ c@(a :< f) -> cofree $ (alg (fmap (second (rhead . extract)) c) :. a) :< fmap snd f
