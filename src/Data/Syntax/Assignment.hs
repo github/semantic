@@ -40,6 +40,7 @@ type Assignment node = Freer (AssignmentF node)
 data AssignmentF node a where
   Get :: AssignmentF node node
   State :: AssignmentF (Node grammar) (AssignmentState grammar)
+  Location :: AssignmentF node Location
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
@@ -61,7 +62,7 @@ state = State `Then` return
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
 location :: Assignment (Node grammar) Location
-location = rtail <$> get <|> (\ (AssignmentState o p _ _) -> Info.Range o o :. Info.SourceSpan p p :. Nil) <$> state
+location = Location `Then` return
 
 -- | Zero-width match of a node with the given symbol.
 --
@@ -126,14 +127,16 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
   (State, state) -> yield state state
-  (assignment, AssignmentState offset _ source (subtree@(Rose node@(_ :. range :. _) children) : _)) -> case assignment of
+  (assignment, AssignmentState offset _ source (subtree@(Rose node@(_ :. range :. span :. Nil) children) : _)) -> case assignment of
     Get -> yield node state
+    Location -> yield (range :. span :. Nil) state
     Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
     Children childAssignment -> do
       c <- assignAllFrom childAssignment state { stateNodes = children }
       yield c (advanceState state)
     _ -> Error ["No rule to match " <> show subtree]
   (Get, AssignmentState{}) -> Error [ "Expected node but got end of input." ]
+  (Location, AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
@@ -165,6 +168,7 @@ instance Show symbol => Show1 (AssignmentF symbol) where
   liftShowsPrec sp sl d a = case a of
     Get -> showString "Get"
     State -> showString "State" . sp d (AssignmentState 0 (Info.SourcePos 0 0) (Source.Source "") [])
+    Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
