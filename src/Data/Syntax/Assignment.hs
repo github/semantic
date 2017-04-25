@@ -5,8 +5,6 @@ module Data.Syntax.Assignment
 , Location
 , location
 , symbol
-, range
-, sourceSpan
 , source
 , children
 , Rose(..)
@@ -62,18 +60,6 @@ location = Location `Then` return
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
 symbol :: Eq symbol => symbol -> Assignment (Node symbol) ()
 symbol s = Symbol s `Then` return
-
--- | Zero-width production of the current node’s range.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (range *> b)' is fine, but 'many range' is not.
-range :: HasField fields Info.Range => Assignment (Record fields) Info.Range
-range = Get `Then` return . getField
-
--- | Zero-width production of the current node’s sourceSpan.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (sourceSpan *> b)' is fine, but 'many sourceSpan' is not.
-sourceSpan :: HasField fields Info.SourceSpan => Assignment (Record fields) Info.SourceSpan
-sourceSpan = Get `Then` return . getField
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: Assignment symbol ByteString
