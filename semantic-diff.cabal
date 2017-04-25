@@ -18,7 +18,8 @@ library
                      , Arguments
                      , Category
                      , Command
-                     , Command.Parse
+                     , Command.Files
+                     , Command.Git
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
@@ -64,6 +65,7 @@ library
                      , Renderer.TOC
                      , RWS
                      , Semantic
+                     , SemanticCmdLine
                      , SES
                      , SES.Myers
                      , Source
@@ -81,6 +83,7 @@ library
                      , aeson-pretty
                      , array
                      , async-pool
+                     , async
                      , bifunctors
                      , blaze-html
                      , blaze-markup
@@ -147,14 +150,13 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
-                     , Command.Spec
-                     , Command.Diff.Spec
-                     , Command.Parse.Spec
+                     , CommandSpec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec
                      , DiffSpec
                      , SemanticSpec
+                     , SemanticCmdLineSpec
                      , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec
@@ -162,6 +164,7 @@ test-suite test
                      , RangeSpec
                      , SES.Myers.Spec
                      , SourceSpec
+                     , SpecHelpers
                      , TermSpec
                      , TOCSpec
                      , IntegrationSpec
@@ -190,6 +193,7 @@ test-suite test
                      , regex-compat
                      , semantic-diff
                      , text >= 1.2.1.3
+                     , text-icu
                      , unordered-containers
                      , these
                      , vector

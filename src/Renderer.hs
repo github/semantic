@@ -1,7 +1,11 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, MultiParamTypeClasses  #-}
 module Renderer
 ( DiffRenderer(..)
+, resolveDiffRenderer
 , runDiffRenderer
+, ParseTreeRenderer(..)
+, resolveParseTreeRenderer
+, runParseTreeRenderer
 , Summaries(..)
 , File(..)
 ) where
@@ -23,6 +27,8 @@ import Renderer.Summary as R
 import Renderer.TOC as R
 import Source (SourceBlob)
 import Syntax
+import Term
+
 
 data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields File
@@ -32,8 +38,8 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
 
-runDiffRenderer :: Monoid output => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
-runDiffRenderer renderer = foldMap . uncurry $ case renderer of
+resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output)
+resolveDiffRenderer renderer = case renderer of
   SplitRenderer -> (File .) . R.split
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
@@ -41,8 +47,30 @@ runDiffRenderer renderer = foldMap . uncurry $ case renderer of
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> R.toc
 
+runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
+runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
+
+
+data ParseTreeRenderer fields output where
+  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
+  JSONParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
+  JSONIndexParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
+
+resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> (SourceBlob -> Term (Syntax Text) (Record fields) -> output)
+resolveParseTreeRenderer renderer = case renderer of
+  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
+  JSONParseTreeRenderer debug -> R.jsonParseTree debug
+  JSONIndexParseTreeRenderer debug -> R.jsonIndexParseTree debug
+
+runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
+runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
+
+
 newtype File = File { unFile :: Text }
   deriving Show
+
+instance StringConv File ByteString where
+  strConv _ = encodeUtf8 . unFile
 
 instance Show (DiffRenderer fields output) where
   showsPrec _ SplitRenderer = showString "SplitRenderer"
@@ -51,6 +79,11 @@ instance Show (DiffRenderer fields output) where
   showsPrec _ SummaryRenderer = showString "SummaryRenderer"
   showsPrec d (SExpressionDiffRenderer format) = showsUnaryWith showsPrec "SExpressionDiffRenderer" d format
   showsPrec _ ToCRenderer = showString "ToCRenderer"
+
+instance Show (ParseTreeRenderer fields output) where
+  showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
+  showsPrec d (JSONParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONParseTreeRenderer" d debug
+  showsPrec d (JSONIndexParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONIndexParseTreeRenderer" d debug
 
 instance Monoid File where
   mempty = File mempty

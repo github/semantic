@@ -1,3 +1,3 @@
 module Main (main)
 where
-import Semantic (main)
+import SemanticCmdLine (main)

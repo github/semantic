@@ -1,5 +1,9 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, OverloadedStrings #-}
-module Renderer.SExpression (sExpression, printTerm, printTerms, SExpressionFormat(..)) where
+module Renderer.SExpression
+( sExpression
+, sExpressionParseTree
+, SExpressionFormat(..)
+) where
 
 import Data.Bifunctor.Join
 import Data.ByteString hiding (foldr, spanEnd)
@@ -17,8 +21,13 @@ import Term
 data SExpressionFormat = TreeOnly | TreeAndRanges
   deriving (Show)
 
+-- | Returns a ByteString SExpression formatted diff.
 sExpression :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> ByteString
 sExpression format _ diff = printDiff diff 0 format
+
+-- | Returns a ByteString SExpression formatted term.
+sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> SourceBlob -> Term (Syntax Text) (Record fields) -> ByteString
+sExpressionParseTree format _ term = printTerm term 0 format
 
 printDiff :: (HasField fields Category, HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> Int -> SExpressionFormat -> ByteString
 printDiff diff level format = case runFree diff of
@@ -34,9 +43,6 @@ printDiff diff level format = case runFree diff of
     pad n | n < 0 = ""
           | n < 1 = "\n"
           | otherwise = "\n" <> replicate (2 * n) space
-
-printTerms :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> [Term (Syntax t) (Record fields)] -> ByteString
-printTerms format terms = foldr (\t acc -> printTerm t 0 format <> acc) "" terms
 
 printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> SExpressionFormat -> ByteString
 printTerm term level format = go term level 0
