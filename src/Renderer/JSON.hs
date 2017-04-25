@@ -1,26 +1,36 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, MultiParamTypeClasses  #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-module Renderer.JSON (
-  json
+module Renderer.JSON
+( json
+, jsonParseTree
+, jsonIndexParseTree
+, ParseTreeFile(..)
 ) where
 
-import Prologue hiding (toList)
 import Alignment
-import Category
+import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
+import Data.Aeson.Types (Pair, emptyArray)
 import Data.Bifunctor.Join
 import Data.Functor.Both
+import Data.Functor.Foldable hiding (Nil)
 import Data.Record
-import qualified Data.Text as T
 import Data.These
 import Data.Vector as Vector hiding (toList)
 import Diff
 import Info
+import Prologue
+import qualified Data.Map as Map
+import qualified Data.Text as T
 import Source
 import SplitDiff
 import Syntax as S
 import Term
-import qualified Data.Map as Map
+
+--
+-- Diffs
+--
 
 -- | Render a diff to a string representing its JSON.
 json :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
@@ -33,6 +43,9 @@ json blobs diff = Map.fromList [
 
 -- | A numbered 'a'.
 newtype NumberedLine a = NumberedLine (Int, a)
+
+instance StringConv (Map Text Value) ByteString where
+  strConv _ = toS . (<> "\n") . encode
 
 instance (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range) => ToJSON (NumberedLine (SplitSyntaxDiff leaf fields)) where
   toJSON (NumberedLine (n, a)) = object (lineFields n a (getRange a))
@@ -82,7 +95,7 @@ termFields :: (ToJSON recur, KeyValue kv, HasField fields Category, HasField fie
   Record fields ->
   Syntax leaf recur ->
   [kv]
-termFields info syntax = "range" .= byteRange info : "category" .= category info : syntaxToTermField syntax
+termFields info syntax = "range" .= byteRange info : "category" .= Info.category info : syntaxToTermField syntax
 
 patchFields :: (ToJSON (Record fields), ToJSON leaf, KeyValue kv, HasField fields Category, HasField fields Range) =>
   SplitPatch (SyntaxTerm leaf fields) ->
@@ -156,3 +169,97 @@ syntaxToTermField syntax = case syntax of
   S.Ty ty -> [ "type" .= ty ]
   S.Send channel expr -> [ "channel" .= channel ] <> [ "expression" .= expr ]
   where childrenFields c = [ "children" .= c ]
+
+
+--
+-- Parse Trees
+--
+
+data ParseTreeFile = ParseTreeFile { parseTreeFilePath :: FilePath, node :: Rose ParseNode } deriving (Show)
+
+data Rose a = Rose a [Rose a]
+  deriving (Eq, Show)
+
+
+instance ToJSON ParseTreeFile where
+  toJSON ParseTreeFile{..} = object [ "filePath" .= parseTreeFilePath, "programNode" .= cata algebra node ]
+    where algebra (RoseF a as) = object $ parseNodeToJSONFields a <> [ "children" .= as ]
+
+instance Monoid Value where
+  mempty = emptyArray
+  mappend a b = A.Array $ Vector.fromList [a, b]
+
+instance StringConv Value ByteString where
+  strConv _ = toS . (<> "\n") . encode
+
+data IndexFile = IndexFile { indexFilePath :: FilePath, nodes :: [ParseNode] } deriving (Show)
+
+instance ToJSON IndexFile where
+  toJSON IndexFile{..} = object [ "filePath" .= indexFilePath, "programNodes" .= foldMap (singleton . object . parseNodeToJSONFields) nodes ]
+    where singleton a = [a]
+
+data ParseNode = ParseNode
+  { category :: Category
+  , sourceRange :: Range
+  , sourceText :: Maybe SourceText
+  , sourceSpan :: SourceSpan
+  , identifier :: Maybe Text
+  }
+  deriving (Show)
+
+-- | Produce a list of JSON 'Pair's for the fields in a given ParseNode.
+parseNodeToJSONFields :: ParseNode -> [Pair]
+parseNodeToJSONFields ParseNode{..} =
+     [ "category" .= (toS category :: Text), "sourceRange" .= sourceRange, "sourceSpan" .= sourceSpan ]
+  <> [ "sourceText" .= sourceText | isJust sourceText ]
+  <> [ "identifier" .= identifier | isJust identifier ]
+
+jsonParseTree :: HasDefaultFields fields => Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Value
+jsonParseTree = jsonParseTree' ParseTreeFile Rose
+
+jsonIndexParseTree :: HasDefaultFields fields => Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Value
+jsonIndexParseTree = jsonParseTree' IndexFile combine
+  where combine node siblings = node : Prologue.concat siblings
+
+jsonParseTree' :: (ToJSON root, HasDefaultFields fields) => (FilePath -> a -> root) -> (ParseNode -> [a] -> a) -> Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Value
+jsonParseTree' constructor combine debug SourceBlob{..} term = toJSON $ constructor path (para algebra term')
+  where
+    term' = decorateTerm (parseDecorator debug source) term
+    algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
+
+    makeNode :: HasDefaultFields fields => Record (Maybe SourceText ': fields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': fields))) -> ParseNode
+    makeNode (sourceText :. record) syntax = ParseNode (getField record) (getField record) sourceText (getField record) (identifierFor syntax)
+
+    -- | Determines the term decorator to use when parsing.
+    parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
+    parseDecorator True = termSourceTextDecorator
+    parseDecorator False = const . const Nothing
+
+    -- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
+    identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, StringConv leaf Text) => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe Text
+    identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
+
+    -- | Decorate a 'Term' using a function to compute the annotation values at every node.
+    decorateTerm :: (Functor f, HasDefaultFields fields) => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
+    decorateTerm decorator = cata $ \ term -> cofree ((decorator term :. headF term) :< tailF term)
+
+    -- | Term decorator extracting the source text for a term.
+    termSourceTextDecorator :: (Functor f, HasField fields Range) => Source -> TermDecorator f fields (Maybe SourceText)
+    termSourceTextDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
+
+-- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
+type TermDecorator f fields field = TermF f (Record fields) (Term f (Record (field ': fields))) -> field
+
+newtype Identifier = Identifier Text
+  deriving (Eq, Show, ToJSON)
+
+data RoseF a b = RoseF a [b]
+  deriving (Eq, Functor, Show)
+
+type instance Base (Rose a) = RoseF a
+
+instance Recursive (Rose a) where
+  project (Rose a tree) = RoseF a tree
+
+instance Corecursive (Rose a) where
+  embed (RoseF a tree) = Rose a tree

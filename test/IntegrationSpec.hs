@@ -1,23 +1,16 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module IntegrationSpec where
 
-import Command
-import Command.Parse
 import Data.Functor.Both
 import Data.List (union, concat, transpose)
-import Data.Record
 import qualified Data.Text as T
 import qualified Data.ByteString as B
 import Data.Text.Encoding (decodeUtf8)
-import Diff
 import GHC.Show (Show(..))
-import Info
 import Prologue hiding (fst, snd, readFile)
-import Renderer.SExpression as Renderer
-import Source
-import Syntax
 import System.FilePath
 import System.FilePath.Glob
+import SpecHelpers
 import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)
 import Test.Hspec.Expectations.Pretty
 
@@ -40,7 +33,7 @@ spec = parallel $ do
       examples <- runIO $ examples directory
       traverse_ runTest examples
     runTest ParseExample{..} = it ("parses " <> file) $ testParse file parseOutput
-    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff (Renderer.sExpression TreeOnly) (both fileA fileB) diffOutput
+    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff (both fileA fileB) diffOutput
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
@@ -109,23 +102,14 @@ normalizeName path = dropExtension $ dropExtension path
 
 testParse :: FilePath -> FilePath -> Expectation
 testParse path expectedOutput = do
-  source <- readAndTranscodeFile path
-  let blob = sourceBlob source path
-  term <- parserForType (toS (takeExtension path)) blob
-  let actual = (Verbatim . stripWhitespace) $ printTerm term 0 TreeOnly
-  expected <- (Verbatim . stripWhitespace) <$> B.readFile expectedOutput
+  actual <- verbatim <$> parseFilePath path
+  expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
-testDiff :: (Both SourceBlob -> Diff (Syntax Text) (Record DefaultFields) -> ByteString) -> Both FilePath -> FilePath -> Expectation
-testDiff renderer paths expectedOutput = do
-  (blobs, diff') <- runCommand $ do
-    blobs <- traverse readFile paths
-    terms <- traverse (traverse parseBlob) blobs
-    Just diff' <- maybeDiff terms
-    return (fromMaybe . emptySourceBlob <$> paths <*> blobs, diff')
-  let diffOutput = renderer blobs diff'
-  let actual = Verbatim (stripWhitespace diffOutput)
-  expected <- Verbatim . stripWhitespace <$> B.readFile expectedOutput
+testDiff :: Both FilePath -> FilePath -> Expectation
+testDiff paths expectedOutput = do
+  actual <- verbatim <$> diffFilePaths paths
+  expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
 stripWhitespace :: ByteString -> ByteString
@@ -139,3 +123,6 @@ newtype Verbatim = Verbatim ByteString
 
 instance Show Verbatim where
   showsPrec _ (Verbatim byteString) = ('\n':) . (T.unpack (decodeUtf8 byteString) ++)
+
+verbatim :: ByteString -> Verbatim
+verbatim = Verbatim . stripWhitespace
