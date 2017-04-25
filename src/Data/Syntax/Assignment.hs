@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
-, get
 , Location
 , location
 , symbol
@@ -36,18 +35,11 @@ type Assignment node = Freer (AssignmentF node)
 
 data AssignmentF node a where
   Symbol :: symbol -> AssignmentF (Node symbol) ()
-  Get :: AssignmentF node node
   Location :: AssignmentF node Location
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
-
--- | Zero-width production of the current node.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (get *> b)' is fine, but 'many get' is not.
-get :: Assignment (Record fields) (Record fields)
-get = Get `Then` return
 
 -- | Zero-width production of the current location.
 --
@@ -105,16 +97,14 @@ runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node 
 runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (assignment, AssignmentState offset _ source (subtree@(Rose node@(symbol :. range :. span :. Nil) children) : _)) -> case assignment of
+  (assignment, AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _)) -> case assignment of
     Symbol s -> guard (s == symbol) >> yield () state
-    Get -> yield node state
     Location -> yield (range :. span :. Nil) state
     Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
     Children childAssignment -> do
       c <- assignAllFrom childAssignment state { stateNodes = children }
       yield c (advanceState state)
     _ -> Error ["No rule to match " <> show subtree]
-  (Get, AssignmentState{}) -> Error [ "Expected node but got end of input." ]
   (Location, AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
@@ -146,7 +136,6 @@ instance Alternative (Assignment symbol) where
 instance Show symbol => Show1 (AssignmentF (Node symbol)) where
   liftShowsPrec sp sl d a = case a of
     Symbol s -> showsUnaryWith showsPrec "Symbol" d s
-    Get -> showString "Get"
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
