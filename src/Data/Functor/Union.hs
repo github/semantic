@@ -13,7 +13,9 @@ import Prologue
 
 -- | N-ary union of type constructors.
 data Union (ts :: [k -> *]) (a :: k) where
+  -- | An element of the first type in the union’s list.
   Here :: f a -> Union (f ': ts) a
+  -- | An element of a later type in the union’s list.
   There :: Union ts a -> Union (f ': ts) a
 
 -- | Embed a functor in a union and lift the union into a free monad.
