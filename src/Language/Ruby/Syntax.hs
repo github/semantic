@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TemplateHaskell, TypeOperators #-}
 module Language.Ruby.Syntax where
 
-import Data.Functor.Foldable (Base, Corecursive(..))
+import Data.Functor.Foldable (Base)
 import Data.Functor.Union
 import Data.Record
 import qualified Data.Syntax as Syntax
@@ -115,23 +115,9 @@ type FAlgebra f a = f a -> a
 -- | An R-algebra on some carrier functor 'f' of its fixpoint type 't'.
 type RAlgebra f t a = f (t, a) -> a
 
--- | A CV-algebra (Course of Value) on some carrier functor 'f'; an algebra which provides its references upon request.
-type CVAlgebra f a = f (Cofree f a) -> a
-
 -- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
 fToR f = f . fmap snd
-
--- | Promote an FAlgebra into a CVAlgebra (by dropping all results except the head).
-fToCV :: Functor f => FAlgebra f a -> CVAlgebra f a
-fToCV f = f . fmap extract
-
--- | Promote an RAlgebra into a CVAlgebra (by dropping all values except the most recent).
---
---   Note that this is in general O(n), since it must visit each node of the term in order to reconstruct the original term; and thus, a histomorphism performed with the resulting algebra will be O(n²).
-rToCV :: (Functor (Base t), Corecursive t) => RAlgebra (Base t) t a -> CVAlgebra (Base t) a
-rToCV r = r . fmap (cata (embed . tailF) &&& extract)
-{-# DEPRECATED rToCV "rToCV is asymptotically inefficient. Suggest refactoring to an FAlgebra or CVAlgebra." #-}
 
 -- | Produce a list of identifiable subterms of a given term.
 --
