@@ -119,14 +119,18 @@ type RAlgebra f t a = f (t, a) -> a
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
 fToR f = f . fmap snd
 
--- | Produce a list of identifiable subterms of a given term.
+newtype Identifier' = Identifier' ByteString
+  deriving (Eq, Show)
+
+-- | Produce the identifier for a given term, if any.
 --
 --   By “identifiable” we mean terms which have a user-assigned identifier associated with them, & which serve as a declaration rather than a reference; i.e. the declaration of a class or method or binding of a variable are all identifiable terms, but calling a named function or referencing a parameter is not.
-identifiableAlg :: (InUnion fs Declaration.Method, InUnion fs Declaration.Class, Foldable (Union fs), Functor (Union fs)) => RAlgebra (Base (Term (Union fs) a)) (Term (Union fs) a) [Term (Union fs) a]
-identifiableAlg c@(_ :< union) = case union of
-  _ | Just Declaration.Class{} <- prj union -> cofree (fmap fst c) : foldMap snd union
-  _ | Just Declaration.Method{} <- prj union -> cofree (fmap fst c) : foldMap snd union
-  _ -> foldMap snd union
+identifierAlg :: (InUnion fs Syntax.Identifier, InUnion fs Declaration.Method, InUnion fs Declaration.Class, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier')
+identifierAlg (_ :< union) = case union of
+  _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier' s)
+  _ | Just Declaration.Class{..} <- prj union -> classIdentifier
+  _ | Just Declaration.Method{..} <- prj union -> methodName
+  _ -> Nothing
 
 -- | The cyclomatic complexity of a (sub)term.
 newtype CyclomaticComplexity = CyclomaticComplexity Int
