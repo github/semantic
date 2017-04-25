@@ -133,6 +133,10 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
   deriving (Enum, Eq, Num, Ord, Show)
 
 -- | Compute the cyclomatic complexity of a (sub)term, measured as the number places where control exits scope, e.g. returns and yields.
+--
+--   TODO: Explicit returns at the end of methods should only count once.
+--   TODO: Anonymous functions should not increase parent scope’s complexity.
+--   TODO: Inner functions should not increase parent scope’s complexity.
 cyclomaticComplexityAlg :: (InUnion fs Statement.Return, InUnion fs Statement.Yield, Foldable (Union fs), Functor (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
 cyclomaticComplexityAlg (_ :< union) = case union of
   _ | Just Statement.Method{} <- prj union -> succ (sum union)
