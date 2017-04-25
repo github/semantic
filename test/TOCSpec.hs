@@ -6,7 +6,7 @@ import Category as C
 import Command
 import Data.Functor.Both
 import Data.Functor.Listable
-import Data.RandomWalkSimilarity
+import RWS
 import Data.Record
 import Data.String
 import Diff

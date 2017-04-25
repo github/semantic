@@ -1,11 +1,22 @@
-{-# LANGUAGE GADTs, DataKinds, TypeOperators #-}
-module RWS (rws) where
+{-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
+module RWS (
+    rws
+  , FeatureVector
+  , stripDiff
+  , defaultFeatureVectorDecorator
+  , stripTerm
+  , featureVectorDecorator
+  , pqGramDecorator
+  , Gram(..)
+  , defaultD
+  ) where
 
 import Prologue
 import Control.Monad.Effect as Eff
 import Control.Monad.Effect.Internal as I
 import Data.Record
 import Data.These
+import Patch
 import Term
 import Data.Array
 import Data.Functor.Classes
@@ -13,11 +24,19 @@ import Info
 import SES
 import qualified Data.Functor.Both as Both
 import Data.Functor.Classes.Eq.Generic
-import Data.RandomWalkSimilarity (FeatureVector)
 
+import Data.Functor.Listable
 import Data.KdTree.Static hiding (toList)
 import qualified Data.IntMap as IntMap
 import Data.Semigroup (Min(..), Option(..))
+
+import Control.Monad.Random
+import System.Random.Mersenne.Pure64
+import Diff (mapAnnotations)
+
+type Label f fields label = forall b. TermF f (Record fields) b -> label
+
+type FeatureVector = Array Int Double
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
@@ -198,9 +217,13 @@ editDistanceIfComparable editDistance canCompare a b = if canCompare a b
   then editDistance (These a b)
   else maxBound
 
-defaultL, defaultMoveBound :: Int
+defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
+defaultD = 15
 defaultL = 2
+defaultP = 2
+defaultQ = 3
 defaultMoveBound = 2
+
 
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
 -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
@@ -284,4 +307,88 @@ insertMapped' :: (RWS f fields :< e)
               -> [MappedDiff f fields]
               -> Eff e [MappedDiff f fields]
 insertMapped' diffs mappedDiffs = send (InsertMapped diffs mappedDiffs)
+
+-- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
+data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
+ deriving (Eq, Show)
+
+-- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
+defaultFeatureVectorDecorator
+ :: (Hashable label, Traversable f)
+ => Label f fields label
+ -> Term f (Record fields)
+ -> Term f (Record (Maybe FeatureVector ': fields))
+defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
+
+-- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Maybe FeatureVector ': fields))
+featureVectorDecorator getLabel p q d
+ = cata collect
+ . pqGramDecorator getLabel p q
+ where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (Just (unitVector d (hash gram))) functor :. rest) :< functor)
+       addSubtermVector :: Functor f => Maybe FeatureVector -> Term f (Record (Maybe FeatureVector ': fields)) -> Maybe FeatureVector
+       addSubtermVector v term = addVectors <$> v <*> rhead (extract term)
+
+       addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
+       addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
+
+-- | Annotates a term with the corresponding p,q-gram at each node.
+pqGramDecorator
+  :: Traversable f
+  => Label f fields label -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
+  -> Int -- ^ 'p'; the desired stem length for the grams.
+  -> Int -- ^ 'q'; the desired base length for the grams.
+  -> Term f (Record fields) -- ^ The term to decorate.
+  -> Term f (Record (Gram label ': fields)) -- ^ The decorated term.
+pqGramDecorator getLabel p q = cata algebra
+  where
+    algebra term = let label = getLabel term in
+      cofree ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
+    gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
+    assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
+
+    assignLabels :: Functor f
+                 => label
+                 -> Term f (Record (Gram label ': fields))
+                 -> State [Maybe label] (Term f (Record (Gram label ': fields)))
+    assignLabels label a = case runCofree a of
+      (gram :. rest) :< functor -> do
+        labels <- get
+        put (drop 1 labels)
+        pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
+    siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
+    siblingLabels = foldMap (base . rhead . extract)
+    padToSize n list = take n (list <> repeat Prologue.empty)
+
+-- | Computes a unit vector of the specified dimension from a hash.
+unitVector :: Int -> Int -> FeatureVector
+unitVector d hash = fmap (* invMagnitude) uniform
+  where
+    uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
+    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) uniform))
+    components = sequenceA (replicate d (liftRand randomDouble))
+
+-- | Strips the head annotation off a term annotated with non-empty records.
+stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
+stripTerm = fmap rtail
+
+-- | Strips the head annotation off a diff annotated with non-empty records.
+stripDiff
+  :: (Functor f, Functor g)
+  => Free (TermF f (g (Record (h ': t)))) (Patch (Term f (Record (h ': t))))
+  -> Free (TermF f (g (Record t)))        (Patch (Term f (Record t)))
+stripDiff = mapAnnotations rtail
+
+
+-- Instances
+
+instance Hashable label => Hashable (Gram label) where
+  hashWithSalt _ = hash
+  hash gram = hash (stem gram <> base gram)
+
+instance Listable1 Gram where
+  liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
+
+instance Listable a => Listable (Gram a) where
+  tiers = tiers1
 
