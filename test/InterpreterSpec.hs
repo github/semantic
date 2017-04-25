@@ -5,7 +5,7 @@ import Category
 import Data.Array
 import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
-import Data.RandomWalkSimilarity
+import RWS
 import Data.Record
 import Data.String
 import Diff

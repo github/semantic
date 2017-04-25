@@ -11,7 +11,7 @@ import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import qualified Data.Text as T
 import Data.Functor.Both
-import Data.RandomWalkSimilarity
+import RWS
 import Data.Record
 import Diff
 import Info

@@ -5,8 +5,7 @@ import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
-import Data.RandomWalkSimilarity as RWS hiding (rws)
-import RWS (rws)
+import RWS
 import Data.Record
 import Data.These
 import Diff

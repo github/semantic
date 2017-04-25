@@ -5,7 +5,7 @@ import Data.Aeson
 import Category as C
 import Data.Functor.Both
 import Data.Functor.Listable
-import Data.RandomWalkSimilarity
+import RWS
 import Data.Record
 import Data.String
 import Diff
