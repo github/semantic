@@ -97,10 +97,10 @@ assignAllFrom assignment state = case runAssignment assignment state of
 runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
 runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result (AssignmentState grammar, a)) -> AssignmentState grammar -> Result (AssignmentState grammar, a)
-        run assignment yield initialState = case (assignment, state) of
+        run assignment yield initialState = case (assignment, stateNodes) of
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-          (Alt a b, state) -> yield a state <|> yield b state
-          (assignment, state@(AssignmentState _ _ _ (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
+          (Alt a b, _) -> yield a state <|> yield b state
+          (assignment, subtree@(Rose (symbol :. range :. span :. Nil) children) : _) -> case assignment of
             Location -> yield (range :. span :. Nil) state
             Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
             Children childAssignment -> do
@@ -110,10 +110,10 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
               Just a -> yield a state
               Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
             _ -> Error ["No rule to match " <> show subtree]
-          (Location, state@AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
-          (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
-          (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
-          (Choose choices, AssignmentState{}) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
+          (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
+          (Source, []) -> Error [ "Expected leaf node but got end of input." ]
+          (Children _, []) -> Error [ "Expected branch node but got end of input." ]
+          (Choose choices, []) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
           _ -> Error ["No rule to match at end of input."]
           where state@AssignmentState{..} = dropAnonymous initialState
 
