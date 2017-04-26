@@ -113,6 +113,7 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
   (Location, AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
+  (Choose choices, AssignmentState{}) -> Error [ "Expected " <> showChoices choices <> " but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
   . fmap (\ a state -> Result (state, a))
   where showChoices :: IntMap.IntMap b -> Text
