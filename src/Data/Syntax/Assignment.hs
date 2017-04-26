@@ -98,7 +98,7 @@ assignAllFrom assignment state = case runAssignment assignment state of
 runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
 runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-  (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
+  (Alt a b, state) -> yield a state <|> yield b state
   (assignment, AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _)) -> case assignment of
     Symbol s -> guard (s == symbol) >> yield () state
     Location -> yield (range :. span :. Nil) state
