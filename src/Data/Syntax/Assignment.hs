@@ -95,26 +95,27 @@ assignAllFrom assignment state = case runAssignment assignment state of
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
-runAssignment = iterFreer (\ assignment yield initialState -> case (assignment, dropAnonymous initialState) of
-  -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-  (Alt a b, state) -> yield a state <|> yield b state
-  (assignment, state@(AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
-    Location -> yield (range :. span :. Nil) state
-    Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
-    Children childAssignment -> do
-      c <- assignAllFrom childAssignment state { stateNodes = children }
-      yield c (advanceState state)
-    Choose choices -> case IntMap.lookup (fromEnum symbol) choices of
-      Just a -> yield a state
-      Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
-    _ -> Error ["No rule to match " <> show subtree]
-  (Location, state@AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
-  (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
-  (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
-  (Choose choices, AssignmentState{}) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
-  _ -> Error ["No rule to match at end of input."])
-  . fmap (\ a state -> Result (state, a))
-  where showChoices :: IntMap.IntMap b -> Text
+runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
+  where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result (AssignmentState grammar, a)) -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+        run assignment yield initialState = case (assignment, dropAnonymous initialState) of
+          -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
+          (Alt a b, state) -> yield a state <|> yield b state
+          (assignment, state@(AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
+            Location -> yield (range :. span :. Nil) state
+            Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
+            Children childAssignment -> do
+              c <- assignAllFrom childAssignment state { stateNodes = children }
+              yield c (advanceState state)
+            Choose choices -> case IntMap.lookup (fromEnum symbol) choices of
+              Just a -> yield a state
+              Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
+            _ -> Error ["No rule to match " <> show subtree]
+          (Location, state@AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
+          (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
+          (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
+          (Choose choices, AssignmentState{}) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
+          _ -> Error ["No rule to match at end of input."]
+        showChoices :: IntMap.IntMap b -> Text
         showChoices = show . fmap (toEnum :: Int -> grammar) . IntMap.keys
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
