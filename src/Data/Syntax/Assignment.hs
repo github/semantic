@@ -135,7 +135,7 @@ instance Alternative (Assignment symbol) where
 
 instance Show symbol => Show1 (AssignmentF (Node symbol)) where
   liftShowsPrec sp sl d a = case a of
-    Symbol s -> showsUnaryWith showsPrec "Symbol" d s
+    Symbol s -> showsUnaryWith showsPrec "Symbol" d s . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
