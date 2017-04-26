@@ -81,7 +81,7 @@ statement  =  exit Statement.Return Return
   where exit construct sym = term <*> (construct <$ symbol sym <*> children (optional (symbol ArgumentList *> children statement)))
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
-comment = term <*> (Comment.Comment <$ symbol Comment <*> source)
+comment = leaf Comment Comment.Comment
 
 if' :: Assignment (Node Grammar) (Term Syntax Location)
 if' = go If
@@ -97,9 +97,9 @@ unlessModifier :: Assignment (Node Grammar) (Term Syntax Location)
 unlessModifier = term <* symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
-literal  =  term <*> (Literal.true <$ symbol Language.Ruby.Syntax.True <* source)
-        <|> term <*> (Literal.false <$ symbol Language.Ruby.Syntax.False <* source)
-        <|> term <*> (Literal.Integer <$ symbol Language.Ruby.Syntax.Integer <*> source)
+literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
+        <|> leaf Language.Ruby.Syntax.False (const Literal.false)
+        <|> leaf Language.Ruby.Syntax.Integer Literal.Integer
 
 -- | Assignment of the current node’s annotation.
 term :: InUnion Syntax' f => Assignment (Node grammar) (f (Term Syntax Location) -> Term Syntax Location)
