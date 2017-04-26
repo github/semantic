@@ -182,8 +182,3 @@ instance Alternative Result where
   Result a <|> _ = Result a
   _ <|> Result b = Result b
   Error a <|> Error b = Error (a <> b)
-
-instance Monad Result where
-  return = pure
-  Error a >>= _ = Error a
-  Result a >>= f = f a
