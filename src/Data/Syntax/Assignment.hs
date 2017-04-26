@@ -110,6 +110,7 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
       Just a -> yield a state
       Nothing -> Error ["Expected " <> showChoices choices <> " but got " <> show subtree]
     _ -> Error ["No rule to match " <> show subtree]
+  (Symbol s, AssignmentState{}) -> Error [ "Expected " <> show s <> " but got end of input." ]
   (Location, AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
