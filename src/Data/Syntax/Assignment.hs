@@ -100,9 +100,9 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
         run assignment yield initialState = case (assignment, state) of
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, state) -> yield a state <|> yield b state
-          (assignment, state@(AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
+          (assignment, state@(AssignmentState _ _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
             Location -> yield (range :. span :. Nil) state
-            Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
+            Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) source)) (advanceState state)
             Children childAssignment -> do
               c <- assignAllFrom childAssignment state { stateNodes = children }
               yield c (advanceState state)
