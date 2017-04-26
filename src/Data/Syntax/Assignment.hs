@@ -101,22 +101,20 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Location, Rose (_ :. location) _ : _) -> yield location state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
-          (Source, []) -> Error [ "Expected leaf node but got end of input." ]
           (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
             Result c -> yield c (advanceState state)
             Error e -> Error e
-          (Children _, []) -> Error [ "Expected branch node but got end of input." ]
-          (Choose choices, Rose (symbol :. _) _ : _) -> case IntMap.lookup (fromEnum symbol) choices of
-            Just a -> yield a state
-            Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
-          (Choose choices, []) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
+          (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          _ -> Error ["No rule to match at " <> maybe "end of input" show (listToMaybe stateNodes)]
+          _ -> Error [expectation <> maybe "end of input" (show . rhead . roseValue) (listToMaybe stateNodes)]
           where state@AssignmentState{..} = dropAnonymous initialState
-
-        showChoices :: IntMap.IntMap b -> Text
-        showChoices = show . fmap (toEnum :: Int -> grammar) . IntMap.keys
+                expectation = case assignment of
+                  Source -> "Expected a leaf node but got "
+                  Children _ -> "Expected a branch node but got "
+                  Choose choices | [(i, _)] <- IntMap.toList choices -> "Expected " <> show ((toEnum :: Int -> grammar) i) <> " but got "
+                                 | otherwise -> "Expected one of " <> show ((toEnum :: Int -> grammar) <$> IntMap.keys choices) <> " but got "
+                  _ -> "No rule to match at "
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
 dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
