@@ -62,6 +62,10 @@ children :: Assignment symbol a -> Assignment symbol a
 children forEach = Children forEach `Then` return
 
 
+commit :: Assignment symbol a -> Assignment symbol a
+commit assignment = assignment
+
+
 -- | A rose tree.
 data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
   deriving (Eq, Functor, Show)
@@ -131,7 +135,7 @@ data AssignmentState grammar = AssignmentState
 
 instance Alternative (Assignment symbol) where
   empty = Empty `Then` return
-  (<|>) = (wrap .) . Alt
+  (<|>) = (wrap .) . Alt . commit
 
 instance Show symbol => Show1 (AssignmentF (Node symbol)) where
   liftShowsPrec sp sl d a = case a of
