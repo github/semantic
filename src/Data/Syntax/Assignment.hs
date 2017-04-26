@@ -102,9 +102,9 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
           (Source, []) -> Error [ "Expected leaf node but got end of input." ]
-          (Children childAssignment, Rose _ children : _) -> do
-            c <- assignAllFrom childAssignment state { stateNodes = children }
-            yield c (advanceState state)
+          (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
+            Result c -> yield c (advanceState state)
+            Error e -> Error e
           (Children _, []) -> Error [ "Expected branch node but got end of input." ]
           (Choose choices, Rose (symbol :. _) _ : _) -> case IntMap.lookup (fromEnum symbol) choices of
             Just a -> yield a state
