@@ -97,7 +97,7 @@ assignAllFrom assignment state = case runAssignment assignment state of
 runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
 runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result (AssignmentState grammar, a)) -> AssignmentState grammar -> Result (AssignmentState grammar, a)
-        run assignment yield initialState = case (assignment, dropAnonymous initialState) of
+        run assignment yield initialState = case (assignment, state) of
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, state) -> yield a state <|> yield b state
           (assignment, state@(AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
@@ -115,6 +115,8 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
           (Choose choices, AssignmentState{}) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
           _ -> Error ["No rule to match at end of input."]
+          where state@AssignmentState{..} = dropAnonymous initialState
+
         showChoices :: IntMap.IntMap b -> Text
         showChoices = show . fmap (toEnum :: Int -> grammar) . IntMap.keys
 
