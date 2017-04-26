@@ -112,9 +112,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Choose choices, []) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          (assignment, subtree : _) -> case assignment of
-            _ -> Error ["No rule to match " <> show subtree]
-          _ -> Error ["No rule to match at end of input."]
+          _ -> Error ["No rule to match at " <> maybe "end of input" show (listToMaybe stateNodes)]
           where state@AssignmentState{..} = dropAnonymous initialState
 
         showChoices :: IntMap.IntMap b -> Text
