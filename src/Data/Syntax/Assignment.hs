@@ -111,13 +111,13 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
       yield c (advanceState state)
     Choose choices -> case IntMap.lookup (fromEnum symbol) choices of
       Just a -> yield a state
-      Nothing -> Error ["Expected " <> showChoices choices <> " but got " <> show symbol]
+      Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
     _ -> Error ["No rule to match " <> show subtree]
   (Symbol s, AssignmentState{}) -> Error [ "Expected " <> show s <> " but got end of input." ]
   (Location, state@AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
-  (Choose choices, AssignmentState{}) -> Error [ "Expected " <> showChoices choices <> " but got end of input." ]
+  (Choose choices, AssignmentState{}) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
   _ -> Error ["No rule to match at end of input."])
   . fmap (\ a state -> Result (state, a))
   where showChoices :: IntMap.IntMap b -> Text
