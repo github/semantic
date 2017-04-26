@@ -51,8 +51,7 @@ spec = do
       () <$ runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result ()
 
     it "does not match if its subrule does not match" $
-      let errors r = case r of { Result _ -> Nothing ; Error e -> Just e } in
-      fmap Prologue.length (errors (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]]))) `shouldBe` Just 1
+      (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Error [ "Expected Red but got Green" ]
 
     it "matches nested children" $ do
       runAssignment
