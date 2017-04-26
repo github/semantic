@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
 , Location
@@ -19,6 +19,7 @@ module Data.Syntax.Assignment
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (Nil)
+import qualified Data.IntMap.Lazy as IntMap
 import Data.Record
 import Data.Text (unpack)
 import qualified Info
@@ -38,6 +39,7 @@ data AssignmentF node a where
   Location :: AssignmentF node Location
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
+  Choose :: IntMap.IntMap a -> AssignmentF node a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
 
@@ -86,10 +88,10 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
+assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
 assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
 
-assignAllFrom :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
 assignAllFrom assignment state = case runAssignment assignment state of
   Result (state, a) -> case stateNodes (dropAnonymous state) of
     [] -> Result a
@@ -97,7 +99,7 @@ assignAllFrom assignment state = case runAssignment assignment state of
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
 runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
@@ -108,6 +110,9 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
     Children childAssignment -> do
       c <- assignAllFrom childAssignment state { stateNodes = children }
       yield c (advanceState state)
+    Choose choices -> case IntMap.lookup (fromEnum symbol) choices of
+      Just a -> yield a state
+      Nothing -> Error ["Expected " <> show ((toEnum :: Int -> grammar) <$> IntMap.keys choices) <> " but got " <> show subtree]
     _ -> Error ["No rule to match " <> show subtree]
   (Location, AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
@@ -143,6 +148,7 @@ instance Show symbol => Show1 (AssignmentF (Node symbol)) where
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
+    Choose choices -> showsUnaryWith (liftShowsPrec sp sl) "Choose" d choices
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
 

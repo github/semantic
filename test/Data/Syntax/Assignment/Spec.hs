@@ -85,7 +85,7 @@ startingState :: ByteString -> [AST grammar] -> AssignmentState grammar
 startingState = AssignmentState 0 (Info.SourcePos 1 1) . Source
 
 data Grammar = Red | Green | Blue
-  deriving (Eq, Show)
+  deriving (Enum, Eq, Show)
 
 instance Symbol Grammar where
   symbolType _ = Regular
