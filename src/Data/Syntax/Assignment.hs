@@ -149,7 +149,7 @@ instance Show symbol => Show1 (AssignmentF (Node symbol)) where
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose choices -> showsUnaryWith (liftShowsPrec sp sl) "Choose" d choices
+    Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
 
