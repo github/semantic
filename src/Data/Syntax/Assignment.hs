@@ -35,7 +35,6 @@ import Text.Show hiding (show)
 type Assignment node = Freer (AssignmentF node)
 
 data AssignmentF node a where
-  Symbol :: symbol -> AssignmentF (Node symbol) ()
   Location :: AssignmentF node Location
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
@@ -52,8 +51,8 @@ location = Location `Then` return
 -- | Zero-width match of a node with the given symbol.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: Eq symbol => symbol -> Assignment (Node symbol) ()
-symbol s = Symbol s `Then` return
+symbol :: (Enum symbol, Eq symbol) => symbol -> Assignment (Node symbol) ()
+symbol s = Choose (IntMap.singleton (fromEnum s) ()) `Then` return
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: Assignment symbol ByteString
@@ -100,10 +99,6 @@ runAssignment = iterFreer (\ assignment yield initialState -> case (assignment, 
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state
   (assignment, state@(AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
-    Symbol s -> if s == symbol then
-      yield () state
-    else
-      Error [ "Expected " <> show s <> " but got " <> show symbol ]
     Location -> yield (range :. span :. Nil) state
     Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
     Children childAssignment -> do
@@ -113,7 +108,6 @@ runAssignment = iterFreer (\ assignment yield initialState -> case (assignment, 
       Just a -> yield a state
       Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
     _ -> Error ["No rule to match " <> show subtree]
-  (Symbol s, AssignmentState{}) -> Error [ "Expected " <> show s <> " but got end of input." ]
   (Location, state@AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
@@ -146,15 +140,11 @@ instance Enum symbol => Alternative (Assignment (Node symbol)) where
   a <|> b = case (a, b) of
     (_, Empty `Then` _) -> a
     (Empty `Then` _, _) -> b
-    (Symbol s1 `Then` _, Symbol s2 `Then` _) -> Choose (IntMap.fromListWith (flip const) [(fromEnum s1, a), (fromEnum s2, b)]) `Then` identity
-    (Symbol s `Then` _, Choose choices `Then` continue) -> Choose (IntMap.insertWith const (fromEnum s) a (fmap continue choices)) `Then` identity
-    (Choose choices `Then` continue, Symbol s `Then` _) -> Choose (IntMap.insertWith (flip const) (fromEnum s) b (fmap continue choices)) `Then` identity
     (Choose choices1 `Then` continue1, Choose choices2 `Then` continue2) -> Choose (IntMap.union (fmap continue1 choices1) (fmap continue2 choices2)) `Then` identity
     _ -> wrap $ Alt a b
 
 instance Show symbol => Show1 (AssignmentF (Node symbol)) where
   liftShowsPrec sp sl d a = case a of
-    Symbol s -> showsUnaryWith showsPrec "Symbol" d s . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
