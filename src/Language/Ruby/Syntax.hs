@@ -59,10 +59,10 @@ class' = term <*  symbol Class
         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
 constant :: Assignment (Node Grammar) (Term Syntax Location)
-constant = term <*> (Syntax.Identifier <$ symbol Constant <*> source)
+constant = leaf Constant Syntax.Identifier
 
 identifier :: Assignment (Node Grammar) (Term Syntax Location)
-identifier = term <*> (Syntax.Identifier <$ symbol Identifier <*> source)
+identifier = leaf Identifier Syntax.Identifier
 
 method :: Assignment (Node Grammar) (Term Syntax Location)
 method = term <*  symbol Method
