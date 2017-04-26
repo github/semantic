@@ -108,12 +108,12 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
             c <- assignAllFrom childAssignment state { stateNodes = children }
             yield c (advanceState state)
           (Children _, []) -> Error [ "Expected branch node but got end of input." ]
-          (assignment, subtree@(Rose (symbol :. _) _) : _) -> case assignment of
-            Choose choices -> case IntMap.lookup (fromEnum symbol) choices of
-              Just a -> yield a state
-              Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
-            _ -> Error ["No rule to match " <> show subtree]
+          (Choose choices, Rose (symbol :. _) _ : _) -> case IntMap.lookup (fromEnum symbol) choices of
+            Just a -> yield a state
+            Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
           (Choose choices, []) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
+          (assignment, subtree : _) -> case assignment of
+            _ -> Error ["No rule to match " <> show subtree]
           _ -> Error ["No rule to match at end of input."]
           where state@AssignmentState{..} = dropAnonymous initialState
 
