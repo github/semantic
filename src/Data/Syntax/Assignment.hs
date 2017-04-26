@@ -64,10 +64,6 @@ children :: Assignment symbol a -> Assignment symbol a
 children forEach = Children forEach `Then` return
 
 
-commit :: Assignment symbol a -> Assignment symbol a
-commit assignment = assignment
-
-
 -- | A rose tree.
 data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
   deriving (Eq, Functor, Show)
@@ -138,9 +134,12 @@ data AssignmentState grammar = AssignmentState
   }
   deriving (Eq, Show)
 
-instance Alternative (Assignment symbol) where
+instance Enum symbol => Alternative (Assignment (Node symbol)) where
   empty = Empty `Then` return
-  (<|>) = (wrap .) . Alt . commit
+  a <|> b = case (a, b) of
+    (Symbol s1 `Then` _, Symbol s2 `Then` _) -> Choose (IntMap.fromListWith (flip const) [(fromEnum s1, a), (fromEnum s2, b)]) `Then` identity
+    (Choose choices `Then` continue, Symbol s `Then` _) -> Choose (IntMap.insertWith (flip const) (fromEnum s) b (fmap continue choices)) `Then` identity
+    _ -> wrap $ Alt a b
 
 instance Show symbol => Show1 (AssignmentF (Node symbol)) where
   liftShowsPrec sp sl d a = case a of
