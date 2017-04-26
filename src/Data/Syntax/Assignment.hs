@@ -145,6 +145,7 @@ instance Enum symbol => Alternative (Assignment (Node symbol)) where
   empty = Empty `Then` return
   a <|> b = case (a, b) of
     (Symbol s1 `Then` _, Symbol s2 `Then` _) -> Choose (IntMap.fromListWith (flip const) [(fromEnum s1, a), (fromEnum s2, b)]) `Then` identity
+    (Symbol s `Then` _, Choose choices `Then` continue) -> Choose (IntMap.insertWith const (fromEnum s) a (fmap continue choices)) `Then` identity
     (Choose choices `Then` continue, Symbol s `Then` _) -> Choose (IntMap.insertWith (flip const) (fromEnum s) b (fmap continue choices)) `Then` identity
     _ -> wrap $ Alt a b
 
