@@ -99,7 +99,7 @@ runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Sh
 runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state
-  (assignment, AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _)) -> case assignment of
+  (assignment, state@(AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
     Symbol s -> if s == symbol then
       yield () state
     else
@@ -114,7 +114,7 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
       Nothing -> Error ["Expected " <> showChoices choices <> " but got " <> show subtree]
     _ -> Error ["No rule to match " <> show subtree]
   (Symbol s, AssignmentState{}) -> Error [ "Expected " <> show s <> " but got end of input." ]
-  (Location, AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
+  (Location, state@AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
   (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
   (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
   (Choose choices, AssignmentState{}) -> Error [ "Expected " <> showChoices choices <> " but got end of input." ]
