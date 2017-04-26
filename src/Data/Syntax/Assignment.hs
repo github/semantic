@@ -102,8 +102,9 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Alt a b, _) -> yield a state <|> yield b state
           (Location, Rose (_ :. location) _ : _) -> yield location state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
-          (assignment, subtree@(Rose (symbol :. range :. _ :. Nil) children) : _) -> case assignment of
-            Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
+          (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
+          (Source, []) -> Error [ "Expected leaf node but got end of input." ]
+          (assignment, subtree@(Rose (symbol :. _) children) : _) -> case assignment of
             Children childAssignment -> do
               c <- assignAllFrom childAssignment state { stateNodes = children }
               yield c (advanceState state)
@@ -111,7 +112,6 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
               Just a -> yield a state
               Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
             _ -> Error ["No rule to match " <> show subtree]
-          (Source, []) -> Error [ "Expected leaf node but got end of input." ]
           (Children _, []) -> Error [ "Expected branch node but got end of input." ]
           (Choose choices, []) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
           _ -> Error ["No rule to match at end of input."]
