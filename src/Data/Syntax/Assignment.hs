@@ -96,7 +96,7 @@ assignAllFrom assignment state = case runAssignment assignment state of
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
-runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
+runAssignment = iterFreer (\ assignment yield initialState -> case (assignment, dropAnonymous initialState) of
   -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
   (Alt a b, state) -> yield a state <|> yield b state
   (assignment, state@(AssignmentState offset _ source (subtree@(Rose (symbol :. range :. span :. Nil) children) : _))) -> case assignment of
