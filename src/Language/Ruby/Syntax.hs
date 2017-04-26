@@ -103,7 +103,7 @@ literal  =  term <*> (Literal.true <$ symbol Language.Ruby.Syntax.True <* source
 
 -- | Assignment of the current node’s annotation.
 term :: InUnion Syntax' f => Assignment (Node grammar) (f (Term Syntax Location) -> Term Syntax Location)
-term =  (\ a f -> cofree $ a :< inj f) <$> location
+term = (\ a f -> cofree $ a :< inj f) <$> location
 
 leaf :: (Enum symbol, Eq symbol, InUnion Syntax' f) => (ByteString -> f (Term Syntax Location)) -> symbol -> Assignment (Node symbol) (Term Syntax Location)
 leaf f s = symbol s *> pure (\ a -> cofree . (a :<) . inj . f) <*> location <*> source
