@@ -101,6 +101,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Location, Rose (_ :. location) _ : _) -> yield location state
+          (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (assignment, subtree@(Rose (symbol :. range :. _ :. Nil) children) : _) -> case assignment of
             Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
             Children childAssignment -> do
@@ -110,7 +111,6 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
               Just a -> yield a state
               Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
             _ -> Error ["No rule to match " <> show subtree]
-          (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, []) -> Error [ "Expected leaf node but got end of input." ]
           (Children _, []) -> Error [ "Expected branch node but got end of input." ]
           (Choose choices, []) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
