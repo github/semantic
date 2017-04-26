@@ -104,15 +104,15 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
           (Source, []) -> Error [ "Expected leaf node but got end of input." ]
-          (assignment, subtree@(Rose (symbol :. _) children) : _) -> case assignment of
-            Children childAssignment -> do
-              c <- assignAllFrom childAssignment state { stateNodes = children }
-              yield c (advanceState state)
+          (Children childAssignment, Rose _ children : _) -> do
+            c <- assignAllFrom childAssignment state { stateNodes = children }
+            yield c (advanceState state)
+          (Children _, []) -> Error [ "Expected branch node but got end of input." ]
+          (assignment, subtree@(Rose (symbol :. _) _) : _) -> case assignment of
             Choose choices -> case IntMap.lookup (fromEnum symbol) choices of
               Just a -> yield a state
               Nothing -> Error ["Expected one of " <> showChoices choices <> " but got " <> show symbol]
             _ -> Error ["No rule to match " <> show subtree]
-          (Children _, []) -> Error [ "Expected branch node but got end of input." ]
           (Choose choices, []) -> Error [ "Expected one of " <> showChoices choices <> " but got end of input." ]
           _ -> Error ["No rule to match at end of input."]
           where state@AssignmentState{..} = dropAnonymous initialState
