@@ -106,7 +106,7 @@ term :: InUnion Syntax' f => Assignment (Node grammar) (f (Term Syntax Location)
 term = (\ a f -> cofree $ a :< inj f) <$> location
 
 leaf :: (Enum symbol, Eq symbol, InUnion Syntax' f) => symbol -> (ByteString -> f (Term Syntax Location)) -> Assignment (Node symbol) (Term Syntax Location)
-leaf s f = symbol s *> pure (\ a -> cofree . (a :<) . inj . f) <*> location <*> source
+leaf s f = (\ a -> cofree . (a :<) . inj . f) <$ symbol s <*> location <*> source
 
 optional :: Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
 optional a = a <|> term <*> pure Syntax.Empty
