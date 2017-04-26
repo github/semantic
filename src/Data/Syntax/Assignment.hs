@@ -111,7 +111,7 @@ runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAno
       yield c (advanceState state)
     Choose choices -> case IntMap.lookup (fromEnum symbol) choices of
       Just a -> yield a state
-      Nothing -> Error ["Expected " <> showChoices choices <> " but got " <> show subtree]
+      Nothing -> Error ["Expected " <> showChoices choices <> " but got " <> show symbol]
     _ -> Error ["No rule to match " <> show subtree]
   (Symbol s, AssignmentState{}) -> Error [ "Expected " <> show s <> " but got end of input." ]
   (Location, state@AssignmentState{..}) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
