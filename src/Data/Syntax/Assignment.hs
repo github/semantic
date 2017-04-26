@@ -17,9 +17,11 @@ module Data.Syntax.Assignment
 ) where
 
 import Control.Monad.Free.Freer
+import qualified Data.ByteString.Char8 as B
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
+import Data.List ((!!))
 import Data.Record
 import Data.Text (unpack)
 import qualified Info
@@ -107,7 +109,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          _ -> Error [expectation <> maybe "end of input" (show . rhead . roseValue) (listToMaybe stateNodes)]
+          _ -> Error [expectation <> maybe "end of input" (show . rhead . roseValue) (listToMaybe stateNodes) <> ":\n" <> toS (B.lines (Source.sourceText stateSource) !! pred (Info.line statePos)) <> "\n" <> toS (replicate (pred (Info.column statePos)) ' ') <> "^\n"]
           where state@AssignmentState{..} = dropAnonymous initialState
                 expectation = case assignment of
                   Source -> "Expected a leaf node but got "

@@ -51,7 +51,7 @@ spec = do
       () <$ runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result ()
 
     it "does not match if its subrule does not match" $
-      (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Error [ "Expected Red but got Green" ]
+      (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Error [ "Expected Red but got Green:\na\n^" ]
 
     it "matches nested children" $ do
       runAssignment
