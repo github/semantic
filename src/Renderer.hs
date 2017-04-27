@@ -10,7 +10,7 @@ module Renderer
 , File(..)
 ) where
 
-import Data.Aeson (Value)
+import Data.Aeson (Value, object)
 import Data.Functor.Both
 import Data.Functor.Classes
 import Text.Show
@@ -62,8 +62,8 @@ resolveParseTreeRenderer renderer blob = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
   JSONParseTreeRenderer True -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
   JSONParseTreeRenderer False -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg)
-  JSONIndexParseTreeRenderer True -> R.jsonIndexParseTree blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
-  JSONIndexParseTreeRenderer False -> R.jsonIndexParseTree blob . decoratorWithAlgebra (fToR identifierAlg)
+  JSONIndexParseTreeRenderer True -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
+  JSONIndexParseTreeRenderer False -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg)
   where sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
         identifierAlg = fmap R.Identifier . maybeIdentifier . fmap (fmap unIdentifier)
 

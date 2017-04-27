@@ -4,7 +4,7 @@
 module Renderer.JSON
 ( json
 , jsonFile
-, jsonIndexParseTree
+, indexTerm
 , ToJSONFields(..)
 , Identifier(..)
 ) where
@@ -206,8 +206,8 @@ instance ToJSONFields Identifier where
 jsonFile :: ToJSON a => SourceBlob -> a -> Value
 jsonFile SourceBlob{..} = toJSON . File path
 
-jsonIndexParseTree :: (ToJSONFields (Record fields), HasField fields (Maybe Identifier)) => SourceBlob -> Term (Syntax Text) (Record fields) -> Value
-jsonIndexParseTree blob = jsonFile blob . fmap (object . toJSONFields) . cata combine
+indexTerm :: (ToJSONFields (Record fields), HasField fields (Maybe Identifier)) => Term (Syntax Text) (Record fields) -> [Record fields]
+indexTerm = cata combine
   where combine (a :< f) | Nothing <- getField a :: Maybe Identifier = Prologue.concat f
                          | Leaf _ <- f = Prologue.concat f
                          | otherwise = a : Prologue.concat f
