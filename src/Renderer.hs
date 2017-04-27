@@ -60,8 +60,8 @@ data ParseTreeRenderer fields output where
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer blob = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
-  JSONParseTreeRenderer True -> R.jsonParseTree blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
-  JSONParseTreeRenderer False -> R.jsonParseTree blob . decoratorWithAlgebra (fToR identifierAlg)
+  JSONParseTreeRenderer True -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
+  JSONParseTreeRenderer False -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg)
   JSONIndexParseTreeRenderer True -> R.jsonIndexParseTree blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
   JSONIndexParseTreeRenderer False -> R.jsonIndexParseTree blob . decoratorWithAlgebra (fToR identifierAlg)
   where sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
