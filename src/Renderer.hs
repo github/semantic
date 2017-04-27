@@ -55,14 +55,15 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
   JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Bool -> ParseTreeRenderer fields Value
-  JSONIndexParseTreeRenderer :: ToJSONFields (Record fields) => Bool -> ParseTreeRenderer fields Value
+  JSONIndexParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Bool -> ParseTreeRenderer fields Value
 
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
   JSONParseTreeRenderer True -> (uncurry R.jsonParseTree .) . decorateWithSource
   JSONParseTreeRenderer False -> R.jsonParseTree
-  JSONIndexParseTreeRenderer debug -> R.jsonIndexParseTree
+  JSONIndexParseTreeRenderer True -> (uncurry R.jsonIndexParseTree .) . decorateWithSource
+  JSONIndexParseTreeRenderer False -> R.jsonIndexParseTree
   where decorateWithSource blob = (,) blob . decoratorWithAlgebra (sourceDecorator (source blob))
         sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
 
