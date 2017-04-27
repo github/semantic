@@ -239,7 +239,7 @@ jsonParseTree' constructor combine debug SourceBlob{..} term = toJSON $ construc
     decorateTerm decorator = cata $ \ term -> cofree ((decorator term :. headF term) :< tailF term)
 
     -- | Term decorator extracting the source text for a term.
-    termSourceTextDecorator :: (Functor f, HasField fields Range) => Source -> TermDecorator f fields (Maybe SourceText)
+    termSourceTextDecorator :: HasField fields Range => Source -> TermDecorator f fields (Maybe SourceText)
     termSourceTextDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
 
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
