@@ -59,8 +59,8 @@ data ParseTreeRenderer fields output where
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
-  JSONParseTreeRenderer debug -> R.jsonParseTree debug
-  JSONIndexParseTreeRenderer debug -> R.jsonIndexParseTree debug
+  JSONParseTreeRenderer debug -> R.jsonParseTree
+  JSONIndexParseTreeRenderer debug -> R.jsonIndexParseTree
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer

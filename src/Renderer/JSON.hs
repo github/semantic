@@ -203,11 +203,11 @@ newtype Identifier = Identifier { unIdentifier :: Text }
 instance ToJSONFields Identifier where
   toJSONFields (Renderer.JSON.Identifier i) = ["identifier" .= i]
 
-jsonParseTree :: ToJSONFields (Record fields) => Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Value
-jsonParseTree _ SourceBlob{..} = toJSON . File path . decoratorWithAlgebra (fToR identifierAlg)
+jsonParseTree :: ToJSONFields (Record fields) => SourceBlob -> Term (Syntax Text) (Record fields) -> Value
+jsonParseTree SourceBlob{..} = toJSON . File path . decoratorWithAlgebra (fToR identifierAlg)
 
-jsonIndexParseTree :: ToJSONFields (Record fields) => Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Value
-jsonIndexParseTree _ SourceBlob{..} = toJSON . File path . fmap (object . toJSONFields) . cata combine . decoratorWithAlgebra (fToR identifierAlg)
+jsonIndexParseTree :: ToJSONFields (Record fields) => SourceBlob -> Term (Syntax Text) (Record fields) -> Value
+jsonIndexParseTree SourceBlob{..} = toJSON . File path . fmap (object . toJSONFields) . cata combine . decoratorWithAlgebra (fToR identifierAlg)
   where combine (a :< f) | Nothing <- rhead a = Prologue.concat f
                          | Leaf _ <- f = Prologue.concat f
                          | otherwise = a : Prologue.concat f
