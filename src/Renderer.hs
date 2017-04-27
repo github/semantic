@@ -18,7 +18,7 @@ import Data.Map as Map hiding (null)
 import Data.Record
 import Diff
 import Info
-import Language.Ruby.Syntax (decoratorWithAlgebra)
+import Language.Ruby.Syntax (decoratorWithAlgebra, fToR)
 import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
@@ -58,14 +58,14 @@ data ParseTreeRenderer fields output where
   JSONIndexParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Bool -> ParseTreeRenderer fields Value
 
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
-resolveParseTreeRenderer renderer = case renderer of
-  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
-  JSONParseTreeRenderer True -> (uncurry R.jsonParseTree .) . decorateWithSource
-  JSONParseTreeRenderer False -> R.jsonParseTree
-  JSONIndexParseTreeRenderer True -> (uncurry R.jsonIndexParseTree .) . decorateWithSource
-  JSONIndexParseTreeRenderer False -> R.jsonIndexParseTree
-  where decorateWithSource blob = (,) blob . decoratorWithAlgebra (sourceDecorator (source blob))
-        sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
+resolveParseTreeRenderer renderer blob = case renderer of
+  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
+  JSONParseTreeRenderer True -> R.jsonParseTree blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
+  JSONParseTreeRenderer False -> R.jsonParseTree blob . decoratorWithAlgebra (fToR identifierAlg)
+  JSONIndexParseTreeRenderer True -> R.jsonIndexParseTree blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
+  JSONIndexParseTreeRenderer False -> R.jsonIndexParseTree blob . decoratorWithAlgebra (fToR identifierAlg)
+  where sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
+        identifierAlg = fmap R.Identifier . maybeIdentifier . fmap (fmap unIdentifier)
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer

@@ -3,9 +3,11 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
 ( json
+, jsonFile
 , jsonParseTree
 , jsonIndexParseTree
 , ToJSONFields(..)
+, Identifier(..)
 ) where
 
 import Alignment
@@ -19,7 +21,6 @@ import Data.These
 import Data.Vector as Vector hiding (toList)
 import Diff
 import Info
-import Language.Ruby.Syntax (decoratorWithAlgebra, fToR, FAlgebra)
 import Prologue
 import qualified Data.Map as Map
 import Source
@@ -197,9 +198,6 @@ instance Monoid Value where
 instance StringConv Value ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-ala :: Functor f => (a -> b) -> (b -> a) -> FAlgebra f a -> FAlgebra f b
-ala into outof f = into . f . fmap outof
-
 newtype Identifier = Identifier { unIdentifier :: Text }
   deriving (Eq, Show)
 
@@ -210,13 +208,10 @@ jsonFile :: ToJSON a => SourceBlob -> a -> Value
 jsonFile SourceBlob{..} = toJSON . File path
 
 jsonParseTree :: ToJSONFields (Record fields) => SourceBlob -> Term (Syntax Text) (Record fields) -> Value
-jsonParseTree blob = jsonFile blob . decoratorWithAlgebra (fToR identifierAlg)
+jsonParseTree = jsonFile
 
-jsonIndexParseTree :: ToJSONFields (Record fields) => SourceBlob -> Term (Syntax Text) (Record fields) -> Value
-jsonIndexParseTree blob = jsonFile blob . fmap (object . toJSONFields) . cata combine . decoratorWithAlgebra (fToR identifierAlg)
-  where combine (a :< f) | Nothing <- rhead a = Prologue.concat f
+jsonIndexParseTree :: (ToJSONFields (Record fields), HasField fields (Maybe Identifier)) => SourceBlob -> Term (Syntax Text) (Record fields) -> Value
+jsonIndexParseTree blob = jsonFile blob . fmap (object . toJSONFields) . cata combine
+  where combine (a :< f) | Nothing <- getField a :: Maybe Identifier = Prologue.concat f
                          | Leaf _ <- f = Prologue.concat f
                          | otherwise = a : Prologue.concat f
-
-identifierAlg :: FAlgebra (SyntaxTermF Text a) (Maybe Identifier)
-identifierAlg = ala (fmap Renderer.JSON.Identifier) (fmap unIdentifier) maybeIdentifier
