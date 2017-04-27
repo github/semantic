@@ -56,7 +56,7 @@ data ParseTreeRenderer fields output where
   JSONParseTreeRenderer :: ToJSONFields (Record fields) => Bool -> ParseTreeRenderer fields Value
   JSONIndexParseTreeRenderer :: ToJSONFields (Record fields) => Bool -> ParseTreeRenderer fields Value
 
-resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> (SourceBlob -> Term (Syntax Text) (Record fields) -> output)
+resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
   JSONParseTreeRenderer debug -> R.jsonParseTree debug
