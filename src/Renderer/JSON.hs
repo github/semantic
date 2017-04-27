@@ -96,6 +96,9 @@ instance ToJSONFields Range where
 instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> toS c }]
 
+instance ToJSONFields a => ToJSONFields (Maybe a) where
+  toJSONFields = maybe [] toJSONFields
+
 
 lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range, KeyValue kv) =>
   Int ->
