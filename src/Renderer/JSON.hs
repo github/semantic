@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, MultiParamTypeClasses  #-}
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
 ( json
@@ -98,6 +98,9 @@ instance ToJSONFields Category where
 
 instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
+
+instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a) where
+  toJSONFields term = let a :< f = runCofree term in toJSONFields a <> toJSONFields f
 
 
 lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range, KeyValue kv) =>
