@@ -10,7 +10,7 @@ module Renderer
 , File(..)
 ) where
 
-import Data.Aeson (ToJSON, Value)
+import Data.Aeson (Value)
 import Data.Functor.Both
 import Data.Functor.Classes
 import Text.Show
@@ -33,7 +33,7 @@ import Term
 data DiffRenderer fields output where
   SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields File
   PatchRenderer :: HasField fields Range => DiffRenderer fields File
-  JSONDiffRenderer :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => DiffRenderer fields (Map Text Value)
+  JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer fields (Map Text Value)
   SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
@@ -53,8 +53,8 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  JSONParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
-  JSONIndexParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
+  JSONParseTreeRenderer :: ToJSONFields (Record fields) => Bool -> ParseTreeRenderer fields Value
+  JSONIndexParseTreeRenderer :: ToJSONFields (Record fields) => Bool -> ParseTreeRenderer fields Value
 
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> (SourceBlob -> Term (Syntax Text) (Record fields) -> output)
 resolveParseTreeRenderer renderer = case renderer of
