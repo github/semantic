@@ -224,16 +224,11 @@ jsonIndexParseTree = jsonParseTree' IndexFile combine
 jsonParseTree' :: (ToJSON root, HasDefaultFields fields) => (FilePath -> a -> root) -> (ParseNode -> [a] -> a) -> Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Value
 jsonParseTree' constructor combine debug SourceBlob{..} term = toJSON $ constructor path (para algebra term')
   where
-    term' = decorateTerm (parseDecorator debug source) term
+    term' = decorateTerm (if debug then termSourceTextDecorator source else const Nothing) term
     algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
 
     makeNode :: HasDefaultFields fields => Record (Maybe SourceText ': fields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': fields))) -> ParseNode
     makeNode (sourceText :. record) syntax = ParseNode (getField record) (getField record) sourceText (getField record) (identifierFor syntax)
-
-    -- | Determines the term decorator to use when parsing.
-    parseDecorator :: (Functor f, HasField fields Range) => Bool -> (Source -> TermDecorator f fields (Maybe SourceText))
-    parseDecorator True = termSourceTextDecorator
-    parseDecorator False = const . const Nothing
 
     -- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
     identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, StringConv leaf Text) => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe Text
