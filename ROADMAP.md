@@ -1,50 +1,41 @@
-# Roadmap
+# Semantic Roadmap
 
-This is the long form version of our [roadmap project][].
+Semantic Code produces data around code’s structure and meaning. This is made available via GraphQL APIs, enabling others (both at GitHub and elsewhere) to build features.
 
-## Things we are currently doing:
+Current granularity:
 
-1. [Diff summaries][] for C & JavaScript. Q3 2016 or so.
+- Parse tree.
+- Diff.
 
-  - Modelling the abstract semantics of the supported languages. Good summaries require us to know what different parts of the syntax represent.
-  - Performance/responsiveness. We need to be able to produce diffs more quickly, and without unicorns. Some of this will involve front-end work (e.g. requesting summaries out-of-band).
+Future:
 
-2. [Semantic diffs][] on .com for C & JavaScript. Q4 2016 or so.
+- Repository/project.
+- Language?
 
-  - Performance, as above.
-  - Resilience. A fault in `semantic-diff` should not break anything else.
-  - Metrics. We need to know how it’s behaving in the wild to know what to do about it. This also includes operational metrics such as health checks.
+Specific tasks:
 
-## Follow-up things:
+- Containerized service we can hit from github/github in prod.
+- GraphQL parse tree API.
+- GraphQL diff API.
 
-1. Add support for more languages: [Ruby][], etc.
-2. [Detecting & rendering moves][moves].
-3. [Merging][].
-4. Refining the diff summaries we produce.
+Ongoing work:
 
-## Things we would like to do:
+- Extend/improve the data provided via GraphQL. API consumers will have to specifically opt in to any new fields in order to receive them. This is our core.
 
-1. [Interactively refining diffs][interactive].
-2. [Filtering][] diffs.
-3. Diff [table of contents][].
-4. [Jump to symbol definition][].
-5. Eliminate conflicts from renaming [variables][].
+  Examples: type signatures, parse/type errors, callers/callees, labelling symbol declarations (for e.g. jump to…/ToC as well as code search), linking symbol references to declarations.
 
-## Things we would like to do modulo interest/support from other teams:
+- Extend the set of supported languages. Provide/improve tooling for writing/testing tree-sitter grammars. Review contributions to open-source grammars. Automate as much as possible to keep us focused on the core. Can we reduce/offload this in other ways?
+- Performance improvements.
+- Resiliency improvements/maintenance/operational excellence.
+- Metrics. How does it perform, how are people using it, what data do people care about, what don’t they use at all.
 
-1. APIs/tooling for data science & engineering teams.
-2. Collect data on our heuristics &c. and refine them via e.g. ML.
-3. Diffs as a [service][].
+High-level goals:
+
+- Help developers understand, [navigate][], and improve their code.
+- Lower barriers to contributions, e.g. by eliminating conflicts from [renaming variables][].
+
+See also our [roadmap project][].
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
-[Diff summaries]: https://github.com/github/semantic-diff/milestones/Summer%20Eyes
-[Semantic diffs]: https://github.com/github/semantic-diff/milestones/Dot%20Calm
-[Ruby]: https://github.com/github/semantic-diff/issues/282
-[moves]: https://github.com/github/semantic-diff/issues/389
-[Merging]: https://github.com/github/semantic-diff/issues/431
-[interactive]: https://github.com/github/semantic-diff/issues/130
-[Filtering]: https://github.com/github/semantic-diff/issues/428
-[table of contents]: https://github.com/github/semantic-diff/issues/16
-[Jump to symbol definition]: https://github.com/github/semantic-diff/issues/6
-[variables]: https://github.com/github/semantic-diff/issues/91
-[service]: https://github.com/github/platform/blob/master/services/README.md
+[navigate]: https://github.com/github/semantic-diff/issues/909
+[renaming variables]: https://github.com/github/semantic-diff/issues/91
