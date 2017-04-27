@@ -226,10 +226,10 @@ jsonParseTree' :: (ToJSON root, HasDefaultFields fields) => (FilePath -> a -> ro
 jsonParseTree' constructor combine debug SourceBlob{..} term = toJSON $ constructor path (para algebra term')
   where
     term' = decorateTerm (if debug then termSourceTextDecorator source else const Nothing) (decoratorWithAlgebra (fToR maybeIdentifier) term)
-    algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
+    algebra (annotation :< syntax) = combine (makeNode annotation) (toList (Prologue.snd <$> syntax))
 
-    makeNode :: HasDefaultFields fields => Record (Maybe SourceText ': Maybe Text ': fields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': Maybe Text ': fields))) -> ParseNode
-    makeNode (sourceText :. record) _ = ParseNode (getField record) (getField record) sourceText (getField record) (getField record)
+    makeNode :: HasDefaultFields fields => Record (Maybe SourceText ': Maybe Text ': fields) -> ParseNode
+    makeNode (sourceText :. record) = ParseNode (getField record) (getField record) sourceText (getField record) (getField record)
 
     -- | Decorate a 'Term' using a function to compute the annotation values at every node.
     decorateTerm :: (Functor f, HasDefaultFields fields) => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
