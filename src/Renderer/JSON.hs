@@ -81,6 +81,16 @@ instance (ToJSON (Record fields), ToJSON leaf, HasField fields Category, HasFiel
   toEncoding term |
     (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
 
+class ToJSONFields a where
+  toJSONFields :: KeyValue kv => a -> [kv]
+
+instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ': t)) where
+  toJSONFields (h :. t) = toJSONFields h <> toJSONFields t
+
+instance ToJSONFields (Record '[]) where
+  toJSONFields _ = []
+
+
 lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range, KeyValue kv) =>
   Int ->
   SplitSyntaxDiff leaf fields ->
