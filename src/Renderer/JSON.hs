@@ -102,6 +102,11 @@ instance ToJSONFields a => ToJSONFields (Maybe a) where
 instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a) where
   toJSONFields term = let a :< f = runCofree term in toJSONFields a <> toJSONFields f
 
+instance ToJSON a => ToJSONFields (SplitPatch a) where
+  toJSONFields (SplitInsert a) = [ "insert" .= a ]
+  toJSONFields (SplitDelete a) = [ "delete" .= a ]
+  toJSONFields (SplitReplace a) = [ "replace" .= a ]
+
 
 lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range, KeyValue kv) =>
   Int ->
