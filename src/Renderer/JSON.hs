@@ -105,6 +105,13 @@ instance (ToJSONFields a, ToJSONFields (f (Cofree f a))) => ToJSONFields (Cofree
 instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (CofreeF f a b) where
   toJSONFields (a :< f) = toJSONFields a <> toJSONFields f
 
+instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSONFields (Free f a) where
+  toJSONFields = toJSONFields . runFree
+
+instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (FreeF f a b) where
+  toJSONFields (Free f) = toJSONFields f
+  toJSONFields (Pure a) = toJSONFields a
+
 instance ToJSON a => ToJSONFields (SplitPatch a) where
   toJSONFields (SplitInsert a) = [ "insert" .= a ]
   toJSONFields (SplitDelete a) = [ "delete" .= a ]
