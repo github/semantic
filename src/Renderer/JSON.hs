@@ -20,6 +20,7 @@ import Data.These
 import Data.Vector as Vector hiding (toList)
 import Diff
 import Info
+import Language.Ruby.Syntax (decoratorWithAlgebra, fToR)
 import Prologue
 import qualified Data.Map as Map
 import qualified Data.Text as T
@@ -224,15 +225,11 @@ jsonIndexParseTree = jsonParseTree' IndexFile combine
 jsonParseTree' :: (ToJSON root, HasDefaultFields fields) => (FilePath -> a -> root) -> (ParseNode -> [a] -> a) -> Bool -> SourceBlob -> Term (Syntax Text) (Record fields) -> Value
 jsonParseTree' constructor combine debug SourceBlob{..} term = toJSON $ constructor path (para algebra term')
   where
-    term' = decorateTerm (if debug then termSourceTextDecorator source else const Nothing) term
+    term' = decorateTerm (if debug then termSourceTextDecorator source else const Nothing) (decoratorWithAlgebra (fToR maybeIdentifier) term)
     algebra (annotation :< syntax) = combine (makeNode annotation (Prologue.fst <$> syntax)) (toList (Prologue.snd <$> syntax))
 
-    makeNode :: HasDefaultFields fields => Record (Maybe SourceText ': fields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': fields))) -> ParseNode
-    makeNode (sourceText :. record) syntax = ParseNode (getField record) (getField record) sourceText (getField record) (identifierFor syntax)
-
-    -- | Returns a Just identifier text if the given Syntax term contains an identifier (leaf) syntax. Otherwise returns Nothing.
-    identifierFor :: (HasField fields (Maybe SourceText), HasField fields Category, StringConv leaf Text) => Syntax leaf (Term (Syntax leaf) (Record fields)) -> Maybe Text
-    identifierFor = fmap toS . extractLeafValue . unwrap <=< maybeIdentifier
+    makeNode :: HasDefaultFields fields => Record (Maybe SourceText ': Maybe Text ': fields) -> Syntax Text (Term (Syntax Text) (Record (Maybe SourceText ': Maybe Text ': fields))) -> ParseNode
+    makeNode (sourceText :. record) _ = ParseNode (getField record) (getField record) sourceText (getField record) (getField record)
 
     -- | Decorate a 'Term' using a function to compute the annotation values at every node.
     decorateTerm :: (Functor f, HasDefaultFields fields) => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
