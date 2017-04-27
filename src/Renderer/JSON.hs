@@ -99,8 +99,11 @@ instance ToJSONFields Category where
 instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
 
-instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a) where
-  toJSONFields term = let a :< f = runCofree term in toJSONFields a <> toJSONFields f
+instance (ToJSONFields a, ToJSONFields (f (Cofree f a))) => ToJSONFields (Cofree f a) where
+  toJSONFields = toJSONFields . runCofree
+
+instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (CofreeF f a b) where
+  toJSONFields (a :< f) = toJSONFields a <> toJSONFields f
 
 instance ToJSON a => ToJSONFields (SplitPatch a) where
   toJSONFields (SplitInsert a) = [ "insert" .= a ]
