@@ -18,6 +18,7 @@ import Data.Map as Map hiding (null)
 import Data.Record
 import Diff
 import Info
+import Language.Ruby.Syntax (decoratorWithAlgebra)
 import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
@@ -25,7 +26,7 @@ import Renderer.SExpression as R
 import Renderer.Split as R
 import Renderer.Summary as R
 import Renderer.TOC as R
-import Source (SourceBlob)
+import Source (SourceBlob(..), slice, toText)
 import Syntax
 import Term
 
@@ -53,14 +54,17 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  JSONParseTreeRenderer :: ToJSONFields (Record fields) => Bool -> ParseTreeRenderer fields Value
+  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Bool -> ParseTreeRenderer fields Value
   JSONIndexParseTreeRenderer :: ToJSONFields (Record fields) => Bool -> ParseTreeRenderer fields Value
 
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
-  JSONParseTreeRenderer debug -> R.jsonParseTree
+  JSONParseTreeRenderer True -> (uncurry R.jsonParseTree .) . decorateWithSource
+  JSONParseTreeRenderer False -> R.jsonParseTree
   JSONIndexParseTreeRenderer debug -> R.jsonIndexParseTree
+  where decorateWithSource blob = (,) blob . decoratorWithAlgebra (sourceDecorator (source blob))
+        sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
