@@ -90,6 +90,12 @@ instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ':
 instance ToJSONFields (Record '[]) where
   toJSONFields _ = []
 
+instance ToJSONFields Range where
+  toJSONFields Range{..} = ["range" .= [ start, end ]]
+
+instance ToJSONFields Category where
+  toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> toS c }]
+
 
 lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range, KeyValue kv) =>
   Int ->
