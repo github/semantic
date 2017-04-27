@@ -4,9 +4,7 @@
 module Renderer.JSON
 ( json
 , jsonFile
-, indexTerm
 , ToJSONFields(..)
-, Identifier(..)
 ) where
 
 import Alignment
@@ -25,7 +23,6 @@ import qualified Data.Map as Map
 import Source
 import SplitDiff
 import Syntax as S
-import Term
 
 --
 -- Diffs
@@ -197,17 +194,5 @@ instance Monoid Value where
 instance StringConv Value ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-newtype Identifier = Identifier { unIdentifier :: Text }
-  deriving (Eq, Show)
-
-instance ToJSONFields Identifier where
-  toJSONFields (Renderer.JSON.Identifier i) = ["identifier" .= i]
-
 jsonFile :: ToJSON a => SourceBlob -> a -> Value
 jsonFile SourceBlob{..} = toJSON . File path
-
-indexTerm :: (ToJSONFields (Record fields), HasField fields (Maybe Identifier)) => Term (Syntax Text) (Record fields) -> [Record fields]
-indexTerm = cata combine
-  where combine (a :< f) | Nothing <- getField a :: Maybe Identifier = Prologue.concat f
-                         | Leaf _ <- f = Prologue.concat f
-                         | otherwise = a : Prologue.concat f

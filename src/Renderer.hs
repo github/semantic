@@ -10,14 +10,14 @@ module Renderer
 , File(..)
 ) where
 
-import Data.Aeson (Value, object)
+import Data.Aeson (Value, object, (.=))
 import Data.Functor.Both
 import Data.Functor.Classes
 import Text.Show
 import Data.Map as Map hiding (null)
 import Data.Record
 import Diff
-import Info
+import Info hiding (Identifier)
 import Language.Ruby.Syntax (decoratorWithAlgebra, fToR)
 import Prologue
 import Renderer.JSON as R
@@ -65,7 +65,21 @@ resolveParseTreeRenderer renderer blob = case renderer of
   JSONIndexParseTreeRenderer True -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
   JSONIndexParseTreeRenderer False -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg)
   where sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
-        identifierAlg = fmap R.Identifier . maybeIdentifier . fmap (fmap unIdentifier)
+        identifierAlg = fmap Identifier . maybeIdentifier . fmap (fmap unIdentifier)
+
+
+newtype Identifier = Identifier { unIdentifier :: Text }
+  deriving (Eq, Show)
+
+instance ToJSONFields Identifier where
+  toJSONFields (Identifier i) = ["identifier" .= i]
+
+
+indexTerm :: (ToJSONFields (Record fields), HasField fields (Maybe Identifier)) => Term (Syntax Text) (Record fields) -> [Record fields]
+indexTerm = cata combine
+  where combine (a :< f) | Nothing <- getField a :: Maybe Identifier = Prologue.concat f
+                         | Leaf _ <- f = Prologue.concat f
+                         | otherwise = a : Prologue.concat f
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
