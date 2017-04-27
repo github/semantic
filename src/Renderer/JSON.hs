@@ -250,9 +250,6 @@ jsonParseTree' constructor combine debug SourceBlob{..} term = toJSON $ construc
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
 type TermDecorator f fields field = TermF f (Record fields) (Term f (Record (field ': fields))) -> field
 
-newtype Identifier = Identifier Text
-  deriving (Eq, Show, ToJSON)
-
 data RoseF a b = RoseF a [b]
   deriving (Eq, Functor, Show)
 
