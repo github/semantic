@@ -11,19 +11,17 @@ module Data.Syntax.Assignment
 , Node
 , AST
 , Result(..)
+, Error(..)
 , assignAll
 , runAssignment
 , AssignmentState(..)
 ) where
 
 import Control.Monad.Free.Freer
-import qualified Data.ByteString.Char8 as B
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
-import Data.List ((!!))
 import Data.Record
-import Data.Text (unpack)
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
@@ -80,27 +78,27 @@ type AST grammar = Rose (Node grammar)
 
 
 -- | The result of assignment, possibly containing an error.
-data Result a = Result [Text] (Maybe a)
+data Result symbol a = Result [Error symbol] (Maybe a)
   deriving (Eq, Foldable, Functor, Traversable)
 
-data Error symbol = Error { errorLine :: Int, errorColumn :: Int, errorSymbols :: [symbol] }
+data Error symbol = Error { errorPos :: Info.SourcePos, errorSymbols :: [symbol] }
   deriving (Eq, Show)
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
+assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result grammar a
 assignAll assignment = (fmap snd .) . (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
-    c:_ -> Result ("Expected end of input, but got: " <> show c : es) Nothing
+    _:_ -> Result (Error (statePos state) [] : es) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
-  where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result (AssignmentState grammar, a)) -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+  where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, Rose (_ :. location) _ : _) -> yield location state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
@@ -111,14 +109,11 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          _ -> Result [expectation <> maybe "end of input" (show . rhead . roseValue) (listToMaybe stateNodes) <> ":\n" <> toS (B.lines (Source.sourceText stateSource) !! pred (Info.line statePos)) <> "\n" <> toS (replicate (pred (Info.column statePos)) ' ') <> "^"] Nothing
+          _ -> Result [ Error statePos expectedSymbols ] Nothing
           where state@AssignmentState{..} = dropAnonymous initialState
-                expectation = case assignment of
-                  Source -> "Expected a leaf node but got "
-                  Children _ -> "Expected a branch node but got "
-                  Choose choices | [(i, _)] <- IntMap.toList choices -> "Expected " <> show ((toEnum :: Int -> grammar) i) <> " but got "
-                                 | otherwise -> "Expected one of " <> show ((toEnum :: Int -> grammar) <$> IntMap.keys choices) <> " but got "
-                  _ -> "No rule to match at "
+                expectedSymbols = case assignment of
+                  Choose choices -> ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
+                  _ -> []
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
 dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
@@ -163,17 +158,20 @@ data RoseF a f = RoseF a [f]
 instance Recursive (Rose a) where project (Rose a as) = RoseF a as
 instance Corecursive (Rose a) where embed (RoseF a as) = Rose a as
 
-instance Show1 Result where
-  liftShowsPrec sp sl d (Result es a) = showsBinaryWith (const (foldr ((.) . (showString . unpack)) identity)) (liftShowsPrec sp sl) "Result" d es a
+instance Show2 Result where
+  liftShowsPrec2 sp1 sl1 sp2 sl2 d (Result es a) = showsBinaryWith (liftShowsPrec (liftShowsPrec sp1 sl1) (liftShowList sp1 sl1)) (liftShowsPrec sp2 sl2) "Result" d es a
 
-instance Show a => Show (Result a) where
-  showsPrec = showsPrec1
+instance (Show symbol, Show a) => Show (Result symbol a) where
+  showsPrec = showsPrec2
 
-instance Applicative Result where
+instance Show1 Error where
+  liftShowsPrec sp sl d (Error p s) = showsBinaryWith showsPrec (liftShowsPrec sp sl) "Error" d p s
+
+instance Applicative (Result symbol) where
   pure = Result [] . Just
   Result e1 f <*> Result e2 a = Result (e1 <> e2) (f <*> a)
 
-instance Alternative Result where
+instance Alternative (Result symbol) where
   empty = Result [] Nothing
   Result e (Just a) <|> _ = Result e (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <> e2) b
