@@ -76,10 +76,7 @@ instance ToJSONFields Identifier where
 
 
 indexTerm :: (ToJSONFields (Record fields), HasField fields (Maybe Identifier)) => Term (Syntax Text) (Record fields) -> [Record fields]
-indexTerm = cata combine
-  where combine (a :< f) | Nothing <- getField a :: Maybe Identifier = Prologue.concat f
-                         | Leaf _ <- f = Prologue.concat f
-                         | otherwise = a : Prologue.concat f
+indexTerm = cata $ \ (a :< f) -> a : Prologue.concat f
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
