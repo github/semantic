@@ -178,5 +178,5 @@ instance Applicative Result where
 instance Alternative Result where
   empty = Error []
   Result e a <|> _ = Result e a
-  _ <|> Result e b = Result e b
+  Error e1 <|> Result e2 b = Result (e1 <> e2) b
   Error a <|> Error b = Error (a <> b)
