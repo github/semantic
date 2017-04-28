@@ -36,7 +36,7 @@ instance Listable ParseFixture where
        \/ cons0 (ParseFixture (jsonIndexParseTree False pathMode "" []) jsonIndexParseTreeOutput)
        \/ cons0 (ParseFixture (sExpressionParseTree commitMode repo []) "(Program\n  (Method\n    (Identifier)))")
        \/ cons0 (ParseFixture (jsonParseTree False commitMode repo []) "[{\"filePath\":\"methods.rb\",\"programNode\":{\"category\":\"Program\",\"start\":[1,1],\"children\":[{\"category\":\"Method\",\"start\":[1,1],\"identifier\":{\"category\":\"Identifier\",\"start\":[1,5],\"identifier\":\"foo\",\"end\":[1,8],\"range\":[4,7]},\"clauses\":[],\"receiver\":null,\"end\":[2,4],\"range\":[0,11],\"callSignature\":[],\"definitions\":[]}],\"end\":[3,1],\"range\":[0,12]}},[]]\n")
-       \/ cons0 (ParseFixture (jsonIndexParseTree False commitMode repo []) "[{\"programNodes\":[{\"category\":\"Program\",\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}},{\"category\":\"Method\",\"identifier\":\"foo\",\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}},{\"category\":\"Identifier\",\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}}],\"filePath\":\"methods.rb\"},[]]\n")
+       \/ cons0 (ParseFixture (jsonIndexParseTree False commitMode repo []) "[{\"filePath\":\"methods.rb\",\"programNode\":[{\"category\":\"Method\",\"start\":[1,1],\"identifier\":\"foo\",\"end\":[2,4],\"range\":[0,11]}]},[]]\n")
 
     where
       pathMode = ParsePaths ["test/fixtures/ruby/and-or.A.rb"]
