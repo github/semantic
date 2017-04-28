@@ -81,7 +81,11 @@ type AST grammar = Rose (Node grammar)
 data Result symbol a = Result [Error symbol] (Maybe a)
   deriving (Eq, Foldable, Functor, Traversable)
 
-data Error symbol = Error { errorPos :: Info.SourcePos, errorSymbols :: [symbol] }
+data Error symbol = Error
+  { errorPos :: Info.SourcePos
+  , errorExpected :: [symbol]
+  , errorActual :: Maybe symbol
+  }
   deriving (Eq, Show)
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
@@ -92,7 +96,7 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Ass
 assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
-    _:_ -> Result (Error (statePos state) [] : es) Nothing
+    Rose (s :. _) _ :_ -> Result (Error (statePos state) [] (Just s) : es) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -109,7 +113,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          _ -> Result [ Error statePos expectedSymbols ] Nothing
+          _ -> Result [ Error statePos expectedSymbols (rhead . roseValue <$> listToMaybe stateNodes) ] Nothing
           where state@AssignmentState{..} = dropAnonymous initialState
                 expectedSymbols = case assignment of
                   Choose choices -> ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
@@ -165,7 +169,9 @@ instance (Show symbol, Show a) => Show (Result symbol a) where
   showsPrec = showsPrec2
 
 instance Show1 Error where
-  liftShowsPrec sp sl d (Error p s) = showsBinaryWith showsPrec (liftShowsPrec sp sl) "Error" d p s
+  liftShowsPrec sp sl d (Error p e a) = showsTernaryWith showsPrec (liftShowsPrec sp sl) (liftShowsPrec sp sl) "Error" d p e a
+    where showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
+            showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
 
 instance Applicative (Result symbol) where
   pure = Result [] . Just
