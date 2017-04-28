@@ -7,6 +7,7 @@ Semantic Code produces data around code’s structure and meaning. This is made 
 
 - Parse tree.
   - Integration with code search 2.0
+  - [Semantic notifications](https://github.com/github/semantic-diff/issues/744)
 - Diff.
 - Repository and/or project-level (semantic index)
   - Dependencies
