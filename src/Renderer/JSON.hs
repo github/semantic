@@ -47,14 +47,6 @@ instance ToJSONFields a => ToJSON (NumberedLine a) where
   toJSON (NumberedLine (n, a)) = object $ "number" .= n : toJSONFields a
   toEncoding (NumberedLine (n, a)) = pairs $ "number" .= n <> mconcat (toJSONFields a)
 
-instance ToJSON Category where
-  toJSON (Other s) = String s
-  toJSON s = String (toS s)
-
-instance ToJSON Range where
-  toJSON (Range start end) = A.Array . Vector.fromList $ toJSON <$> [ start, end ]
-  toEncoding (Range start end) = foldable [ start, end ]
-
 instance ToJSON a => ToJSON (Join These a) where
   toJSON (Join vs) = A.Array . Vector.fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
   toEncoding = foldable
