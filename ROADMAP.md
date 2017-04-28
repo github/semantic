@@ -2,21 +2,62 @@
 
 Semantic Code produces data around code’s structure and meaning. This is made available via GraphQL APIs, enabling others (both at GitHub and elsewhere) to build features.
 
-Current granularity:
+
+### GraphQL APIs
 
 - Parse tree.
 - Diff.
+- Repository and/or project-level
+  - Dependencies
+  - Some sort of persistence to “link” together different parse trees/repositories/etc
 
-Future:
 
-- Repository/project.
-- Language?
+### LSP integration
 
-Specific tasks:
+Enables:
 
-- Containerized service we can hit from github/github in prod.
-- GraphQL parse tree API.
-- GraphQL diff API.
+- Find References from blobs
+- Go To definition
+- Find workspace symbols
+
+Tasks:
+
+- Hosting language servers
+- Hosting LSP servers in containers
+- Persistence or caching of requests
+
+
+### Semantic analysis
+
+- À la carte syntax
+- Cyclomatic complexity
+- Modular abstract interpreters
+- Type inference
+  - Is this program well-typed?
+  - What is the type at any particular node?
+
+
+### Language support
+
+- Python
+
+
+### Operability/Production readiness
+
+- Containerization/[-as-a-service architecture](https://github.com/github/semantic-diff/projects/8)
+- Caching
+- Performance
+- Security review of tree-sitter
+- Resolving tree-sitter error recovery hangs
+
+
+### ToC
+
+- Performance with large parse trees
+- Depends on improved operability
+- Production ready tree-sitter
+- ToC in Enterprise
+
 
 Ongoing work:
 
@@ -31,6 +72,7 @@ Ongoing work:
 
 High-level goals:
 
+- Production ready in Q3 2017.
 - Help developers understand, [navigate][], and improve their code.
 - Lower barriers to contributions, e.g. by eliminating conflicts from [renaming variables][].
 
