@@ -82,7 +82,7 @@ instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> toS c }]
 
 instance ToJSONFields SourceSpan where
-  toJSONFields SourceSpan{..} = [ "start" .= spanStart, "end" .= spanEnd ]
+  toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 instance ToJSONFields SourceText where
   toJSONFields (SourceText t) = [ "sourceText" .= t ]
