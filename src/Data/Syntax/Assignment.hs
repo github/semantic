@@ -80,7 +80,7 @@ type AST grammar = Rose (Node grammar)
 
 
 -- | The result of assignment, possibly containing an error.
-data Result a = Result [Text] a | Error [Text]
+data Result a = Result [Text] (Maybe a)
   deriving (Eq, Foldable, Functor, Traversable)
 
 
@@ -90,26 +90,26 @@ assignAll assignment = (fmap snd .) . (assignAllFrom assignment .) . AssignmentS
 
 assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
-  Result es (state, a) -> case stateNodes (dropAnonymous state) of
-    [] -> Result [] (state, a)
-    c:_ -> Error ("Expected end of input, but got: " <> show c : es)
-  Error e -> Error e
+  Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
+    [] -> Result [] (Just (state, a))
+    c:_ -> Result ("Expected end of input, but got: " <> show c : es) Nothing
+  r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
-runAssignment = iterFreer run . fmap (\ a state -> Result [] (state, a))
+runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result (AssignmentState grammar, a)) -> AssignmentState grammar -> Result (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, Rose (_ :. location) _ : _) -> yield location state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
           (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
-            Result _ (state', a) -> yield a (advanceState state' { stateNodes = stateNodes })
-            Error e -> Error e
+            Result _ (Just (state', a)) -> yield a (advanceState state' { stateNodes = stateNodes })
+            Result es Nothing -> Result es Nothing
           (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          _ -> Error [expectation <> maybe "end of input" (show . rhead . roseValue) (listToMaybe stateNodes) <> ":\n" <> toS (B.lines (Source.sourceText stateSource) !! pred (Info.line statePos)) <> "\n" <> toS (replicate (pred (Info.column statePos)) ' ') <> "^"]
+          _ -> Result [expectation <> maybe "end of input" (show . rhead . roseValue) (listToMaybe stateNodes) <> ":\n" <> toS (B.lines (Source.sourceText stateSource) !! pred (Info.line statePos)) <> "\n" <> toS (replicate (pred (Info.column statePos)) ' ') <> "^"] Nothing
           where state@AssignmentState{..} = dropAnonymous initialState
                 expectation = case assignment of
                   Source -> "Expected a leaf node but got "
@@ -162,21 +162,16 @@ instance Recursive (Rose a) where project (Rose a as) = RoseF a as
 instance Corecursive (Rose a) where embed (RoseF a as) = Rose a as
 
 instance Show1 Result where
-  liftShowsPrec _ _ d (Error es) = showsUnaryWith (const (foldr ((.) . (showString . unpack)) identity)) "Error" d es
-  liftShowsPrec sp _ d (Result es a) = showsBinaryWith (const (foldr ((.) . (showString . unpack)) identity)) sp "Result" d es a
+  liftShowsPrec sp sl d (Result es a) = showsBinaryWith (const (foldr ((.) . (showString . unpack)) identity)) (liftShowsPrec sp sl) "Result" d es a
 
 instance Show a => Show (Result a) where
   showsPrec = showsPrec1
 
 instance Applicative Result where
-  pure = Result []
-  Error a <*> Error b = Error (a <> b)
-  Error a <*> Result b _ = Error (a <> b)
-  Result a _ <*> Error b = Error (a <> b)
-  Result e1 f <*> Result e2 a = Result (e1 <> e2) (f a)
+  pure = Result [] . Just
+  Result e1 f <*> Result e2 a = Result (e1 <> e2) (f <*> a)
 
 instance Alternative Result where
-  empty = Error []
-  Result e a <|> _ = Result e a
-  Error e1 <|> Result e2 b = Result (e1 <> e2) b
-  Error a <|> Error b = Error (a <> b)
+  empty = Result [] Nothing
+  Result e (Just a) <|> _ = Result e (Just a)
+  Result e1 Nothing <|> Result e2 b = Result (e1 <> e2) b
