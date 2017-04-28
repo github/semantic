@@ -51,8 +51,7 @@ spec = do
       () <$ runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result ()
 
     it "does not match if its subrule does not match" $
-      let errors r = case r of { Result _ -> [] ; Error e -> e } in
-      Prologue.length (errors (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]]))) `shouldBe` 1
+      (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Error [ "Expected Red but got Green:\na\n^" ]
 
     it "matches nested children" $ do
       runAssignment
@@ -85,7 +84,7 @@ startingState :: ByteString -> [AST grammar] -> AssignmentState grammar
 startingState = AssignmentState 0 (Info.SourcePos 1 1) . Source
 
 data Grammar = Red | Green | Blue
-  deriving (Eq, Show)
+  deriving (Enum, Eq, Show)
 
 instance Symbol Grammar where
   symbolType _ = Regular

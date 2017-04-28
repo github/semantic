@@ -1,13 +1,9 @@
-{-# LANGUAGE DataKinds, GADTs, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies #-}
 module Data.Syntax.Assignment
 ( Assignment
-, get
-, state
 , Location
 , location
 , symbol
-, range
-, sourceSpan
 , source
 , children
 , Rose(..)
@@ -21,8 +17,11 @@ module Data.Syntax.Assignment
 ) where
 
 import Control.Monad.Free.Freer
+import qualified Data.ByteString.Char8 as B
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (Nil)
+import qualified Data.IntMap.Lazy as IntMap
+import Data.List ((!!))
 import Data.Record
 import Data.Text (unpack)
 import qualified Info
@@ -38,48 +37,24 @@ import Text.Show hiding (show)
 type Assignment node = Freer (AssignmentF node)
 
 data AssignmentF node a where
-  Get :: AssignmentF node node
-  State :: AssignmentF (Node grammar) (AssignmentState grammar)
+  Location :: AssignmentF node Location
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
+  Choose :: IntMap.IntMap a -> AssignmentF node a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
-
--- | Zero-width production of the current node.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (get *> b)' is fine, but 'many get' is not.
-get :: Assignment (Record fields) (Record fields)
-get = Get `Then` return
-
--- | Zero-width production of the current state.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (state *> b)' is fine, but 'many state' is not.
-state :: Assignment (Node grammar) (AssignmentState grammar)
-state = State `Then` return
 
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
 location :: Assignment (Node grammar) Location
-location = rtail <$> get <|> (\ (AssignmentState o p _ _) -> Info.Range o o :. Info.SourceSpan p p :. Nil) <$> state
+location = Location `Then` return
 
 -- | Zero-width match of a node with the given symbol.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: (HasField fields symbol, Eq symbol) => symbol -> Assignment (Record fields) ()
-symbol s = Get `Then` guard . (s ==) . getField
-
--- | Zero-width production of the current node’s range.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (range *> b)' is fine, but 'many range' is not.
-range :: HasField fields Info.Range => Assignment (Record fields) Info.Range
-range = Get `Then` return . getField
-
--- | Zero-width production of the current node’s sourceSpan.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (sourceSpan *> b)' is fine, but 'many sourceSpan' is not.
-sourceSpan :: HasField fields Info.SourceSpan => Assignment (Record fields) Info.SourceSpan
-sourceSpan = Get `Then` return . getField
+symbol :: (Enum symbol, Eq symbol) => symbol -> Assignment (Node symbol) ()
+symbol s = Choose (IntMap.singleton (fromEnum s) ()) `Then` return
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: Assignment symbol ByteString
@@ -110,10 +85,10 @@ data Result a = Result a | Error [Text]
 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
+assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
 assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
 
-assignAllFrom :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
 assignAllFrom assignment state = case runAssignment assignment state of
   Result (state, a) -> case stateNodes (dropAnonymous state) of
     [] -> Result a
@@ -121,23 +96,27 @@ assignAllFrom assignment state = case runAssignment assignment state of
   Error e -> Error e
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: (Symbol grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
-runAssignment = iterFreer (\ assignment yield state -> case (assignment, dropAnonymous state) of
-  -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-  (Alt a b, state) -> yield a state <|> yield b state -- FIXME: Symbol `Alt` Symbol `Alt` Symbol is inefficient, should build and match against an IntMap instead.
-  (State, state) -> yield state state
-  (assignment, AssignmentState offset _ source (subtree@(Rose node@(_ :. range :. _) children) : _)) -> case assignment of
-    Get -> yield node state
-    Source -> yield (Source.sourceText (Source.slice (offsetRange range (negate offset)) source)) (advanceState state)
-    Children childAssignment -> do
-      c <- assignAllFrom childAssignment state { stateNodes = children }
-      yield c (advanceState state)
-    _ -> Error ["No rule to match " <> show subtree]
-  (Get, AssignmentState{}) -> Error [ "Expected node but got end of input." ]
-  (Source, AssignmentState{}) -> Error [ "Expected leaf node but got end of input." ]
-  (Children _, AssignmentState{}) -> Error [ "Expected branch node but got end of input." ]
-  _ -> Error ["No rule to match at end of input."])
-  . fmap (\ a state -> Result (state, a))
+runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
+  where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result (AssignmentState grammar, a)) -> AssignmentState grammar -> Result (AssignmentState grammar, a)
+        run assignment yield initialState = case (assignment, stateNodes) of
+          (Location, Rose (_ :. location) _ : _) -> yield location state
+          (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
+          (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
+          (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
+            Result c -> yield c (advanceState state)
+            Error e -> Error e
+          (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
+          (Alt a b, _) -> yield a state <|> yield b state
+          _ -> Error [expectation <> maybe "end of input" (show . rhead . roseValue) (listToMaybe stateNodes) <> ":\n" <> toS (B.lines (Source.sourceText stateSource) !! pred (Info.line statePos)) <> "\n" <> toS (replicate (pred (Info.column statePos)) ' ') <> "^"]
+          where state@AssignmentState{..} = dropAnonymous initialState
+                expectation = case assignment of
+                  Source -> "Expected a leaf node but got "
+                  Children _ -> "Expected a branch node but got "
+                  Choose choices | [(i, _)] <- IntMap.toList choices -> "Expected " <> show ((toEnum :: Int -> grammar) i) <> " but got "
+                                 | otherwise -> "Expected one of " <> show ((toEnum :: Int -> grammar) <$> IntMap.keys choices) <> " but got "
+                  _ -> "No rule to match at "
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
 dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
@@ -157,16 +136,20 @@ data AssignmentState grammar = AssignmentState
   }
   deriving (Eq, Show)
 
-instance Alternative (Assignment symbol) where
+instance Enum symbol => Alternative (Assignment (Node symbol)) where
   empty = Empty `Then` return
-  (<|>) = (wrap .) . Alt
+  a <|> b = case (a, b) of
+    (_, Empty `Then` _) -> a
+    (Empty `Then` _, _) -> b
+    (Choose choices1 `Then` continue1, Choose choices2 `Then` continue2) -> Choose (IntMap.union (fmap continue1 choices1) (fmap continue2 choices2)) `Then` identity
+    _ -> wrap $ Alt a b
 
-instance Show symbol => Show1 (AssignmentF symbol) where
+instance Show symbol => Show1 (AssignmentF (Node symbol)) where
   liftShowsPrec sp sl d a = case a of
-    Get -> showString "Get"
-    State -> showString "State" . sp d (AssignmentState 0 (Info.SourcePos 0 0) (Source.Source "") [])
+    Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
+    Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
 
@@ -197,8 +180,3 @@ instance Alternative Result where
   Result a <|> _ = Result a
   _ <|> Result b = Result b
   Error a <|> Error b = Error (a <> b)
-
-instance Monad Result where
-  return = pure
-  Error a >>= _ = Error a
-  Result a >>= f = f a
