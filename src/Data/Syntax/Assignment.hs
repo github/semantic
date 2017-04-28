@@ -83,6 +83,8 @@ type AST grammar = Rose (Node grammar)
 data Result a = Result [Text] (Maybe a)
   deriving (Eq, Foldable, Functor, Traversable)
 
+data Error symbol = Error { errorLine :: Int, errorColumn :: Int, errorSymbols :: [symbol] }
+  deriving (Eq, Show)
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
