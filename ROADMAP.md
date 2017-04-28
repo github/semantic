@@ -6,10 +6,11 @@ Semantic Code produces data around code’s structure and meaning. This is made 
 ### GraphQL APIs
 
 - Parse tree.
+  - Integration with code search 2.0
 - Diff.
-- Repository and/or project-level
+- Repository and/or project-level (semantic index)
   - Dependencies
-  - Some sort of persistence to “link” together different parse trees/repositories/etc
+  - Some sort of persistence to “link” together different parse trees/repositories/etc.
 
 
 ### LSP integration
