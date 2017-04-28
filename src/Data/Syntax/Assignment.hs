@@ -86,12 +86,12 @@ data Result a = Result a | Error [Text]
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result a
-assignAll assignment = (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
+assignAll assignment = (fmap snd .) . (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result a
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
   Result (state, a) -> case stateNodes (dropAnonymous state) of
-    [] -> Result a
+    [] -> Result (state, a)
     c:_ -> Error ["Expected end of input, but got: " <> show c]
   Error e -> Error e
 
@@ -104,7 +104,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result (state, a))
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
           (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
-            Result c -> yield c (advanceState state)
+            Result (_, a) -> yield a (advanceState state)
             Error e -> Error e
           (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
