@@ -24,7 +24,7 @@ Ongoing work:
 
   Examples: type signatures, parse/type errors, callers/callees, labelling symbol declarations (for e.g. jump to…/ToC as well as code search), linking symbol references to declarations.
 
-- Extend the set of supported languages. Provide/improve tooling for writing/testing tree-sitter grammars. Review contributions to open-source grammars. Automate as much as possible to keep us focused on the core. Can we reduce/offload this in other ways?
+- Extend the set of supported languages, guided by data on language usage. Provide/improve tooling for writing/testing tree-sitter grammars. Review contributions to open-source grammars. Automate as much as possible to keep us focused on the core. Can we reduce/offload this in other ways?
 - Performance improvements.
 - Resiliency improvements/maintenance/operational excellence.
 - Metrics. How does it perform, how are people using it, what data do people care about, what don’t they use at all.
