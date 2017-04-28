@@ -44,7 +44,7 @@ instance Listable ParseFixture where
 
       sExpressionParseTreeOutput = "(Program\n  (Binary\n    (Identifier)\n    (Other \"and\")\n    (Identifier)))"
       jsonParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"start\":[1,1],\"children\":[{\"operatorSyntaxes\":[{\"category\":\"Identifier\",\"start\":[1,1],\"identifier\":\"foo\",\"end\":[1,4],\"range\":[0,3]},{\"category\":\"and\",\"start\":[1,5],\"identifier\":\"and\",\"end\":[1,8],\"range\":[4,7]},{\"category\":\"Identifier\",\"start\":[1,9],\"identifier\":\"bar\",\"end\":[1,12],\"range\":[8,11]}],\"category\":\"Binary\",\"start\":[1,1],\"end\":[1,12],\"range\":[0,11]}],\"end\":[2,1],\"range\":[0,12]}},[]]\n"
-      jsonIndexParseTreeOutput = "[{\"programNodes\":[{\"category\":\"Program\",\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},{\"category\":\"Binary\",\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}},{\"category\":\"Identifier\",\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"Other \\\"and\\\"\",\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"filePath\":\"test/fixtures/ruby/and-or.A.rb\"},[]]\n"
+      jsonIndexParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":[]},[]]\n"
 
 
 data DiffFixture = DiffFixture
