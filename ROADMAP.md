@@ -3,6 +3,13 @@
 Semantic Code produces data around code’s structure and meaning. This is made available via GraphQL APIs, enabling others (both at GitHub and elsewhere) to build features.
 
 
+## High-level goals:
+
+- Production ready in Q3 2017.
+- Help developers understand, [navigate][], and improve their code.
+- Lower barriers to contributions, e.g. by eliminating conflicts from [renaming variables][].
+
+
 ### GraphQL APIs
 
 - Parse tree.
@@ -13,6 +20,10 @@ Semantic Code produces data around code’s structure and meaning. This is made 
   - Dependencies
   - Some sort of persistence to “link” together different parse trees/repositories/etc.
 
+**Ongoing Work:**
+
+- Extend/improve the data provided via GraphQL. API consumers will have to specifically opt in to any new fields in order to receive them.
+
 
 ### LSP integration
 
@@ -22,7 +33,7 @@ Enables:
 - Go To definition
 - Find workspace symbols
 
-Tasks:
+**Ongoing Work:**
 
 - Hosting language servers
 - Hosting LSP servers in containers
@@ -38,10 +49,25 @@ Tasks:
   - Is this program well-typed?
   - What is the type at any particular node?
 
+**Ongoing Work:**
+
+- type signatures,
+- parse/type errors,
+- callers/callees,
+- labelling symbol declarations (for e.g. jump to…/ToC as well as code search)
+- linking symbol references to declarations.
+
 
 ### Language support
 
 - Python
+
+**Ongoing Work:**
+
+- Extend the set of supported languages, guided by data on language usage.
+- Provide/improve tooling for writing/testing tree-sitter grammars.
+- Review contributions to open-source grammars.
+- Automate as much as possible to keep us focused on the core. Can we reduce/offload this in other ways?
 
 
 ### Operability/Production readiness
@@ -52,6 +78,11 @@ Tasks:
 - Security review of tree-sitter
 - Resolving tree-sitter error recovery hangs
 
+**Ongoing Work:**
+- Performance improvements.
+- Resiliency improvements/maintenance/operational excellence.
+- Metrics. How does it perform, how are people using it, what data do people care about, what don’t they use at all.
+
 
 ### ToC
 
@@ -60,23 +91,6 @@ Tasks:
 - Production ready tree-sitter
 - ToC in Enterprise
 
-
-Ongoing work:
-
-- Extend/improve the data provided via GraphQL. API consumers will have to specifically opt in to any new fields in order to receive them. This is our core.
-
-  Examples: type signatures, parse/type errors, callers/callees, labelling symbol declarations (for e.g. jump to…/ToC as well as code search), linking symbol references to declarations.
-
-- Extend the set of supported languages, guided by data on language usage. Provide/improve tooling for writing/testing tree-sitter grammars. Review contributions to open-source grammars. Automate as much as possible to keep us focused on the core. Can we reduce/offload this in other ways?
-- Performance improvements.
-- Resiliency improvements/maintenance/operational excellence.
-- Metrics. How does it perform, how are people using it, what data do people care about, what don’t they use at all.
-
-High-level goals:
-
-- Production ready in Q3 2017.
-- Help developers understand, [navigate][], and improve their code.
-- Lower barriers to contributions, e.g. by eliminating conflicts from [renaming variables][].
 
 See also our [roadmap project][].
 
