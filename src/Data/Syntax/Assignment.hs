@@ -140,7 +140,8 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          _ -> Result [ Error statePos expectedSymbols (rhead . roseValue <$> listToMaybe stateNodes) ] Nothing
+          (_, []) -> Result [ Error statePos expectedSymbols Nothing ] Nothing
+          (_, Rose (symbol :. _) _:_) -> Result [ Error statePos expectedSymbols (Just symbol) ] Nothing
           where state@AssignmentState{..} = dropAnonymous initialState
                 expectedSymbols = case assignment of
                   Choose choices -> ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
