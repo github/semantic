@@ -88,6 +88,13 @@ data Error symbol = Error
   }
   deriving (Eq, Show)
 
+showSymbols :: Show symbol => [symbol] -> ShowS
+showSymbols [] = showString "end of input nodes"
+showSymbols [symbol] = shows symbol
+showSymbols [a, b] = shows a . showString " or " . shows b
+showSymbols [a, b, c] = shows a . showString ", " . shows b . showString ", or " . shows c
+showSymbols (h:t) = shows h . showString ", " . showSymbols t
+
 showSourcePos :: Info.SourcePos -> ShowS
 showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
 
