@@ -34,6 +34,7 @@ type Syntax' =
   , Statement.Continue
   , Statement.If
   , Statement.Return
+  , Statement.While
   , Statement.Yield
   , Syntax.Empty
   , Syntax.Identifier
@@ -75,6 +76,7 @@ statement  =  exit Statement.Return Return
           <|> ifModifier
           <|> unless
           <|> unlessModifier
+          <|> while
           <|> literal
   where exit construct sym = symbol sym *> term <*> (children (construct <$> optional (symbol ArgumentList *> children statement)))
 
@@ -93,6 +95,9 @@ unless = symbol Unless *> term <*> children (Statement.If <$> (term <*> (Express
 
 unlessModifier :: Assignment (Node Grammar) (Term Syntax Location)
 unlessModifier = symbol UnlessModifier *> term <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
+
+while :: Assignment (Node Grammar) (Term Syntax Location)
+while = symbol While *> term <*> children (Statement.While <$> statement <*> (term <*> many statement))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
