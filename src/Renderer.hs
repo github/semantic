@@ -26,7 +26,7 @@ import Renderer.SExpression as R
 import Renderer.Split as R
 import Renderer.Summary as R
 import Renderer.TOC as R
-import Source (SourceBlob(..), slice, toText)
+import Source (SourceBlob(..))
 import Syntax
 import Term
 
@@ -54,18 +54,15 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Bool -> ParseTreeRenderer fields Value
-  JSONIndexParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Bool -> ParseTreeRenderer fields Value
+  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields Value
+  JSONIndexParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields Value
 
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer blob = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
-  JSONParseTreeRenderer True -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
-  JSONParseTreeRenderer False -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg)
-  JSONIndexParseTreeRenderer True -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg) . decoratorWithAlgebra (sourceDecorator (source blob))
-  JSONIndexParseTreeRenderer False -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg)
-  where sourceDecorator source (ann :< _) = Just (SourceText (toText (Source.slice (byteRange ann) source)))
-        identifierAlg = fmap Identifier . maybeIdentifier . fmap (fmap unIdentifier)
+  JSONParseTreeRenderer -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg)
+  JSONIndexParseTreeRenderer -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg)
+  where identifierAlg = fmap Identifier . maybeIdentifier . fmap (fmap unIdentifier)
 
 
 newtype Identifier = Identifier { unIdentifier :: Text }
@@ -98,8 +95,8 @@ instance Show (DiffRenderer fields output) where
 
 instance Show (ParseTreeRenderer fields output) where
   showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
-  showsPrec d (JSONParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONParseTreeRenderer" d debug
-  showsPrec d (JSONIndexParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONIndexParseTreeRenderer" d debug
+  showsPrec _ JSONParseTreeRenderer = showString "JSONParseTreeRenderer"
+  showsPrec _ JSONIndexParseTreeRenderer = showString "JSONIndexParseTreeRenderer"
 
 instance Monoid File where
   mempty = File mempty
