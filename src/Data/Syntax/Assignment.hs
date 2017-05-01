@@ -123,7 +123,7 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Ass
 assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
-    Rose (s :. _) _ :_ -> Result (Error (statePos state) [] (Just s) : es) Nothing
+    Rose (s :. _) _ :_ -> Result (if null es then [ Error (statePos state) [] (Just s) ] else es) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
