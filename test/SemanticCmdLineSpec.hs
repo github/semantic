@@ -32,11 +32,9 @@ data ParseFixture = ParseFixture
 
 instance Listable ParseFixture where
   tiers = cons0 (ParseFixture (sExpressionParseTree pathMode "" []) sExpressionParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree False pathMode "" []) jsonParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonIndexParseTree False pathMode "" []) jsonIndexParseTreeOutput)
+       \/ cons0 (ParseFixture (jsonParseTree pathMode "" []) jsonParseTreeOutput)
        \/ cons0 (ParseFixture (sExpressionParseTree commitMode repo []) "(Program\n  (Method\n    (Identifier)))")
-       \/ cons0 (ParseFixture (jsonParseTree False commitMode repo []) "[{\"filePath\":\"methods.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Method\",\"identifier\":{\"category\":\"Identifier\",\"identifier\":\"foo\",\"range\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},\"clauses\":[],\"receiver\":null,\"range\":[0,11],\"callSignature\":[],\"definitions\":[],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}}],\"range\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}}},[]]\n")
-       \/ cons0 (ParseFixture (jsonIndexParseTree False commitMode repo []) "[{\"filePath\":\"methods.rb\",\"programNode\":[{\"category\":\"Program\",\"range\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}},{\"category\":\"Method\",\"identifier\":\"foo\",\"range\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}},{\"category\":\"Identifier\",\"identifier\":\"foo\",\"range\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}}]},[]]\n")
+       \/ cons0 (ParseFixture (jsonParseTree commitMode repo []) "[{\"filePath\":\"methods.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Method\",\"identifier\":{\"category\":\"Identifier\",\"identifier\":\"foo\",\"range\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},\"clauses\":[],\"receiver\":null,\"range\":[0,11],\"callSignature\":[],\"definitions\":[],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}}],\"range\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}}},[]]\n")
 
     where
       pathMode = ParsePaths ["test/fixtures/ruby/and-or.A.rb"]
@@ -44,7 +42,6 @@ instance Listable ParseFixture where
 
       sExpressionParseTreeOutput = "(Program\n  (Binary\n    (Identifier)\n    (Other \"and\")\n    (Identifier)))"
       jsonParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"operatorSyntaxes\":[{\"category\":\"Identifier\",\"identifier\":\"foo\",\"range\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"identifier\":\"and\",\"range\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"identifier\":\"bar\",\"range\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"category\":\"Binary\",\"range\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"range\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}}},[]]\n"
-      jsonIndexParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":[{\"category\":\"Program\",\"range\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},{\"category\":\"Binary\",\"range\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}},{\"category\":\"Identifier\",\"identifier\":\"foo\",\"range\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"identifier\":\"and\",\"range\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"identifier\":\"bar\",\"range\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}]},[]]\n"
 
 
 data DiffFixture = DiffFixture
