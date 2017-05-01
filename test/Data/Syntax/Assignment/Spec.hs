@@ -24,10 +24,10 @@ spec = do
       let s = "colourless green ideas sleep furiously"
           w = words s
           (_, nodes) = foldl (\ (i, prev) word -> (i + B.length word + 1, prev <> [Rose (rec Red i (i + B.length word)) []])) (0, []) w in
-      runAssignment (many red) (startingState s nodes) `shouldBe` Result [] (Just (AssignmentState (B.length s) (Info.SourcePos 1 (succ (B.length s))) (Source "") [], Out <$> w))
+      resultValue (runAssignment (many red) (startingState s nodes)) `shouldBe` Just (AssignmentState (B.length s) (Info.SourcePos 1 (succ (B.length s))) (Source "") [], Out <$> w)
 
     it "matches one-or-more repetitions against one or more input nodes" $
-      runAssignment (some red) (startingState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result [] (Just (AssignmentState 5 (Info.SourcePos 1 6) (Source "") [], [Out "hello"]))
+      resultValue (runAssignment (some red) (startingState "hello" [Rose (rec Red 0 5) []])) `shouldBe` Just (AssignmentState 5 (Info.SourcePos 1 6) (Source "") [], [Out "hello"])
 
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
@@ -61,13 +61,13 @@ spec = do
         Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) (Source "") [], "1"))
 
     it "continues after children" $ do
-      runAssignment
+      resultValue (runAssignment
         (many (symbol Red *> children (symbol Green *> source)
            <|> symbol Blue *> source))
         (startingState "BC" [ Rose (rec Red 0 1) [ Rose (rec Green 0 1) [] ]
-                            , Rose (rec Blue 1 2) [] ])
+                            , Rose (rec Blue 1 2) [] ]))
       `shouldBe`
-        Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["B", "C"]))
+        Just (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["B", "C"])
 
     it "matches multiple nested children" $ do
       runAssignment
