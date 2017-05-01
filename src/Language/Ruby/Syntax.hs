@@ -12,7 +12,7 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Language.Haskell.TH hiding (location, Range(..))
-import Prologue hiding (get, Location, optional, state, unless)
+import Prologue hiding (for, get, Location, optional, state, unless)
 import Term
 import Text.Parser.TreeSitter.Language
 import Text.Parser.TreeSitter.Ruby
@@ -32,6 +32,7 @@ type Syntax' =
   , Literal.Symbol
   , Statement.Break
   , Statement.Continue
+  , Statement.ForEach
   , Statement.If
   , Statement.Return
   , Statement.While
@@ -80,6 +81,7 @@ statement  =  exit Statement.Return Return
           <|> whileModifier
           <|> until
           <|> untilModifier
+          <|> for
           <|> literal
   where exit construct sym = symbol sym *> term <*> (children (construct <$> optional (symbol ArgumentList *> children statement)))
 
@@ -110,6 +112,9 @@ until = symbol Until *> term <*> children (Statement.While <$> (term <*> (Expres
 
 untilModifier :: Assignment (Node Grammar) (Term Syntax Location)
 untilModifier = symbol UntilModifier *> term <*> children (flip Statement.While <$> statement <*> (term <*> (Expression.Not <$> statement)))
+
+for :: Assignment (Node Grammar) (Term Syntax Location)
+for = symbol For *> term <*> children (Statement.ForEach <$> statement <*> statement <*> (term <*> many statement))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
