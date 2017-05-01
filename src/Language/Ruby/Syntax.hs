@@ -111,6 +111,7 @@ literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
         <|> leaf Language.Ruby.Syntax.False (const Literal.false)
         <|> leaf Language.Ruby.Syntax.Integer Literal.Integer
+        <|> symbol Symbol *> term <*> (Literal.Symbol <$> source)
         <|> symbol Range *> term <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
 -- | Assignment of the current node’s annotation.
