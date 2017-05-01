@@ -77,6 +77,7 @@ statement  =  exit Statement.Return Return
           <|> unless
           <|> unlessModifier
           <|> while
+          <|> whileModifier
           <|> literal
   where exit construct sym = symbol sym *> term <*> (children (construct <$> optional (symbol ArgumentList *> children statement)))
 
@@ -98,6 +99,9 @@ unlessModifier = symbol UnlessModifier *> term <*> children (flip Statement.If <
 
 while :: Assignment (Node Grammar) (Term Syntax Location)
 while = symbol While *> term <*> children (Statement.While <$> statement <*> (term <*> many statement))
+
+whileModifier :: Assignment (Node Grammar) (Term Syntax Location)
+whileModifier = symbol WhileModifier *> term <*> children (flip Statement.While <$> statement <*> statement)
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
