@@ -10,7 +10,7 @@ module Renderer
 , File(..)
 ) where
 
-import Data.Aeson (Value, object, (.=))
+import Data.Aeson (Value, (.=))
 import Data.Functor.Both
 import Data.Functor.Classes
 import Text.Show
@@ -55,13 +55,11 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
   JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields Value
-  JSONIndexParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields Value
 
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer blob = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
   JSONParseTreeRenderer -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg)
-  JSONIndexParseTreeRenderer -> R.jsonFile blob . fmap (object . toJSONFields) . indexTerm . decoratorWithAlgebra (fToR identifierAlg)
   where identifierAlg = fmap Identifier . maybeIdentifier . fmap (fmap unIdentifier)
 
 
@@ -71,9 +69,6 @@ newtype Identifier = Identifier { unIdentifier :: Text }
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]
 
-
-indexTerm :: (ToJSONFields (Record fields), HasField fields (Maybe Identifier)) => Term (Syntax Text) (Record fields) -> [Record fields]
-indexTerm = cata $ \ (a :< f) -> a : Prologue.concat f
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
@@ -96,7 +91,6 @@ instance Show (DiffRenderer fields output) where
 instance Show (ParseTreeRenderer fields output) where
   showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
   showsPrec _ JSONParseTreeRenderer = showString "JSONParseTreeRenderer"
-  showsPrec _ JSONIndexParseTreeRenderer = showString "JSONIndexParseTreeRenderer"
 
 instance Monoid File where
   mempty = File mempty

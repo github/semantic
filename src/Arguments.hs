@@ -61,9 +61,6 @@ sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 jsonParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
 jsonParseTree = ParseArguments JSONParseTreeRenderer
 
-jsonIndexParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
-jsonIndexParseTree = ParseArguments JSONIndexParseTreeRenderer
-
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
 
