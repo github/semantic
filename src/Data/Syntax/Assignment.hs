@@ -88,6 +88,9 @@ data Error symbol = Error
   }
   deriving (Eq, Show)
 
+showSourcePos :: Info.SourcePos -> ShowS
+showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
+
 -- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
 assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result grammar a
 assignAll assignment = (fmap snd .) . (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
