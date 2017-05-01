@@ -35,6 +35,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
 -- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
 -- TODO: Float/Double literals.
+-- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 
 data Range a = Range { rangeStart :: a, rangeEnd :: a }
