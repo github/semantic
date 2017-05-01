@@ -93,12 +93,13 @@ data Error symbol = Error
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
   = showSourcePos errorPos . showString ": error: " . showExpectation . showChar '\n'
-  . showString (toS (Source.sourceText (Source.actualLines source !! Info.line errorPos))) -- actualLines results include line endings, so no newline here
+  . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (Info.column errorPos) ' ') . showChar '^' . showChar '\n'
   where showExpectation = case (errorExpected, errorActual) of
           ([], Nothing) -> showString "no rule to match at end of input nodes"
           (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
           (symbols, Just a) -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+        context = toS (Source.sourceText (Source.actualLines source !! Info.line errorPos))
 
 showSymbols :: Show symbol => [symbol] -> ShowS
 showSymbols [] = showString "end of input nodes"
