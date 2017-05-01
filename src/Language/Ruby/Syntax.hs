@@ -79,6 +79,7 @@ statement  =  exit Statement.Return Return
           <|> while
           <|> whileModifier
           <|> until
+          <|> untilModifier
           <|> literal
   where exit construct sym = symbol sym *> term <*> (children (construct <$> optional (symbol ArgumentList *> children statement)))
 
@@ -106,6 +107,9 @@ whileModifier = symbol WhileModifier *> term <*> children (flip Statement.While 
 
 until :: Assignment (Node Grammar) (Term Syntax Location)
 until = symbol Until *> term <*> children (Statement.While <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement))
+
+untilModifier :: Assignment (Node Grammar) (Term Syntax Location)
+untilModifier = symbol UntilModifier *> term <*> children (flip Statement.While <$> statement <*> (term <*> (Expression.Not <$> statement)))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
