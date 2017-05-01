@@ -77,13 +77,9 @@ statement  =  exit Statement.Return Return
           <|> exit Statement.Break Break
           <|> exit Statement.Continue Next
           <|> if'
-          <|> ifModifier
           <|> unless
-          <|> unlessModifier
           <|> while
-          <|> whileModifier
           <|> until
-          <|> untilModifier
           <|> for
           <|> literal
   where exit construct sym = symbol sym *> term <*> (children (construct <$> optional (symbol ArgumentList *> children statement)))
@@ -92,29 +88,21 @@ comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = leaf Comment Comment.Comment
 
 if' :: Assignment (Node Grammar) (Term Syntax Location)
-if' = go If
-  where go s = symbol s *> term <*> children (Statement.If <$> statement <*> (term <*> many statement) <*> optional (go Elsif <|> symbol Else *> term <*> children (many statement)))
-
-ifModifier :: Assignment (Node Grammar) (Term Syntax Location)
-ifModifier = symbol IfModifier *> term <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
+if' =  go If
+   <|> symbol IfModifier *> term <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
+  where go s = symbol s  *> term <*> children      (Statement.If <$> statement <*> (term <*> many statement) <*> optional (go Elsif <|> symbol Else *> term <*> children (many statement)))
 
 unless :: Assignment (Node Grammar) (Term Syntax Location)
-unless = symbol Unless *> term <*> children (Statement.If <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement) <*> optional (symbol Else *> term <*> children (many statement)))
-
-unlessModifier :: Assignment (Node Grammar) (Term Syntax Location)
-unlessModifier = symbol UnlessModifier *> term <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
+unless =  symbol Unless         *> term <*> children      (Statement.If <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement) <*> optional (symbol Else *> term <*> children (many statement)))
+      <|> symbol UnlessModifier *> term <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
 
 while :: Assignment (Node Grammar) (Term Syntax Location)
-while = symbol While *> term <*> children (Statement.While <$> statement <*> (term <*> many statement))
-
-whileModifier :: Assignment (Node Grammar) (Term Syntax Location)
-whileModifier = symbol WhileModifier *> term <*> children (flip Statement.While <$> statement <*> statement)
+while =  symbol While         *> term <*> children      (Statement.While <$> statement <*> (term <*> many statement))
+     <|> symbol WhileModifier *> term <*> children (flip Statement.While <$> statement <*> statement)
 
 until :: Assignment (Node Grammar) (Term Syntax Location)
-until = symbol Until *> term <*> children (Statement.While <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement))
-
-untilModifier :: Assignment (Node Grammar) (Term Syntax Location)
-untilModifier = symbol UntilModifier *> term <*> children (flip Statement.While <$> statement <*> (term <*> (Expression.Not <$> statement)))
+until =  symbol Until         *> term <*> children      (Statement.While <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement))
+     <|> symbol UntilModifier *> term <*> children (flip Statement.While <$> statement <*> (term <*> (Expression.Not <$> statement)))
 
 for :: Assignment (Node Grammar) (Term Syntax Location)
 for = symbol For *> term <*> children (Statement.ForEach <$> identifier <*> statement <*> (term <*> many statement))
