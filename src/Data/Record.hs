@@ -1,8 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Record where
 
-import Data.Aeson
-import Data.Aeson.Types
 import Data.Functor.Listable
 import GHC.Show
 import Prologue
@@ -56,22 +54,6 @@ instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
 
 instance Show (Record '[]) where
   showsPrec n Nil = showParen (n > 0) ("Nil" <>)
-
-instance (ToJSON h, ToJSONList (Record t)) => ToJSON (Record (h ': t)) where
-  toJSON r = toJSONList (toJSONValues r)
-
-instance ToJSON (Record '[]) where
-  toJSON _ = emptyArray
-
-class ToJSONList t where
-  toJSONValues :: t -> [Value]
-
-instance (ToJSON h, ToJSONList (Record t)) => ToJSONList (Record (h ': t)) where
-  toJSONValues (h :. t) = toJSON h : toJSONValues t
-
-instance ToJSONList (Record '[]) where
-  toJSONValues _ = []
-
 
 instance (Eq h, Eq (Record t)) => Eq (Record (h ': t)) where
   (h1 :. t1) == (h2 :. t2) = h1 == h2 && t1 == t2

@@ -92,8 +92,7 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
       <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
-           <|> (flag' jsonParseTree (long "json" <> help "Output JSON parse trees") <*> switch (long "debug"))
-           <|> (flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") <*> switch (long "debug")) )
+           <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees") )
          <*> (  ParsePaths
                <$> some (argument str (metavar "FILES..."))
             <|> ParseCommit
