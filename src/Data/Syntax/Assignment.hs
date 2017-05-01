@@ -22,7 +22,8 @@ import Control.Monad.Free.Freer
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
-import Data.List ((!!))
+import Data.Ix (inRange)
+import Data.List.NonEmpty (nonEmpty)
 import Data.Record
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
@@ -100,7 +101,7 @@ showError source Error{..}
           ([], Nothing) -> showString "no rule to match at end of input nodes"
           (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
           (symbols, Just a) -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
-        context = toS (Source.sourceText (Source.actualLines source !! Info.line errorPos))
+        context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ l | (i, l) <- zip [0..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
 
 showSymbols :: Show symbol => [symbol] -> ShowS
 showSymbols [] = showString "end of input nodes"
