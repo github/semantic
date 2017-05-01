@@ -77,7 +77,9 @@ newtype Symbol a = SymbolLiteral { symbolContent :: ByteString }
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Heredoc-style string literals?
 -- TODO: Character literals.
+-- TODO: Regular expressions.
 
 
 -- Collections
