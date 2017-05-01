@@ -96,12 +96,14 @@ showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
   = showSourcePos errorPos . showString ": error: " . showExpectation . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
-  . showString (replicate (Info.column errorPos) ' ') . showChar '^' . showChar '\n'
+  . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
   where showExpectation = case (errorExpected, errorActual) of
           ([], Nothing) -> showString "no rule to match at end of input nodes"
           (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
           (symbols, Just a) -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
-        context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ l | (i, l) <- zip [0..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
+        context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
+        showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
 
 showSymbols :: Show symbol => [symbol] -> ShowS
 showSymbols [] = showString "end of input nodes"
