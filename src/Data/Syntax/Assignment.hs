@@ -22,11 +22,12 @@ import Control.Monad.Free.Freer
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
+import Data.List ((!!))
 import Data.Record
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
-import qualified Source (Source(..), drop, slice, sourceText)
+import qualified Source (Source(..), drop, slice, sourceText, actualLines)
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
@@ -90,7 +91,10 @@ data Error symbol = Error
   deriving (Eq, Show)
 
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
-showError source Error{..} = showSourcePos errorPos . showString ": error: " . showExpectation
+showError source Error{..}
+  = showSourcePos errorPos . showString ": error: " . showExpectation . showChar '\n'
+  . showString (toS (Source.sourceText (Source.actualLines source !! Info.line errorPos))) -- actualLines results include line endings, so no newline here
+  . showString (replicate (Info.column errorPos) ' ') . showChar '^' . showChar '\n'
   where showExpectation = case (errorExpected, errorActual) of
           ([], Nothing) -> showString "no rule to match at end of input nodes"
           (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
