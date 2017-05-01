@@ -1,8 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Data.Record
-import qualified Info
 import Data.Aeson
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
@@ -119,21 +117,22 @@ extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
 
-maybeIdentifier :: HasField fields Info.Category => Syntax leaf (Cofree (Syntax leaf) (Record fields)) -> Maybe (Cofree (Syntax leaf) (Record fields))
-maybeIdentifier syntax = case syntax of
-  Assignment f _ -> Just f
-  Class f _ _ -> Just f
-  Export f _ -> f
-  Function f _ _ -> Just f
-  FunctionCall f _ _ -> Just f
-  Import f _ -> Just f
-  Method _ f _ _ _ -> Just f
-  MethodCall _ f _ _ -> Just f
-  Module f _ -> Just f
-  OperatorAssignment f _ -> Just f
-  SubscriptAccess f _  -> Just f
-  TypeDecl f _ -> Just f
-  VarAssignment f _ -> find ((== Info.Identifier) . Info.category . extract) f
+maybeIdentifier :: CofreeF (Syntax leaf) a (Maybe leaf) -> Maybe leaf
+maybeIdentifier (_ :< syntax) = case syntax of
+  Leaf f -> Just f
+  Assignment f _ -> f
+  Class f _ _ -> f
+  Export f _ -> join f
+  Function f _ _ -> f
+  FunctionCall f _ _ -> f
+  Import f _ -> f
+  Method _ f _ _ _ -> f
+  MethodCall _ f _ _ -> f
+  Module f _ -> f
+  OperatorAssignment f _ -> f
+  SubscriptAccess f _  -> f
+  TypeDecl f _ -> f
+  VarAssignment f _ -> asum f
   _ -> Nothing
 
 -- Instances

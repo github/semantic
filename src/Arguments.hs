@@ -58,11 +58,8 @@ deriving instance Show ParseArguments
 sExpressionParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
-jsonParseTree :: Bool -> ParseMode -> FilePath -> [FilePath] -> ParseArguments
-jsonParseTree = ParseArguments . JSONParseTreeRenderer
-
-jsonIndexParseTree :: Bool -> ParseMode -> FilePath -> [FilePath] -> ParseArguments
-jsonIndexParseTree = ParseArguments . JSONIndexParseTreeRenderer
+jsonParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
+jsonParseTree = ParseArguments JSONParseTreeRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
