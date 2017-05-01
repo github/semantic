@@ -90,6 +90,7 @@ data Error symbol = Error
   }
   deriving (Eq, Show)
 
+-- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
   = showSourcePos errorPos . showString ": error: " . showExpectation . showChar '\n'
