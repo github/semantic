@@ -15,3 +15,4 @@ instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 -- TODO: nested comment types
 -- TODO: documentation comment types
 -- TODO: literate programming comment types? alternatively, consider those as markup
+-- TODO: Differentiate between line/block comments?
