@@ -12,6 +12,7 @@ module Data.Syntax.Assignment
 , AST
 , Result(..)
 , Error(..)
+, showError
 , assignAll
 , runAssignment
 , AssignmentState(..)
@@ -87,6 +88,12 @@ data Error symbol = Error
   , errorActual :: Maybe symbol
   }
   deriving (Eq, Show)
+
+showError :: Show symbol => Source.Source -> Error symbol -> ShowS
+showError source Error{..} = showSourcePos errorPos . showString ": error: " . case (errorExpected, errorActual) of
+  ([], Nothing) -> showString "no rule to match at end of input nodes"
+  (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
+  (symbols, Just a) -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
 
 showSymbols :: Show symbol => [symbol] -> ShowS
 showSymbols [] = showString "end of input nodes"
