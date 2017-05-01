@@ -28,6 +28,7 @@ type Syntax' =
   , Literal.Boolean
   , Literal.Hash
   , Literal.Integer
+  , Literal.Range
   , Literal.String
   , Literal.Symbol
   , Statement.Break
@@ -120,6 +121,7 @@ literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
         <|> leaf Language.Ruby.Syntax.False (const Literal.false)
         <|> leaf Language.Ruby.Syntax.Integer Literal.Integer
+        <|> symbol Range *> term <*> children (Literal.Range <$> statement <*> statement)
 
 -- | Assignment of the current node’s annotation.
 term :: InUnion Syntax' f => Assignment (Node grammar) (f (Term Syntax Location) -> Term Syntax Location)

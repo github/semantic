@@ -37,6 +37,13 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 -- TODO: Float/Double literals.
 
 
+data Range a = Range { rangeStart :: a, rangeEnd :: a }
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Range where liftEq = genericLiftEq
+instance Show1 Range where liftShowsPrec = genericLiftShowsPrec
+
+
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [Union '[InterpolationElement, TextElement] a] }
