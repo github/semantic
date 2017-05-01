@@ -114,7 +114,7 @@ untilModifier :: Assignment (Node Grammar) (Term Syntax Location)
 untilModifier = symbol UntilModifier *> term <*> children (flip Statement.While <$> statement <*> (term <*> (Expression.Not <$> statement)))
 
 for :: Assignment (Node Grammar) (Term Syntax Location)
-for = symbol For *> term <*> children (Statement.ForEach <$> statement <*> statement <*> (term <*> many statement))
+for = symbol For *> term <*> children (Statement.ForEach <$> identifier <*> statement <*> (term <*> many statement))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
