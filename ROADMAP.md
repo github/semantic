@@ -5,7 +5,7 @@ Semantic Code produces data around code’s structure and meaning. This is made 
 
 ## High-level goals:
 
-- Production ready in Q3 2017.
+- Production ready in Q2 FY2018.
 - Help developers understand, [navigate][], and improve their code.
 - Lower barriers to contributions, e.g. by eliminating conflicts from [renaming variables][].
 
