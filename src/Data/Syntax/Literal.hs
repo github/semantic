@@ -71,7 +71,7 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 
-newtype Symbol a = SymbolLiteral { symbolContent :: ByteString }
+newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
