@@ -82,7 +82,7 @@ statement  =  exit Statement.Return Return
           <|> until
           <|> for
           <|> literal
-  where exit construct sym = symbol sym *> term <*> (children (construct <$> optional (symbol ArgumentList *> children statement)))
+  where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = leaf Comment Comment.Comment
