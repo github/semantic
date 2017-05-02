@@ -2,13 +2,13 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
-import Prelude (FilePath)
-import Prologue
 import qualified Data.ByteString as B
 import qualified Data.Text as T
 import Numeric
 import Range
+import Prologue
 import SourceSpan
+import System.IO (FilePath)
 import Test.LeanCheck
 
 -- | The source, oid, path, and Maybe SourceKind of a blob.
