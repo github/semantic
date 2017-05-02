@@ -12,7 +12,7 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Language.Haskell.TH hiding (location, Range(..))
-import Prologue hiding (get, Location, optional, state, unless)
+import Prologue hiding (for, get, Location, optional, state, unless)
 import Term
 import Text.Parser.TreeSitter.Language
 import Text.Parser.TreeSitter.Ruby
@@ -28,12 +28,17 @@ type Syntax' =
   , Literal.Boolean
   , Literal.Hash
   , Literal.Integer
+  , Literal.Range
   , Literal.String
   , Literal.Symbol
   , Statement.Break
   , Statement.Continue
+  , Statement.ForEach
   , Statement.If
+  -- TODO: redo
+  -- TODO: retry
   , Statement.Return
+  , Statement.While
   , Statement.Yield
   , Syntax.Empty
   , Syntax.Identifier
@@ -72,32 +77,42 @@ statement  =  exit Statement.Return Return
           <|> exit Statement.Break Break
           <|> exit Statement.Continue Next
           <|> if'
-          <|> ifModifier
           <|> unless
-          <|> unlessModifier
+          <|> while
+          <|> until
+          <|> for
           <|> literal
-  where exit construct sym = symbol sym *> term <*> (children (construct <$> optional (symbol ArgumentList *> children statement)))
+  where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = leaf Comment Comment.Comment
 
 if' :: Assignment (Node Grammar) (Term Syntax Location)
-if' = go If
-  where go s = symbol s *> term <*> children (Statement.If <$> statement <*> (term <*> many statement) <*> optional (go Elsif <|> symbol Else *> term <*> children (many statement)))
-
-ifModifier :: Assignment (Node Grammar) (Term Syntax Location)
-ifModifier = symbol IfModifier *> term <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
+if' =  ifElsif If
+   <|> symbol IfModifier     *> term <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
+  where ifElsif s = symbol s *> term <*> children      (Statement.If <$> statement <*> (term <*> many statement) <*> optional (ifElsif Elsif <|> symbol Else *> term <*> children (many statement)))
 
 unless :: Assignment (Node Grammar) (Term Syntax Location)
-unless = symbol Unless *> term <*> children (Statement.If <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement) <*> optional (symbol Else *> term <*> children (many statement)))
+unless =  symbol Unless         *> term <*> children      (Statement.If <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement) <*> optional (symbol Else *> term <*> children (many statement)))
+      <|> symbol UnlessModifier *> term <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
 
-unlessModifier :: Assignment (Node Grammar) (Term Syntax Location)
-unlessModifier = symbol UnlessModifier *> term <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
+while :: Assignment (Node Grammar) (Term Syntax Location)
+while =  symbol While         *> term <*> children      (Statement.While <$> statement <*> (term <*> many statement))
+     <|> symbol WhileModifier *> term <*> children (flip Statement.While <$> statement <*> statement)
+
+until :: Assignment (Node Grammar) (Term Syntax Location)
+until =  symbol Until         *> term <*> children      (Statement.While <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement))
+     <|> symbol UntilModifier *> term <*> children (flip Statement.While <$> statement <*> (term <*> (Expression.Not <$> statement)))
+
+for :: Assignment (Node Grammar) (Term Syntax Location)
+for = symbol For *> term <*> children (Statement.ForEach <$> identifier <*> statement <*> (term <*> many statement))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
         <|> leaf Language.Ruby.Syntax.False (const Literal.false)
         <|> leaf Language.Ruby.Syntax.Integer Literal.Integer
+        <|> leaf Symbol Literal.Symbol
+        <|> symbol Range *> term <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
 -- | Assignment of the current node’s annotation.
 term :: InUnion Syntax' f => Assignment (Node grammar) (f (Term Syntax Location) -> Term Syntax Location)

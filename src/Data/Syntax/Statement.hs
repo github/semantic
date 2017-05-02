@@ -30,6 +30,16 @@ instance Eq1 Pattern where liftEq = genericLiftEq
 instance Show1 Pattern where liftShowsPrec = genericLiftShowsPrec
 
 
+-- Assignment
+
+-- | Assignment to a variable or other lvalue.
+data Assignment a = Assignment { assignmentTarget :: !a, assignmentValue :: !a }
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Assignment where liftEq = genericLiftEq
+instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
+
+
 -- Returns
 
 newtype Return a = Return a

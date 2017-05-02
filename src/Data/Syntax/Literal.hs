@@ -35,6 +35,14 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
 -- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
 -- TODO: Float/Double literals.
+-- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
+
+
+data Range a = Range { rangeStart :: a, rangeEnd :: a }
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Range where liftEq = genericLiftEq
+instance Show1 Range where liftShowsPrec = genericLiftShowsPrec
 
 
 -- Strings, symbols
@@ -63,13 +71,15 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 
-newtype Symbol a = SymbolLiteral { symbolContent :: ByteString }
+newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Heredoc-style string literals?
 -- TODO: Character literals.
+-- TODO: Regular expressions.
 
 
 -- Collections
