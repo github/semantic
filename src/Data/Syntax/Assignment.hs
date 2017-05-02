@@ -13,7 +13,7 @@ module Data.Syntax.Assignment
 , Result(..)
 , Error(..)
 , showError
-, assignAll
+, assign
 , runAssignment
 , AssignmentState(..)
 ) where
@@ -115,9 +115,9 @@ showSymbols (h:t) = shows h . showString ", " . showSymbols t
 showSourcePos :: Info.SourcePos -> ShowS
 showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
 
--- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result grammar a
-assignAll assignment = (fmap snd .) . (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
+-- | Run an assignment over an AST exhaustively.
+assign :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
+assign assignment source = fmap snd . assignAllFrom assignment . AssignmentState 0 (Info.SourcePos 1 1) source . pure
 
 assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
