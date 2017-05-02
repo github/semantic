@@ -2,6 +2,7 @@
 module TreeSitter
 ( treeSitterParser
 , parseRubyToAST
+, parseRubyToTerm
 , defaultTermAssignment
 ) where
 
@@ -74,6 +75,15 @@ parseRubyToAST source = do
 
         anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
         anaM g = a where a = pure . embed <=< traverse a <=< g
+
+
+parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
+parseRubyToTerm source = do
+  ast <- parseRubyToAST source
+  let A.Result errors value = A.assign Ruby.assignment source ast
+  case value of
+    Just a -> pure (Just a)
+    _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
 
 -- | Return a parser for a tree sitter language & document.
