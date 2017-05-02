@@ -14,60 +14,60 @@ spec :: Spec
 spec = do
   describe "Applicative" $ do
     it "matches in sequence" $
-      runAssignment ((,) <$> red <*> red) (startingState "helloworld" [Rose (rec Red 0 5) [], Rose (rec Red 5 10) []]) `shouldBe` Result (AssignmentState 10 (Info.SourcePos 1 11) (Source "") [], (Out "hello", Out "world"))
+      runAssignment ((,) <$> red <*> red) (startingState "helloworld" [Rose (rec Red 0 5) [], Rose (rec Red 5 10) []]) `shouldBe` Result [] (Just (AssignmentState 10 (Info.SourcePos 1 11) (Source "") [], (Out "hello", Out "world")))
 
   describe "Alternative" $ do
     it "attempts multiple alternatives" $
-      runAssignment (green <|> red) (startingState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result (AssignmentState 5 (Info.SourcePos 1 6) (Source "") [], Out "hello")
+      runAssignment (green <|> red) (startingState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result [] (Just (AssignmentState 5 (Info.SourcePos 1 6) (Source "") [], Out "hello"))
 
     it "matches repetitions" $
       let s = "colourless green ideas sleep furiously"
           w = words s
           (_, nodes) = foldl (\ (i, prev) word -> (i + B.length word + 1, prev <> [Rose (rec Red i (i + B.length word)) []])) (0, []) w in
-      runAssignment (many red) (startingState s nodes) `shouldBe` Result (AssignmentState (B.length s) (Info.SourcePos 1 (succ (B.length s))) (Source "") [], Out <$> w)
+      resultValue (runAssignment (many red) (startingState s nodes)) `shouldBe` Just (AssignmentState (B.length s) (Info.SourcePos 1 (succ (B.length s))) (Source "") [], Out <$> w)
 
     it "matches one-or-more repetitions against one or more input nodes" $
-      runAssignment (some red) (startingState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result (AssignmentState 5 (Info.SourcePos 1 6) (Source "") [], [Out "hello"])
+      resultValue (runAssignment (some red) (startingState "hello" [Rose (rec Red 0 5) []])) `shouldBe` Just (AssignmentState 5 (Info.SourcePos 1 6) (Source "") [], [Out "hello"])
 
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
-      snd <$> runAssignment red (startingState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result (Out "hello")
+      snd <$> runAssignment red (startingState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result [] (Just (Out "hello"))
 
     it "does not advance past the current node" $
-      fst <$> runAssignment (symbol Red) (startingState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result (AssignmentState 0 (Info.SourcePos 1 1) (Source "hi") [ Rose (rec Red 0 2) [] ])
+      fst <$> runAssignment (symbol Red) (startingState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result [] (Just (AssignmentState 0 (Info.SourcePos 1 1) (Source "hi") [ Rose (rec Red 0 2) [] ]))
 
   describe "source" $ do
     it "produces the node’s source" $
-      assignAll source (Source "hi") [ Rose (rec Red 0 2) [] ] `shouldBe` Result "hi"
+      assignAll source (Source "hi") [ Rose (rec Red 0 2) [] ] `shouldBe` Result [] (Just "hi")
 
     it "advances past the current node" $
-      fst <$> runAssignment source (startingState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [])
+      fst <$> runAssignment source (startingState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) (Source "") []))
 
   describe "children" $ do
     it "advances past the current node" $
-      fst <$> runAssignment (children (pure (Out ""))) (startingState "a" [Rose (rec Red 0 1) []]) `shouldBe` Result (AssignmentState 1 (Info.SourcePos 1 2) (Source "") [])
+      fst <$> runAssignment (children (pure (Out ""))) (startingState "a" [Rose (rec Red 0 1) []]) `shouldBe` Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) (Source "") []))
 
     it "matches if its subrule matches" $
-      () <$ runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result ()
+      () <$ runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result [] (Just ())
 
     it "does not match if its subrule does not match" $
-      (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Error [ "Expected Red but got Green:\na\n^" ]
+      (runAssignment (children red) (startingState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Result [ Error (Info.SourcePos 1 1) [Red] (Just Green) ] Nothing
 
     it "matches nested children" $ do
       runAssignment
         (symbol Red *> children (symbol Green *> children (symbol Blue *> source)))
         (startingState "1" [ Rose (rec Red 0 1) [ Rose (rec Green 0 1) [ Rose (rec Blue 0 1) [] ] ] ])
       `shouldBe`
-        Result (AssignmentState 1 (Info.SourcePos 1 2) (Source "") [], "1")
+        Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) (Source "") [], "1"))
 
     it "continues after children" $ do
-      runAssignment
+      resultValue (runAssignment
         (many (symbol Red *> children (symbol Green *> source)
            <|> symbol Blue *> source))
         (startingState "BC" [ Rose (rec Red 0 1) [ Rose (rec Green 0 1) [] ]
-                            , Rose (rec Blue 1 2) [] ])
+                            , Rose (rec Blue 1 2) [] ]))
       `shouldBe`
-        Result (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["B", "C"])
+        Just (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["B", "C"])
 
     it "matches multiple nested children" $ do
       runAssignment
@@ -75,7 +75,7 @@ spec = do
         (startingState "12" [ Rose (rec Red 0 2) [ Rose (rec Green 0 1) [ Rose (rec Blue 0 1) [] ]
                                                  , Rose (rec Green 1 2) [ Rose (rec Blue 1 2) [] ] ] ])
       `shouldBe`
-        Result (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["1", "2"])
+        Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) (Source "") [], ["1", "2"]))
 
 rec :: symbol -> Int -> Int -> Record '[symbol, Range, SourceSpan]
 rec symbol start end = symbol :. Range start end :. Info.SourceSpan (Info.SourcePos 1 (succ start)) (Info.SourcePos 1 (succ end)) :. Nil
