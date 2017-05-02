@@ -3,6 +3,7 @@
 module Source where
 
 import qualified Data.ByteString as B
+import Data.String (IsString(..))
 import qualified Data.Text as T
 import Numeric
 import Range
@@ -21,7 +22,7 @@ data SourceBlob = SourceBlob
 
 -- | The contents of a source file, represented as a ByteString.
 newtype Source = Source { sourceText :: B.ByteString }
-  deriving (Eq, Show)
+  deriving (Eq, IsString, Show)
 
 -- | The kind of a blob, along with it's file mode.
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
