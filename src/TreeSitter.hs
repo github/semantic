@@ -49,7 +49,7 @@ treeSitterParser language grammar blob = do
 
 -- | Parse Ruby to AST. Intended for use in ghci, e.g.:
 --
---   > Source.readAndTranscodeFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST >>= pure . uncurry (assignAll assignment) . second pure
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST . source
 parseRubyToAST :: Source -> IO (A.AST Ruby.Grammar)
 parseRubyToAST source = do
   document <- ts_document_new
@@ -77,6 +77,9 @@ parseRubyToAST source = do
         anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
+-- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
+--
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
 parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
 parseRubyToTerm source = do
   ast <- parseRubyToAST source
