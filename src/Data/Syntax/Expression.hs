@@ -41,3 +41,10 @@ data Times a = Times a a
 
 instance Eq1 Times where liftEq = genericLiftEq
 instance Show1 Times where liftShowsPrec = genericLiftShowsPrec
+
+-- | Binary exponentiation.
+data Power a = Power a a
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Power where liftEq = genericLiftEq
+instance Show1 Power where liftShowsPrec = genericLiftShowsPrec
