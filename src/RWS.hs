@@ -19,11 +19,8 @@ import Data.These
 import Patch
 import Term
 import Data.Array
-import Data.Functor.Classes
-import Info
 import SES
 import qualified Data.Functor.Both as Both
-import Data.Functor.Classes.Eq.Generic
 
 import Data.Functor.Listable
 import Data.KdTree.Static hiding (toList)
@@ -48,7 +45,7 @@ data UnmappedTerm f fields = UnmappedTerm {
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index Int | None
 
-rws :: (HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f)
+rws :: (HasField fields (Maybe FeatureVector), Foldable t, Functor f)
     => (Diff f fields -> Int)
     -> (Term f (Record fields) -> Term f (Record fields) -> Bool)
     -> t (Term f (Record fields))
@@ -91,7 +88,7 @@ type MappedDiff f fields = (These Int Int, Diff f fields)
 
 type RWSEditScript f fields = [Diff f fields]
 
-run :: (Eq1 f, Functor f, HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t)
+run :: (Functor f, HasField fields (Maybe FeatureVector), Foldable t)
     => (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
     -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
     -> t (Term f (Record fields))
@@ -99,7 +96,7 @@ run :: (Eq1 f, Functor f, HasField fields Category, HasField fields (Maybe Featu
     -> Eff (RWS f fields ': e) (RWSEditScript f fields)
     -> Eff e (RWSEditScript f fields)
 run editDistance canCompare as bs = relay pure (\m q -> q $ case m of
-  SES -> ses (gliftEq (==) `on` fmap category) as bs
+  SES -> ses canCompare as bs
   (GenFeaturizedTermsAndDiffs sesDiffs) ->
     evalState (genFeaturizedTermsAndDiffs sesDiffs) (0, 0)
   (FindNearestNeighoursToDiff allDiffs featureAs featureBs) ->
@@ -391,4 +388,3 @@ instance Listable1 Gram where
 
 instance Listable a => Listable (Gram a) where
   tiers = tiers1
-

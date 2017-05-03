@@ -5,7 +5,6 @@ import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
-import Data.Functor.Classes (Eq1)
 import RWS
 import Data.Record
 import Data.These
@@ -42,7 +41,7 @@ runAlgorithmSteps decompose = go
           step `Then` yield -> algorithm : go (decompose step >>= yield)
 
 -- | Decompose a step of an algorithm into the next steps to perform using a helper function.
-decomposeWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector), HasField fields Category)
+decomposeWith :: (Traversable f, GAlign f, HasField fields (Maybe FeatureVector), HasField fields Category)
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
               -> AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result
               -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
