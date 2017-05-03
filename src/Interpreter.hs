@@ -33,16 +33,16 @@ runSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVe
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
     -> [Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result]
 runSteps algorithm = case runStep algorithm of
-  Left a -> [Return a]
-  Right next -> next : runSteps next
+  Return a -> [Return a]
+  next -> next : runSteps next
 
--- | Run a single step of an Algorithm, returning Either its result if it has finished, or the next step otherwise.
+-- | Run a single step of an Algorithm, returning its result if it has finished, or the next step otherwise.
 runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
         => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-        -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
+        -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
 runStep step = case step of
-  Return a -> Left a
-  algorithm `Then` cont -> Right $ decompose algorithm >>= cont
+  Return a -> Return a
+  algorithm `Then` cont -> decompose algorithm >>= cont
 
 
 -- | Decompose a step of an algorithm into the next steps to perform.
