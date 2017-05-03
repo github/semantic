@@ -31,13 +31,15 @@ runAlgorithm decompose = go
   where go :: Algorithm (Term f a) (Diff f a) x -> x
         go = iterFreer (\ algorithm cont -> cont (go (decompose algorithm)))
 
--- | Run an Algorithm to completion, returning the list of steps taken.
-runAlgorithmSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-    -> [Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result]
-runAlgorithmSteps algorithm = case runAlgorithmStep algorithm of
-  Return a -> [Return a]
-  next -> next : runAlgorithmSteps next
+-- | Run an Algorithm to completion by repeated application of a stepping operation, returning the list of steps taken up to and including the final result.
+runAlgorithmSteps :: forall f a result
+    . (forall x. AlgorithmF (Term f a) (Diff f a) x -> Algorithm (Term f a) (Diff f a) x)
+    -> Algorithm (Term f a) (Diff f a) result
+    -> [Algorithm (Term f a) (Diff f a) result]
+runAlgorithmSteps decompose = go
+  where go algorithm = case algorithm of
+          Return a -> [Return a]
+          step `Then` yield -> algorithm : go (decompose step >>= yield)
 
 -- | Run a single step of an Algorithm, returning its result if it has finished, or the next step otherwise.
 runAlgorithmStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
