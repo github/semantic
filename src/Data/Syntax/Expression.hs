@@ -13,13 +13,6 @@ instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
 
--- | Unary boolean negation, like '!x' in many languages.
-data Not a = Not a
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
-
-instance Eq1 Not where liftEq = genericLiftEq
-instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
-
 -- | Binary arithmetic operators.
 data Arithmetic a
   = Plus a a
@@ -31,3 +24,13 @@ data Arithmetic a
 
 instance Eq1 Arithmetic where liftEq = genericLiftEq
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
+
+-- | Boolean operators.
+data Boolean a
+  = Or a a
+  | And a a
+  | Not a
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Boolean where liftEq = genericLiftEq
+instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec

@@ -24,7 +24,7 @@ type Syntax' =
   , Declaration.Class
   , Declaration.Method
   , Expression.Arithmetic
-  , Expression.Not
+  , Expression.Boolean
   , Literal.Array
   , Literal.Boolean
   , Literal.Hash
