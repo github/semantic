@@ -85,6 +85,10 @@ spec = do
     it "does not drop anonymous nodes after matching" $
       runAssignment red (makeState "red magenta" [Rose (rec Red 0 3) [], Rose (rec Magenta 4 11) []]) `shouldBe` Result [] (Just (AssignmentState 3 (Info.SourcePos 1 4) [Regular] " magenta" [Rose (rec Magenta 4 11) []], Out "red"))
 
+  describe "withTokens" $ do
+    it "preserves anonymous nodes before matching" $
+      runAssignment ((,) <$> withTokens magenta <*> red) (makeState "magenta red" [Rose (rec Magenta 0 7) [], Rose (rec Red 8 11) []]) `shouldBe` Result [] (Just (AssignmentState 11 (Info.SourcePos 1 12) [Regular] "" [], (Out "magenta", Out "red")))
+
 rec :: symbol -> Int -> Int -> Record '[symbol, Range, SourceSpan]
 rec symbol start end = symbol :. Range start end :. Info.SourceSpan (Info.SourcePos 1 (succ start)) (Info.SourcePos 1 (succ end)) :. Nil
 
@@ -106,3 +110,6 @@ green = Out <$ symbol Green <*> source
 
 blue :: Assignment (Node Grammar) Out
 blue = Out <$ symbol Blue <*> source
+
+magenta :: Assignment (Node Grammar) Out
+magenta = Out <$ symbol Magenta <*> source
