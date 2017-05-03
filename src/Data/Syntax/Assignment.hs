@@ -6,6 +6,7 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
+, withTokens
 , Rose(..)
 , RoseF(..)
 , Node
@@ -42,6 +43,7 @@ data AssignmentF node a where
   Location :: AssignmentF node Location
   Source :: AssignmentF symbol ByteString
   Children :: Assignment symbol a -> AssignmentF symbol a
+  WithTokens :: Assignment symbol a -> AssignmentF symbol a
   Choose :: IntMap.IntMap a -> AssignmentF node a
   Alt :: a -> a -> AssignmentF symbol a
   Empty :: AssignmentF symbol a
@@ -65,6 +67,10 @@ source = Source `Then` return
 -- | Match a node by applying an assignment to its children.
 children :: Assignment symbol a -> Assignment symbol a
 children forEach = Children forEach `Then` return
+
+-- | Match the argument without automatically dropping tokens.
+withTokens :: Assignment symbol a -> Assignment symbol a
+withTokens sub = WithTokens sub `Then` return
 
 
 -- | A rose tree.
@@ -138,6 +144,9 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
             Result _ (Just (state', a)) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result es Nothing -> Result es Nothing
+          (WithTokens sub, _) -> case runAssignment sub initialState { stateTypes = Anonymous : stateTypes } of
+            Result _ (Just (state', a)) -> yield a state' { stateTypes = stateTypes }
+            Result es Nothing -> Result es Nothing
           (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
@@ -186,6 +195,7 @@ instance Show symbol => Show1 (AssignmentF (Node symbol)) where
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
+    WithTokens a -> showsUnaryWith (liftShowsPrec sp sl) "WithTokens" d a
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
