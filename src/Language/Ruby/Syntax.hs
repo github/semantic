@@ -93,7 +93,8 @@ statement  =  exit Statement.Return Return
             <|> symbol AnonSlashEqual              *> term <*> (Expression.DividedBy var <$> expression)
             <|> symbol AnonPipePipeEqual           *> term <*> (Expression.And var       <$> expression)
             <|> symbol AnonPipeEqual               *> term <*> (Expression.BOr var       <$> expression)
-            <|> symbol AnonAmpersandAmpersandEqual *> term <*> (Expression.And var       <$> expression)))
+            <|> symbol AnonAmpersandAmpersandEqual *> term <*> (Expression.And var       <$> expression)
+            <|> symbol AnonAmpersandEqual          *> term <*> (Expression.BAnd var      <$> expression)))
   where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
