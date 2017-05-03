@@ -152,7 +152,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
                 choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
-dropAnonymous state = state { stateNodes = dropWhile ((flip notElem (stateTypes state)) . symbolType . rhead . roseValue) (stateNodes state) }
+dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: AssignmentState grammar -> AssignmentState grammar
