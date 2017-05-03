@@ -6,7 +6,6 @@ import Data.Align
 import Data.These
 import GHC.Generics
 import Prologue
-import Syntax
 
 -- | Functors which can be aligned (structure-unioning-ly zipped). The default implementation will operate generically over the constructors in the aligning type.
 class Functor f => GAlign f where
@@ -17,11 +16,6 @@ class Functor f => GAlign f where
   -- | Perform generic alignment of values of some functor, applying the given function to alignments of elements.
   galignWith :: (These a b -> c) -> f a -> f b -> Maybe (f c)
   galignWith f = (fmap (fmap f) .) . galign
-
-
--- Generically-derived instances
-
-instance Eq a => GAlign (Syntax a)
 
 
 -- 'Data.Align.Align' instances
