@@ -16,6 +16,7 @@ module Data.Syntax.Assignment
 , assign
 , runAssignment
 , AssignmentState(..)
+, makeState
 ) where
 
 import Control.Monad.Free.Freer
@@ -117,7 +118,7 @@ showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
 assign :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
-assign assignment source = fmap snd . assignAllFrom assignment . AssignmentState 0 (Info.SourcePos 1 1) source . pure
+assign assignment source = fmap snd . assignAllFrom assignment . makeState source . pure
 
 assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
@@ -164,6 +165,9 @@ data AssignmentState grammar = AssignmentState
   , stateNodes :: [AST grammar] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
+
+makeState :: Source.Source -> [AST grammar] -> AssignmentState grammar
+makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) source nodes
 
 
 -- Instances
