@@ -1,20 +1,11 @@
-(Program
+(ParseError
   (Module
     (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (ParseError
-        (VarAssignment
-          (Other "identifier_list"
-            (Identifier))
-          (Other "expression_list"
-            (NumberLiteral)
-            (Identifier)))
-        (Assignment
-          (Other "expression_list"
-            (NumberLiteral)
-            (Identifier))
-          (Other "expression_list"
-            (NumberLiteral)))))))
+  (Identifier)
+  (Args)
+  (VarAssignment
+    (Other "identifier_list"
+      (Identifier))
+    (Other "expression_list"
+      (NumberLiteral)
+      (Identifier))))
