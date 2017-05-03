@@ -23,19 +23,19 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
 diffTerms = (runAlgorithm decompose .) . diff
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
-runAlgorithm :: forall f a result
-  .  (forall x. AlgorithmF (Term f a) (Diff f a) x -> Algorithm (Term f a) (Diff f a) x)
-  -> Algorithm (Term f a) (Diff f a) result
+runAlgorithm :: forall term diff result
+  .  (forall x. AlgorithmF term diff x -> Algorithm term diff x)
+  -> Algorithm term diff result
   -> result
 runAlgorithm decompose = go
-  where go :: Algorithm (Term f a) (Diff f a) x -> x
+  where go :: Algorithm term diff x -> x
         go = iterFreer (\ algorithm cont -> cont (go (decompose algorithm)))
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation, returning the list of steps taken up to and including the final result.
-runAlgorithmSteps :: forall f a result
-    . (forall x. AlgorithmF (Term f a) (Diff f a) x -> Algorithm (Term f a) (Diff f a) x)
-    -> Algorithm (Term f a) (Diff f a) result
-    -> [Algorithm (Term f a) (Diff f a) result]
+runAlgorithmSteps :: forall term diff result
+    .  (forall x. AlgorithmF term diff x -> Algorithm term diff x)
+    -> Algorithm term diff result
+    -> [Algorithm term diff result]
 runAlgorithmSteps decompose = go
   where go algorithm = case algorithm of
           Return a -> [Return a]
