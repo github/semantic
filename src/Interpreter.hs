@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
-module Interpreter (diffTerms, runAlgorithm, runAlgorithmSteps, runAlgorithmStep) where
+module Interpreter (diffTerms, runAlgorithm, runAlgorithmSteps) where
 
 import Algorithm
 import Control.Monad.Free.Freer
@@ -40,15 +40,6 @@ runAlgorithmSteps decompose = go
   where go algorithm = case algorithm of
           Return a -> [Return a]
           step `Then` yield -> algorithm : go (decompose step >>= yield)
-
--- | Run a single step of an Algorithm, returning its result if it has finished, or the next step otherwise.
-runAlgorithmStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-        => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-        -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-runAlgorithmStep step = case step of
-  Return a -> Return a
-  algorithm `Then` cont -> decompose algorithm >>= cont
-
 
 -- | Decompose a step of an algorithm into the next steps to perform.
 decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
