@@ -38,7 +38,7 @@ spec = do
 
   describe "source" $ do
     it "produces the node’s source" $
-      assignAll source (Source "hi") [ Rose (rec Red 0 2) [] ] `shouldBe` Result [] (Just "hi")
+      assign source (Source "hi") (Rose (rec Red 0 2) []) `shouldBe` Result [] (Just "hi")
 
     it "advances past the current node" $
       fst <$> runAssignment source (startingState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) (Source "") []))
