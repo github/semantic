@@ -24,6 +24,7 @@ type Syntax' =
   , Declaration.Class
   , Declaration.Method
   , Expression.Not
+  , Expression.Plus
   , Literal.Array
   , Literal.Boolean
   , Literal.Hash
@@ -31,6 +32,7 @@ type Syntax' =
   , Literal.Range
   , Literal.String
   , Literal.Symbol
+  , Statement.Assignment
   , Statement.Break
   , Statement.Continue
   , Statement.ForEach
@@ -82,7 +84,14 @@ statement  =  exit Statement.Return Return
           <|> until
           <|> for
           <|> literal
+          <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$ withTokens (symbol AnonPlusEqual) <*> (term <*> (Expression.Plus var <$> expression)))
   where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
+
+lvalue :: Assignment (Node Grammar) (Term Syntax Location)
+lvalue = identifier
+
+expression :: Assignment (Node Grammar) (Term Syntax Location)
+expression = identifier <|> statement
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = leaf Comment Comment.Comment
