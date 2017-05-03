@@ -152,10 +152,13 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Alt a b, _) -> yield a state <|> yield b state
           (_, []) -> Result [ Error statePos expectedSymbols Nothing ] Nothing
           (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols (Just symbol) ] Nothing
-          where state@AssignmentState{..} = dropAnonymous initialState
+          where state@AssignmentState{..} = case assignment of
+                  Choose choices | any ((/= Regular) . symbolType) (choiceSymbols choices) -> initialState
+                  _ -> dropAnonymous initialState
                 expectedSymbols = case assignment of
-                  Choose choices -> ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
+                  Choose choices -> choiceSymbols choices
                   _ -> []
+                choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
 dropAnonymous state = state { stateNodes = dropWhile ((flip notElem (stateTypes state)) . symbolType . rhead . roseValue) (stateNodes state) }
