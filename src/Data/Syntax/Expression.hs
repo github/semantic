@@ -35,3 +35,15 @@ data Boolean a
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+
+-- | Bitwise operators.
+data Bitwise a
+  = BOr a a
+  | BAnd a a
+  | BXOr a a
+  | LShift a a
+  | RShift a a
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Bitwise where liftEq = genericLiftEq
+instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
