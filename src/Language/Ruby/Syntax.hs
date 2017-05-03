@@ -23,6 +23,7 @@ type Syntax' =
   '[Comment.Comment
   , Declaration.Class
   , Declaration.Method
+  , Expression.Minus
   , Expression.Not
   , Expression.Plus
   , Literal.Array
@@ -84,7 +85,9 @@ statement  =  exit Statement.Return Return
           <|> until
           <|> for
           <|> literal
-          <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$ symbol AnonPlusEqual <*> (term <*> (Expression.Plus var <$> expression)))
+          <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
+              ( symbol AnonPlusEqual  *> term <*>  (Expression.Plus var <$> expression)
+            <|> symbol AnonMinusEqual *> term <*> (Expression.Minus var <$> expression)))
   where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
