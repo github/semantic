@@ -61,42 +61,42 @@ decomposeWith algorithmWithTerms step = case step of
 algorithmWithTerms :: SyntaxTerm leaf fields
                    -> SyntaxTerm leaf fields
                    -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) (SyntaxDiff leaf fields)
-algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
+algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
-    Just $ Indexed <$> byRWS a b
+    annotate . Indexed <$> byRWS a b
   (S.Module idA a, S.Module idB b) ->
-    Just $ S.Module <$> linearly idA idB <*> byRWS a b
-  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> Just $
+    (annotate .) . S.Module <$> linearly idA idB <*> byRWS a b
+  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> fmap annotate $
     S.FunctionCall <$> linearly identifierA identifierB
                    <*> byRWS typeParamsA typeParamsB
                    <*> byRWS argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
+  (S.Switch exprA casesA, S.Switch exprB casesB) -> fmap annotate $
     S.Switch <$> byRWS exprA exprB
              <*> byRWS casesA casesB
-  (S.Object tyA a, S.Object tyB b) -> Just $
+  (S.Object tyA a, S.Object tyB b) -> fmap annotate $
     S.Object <$> maybeLinearly tyA tyB
              <*> byRWS a b
-  (Commented commentsA a, Commented commentsB b) -> Just $
+  (Commented commentsA a, Commented commentsB b) -> fmap annotate $
     Commented <$> byRWS commentsA commentsB
               <*> maybeLinearly a b
-  (Array tyA a, Array tyB b) -> Just $
+  (Array tyA a, Array tyB b) -> fmap annotate $
     Array <$> maybeLinearly tyA tyB
           <*> byRWS a b
-  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> Just $
+  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> fmap annotate $
     S.Class <$> linearly identifierA identifierB
             <*> byRWS clausesA clausesB
             <*> byRWS expressionsA expressionsB
-  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> Just $
+  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> fmap annotate $
     S.Method <$> byRWS clausesA clausesB
              <*> linearly identifierA identifierB
              <*> maybeLinearly receiverA receiverB
              <*> byRWS paramsA paramsB
              <*> byRWS expressionsA expressionsB
-  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $
+  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> fmap annotate $
     S.Function <$> linearly idA idB
                <*> byRWS paramsA paramsB
                <*> byRWS bodyA bodyB
-  _ -> Nothing
+  _ -> linearly t1 t2
   where
     annotate = wrap . (both (extract t1) (extract t2) :<)
 
