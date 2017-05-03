@@ -20,14 +20,21 @@ class GAlign f where
 
 -- 'Data.Align.Align' instances
 
-instance GAlign [] where galign = galignAlign
-instance GAlign Maybe where galign = galignAlign
+instance GAlign [] where
+  galign = galignAlign
+  galignWith = galignWithAlign
+instance GAlign Maybe where
+  galign = galignAlign
+  galignWith = galignWithAlign
 instance GAlign Identity where
   galignWith f (Identity a) (Identity b) = Just (Identity (f (These a b)))
 
 -- | Implements a function suitable for use as the definition of 'galign' for 'Align'able functors.
 galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))
 galignAlign a = Just . align a
+
+galignWithAlign :: Align f => (These a b -> c) -> f a -> f b -> Maybe (f c)
+galignWithAlign f a b = Just (alignWith f a b)
 
 
 -- Generics
