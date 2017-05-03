@@ -27,3 +27,10 @@ data Plus a = Plus a a
 
 instance Eq1 Plus where liftEq = genericLiftEq
 instance Show1 Plus where liftShowsPrec = genericLiftShowsPrec
+
+-- | Binary subtraction.
+data Minus a = Minus a a
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Minus where liftEq = genericLiftEq
+instance Show1 Minus where liftShowsPrec = genericLiftShowsPrec
