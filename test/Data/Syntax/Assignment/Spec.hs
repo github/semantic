@@ -34,7 +34,8 @@ spec = do
       snd <$> runAssignment red (makeState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result [] (Just (Out "hello"))
 
     it "does not advance past the current node" $
-      fst <$> runAssignment (symbol Red) (makeState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result [] (Just (makeState "hi" [ Rose (rec Red 0 2) [] ]))
+      let initialState = makeState "hi" [ Rose (rec Red 0 2) [] ] in
+      fst <$> runAssignment (symbol Red) initialState `shouldBe` Result [] (Just initialState)
 
   describe "source" $ do
     it "produces the node’s source" $
