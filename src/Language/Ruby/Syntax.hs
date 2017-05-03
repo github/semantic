@@ -118,8 +118,8 @@ for :: Assignment (Node Grammar) (Term Syntax Location)
 for = symbol For *> term <*> children (Statement.ForEach <$> identifier <*> statement <*> (term <*> many statement))
 
 assignment' :: Assignment (Node Grammar) (Term Syntax Location)
-assignment' =
-  symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
+assignment' =  symbol Assignment *> term <*> children (Statement.Assignment <$> lvalue <*> expression)
+           <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
        (symbol AnonPlusEqual               *> term <*> (Expression.Plus var      <$> expression)
     <|> symbol AnonMinusEqual              *> term <*> (Expression.Minus var     <$> expression)
     <|> symbol AnonStarEqual               *> term <*> (Expression.Times var     <$> expression)
