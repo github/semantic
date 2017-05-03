@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes #-}
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
 module Interpreter (diffTerms, runAlgorithm, runAlgorithmSteps, runAlgorithmStep) where
 
 import Algorithm
@@ -20,13 +20,16 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = (runAlgorithm .) . diff
+diffTerms = (runAlgorithm decompose .) . diff
 
--- | Run an Algorithm to completion, returning its result.
-runAlgorithm :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-    -> result
-runAlgorithm = iterFreer (\ algorithm cont -> cont (runAlgorithm (decompose algorithm)))
+-- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
+runAlgorithm :: forall f a result
+  .  (forall x. AlgorithmF (Term f a) (Diff f a) x -> Algorithm (Term f a) (Diff f a) x)
+  -> Algorithm (Term f a) (Diff f a) result
+  -> result
+runAlgorithm decompose = go
+  where go :: Algorithm (Term f a) (Diff f a) x -> x
+        go = iterFreer (\ algorithm cont -> cont (go (decompose algorithm)))
 
 -- | Run an Algorithm to completion, returning the list of steps taken.
 runAlgorithmSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
