@@ -86,13 +86,13 @@ statement  =  exit Statement.Return Return
           <|> for
           <|> literal
           <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
-               (symbol AnonPlusEqual     *> term <*>      (Expression.Plus var <$> expression)
-            <|> symbol AnonMinusEqual    *> term <*>     (Expression.Minus var <$> expression)
-            <|> symbol AnonStarEqual     *> term <*>     (Expression.Times var <$> expression)
-            <|> symbol AnonStarStarEqual *> term <*>     (Expression.Power var <$> expression)
+               (symbol AnonPlusEqual     *> term <*> (Expression.Plus var      <$> expression)
+            <|> symbol AnonMinusEqual    *> term <*> (Expression.Minus var     <$> expression)
+            <|> symbol AnonStarEqual     *> term <*> (Expression.Times var     <$> expression)
+            <|> symbol AnonStarStarEqual *> term <*> (Expression.Power var     <$> expression)
             <|> symbol AnonSlashEqual    *> term <*> (Expression.DividedBy var <$> expression)
-            <|> symbol AnonPipePipeEqual *> term <*>       (Expression.And var <$> expression)
-            <|> symbol AnonPipeEqual     *> term <*>       (Expression.BOr var <$> expression)))
+            <|> symbol AnonPipePipeEqual *> term <*> (Expression.And var       <$> expression)
+            <|> symbol AnonPipeEqual     *> term <*> (Expression.BOr var       <$> expression)))
   where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
