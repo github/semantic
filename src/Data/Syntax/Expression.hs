@@ -19,6 +19,7 @@ data Arithmetic a
   | Minus a a
   | Times a a
   | DividedBy a a
+  | Modulo a a
   | Power a a
   deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
 
