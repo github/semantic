@@ -165,6 +165,9 @@ data AssignmentState grammar = AssignmentState
   }
   deriving (Eq, Show)
 
+
+-- Instances
+
 instance Enum symbol => Alternative (Assignment (Node symbol)) where
   empty = Empty `Then` return
   a <|> b = case (a, b) of
