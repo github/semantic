@@ -79,7 +79,7 @@ spec = do
         Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) "" [], ["1", "2"]))
 
   describe "runAssignment" $ do
-    it "drops anonymous nodes before matching" $
+    it "drops anonymous nodes before matching symbols" $
       runAssignment red (makeState "magenta red" [Rose (rec Magenta 0 7) [], Rose (rec Red 8 11) []]) `shouldBe` Result [] (Just (AssignmentState 11 (Info.SourcePos 1 12) "" [], Out "red"))
 
     it "does not drop anonymous nodes after matching" $
