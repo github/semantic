@@ -34,3 +34,10 @@ data Minus a = Minus a a
 
 instance Eq1 Minus where liftEq = genericLiftEq
 instance Show1 Minus where liftShowsPrec = genericLiftShowsPrec
+
+-- | Binary multiplication.
+data Times a = Times a a
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq1 Times where liftEq = genericLiftEq
+instance Show1 Times where liftShowsPrec = genericLiftShowsPrec

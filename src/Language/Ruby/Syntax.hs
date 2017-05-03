@@ -26,6 +26,7 @@ type Syntax' =
   , Expression.Minus
   , Expression.Not
   , Expression.Plus
+  , Expression.Times
   , Literal.Array
   , Literal.Boolean
   , Literal.Hash
@@ -86,8 +87,9 @@ statement  =  exit Statement.Return Return
           <|> for
           <|> literal
           <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
-              ( symbol AnonPlusEqual  *> term <*>  (Expression.Plus var <$> expression)
-            <|> symbol AnonMinusEqual *> term <*> (Expression.Minus var <$> expression)))
+               (symbol AnonPlusEqual  *> term <*>  (Expression.Plus var <$> expression)
+            <|> symbol AnonMinusEqual *> term <*> (Expression.Minus var <$> expression)
+            <|> symbol AnonStarEqual  *> term <*> (Expression.Times var <$> expression)))
   where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
