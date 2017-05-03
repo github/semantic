@@ -97,9 +97,9 @@ comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = leaf Comment Comment.Comment
 
 if' :: Assignment (Node Grammar) (Term Syntax Location)
-if' =  go If
-   <|> symbol IfModifier *> term <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
-  where go s = symbol s  *> term <*> children      (Statement.If <$> statement <*> (term <*> many statement) <*> optional (go Elsif <|> symbol Else *> term <*> children (many statement)))
+if' =  ifElsif If
+   <|> symbol IfModifier     *> term <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
+  where ifElsif s = symbol s *> term <*> children      (Statement.If <$> statement <*> (term <*> many statement) <*> optional (ifElsif Elsif <|> symbol Else *> term <*> children (many statement)))
 
 unless :: Assignment (Node Grammar) (Term Syntax Location)
 unless =  symbol Unless         *> term <*> children      (Statement.If <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement) <*> optional (symbol Else *> term <*> children (many statement)))
