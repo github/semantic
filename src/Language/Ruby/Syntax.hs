@@ -23,11 +23,8 @@ type Syntax' =
   '[Comment.Comment
   , Declaration.Class
   , Declaration.Method
-  , Expression.Minus
+  , Expression.Arithmetic
   , Expression.Not
-  , Expression.Plus
-  , Expression.Times
-  , Expression.Power
   , Literal.Array
   , Literal.Boolean
   , Literal.Hash

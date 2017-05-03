@@ -20,31 +20,14 @@ data Not a = Not a
 instance Eq1 Not where liftEq = genericLiftEq
 instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
 
-
--- | Binary addition.
-data Plus a = Plus a a
+-- | Binary arithmetic operators.
+data Arithmetic a
+  = Plus a a
+  | Minus a a
+  | Times a a
+  | DividedBy a a
+  | Power a a
   deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
 
-instance Eq1 Plus where liftEq = genericLiftEq
-instance Show1 Plus where liftShowsPrec = genericLiftShowsPrec
-
--- | Binary subtraction.
-data Minus a = Minus a a
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
-
-instance Eq1 Minus where liftEq = genericLiftEq
-instance Show1 Minus where liftShowsPrec = genericLiftShowsPrec
-
--- | Binary multiplication.
-data Times a = Times a a
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
-
-instance Eq1 Times where liftEq = genericLiftEq
-instance Show1 Times where liftShowsPrec = genericLiftShowsPrec
-
--- | Binary exponentiation.
-data Power a = Power a a
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
-
-instance Eq1 Power where liftEq = genericLiftEq
-instance Show1 Power where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Arithmetic where liftEq = genericLiftEq
+instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
