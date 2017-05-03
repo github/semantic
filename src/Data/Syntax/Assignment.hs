@@ -157,21 +157,20 @@ dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: AssignmentState grammar -> AssignmentState grammar
 advanceState state@AssignmentState{..}
-  | Rose (_ :. range :. span :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Info.spanEnd span) stateTypes (Source.drop (Info.end range - stateOffset) stateSource) rest
+  | Rose (_ :. range :. span :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data AssignmentState grammar = AssignmentState
   { stateOffset :: Int -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: Info.SourcePos -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateTypes :: [SymbolType] -- ^ The set of symbol types to consider. Nodes with other symbols will be skipped.
   , stateSource :: Source.Source -- ^ The remaining Source. Equal to dropping 'stateOffset' bytes off the original input Source.
   , stateNodes :: [AST grammar] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
 makeState :: Source.Source -> [AST grammar] -> AssignmentState grammar
-makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) [Regular] source nodes
+makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) source nodes
 
 
 -- Instances
