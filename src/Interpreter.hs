@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Interpreter (diffTerms, run, runSteps, runStep) where
+module Interpreter (diffTerms, runAlgorithm, runAlgorithmSteps, runAlgorithmStep) where
 
 import Algorithm
 import Control.Monad.Free.Freer
@@ -20,27 +20,27 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = (run .) . diff
+diffTerms = (runAlgorithm .) . diff
 
 -- | Run an Algorithm to completion, returning its result.
-run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+runAlgorithm :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
     -> result
-run = iterFreer (\ algorithm cont -> cont (run (decompose algorithm)))
+runAlgorithm = iterFreer (\ algorithm cont -> cont (runAlgorithm (decompose algorithm)))
 
 -- | Run an Algorithm to completion, returning the list of steps taken.
-runSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+runAlgorithmSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
     => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
     -> [Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result]
-runSteps algorithm = case runStep algorithm of
+runAlgorithmSteps algorithm = case runAlgorithmStep algorithm of
   Return a -> [Return a]
-  next -> next : runSteps next
+  next -> next : runAlgorithmSteps next
 
 -- | Run a single step of an Algorithm, returning its result if it has finished, or the next step otherwise.
-runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+runAlgorithmStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
         => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
         -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-runStep step = case step of
+runAlgorithmStep step = case step of
   Return a -> Return a
   algorithm `Then` cont -> decompose algorithm >>= cont
 
