@@ -74,13 +74,13 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
     S.Switch <$> byRWS exprA exprB
              <*> byRWS casesA casesB
   (S.Object tyA a, S.Object tyB b) -> fmap annotate $
-    S.Object <$> maybeLinearly tyA tyB
+    S.Object <$> diffMaybe tyA tyB
              <*> byRWS a b
   (Commented commentsA a, Commented commentsB b) -> fmap annotate $
     Commented <$> byRWS commentsA commentsB
-              <*> maybeLinearly a b
+              <*> diffMaybe a b
   (Array tyA a, Array tyB b) -> fmap annotate $
-    Array <$> maybeLinearly tyA tyB
+    Array <$> diffMaybe tyA tyB
           <*> byRWS a b
   (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> fmap annotate $
     S.Class <$> linearly identifierA identifierB
@@ -89,7 +89,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> fmap annotate $
     S.Method <$> byRWS clausesA clausesB
              <*> linearly identifierA identifierB
-             <*> maybeLinearly receiverA receiverB
+             <*> diffMaybe receiverA receiverB
              <*> byRWS paramsA paramsB
              <*> byRWS expressionsA expressionsB
   (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> fmap annotate $
@@ -99,12 +99,6 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   _ -> linearly t1 t2
   where
     annotate = wrap . (both (extract t1) (extract t2) :<)
-
-    maybeLinearly a b = case (a, b) of
-      (Just a, Just b) -> Just <$> linearly a b
-      (Nothing, Just b) -> Just <$> byInserting b
-      (Just a, Nothing) -> Just <$> byDeleting a
-      (Nothing, Nothing) -> pure Nothing
 
 
 -- | Test whether two terms are comparable.
