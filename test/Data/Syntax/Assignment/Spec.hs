@@ -14,20 +14,20 @@ spec :: Spec
 spec = do
   describe "Applicative" $ do
     it "matches in sequence" $
-      runAssignment ((,) <$> red <*> red) (makeState "helloworld" [Rose (rec Red 0 5) [], Rose (rec Red 5 10) []]) `shouldBe` Result [] (Just (AssignmentState 10 (Info.SourcePos 1 11) "" [], (Out "hello", Out "world")))
+      runAssignment ((,) <$> red <*> red) (makeState "helloworld" [Rose (rec Red 0 5) [], Rose (rec Red 5 10) []]) `shouldBe` Result [] (Just (AssignmentState 10 (Info.SourcePos 1 11) [Regular] "" [], (Out "hello", Out "world")))
 
   describe "Alternative" $ do
     it "attempts multiple alternatives" $
-      runAssignment (green <|> red) (makeState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result [] (Just (AssignmentState 5 (Info.SourcePos 1 6) "" [], Out "hello"))
+      runAssignment (green <|> red) (makeState "hello" [Rose (rec Red 0 5) []]) `shouldBe` Result [] (Just (AssignmentState 5 (Info.SourcePos 1 6) [Regular] "" [], Out "hello"))
 
     it "matches repetitions" $
       let s = "colourless green ideas sleep furiously"
           w = words s
           (_, nodes) = foldl (\ (i, prev) word -> (i + B.length word + 1, prev <> [Rose (rec Red i (i + B.length word)) []])) (0, []) w in
-      resultValue (runAssignment (many red) (makeState (Source s) nodes)) `shouldBe` Just (AssignmentState (B.length s) (Info.SourcePos 1 (succ (B.length s))) "" [], Out <$> w)
+      resultValue (runAssignment (many red) (makeState (Source s) nodes)) `shouldBe` Just (AssignmentState (B.length s) (Info.SourcePos 1 (succ (B.length s))) [Regular] "" [], Out <$> w)
 
     it "matches one-or-more repetitions against one or more input nodes" $
-      resultValue (runAssignment (some red) (makeState "hello" [Rose (rec Red 0 5) []])) `shouldBe` Just (AssignmentState 5 (Info.SourcePos 1 6) "" [], [Out "hello"])
+      resultValue (runAssignment (some red) (makeState "hello" [Rose (rec Red 0 5) []])) `shouldBe` Just (AssignmentState 5 (Info.SourcePos 1 6) [Regular] "" [], [Out "hello"])
 
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
@@ -42,11 +42,11 @@ spec = do
       assign source "hi" (Rose (rec Red 0 2) []) `shouldBe` Result [] (Just "hi")
 
     it "advances past the current node" $
-      fst <$> runAssignment source (makeState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) "" []))
+      fst <$> runAssignment source (makeState "hi" [ Rose (rec Red 0 2) [] ]) `shouldBe` Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) [Regular] "" []))
 
   describe "children" $ do
     it "advances past the current node" $
-      fst <$> runAssignment (children (pure (Out ""))) (makeState "a" [Rose (rec Red 0 1) []]) `shouldBe` Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) "" []))
+      fst <$> runAssignment (children (pure (Out ""))) (makeState "a" [Rose (rec Red 0 1) []]) `shouldBe` Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) [Regular] "" []))
 
     it "matches if its subrule matches" $
       () <$ runAssignment (children red) (makeState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result [] (Just ())
@@ -59,7 +59,7 @@ spec = do
         (symbol Red *> children (symbol Green *> children (symbol Blue *> source)))
         (makeState "1" [ Rose (rec Red 0 1) [ Rose (rec Green 0 1) [ Rose (rec Blue 0 1) [] ] ] ])
       `shouldBe`
-        Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) "" [], "1"))
+        Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) [Regular] "" [], "1"))
 
     it "continues after children" $ do
       resultValue (runAssignment
@@ -68,7 +68,7 @@ spec = do
         (makeState "BC" [ Rose (rec Red 0 1) [ Rose (rec Green 0 1) [] ]
                         , Rose (rec Blue 1 2) [] ]))
       `shouldBe`
-        Just (AssignmentState 2 (Info.SourcePos 1 3) "" [], ["B", "C"])
+        Just (AssignmentState 2 (Info.SourcePos 1 3) [Regular] "" [], ["B", "C"])
 
     it "matches multiple nested children" $ do
       runAssignment
@@ -76,7 +76,7 @@ spec = do
         (makeState "12" [ Rose (rec Red 0 2) [ Rose (rec Green 0 1) [ Rose (rec Blue 0 1) [] ]
                                              , Rose (rec Green 1 2) [ Rose (rec Blue 1 2) [] ] ] ])
       `shouldBe`
-        Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) "" [], ["1", "2"]))
+        Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) [Regular] "" [], ["1", "2"]))
 
 rec :: symbol -> Int -> Int -> Record '[symbol, Range, SourceSpan]
 rec symbol start end = symbol :. Range start end :. Info.SourceSpan (Info.SourcePos 1 (succ start)) (Info.SourcePos 1 (succ end)) :. Nil
