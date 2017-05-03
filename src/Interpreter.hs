@@ -29,7 +29,7 @@ runAlgorithm :: forall f result
              -> result
 runAlgorithm decompose = go
   where go :: Freer f x -> x
-        go = iterFreer (\ algorithm cont -> cont (go (decompose algorithm)))
+        go = iterFreer (\ algorithm yield -> yield (go (decompose algorithm)))
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation, returning the list of steps taken up to and including the final result.
 runAlgorithmSteps :: (forall x. f x -> Freer f x)
