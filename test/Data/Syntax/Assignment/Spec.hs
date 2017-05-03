@@ -78,13 +78,18 @@ spec = do
       `shouldBe`
         Result [] (Just (AssignmentState 2 (Info.SourcePos 1 3) [Regular] "" [], ["1", "2"]))
 
+  describe "runAssignment" $ do
+    it "drops anonymous nodes before matching" $
+      runAssignment red (makeState "magenta red" [Rose (rec Magenta 0 7) [], Rose (rec Red 8 11) []]) `shouldBe` Result [] (Just (AssignmentState 11 (Info.SourcePos 1 12) [Regular] "" [], Out "red"))
+
 rec :: symbol -> Int -> Int -> Record '[symbol, Range, SourceSpan]
 rec symbol start end = symbol :. Range start end :. Info.SourceSpan (Info.SourcePos 1 (succ start)) (Info.SourcePos 1 (succ end)) :. Nil
 
-data Grammar = Red | Green | Blue
+data Grammar = Red | Green | Blue | Magenta
   deriving (Enum, Eq, Show)
 
 instance Symbol Grammar where
+  symbolType Magenta = Anonymous
   symbolType _ = Regular
 
 data Out = Out ByteString
