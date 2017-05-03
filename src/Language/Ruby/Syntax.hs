@@ -84,7 +84,7 @@ statement  =  exit Statement.Return Return
           <|> until
           <|> for
           <|> literal
-          <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$ withTokens (symbol AnonPlusEqual) <*> (term <*> (Expression.Plus var <$> expression)))
+          <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$ symbol AnonPlusEqual <*> (term <*> (Expression.Plus var <$> expression)))
   where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
