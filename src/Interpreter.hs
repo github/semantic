@@ -5,6 +5,7 @@ import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
+import Data.Functor.Classes (Eq1)
 import RWS
 import Data.Record
 import Data.These
@@ -20,7 +21,7 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = (runAlgorithm decompose .) . diff
+diffTerms = (runAlgorithm (decomposeWith algorithmWithTerms) .) . diff
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
 runAlgorithm :: forall f result
@@ -40,11 +41,12 @@ runAlgorithmSteps decompose = go
           Return a -> [Return a]
           step `Then` yield -> algorithm : go (decompose step >>= yield)
 
--- | Decompose a step of an algorithm into the next steps to perform.
-decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-          => AlgorithmF (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The step in an algorithm to decompose into its next steps.
-          -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The sequence of next steps to undertake to continue the algorithm.
-decompose step = case step of
+-- | Decompose a step of an algorithm into the next steps to perform using a helper function.
+decomposeWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector), HasField fields Category)
+              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
+              -> AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result
+              -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
+decomposeWith algorithmWithTerms step = case step of
   Diff t1 t2 -> algorithmWithTerms t1 t2
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
     Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
