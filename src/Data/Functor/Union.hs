@@ -6,6 +6,7 @@ module Data.Functor.Union
 , InUnion(..)
 ) where
 
+import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Kind
 import GHC.Show
@@ -111,3 +112,11 @@ instance (Show1 f, Show1 (Union fs)) => Show1 (Union (f ': fs)) where
 
 instance Show1 (Union '[]) where
   liftShowsPrec _ _ _ _ = identity
+
+instance (GAlign f, GAlign (Union fs)) => GAlign (Union (f ': fs)) where
+  galignWith f (Here a) (Here b) = Here <$> galignWith f a b
+  galignWith f (There a) (There b) = There <$> galignWith f a b
+  galignWith _ _ _ = Nothing
+
+instance GAlign (Union '[]) where
+  galignWith _ _ _ = Nothing
