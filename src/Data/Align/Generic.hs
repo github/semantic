@@ -22,6 +22,8 @@ class GAlign f where
 
 instance GAlign [] where galign = galignAlign
 instance GAlign Maybe where galign = galignAlign
+instance GAlign Identity where
+  galignWith f (Identity a) (Identity b) = Just (Identity (f (These a b)))
 
 -- | Implements a function suitable for use as the definition of 'galign' for 'Align'able functors.
 galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))
