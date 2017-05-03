@@ -24,6 +24,7 @@ type Syntax' =
   , Declaration.Class
   , Declaration.Method
   , Expression.Arithmetic
+  , Expression.Bitwise
   , Expression.Boolean
   , Literal.Array
   , Literal.Boolean
@@ -90,7 +91,8 @@ statement  =  exit Statement.Return Return
             <|> symbol AnonStarEqual     *> term <*>     (Expression.Times var <$> expression)
             <|> symbol AnonStarStarEqual *> term <*>     (Expression.Power var <$> expression)
             <|> symbol AnonSlashEqual    *> term <*> (Expression.DividedBy var <$> expression)
-            <|> symbol AnonPipePipeEqual *> term <*>       (Expression.And var <$> expression)))
+            <|> symbol AnonPipePipeEqual *> term <*>       (Expression.And var <$> expression)
+            <|> symbol AnonPipeEqual     *> term <*>       (Expression.BOr var <$> expression)))
   where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
