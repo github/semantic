@@ -317,5 +317,5 @@ instance SyntaxConstructible (Cofree (Syntax Text)) where
   info `branch` children = cofree $ info :< Indexed children
 
 instance SyntaxConstructible (Cofree []) where
-  info `leaf` value = cofree $ info :< []
+  info `leaf` _ = cofree $ info :< []
   info `branch` children = cofree $ info :< children
