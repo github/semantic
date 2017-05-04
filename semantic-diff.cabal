@@ -84,8 +84,6 @@ library
                      , async-pool
                      , async
                      , bifunctors
-                     , blaze-html
-                     , blaze-markup
                      , bytestring
                      , cmark
                      , comonad
