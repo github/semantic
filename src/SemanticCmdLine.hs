@@ -74,7 +74,6 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
       <$> ( (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-           <|> flag' splitDiff (long "split" <> help "Output a split diff")
            <|> flag' jsonDiff (long "json" <> help "Output a json diff")
            <|> flag' summaryDiff (long "summary" <> help "Output a diff summary")
            <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
