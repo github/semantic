@@ -23,7 +23,6 @@ import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
-import Renderer.Split as R
 import Renderer.Summary as R
 import Renderer.TOC as R
 import Source (SourceBlob(..))
@@ -32,7 +31,6 @@ import Term
 
 
 data DiffRenderer fields output where
-  SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields File
   PatchRenderer :: HasField fields Range => DiffRenderer fields File
   JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer fields (Map Text Value)
   SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
@@ -41,7 +39,6 @@ data DiffRenderer fields output where
 
 resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output)
 resolveDiffRenderer renderer = case renderer of
-  SplitRenderer -> (File .) . R.split
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
   SummaryRenderer -> R.summary
@@ -81,7 +78,6 @@ instance StringConv File ByteString where
   strConv _ = encodeUtf8 . unFile
 
 instance Show (DiffRenderer fields output) where
-  showsPrec _ SplitRenderer = showString "SplitRenderer"
   showsPrec _ PatchRenderer = showString "PatchRenderer"
   showsPrec _ JSONDiffRenderer = showString "JSONDiffRenderer"
   showsPrec _ SummaryRenderer = showString "SummaryRenderer"
