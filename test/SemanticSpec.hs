@@ -23,7 +23,7 @@ spec = parallel $ do
   describe "parseBlobs" $ do
     it "renders to ByteString output" $ do
       output <- parseBlobs (SExpressionParseTreeRenderer TreeOnly) [methodsBlob]
-      output `shouldBe` "(Program\n  (Method\n    (Identifier)))"
+      output `shouldBe` "(Program\n  (Method\n    (Identifier)))\n"
 
   where
     methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob)
