@@ -22,11 +22,11 @@ data SExpressionFormat = TreeOnly | TreeAndRanges
 
 -- | Returns a ByteString SExpression formatted diff.
 sExpression :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> Both SourceBlob -> Diff f (Record fields) -> ByteString
-sExpression format _ diff = printDiff diff 0 format
+sExpression format _ diff = printDiff diff 0 format <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
 sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> SourceBlob -> Term f (Record fields) -> ByteString
-sExpressionParseTree format _ term = printTerm term 0 format
+sExpressionParseTree format _ term = printTerm term 0 format <> "\n"
 
 printDiff :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Diff f (Record fields) -> Int -> SExpressionFormat -> ByteString
 printDiff diff level format = case runFree diff of

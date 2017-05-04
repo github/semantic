@@ -1,17 +1,7 @@
-{-(Program
+{-(ParseError
   (Module
     (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (ParseError
-      (Identifier))
-    (StringLiteral)
-    (ParseError
-      (Identifier))
-    (StringLiteral)
-    (Identifier)
-    (ParseError
-      (Import
-        (Identifier)
-        (StringLiteral)))))-}
+  (Identifier)
+  (Args)
+  (Identifier)
+  (StringLiteral))-}
