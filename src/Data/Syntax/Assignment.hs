@@ -26,6 +26,33 @@
 --   3. The 'Alternative' instance chooses between a set of assignments, as well as providing 'empty' assignments (see above). See below re: committed choice for best practices for efficiency & error reporting when it comes to assigning multiple alternatives. Most high-level assignments (e.g. “declaration” or “statement” assignments) consist of choices among two or more 'Applicative' chains of assignments, mirroring the structure of the parser’s choices.
 --
 --   4. The 'Monad' instance allows assignments to depend on the results of earlier assignments. In general, most assignments should not be written using the 'Monad' instance; however, some specific situations require it, e.g. assigning 'x += y' to be equivalent to 'x = x + y'.
+--
+--
+--   == Best practices
+--
+--   Because of their flexibility, the same assignment can often be written in multiple different ways. The following best practices should ensure efficient assignment with clear error messages for ill-formed AST.
+--
+--   === Committed choice
+--
+--   Assignments can represent alternatives as either committed or uncommitted choices, both written with '<|>'. “Committed” in this context means that a failure in one of the alternatives will not result in backtracking followed by an attempt of one of the other alternatives; thus, committed choice is more efficient. (By the same token, it enables much better error messages since backtracking erases most of the relevant context.) Committed choices are constructed via the following rules:
+--
+--   1. 'empty' is dropped from choices:
+--   prop> empty <|> a = a -- empty is the left-identity of <|>
+--   prop> a <|> empty = a -- empty is the right-identity of <|>
+--
+--   2. 'symbol' rules construct a committed choice (with only a single alternative).
+--
+--   3. 'fmap' (and by extension '<$>' and '<$') of a committed choice is a committed choice.
+--
+--   4. '<*>' (and by extension '*>' and '<*') with a committed choice on the left is a committed choice.
+--
+--   5. '>>=' (and by extension '>>', '=<<', and '<<') of a committed choice is a committed choice. It may be helpful to think of this and the above rule for '<*>' as “sequences starting with committed choices remain committed choices.”
+--
+--   6. '<|>' of two committed choices is a committed choice.
+--
+--   Finally, if a given choice is not a committed choice, it is an uncommitted choice.
+--
+--   Distilling the above, the rule of thumb is to always start an assignment for a given piece of syntax with either a 'symbol' rule or an 'fmap' over a 'symbol' rule. When assigning multiple pieces of syntax, place any known uncommitted choices at the (rightmost) end of the chain; '<|>' is left-associative, so this guarantees that you’re adding at most one uncommitted choice on top of the ones already present.
 module Data.Syntax.Assignment
 ( Assignment
 , Location
