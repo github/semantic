@@ -1,17 +1,10 @@
-(Program
+(ParseError
   (Module
     (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (TypeConversion
-      (Identifier)
-    { (StringLiteral)
-    ->(StringLiteral) }
-      (ParseError
-      { (StringLiteral)
-      ->(StringLiteral) }
-        (Import
-          (Identifier)
-        { (StringLiteral)
-        ->(StringLiteral) })))))
+  (Identifier)
+  (Args)
+  (Identifier)
+{ (StringLiteral)
+->(StringLiteral) }
+{ (StringLiteral)
+->(StringLiteral) })
