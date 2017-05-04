@@ -69,7 +69,7 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
 
     argumentsParser = Arguments
       <$> hsubparser (diffCommand <> parseCommand)
-      <*> optional (strOption (long "output" <> short 'o' <> help "Output path (directory for split diffs), defaults to stdout"))
+      <*> optional (strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout"))
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
