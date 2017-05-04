@@ -1,24 +1,15 @@
-(Program
+(ParseError
   (Module
     (Identifier))
-  (Function
+  (Identifier)
+  (Args)
+  (TypeDecl
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (FunctionTy
-          (Args
-            (Identifier))
-          (Identifier)))
-      (TypeDecl
-        (Identifier)
-        (FunctionTy
-          (Args
-            (Identifier)
-            (Identifier))
-          (Args
-            (ParameterDecl
-              (ChannelTy
-                (ParseError)
-                (Identifier)))))))))
+    (FunctionTy
+      (Args
+        (Identifier))
+      (Identifier)))
+  (Identifier)
+  (Args
+    (Identifier)
+    (Identifier)))

@@ -52,7 +52,7 @@ generate_example () {
   stack exec semantic diff -- --sexpression $fileA /dev/null > $diffFileRemoveA
 
   status $diffFileAddB
-  stack exec semantic diff -- --sexpression --no-index /dev/null $fileB > $diffFileAddB
+  stack exec semantic diff -- --sexpression /dev/null $fileB > $diffFileAddB
 
   status $diffFileRemoveB
   stack exec semantic diff -- --sexpression $fileB /dev/null > $diffFileRemoveB
