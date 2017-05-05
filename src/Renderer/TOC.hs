@@ -130,7 +130,7 @@ mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm dif
     mapToInSummarizable' source term summary =
       case (parentInfo summary, summarizable term) of
         (NotSummarizable, SummarizableTerm _) ->
-          summary { parentInfo = InSummarizable (category (extract term)) (toTermName 0 source term) (Info.sourceSpan (extract term)) }
+          summary { parentInfo = InSummarizable (category (extract term)) (toTermName 0 source term) (sourceSpan (extract term)) }
         (_, _) -> summary
 
 summarizable :: ComonadCofree (Syntax t) w => w a -> SummarizableTerm (w a)
