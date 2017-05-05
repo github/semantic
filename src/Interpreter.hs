@@ -1,10 +1,11 @@
-{-# LANGUAGE GADTs, RankNTypes #-}
-module Interpreter (diffTerms, run, runSteps, runStep) where
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
+module Interpreter (diffTerms, runAlgorithm, runAlgorithmSteps) where
 
 import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
+import Data.Functor.Classes (Eq1)
 import RWS
 import Data.Record
 import Data.These
@@ -20,36 +21,32 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = (run .) . diff
+diffTerms = (runAlgorithm (decomposeWith algorithmWithTerms) .) . diff
 
--- | Run an Algorithm to completion, returning its result.
-run :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-    -> result
-run = iterFreer (\ algorithm cont -> cont (run (decompose algorithm)))
+-- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
+runAlgorithm :: forall f result
+             .  (forall x. f x -> Freer f x)
+             -> Freer f result
+             -> result
+runAlgorithm decompose = go
+  where go :: Freer f x -> x
+        go = iterFreer (\ algorithm yield -> yield (go (decompose algorithm)))
 
--- | Run an Algorithm to completion, returning the list of steps taken.
-runSteps :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-    => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-    -> [Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result]
-runSteps algorithm = case runStep algorithm of
-  Left a -> [Return a]
-  Right next -> next : runSteps next
+-- | Run an Algorithm to completion by repeated application of a stepping operation, returning the list of steps taken up to and including the final result.
+runAlgorithmSteps :: (forall x. f x -> Freer f x)
+                  -> Freer f result
+                  -> [Freer f result]
+runAlgorithmSteps decompose = go
+  where go algorithm = case algorithm of
+          Return a -> [Return a]
+          step `Then` yield -> algorithm : go (decompose step >>= yield)
 
--- | Run a single step of an Algorithm, returning Either its result if it has finished, or the next step otherwise.
-runStep :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-        => Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result
-        -> Either result (Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result)
-runStep step = case step of
-  Return a -> Left a
-  algorithm `Then` cont -> Right $ decompose algorithm >>= cont
-
-
--- | Decompose a step of an algorithm into the next steps to perform.
-decompose :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
-          => AlgorithmF (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The step in an algorithm to decompose into its next steps.
-          -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) result -- ^ The sequence of next steps to undertake to continue the algorithm.
-decompose step = case step of
+-- | Decompose a step of an algorithm into the next steps to perform using a helper function.
+decomposeWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector), HasField fields Category)
+              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
+              -> AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result
+              -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
+decomposeWith algorithmWithTerms step = case step of
   Diff t1 t2 -> algorithmWithTerms t1 t2
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
     Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
@@ -64,50 +61,44 @@ decompose step = case step of
 algorithmWithTerms :: SyntaxTerm leaf fields
                    -> SyntaxTerm leaf fields
                    -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) (SyntaxDiff leaf fields)
-algorithmWithTerms t1 t2 = maybe (linearly t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
+algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
-    Just $ Indexed <$> byRWS a b
+    annotate . Indexed <$> byRWS a b
   (S.Module idA a, S.Module idB b) ->
-    Just $ S.Module <$> linearly idA idB <*> byRWS a b
-  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> Just $
+    (annotate .) . S.Module <$> linearly idA idB <*> byRWS a b
+  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> fmap annotate $
     S.FunctionCall <$> linearly identifierA identifierB
                    <*> byRWS typeParamsA typeParamsB
                    <*> byRWS argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
+  (S.Switch exprA casesA, S.Switch exprB casesB) -> fmap annotate $
     S.Switch <$> byRWS exprA exprB
              <*> byRWS casesA casesB
-  (S.Object tyA a, S.Object tyB b) -> Just $
-    S.Object <$> maybeLinearly tyA tyB
+  (S.Object tyA a, S.Object tyB b) -> fmap annotate $
+    S.Object <$> diffMaybe tyA tyB
              <*> byRWS a b
-  (Commented commentsA a, Commented commentsB b) -> Just $
+  (Commented commentsA a, Commented commentsB b) -> fmap annotate $
     Commented <$> byRWS commentsA commentsB
-              <*> maybeLinearly a b
-  (Array tyA a, Array tyB b) -> Just $
-    Array <$> maybeLinearly tyA tyB
+              <*> diffMaybe a b
+  (Array tyA a, Array tyB b) -> fmap annotate $
+    Array <$> diffMaybe tyA tyB
           <*> byRWS a b
-  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> Just $
+  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> fmap annotate $
     S.Class <$> linearly identifierA identifierB
             <*> byRWS clausesA clausesB
             <*> byRWS expressionsA expressionsB
-  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> Just $
+  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> fmap annotate $
     S.Method <$> byRWS clausesA clausesB
              <*> linearly identifierA identifierB
-             <*> maybeLinearly receiverA receiverB
+             <*> diffMaybe receiverA receiverB
              <*> byRWS paramsA paramsB
              <*> byRWS expressionsA expressionsB
-  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $
+  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> fmap annotate $
     S.Function <$> linearly idA idB
                <*> byRWS paramsA paramsB
                <*> byRWS bodyA bodyB
-  _ -> Nothing
+  _ -> linearly t1 t2
   where
     annotate = wrap . (both (extract t1) (extract t2) :<)
-
-    maybeLinearly a b = case (a, b) of
-      (Just a, Just b) -> Just <$> linearly a b
-      (Nothing, Just b) -> Just <$> byInserting b
-      (Just a, Nothing) -> Just <$> byDeleting a
-      (Nothing, Nothing) -> pure Nothing
 
 
 -- | Test whether two terms are comparable.
@@ -121,7 +112,7 @@ defaultM = 10
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign f, Foldable f, Functor f, HasField fields Category) => Integer -> These (Term f (Record fields)) (Term f (Record fields)) -> Int
+editDistanceUpTo :: (GAlign f, Foldable f, Functor f) => Integer -> These (Term f (Record fields)) (Term f (Record fields)) -> Int
 editDistanceUpTo m = these termSize termSize (\ a b -> diffSum (patchSum termSize) (cutoff m (approximateDiff a b)))
   where diffSum patchCost = sum . fmap (maybe 0 patchCost)
         approximateDiff a b = maybe (replacing a b) wrap (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
