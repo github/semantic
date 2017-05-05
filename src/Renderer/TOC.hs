@@ -113,10 +113,10 @@ toTOCSummaries patch = case afterOrBefore patch of
     _ -> NotSummarizable
 
 flattenPatch :: Patch DiffInfo -> [Patch DiffInfo]
-flattenPatch patch = case patch of
-  Replace i1 i2 -> zipWith Replace (toLeafInfos i1) (toLeafInfos i2)
-  Insert info -> Insert <$> toLeafInfos info
-  Delete info -> Delete <$> toLeafInfos info
+flattenPatch patch = case toLeafInfos <$> patch of
+  Replace i1 i2 -> zipWith Replace i1 i2
+  Insert info -> Insert <$> info
+  Delete info -> Delete <$> info
 
 toLeafInfos :: DiffInfo -> [DiffInfo]
 toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
