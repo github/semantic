@@ -2,6 +2,7 @@
 module Syntax where
 
 import Data.Aeson
+import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
@@ -184,3 +185,5 @@ instance (Listable leaf, Listable recur) => Listable (Syntax leaf recur) where
 
 instance Eq leaf => Eq1 (Syntax leaf) where
   liftEq = genericLiftEq
+
+instance Eq leaf => GAlign (Syntax leaf)

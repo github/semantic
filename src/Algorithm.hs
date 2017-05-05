@@ -34,6 +34,14 @@ diff = (liftF .) . Diff
 diffThese :: These term term -> Algorithm term diff diff
 diffThese = these byDeleting byInserting diff
 
+-- | Diff a pair of optional terms without specifying the algorithm to be used.
+diffMaybe :: Maybe term -> Maybe term -> Algorithm term diff (Maybe diff)
+diffMaybe a b = case (a, b) of
+  (Just a, Just b) -> Just <$> diff a b
+  (Just a, _) -> Just <$> byDeleting a
+  (_, Just b) -> Just <$> byInserting b
+  _ -> pure Nothing
+
 -- | Diff two terms linearly.
 linearly :: term -> term -> Algorithm term diff diff
 linearly a b = liftF (Linear a b)
