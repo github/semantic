@@ -134,11 +134,10 @@ mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm dif
         (_, _) -> summary
 
 summarizable :: ComonadCofree (Syntax t) w => w a -> SummarizableTerm (w a)
-summarizable term = go (unwrap term) term
-  where go syntax = case syntax of
-          S.Method{} -> SummarizableTerm
-          S.Function{} -> SummarizableTerm
-          _ -> NotSummarizableTerm
+summarizable term = case unwrap term of
+  S.Method{} -> SummarizableTerm term
+  S.Function{} -> SummarizableTerm term
+  _ -> NotSummarizableTerm term
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
 toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
