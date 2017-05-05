@@ -11,14 +11,14 @@ module Renderer
 ) where
 
 import Data.Aeson (Value, (.=))
-import Data.Functor.Both
+import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Classes
 import Text.Show
 import Data.Map as Map hiding (null)
 import Data.Record
 import Diff
 import Info hiding (Identifier)
-import Language.Ruby.Syntax (decoratorWithAlgebra, fToR)
+import Language.Ruby.Syntax (RAlgebra, decoratorWithAlgebra)
 import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
@@ -26,7 +26,7 @@ import Renderer.SExpression as R
 import Renderer.Summary as R
 import Renderer.TOC as R
 import Source (SourceBlob(..))
-import Syntax
+import Syntax as S
 import Term
 
 
@@ -56,11 +56,27 @@ data ParseTreeRenderer fields output where
 resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
 resolveParseTreeRenderer renderer blob = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
-  JSONParseTreeRenderer -> R.jsonFile blob . decoratorWithAlgebra (fToR identifierAlg)
-  where identifierAlg = fmap Identifier . maybeIdentifier . fmap (fmap unIdentifier)
+  JSONParseTreeRenderer -> R.jsonFile blob . decoratorWithAlgebra identifierAlg
+  where identifierAlg :: RAlgebra (CofreeF (Syntax Text) a) (Cofree (Syntax Text) a) (Maybe Identifier)
+        identifierAlg (_ :< syntax) = case syntax of
+          S.Assignment f _ -> identifier f
+          S.Class f _ _ -> identifier f
+          S.Export f _ -> f >>= identifier
+          S.Function f _ _ -> identifier f
+          S.FunctionCall f _ _ -> identifier f
+          S.Import f _ -> identifier f
+          S.Method _ f _ _ _ -> identifier f
+          S.MethodCall _ f _ _ -> identifier f
+          S.Module f _ -> identifier f
+          S.OperatorAssignment f _ -> identifier f
+          S.SubscriptAccess f _  -> identifier f
+          S.TypeDecl f _ -> identifier f
+          S.VarAssignment f _ -> asum $ identifier <$> f
+          _ -> Nothing
+          where identifier = fmap Identifier . extractLeafValue . unwrap . fst
 
 
-newtype Identifier = Identifier { unIdentifier :: Text }
+newtype Identifier = Identifier Text
   deriving (Eq, Show)
 
 instance ToJSONFields Identifier where
