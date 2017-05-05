@@ -95,11 +95,10 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     diffToTOCSummaries sources = para $ \diff ->
       let
         diff' = free (Prologue.fst <$> diff)
-        patch' = mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource)
-        (beforeSource, afterSource) = runJoin sources
-      in case diff of
+        (beforeInfo, afterInfo) = runJoin $ termToDiffInfo <$> sources
+      in case first (toTOCSummaries . mapPatch beforeInfo afterInfo) diff of
         (Free (_ :< syntax)) -> mapToInSummarizable sources diff' (toList syntax >>= snd)
-        (Pure patch) -> toTOCSummaries (patch' patch)
+        (Pure summaries) -> summaries
 
 -- Mark which leaves are summarizable.
 toTOCSummaries :: Patch DiffInfo -> [TOCSummary DiffInfo]
