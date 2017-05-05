@@ -1,5 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, MultiParamTypeClasses  #-}
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, MultiParamTypeClasses, DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
 ( json
@@ -10,15 +9,14 @@ module Renderer.JSON
 import Alignment
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
-import Data.Aeson.Types (emptyArray)
 import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.Record
 import Data.These
-import Data.Vector as Vector hiding (toList)
+import Data.Vector as Vector
 import Diff
 import Info
-import Prologue
+import Prologue hiding ((++))
 import qualified Data.Map as Map
 import Source
 import SplitDiff
@@ -183,8 +181,13 @@ instance ToJSON a => ToJSON (File a) where
   toJSON File{..} = object [ "filePath" .= filePath, "programNode" .= fileContent ]
 
 instance Monoid Value where
-  mempty = emptyArray
-  mappend a b = A.Array $ Vector.fromList [a, b]
+  mempty = Null
+  mappend a b | Null <- b = A.Array (singleton a)
+              | Null <- a = A.Array (singleton b)
+              | A.Array a' <- a, A.Array b' <- b = A.Array (a' ++ b')
+              | A.Array b' <- b = A.Array (singleton a ++ b')
+              | A.Array a' <- a = A.Array (a' ++ singleton b)
+              | otherwise = A.Array (fromList [a, b])
 
 instance StringConv Value ByteString where
   strConv _ = toS . (<> "\n") . encode
