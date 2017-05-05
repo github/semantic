@@ -97,7 +97,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
         diff' = free (Prologue.fst <$> diff)
         (beforeInfo, afterInfo) = runJoin $ termToDiffInfo <$> sources
       in case first (toTOCSummaries . mapPatch beforeInfo afterInfo) diff of
-        (Free (_ :< syntax)) -> mapToInSummarizable sources diff' (toList syntax >>= snd)
+        (Free _) -> mapToInSummarizable sources diff' (toList diff >>= snd)
         (Pure summaries) -> summaries
 
 -- Mark which leaves are summarizable.
