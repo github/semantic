@@ -52,10 +52,7 @@ before :: Patch a -> Maybe a
 before = maybeFst . unPatch
 
 afterOrBefore :: Patch a -> a
-afterOrBefore patch = case patch of
-  Insert after -> after
-  Delete before -> before
-  Replace _ after -> after
+afterOrBefore = these identity identity (curry snd) . unPatch
 
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
