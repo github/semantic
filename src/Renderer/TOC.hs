@@ -103,9 +103,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
 -- Mark which leaves are summarizable.
 toTOCSummaries :: Patch DiffInfo -> [TOCSummary DiffInfo]
-toTOCSummaries patch = case afterOrBefore patch of
-  Just diffInfo -> toTOCSummaries' patch diffInfo
-  Nothing -> panic "No diff"
+toTOCSummaries patch = toTOCSummaries' patch (afterOrBefore patch)
   where
     toTOCSummaries' patch' diffInfo = case diffInfo of
       ErrorInfo{..} -> pure $ TOCSummary patch' NotSummarizable
@@ -147,9 +145,7 @@ summarizable term = go (unwrap term) term
           _ -> NotSummarizableTerm
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
-toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
-  Just diffInfo -> toJSONSummaries' diffInfo
-  Nothing -> panic "No diff"
+toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
   where
     toJSONSummaries' diffInfo = case diffInfo of
       ErrorInfo{..} -> pure $ ErrorSummary termName infoSpan

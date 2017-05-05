@@ -51,11 +51,11 @@ after = maybeSnd . unPatch
 before :: Patch a -> Maybe a
 before = maybeFst . unPatch
 
-afterOrBefore :: Patch a -> Maybe a
-afterOrBefore patch = case (before patch, after patch) of
-  (_, Just after) -> Just after
-  (Just before, _) -> Just before
-  (_, _) -> Nothing
+afterOrBefore :: Patch a -> a
+afterOrBefore patch = case patch of
+  Insert after -> after
+  Delete before -> before
+  Replace _ after -> after
 
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
