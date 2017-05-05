@@ -120,17 +120,8 @@ data File a = File { filePath :: FilePath, fileContent :: a }
 instance ToJSON a => ToJSON (File a) where
   toJSON File{..} = object [ "filePath" .= filePath, "programNode" .= fileContent ]
 
-instance Monoid Value where
-  mempty = Null
-  mappend a b | Null <- b = A.Array (singleton a)
-              | Null <- a = A.Array (singleton b)
-              | A.Array a' <- a, A.Array b' <- b = A.Array (a' ++ b')
-              | A.Array b' <- b = A.Array (singleton a ++ b')
-              | A.Array a' <- a = A.Array (a' ++ singleton b)
-              | otherwise = A.Array (fromList [a, b])
-
-instance StringConv Value ByteString where
+instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-jsonFile :: ToJSON a => SourceBlob -> a -> Value
-jsonFile SourceBlob{..} = toJSON . File path
+jsonFile :: ToJSON a => SourceBlob -> a -> [Value]
+jsonFile SourceBlob{..} = pure . toJSON . File path
