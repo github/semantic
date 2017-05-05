@@ -155,12 +155,12 @@ termToDiffInfo source = termToDiffInfo'
   where termToDiffInfo' term = case unwrap term of
           S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
           S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (category $ extract term)
-          S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction (toTermName' term) (getField $ extract term)
+          S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction (toTermName' term) (sourceSpan $ extract term)
           S.Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (category $ extract term)
-          S.ParseError _ -> ErrorInfo (getField $ extract term) (toTermName' term)
+          S.ParseError _ -> ErrorInfo (sourceSpan $ extract term) (toTermName' term)
           _ -> toLeafInfo term
         toTermName' = toTermName 0 source
-        toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
+        toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (sourceSpan $ extract term)
 
 toTermName :: forall leaf fields. HasDefaultFields fields => Int -> Source -> SyntaxTerm leaf fields -> Text
 toTermName parentOffset parentSource term = case unwrap term of
