@@ -114,13 +114,13 @@ toTOCSummaries patch = case afterOrBefore patch of
 
 flattenPatch :: Patch DiffInfo -> [Patch DiffInfo]
 flattenPatch patch = case patch of
-  Replace i1 i2 -> zipWith Replace (toLeafInfos' i1) (toLeafInfos' i2)
-  Insert info -> Insert <$> toLeafInfos' info
-  Delete info -> Delete <$> toLeafInfos' info
+  Replace i1 i2 -> zipWith Replace (toLeafInfos i1) (toLeafInfos i2)
+  Insert info -> Insert <$> toLeafInfos info
+  Delete info -> Delete <$> toLeafInfos info
 
-toLeafInfos' :: DiffInfo -> [DiffInfo]
-toLeafInfos' BranchInfo{..} = branches >>= toLeafInfos'
-toLeafInfos' leaf = [leaf]
+toLeafInfos :: DiffInfo -> [DiffInfo]
+toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
+toLeafInfos leaf = [leaf]
 
 mapToInSummarizable :: forall leaf fields. HasDefaultFields fields => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
 mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm diff) of
