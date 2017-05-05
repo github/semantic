@@ -61,7 +61,7 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) =
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ actualLineRanges . byteRange <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
-        makeNode info (range, children) = toNode (setCharacterRange info range :< children)
+        makeNode info (range, children) = toNode (setByteRange info range :< children)
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]
