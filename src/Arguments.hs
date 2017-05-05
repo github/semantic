@@ -26,9 +26,6 @@ deriving instance Show DiffArguments
 patchDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
 patchDiff = DiffArguments PatchRenderer
 
-splitDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
-splitDiff = DiffArguments SplitRenderer
-
 jsonDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
 jsonDiff = DiffArguments JSONDiffRenderer
 
