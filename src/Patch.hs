@@ -52,7 +52,7 @@ before :: Patch a -> Maybe a
 before = maybeFst . unPatch
 
 afterOrBefore :: Patch a -> a
-afterOrBefore = these identity identity (curry snd) . unPatch
+afterOrBefore = mergeThese (flip const) . unPatch
 
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
