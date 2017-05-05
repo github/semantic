@@ -94,10 +94,10 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     diffToTOCSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
       let diff' = free (Prologue.fst <$> diff)
-      in case first (toTOCSummaries . mapPatch beforeInfo afterInfo) diff of
+      in case first (toTOCSummaries . runBothWith mapPatch toInfo) diff of
         Free _ -> mapToInSummarizable sources diff' (toList diff >>= snd)
         Pure summaries -> summaries
-      where (beforeInfo, afterInfo) = runJoin $ termToDiffInfo <$> sources
+      where toInfo = termToDiffInfo <$> sources
 
 -- Mark which leaves are summarizable.
 toTOCSummaries :: Patch DiffInfo -> [TOCSummary DiffInfo]
