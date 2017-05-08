@@ -126,7 +126,7 @@ mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm dif
   where
     mapToInSummarizable' :: Source -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
     mapToInSummarizable' source term summary =
-      case (parentInfo summary) of
+      case parentInfo summary of
         NotSummarizable | isSummarizable term ->
           summary { parentInfo = InSummarizable (category (extract term)) (toTermName 0 source term) (sourceSpan (extract term)) }
         _ -> summary
