@@ -31,10 +31,17 @@ isErrorSummary :: JSONSummary -> Bool
 isErrorSummary ErrorSummary{} = True
 isErrorSummary _ = False
 
-data DiffInfo = LeafInfo { leafCategory :: Category, termName :: Text, leafSourceSpan :: SourceSpan }
- | BranchInfo { branches :: [ DiffInfo ], branchCategory :: Category }
- | ErrorInfo { infoSpan :: SourceSpan, termName :: Text }
- deriving (Eq, Show)
+data DiffInfo
+  = LeafInfo
+    { leafCategory :: Category
+    , termName :: Text
+    , leafSourceSpan :: SourceSpan
+    }
+  | ErrorInfo
+    { infoSpan :: SourceSpan
+    , termName :: Text
+    }
+  deriving (Eq, Show)
 
 data TOCSummary a = TOCSummary {
                       summaryPatch :: Patch a,
@@ -93,20 +100,20 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     diffToTOCSummaries sources = para $ \diff -> case diff of
         Free (annotations :< syntax) -> toList diff >>= \ summaries ->
           fmap (contextualize (Both.snd sources) (Both.snd annotations :< fmap fst syntax)) (snd summaries)
-        Pure patch -> toTOCSummaries (runBothWith mapPatch (toInfo <$> sources) patch)
+        Pure patch -> fmap toTOCSummaries (sequenceA (runBothWith mapPatch (toInfo <$> sources) patch))
 
+    toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
     toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
-      S.ParseError _ -> ErrorInfo (sourceSpan annotation) termName
-      S.Indexed children -> BranchInfo (snd <$> children) (category annotation)
-      S.Fixed children -> BranchInfo (snd <$> children) (category annotation)
-      S.Commented cs leaf -> BranchInfo (snd <$> (cs <> maybeToList leaf)) (category annotation)
-      S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction termName (sourceSpan annotation)
-      _ -> LeafInfo (category annotation) termName (sourceSpan annotation)
+      S.ParseError _ -> [ErrorInfo (sourceSpan annotation) termName]
+      S.Indexed children -> children >>= snd
+      S.Fixed children -> children >>= snd
+      S.Commented cs leaf -> (cs <> maybeToList leaf) >>= snd
+      S.AnonymousFunction _ _ -> [LeafInfo C.AnonymousFunction termName (sourceSpan annotation)]
+      _ -> [LeafInfo (category annotation) termName (sourceSpan annotation)]
 
     toTOCSummaries patch = case afterOrBefore patch of
-      ErrorInfo{..} -> pure $ TOCSummary patch Nothing
-      BranchInfo{..} -> traverse toLeafInfos patch >>= toTOCSummaries
-      LeafInfo{..} -> pure . TOCSummary patch $ case leafCategory of
+      ErrorInfo{..} -> TOCSummary patch Nothing
+      LeafInfo{..} -> TOCSummary patch $ case leafCategory of
         C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
         C.Method -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
         C.SingletonMethod -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
@@ -122,16 +129,11 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     isSummarizable S.Function{} = True
     isSummarizable _ = False
 
-toLeafInfos :: DiffInfo -> [DiffInfo]
-toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
-toLeafInfos leaf = [leaf]
-
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
 toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
   where
     toJSONSummaries' diffInfo = case diffInfo of
       ErrorInfo{..} -> [ErrorSummary termName infoSpan]
-      BranchInfo{..} -> branches >>= toJSONSummaries'
       LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
 
 toTermName :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> Text
