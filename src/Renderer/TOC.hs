@@ -146,17 +146,15 @@ termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTerm
   _ -> LeafInfo (category annotation) termName (sourceSpan annotation)
 
 toTermName :: forall leaf fields. HasDefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
-toTermName source term = case unwrap term of
-  S.Function identifier _ _ -> toTermName source identifier
-  S.Method _ identifier Nothing _ _ -> toTermName source identifier
-  S.Method _ identifier (Just receiver) _ _ -> case unwrap receiver of
+toTermName source = para $ \ (annotation :< syntax) -> case syntax of
+  S.Function (_, identifier) _ _ -> identifier
+  S.Method _ (_, identifier) Nothing _ _ -> identifier
+  S.Method _ (_, identifier) (Just (receiver, receiverSource)) _ _ -> case unwrap receiver of
     S.Indexed [receiverParams] -> case unwrap receiverParams of
-      S.ParameterDecl (Just ty) _ -> "(" <> toTermName source ty <> ") " <> toTermName source identifier
-      _ -> toMethodNameWithReceiver receiver identifier
-    _ -> toMethodNameWithReceiver receiver identifier
-  _ -> toText source
-  where
-    toMethodNameWithReceiver receiver name = toTermName source receiver <> "." <> toTermName source name
+      S.ParameterDecl (Just ty) _ -> "(" <> toTermName source ty <> ") " <> identifier
+      _ -> receiverSource <> "." <> identifier
+    _ -> receiverSource <> "." <> identifier
+  _ -> toText (Source.slice (byteRange annotation) source)
 
 -- The user-facing category name
 toCategoryName :: Category -> Text
