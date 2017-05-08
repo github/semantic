@@ -10,7 +10,6 @@ import Data.Record
 import Diff
 import Info
 import Prologue
-import Range
 import Renderer.Summary (Summaries(..))
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
@@ -99,7 +98,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     contextualize source (annotation :< syntax) summary
       | NotSummarizable <- parentInfo summary
       , isSummarizable syntax
-      , Just terms <- traverse afterTerm syntax = summary { parentInfo = InSummarizable (category annotation) (toTermName 0 source (cofree (annotation :< terms))) (sourceSpan annotation) }
+      , Just terms <- traverse afterTerm syntax = summary { parentInfo = InSummarizable (category annotation) (toTermName source (cofree (annotation :< terms))) (sourceSpan annotation) }
       | otherwise = summary
 
     isSummarizable S.Method{} = True
@@ -138,7 +137,7 @@ toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
         _ -> pure $ JSONSummary parentInfo
 
 termToDiffInfo :: forall leaf fields. (StringConv leaf Text, HasDefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
-termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName 0 source (cofree (annotation :< (fst <$> syntax))) in case syntax of
+termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
   S.Indexed children -> BranchInfo (snd <$> children) (category annotation)
   S.Fixed children -> BranchInfo (snd <$> children) (category annotation)
   S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction termName (sourceSpan annotation)
@@ -146,20 +145,18 @@ termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTerm
   S.ParseError _ -> ErrorInfo (sourceSpan annotation) termName
   _ -> LeafInfo (category annotation) termName (sourceSpan annotation)
 
-toTermName :: forall leaf fields. HasDefaultFields fields => Int -> Source -> SyntaxTerm leaf fields -> Text
-toTermName parentOffset parentSource term = case unwrap term of
-  S.Function identifier _ _ -> toTermName' identifier
-  S.Method _ identifier Nothing _ _ -> toTermName' identifier
+toTermName :: forall leaf fields. HasDefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
+toTermName source term = case unwrap term of
+  S.Function identifier _ _ -> toTermName source identifier
+  S.Method _ identifier Nothing _ _ -> toTermName source identifier
   S.Method _ identifier (Just receiver) _ _ -> case unwrap receiver of
     S.Indexed [receiverParams] -> case unwrap receiverParams of
-      S.ParameterDecl (Just ty) _ -> "(" <> toTermName' ty <> ") " <> toTermName' identifier
+      S.ParameterDecl (Just ty) _ -> "(" <> toTermName source ty <> ") " <> toTermName source identifier
       _ -> toMethodNameWithReceiver receiver identifier
     _ -> toMethodNameWithReceiver receiver identifier
   _ -> toText source
   where
-    source = Source.slice (offsetRange (byteRange (extract term)) (negate parentOffset)) parentSource
-    toMethodNameWithReceiver receiver name = toTermName' receiver <> "." <> toTermName' name
-    toTermName' = toTermName (start (byteRange (extract term))) source
+    toMethodNameWithReceiver receiver name = toTermName source receiver <> "." <> toTermName source name
 
 -- The user-facing category name
 toCategoryName :: Category -> Text
