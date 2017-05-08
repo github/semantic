@@ -1,5 +1,7 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Data.Syntax.Expression where
 
+import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
@@ -7,7 +9,7 @@ import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callFunction :: a, callParams :: [a] }
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
@@ -21,7 +23,7 @@ data Arithmetic a
   | DividedBy a a
   | Modulo a a
   | Power a a
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Arithmetic where liftEq = genericLiftEq
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
@@ -43,7 +45,7 @@ data Bitwise a
   | BXOr a a
   | LShift a a
   | RShift a a
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
