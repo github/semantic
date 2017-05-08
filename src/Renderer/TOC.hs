@@ -90,12 +90,21 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
           (_, _) -> False
 
     diffToTOCSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
-    diffToTOCSummaries sources = para $ \diff ->
-      let diff' = free (Prologue.fst <$> diff)
-      in case first (toTOCSummaries . runBothWith mapPatch toInfo) diff of
-        Free _ -> mapToInSummarizable sources diff' (toList diff >>= snd)
+    diffToTOCSummaries sources = para $ \diff -> case first (toTOCSummaries . runBothWith mapPatch toInfo) diff of
+        Free (annotations :< syntax) -> toList diff >>= \ summaries ->
+          fmap (contextualize (Both.snd sources) (Both.snd annotations :< fmap fst syntax)) (snd summaries)
         Pure summaries -> summaries
       where toInfo = termToDiffInfo <$> sources
+
+    contextualize source (annotation :< syntax) summary
+      | NotSummarizable <- parentInfo summary
+      , isSummarizable syntax
+      , Just terms <- traverse afterTerm syntax = summary { parentInfo = InSummarizable (category annotation) (toTermName 0 source (cofree (annotation :< terms))) (sourceSpan annotation) }
+      | otherwise = summary
+
+    isSummarizable S.Method{} = True
+    isSummarizable S.Function{} = True
+    isSummarizable _ = False
 
 -- Mark which leaves are summarizable.
 toTOCSummaries :: Patch DiffInfo -> [TOCSummary DiffInfo]
@@ -117,23 +126,6 @@ flattenPatch patch = case toLeafInfos <$> patch of
 toLeafInfos :: DiffInfo -> [DiffInfo]
 toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
 toLeafInfos leaf = [leaf]
-
-mapToInSummarizable :: forall leaf fields. HasDefaultFields fields => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm diff) of
-  (_, Just diff') -> mapToInSummarizable' (Both.snd sources) diff' <$> children
-  (Just diff', _) -> mapToInSummarizable' (Both.fst sources) diff' <$> children
-  (Nothing, Nothing) -> []
-  where
-    mapToInSummarizable' :: Source -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
-    mapToInSummarizable' source term summary =
-      case parentInfo summary of
-        NotSummarizable | isSummarizable term ->
-          summary { parentInfo = InSummarizable (category (extract term)) (toTermName 0 source term) (sourceSpan (extract term)) }
-        _ -> summary
-    isSummarizable term = case unwrap term of
-      S.Method{} -> True
-      S.Function{} -> True
-      _ -> False
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
 toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
