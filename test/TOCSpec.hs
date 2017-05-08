@@ -126,18 +126,18 @@ numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC 
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
-programWithChange body = free $ Free (pure programInfo :< Indexed [ function' ])
+programWithChange body = wrap (pure programInfo :< Indexed [ function' ])
   where
-    function' = free $ Free (pure functionInfo :< S.Function name' [] [ free $ Pure (Insert body) ] )
-    name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    function' = wrap (pure functionInfo :< S.Function name' [] [ pure (Insert body) ] )
+    name' = wrap (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
-programWithChangeOutsideFunction term = free $ Free (pure programInfo :< Indexed [ function', term' ])
+programWithChangeOutsideFunction term = wrap (pure programInfo :< Indexed [ function', term' ])
   where
-    function' = free $ Free (pure functionInfo :< S.Function name' [] [] )
-    name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
-    term' = free $ Pure (Insert term)
+    function' = wrap (pure functionInfo :< S.Function name' [] [] )
+    name' = wrap (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    term' = pure (Insert term)
 
 programWithInsert :: String -> Term' -> Diff'
 programWithInsert name body = programOf $ Insert (functionOf name body)
@@ -149,7 +149,7 @@ programWithReplace :: String -> Term' -> Diff'
 programWithReplace name body = programOf $ Replace (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Patch Term' -> Diff'
-programOf patch = free $ Free (pure programInfo :< Indexed [ free $ Pure patch ])
+programOf patch = wrap (pure programInfo :< Indexed [ pure patch ])
 
 functionOf :: String -> Term' -> Term'
 functionOf name body = cofree $ functionInfo :< S.Function name' [] [body]
@@ -190,7 +190,7 @@ sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
 blankDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
-blankDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
+blankDiff = wrap (pure arrayInfo :< Indexed [ pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
   where
     arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
