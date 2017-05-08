@@ -98,7 +98,13 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
     diffToTOCSummaries :: HasDefaultFields fields => Both Source -> Diff (Syntax Text) (Record fields) -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff -> case diff of
-        Free (annotations :< syntax) -> foldMap (fmap (contextualize (Both.snd sources) (Both.snd annotations :< fmap fst syntax)) . snd) diff
+        Free (Join (_, annotation) :< syntax)
+          | isSummarizable syntax
+          , Just terms <- traverse (afterTerm . fst) syntax
+          , termName <- toTermName (Both.snd sources) (cofree (annotation :< terms))
+          , parentInfo <- InSummarizable (category annotation) termName (sourceSpan annotation) ->
+            foldMap (fmap (contextualize parentInfo) . snd) syntax
+          | otherwise -> foldMap snd syntax
         Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo <$> sources) patch))
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
@@ -118,11 +124,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
         C.SingletonMethod -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
         _ -> Nothing
 
-    contextualize source (annotation :< syntax) summary
-      | Nothing <- parentInfo summary
-      , isSummarizable syntax
-      , Just terms <- traverse afterTerm syntax = summary { parentInfo = Just (InSummarizable (category annotation) (toTermName source (cofree (annotation :< terms))) (sourceSpan annotation)) }
-      | otherwise = summary
+    contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
 
     isSummarizable S.Method{} = True
     isSummarizable S.Function{} = True
