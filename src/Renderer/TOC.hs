@@ -129,11 +129,9 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     isSummarizable _ = False
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
-toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
-  where
-    toJSONSummaries' diffInfo = case diffInfo of
-      ErrorInfo{..} -> [ErrorSummary termName infoSpan]
-      LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
+toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
+  ErrorInfo{..} -> [ErrorSummary termName infoSpan]
+  LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
 
 toTermName :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> Text
 toTermName source = para $ \ (annotation :< syntax) -> case syntax of
