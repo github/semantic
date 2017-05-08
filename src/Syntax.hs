@@ -2,6 +2,7 @@
 module Syntax where
 
 import Data.Aeson
+import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
@@ -117,24 +118,6 @@ extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
 
-maybeIdentifier :: CofreeF (Syntax leaf) a (Maybe leaf) -> Maybe leaf
-maybeIdentifier (_ :< syntax) = case syntax of
-  Leaf f -> Just f
-  Assignment f _ -> f
-  Class f _ _ -> f
-  Export f _ -> join f
-  Function f _ _ -> f
-  FunctionCall f _ _ -> f
-  Import f _ -> f
-  Method _ f _ _ _ -> f
-  MethodCall _ f _ _ -> f
-  Module f _ -> f
-  OperatorAssignment f _ -> f
-  SubscriptAccess f _  -> f
-  TypeDecl f _ -> f
-  VarAssignment f _ -> asum f
-  _ -> Nothing
-
 -- Instances
 
 instance Listable2 Syntax where
@@ -202,3 +185,5 @@ instance (Listable leaf, Listable recur) => Listable (Syntax leaf recur) where
 
 instance Eq leaf => Eq1 (Syntax leaf) where
   liftEq = genericLiftEq
+
+instance Eq leaf => GAlign (Syntax leaf)

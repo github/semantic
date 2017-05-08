@@ -76,7 +76,7 @@ diffBlobPair blobs = do
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
 parseBlobs renderer blobs = do
-  terms <- traverse go blobs
+  terms <- traverse go (filter (not . nonExistentBlob) blobs)
   toS <$> renderConcurrently (resolveParseTreeRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
