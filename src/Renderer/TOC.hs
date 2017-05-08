@@ -26,7 +26,6 @@ instance ToJSON JSONSummary where
   toJSON JSONSummary{..} = object $ case info of
     InSummarizable{..} -> [ "changeType" .= ("modified" :: Text), "category" .= toCategoryName parentCategory, "term" .= parentTermName, "span" .= parentSourceSpan ]
     Summarizable{..} -> [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
-    NotSummarizable -> panic "NotSummarizable should have been pruned"
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
 isErrorSummary :: JSONSummary -> Bool
@@ -40,12 +39,11 @@ data DiffInfo = LeafInfo { leafCategory :: Category, termName :: Text, leafSourc
 
 data TOCSummary a = TOCSummary {
                       summaryPatch :: Patch a,
-                      parentInfo :: Summarizable
+                      parentInfo :: Maybe Summarizable
                     } deriving (Eq, Functor, Show, Generic)
 
 data Summarizable = Summarizable { summarizableCategory :: Category, summarizableTermName :: Text, summarizableSourceSpan :: SourceSpan, summarizableChangeType :: Text }
   | InSummarizable { parentCategory :: Category, parentTermName :: Text, parentSourceSpan :: SourceSpan }
-  | NotSummarizable
   deriving (Eq, Show)
 
 toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
@@ -77,15 +75,15 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
         go xs x | (_, _ : _) <- find exactMatch x xs = xs
                 | (front, existingItem : back) <- find similarMatch x xs =
                    let
-                     (Summarizable category name sourceSpan _) = parentInfo existingItem
-                     replacement = x { parentInfo = Summarizable category name sourceSpan "modified" }
+                     Just (Summarizable category name sourceSpan _) = parentInfo existingItem
+                     replacement = x { parentInfo = Just $ Summarizable category name sourceSpan "modified" }
                    in
                      front <> (replacement : back)
                 | otherwise = xs <> [x]
         find p x = List.break (p x)
         exactMatch a b = parentInfo a == parentInfo b
         similarMatch a b = case (parentInfo a, parentInfo b) of
-          (Summarizable catA nameA _ _, Summarizable catB nameB _ _) -> catA == catB && toLower nameA == toLower nameB
+          (Just (Summarizable catA nameA _ _), Just (Summarizable catB nameB _ _)) -> catA == catB && toLower nameA == toLower nameB
           (_, _) -> False
 
     diffToTOCSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
@@ -96,9 +94,9 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
       where toInfo = termToDiffInfo <$> sources
 
     contextualize source (annotation :< syntax) summary
-      | NotSummarizable <- parentInfo summary
+      | Nothing <- parentInfo summary
       , isSummarizable syntax
-      , Just terms <- traverse afterTerm syntax = summary { parentInfo = InSummarizable (category annotation) (toTermName source (cofree (annotation :< terms))) (sourceSpan annotation) }
+      , Just terms <- traverse afterTerm syntax = summary { parentInfo = Just (InSummarizable (category annotation) (toTermName source (cofree (annotation :< terms))) (sourceSpan annotation)) }
       | otherwise = summary
 
     isSummarizable S.Method{} = True
@@ -108,13 +106,13 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 -- Mark which leaves are summarizable.
 toTOCSummaries :: Patch DiffInfo -> [TOCSummary DiffInfo]
 toTOCSummaries patch = case afterOrBefore patch of
-  ErrorInfo{..} -> pure $ TOCSummary patch NotSummarizable
+  ErrorInfo{..} -> pure $ TOCSummary patch Nothing
   BranchInfo{..} -> flattenPatch patch >>= toTOCSummaries
   LeafInfo{..} -> pure . TOCSummary patch $ case leafCategory of
-    C.Function -> Summarizable leafCategory termName leafSourceSpan (patchType patch)
-    C.Method -> Summarizable leafCategory termName leafSourceSpan (patchType patch)
-    C.SingletonMethod -> Summarizable leafCategory termName leafSourceSpan (patchType patch)
-    _ -> NotSummarizable
+    C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
+    C.Method -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
+    C.SingletonMethod -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
+    _ -> Nothing
 
 flattenPatch :: Patch DiffInfo -> [Patch DiffInfo]
 flattenPatch patch = case toLeafInfos <$> patch of
@@ -132,9 +130,7 @@ toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
     toJSONSummaries' diffInfo = case diffInfo of
       ErrorInfo{..} -> pure $ ErrorSummary termName infoSpan
       BranchInfo{..} -> branches >>= toJSONSummaries'
-      LeafInfo{..} -> case parentInfo of
-        NotSummarizable -> []
-        _ -> pure $ JSONSummary parentInfo
+      LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
 
 termToDiffInfo :: forall leaf fields. (StringConv leaf Text, HasDefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
