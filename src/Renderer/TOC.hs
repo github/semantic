@@ -90,11 +90,10 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
           (_, _) -> False
 
     diffToTOCSummaries :: HasDefaultFields fields => Both Source -> Diff (Syntax Text) (Record fields) -> [TOCSummary DiffInfo]
-    diffToTOCSummaries sources = para $ \diff -> case first (toTOCSummaries . runBothWith mapPatch toInfo) diff of
+    diffToTOCSummaries sources = para $ \diff -> case diff of
         Free (annotations :< syntax) -> toList diff >>= \ summaries ->
           fmap (contextualize (Both.snd sources) (Both.snd annotations :< fmap fst syntax)) (snd summaries)
-        Pure summaries -> summaries
-      where toInfo = termToDiffInfo <$> sources
+        Pure patch -> toTOCSummaries $ runBothWith mapPatch (termToDiffInfo <$> sources) patch
 
     contextualize source (annotation :< syntax) summary
       | Nothing <- parentInfo summary
