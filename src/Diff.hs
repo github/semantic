@@ -47,17 +47,21 @@ mapAnnotations :: (Functor f, Functor g)
 mapAnnotations f = iter (wrap . first (fmap f)) . fmap (pure . fmap (fmap f))
 
 
+-- | Fold a diff with a combining rule for replacement patches and an algebra on the annotated syntax functor.
 foldDiffWith :: Functor f
-             => (b -> b -> b)
-             -> (TermF f (These a a) b -> b)
-             -> Diff f a
-             -> b
+             => (b -> b -> b) -- ^ A function to merge the results of the algebra when applied to replacement patches.
+             -> (TermF f (These a a) b -> b) -- ^ An algebra on the annotated syntax functor.
+             -> Diff f a -- ^ The diff to fold.
+             -> b -- ^ The final resulting value.
 foldDiffWith merge algebra = iter (algebra . first (runBothWith These)) . fmap (mergeTheseWith (cata algebra . fmap This) (cata algebra . fmap That) merge . unPatch)
 
+-- | Fold a diff with an algebra on the annotated syntax functor.
+--
+--   This is just like 'foldDiffWith' except that it uses the overloaded '(<>)' method from 'Semigroup'.
 foldDiff :: (Semigroup b, Functor f)
-         => (TermF f (These a a) b -> b)
-         -> Diff f a
-         -> b
+         => (TermF f (These a a) b -> b) -- ^ An algebra on the annotated syntax functor.
+         -> Diff f a -- ^ The diff to fold.
+         -> b -- ^ The final resulting value.
 foldDiff = foldDiffWith (<>)
 
 
