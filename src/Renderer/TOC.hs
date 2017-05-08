@@ -165,12 +165,9 @@ toTermName parentOffset parentSource term = case unwrap term of
     _ -> toMethodNameWithReceiver receiver identifier
   _ -> toText source
   where
-    source = Source.slice (offsetRange (range term) (negate parentOffset)) parentSource
+    source = Source.slice (offsetRange (byteRange (extract term)) (negate parentOffset)) parentSource
     toMethodNameWithReceiver receiver name = toTermName' receiver <> "." <> toTermName' name
-    offset = start (range term)
-    toTermName' :: SyntaxTerm leaf fields -> Text
-    toTermName' = toTermName offset source
-    range = byteRange . extract
+    toTermName' = toTermName (start (byteRange (extract term))) source
 
 -- The user-facing category name
 toCategoryName :: Category -> Text
