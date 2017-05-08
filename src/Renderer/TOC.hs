@@ -103,11 +103,11 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
     toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< fmap fst syntax)) in case syntax of
-      S.ParseError _ -> [ErrorInfo (sourceSpan annotation) termName]
+      S.ParseError{} -> [ErrorInfo (sourceSpan annotation) termName]
       S.Indexed{} -> foldMap snd syntax
       S.Fixed{} -> foldMap snd syntax
       S.Commented{} -> foldMap snd syntax
-      S.AnonymousFunction _ _ -> [LeafInfo C.AnonymousFunction termName (sourceSpan annotation)]
+      S.AnonymousFunction{} -> [LeafInfo C.AnonymousFunction termName (sourceSpan annotation)]
       _ -> [LeafInfo (category annotation) termName (sourceSpan annotation)]
 
     summarize patch = case afterOrBefore patch of
