@@ -47,10 +47,17 @@ mapAnnotations :: (Functor f, Functor g)
 mapAnnotations f = iter (wrap . first (fmap f)) . fmap (pure . fmap (fmap f))
 
 
-foldDiffWith :: Functor f => (b -> b -> b) -> (TermF f (These a a) b -> b) -> Diff f a -> b
+foldDiffWith :: Functor f
+             => (b -> b -> b)
+             -> (TermF f (These a a) b -> b)
+             -> Diff f a
+             -> b
 foldDiffWith merge algebra = iter (algebra . first (runBothWith These)) . fmap (mergeTheseWith (cata algebra . fmap This) (cata algebra . fmap That) merge . unPatch)
 
-foldDiff :: (Semigroup b, Functor f) => (TermF f (These a a) b -> b) -> Diff f a -> b
+foldDiff :: (Semigroup b, Functor f)
+         => (TermF f (These a a) b -> b)
+         -> Diff f a
+         -> b
 foldDiff = foldDiffWith (<>)
 
 
