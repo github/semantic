@@ -99,7 +99,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     diffToTOCSummaries :: HasDefaultFields fields => Both Source -> Diff (Syntax Text) (Record fields) -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff -> case diff of
         Free (annotations :< syntax) -> foldMap (fmap (contextualize (Both.snd sources) (Both.snd annotations :< fmap fst syntax)) . snd) diff
-        Pure patch -> fmap toTOCSummaries (sequenceA (runBothWith mapPatch (toInfo <$> sources) patch))
+        Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo <$> sources) patch))
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
     toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
@@ -110,7 +110,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
       S.AnonymousFunction _ _ -> [LeafInfo C.AnonymousFunction termName (sourceSpan annotation)]
       _ -> [LeafInfo (category annotation) termName (sourceSpan annotation)]
 
-    toTOCSummaries patch = case afterOrBefore patch of
+    summarize patch = case afterOrBefore patch of
       ErrorInfo{..} -> TOCSummary patch Nothing
       LeafInfo{..} -> TOCSummary patch $ case leafCategory of
         C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
