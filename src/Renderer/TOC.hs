@@ -141,7 +141,7 @@ termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTerm
   S.ParseError _ -> ErrorInfo (sourceSpan annotation) termName
   _ -> LeafInfo (category annotation) termName (sourceSpan annotation)
 
-toTermName :: forall fields. HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> Text
+toTermName :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> Text
 toTermName source = para $ \ (annotation :< syntax) -> case syntax of
   S.Function (_, identifier) _ _ -> identifier
   S.Method _ (_, identifier) Nothing _ _ -> identifier
