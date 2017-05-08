@@ -102,7 +102,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
         Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo <$> sources) patch))
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
-    toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
+    toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< fmap fst syntax)) in case syntax of
       S.ParseError _ -> [ErrorInfo (sourceSpan annotation) termName]
       S.Indexed children -> children >>= snd
       S.Fixed children -> children >>= snd
