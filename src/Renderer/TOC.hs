@@ -128,7 +128,7 @@ toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
 toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
   where
     toJSONSummaries' diffInfo = case diffInfo of
-      ErrorInfo{..} -> pure $ ErrorSummary termName infoSpan
+      ErrorInfo{..} -> [ErrorSummary termName infoSpan]
       BranchInfo{..} -> branches >>= toJSONSummaries'
       LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
 
