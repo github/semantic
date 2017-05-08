@@ -51,19 +51,13 @@ toc blobs diff = Summaries changes errors
     changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
     errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')
     (errors', changes') = List.partition isErrorSummary summaries
-    summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffTOC blobs diff
 
-    -- Returns a key representing the filename. If the filenames are different,
-    -- return 'before -> after'.
-    toSummaryKey :: Both FilePath -> Text
-    toSummaryKey = runBothWith $ \before after ->
-      toS $ case (before, after) of
-        ("", after) -> after
-        (before, "") -> before
-        (before, after) | before == after -> after
-        (before, after) | not (null before) && not (null after) -> before <> " -> " <> after
-        (_, _) -> mempty
+    summaryKey = toS $ case runJoin (path <$> blobs) of
+      (before, after) | null before -> after
+                      | null after -> before
+                      | before == after -> after
+                      | otherwise -> before <> " -> " <> after
 
 diffTOC :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [JSONSummary]
 diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
