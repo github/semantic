@@ -149,11 +149,10 @@ toTermName :: forall leaf fields. HasDefaultFields fields => Source -> SyntaxTer
 toTermName source = para $ \ (annotation :< syntax) -> case syntax of
   S.Function (_, identifier) _ _ -> identifier
   S.Method _ (_, identifier) Nothing _ _ -> identifier
-  S.Method _ (_, identifier) (Just (receiver, receiverSource)) _ _ -> case unwrap receiver of
-    S.Indexed [receiverParams] -> case unwrap receiverParams of
-      S.ParameterDecl (Just ty) _ -> "(" <> toTermName source ty <> ") " <> identifier
-      _ -> receiverSource <> "." <> identifier
-    _ -> receiverSource <> "." <> identifier
+  S.Method _ (_, identifier) (Just (receiver, receiverSource)) _ _
+    | S.Indexed [receiverParams] <- unwrap receiver
+    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> "(" <> toTermName source ty <> ") " <> identifier
+    | otherwise -> receiverSource <> "." <> identifier
   _ -> toText (Source.slice (byteRange annotation) source)
 
 -- The user-facing category name
