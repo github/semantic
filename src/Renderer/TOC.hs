@@ -93,7 +93,24 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     diffToTOCSummaries sources = para $ \diff -> case diff of
         Free (annotations :< syntax) -> toList diff >>= \ summaries ->
           fmap (contextualize (Both.snd sources) (Both.snd annotations :< fmap fst syntax)) (snd summaries)
-        Pure patch -> toTOCSummaries $ runBothWith mapPatch (termToDiffInfo <$> sources) patch
+        Pure patch -> toTOCSummaries (runBothWith mapPatch (toInfo <$> sources) patch)
+
+    toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
+      S.ParseError _ -> ErrorInfo (sourceSpan annotation) termName
+      S.Indexed children -> BranchInfo (snd <$> children) (category annotation)
+      S.Fixed children -> BranchInfo (snd <$> children) (category annotation)
+      S.Commented cs leaf -> BranchInfo (snd <$> (cs <> maybeToList leaf)) (category annotation)
+      S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction termName (sourceSpan annotation)
+      _ -> LeafInfo (category annotation) termName (sourceSpan annotation)
+
+    toTOCSummaries patch = case afterOrBefore patch of
+      ErrorInfo{..} -> pure $ TOCSummary patch Nothing
+      BranchInfo{..} -> flattenPatch (toLeafInfos <$> patch) >>= toTOCSummaries
+      LeafInfo{..} -> pure . TOCSummary patch $ case leafCategory of
+        C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
+        C.Method -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
+        C.SingletonMethod -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
+        _ -> Nothing
 
     contextualize source (annotation :< syntax) summary
       | Nothing <- parentInfo summary
@@ -105,19 +122,8 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     isSummarizable S.Function{} = True
     isSummarizable _ = False
 
--- Mark which leaves are summarizable.
-toTOCSummaries :: Patch DiffInfo -> [TOCSummary DiffInfo]
-toTOCSummaries patch = case afterOrBefore patch of
-  ErrorInfo{..} -> pure $ TOCSummary patch Nothing
-  BranchInfo{..} -> flattenPatch patch >>= toTOCSummaries
-  LeafInfo{..} -> pure . TOCSummary patch $ case leafCategory of
-    C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
-    C.Method -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
-    C.SingletonMethod -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
-    _ -> Nothing
-
-flattenPatch :: Patch DiffInfo -> [Patch DiffInfo]
-flattenPatch patch = case toLeafInfos <$> patch of
+flattenPatch :: Patch [a] -> [Patch a]
+flattenPatch patch = case patch of
   Replace i1 i2 -> zipWith Replace i1 i2
   Insert info -> Insert <$> info
   Delete info -> Delete <$> info
@@ -133,15 +139,6 @@ toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
       ErrorInfo{..} -> [ErrorSummary termName infoSpan]
       BranchInfo{..} -> branches >>= toJSONSummaries'
       LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
-
-termToDiffInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> DiffInfo
-termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
-  S.Indexed children -> BranchInfo (snd <$> children) (category annotation)
-  S.Fixed children -> BranchInfo (snd <$> children) (category annotation)
-  S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction termName (sourceSpan annotation)
-  S.Commented cs leaf -> BranchInfo (snd <$> (cs <> maybeToList leaf)) (category annotation)
-  S.ParseError _ -> ErrorInfo (sourceSpan annotation) termName
-  _ -> LeafInfo (category annotation) termName (sourceSpan annotation)
 
 toTermName :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> Text
 toTermName source = para $ \ (annotation :< syntax) -> case syntax of
