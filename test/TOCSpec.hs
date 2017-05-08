@@ -7,7 +7,7 @@ import Data.Functor.Both
 import Data.Functor.Listable
 import RWS
 import Data.Record
-import Data.String
+import Data.Text.Listable
 import Diff
 import Info
 import Interpreter
@@ -118,8 +118,8 @@ spec = parallel $ do
       output <- diffBlobPairs ToCRenderer [blobs]
       output `shouldBe` "{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n"
 
-type Diff' = SyntaxDiff String DefaultFields
-type Term' = SyntaxTerm String DefaultFields
+type Diff' = SyntaxDiff Text DefaultFields
+type Term' = SyntaxTerm Text DefaultFields
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
@@ -139,19 +139,19 @@ programWithChangeOutsideFunction term = wrap (pure programInfo :< Indexed [ func
     name' = wrap (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
     term' = pure (Insert term)
 
-programWithInsert :: String -> Term' -> Diff'
+programWithInsert :: Text -> Term' -> Diff'
 programWithInsert name body = programOf $ Insert (functionOf name body)
 
-programWithDelete :: String -> Term' -> Diff'
+programWithDelete :: Text -> Term' -> Diff'
 programWithDelete name body = programOf $ Delete (functionOf name body)
 
-programWithReplace :: String -> Term' -> Diff'
+programWithReplace :: Text -> Term' -> Diff'
 programWithReplace name body = programOf $ Replace (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Patch Term' -> Diff'
 programOf patch = wrap (pure programInfo :< Indexed [ pure patch ])
 
-functionOf :: String -> Term' -> Term'
+functionOf :: Text -> Term' -> Term'
 functionOf name body = cofree $ functionInfo :< S.Function name' [] [body]
   where
     name' = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
@@ -200,3 +200,6 @@ blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPl
 
 unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
 unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff
+
+instance Listable Text where
+  tiers = unListableText `mapT` tiers
