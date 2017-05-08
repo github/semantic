@@ -49,8 +49,6 @@ data Summarizable = Summarizable { summarizableCategory :: Category, summarizabl
   | NotSummarizable
   deriving (Eq, Show)
 
-data SummarizableTerm a = SummarizableTerm a | NotSummarizableTerm a
-
 toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
 toc blobs diff = Summaries changes errors
   where
@@ -128,16 +126,14 @@ mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm dif
   where
     mapToInSummarizable' :: Source -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
     mapToInSummarizable' source term summary =
-      case (parentInfo summary, summarizable term) of
-        (NotSummarizable, SummarizableTerm _) ->
+      case (parentInfo summary) of
+        NotSummarizable | isSummarizable term ->
           summary { parentInfo = InSummarizable (category (extract term)) (toTermName 0 source term) (sourceSpan (extract term)) }
-        (_, _) -> summary
-
-summarizable :: ComonadCofree (Syntax t) w => w a -> SummarizableTerm (w a)
-summarizable term = case unwrap term of
-  S.Method{} -> SummarizableTerm term
-  S.Function{} -> SummarizableTerm term
-  _ -> NotSummarizableTerm term
+        _ -> summary
+    isSummarizable term = case unwrap term of
+      S.Method{} -> True
+      S.Function{} -> True
+      _ -> False
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
 toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
