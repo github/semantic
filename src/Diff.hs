@@ -46,12 +46,6 @@ mapAnnotations :: (Functor f, Functor g)
                -> Free (TermF f (g annotation')) (Patch (Term f annotation'))
 mapAnnotations f = iter (wrap . first (fmap f)) . fmap (pure . fmap (fmap f))
 
--- | Map a function over the annotations of a single diff node, if it is in Free.
-modifyAnnotations :: (Functor f, Functor g) => (annotation -> annotation) -> Free (TermF f (g annotation)) a -> Free (TermF f (g annotation)) a
-modifyAnnotations f r = case runFree r of
-  Free (ga :< functor) -> wrap (fmap f ga :< functor)
-  _ -> r
-
 
 foldDiff :: Functor f => (TermF f (These a a) b -> b) -> Diff f a -> b
 foldDiff algebra = iter (algebra . first (runBothWith These)) . fmap (mergeTheseWith (cata algebra . fmap This) (cata algebra . fmap That) const . unPatch)
