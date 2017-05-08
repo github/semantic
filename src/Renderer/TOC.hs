@@ -100,8 +100,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     diffToTOCSummaries sources = para $ \diff -> case diff of
         Free (Join (_, annotation) :< syntax)
           | isSummarizable syntax
-          , Just terms <- traverse (afterTerm . fst) syntax
-          , termName <- toTermName (Both.snd sources) (cofree (annotation :< terms))
+          , Just termName <- toTermName (Both.snd sources) . cofree . (annotation :<) <$> traverse (afterTerm . fst) syntax
           , parentInfo <- InSummarizable (category annotation) termName (sourceSpan annotation) ->
             foldMap (fmap (contextualize parentInfo) . snd) syntax
           | otherwise -> foldMap snd syntax
