@@ -66,7 +66,7 @@ toc blobs diff = Summaries changes errors
         (before, after) | not (null before) && not (null after) -> before <> " -> " <> after
         (_, _) -> mempty
 
-diffTOC :: (StringConv leaf Text, HasDefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
+diffTOC :: (StringConv leaf Text, HasDefaultFields fields) => Both SourceBlob -> Diff (Syntax leaf) (Record fields) -> [JSONSummary]
 diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
@@ -86,7 +86,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
           (Just (Summarizable catA nameA _ _), Just (Summarizable catB nameB _ _)) -> catA == catB && toLower nameA == toLower nameB
           (_, _) -> False
 
-    diffToTOCSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both Source -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
+    diffToTOCSummaries :: (StringConv leaf Text, HasDefaultFields fields) => Both Source -> Diff (Syntax leaf) (Record fields) -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff -> case first (toTOCSummaries . runBothWith mapPatch toInfo) diff of
         Free (annotations :< syntax) -> toList diff >>= \ summaries ->
           fmap (contextualize (Both.snd sources) (Both.snd annotations :< fmap fst syntax)) (snd summaries)
@@ -132,7 +132,7 @@ toJSONSummaries TOCSummary{..} = toJSONSummaries' (afterOrBefore summaryPatch)
       BranchInfo{..} -> branches >>= toJSONSummaries'
       LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
 
-termToDiffInfo :: forall leaf fields. (StringConv leaf Text, HasDefaultFields fields) => Source -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: forall leaf fields. (StringConv leaf Text, HasDefaultFields fields) => Source -> Term (Syntax leaf) (Record fields) -> DiffInfo
 termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< (fst <$> syntax))) in case syntax of
   S.Indexed children -> BranchInfo (snd <$> children) (category annotation)
   S.Fixed children -> BranchInfo (snd <$> children) (category annotation)
@@ -141,7 +141,7 @@ termToDiffInfo source = para $ \ (annotation :< syntax) -> let termName = toTerm
   S.ParseError _ -> ErrorInfo (sourceSpan annotation) termName
   _ -> LeafInfo (category annotation) termName (sourceSpan annotation)
 
-toTermName :: forall leaf fields. HasDefaultFields fields => Source -> SyntaxTerm leaf fields -> Text
+toTermName :: forall leaf fields. HasDefaultFields fields => Source -> Term (Syntax leaf) (Record fields) -> Text
 toTermName source = para $ \ (annotation :< syntax) -> case syntax of
   S.Function (_, identifier) _ _ -> identifier
   S.Method _ (_, identifier) Nothing _ _ -> identifier
