@@ -41,8 +41,18 @@ data TOCSummary a = TOCSummary {
                       parentInfo :: Maybe Summarizable
                     } deriving (Eq, Functor, Show, Generic)
 
-data Summarizable = Summarizable { summarizableCategory :: Category, summarizableTermName :: Text, summarizableSourceSpan :: SourceSpan, summarizableChangeType :: Text }
-  | InSummarizable { parentCategory :: Category, parentTermName :: Text, parentSourceSpan :: SourceSpan }
+data Summarizable
+  = Summarizable
+    { summarizableCategory :: Category
+    , summarizableTermName :: Text
+    , summarizableSourceSpan :: SourceSpan
+    , summarizableChangeType :: Text
+    }
+  | InSummarizable
+    { parentCategory :: Category
+    , parentTermName :: Text
+    , parentSourceSpan :: SourceSpan
+    }
   deriving (Eq, Show)
 
 toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
