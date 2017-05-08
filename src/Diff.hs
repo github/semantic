@@ -6,6 +6,7 @@ import Prologue
 import Data.Functor.Both as Both
 import Data.Mergeable
 import Data.Record
+import Data.These
 import Patch
 import Syntax
 import Term
@@ -51,6 +52,11 @@ modifyAnnotations :: (Functor f, Functor g) => (annotation -> annotation) -> Fre
 modifyAnnotations f r = case runFree r of
   Free (ga :< functor) -> wrap (fmap f ga :< functor)
   _ -> r
+
+
+foldDiff :: Functor f => (TermF f (These a a) b -> b) -> Diff f a -> b
+foldDiff algebra = iter (algebra . first (runBothWith These)) . fmap (mergeTheseWith (cata algebra . fmap This) (cata algebra . fmap That) const . unPatch)
+
 
 instance (NFData (f (Diff f a)), NFData (Cofree f a), NFData a, Functor f) => NFData (Diff f a) where
   rnf fa = case runFree fa of
