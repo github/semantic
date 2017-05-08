@@ -47,8 +47,8 @@ mapAnnotations :: (Functor f, Functor g)
 mapAnnotations f = iter (wrap . first (fmap f)) . fmap (pure . fmap (fmap f))
 
 
-foldDiff :: Functor f => (TermF f (These a a) b -> b) -> Diff f a -> b
-foldDiff algebra = iter (algebra . first (runBothWith These)) . fmap (mergeTheseWith (cata algebra . fmap This) (cata algebra . fmap That) const . unPatch)
+foldDiffWith :: Functor f => (TermF f (These a a) b -> b) -> (b -> b -> b) -> Diff f a -> b
+foldDiffWith algebra merge = iter (algebra . first (runBothWith These)) . fmap (mergeTheseWith (cata algebra . fmap This) (cata algebra . fmap That) merge . unPatch)
 
 
 instance (NFData (f (Diff f a)), NFData (Cofree f a), NFData a, Functor f) => NFData (Diff f a) where
