@@ -105,7 +105,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
     toTOCSummaries patch = case afterOrBefore patch of
       ErrorInfo{..} -> pure $ TOCSummary patch Nothing
-      BranchInfo{..} -> flattenPatch (toLeafInfos <$> patch) >>= toTOCSummaries
+      BranchInfo{..} -> traverse toLeafInfos patch >>= toTOCSummaries
       LeafInfo{..} -> pure . TOCSummary patch $ case leafCategory of
         C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
         C.Method -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
@@ -121,12 +121,6 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     isSummarizable S.Method{} = True
     isSummarizable S.Function{} = True
     isSummarizable _ = False
-
-flattenPatch :: Patch [a] -> [Patch a]
-flattenPatch patch = case patch of
-  Replace i1 i2 -> zipWith Replace i1 i2
-  Insert info -> Insert <$> info
-  Delete info -> Delete <$> info
 
 toLeafInfos :: DiffInfo -> [DiffInfo]
 toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
