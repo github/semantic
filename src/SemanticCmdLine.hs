@@ -69,12 +69,11 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
 
     argumentsParser = Arguments
       <$> hsubparser (diffCommand <> parseCommand)
-      <*> optional (strOption (long "output" <> short 'o' <> help "Output path (directory for split diffs), defaults to stdout"))
+      <*> optional (strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout"))
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
       <$> ( (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-           <|> flag' splitDiff (long "split" <> help "Output a split diff")
            <|> flag' jsonDiff (long "json" <> help "Output a json diff")
            <|> flag' summaryDiff (long "summary" <> help "Output a diff summary")
            <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
@@ -92,8 +91,7 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
     parseArgumentsParser = Parse
       <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
-           <|> (flag' jsonParseTree (long "json" <> help "Output JSON parse trees") <*> switch (long "debug"))
-           <|> (flag' jsonIndexParseTree (long "index" <> help "Output JSON parse trees in index format") <*> switch (long "debug")) )
+           <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees") )
          <*> (  ParsePaths
                <$> some (argument str (metavar "FILES..."))
             <|> ParseCommit

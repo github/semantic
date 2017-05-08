@@ -15,21 +15,20 @@ import Diff
 import Patch
 import Info
 import Source
-import Syntax
 import Term
 
 data SExpressionFormat = TreeOnly | TreeAndRanges
   deriving (Show)
 
 -- | Returns a ByteString SExpression formatted diff.
-sExpression :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> ByteString
-sExpression format _ diff = printDiff diff 0 format
+sExpression :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> Both SourceBlob -> Diff f (Record fields) -> ByteString
+sExpression format _ diff = printDiff diff 0 format <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
-sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> SourceBlob -> Term (Syntax Text) (Record fields) -> ByteString
-sExpressionParseTree format _ term = printTerm term 0 format
+sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> SourceBlob -> Term f (Record fields) -> ByteString
+sExpressionParseTree format _ term = printTerm term 0 format <> "\n"
 
-printDiff :: (HasField fields Category, HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> Int -> SExpressionFormat -> ByteString
+printDiff :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Diff f (Record fields) -> Int -> SExpressionFormat -> ByteString
 printDiff diff level format = case runFree diff of
   (Pure patch) -> case patch of
     Insert term -> pad (level - 1) <> "{+" <> printTerm term level format <> "+}"
@@ -44,15 +43,14 @@ printDiff diff level format = case runFree diff of
           | n < 1 = "\n"
           | otherwise = "\n" <> replicate (2 * n) space
 
-printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> SExpressionFormat -> ByteString
+printTerm :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Term f (Record fields) -> Int -> SExpressionFormat -> ByteString
 printTerm term level format = go term level 0
   where
     pad :: Int -> Int -> ByteString
     pad p n | n < 1 = ""
             | otherwise = "\n" <> replicate (2 * (p + n)) space
-    go :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> Int -> ByteString
+    go :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
     go term parentLevel level = case runCofree term of
-      (annotation :< Leaf _) -> pad parentLevel level <> "(" <> showAnnotation annotation format <> ")"
       (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation format <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
 
 showAnnotation :: (HasField fields Category, HasField fields SourceSpan) => Record fields -> SExpressionFormat -> ByteString

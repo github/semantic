@@ -2,6 +2,7 @@
 module TreeSitter
 ( treeSitterParser
 , parseRubyToAST
+, parseRubyToTerm
 , defaultTermAssignment
 ) where
 
@@ -40,7 +41,7 @@ treeSitterParser language grammar blob = do
   ts_document_set_language document grammar
   withCStringLen (toText (source blob)) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
-    ts_document_parse document
+    ts_document_parse_halt_on_error document
     term <- documentToTerm language document blob
     ts_document_free document
     pure term
@@ -48,14 +49,14 @@ treeSitterParser language grammar blob = do
 
 -- | Parse Ruby to AST. Intended for use in ghci, e.g.:
 --
---   > Source.readAndTranscodeFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST >>= pure . uncurry (assignAll assignment) . second pure
-parseRubyToAST :: Source -> IO (Source, A.AST Ruby.Grammar)
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST . source
+parseRubyToAST :: Source -> IO (A.AST Ruby.Grammar)
 parseRubyToAST source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
   root <- withCStringLen (toText source) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
-    ts_document_parse document
+    ts_document_parse_halt_on_error document
     alloca (\ rootPtr -> do
       ts_document_root_node_p document rootPtr
       peek rootPtr)
@@ -63,7 +64,7 @@ parseRubyToAST source = do
   ast <- anaM toAST root
 
   ts_document_free document
-  pure (source, ast)
+  pure ast
   where toAST :: Node -> IO (A.RoseF (A.Node Ruby.Grammar) Node)
         toAST node@Node{..} = do
           let count = fromIntegral nodeChildCount
@@ -74,6 +75,18 @@ parseRubyToAST source = do
 
         anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
         anaM g = a where a = pure . embed <=< traverse a <=< g
+
+
+-- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
+--
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
+parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
+parseRubyToTerm source = do
+  ast <- parseRubyToAST source
+  let A.Result errors value = A.assign Ruby.assignment source ast
+  case value of
+    Just a -> pure (Just a)
+    _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
 
 -- | Return a parser for a tree sitter language & document.

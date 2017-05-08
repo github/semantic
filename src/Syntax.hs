@@ -1,9 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Data.Record
-import qualified Info
 import Data.Aeson
+import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
@@ -119,23 +118,6 @@ extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
 
-maybeIdentifier :: HasField fields Info.Category => Syntax leaf (Cofree (Syntax leaf) (Record fields)) -> Maybe (Cofree (Syntax leaf) (Record fields))
-maybeIdentifier syntax = case syntax of
-  Assignment f _ -> Just f
-  Class f _ _ -> Just f
-  Export f _ -> f
-  Function f _ _ -> Just f
-  FunctionCall f _ _ -> Just f
-  Import f _ -> Just f
-  Method _ f _ _ _ -> Just f
-  MethodCall _ f _ _ -> Just f
-  Module f _ -> Just f
-  OperatorAssignment f _ -> Just f
-  SubscriptAccess f _  -> Just f
-  TypeDecl f _ -> Just f
-  VarAssignment f _ -> find ((== Info.Identifier) . Info.category . extract) f
-  _ -> Nothing
-
 -- Instances
 
 instance Listable2 Syntax where
@@ -203,3 +185,5 @@ instance (Listable leaf, Listable recur) => Listable (Syntax leaf recur) where
 
 instance Eq leaf => Eq1 (Syntax leaf) where
   liftEq = genericLiftEq
+
+instance Eq leaf => GAlign (Syntax leaf)

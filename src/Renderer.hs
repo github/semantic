@@ -10,37 +10,35 @@ module Renderer
 , File(..)
 ) where
 
-import Data.Aeson (ToJSON, Value)
-import Data.Functor.Both
+import Data.Aeson (Value, (.=))
+import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Classes
 import Text.Show
 import Data.Map as Map hiding (null)
 import Data.Record
 import Diff
-import Info
+import Info hiding (Identifier)
+import Language.Ruby.Syntax (RAlgebra, decoratorWithAlgebra)
 import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
-import Renderer.Split as R
 import Renderer.Summary as R
 import Renderer.TOC as R
-import Source (SourceBlob)
-import Syntax
+import Source (SourceBlob(..))
+import Syntax as S
 import Term
 
 
 data DiffRenderer fields output where
-  SplitRenderer :: (HasField fields Category, HasField fields Range) => DiffRenderer fields File
   PatchRenderer :: HasField fields Range => DiffRenderer fields File
-  JSONDiffRenderer :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => DiffRenderer fields (Map Text Value)
+  JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer fields (Map Text Value)
   SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
 
 resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output)
 resolveDiffRenderer renderer = case renderer of
-  SplitRenderer -> (File .) . R.split
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
   SummaryRenderer -> R.summary
@@ -53,14 +51,37 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 
 data ParseTreeRenderer fields output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  JSONParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
-  JSONIndexParseTreeRenderer :: HasDefaultFields fields => Bool -> ParseTreeRenderer fields Value
+  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields [Value]
 
-resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> (SourceBlob -> Term (Syntax Text) (Record fields) -> output)
-resolveParseTreeRenderer renderer = case renderer of
-  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format
-  JSONParseTreeRenderer debug -> R.jsonParseTree debug
-  JSONIndexParseTreeRenderer debug -> R.jsonIndexParseTree debug
+resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
+resolveParseTreeRenderer renderer blob = case renderer of
+  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
+  JSONParseTreeRenderer -> R.jsonFile blob . decoratorWithAlgebra identifierAlg
+  where identifierAlg :: RAlgebra (CofreeF (Syntax Text) a) (Cofree (Syntax Text) a) (Maybe Identifier)
+        identifierAlg (_ :< syntax) = case syntax of
+          S.Assignment f _ -> identifier f
+          S.Class f _ _ -> identifier f
+          S.Export f _ -> f >>= identifier
+          S.Function f _ _ -> identifier f
+          S.FunctionCall f _ _ -> identifier f
+          S.Import f _ -> identifier f
+          S.Method _ f _ _ _ -> identifier f
+          S.MethodCall _ f _ _ -> identifier f
+          S.Module f _ -> identifier f
+          S.OperatorAssignment f _ -> identifier f
+          S.SubscriptAccess f _  -> identifier f
+          S.TypeDecl f _ -> identifier f
+          S.VarAssignment f _ -> asum $ identifier <$> f
+          _ -> Nothing
+          where identifier = fmap Identifier . extractLeafValue . unwrap . fst
+
+
+newtype Identifier = Identifier Text
+  deriving (Eq, Show)
+
+instance ToJSONFields Identifier where
+  toJSONFields (Identifier i) = ["identifier" .= i]
+
 
 runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
@@ -73,7 +94,6 @@ instance StringConv File ByteString where
   strConv _ = encodeUtf8 . unFile
 
 instance Show (DiffRenderer fields output) where
-  showsPrec _ SplitRenderer = showString "SplitRenderer"
   showsPrec _ PatchRenderer = showString "PatchRenderer"
   showsPrec _ JSONDiffRenderer = showString "JSONDiffRenderer"
   showsPrec _ SummaryRenderer = showString "SummaryRenderer"
@@ -82,8 +102,7 @@ instance Show (DiffRenderer fields output) where
 
 instance Show (ParseTreeRenderer fields output) where
   showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
-  showsPrec d (JSONParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONParseTreeRenderer" d debug
-  showsPrec d (JSONIndexParseTreeRenderer debug) = showsUnaryWith showsPrec "JSONIndexParseTreeRenderer" d debug
+  showsPrec _ JSONParseTreeRenderer = showString "JSONParseTreeRenderer"
 
 instance Monoid File where
   mempty = File mempty
