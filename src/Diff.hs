@@ -44,7 +44,7 @@ mapAnnotations :: (Functor f, Functor g)
                => (annotation -> annotation')
                -> Free (TermF f (g annotation))  (Patch (Term f annotation))
                -> Free (TermF f (g annotation')) (Patch (Term f annotation'))
-mapAnnotations f = iter (wrap . first (fmap f)) . fmap (pure . fmap (fmap f))
+mapAnnotations f = hoistFree (first (fmap f)) . fmap (fmap (fmap f))
 
 
 -- | Fold a diff with a combining rule for replacement patches and an algebra on the annotated syntax functor.
