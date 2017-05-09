@@ -9,7 +9,6 @@ import Data.List.Split (splitWhen)
 import Data.String
 import Data.Version (showVersion)
 import Development.GitRev
-import Language
 import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Data.ByteString as B
@@ -81,12 +80,12 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
            <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
            <|> flag' tocDiff (long "toc" <> help "Output a table of contents diff summary") )
          <*> (  DiffPaths
-               <$> argument (maybeReader parseFilePath) (metavar "FILE_A")
-               <*> argument (maybeReader parseFilePath) (metavar "FILE_B")
+               <$> argument filePathReader (metavar "FILE_A")
+               <*> argument filePathReader (metavar "FILE_B")
             <|> DiffCommits
                <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
                <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
-               <*> many (argument (maybeReader parseFilePath) (metavar "FILES...")) )
+               <*> many (argument filePathReader (metavar "FILES...")) )
          <*> pure gitDir
          <*> pure alternates )
 
@@ -95,10 +94,10 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
       <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
            <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees") )
          <*> (  ParsePaths
-               <$> some (argument (maybeReader parseFilePath) (metavar "FILES..."))
+               <$> some (argument filePathReader (metavar "FILES..."))
             <|> ParseCommit
                <$> option (eitherReader parseSha) (long "sha" <> metavar "SHA" <> help "Commit SHA")
-               <*> some (argument (maybeReader parseFilePath) (metavar "FILES...")) )
+               <*> some (argument filePathReader (metavar "FILES...")) )
          <*> pure gitDir
          <*> pure alternates )
 
@@ -108,9 +107,9 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
       _ -> Left $ s <> " is not a valid SHA-1"
       where regex = mkRegexWithOpts "([0-9a-f]{40})" True False
 
-    parseFilePath :: String -> Maybe (FilePath, Maybe Language)
+    filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
-      [a, b] | Just lang <- readMaybe a -> Just (b, Just lang)
-             | Just lang <- readMaybe b -> Just (a, Just lang)
-      [path] -> Just (path, languageForFilePath path)
-      _ -> Nothing
+        [a, b] | Just lang <- readMaybe a -> Right (b, Just lang)
+               | Just lang <- readMaybe b -> Right (a, Just lang)
+        [path] -> Right (path, languageForFilePath path)
+        _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
