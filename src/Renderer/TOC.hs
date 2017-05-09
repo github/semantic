@@ -100,7 +100,7 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
 
 
 toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
-toInfo source = para $ \ c -> let termName = fromMaybe (textFor source (byteRange (headF c))) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) c) in case tailF c of
+toInfo source = para $ \ c -> let termName = fromMaybe (textFor source (byteRange (headF c))) (identifierFor (termFSource source . runCofree) (Just . runCofree) c) in case tailF c of
   S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan (headF c))]
   S.Indexed{} -> foldMap snd c
   S.Fixed{} -> foldMap snd c
@@ -108,19 +108,19 @@ toInfo source = para $ \ c -> let termName = fromMaybe (textFor source (byteRang
   S.AnonymousFunction{} -> [DiffInfo (Just C.AnonymousFunction) termName (sourceSpan (headF c))]
   _ -> [DiffInfo (Just (category (headF c))) termName (sourceSpan (headF c))]
 
-identifierFor :: (a -> Text) -> (a -> Maybe (Syntax Text a)) -> TermF (Syntax Text) annotation (a, b) -> Maybe Text
-identifierFor getSource unwrap (_ :< syntax) = case syntax of
+identifierFor :: (a -> Text) -> (a -> Maybe (TermF (Syntax Text) annotation a)) -> TermF (Syntax Text) annotation (a, b) -> Maybe Text
+identifierFor getSource project (_ :< syntax) = case syntax of
   S.Function (identifier, _) _ _ -> Just $ getSource identifier
   S.Method _ (identifier, _) Nothing _ _ -> Just $ getSource identifier
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
-    | Just (S.Indexed [receiverParams]) <- unwrap receiver
-    , Just (S.ParameterDecl (Just ty) _) <- unwrap receiverParams -> Just $ "(" <> getSource ty <> ") " <> getSource identifier
+    | Just (_ :< S.Indexed [receiverParams]) <- project receiver
+    , Just (_ :< S.ParameterDecl (Just ty) _) <- project receiverParams -> Just $ "(" <> getSource ty <> ") " <> getSource identifier
     | otherwise -> Just $ getSource receiver <> "." <> getSource identifier
   _ -> Nothing
 
-diffUnwrap :: Diff f (Record fields) -> Maybe (f (Diff f (Record fields)))
+diffUnwrap :: Diff f (Record fields) -> Maybe (TermF f (Both (Record fields)) (Diff f (Record fields)))
 diffUnwrap diff = case runFree diff of
-  Free (_ :< syntax) -> Just syntax
+  Free r -> Just r
   _ -> Nothing
 
 termFSource :: HasField fields Range => Source -> TermF f (Record fields) a -> Text
