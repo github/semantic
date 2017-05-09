@@ -66,7 +66,7 @@ toc blobs diff = Summaries changes errors
                       | otherwise -> before <> " -> " <> after
 
 diffTOC :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [JSONSummary]
-diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>= toJSONSummaries
+diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
   where
     removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
     removeDupes = foldl' go []
@@ -81,15 +81,13 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
           (Just (Summarizable catA nameA _ _), Just (Summarizable catB nameB _ _)) -> catA == catB && toLower nameA == toLower nameB
           (_, _) -> False
 
-    diffToTOCSummaries :: HasDefaultFields fields => Both Source -> Diff (Syntax Text) (Record fields) -> [TOCSummary DiffInfo]
-    diffToTOCSummaries sources = para $ \diff -> case diff of
-        Free (Join (_, annotation) :< syntax)
-          | isSummarizable syntax
-          , Just termName <- toTermName (Both.snd sources) . cofree . (annotation :<) <$> traverse (afterTerm . fst) syntax
-          , parentInfo <- Summarizable (category annotation) termName (sourceSpan annotation) "modified" ->
-            foldMap (fmap (contextualize parentInfo) . snd) syntax
-          | otherwise -> foldMap snd syntax
-        Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo <$> sources) patch))
+    diffToTOCSummaries :: HasDefaultFields fields => Diff (Syntax Text) (Record fields) -> [TOCSummary DiffInfo]
+    diffToTOCSummaries = para $ \diff -> case diff of
+      Free (Join (_, annotation) :< syntax)
+        | Just identifier <- identifierFor (textFor (source (Both.snd blobs)) . diffRange) diffUnwrap syntax ->
+          foldMap (fmap (contextualize (Summarizable (category annotation) identifier (sourceSpan annotation) "modified")) . snd) syntax
+        | otherwise -> foldMap snd syntax
+      Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
     toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< fmap fst syntax)) in case syntax of
@@ -106,9 +104,29 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
     contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
 
-    isSummarizable S.Method{} = True
-    isSummarizable S.Function{} = True
-    isSummarizable _ = False
+identifierFor :: (a -> Text) -> (a -> Maybe (Syntax Text a)) -> Syntax Text (a, b) -> Maybe Text
+identifierFor getSource unwrap syntax = case syntax of
+  S.Function (identifier, _) _ _ -> Just $ getSource identifier
+  S.Method _ (identifier, _) Nothing _ _ -> Just $ getSource identifier
+  S.Method _ (identifier, _) (Just (receiver, _)) _ _
+    | Just (S.Indexed [receiverParams]) <- unwrap receiver
+    , Just (S.ParameterDecl (Just ty) _) <- unwrap receiverParams -> Just $ "(" <> getSource ty <> ") " <> getSource identifier
+    | otherwise -> Just $ getSource receiver <> "." <> getSource identifier
+  _ -> Nothing
+
+diffRange :: (HasField fields Range, Functor f) => Diff f (Record fields) -> Range
+diffRange = iter (byteRange . Both.snd . headF) . fmap (termRange . afterOrBefore)
+
+diffUnwrap :: Diff f (Record fields) -> Maybe (f (Diff f (Record fields)))
+diffUnwrap diff = case runFree diff of
+  Free (_ :< syntax) -> Just syntax
+  _ -> Nothing
+
+termRange :: (HasField fields Range, Functor f) => Term f (Record fields) -> Range
+termRange = byteRange . extract
+
+textFor :: Source -> Range -> Text
+textFor source = toText . flip Source.slice source
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
 toJSONSummaries TOCSummary{..} = case infoCategory of
