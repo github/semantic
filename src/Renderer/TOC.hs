@@ -83,12 +83,8 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     removeDupes = foldl' go []
       where
         go xs x | (_, _ : _) <- find exactMatch x xs = xs
-                | (front, existingItem : back) <- find similarMatch x xs =
-                   let
-                     Just (Summarizable category name sourceSpan _) = parentInfo existingItem
-                     replacement = x { parentInfo = Just $ Summarizable category name sourceSpan "modified" }
-                   in
-                     front <> (replacement : back)
+                | (front, TOCSummary _ (Just info) : back) <- find similarMatch x xs =
+                  front <> (x { parentInfo = Just (info { summarizableChangeType = "modified" }) } : back)
                 | otherwise = xs <> [x]
         find p x = List.break (p x)
         exactMatch a b = parentInfo a == parentInfo b
