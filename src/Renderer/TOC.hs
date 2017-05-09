@@ -43,10 +43,12 @@ data DiffInfo
     }
   deriving (Eq, Show)
 
-data TOCSummary a = TOCSummary {
-                      summaryPatch :: Patch a,
-                      parentInfo :: Maybe Summarizable
-                    } deriving (Eq, Functor, Show, Generic)
+data TOCSummary a
+  = TOCSummary
+    { summaryPatch :: Patch a
+    , parentInfo :: Maybe Summarizable
+    }
+  deriving (Eq, Functor, Show, Generic)
 
 data Summarizable
   = Summarizable
