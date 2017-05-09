@@ -81,7 +81,6 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
           (Just (Summarizable catA nameA _ _), Just (Summarizable catB nameB _ _)) -> catA == catB && toLower nameA == toLower nameB
           (_, _) -> False
 
-    diffToTOCSummaries :: HasDefaultFields fields => Diff (Syntax Text) (Record fields) -> [TOCSummary DiffInfo]
     diffToTOCSummaries = para $ \diff -> case diff of
       Free (Join (_, annotation) :< syntax)
         | Just identifier <- identifierFor diffSource diffUnwrap syntax ->
