@@ -22,9 +22,7 @@ data JSONSummary = JSONSummary { info :: Summarizable }
                  deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
-  toJSON JSONSummary{..} = object $ case info of
-    InSummarizable{..} -> [ "changeType" .= ("modified" :: Text), "category" .= toCategoryName parentCategory, "term" .= parentTermName, "span" .= parentSourceSpan ]
-    Summarizable{..} -> [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
+  toJSON (JSONSummary Summarizable{..}) = object [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
 isErrorSummary :: JSONSummary -> Bool
@@ -50,11 +48,6 @@ data Summarizable
     , summarizableTermName :: Text
     , summarizableSourceSpan :: SourceSpan
     , summarizableChangeType :: Text
-    }
-  | InSummarizable
-    { parentCategory :: Category
-    , parentTermName :: Text
-    , parentSourceSpan :: SourceSpan
     }
   deriving (Eq, Show)
 
@@ -93,7 +86,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
         Free (Join (_, annotation) :< syntax)
           | isSummarizable syntax
           , Just termName <- toTermName (Both.snd sources) . cofree . (annotation :<) <$> traverse (afterTerm . fst) syntax
-          , parentInfo <- InSummarizable (category annotation) termName (sourceSpan annotation) ->
+          , parentInfo <- Summarizable (category annotation) termName (sourceSpan annotation) "modified" ->
             foldMap (fmap (contextualize parentInfo) . snd) syntax
           | otherwise -> foldMap snd syntax
         Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo <$> sources) patch))
