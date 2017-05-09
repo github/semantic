@@ -106,6 +106,9 @@ instance ToJSON a => ToJSONFields (SplitPatch a) where
   toJSONFields (SplitDelete a) = [ "delete" .= a ]
   toJSONFields (SplitReplace a) = [ "replace" .= a ]
 
+instance ToJSON a => ToJSONFields [a] where
+  toJSONFields list = [ "children" .= list ]
+
 instance ToJSON recur => ToJSONFields (Syntax leaf recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
 
