@@ -90,7 +90,7 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
       Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
-    toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< fmap fst syntax)) in case syntax of
+    toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (textFor source . termRange) (Just . unwrap) syntax) in case syntax of
       S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan annotation)]
       S.Indexed{} -> foldMap snd syntax
       S.Fixed{} -> foldMap snd syntax
@@ -133,16 +133,6 @@ toJSONSummaries TOCSummary{..} = case infoCategory of
   Nothing -> [ErrorSummary infoName infoSpan]
   _ -> maybe [] (pure . JSONSummary) parentInfo
   where DiffInfo{..} = afterOrBefore summaryPatch
-
-toTermName :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> Text
-toTermName source = para $ \ (annotation :< syntax) -> case syntax of
-  S.Function (_, identifier) _ _ -> identifier
-  S.Method _ (_, identifier) Nothing _ _ -> identifier
-  S.Method _ (_, identifier) (Just (receiver, receiverSource)) _ _
-    | S.Indexed [receiverParams] <- unwrap receiver
-    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> "(" <> toTermName source ty <> ") " <> identifier
-    | otherwise -> receiverSource <> "." <> identifier
-  _ -> toText (Source.slice (byteRange annotation) source)
 
 -- The user-facing category name
 toCategoryName :: Category -> Text
