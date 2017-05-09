@@ -84,7 +84,7 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
     diffToTOCSummaries :: HasDefaultFields fields => Diff (Syntax Text) (Record fields) -> [TOCSummary DiffInfo]
     diffToTOCSummaries = para $ \diff -> case diff of
       Free (Join (_, annotation) :< syntax)
-        | Just identifier <- identifierFor (diffSource (source (Both.snd blobs))) diffUnwrap syntax ->
+        | Just identifier <- identifierFor diffSource diffUnwrap syntax ->
           foldMap (fmap (contextualize (Summarizable (category annotation) identifier (sourceSpan annotation) "modified")) . snd) syntax
         | otherwise -> foldMap snd syntax
       Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
@@ -95,6 +95,11 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
 
     contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
 
+    diffSource diff = case runFree diff of
+      Free (Join (_, a) :< r) -> termFSource (source (Both.snd blobs)) (a :< r)
+      Pure a -> termFSource (source (Both.snd blobs)) (runCofree (afterOrBefore a))
+
+
 toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
 toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) syntax) in case syntax of
   S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan annotation)]
@@ -102,7 +107,7 @@ toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (tex
   S.Fixed{} -> foldMap snd syntax
   S.Commented{} -> foldMap snd syntax
   S.AnonymousFunction{} -> [DiffInfo (Just C.AnonymousFunction) termName (sourceSpan annotation)]
-  _ -> [DiffInfo (Just (category annotation)) termName (sourceSpan annotation)]  
+  _ -> [DiffInfo (Just (category annotation)) termName (sourceSpan annotation)]
 
 identifierFor :: (a -> Text) -> (a -> Maybe (Syntax Text a)) -> Syntax Text (a, b) -> Maybe Text
 identifierFor getSource unwrap syntax = case syntax of
@@ -113,11 +118,6 @@ identifierFor getSource unwrap syntax = case syntax of
     , Just (S.ParameterDecl (Just ty) _) <- unwrap receiverParams -> Just $ "(" <> getSource ty <> ") " <> getSource identifier
     | otherwise -> Just $ getSource receiver <> "." <> getSource identifier
   _ -> Nothing
-
-diffSource :: HasField fields Range => Source -> Diff f (Record fields) -> Text
-diffSource source diff = case runFree diff of
-  Free (Join (_, a) :< r) -> termFSource source (a :< r)
-  Pure a -> termFSource source (runCofree (afterOrBefore a))
 
 diffUnwrap :: Diff f (Record fields) -> Maybe (f (Diff f (Record fields)))
 diffUnwrap diff = case runFree diff of
