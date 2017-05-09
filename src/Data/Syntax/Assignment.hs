@@ -73,9 +73,10 @@ module Data.Syntax.Assignment
 , Result(..)
 , Error(..)
 , showError
-, assignAll
+, assign
 , runAssignment
 , AssignmentState(..)
+, makeState
 ) where
 
 import Control.Monad.Free.Freer
@@ -175,9 +176,9 @@ showSymbols (h:t) = shows h . showString ", " . showSymbols t
 showSourcePos :: Info.SourcePos -> ShowS
 showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
 
--- | Run an assignment of nodes in a grammar onto terms in a syntax, discarding any unparsed nodes.
-assignAll :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> [AST grammar] -> Result grammar a
-assignAll assignment = (fmap snd .) . (assignAllFrom assignment .) . AssignmentState 0 (Info.SourcePos 1 1)
+-- | Run an assignment over an AST exhaustively.
+assign :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
+assign assignment source = fmap snd . assignAllFrom assignment . makeState source . pure
 
 assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
@@ -202,10 +203,13 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Alt a b, _) -> yield a state <|> yield b state
           (_, []) -> Result [ Error statePos expectedSymbols Nothing ] Nothing
           (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols (Just symbol) ] Nothing
-          where state@AssignmentState{..} = dropAnonymous initialState
+          where state@AssignmentState{..} = case assignment of
+                  Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous initialState
+                  _ -> initialState
                 expectedSymbols = case assignment of
-                  Choose choices -> ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
+                  Choose choices -> choiceSymbols choices
                   _ -> []
+                choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
 dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
@@ -224,6 +228,12 @@ data AssignmentState grammar = AssignmentState
   , stateNodes :: [AST grammar] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
+
+makeState :: Source.Source -> [AST grammar] -> AssignmentState grammar
+makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) source nodes
+
+
+-- Instances
 
 instance Enum symbol => Alternative (Assignment (Node symbol)) where
   empty = Empty `Then` return

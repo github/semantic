@@ -13,7 +13,7 @@ import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.Record
 import Data.These
-import Data.Vector as Vector
+import Data.Vector as Vector hiding (toList)
 import Diff
 import Info
 import Prologue hiding ((++))
@@ -74,7 +74,7 @@ instance ToJSONFields (Record '[]) where
   toJSONFields _ = []
 
 instance ToJSONFields Range where
-  toJSONFields Range{..} = ["range" .= [ start, end ]]
+  toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
 
 instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> toS c }]
@@ -106,65 +106,11 @@ instance ToJSON a => ToJSONFields (SplitPatch a) where
   toJSONFields (SplitDelete a) = [ "delete" .= a ]
   toJSONFields (SplitReplace a) = [ "replace" .= a ]
 
+instance ToJSON a => ToJSONFields [a] where
+  toJSONFields list = [ "children" .= list ]
+
 instance ToJSON recur => ToJSONFields (Syntax leaf recur) where
-  toJSONFields syntax = case syntax of
-    Leaf _ -> []
-    Indexed c -> childrenFields c
-    Fixed c -> childrenFields c
-    S.FunctionCall identifier typeParameters parameters -> [ "identifier" .= identifier, "typeArguments" .= typeParameters, "parameters" .= parameters ]
-    S.Ternary expression cases -> [ "expression" .= expression, "cases" .= cases ]
-    S.AnonymousFunction callSignature c -> "callSignature" .= callSignature : childrenFields c
-    S.Function identifier callSignature c -> "identifier" .= identifier : "callSignature" .= callSignature : childrenFields c
-    S.Assignment assignmentId value -> [ "identifier" .= assignmentId, "value" .= value ]
-    S.OperatorAssignment identifier value -> [ "identifier" .= identifier, "value" .= value ]
-    S.MemberAccess identifier value -> [ "identifier" .= identifier, "value" .= value ]
-    S.MethodCall identifier methodIdentifier typeParameters parameters -> [ "identifier" .= identifier, "methodIdentifier" .= methodIdentifier, "typeParameters" .= typeParameters, "parameters" .= parameters ]
-    S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
-    S.VarDecl children -> childrenFields children
-    S.VarAssignment identifier value -> [ "identifier" .= identifier, "value" .= value ]
-    S.SubscriptAccess identifier property -> [ "identifier" .= identifier, "property" .= property ]
-    S.Switch expression cases -> [ "expression" .= expression, "cases" .= cases ]
-    S.Case expression statements -> [ "expression" .= expression, "statements" .= statements ]
-    S.Object ty keyValuePairs -> "type" .= ty : childrenFields keyValuePairs
-    S.Pair a b -> childrenFields [a, b]
-    S.Comment _ -> []
-    S.Commented comments child -> childrenFields (comments <> maybeToList child)
-    S.ParseError c -> childrenFields c
-    S.For expressions body -> [ "expressions" .= expressions, "body" .= body ]
-    S.DoWhile expression body -> [ "expression" .= expression, "body" .= body ]
-    S.While expression body -> [ "expression" .= expression, "body" .= body ]
-    S.Return expression -> [ "expression" .= expression ]
-    S.Throw c -> [ "expression" .= c ]
-    S.Constructor expression -> [ "expression" .= expression ]
-    S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body, "catchExpression" .= catchExpression, "elseExpression" .= elseExpression, "finallyExpression" .= finallyExpression ]
-    S.Array ty c -> "type" .= ty : childrenFields c
-    S.Class identifier superclass definitions -> [ "identifier" .= identifier, "superclass" .= superclass, "definitions" .= definitions ]
-    S.Method clauses identifier receiver callSignature definitions -> [ "clauses" .= clauses, "identifier" .= identifier, "receiver" .= receiver, "callSignature" .= callSignature, "definitions" .= definitions ]
-    S.If expression clauses -> "expression" .= expression : childrenFields clauses
-    S.Module identifier definitions -> [ "identifier" .= identifier, "definitions" .= definitions ]
-    S.Namespace identifier definitions -> [ "identifier" .= identifier, "definitions" .= definitions ]
-    S.Interface identifier clauses definitions -> [ "identifier" .= identifier, "clauses" .= clauses, "definitions" .= definitions ]
-    S.Import identifier statements -> [ "identifier" .= identifier, "statements" .= statements ]
-    S.Export identifier statements -> [ "identifier" .= identifier, "statements" .= statements ]
-    S.Yield expr -> [ "yieldExpression" .= expr ]
-    S.Negate expr -> [ "negate" .= expr ]
-    S.Rescue args expressions -> "args" .= args : childrenFields expressions
-    S.Select cases -> childrenFields cases
-    S.Go cases -> childrenFields cases
-    S.Defer cases -> childrenFields cases
-    S.TypeAssertion a b -> childrenFields [a, b]
-    S.TypeConversion a b -> childrenFields [a, b]
-    S.Struct ty fields -> "type" .= ty : childrenFields fields
-    S.Break expr -> [ "expression" .= expr ]
-    S.Continue expr -> [ "expression" .= expr ]
-    S.BlockStatement c -> childrenFields c
-    S.ParameterDecl ty field -> [ "type" .= ty, "identifier" .= field ]
-    S.DefaultCase c -> childrenFields c
-    S.TypeDecl id ty -> [ "type" .= ty, "identifier" .= id ]
-    S.FieldDecl children -> childrenFields children
-    S.Ty ty -> [ "type" .= ty ]
-    S.Send channel expr -> [ "channel" .= channel, "expression" .= expr ]
-    where childrenFields c = [ "children" .= c ]
+  toJSONFields syntax = [ "children" .= toList syntax ]
 
 
 --
@@ -177,17 +123,8 @@ data File a = File { filePath :: FilePath, fileContent :: a }
 instance ToJSON a => ToJSON (File a) where
   toJSON File{..} = object [ "filePath" .= filePath, "programNode" .= fileContent ]
 
-instance Monoid Value where
-  mempty = Null
-  mappend a b | Null <- b = A.Array (singleton a)
-              | Null <- a = A.Array (singleton b)
-              | A.Array a' <- a, A.Array b' <- b = A.Array (a' ++ b')
-              | A.Array b' <- b = A.Array (singleton a ++ b')
-              | A.Array a' <- a = A.Array (a' ++ singleton b)
-              | otherwise = A.Array (fromList [a, b])
-
-instance StringConv Value ByteString where
+instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-jsonFile :: ToJSON a => SourceBlob -> a -> Value
-jsonFile SourceBlob{..} = toJSON . File path
+jsonFile :: ToJSON a => SourceBlob -> a -> [Value]
+jsonFile SourceBlob{..} = pure . toJSON . File path
