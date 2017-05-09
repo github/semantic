@@ -32,8 +32,7 @@ readFilesAtSHAs gitDir alternates paths shas = do
     [] -> runGit' $ do
       trees <- for shas treeForSha
       paths <- for trees (reportGitmon "ls-tree" . treeBlobEntries)
-      -- TODO: use file extension here to get language?
-      pure . nub $! (\ (p, _, _) -> (toS p, Nothing)) <$> runBothWith (\\) paths <> runBothWith (flip (\\)) paths
+      pure . nub $! (\ (p, _, _) -> (toS p, languageForFilePath (toS p))) <$> runBothWith (\\) paths <> runBothWith (flip (\\)) paths
     _ -> pure paths
 
   Async.mapConcurrently (runGit' . blobsForPath) paths

@@ -3,6 +3,7 @@ module SemanticCmdLine (main, runDiff, runParse) where
 
 import Arguments
 import Command
+import Command.Files (languageForFilePath)
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.String
@@ -17,7 +18,6 @@ import System.Directory
 import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
-import System.FilePath
 import Text.Regex
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
@@ -112,6 +112,5 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
     parseFilePath arg = case splitWhen (== ':') arg of
       [a, b] | Just lang <- readMaybe a -> Just (b, Just lang)
              | Just lang <- readMaybe b -> Just (a, Just lang)
-      [path] -> Just (path, languageForPath path)
+      [path] -> Just (path, languageForFilePath path)
       _ -> Nothing
-      where languageForPath = languageForType . toS . takeExtension
