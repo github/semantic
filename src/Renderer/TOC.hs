@@ -83,7 +83,7 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
 
     diffToTOCSummaries = para $ \diff -> case diff of
       Free r
-        | Just identifier <- identifierFor diffSource diffUnwrap (tailF r) ->
+        | Just identifier <- identifierFor diffSource diffUnwrap r ->
           foldMap (fmap (contextualize (Summarizable (category (Both.snd (headF r))) identifier (sourceSpan (Both.snd (headF r))) "modified")) . snd) r
         | otherwise -> foldMap snd r
       Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
@@ -100,16 +100,16 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
 
 
 toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
-toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) syntax) in case syntax of
-  S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan annotation)]
-  S.Indexed{} -> foldMap snd syntax
-  S.Fixed{} -> foldMap snd syntax
-  S.Commented{} -> foldMap snd syntax
-  S.AnonymousFunction{} -> [DiffInfo (Just C.AnonymousFunction) termName (sourceSpan annotation)]
-  _ -> [DiffInfo (Just (category annotation)) termName (sourceSpan annotation)]
+toInfo source = para $ \ c -> let termName = fromMaybe (textFor source (byteRange (headF c))) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) c) in case tailF c of
+  S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan (headF c))]
+  S.Indexed{} -> foldMap snd c
+  S.Fixed{} -> foldMap snd c
+  S.Commented{} -> foldMap snd c
+  S.AnonymousFunction{} -> [DiffInfo (Just C.AnonymousFunction) termName (sourceSpan (headF c))]
+  _ -> [DiffInfo (Just (category (headF c))) termName (sourceSpan (headF c))]
 
-identifierFor :: (a -> Text) -> (a -> Maybe (Syntax Text a)) -> Syntax Text (a, b) -> Maybe Text
-identifierFor getSource unwrap syntax = case syntax of
+identifierFor :: (a -> Text) -> (a -> Maybe (Syntax Text a)) -> TermF (Syntax Text) annotation (a, b) -> Maybe Text
+identifierFor getSource unwrap (_ :< syntax) = case syntax of
   S.Function (identifier, _) _ _ -> Just $ getSource identifier
   S.Method _ (identifier, _) Nothing _ _ -> Just $ getSource identifier
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
