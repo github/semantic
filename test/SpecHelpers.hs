@@ -8,7 +8,6 @@ module SpecHelpers
 
 import Data.Functor.Both
 import Language
-import Parser
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.Text.ICU.Convert as Convert
