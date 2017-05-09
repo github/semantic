@@ -37,14 +37,14 @@ spec = parallel $ do
       Just diff <- diffBlobPair sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
         [ JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
-        , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
+        , JSONSummary $ Summarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
         , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
       Just diff <- diffBlobPair sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
-        [ JSONSummary $ InSummarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
+        [ JSONSummary $ Summarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
@@ -62,7 +62,7 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
       Just diff <- diffBlobPair sourceBlobs
       diffTOC sourceBlobs diff `shouldBe`
-        [ JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) ]
+        [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
@@ -101,7 +101,7 @@ spec = parallel $ do
 
   describe "JSONSummary" $ do
     it "encodes InSummarizable to JSON" $ do
-      let summary = JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4))
+      let summary = JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
 
     it "encodes Summarizable to JSON" $ do
