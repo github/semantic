@@ -32,7 +32,7 @@ isErrorSummary ErrorSummary{} = True
 isErrorSummary _ = False
 
 data DiffInfo = DiffInfo
-  { infoCategory :: Category
+  { infoCategory :: Maybe Category
   , infoName :: Text
   , infoSpan :: SourceSpan
   }
@@ -101,15 +101,16 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
     toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< fmap fst syntax)) in case syntax of
-      S.ParseError{} -> [DiffInfo C.ParseError termName (sourceSpan annotation)]
+      S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan annotation)]
       S.Indexed{} -> foldMap snd syntax
       S.Fixed{} -> foldMap snd syntax
       S.Commented{} -> foldMap snd syntax
-      S.AnonymousFunction{} -> [DiffInfo C.AnonymousFunction termName (sourceSpan annotation)]
-      _ -> [DiffInfo (category annotation) termName (sourceSpan annotation)]
+      S.AnonymousFunction{} -> [DiffInfo (Just C.AnonymousFunction) termName (sourceSpan annotation)]
+      _ -> [DiffInfo (Just (category annotation)) termName (sourceSpan annotation)]
 
-    summarize patch = TOCSummary patch (Summarizable infoCategory infoName infoSpan (patchType patch) <$ find (infoCategory ==) [C.Function, C.Method, C.SingletonMethod])
+    summarize patch = TOCSummary patch (infoCategory >>= summarizable)
       where DiffInfo{..} = afterOrBefore patch
+            summarizable category = Summarizable category infoName infoSpan (patchType patch) <$ find (category ==) [C.Function, C.Method, C.SingletonMethod]
 
     contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
 
@@ -119,7 +120,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
 toJSONSummaries TOCSummary{..} = case infoCategory of
-  C.ParseError -> [ErrorSummary infoName infoSpan]
+  Nothing -> [ErrorSummary infoName infoSpan]
   _ -> maybe [] (pure . JSONSummary) parentInfo
   where DiffInfo{..} = afterOrBefore summaryPatch
 
