@@ -113,9 +113,9 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
       S.AnonymousFunction{} -> [LeafInfo C.AnonymousFunction termName (sourceSpan annotation)]
       _ -> [LeafInfo (category annotation) termName (sourceSpan annotation)]
 
-    summarize patch = case afterOrBefore patch of
-      ErrorInfo{..} -> TOCSummary patch Nothing
-      LeafInfo{..} -> TOCSummary patch $ case leafCategory of
+    summarize patch = TOCSummary patch $ case afterOrBefore patch of
+      ErrorInfo{..} -> Nothing
+      LeafInfo{..} -> case leafCategory of
         C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
         C.Method -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
         C.SingletonMethod -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
