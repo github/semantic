@@ -89,20 +89,20 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
         | otherwise -> foldMap snd syntax
       Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
 
-    toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
-    toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) syntax) in case syntax of
-      S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan annotation)]
-      S.Indexed{} -> foldMap snd syntax
-      S.Fixed{} -> foldMap snd syntax
-      S.Commented{} -> foldMap snd syntax
-      S.AnonymousFunction{} -> [DiffInfo (Just C.AnonymousFunction) termName (sourceSpan annotation)]
-      _ -> [DiffInfo (Just (category annotation)) termName (sourceSpan annotation)]
-
     summarize patch = TOCSummary patch (infoCategory >>= summarizable)
       where DiffInfo{..} = afterOrBefore patch
             summarizable category = Summarizable category infoName infoSpan (patchType patch) <$ find (category ==) [C.Function, C.Method, C.SingletonMethod]
 
     contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
+
+toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
+toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) syntax) in case syntax of
+  S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan annotation)]
+  S.Indexed{} -> foldMap snd syntax
+  S.Fixed{} -> foldMap snd syntax
+  S.Commented{} -> foldMap snd syntax
+  S.AnonymousFunction{} -> [DiffInfo (Just C.AnonymousFunction) termName (sourceSpan annotation)]
+  _ -> [DiffInfo (Just (category annotation)) termName (sourceSpan annotation)]  
 
 identifierFor :: (a -> Text) -> (a -> Maybe (Syntax Text a)) -> Syntax Text (a, b) -> Maybe Text
 identifierFor getSource unwrap syntax = case syntax of
