@@ -90,7 +90,7 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
       Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
-    toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termSource source) (Just . tailF . runCofree) syntax) in case syntax of
+    toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) syntax) in case syntax of
       S.ParseError{} -> [DiffInfo Nothing termName (sourceSpan annotation)]
       S.Indexed{} -> foldMap snd syntax
       S.Fixed{} -> foldMap snd syntax
@@ -116,16 +116,16 @@ identifierFor getSource unwrap syntax = case syntax of
 
 diffSource :: HasField fields Range => Source -> Diff f (Record fields) -> Text
 diffSource source diff = case runFree diff of
-  Free (a :< _) -> toText (Source.slice (byteRange (Both.snd a)) source)
-  Pure a -> termSource source (afterOrBefore a)
+  Free (Join (_, a) :< r) -> termFSource source (a :< r)
+  Pure a -> termFSource source (runCofree (afterOrBefore a))
 
 diffUnwrap :: Diff f (Record fields) -> Maybe (f (Diff f (Record fields)))
 diffUnwrap diff = case runFree diff of
   Free (_ :< syntax) -> Just syntax
   _ -> Nothing
 
-termSource :: HasField fields Range => Source -> Term f (Record fields) -> Text
-termSource source = toText . flip Source.slice source . byteRange . headF . runCofree
+termFSource :: HasField fields Range => Source -> TermF f (Record fields) a -> Text
+termFSource source = toText . flip Source.slice source . byteRange . headF
 
 textFor :: Source -> Range -> Text
 textFor source = toText . flip Source.slice source
