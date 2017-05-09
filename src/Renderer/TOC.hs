@@ -82,10 +82,10 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
           (_, _) -> False
 
     diffToTOCSummaries = para $ \diff -> case diff of
-      Free (Join (_, annotation) :< syntax)
-        | Just identifier <- identifierFor diffSource diffUnwrap syntax ->
-          foldMap (fmap (contextualize (Summarizable (category annotation) identifier (sourceSpan annotation) "modified")) . snd) syntax
-        | otherwise -> foldMap snd syntax
+      Free r
+        | Just identifier <- identifierFor diffSource diffUnwrap (tailF r) ->
+          foldMap (fmap (contextualize (Summarizable (category (Both.snd (headF r))) identifier (sourceSpan (Both.snd (headF r))) "modified")) . snd) r
+        | otherwise -> foldMap snd r
       Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
 
     summarize patch = TOCSummary patch (infoCategory >>= summarizable)
