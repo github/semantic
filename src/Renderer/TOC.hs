@@ -31,16 +31,11 @@ isErrorSummary :: JSONSummary -> Bool
 isErrorSummary ErrorSummary{} = True
 isErrorSummary _ = False
 
-data DiffInfo
-  = LeafInfo
-    { leafCategory :: Category
-    , termName :: Text
-    , leafSourceSpan :: SourceSpan
-    }
-  | ErrorInfo
-    { infoSpan :: SourceSpan
-    , termName :: Text
-    }
+data DiffInfo = DiffInfo
+  { infoCategory :: Category
+  , infoName :: Text
+  , infoSpan :: SourceSpan
+  }
   deriving (Eq, Show)
 
 data TOCSummary a
@@ -106,16 +101,15 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
     toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
     toInfo source = para $ \ (annotation :< syntax) -> let termName = toTermName source (cofree (annotation :< fmap fst syntax)) in case syntax of
-      S.ParseError{} -> [ErrorInfo (sourceSpan annotation) termName]
+      S.ParseError{} -> [DiffInfo C.ParseError termName (sourceSpan annotation)]
       S.Indexed{} -> foldMap snd syntax
       S.Fixed{} -> foldMap snd syntax
       S.Commented{} -> foldMap snd syntax
-      S.AnonymousFunction{} -> [LeafInfo C.AnonymousFunction termName (sourceSpan annotation)]
-      _ -> [LeafInfo (category annotation) termName (sourceSpan annotation)]
+      S.AnonymousFunction{} -> [DiffInfo C.AnonymousFunction termName (sourceSpan annotation)]
+      _ -> [DiffInfo (category annotation) termName (sourceSpan annotation)]
 
-    summarize patch = TOCSummary patch $ case afterOrBefore patch of
-      ErrorInfo{..} -> Nothing
-      LeafInfo{..} -> Summarizable leafCategory termName leafSourceSpan (patchType patch) <$ find (leafCategory ==) [C.Function, C.Method, C.SingletonMethod]
+    summarize patch = TOCSummary patch (Summarizable infoCategory infoName infoSpan (patchType patch) <$ find (infoCategory ==) [C.Function, C.Method, C.SingletonMethod])
+      where DiffInfo{..} = afterOrBefore patch
 
     contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
 
@@ -124,9 +118,10 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
     isSummarizable _ = False
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
-toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
-  ErrorInfo{..} -> [ErrorSummary termName infoSpan]
-  LeafInfo{..} -> maybe [] (pure . JSONSummary) parentInfo
+toJSONSummaries TOCSummary{..} = case infoCategory of
+  C.ParseError -> [ErrorSummary infoName infoSpan]
+  _ -> maybe [] (pure . JSONSummary) parentInfo
+  where DiffInfo{..} = afterOrBefore summaryPatch
 
 toTermName :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> Text
 toTermName source = para $ \ (annotation :< syntax) -> case syntax of
