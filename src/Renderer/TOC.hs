@@ -115,11 +115,7 @@ diffTOC blobs diff = removeDupes (diffToTOCSummaries (source <$> blobs) diff) >>
 
     summarize patch = TOCSummary patch $ case afterOrBefore patch of
       ErrorInfo{..} -> Nothing
-      LeafInfo{..} -> case leafCategory of
-        C.Function -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
-        C.Method -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
-        C.SingletonMethod -> Just $ Summarizable leafCategory termName leafSourceSpan (patchType patch)
-        _ -> Nothing
+      LeafInfo{..} -> Summarizable leafCategory termName leafSourceSpan (patchType patch) <$ find (leafCategory ==) [C.Function, C.Method, C.SingletonMethod]
 
     contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
 
