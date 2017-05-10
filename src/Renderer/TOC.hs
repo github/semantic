@@ -55,8 +55,9 @@ data Summarizable
 
 -- | An entry in a table of contents.
 data Entry a
-  = Unchanged a                  -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
-  | Changed (Either a (Patch a)) -- ^ Either an entry for a diff node contianing changes, or an entry for a node in a patch.
+  = Unchanged a       -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
+  | Changed a         -- ^ An entry for a node containing changes.
+  | Patched (Patch a) -- ^ An entry for a change occurring inside a 'Patch'.
   deriving (Eq, Show)
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
@@ -64,8 +65,8 @@ tableOfContentsBy :: Traversable f
                   => (forall b. TermF f (Record fields) b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f (Record fields)                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                        -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap (Changed . Right) . crosswalk (cata termAlgebra))
-  where diffAlgebra r | Just a <- selector (first Both.snd r) = Just (maybe [Unchanged a] (maybe [Changed (Left a)] (uncurry (:)) . uncons) (fold r))
+tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap Patched . crosswalk (cata termAlgebra))
+  where diffAlgebra r | Just a <- selector (first Both.snd r) = Just (maybe [Unchanged a] (maybe [Changed a] (uncurry (:)) . uncons) (fold r))
                       | otherwise = fold r
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
