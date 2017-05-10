@@ -70,7 +70,7 @@ data Declaration = Declaration { declarationIdentifier :: Text, declarationType 
   deriving (Eq, Show)
 
 -- | The type of a declaration.
-data DeclarationType = MethodDeclaration | FunctionDeclaration | ClassDeclaration
+data DeclarationType = MethodDeclaration | FunctionDeclaration
   deriving (Eq, Show)
 
 -- | Produce the annotations of nodes representing declarations.
