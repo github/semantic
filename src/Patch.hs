@@ -16,7 +16,6 @@ module Patch
 , patchType
 ) where
 
-import Data.Align
 import Data.Functor.Listable
 import Data.These
 import Prologue
@@ -91,8 +90,3 @@ instance Listable1 Patch where
 
 instance Listable a => Listable (Patch a) where
   tiers = tiers1
-
-instance Crosswalk Patch where
-  crosswalk f (Replace a b) = alignWith (these Delete Insert Replace) (f a) (f b)
-  crosswalk f (Insert b) = Insert <$> f b
-  crosswalk f (Delete a) = Delete <$> f a
