@@ -129,7 +129,7 @@ numTocSummaries diff = Prologue.length $ filter isValidSummary (diffTOC blankDif
 programWithChange :: Term' -> Diff'
 programWithChange body = wrap (pure programInfo :< Indexed [ function' ])
   where
-    function' = wrap (pure functionInfo :< S.Function name' [] [ pure (Insert body) ] )
+    function' = wrap (pure functionInfo :< S.Function name' [] [ inserting body ] )
     name' = wrap (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
@@ -138,7 +138,7 @@ programWithChangeOutsideFunction term = wrap (pure programInfo :< Indexed [ func
   where
     function' = wrap (pure functionInfo :< S.Function name' [] [] )
     name' = wrap (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
-    term' = pure (Insert term)
+    term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
 programWithInsert name body = programOf $ Insert (functionOf name body)
@@ -191,7 +191,7 @@ sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
 blankDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
-blankDiff = wrap (pure arrayInfo :< Indexed [ pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
+blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :< Leaf "\"a\"") ])
   where
     arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
