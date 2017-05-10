@@ -46,14 +46,14 @@ import System.FilePath
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 -- | Diff a list of SourceBlob pairs to produce ByteString output using the specified renderer.
-diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer DefaultFields output -> [Both SourceBlob] -> IO ByteString
-diffBlobPairs renderer blobs = do
+diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> DiffRenderer fields output -> [Both SourceBlob] -> IO ByteString
+diffBlobPairs decorator renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
   toS <$> renderConcurrently (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
-      diff <- diffBlobPair identity blobPair
+      diff <- diffBlobPair decorator blobPair
       pure (blobPair, diff)
 
 -- | Diff a pair of SourceBlobs.
