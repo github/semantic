@@ -2,6 +2,7 @@ module Renderer.TOC (toc, diffTOC, JSONSummary(..), Summarizable(..), isErrorSum
 
 import Category as C
 import Data.Aeson
+import Data.Align (sequenceL)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Text (toLower)
@@ -86,7 +87,7 @@ diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
         | Just identifier <- identifierFor diffSource diffUnwrap syntax ->
           foldMap (fmap (contextualize (Summarizable (category annotation) identifier (sourceSpan annotation) "modified")) . snd) syntax
         | otherwise -> foldMap snd syntax
-      Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
+      Pure patch -> fmap summarize (sequenceL (runBothWith mapPatch (toInfo . source <$> blobs) patch))
 
     summarize patch = TOCSummary patch (infoCategory >>= summarizable)
       where DiffInfo{..} = afterOrBefore patch
