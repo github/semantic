@@ -1,8 +1,9 @@
+{-# LANGUAGE RankNTypes #-}
 module Renderer.TOC (toc, diffTOC, JSONSummary(..), Summarizable(..), isErrorSummary) where
 
 import Category as C
 import Data.Aeson
-import Data.Align (sequenceL)
+import Data.Align (crosswalk, sequenceL)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Text (toLower)
@@ -51,6 +52,21 @@ data Summarizable
     , summarizableChangeType :: Text
     }
   deriving (Eq, Show)
+
+data Entry a
+  = Unchanged a
+  | Changed (Either a (Patch a))
+  deriving (Eq, Show)
+
+tableOfContentsBy :: Traversable f => (forall b. TermF f (Record fields) b -> Bool) -> Diff f (Record fields) -> [Entry (Record fields)]
+tableOfContentsBy isRelevant = fromMaybe [] . iter alg . fmap (Just . fmap (Changed . Right) . crosswalk (cata termAlgebra))
+  where alg r | isRelevant (first Both.snd r)
+              , annotation <- Both.snd (headF r) = Just (maybe [Unchanged annotation] (wrapList annotation) (fold r))
+              | otherwise = fold r
+        wrapList a es | null es = [Changed (Left a)]
+                      | otherwise = es
+        termAlgebra r | isRelevant r = [headF r]
+                      | otherwise = fold r
 
 toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
 toc blobs diff = Summaries changes errors
