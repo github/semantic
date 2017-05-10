@@ -45,7 +45,7 @@ resolveDiffRenderer renderer = case renderer of
   JSONDiffRenderer -> R.json
   SummaryRenderer -> R.summary
   SExpressionDiffRenderer format -> R.sExpression format
-  ToCRenderer -> R.toc2
+  ToCRenderer -> R.toc
 
 runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runDiffRenderer = foldMap . uncurry . resolveDiffRenderer

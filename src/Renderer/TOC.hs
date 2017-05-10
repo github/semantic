@@ -118,8 +118,8 @@ entrySummary entry = case entry of
   Patched p   -> Just (recordSummary (afterOrBefore p) (patchType p))
   where recordSummary record = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
-toc2 :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
-toc2 blobs = uncurry Summaries . bimap toMap toMap . List.partition isErrorSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
+toc :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isErrorSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         dedupe = identity
@@ -129,8 +129,8 @@ toc2 blobs = uncurry Summaries . bimap toMap toMap . List.partition isErrorSumma
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
-toc blobs diff = Summaries changes errors
+toc2 :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+toc2 blobs diff = Summaries changes errors
   where
     changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
     errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')
