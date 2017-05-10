@@ -10,6 +10,7 @@ module Renderer.TOC
 , declarationAlgebra
 , Entry(..)
 , tableOfContentsBy
+, entrySummary
 ) where
 
 import Category as C
@@ -105,6 +106,14 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
                       | otherwise = fold r
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
+
+-- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
+entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
+entrySummary entry = case entry of
+  Unchanged _ -> Nothing
+  Changed a   -> Just (recordSummary a "modified")
+  Patched p   -> Just (recordSummary (afterOrBefore p) (patchType p))
+  where recordSummary record = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
 toc blobs diff = Summaries changes errors
