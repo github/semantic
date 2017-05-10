@@ -103,8 +103,10 @@ tableOfContentsBy :: Traversable f
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap Patched . crosswalk (cata termAlgebra))
-  where diffAlgebra r | Just a <- selector (first Both.snd r) = Just (maybe [Unchanged a] (maybe [Changed a] (uncurry (:)) . uncons) (fold r))
-                      | otherwise = fold r
+  where diffAlgebra r = case (selector (first Both.snd r), fold r) of
+          (Just a, Nothing) -> Just [Unchanged a]
+          (Just a, Just []) -> Just [Changed a]
+          (_     , rs     ) -> rs
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
