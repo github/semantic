@@ -53,6 +53,7 @@ data Summarizable
     }
   deriving (Eq, Show)
 
+-- | An entry in a table of contents.
 data Entry a
   = Unchanged a
   | Changed (Either a (Patch a))
