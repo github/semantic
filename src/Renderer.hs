@@ -36,7 +36,7 @@ data DiffRenderer fields output where
   JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer fields (Map Text Value)
   SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
-  ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
+  ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => DiffRenderer fields Summaries
 
 resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output)
 resolveDiffRenderer renderer = case renderer of
@@ -44,7 +44,7 @@ resolveDiffRenderer renderer = case renderer of
   JSONDiffRenderer -> R.json
   SummaryRenderer -> R.summary
   SExpressionDiffRenderer format -> R.sExpression format
-  ToCRenderer -> R.toc
+  ToCRenderer -> R.toc2
 
 runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
