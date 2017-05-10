@@ -5,6 +5,8 @@ module Renderer.TOC
 , JSONSummary(..)
 , Summarizable(..)
 , isErrorSummary
+, Declaration(..)
+, DeclarationType(..)
 , Entry(..)
 , tableOfContentsBy
 ) where
@@ -59,6 +61,14 @@ data Summarizable
     , summarizableSourceSpan :: SourceSpan
     , summarizableChangeType :: Text
     }
+  deriving (Eq, Show)
+
+-- | A declaration’s identifier and type.
+data Declaration = Declaration { declarationIdentifier :: Text, declarationType :: DeclarationType }
+  deriving (Eq, Show)
+
+-- | The type of a declaration.
+data DeclarationType = Method | Function | Class
   deriving (Eq, Show)
 
 -- | An entry in a table of contents.
