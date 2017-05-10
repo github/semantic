@@ -5,7 +5,7 @@ module Renderer.TOC
 , diffTOC
 , JSONSummary(..)
 , Summarizable(..)
-, isErrorSummary
+, isValidSummary
 , Declaration(..)
 , declaration
 , declarationAlgebra
@@ -40,9 +40,9 @@ instance ToJSON JSONSummary where
   toJSON (JSONSummary Summarizable{..}) = object [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
-isErrorSummary :: JSONSummary -> Bool
-isErrorSummary ErrorSummary{} = True
-isErrorSummary _ = False
+isValidSummary :: JSONSummary -> Bool
+isValidSummary ErrorSummary{} = False
+isValidSummary _ = True
 
 data DiffInfo = DiffInfo
   { infoCategory :: Maybe Category
@@ -119,7 +119,7 @@ entrySummary entry = case entry of
   where recordSummary record = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 toc :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
-toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isErrorSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
+toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         dedupe = identity
@@ -134,7 +134,7 @@ toc2 blobs diff = Summaries changes errors
   where
     changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
     errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')
-    (errors', changes') = List.partition isErrorSummary summaries
+    (changes', errors') = List.partition isValidSummary summaries
     summaries = diffTOC blobs diff
 
     summaryKey = toS $ case runJoin (path <$> blobs) of

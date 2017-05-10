@@ -123,7 +123,7 @@ type Diff' = SyntaxDiff Text DefaultFields
 type Term' = SyntaxTerm Text DefaultFields
 
 numTocSummaries :: Diff' -> Int
-numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
+numTocSummaries diff = Prologue.length $ filter isValidSummary (diffTOC blankDiffBlobs diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
