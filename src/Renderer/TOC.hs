@@ -7,6 +7,7 @@ module Renderer.TOC
 , isErrorSummary
 , Declaration(..)
 , DeclarationType(..)
+, declaration
 , Entry(..)
 , tableOfContentsBy
 ) where
@@ -70,6 +71,12 @@ data Declaration = Declaration { declarationIdentifier :: Text, declarationType 
 -- | The type of a declaration.
 data DeclarationType = Method | Function | Class
   deriving (Eq, Show)
+
+declaration :: HasField fields (Maybe Declaration) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
+declaration (annotation :< syntax) | S.Method{} <- syntax   = Just annotation
+                                   | S.Function{} <- syntax = Just annotation
+                                   | otherwise              = Nothing
+
 
 -- | An entry in a table of contents.
 data Entry a
