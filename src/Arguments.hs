@@ -6,7 +6,6 @@ import Data.Maybe
 import Prelude
 import Prologue
 import Renderer
-import Renderer.SExpression
 import Info
 
 

@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, MultiParamTypeClasses  #-}
 module Renderer
 ( DiffRenderer(..)
+, SExpressionFormat(..)
 , resolveDiffRenderer
 , runDiffRenderer
 , ParseTreeRenderer(..)
