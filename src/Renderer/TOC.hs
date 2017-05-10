@@ -62,9 +62,9 @@ data Entry a
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
 tableOfContentsBy :: Traversable f
-                  => (forall b. TermF f (Record fields) b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
-                  -> Diff f (Record fields)                           -- ^ The diff to compute the table of contents for.
-                  -> [Entry a]                                        -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
+                  => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
+                  -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
+                  -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap Patched . crosswalk (cata termAlgebra))
   where diffAlgebra r | Just a <- selector (first Both.snd r) = Just (maybe [Unchanged a] (maybe [Changed a] (uncurry (:)) . uncons) (fold r))
                       | otherwise = fold r
