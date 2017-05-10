@@ -28,6 +28,9 @@ import Test.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
+  describe "tableOfContentsBy" $ do
+    prop "drops all nodes with the constant Nothing function" $
+      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (unListableDiff diff :: Diff (Syntax ()) ()) `shouldBe` []
   describe "diffTOC" $ do
     it "blank if there are no methods" $
       diffTOC blankDiffBlobs blankDiff `shouldBe` [ ]
