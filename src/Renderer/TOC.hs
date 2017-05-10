@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE DeriveAnyClass, RankNTypes #-}
 module Renderer.TOC
 ( toc
 , toc2
@@ -70,7 +70,7 @@ data Summarizable
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: Text }
   | FunctionDeclaration { declarationIdentifier :: Text }
-  deriving (Eq, Show)
+  deriving (Eq, Generic, NFData, Show)
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
