@@ -106,7 +106,7 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
   where diffAlgebra r = case (selector (first Both.snd r), fold r) of
           (Just a, Nothing) -> Just [Unchanged a]
           (Just a, Just []) -> Just [Changed a]
-          (_     , rs     ) -> rs
+          (_     , entries) -> entries
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
