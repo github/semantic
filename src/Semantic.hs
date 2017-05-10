@@ -53,18 +53,18 @@ diffBlobPairs renderer blobs = do
   toS <$> renderConcurrently (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
-      diff <- diffBlobPair blobPair
+      diff <- diffBlobPair identity blobPair
       pure (blobPair, diff)
 
 -- | Diff a pair of SourceBlobs.
-diffBlobPair :: Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record DefaultFields)))
-diffBlobPair blobs = do
+diffBlobPair :: (HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record fields)))
+diffBlobPair decorator blobs = do
   terms <- Async.mapConcurrently parseBlob blobs
-  pure $ case (runJoin blobs, runJoin terms) of
+  pure $ case (runJoin blobs, runJoin (decorator . source <$> blobs <*> terms)) of
     ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> Nothing
                             | nonExistentBlob right -> Just . pure $ Delete a
                             | nonExistentBlob left -> Just . pure $ Insert b
-                            | otherwise -> Just $ runDiff terms
+                            | otherwise -> Just $ runDiff (both a b)
   where
     runDiff terms = stripDiff (runBothWith diffTerms (fmap decorate (terms `using` parTraversable rdeepseq)))
     decorate = defaultFeatureVectorDecorator getLabel
