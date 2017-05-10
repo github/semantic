@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 module Renderer.TOC
 ( toc
+, toc2
 , diffTOC
 , JSONSummary(..)
 , Summarizable(..)
@@ -114,6 +115,17 @@ entrySummary entry = case entry of
   Changed a   -> Just (recordSummary a "modified")
   Patched p   -> Just (recordSummary (afterOrBefore p) (patchType p))
   where recordSummary record = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
+
+toc2 :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+toc2 blobs = uncurry Summaries . bimap toMap toMap . List.partition isErrorSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
+  where toMap [] = mempty
+        toMap as = Map.singleton summaryKey (toJSON <$> as)
+        dedupe = identity
+        summaryKey = toS $ case runJoin (path <$> blobs) of
+          (before, after) | null before -> after
+                          | null after -> before
+                          | before == after -> after
+                          | otherwise -> before <> " -> " <> after
 
 toc :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
 toc blobs diff = Summaries changes errors
