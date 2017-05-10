@@ -59,12 +59,10 @@ data Entry a
   deriving (Eq, Show)
 
 tableOfContentsBy :: Traversable f => (forall b. TermF f (Record fields) b -> Bool) -> Diff f (Record fields) -> [Entry (Record fields)]
-tableOfContentsBy isRelevant = fromMaybe [] . iter alg . fmap (Just . fmap (Changed . Right) . crosswalk (cata termAlgebra))
-  where alg r | isRelevant (first Both.snd r)
-              , annotation <- Both.snd (headF r) = Just (maybe [Unchanged annotation] (wrapList annotation) (fold r))
-              | otherwise = fold r
-        wrapList a es | null es = [Changed (Left a)]
-                      | otherwise = es
+tableOfContentsBy isRelevant = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap (Changed . Right) . crosswalk (cata termAlgebra))
+  where diffAlgebra r | isRelevant (first Both.snd r)
+                      , annotation <- Both.snd (headF r) = Just (maybe [Unchanged annotation] (maybe [Changed (Left annotation)] (uncurry (:)) . uncons) (fold r))
+                      | otherwise = fold r
         termAlgebra r | isRelevant r = [headF r]
                       | otherwise = fold r
 
