@@ -26,7 +26,7 @@ import System.FilePath
 diffFilePaths :: Both FilePath -> IO ByteString
 diffFilePaths paths = do
   blobs <- pure <$> traverse readFile paths
-  diffBlobPairs (SExpressionDiffRenderer TreeOnly) blobs
+  diffBlobPairs (const identity) (SExpressionDiffRenderer TreeOnly) blobs
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
