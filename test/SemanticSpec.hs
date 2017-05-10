@@ -6,7 +6,6 @@ import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 import Syntax
 import Renderer
-import Renderer.SExpression
 import Source
 
 spec :: Spec
