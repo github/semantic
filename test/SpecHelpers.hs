@@ -16,7 +16,6 @@ import qualified Data.ByteString as B
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Renderer
-import Renderer.SExpression
 import Semantic
 import Source
 import Syntax
