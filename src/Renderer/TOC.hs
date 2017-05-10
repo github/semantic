@@ -78,6 +78,7 @@ declaration :: HasField fields (Maybe Declaration) => TermF (Syntax Text) (Recor
 declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
+-- | Compute 'Declaration's for methods and functions.
 declarationAlgebra :: HasField fields Range => Source -> TermF (Syntax Text) (Record fields) (Term (Syntax Text) (Record fields), Maybe Declaration) -> Maybe Declaration
 declarationAlgebra source r = case tailF r of
   S.Function (identifier, _) _ _ -> Just $ Declaration (getSource identifier) FunctionDeclaration
