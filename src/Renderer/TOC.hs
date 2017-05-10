@@ -55,8 +55,8 @@ data Summarizable
 
 -- | An entry in a table of contents.
 data Entry a
-  = Unchanged a
-  | Changed (Either a (Patch a))
+  = Unchanged a                  -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
+  | Changed (Either a (Patch a)) -- ^ Either an entry for a diff node contianing changes, or an entry for a node in a patch.
   deriving (Eq, Show)
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
