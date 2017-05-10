@@ -8,6 +8,7 @@ module Renderer.TOC
 , Declaration(..)
 , DeclarationType(..)
 , declaration
+, declarationAlgebra
 , Entry(..)
 , tableOfContentsBy
 ) where
@@ -69,12 +70,24 @@ data Declaration = Declaration { declarationIdentifier :: Text, declarationType 
   deriving (Eq, Show)
 
 -- | The type of a declaration.
-data DeclarationType = Method | Function | Class
+data DeclarationType = MethodDeclaration | FunctionDeclaration | ClassDeclaration
   deriving (Eq, Show)
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
 declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
+
+
+declarationAlgebra :: HasField fields Range => Source -> TermF (Syntax Text) (Record fields) (Term (Syntax Text) (Record fields), Maybe Declaration) -> Maybe Declaration
+declarationAlgebra source r = case tailF r of
+  S.Function (identifier, _) _ _ -> Just $ Declaration (getSource identifier) FunctionDeclaration
+  S.Method _ (identifier, _) Nothing _ _ -> Just $ Declaration (getSource identifier) MethodDeclaration
+  S.Method _ (identifier, _) (Just (receiver, _)) _ _
+    | S.Indexed [receiverParams] <- unwrap receiver
+    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ Declaration ("(" <> getSource ty <> ") " <> getSource identifier) MethodDeclaration
+    | otherwise -> Just $ Declaration (getSource receiver <> "." <> getSource identifier) MethodDeclaration
+  _ -> Nothing
+  where getSource = toText . flip Source.slice source . byteRange . extract
 
 
 -- | An entry in a table of contents.
