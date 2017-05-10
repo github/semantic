@@ -1,5 +1,12 @@
 {-# LANGUAGE RankNTypes #-}
-module Renderer.TOC (toc, diffTOC, JSONSummary(..), Summarizable(..), isErrorSummary, tableOfContentsBy) where
+module Renderer.TOC
+( toc
+, diffTOC
+, JSONSummary(..)
+, Summarizable(..)
+, isErrorSummary
+, tableOfContentsBy
+) where
 
 import Category as C
 import Data.Aeson
