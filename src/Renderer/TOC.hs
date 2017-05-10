@@ -73,9 +73,7 @@ data DeclarationType = Method | Function | Class
   deriving (Eq, Show)
 
 declaration :: HasField fields (Maybe Declaration) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
-declaration (annotation :< syntax) | S.Method{} <- syntax   = Just annotation
-                                   | S.Function{} <- syntax = Just annotation
-                                   | otherwise              = Nothing
+declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
 -- | An entry in a table of contents.
