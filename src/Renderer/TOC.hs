@@ -72,6 +72,7 @@ data Declaration = Declaration { declarationIdentifier :: Text, declarationType 
 data DeclarationType = Method | Function | Class
   deriving (Eq, Show)
 
+-- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
 declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
 
