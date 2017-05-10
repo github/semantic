@@ -58,7 +58,10 @@ data Entry a
   | Changed (Either a (Patch a))
   deriving (Eq, Show)
 
-tableOfContentsBy :: Traversable f => (forall b. TermF f (Record fields) b -> Maybe a) -> Diff f (Record fields) -> [Entry a]
+tableOfContentsBy :: Traversable f
+                  => (forall b. TermF f (Record fields) b -> Maybe a)
+                  -> Diff f (Record fields)
+                  -> [Entry a]
 tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap (Changed . Right) . crosswalk (cata termAlgebra))
   where diffAlgebra r | Just a <- selector (first Both.snd r) = Just (maybe [Unchanged a] (maybe [Changed (Left a)] (uncurry (:)) . uncons) (fold r))
                       | otherwise = fold r
