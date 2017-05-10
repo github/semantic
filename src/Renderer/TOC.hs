@@ -58,6 +58,7 @@ data Entry a
   | Changed (Either a (Patch a))
   deriving (Eq, Show)
 
+-- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
 tableOfContentsBy :: Traversable f
                   => (forall b. TermF f (Record fields) b -> Maybe a)
                   -> Diff f (Record fields)
