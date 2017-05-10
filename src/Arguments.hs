@@ -6,10 +6,8 @@ import Data.Maybe
 import Data.Record
 import Data.String
 import Info
-import Language.Ruby.Syntax (decoratorWithAlgebra)
 import Prologue
 import Renderer
-import Renderer.TOC (declarationAlgebra)
 import Source
 import Syntax
 import Term
@@ -49,7 +47,7 @@ sExpressionDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
 sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) (const identity)
 
 tocDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
-tocDiff = DiffArguments ToCRenderer (decoratorWithAlgebra . declarationAlgebra)
+tocDiff = DiffArguments ToCRenderer declarationDecorator
 
 
 data ParseMode = ParseCommit String [FilePath] | ParsePaths [FilePath]
