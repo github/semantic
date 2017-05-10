@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, RankNTypes #-}
 module Renderer.TOC
 ( toc
-, toc2
 , diffTOC
 , JSONSummary(..)
 , Summarizable(..)
@@ -127,20 +126,6 @@ toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummar
                           | null after -> before
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
-
-toc2 :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
-toc2 blobs diff = Summaries changes errors
-  where
-    changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
-    errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')
-    (changes', errors') = List.partition isValidSummary summaries
-    summaries = diffTOC blobs diff
-
-    summaryKey = toS $ case runJoin (path <$> blobs) of
-      (before, after) | null before -> after
-                      | null after -> before
-                      | before == after -> after
-                      | otherwise -> before <> " -> " <> after
 
 diffTOC :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [JSONSummary]
 diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
