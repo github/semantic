@@ -5,6 +5,7 @@ module Renderer.TOC
 , JSONSummary(..)
 , Summarizable(..)
 , isErrorSummary
+, Entry(..)
 , tableOfContentsBy
 ) where
 
