@@ -6,7 +6,6 @@ module Renderer.TOC
 , Summarizable(..)
 , isErrorSummary
 , Declaration(..)
-, DeclarationType(..)
 , declaration
 , declarationAlgebra
 , Entry(..)
@@ -66,11 +65,9 @@ data Summarizable
   deriving (Eq, Show)
 
 -- | A declaration’s identifier and type.
-data Declaration = Declaration { declarationIdentifier :: Text, declarationType :: DeclarationType }
-  deriving (Eq, Show)
-
--- | The type of a declaration.
-data DeclarationType = MethodDeclaration | FunctionDeclaration
+data Declaration
+  = MethodDeclaration { declarationIdentifier :: Text }
+  | FunctionDeclaration { declarationIdentifier :: Text }
   deriving (Eq, Show)
 
 -- | Produce the annotations of nodes representing declarations.
@@ -81,12 +78,12 @@ declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Decl
 -- | Compute 'Declaration's for methods and functions.
 declarationAlgebra :: HasField fields Range => Source -> TermF (Syntax Text) (Record fields) (Term (Syntax Text) (Record fields), Maybe Declaration) -> Maybe Declaration
 declarationAlgebra source r = case tailF r of
-  S.Function (identifier, _) _ _ -> Just $ Declaration (getSource identifier) FunctionDeclaration
-  S.Method _ (identifier, _) Nothing _ _ -> Just $ Declaration (getSource identifier) MethodDeclaration
+  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
+  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
     | S.Indexed [receiverParams] <- unwrap receiver
-    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ Declaration ("(" <> getSource ty <> ") " <> getSource identifier) MethodDeclaration
-    | otherwise -> Just $ Declaration (getSource receiver <> "." <> getSource identifier) MethodDeclaration
+    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
+    | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
   _ -> Nothing
   where getSource = toText . flip Source.slice source . byteRange . extract
 
