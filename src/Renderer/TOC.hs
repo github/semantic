@@ -66,7 +66,7 @@ data Summarizable
 
 -- | A declaration’s identifier and type.
 data Declaration
-  = MethodDeclaration { declarationIdentifier :: Text }
+  = MethodDeclaration   { declarationIdentifier :: Text }
   | FunctionDeclaration { declarationIdentifier :: Text }
   deriving (Eq, Show)
 
