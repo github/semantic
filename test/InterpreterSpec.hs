@@ -22,22 +22,21 @@ import Test.Hspec.LeanCheck
 spec :: Spec
 spec = parallel $ do
   describe "interpret" $ do
-    let decorate = defaultFeatureVectorDecorator (category . headF)
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = cofree $ (StringLiteral :. Nil) :< Leaf ("t\776" :: String)
           termB = cofree $ (StringLiteral :. Nil) :< Leaf "\7831" in
-          stripDiff (diffTerms (decorate termA) (decorate termB)) `shouldBe` replacing termA termB
+          diffTerms termA termB `shouldBe` replacing termA termB
 
     prop "produces correct diffs" $
-      \ a b -> let diff = stripDiff $ diffTerms (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
+      \ a b -> let diff = diffTerms (unListableF a) (unListableF b :: SyntaxTerm String '[Category]) in
                    (beforeTerm diff, afterTerm diff) `shouldBe` (Just (unListableF a), Just (unListableF b))
 
     prop "constructs zero-cost diffs of equal terms" $
-      \ a -> let term = decorate (unListableF a :: SyntaxTerm String '[Category])
+      \ a -> let term = (unListableF a :: SyntaxTerm String '[Category])
                  diff = diffTerms term term in
                  diffCost diff `shouldBe` 0
 
     it "produces unbiased insertions within branches" $
-      let term s = decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf s) ]))
-          root = cofree . ((Just (listArray (0, defaultD) (repeat 0)) :. Program :. Nil) :<) . Indexed in
-      stripDiff (diffTerms (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program :. Nil) :< Indexed [ inserting (stripTerm (term "a")), cata wrap (fmap pure (stripTerm (term "b"))) ])
+      let term s = cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf s) ]) :: SyntaxTerm String '[Category]
+          root = cofree . ((Program :. Nil) :<) . Indexed in
+      diffTerms (root [ term "b" ]) (root [ term "a", term "b" ]) `shouldBe` wrap (pure (Program :. Nil) :< Indexed [ inserting (term "a"), cata wrap (fmap pure (term "b")) ])
