@@ -16,7 +16,7 @@ data Language =
     | Markdown
     | Ruby
     | TypeScript
-    deriving (Show)
+    deriving (Show, Eq, Read)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
