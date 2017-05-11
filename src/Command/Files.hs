@@ -14,8 +14,8 @@ import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 
 -- | Read a file to a SourceBlob, transcoding to UTF-8 along the way.
-readFile :: (FilePath, Maybe Language) -> IO SourceBlob
-readFile (path, language) = do
+readFile :: FilePath -> Maybe Language -> IO SourceBlob
+readFile path language = do
   raw <- (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
   source <- traverse transcode raw
   pure $ fromMaybe (emptySourceBlob path) (sourceBlob path language <$> source)

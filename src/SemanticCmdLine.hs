@@ -48,14 +48,14 @@ main = do
 runDiff :: DiffArguments -> IO ByteString
 runDiff DiffArguments{..} = do
   blobs <- runCommand $ case diffMode of
-   DiffPaths a b -> pure <$> traverse readFile (both a b)
+   DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
    DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
   Semantic.diffBlobPairs diffRenderer blobs
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do
   blobs <- runCommand $ case parseMode of
-    ParsePaths paths -> traverse readFile paths
+    ParsePaths paths -> traverse (uncurry readFile) paths
     ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
   Semantic.parseBlobs parseTreeRenderer blobs
 

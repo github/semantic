@@ -23,7 +23,7 @@ import Source
 readFilesAtSHA :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> String -> IO [SourceBlob]
 readFilesAtSHA gitDir alternates paths sha = runGit gitDir alternates $ do
   tree <- treeForSha sha
-  traverse (`blobForPathInTree` tree) paths
+  traverse (uncurry (blobForPathInTree tree)) paths
 
 -- | Read files at the specified commit SHA pair as blobs from a Git repo.
 readFilesAtSHAs :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> Both String -> IO [Both SourceBlob]
@@ -38,9 +38,9 @@ readFilesAtSHAs gitDir alternates paths shas = do
   Async.mapConcurrently (runGit' . blobsForPath) paths
   where
     runGit' = runGit gitDir alternates
-    blobsForPath path = do
+    blobsForPath (path, lang) = do
       trees <- traverse treeForSha shas
-      traverse (blobForPathInTree path) trees
+      traverse (\t -> blobForPathInTree t path lang) trees
 
 runGit :: FilePath -> [FilePath] -> ReaderT LgRepo IO a -> IO a
 runGit gitDir alternates action = withRepository lgFactory gitDir $ do
@@ -54,8 +54,8 @@ treeForSha sha = do
   commit <- reportGitmon "cat-file" $ lookupCommit obj
   reportGitmon "cat-file" $ lookupTree (commitTree commit)
 
-blobForPathInTree :: (FilePath, Maybe Language) -> Git.Tree LgRepo -> ReaderT LgRepo IO SourceBlob
-blobForPathInTree (path, language) tree = do
+blobForPathInTree :: Git.Tree LgRepo -> FilePath -> Maybe Language -> ReaderT LgRepo IO SourceBlob
+blobForPathInTree tree path language = do
   entry <- reportGitmon "ls-tree" $ treeEntry tree (toS path)
   case entry of
     Just (BlobEntry entryOid entryKind) -> do

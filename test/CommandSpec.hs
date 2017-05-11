@@ -22,11 +22,11 @@ spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      blob <- runCommand (readFile ("semantic-diff.cabal", Nothing))
+      blob <- runCommand (readFile "semantic-diff.cabal" Nothing)
       path blob `shouldBe` "semantic-diff.cabal"
 
     it "returns a nullBlob for absent files" $ do
-      blob <- runCommand (readFile ("this file should not exist", Nothing))
+      blob <- runCommand (readFile "this file should not exist" Nothing)
       nullBlob blob `shouldBe` True
 
   describe "readFilesAtSHA" $ do
