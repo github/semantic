@@ -150,7 +150,7 @@ entrySummary entry = case entry of
           | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 toc :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
-toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
+toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC blobs
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = toS $ case runJoin (path <$> blobs) of
@@ -159,39 +159,8 @@ toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummar
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-diffTOC :: HasDefaultFields fields => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [JSONSummary]
-diffTOC blobs = removeDupes . diffToTOCSummaries >=> toJSONSummaries
-  where
-    removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-    removeDupes = foldl' go []
-      where
-        go xs x | (_, _ : _) <- find exactMatch x xs = xs
-                | (front, TOCSummary _ (Just info) : back) <- find similarMatch x xs =
-                  front <> (x { parentInfo = Just (info { summarizableChangeType = "modified" }) } : back)
-                | otherwise = xs <> [x]
-        find p x = List.break (p x)
-        exactMatch a b = parentInfo a == parentInfo b
-        similarMatch a b = case (parentInfo a, parentInfo b) of
-          (Just (Summarizable catA nameA _ _), Just (Summarizable catB nameB _ _)) -> catA == catB && toLower nameA == toLower nameB
-          (_, _) -> False
-
-    diffToTOCSummaries = para $ \diff -> case diff of
-      Free (Join (_, annotation) :< syntax)
-        | Just identifier <- identifierFor diffSource diffUnwrap syntax ->
-          foldMap (fmap (contextualize (Summarizable (category annotation) identifier (sourceSpan annotation) "modified")) . snd) syntax
-        | otherwise -> foldMap snd syntax
-      Pure patch -> fmap summarize (sequenceA (runBothWith mapPatch (toInfo . source <$> blobs) patch))
-
-    summarize patch = TOCSummary patch (infoCategory >>= summarizable)
-      where DiffInfo{..} = afterOrBefore patch
-            summarizable category = Summarizable category infoName infoSpan (patchType patch) <$ find (category ==) [C.Function, C.Method, C.SingletonMethod]
-
-    contextualize info summary = summary { parentInfo = Just (fromMaybe info (parentInfo summary)) }
-
-    diffSource diff = case runFree diff of
-      Free (Join (_, a) :< r) -> termFSource (source (Both.snd blobs)) (a :< r)
-      Pure a -> termFSource (source (Both.snd blobs)) (runCofree (afterOrBefore a))
-
+diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [JSONSummary]
+diffTOC blobs = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
 toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) syntax) in case syntax of
