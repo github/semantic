@@ -11,7 +11,6 @@ import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import qualified Data.Text as T
 import Data.Functor.Both
-import RWS
 import Data.Record
 import Diff
 import Info
@@ -66,12 +65,7 @@ diffBlobPair decorator blobs = do
                             | nonExistentBlob left -> Just . pure $ Insert b
                             | otherwise -> Just $ runDiff (both a b)
   where
-    runDiff terms = stripDiff (runBothWith diffTerms (fmap decorate (terms `using` parTraversable rdeepseq)))
-    decorate = defaultFeatureVectorDecorator getLabel
-    getLabel :: HasField fields Category => TermF (Syntax Text) (Record fields) a -> (Category, Maybe Text)
-    getLabel (h :< t) = (Info.category h, case t of
-      Leaf s -> Just s
-      _ -> Nothing)
+    runDiff terms = runBothWith diffTerms (terms `using` parTraversable rdeepseq)
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
