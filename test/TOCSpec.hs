@@ -31,6 +31,12 @@ spec = parallel $ do
   describe "tableOfContentsBy" $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (unListableDiff diff :: Diff (Syntax ()) ()) `shouldBe` []
+
+    let entryValue e = case e of { Unchanged a -> a; Changed a -> a ; Patched p -> afterOrBefore p }
+    let diffSize = cata (succ . sum) . fmap (termSize . afterOrBefore)
+    prop "includes all nodes with a constant Just function" $
+      \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryValue <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
+
   describe "diffTOC" $ do
     it "blank if there are no methods" $
       diffTOC blankDiffBlobs blankDiff `shouldBe` [ ]
