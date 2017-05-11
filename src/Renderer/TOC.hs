@@ -30,7 +30,6 @@ import qualified Data.Map as Map hiding (null)
 import Source hiding (null)
 import Syntax as S
 import Term
-import Patch
 
 data JSONSummary = JSONSummary { info :: Summarizable }
                  | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
