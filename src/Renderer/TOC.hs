@@ -157,7 +157,7 @@ entrySummary entry = case entry of
           | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 toc :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
-toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC blobs
+toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = toS $ case runJoin (path <$> blobs) of
@@ -166,8 +166,6 @@ toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummar
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [JSONSummary]
-diffTOC blobs = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 toInfo :: HasDefaultFields fields => Source -> Term (Syntax Text) (Record fields) -> [DiffInfo]
 toInfo source = para $ \ (annotation :< syntax) -> let termName = fromMaybe (textFor source (byteRange annotation)) (identifierFor (termFSource source . runCofree) (Just . tailF . runCofree) syntax) in case syntax of
@@ -204,6 +202,8 @@ toJSONSummaries TOCSummary{..} = case infoCategory of
   Nothing -> [ErrorSummary infoName infoSpan]
   _ -> maybe [] (pure . JSONSummary) parentInfo
   where DiffInfo{..} = afterOrBefore summaryPatch
+diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> [JSONSummary]
+diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Category -> Text
