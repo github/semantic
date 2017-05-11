@@ -9,6 +9,7 @@ module Renderer.TOC
 , declaration
 , declarationAlgebra
 , Entry(..)
+, entryPayload
 , tableOfContentsBy
 , entrySummary
 ) where
@@ -100,6 +101,12 @@ data Entry a
   | Changed a         -- ^ An entry for a node containing changes.
   | Patched (Patch a) -- ^ An entry for a change occurring inside a 'Patch'.
   deriving (Eq, Show)
+
+entryPayload :: Entry a -> a
+entryPayload (Unchanged a) = a
+entryPayload (Changed a) = a
+entryPayload (Patched p) = afterOrBefore p
+
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
 tableOfContentsBy :: Traversable f
