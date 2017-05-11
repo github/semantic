@@ -115,7 +115,9 @@ entrySummary entry = case entry of
   Unchanged _ -> Nothing
   Changed a   -> Just (recordSummary a "modified")
   Patched p   -> Just (recordSummary (afterOrBefore p) (patchType p))
-  where recordSummary record = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
+  where recordSummary record
+          | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
+          | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 toc :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
 toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
