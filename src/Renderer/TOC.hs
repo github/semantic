@@ -114,6 +114,9 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
+dedupe :: [Entry (Record fields)] -> [Entry (Record fields)]
+dedupe = identity
+
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
 entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
@@ -128,7 +131,6 @@ toc :: (HasField fields Category, HasField fields (Maybe Declaration), HasField 
 toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
-        dedupe = identity
         summaryKey = toS $ case runJoin (path <$> blobs) of
           (before, after) | null before -> after
                           | null after -> before
