@@ -35,7 +35,7 @@ spec = parallel $ do
 
     let entryValue e = case e of { Unchanged a -> a; Changed a -> a ; Patched p -> afterOrBefore p }
     let diffSize = cata (succ . sum) . fmap (termSize . afterOrBefore)
-    let lastValue = fromJust . getLast . foldMap (Last . Just)
+    let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
       \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryValue <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
