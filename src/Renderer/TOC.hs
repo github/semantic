@@ -11,6 +11,7 @@ module Renderer.TOC
 , Entry(..)
 , entryPayload
 , tableOfContentsBy
+, dedupe
 , entrySummary
 ) where
 
@@ -121,8 +122,20 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
-dedupe :: [Entry (Record fields)] -> [Entry (Record fields)]
-dedupe = identity
+dedupe :: (HasField fields Category, HasField fields (Maybe Declaration)) => [Entry (Record fields)] -> [Entry (Record fields)]
+dedupe = foldl' go []
+  where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
+                | (front, _ : back) <- find (similarMatch `on` entryPayload) x xs =
+                  front <> (x : back)
+                | otherwise = xs <> [x]
+
+        find p x = List.break (p x)
+        exactMatch = (==) `on` getDeclaration
+        similarMatch a b = sameCategory a b && similarDeclaration a b
+        sameCategory = (==) `on` category
+        similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
+        getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
+        getDeclaration = getField
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
 entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
