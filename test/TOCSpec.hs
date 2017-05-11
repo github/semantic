@@ -6,7 +6,6 @@ import Data.Aeson
 import Category as C
 import Data.Functor.Both
 import Data.Functor.Listable
-import Data.Maybe (fromJust)
 import Data.Record
 import Data.Text.Listable
 import Data.These

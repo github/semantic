@@ -2,14 +2,12 @@
 module DiffSpec where
 
 import Category
-import Data.Bifunctor.Join
 import Data.Functor.Listable
 import RWS
 import Data.String
 import Diff
 import Info
 import Interpreter
-import Patch
 import Prologue
 import SpecHelpers
 import Term
