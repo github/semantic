@@ -21,7 +21,7 @@ diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureV
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = (runAlgorithm (decomposeWith algorithmWithTerms) .) . diff
+diffTerms a b = runAlgorithm (decomposeWith algorithmWithTerms) (diff a b)
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
 runAlgorithm :: forall f result
