@@ -15,6 +15,7 @@ import Interpreter
 import Patch
 import Prologue
 import Source
+import SpecHelpers
 import Syntax
 import Term
 import Test.Hspec (Spec, describe, it, parallel)
@@ -98,6 +99,3 @@ isIndexedOrFixed' syntax = case syntax of
 
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo
-
-unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
-unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff
