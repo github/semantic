@@ -149,9 +149,9 @@ entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), 
 entrySummary entry = case entry of
   Unchanged _ -> Nothing
   Changed a   -> Just (recordSummary a "modified")
-  Deleted a   -> Just (recordSummary a "deleted")
-  Inserted a  -> Just (recordSummary a "inserted")
-  Replaced a  -> Just (recordSummary a "replaced")
+  Deleted a   -> Just (recordSummary a "removed")
+  Inserted a  -> Just (recordSummary a "added")
+  Replaced a  -> Just (recordSummary a "modified")
   where recordSummary record
           | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
           | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
