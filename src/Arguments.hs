@@ -3,14 +3,14 @@
 module Arguments where
 
 import Data.Maybe
+import Language
 import Prelude
 import Prologue
 import Renderer
 import Renderer.SExpression
 import Info
 
-
-data DiffMode = DiffCommits String String [FilePath] | DiffPaths FilePath FilePath
+data DiffMode = DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
   deriving Show
 
 data DiffArguments where
@@ -23,23 +23,25 @@ data DiffArguments where
 
 deriving instance Show DiffArguments
 
-patchDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
+
+patchDiff :: DiffArguments'
 patchDiff = DiffArguments PatchRenderer
 
-jsonDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+jsonDiff :: DiffArguments'
 jsonDiff = DiffArguments JSONDiffRenderer
 
-summaryDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+summaryDiff :: DiffArguments'
 summaryDiff = DiffArguments SummaryRenderer
 
-sExpressionDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+sExpressionDiff :: DiffArguments'
 sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly)
 
-tocDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+tocDiff :: DiffArguments'
 tocDiff = DiffArguments ToCRenderer
 
 
-data ParseMode = ParseCommit String [FilePath] | ParsePaths [FilePath]
+data ParseMode = ParseCommit String [(FilePath, Maybe Language)] | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
 
 data ParseArguments where
@@ -52,10 +54,12 @@ data ParseArguments where
 
 deriving instance Show ParseArguments
 
-sExpressionParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
+type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
+
+sExpressionParseTree :: ParseArguments'
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
-jsonParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
+jsonParseTree :: ParseArguments'
 jsonParseTree = ParseArguments JSONParseTreeRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments

@@ -5,6 +5,7 @@ module Source where
 import qualified Data.ByteString as B
 import Data.String (IsString(..))
 import qualified Data.Text as T
+import Language
 import Numeric
 import Range
 import Prologue
@@ -18,6 +19,7 @@ data SourceBlob = SourceBlob
   , oid :: T.Text -- ^ The Git object ID (SHA-1) of the blob.
   , path :: FilePath -- ^ The file path to the blob.
   , blobKind :: Maybe SourceKind -- ^ The kind of blob, Nothing denotes a blob that doesn't exist (e.g. on one side of a diff for adding a new file or deleting a file).
+  , blobLanguage :: Maybe Language -- ^ The language of this blob. Nothing denotes a langauge we don't support yet.
   } deriving (Show, Eq)
 
 -- | The contents of a source file, represented as a ByteString.
@@ -38,7 +40,7 @@ defaultPlainBlob :: SourceKind
 defaultPlainBlob = PlainBlob 0o100644
 
 emptySourceBlob :: FilePath -> SourceBlob
-emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothing
+emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothing Nothing
 
 nullBlob :: SourceBlob -> Bool
 nullBlob SourceBlob{..} = oid == nullOid || Source.null source
@@ -46,8 +48,8 @@ nullBlob SourceBlob{..} = oid == nullOid || Source.null source
 nonExistentBlob :: SourceBlob -> Bool
 nonExistentBlob SourceBlob{..} = isNothing blobKind
 
-sourceBlob :: Source -> FilePath -> SourceBlob
-sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
+sourceBlob :: FilePath -> Maybe Language -> Source -> SourceBlob
+sourceBlob filepath language source = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob) language
 
 -- | Map blobs with Nothing blobKind to empty blobs.
 idOrEmptySourceBlob :: SourceBlob -> SourceBlob

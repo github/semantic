@@ -32,10 +32,6 @@ import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
 
--- TODO: Shouldn't need to depend on System.FilePath in here, but this is
--- currently the way we do language detection.
-import System.FilePath
-
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
 -- blobs.
@@ -85,7 +81,7 @@ parseBlobs renderer blobs = do
 
 -- | Parse a SourceBlob.
 parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-parseBlob blob@SourceBlob{..} = parserForFilePath path blob
+parseBlob blob@SourceBlob{..} = parserForLanguage blobLanguage blob
 
 -- | Return a parser for a given langauge or the lineByLineParser parser.
 parserForLanguage :: Maybe Language -> Parser (Syntax Text) (Record DefaultFields)
@@ -105,11 +101,6 @@ renderConcurrently :: (Monoid output, StringConv output ByteString) => (a -> b -
 renderConcurrently f diffs = do
   outputs <- Async.mapConcurrently (pure . uncurry f) diffs
   pure $ mconcat (outputs `using` parTraversable rseq)
-
--- | Return a parser based on the FilePath's extension (including the ".").
--- | TODO: Remove this.
-parserForFilePath :: FilePath -> Parser (Syntax Text) (Record DefaultFields)
-parserForFilePath = parserForLanguage . languageForType . toS . takeExtension
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)

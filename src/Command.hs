@@ -17,6 +17,7 @@ import Data.Functor.Both
 import Data.Functor.Classes
 import Data.String
 import Prologue hiding (readFile)
+import Language
 import Source
 import Text.Show
 
@@ -28,13 +29,13 @@ type Command = Freer CommandF
 -- Constructors
 
 -- | Read a file into a SourceBlob.
-readFile :: FilePath -> Command SourceBlob
-readFile path = ReadFile path `Then` return
+readFile :: FilePath -> Maybe Language -> Command SourceBlob
+readFile path lang = ReadFile path lang `Then` return
 
 -- | Read a list of files at the given commit SHA.
 readFilesAtSHA :: FilePath -- ^ GIT_DIR
                 -> [FilePath] -- ^ GIT_ALTERNATE_OBJECT_DIRECTORIES
-                -> [FilePath] -- ^ Specific paths. If empty, return changed paths.
+                -> [(FilePath, Maybe Language)] -- ^ Specific paths. If empty, return changed paths.
                 -> String -- ^ The commit SHA.
                 -> Command [SourceBlob] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
 readFilesAtSHA gitDir alternates paths sha = ReadFilesAtSHA gitDir alternates paths sha `Then` return
@@ -42,7 +43,7 @@ readFilesAtSHA gitDir alternates paths sha = ReadFilesAtSHA gitDir alternates pa
 -- | Read a list of files at the states corresponding to the given shas.
 readFilesAtSHAs :: FilePath -- ^ GIT_DIR
                 -> [FilePath] -- ^ GIT_ALTERNATE_OBJECT_DIRECTORIES
-                -> [FilePath] -- ^ Specific paths. If empty, return changed paths.
+                -> [(FilePath, Maybe Language)] -- ^ Specific paths. If empty, return changed paths.
                 -> Both String -- ^ The commit shas for the before & after states.
                 -> Command [Both SourceBlob] -- ^ A command producing a list of pairs of blobs for the specified files (or all files if none were specified).
 readFilesAtSHAs gitDir alternates paths shas = ReadFilesAtSHAs gitDir alternates paths shas `Then` return
@@ -53,7 +54,7 @@ readFilesAtSHAs gitDir alternates paths shas = ReadFilesAtSHAs gitDir alternates
 -- | Run the passed command and return its results in IO.
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
-  ReadFile path -> Files.readFile path >>= yield
+  ReadFile path lang -> Files.readFile path lang >>= yield
   ReadFilesAtSHA gitDir alternates paths sha -> Git.readFilesAtSHA gitDir alternates paths sha >>= yield
   ReadFilesAtSHAs gitDir alternates paths shas -> Git.readFilesAtSHAs gitDir alternates paths shas >>= yield
   LiftIO io -> io >>= yield
@@ -62,9 +63,9 @@ runCommand = iterFreerA $ \ command yield -> case command of
 -- Implementation details
 
 data CommandF f where
-  ReadFile :: FilePath -> CommandF SourceBlob
-  ReadFilesAtSHA :: FilePath -> [FilePath] -> [FilePath] -> String -> CommandF [SourceBlob]
-  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [FilePath] -> Both String -> CommandF [Both SourceBlob]
+  ReadFile :: FilePath -> Maybe Language -> CommandF SourceBlob
+  ReadFilesAtSHA :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> String -> CommandF [SourceBlob]
+  ReadFilesAtSHAs :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> Both String -> CommandF [Both SourceBlob]
   LiftIO :: IO a -> CommandF a
 
 instance MonadIO Command where
@@ -72,7 +73,7 @@ instance MonadIO Command where
 
 instance Show1 CommandF where
   liftShowsPrec _ _ d command = case command of
-    ReadFile path -> showsUnaryWith showsPrec "ReadFile" d path
+    ReadFile path lang -> showsBinaryWith showsPrec showsPrec "ReadFile" d path lang
     ReadFilesAtSHA gitDir alternates paths sha -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHA" d gitDir alternates paths sha
     ReadFilesAtSHAs gitDir alternates paths shas -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHAs" d gitDir alternates paths shas
     LiftIO _ -> showsUnaryWith (const showChar) "LiftIO" d '_'
