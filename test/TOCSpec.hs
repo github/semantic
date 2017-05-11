@@ -46,7 +46,7 @@ spec = parallel $ do
       \ patch -> let patch' = (unListableF <$> patch :: Patch (Term (Syntax ()) Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` Patched <$> traverse (pure . lastValue) patch'
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (unListableDiff diff :: Diff (Syntax ()) Int) in tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe` if Prologue.null diff' then [Unchanged 0] else replicate (Prologue.length diff') (Changed 1)
+      \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff (Syntax ()) Int])) in tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe` if Prologue.null diff' then [Unchanged 0] else replicate (Prologue.length diff') (Changed 0)
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
