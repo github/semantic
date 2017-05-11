@@ -6,7 +6,6 @@ import Data.Aeson
 import Category as C
 import Data.Functor.Both
 import Data.Functor.Listable
-import RWS
 import Data.Record
 import Data.Text.Listable
 import Diff
@@ -16,11 +15,12 @@ import Patch
 import Prologue hiding (fst, snd)
 import Renderer
 import Renderer.TOC
+import RWS
+import Semantic
 import Source
+import SpecHelpers
 import Syntax as S
 import Term
-import Semantic
-import SpecHelpers
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
