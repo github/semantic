@@ -4,13 +4,17 @@ module SpecHelpers
 , parseFilePath
 , readFileToUnicode
 , parserForFilePath
+, unListableDiff
 ) where
 
 import Data.Functor.Both
+import Data.Functor.Listable
 import Data.Record
+import Diff
 import Info
 import Language
 import Parser
+import Patch
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.Text.ICU.Convert as Convert
@@ -20,6 +24,7 @@ import Semantic
 import Source
 import Syntax
 import System.FilePath
+import Term
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
@@ -60,3 +65,8 @@ readFile :: FilePath -> IO SourceBlob
 readFile path = do
   source <- (Just <$> readFileToUnicode path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
   pure $ fromMaybe (emptySourceBlob path) (flip sourceBlob path <$> source)
+
+
+-- | Extract a 'Diff' from a 'ListableF' enumerated by a property test.
+unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
+unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff

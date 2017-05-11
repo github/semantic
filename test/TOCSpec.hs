@@ -208,8 +208,5 @@ blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :<
 blankDiffBlobs :: Both SourceBlob
 blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
 
-unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
-unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff
-
 instance Listable Text where
   tiers = unListableText `mapT` tiers
