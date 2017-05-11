@@ -107,13 +107,14 @@ tableOfContentsBy :: Traversable f
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . foldMap (these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) . unPatch) . crosswalk (cata termAlgebra))
+tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . foldMap patchEntries . crosswalk (cata termAlgebra))
   where diffAlgebra r = case (selector (first Both.snd r), fold r) of
           (Just a, Nothing) -> Just [Unchanged a]
           (Just a, Just []) -> Just [Changed a]
           (_     , entries) -> entries
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
+        patchEntries = these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) . unPatch
 
 dedupe :: (HasField fields Category, HasField fields (Maybe Declaration)) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = foldl' go []
