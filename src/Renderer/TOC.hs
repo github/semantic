@@ -9,7 +9,6 @@ module Renderer.TOC
 , declaration
 , declarationAlgebra
 , Entry(..)
-, entryPayload
 , tableOfContentsBy
 , dedupe
 , entrySummary
@@ -87,19 +86,12 @@ declarationAlgebra source r = case tailF r of
 
 -- | An entry in a table of contents.
 data Entry a
-  = Unchanged a -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
-  | Changed a   -- ^ An entry for a node containing changes.
-  | Inserted a  -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
-  | Deleted a   -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
-  | Replaced a  -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
+  = Unchanged { entryPayload :: a } -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
+  | Changed   { entryPayload :: a } -- ^ An entry for a node containing changes.
+  | Inserted  { entryPayload :: a } -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
+  | Deleted   { entryPayload :: a } -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
+  | Replaced  { entryPayload :: a } -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
   deriving (Eq, Show)
-
-entryPayload :: Entry a -> a
-entryPayload (Unchanged a) = a
-entryPayload (Changed a) = a
-entryPayload (Inserted a) = a
-entryPayload (Deleted a) = a
-entryPayload (Replaced a) = a
 
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
