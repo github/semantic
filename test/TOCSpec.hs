@@ -107,7 +107,7 @@ spec = parallel $ do
     prop "replacements of methods and functions are summarized" $
       \name body ->
         let diff = programWithReplace name (unListableF body)
-        in numTocSummaries diff `shouldBe` 1
+        in numTocSummaries diff `shouldBe` 2
 
     prop "changes inside methods and functions are summarizied" . forAll (isMeaningfulTerm `filterT` tiers) $
       \body ->
