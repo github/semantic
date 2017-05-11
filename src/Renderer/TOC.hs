@@ -127,8 +127,8 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
 dedupe :: (HasField fields Category, HasField fields (Maybe Declaration)) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = foldl' go []
   where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
-                | (front, _ : back) <- find (similarMatch `on` entryPayload) x xs =
-                  front <> (x : back)
+                | (front, similar : back) <- find (similarMatch `on` entryPayload) x xs =
+                  front <> (similar : back)
                 | otherwise = xs <> [x]
 
         find p x = List.break (p x)
