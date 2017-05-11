@@ -7,7 +7,6 @@ module Patch
 , deleting
 , after
 , before
-, afterOrBefore
 , unPatch
 , patchSum
 , maybeFst
@@ -50,9 +49,6 @@ after = maybeSnd . unPatch
 -- | Return the item from the before side of the patch.
 before :: Patch a -> Maybe a
 before = maybeFst . unPatch
-
-afterOrBefore :: Patch a -> a
-afterOrBefore = mergeThese (flip const) . unPatch
 
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
