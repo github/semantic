@@ -35,11 +35,12 @@ spec = parallel $ do
 
     let entryValue e = case e of { Unchanged a -> a; Changed a -> a ; Patched p -> afterOrBefore p }
     let diffSize = cata (succ . sum) . fmap (termSize . afterOrBefore)
+    let lastValue = fromJust . getLast . foldMap (Last . Just)
     prop "includes all nodes with a constant Just function" $
       \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryValue <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
     prop "produces an unchanged entry for identity diffs" $
-      \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms term' term') `shouldBe` [Unchanged (fromJust (getLast (foldMap (Last . Just) term')))]
+      \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms term' term') `shouldBe` [Unchanged (lastValue term')]
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
