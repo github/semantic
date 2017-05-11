@@ -67,9 +67,8 @@ data Declaration
 -- | Produce the annotations of nodes representing declarations.
 declaration :: (HasField fields (Maybe Declaration), HasField fields Category) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
 declaration (annotation :< syntax)
-  | S.ParseError{} <- syntax            = Just (setCategory annotation C.ParseError)
-  | C.ParseError <- category annotation = Just annotation
-  | otherwise                           = annotation <$ (getField annotation :: Maybe Declaration)
+  | S.ParseError{} <- syntax = Just (setCategory annotation C.ParseError)
+  | otherwise                = annotation <$ (getField annotation :: Maybe Declaration)
 
 
 -- | Compute 'Declaration's for methods and functions.
