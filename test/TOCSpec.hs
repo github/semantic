@@ -6,6 +6,7 @@ import Data.Aeson
 import Category as C
 import Data.Functor.Both
 import Data.Functor.Listable
+import Data.Maybe (fromJust)
 import Data.Record
 import Data.Text.Listable
 import Diff
@@ -36,6 +37,9 @@ spec = parallel $ do
     let diffSize = cata (succ . sum) . fmap (termSize . afterOrBefore)
     prop "includes all nodes with a constant Just function" $
       \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryValue <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
+
+    prop "produces an unchanged entry for identity diffs" $
+      \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms term' term') `shouldBe` [Unchanged (fromJust (getLast (foldMap (Last . Just) term')))]
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
