@@ -35,7 +35,7 @@ spec = parallel $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (unListableDiff diff :: Diff (Syntax ()) ()) `shouldBe` []
 
-    let diffSize = max 1 . sum . fmap (sum . fmap (const 1))
+    let diffSize = max 1 . sum . fmap (const 1)
     let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
       \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
@@ -107,7 +107,7 @@ spec = parallel $ do
     prop "replacements of methods and functions are summarized" $
       \name body ->
         let diff = programWithReplace name (unListableF body)
-        in numTocSummaries diff `shouldBe` 2
+        in numTocSummaries diff `shouldBe` 1
 
     prop "changes inside methods and functions are summarizied" . forAll (isMeaningfulTerm `filterT` tiers) $
       \body ->
