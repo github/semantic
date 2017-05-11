@@ -9,6 +9,7 @@ import RWS
 import Data.Record
 import Data.String
 import Diff
+import Language
 import Renderer.Summary
 import Info
 import Interpreter
@@ -42,7 +43,7 @@ replacementSummary :: DiffSummary DiffInfo
 replacementSummary = DiffSummary { diffSummaryPatch = Replace (LeafInfo StringLiteral "a" $ sourceSpanBetween (1, 2) (1, 4)) (LeafInfo SymbolLiteral "b" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
 
 blobs :: Both SourceBlob
-blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
+blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just JavaScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just JavaScript))
 
 spec :: Spec
 spec = parallel $ do

@@ -9,6 +9,7 @@ import Data.Maybe
 import Data.Record
 import Data.String
 import Info (DefaultFields, HasDefaultFields)
+import Language
 import Prologue hiding (readFile, toList)
 import qualified Data.Vector as V
 import qualified Git.Types as Git
@@ -23,25 +24,25 @@ spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      blob <- runCommand (readFile "semantic-diff.cabal")
+      blob <- runCommand (readFile "semantic-diff.cabal" Nothing)
       path blob `shouldBe` "semantic-diff.cabal"
 
     it "returns a nullBlob for absent files" $ do
-      blob <- runCommand (readFile "this file should not exist")
+      blob <- runCommand (readFile "this file should not exist" Nothing)
       nullBlob blob `shouldBe` True
 
   describe "readFilesAtSHA" $ do
     it "returns blobs for the specified paths" $ do
-      blobs <- runCommand (readFilesAtSHA repoPath [] ["methods.rb"] (Both.snd (shas methodsFixture)))
+      blobs <- runCommand (readFilesAtSHA repoPath [] [("methods.rb", Just Ruby)] (Both.snd (shas methodsFixture)))
       blobs `shouldBe` [methodsBlob]
 
     it "returns emptySourceBlob if path doesn't exist at sha" $ do
-      blobs <- runCommand (readFilesAtSHA repoPath [] ["methods.rb"] (Both.fst (shas methodsFixture)))
+      blobs <- runCommand (readFilesAtSHA repoPath [] [("methods.rb", Just Ruby)] (Both.fst (shas methodsFixture)))
       nonExistentBlob <$> blobs `shouldBe` [True]
 
   describe "readFilesAtSHAs" $ do
     it "returns blobs for the specified paths" $ do
-      blobs <- runCommand (readFilesAtSHAs repoPath [] ["methods.rb"] (shas methodsFixture))
+      blobs <- runCommand (readFilesAtSHAs repoPath [] [("methods.rb", Just Ruby)] (shas methodsFixture))
       blobs `shouldBe` expectedBlobs methodsFixture
 
     it "returns blobs for all paths if none are specified" $ do
@@ -49,18 +50,18 @@ spec = parallel $ do
       blobs `shouldBe` expectedBlobs methodsFixture
 
     it "returns entries for missing paths" $ do
-      blobs <- runCommand (readFilesAtSHAs repoPath [] ["this file should not exist"] (shas methodsFixture))
+      blobs <- runCommand (readFilesAtSHAs repoPath [] [("this file should not exist", Nothing)] (shas methodsFixture))
       let b = emptySourceBlob "this file should not exist"
       blobs `shouldBe` [both b b]
 
   describe "fetchDiffs" $ do
     it "generates diff summaries for two shas" $ do
-      (errors, summaries) <- fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] (const identity) Renderer.SummaryRenderer
+      (errors, summaries) <- fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] (const identity) Renderer.SummaryRenderer
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
 
     it "generates toc summaries for two shas" $ do
-      (errors, summaries) <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] declarationDecorator Renderer.ToCRenderer
+      (errors, summaries) <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] declarationDecorator Renderer.ToCRenderer
       errors `shouldBe` Just (fromList [])
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
@@ -70,22 +71,22 @@ spec = parallel $ do
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
     it "errors with bad shas" $
-      fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dead" "beef" ["methods.rb"] (const identity) Renderer.SummaryRenderer
+      fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dead" "beef" [("methods.rb", Just Ruby)] (const identity) Renderer.SummaryRenderer
         `shouldThrow` (== Git.BackendError "Could not lookup dead: Object not found - no match for prefix (dead000000000000000000000000000000000000)")
 
     it "errors with bad repo path" $
-      fetchDiffsOutput summaryText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" ["methods.rb"] (const identity) Renderer.SummaryRenderer
+      fetchDiffsOutput summaryText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] (const identity) Renderer.SummaryRenderer
         `shouldThrow` errorCall "Could not open repository \"test/fixtures/git/examples/not-a-repo.git\""
 
   where repoPath = "test/fixtures/git/examples/all-languages.git"
         methodsFixture = Fixture
           (both "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe")
           [ both (emptySourceBlob "methods.rb") methodsBlob ]
-        methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob)
+        methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)
 
 data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
 
-fetchDiffsOutput :: (HasDefaultFields fields, NFData (Record fields)) => (Object -> Text) -> FilePath -> String -> String -> [FilePath] -> (Source -> SyntaxTerm Text DefaultFields -> SyntaxTerm Text fields) -> DiffRenderer fields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
+fetchDiffsOutput :: (HasDefaultFields fields, NFData (Record fields)) => (Object -> Text) -> FilePath -> String -> String -> [(FilePath, Maybe Language)] -> (Source -> SyntaxTerm Text DefaultFields -> SyntaxTerm Text fields) -> DiffRenderer fields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f gitDir sha1 sha2 filePaths decorator renderer = do
   blobs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
   results <- Semantic.diffBlobPairs decorator renderer blobs

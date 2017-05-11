@@ -3,6 +3,7 @@ module SemanticCmdLine (main, runDiff, runParse) where
 
 import Arguments
 import Command
+import Command.Files (languageForFilePath)
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.String
@@ -47,14 +48,14 @@ main = do
 runDiff :: DiffArguments -> IO ByteString
 runDiff DiffArguments{..} = do
   blobs <- runCommand $ case diffMode of
-   DiffPaths a b -> pure <$> traverse readFile (both a b)
+   DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
    DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
   Semantic.diffBlobPairs termDecorator diffRenderer blobs
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do
   blobs <- runCommand $ case parseMode of
-    ParsePaths paths -> traverse readFile paths
+    ParsePaths paths -> traverse (uncurry readFile) paths
     ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
   Semantic.parseBlobs parseTreeRenderer blobs
 
@@ -79,12 +80,12 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
            <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
            <|> flag' tocDiff (long "toc" <> help "Output a table of contents diff summary") )
          <*> (  DiffPaths
-               <$> argument str (metavar "FILE_A")
-               <*> argument str (metavar "FILE_B")
+               <$> argument filePathReader (metavar "FILE_A")
+               <*> argument filePathReader (metavar "FILE_B")
             <|> DiffCommits
                <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
                <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
-               <*> many (argument str (metavar "FILES...")) )
+               <*> many (argument filePathReader (metavar "FILES...")) )
          <*> pure gitDir
          <*> pure alternates )
 
@@ -93,10 +94,10 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
       <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
            <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees") )
          <*> (  ParsePaths
-               <$> some (argument str (metavar "FILES..."))
+               <$> some (argument filePathReader (metavar "FILES..."))
             <|> ParseCommit
                <$> option (eitherReader parseSha) (long "sha" <> metavar "SHA" <> help "Commit SHA")
-               <*> some (argument str (metavar "FILES...")) )
+               <*> some (argument filePathReader (metavar "FILES...")) )
          <*> pure gitDir
          <*> pure alternates )
 
@@ -105,3 +106,10 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
       Just [sha] -> Right sha
       _ -> Left $ s <> " is not a valid SHA-1"
       where regex = mkRegexWithOpts "([0-9a-f]{40})" True False
+
+    filePathReader = eitherReader parseFilePath
+    parseFilePath arg = case splitWhen (== ':') arg of
+        [a, b] | Just lang <- readMaybe a -> Right (b, Just lang)
+               | Just lang <- readMaybe b -> Right (a, Just lang)
+        [path] -> Right (path, languageForFilePath path)
+        _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")

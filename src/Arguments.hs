@@ -6,6 +6,7 @@ import Data.Maybe
 import Data.Record
 import Data.String
 import Info
+import Language
 import Prologue
 import Renderer
 import Source
@@ -13,8 +14,7 @@ import Syntax
 import Term
 import Text.Show
 
-
-data DiffMode = DiffCommits String String [FilePath] | DiffPaths FilePath FilePath
+data DiffMode = DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
   deriving Show
 
 data DiffArguments where
@@ -34,23 +34,25 @@ instance Show DiffArguments where
                    , showString "gitDir " . shows gitDir
                    , showString "alternateObjectDirs " . shows alternateObjectDirs ]
 
-patchDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
+
+patchDiff :: DiffArguments'
 patchDiff = DiffArguments PatchRenderer (const identity)
 
-jsonDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+jsonDiff :: DiffArguments'
 jsonDiff = DiffArguments JSONDiffRenderer (const identity)
 
-summaryDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+summaryDiff :: DiffArguments'
 summaryDiff = DiffArguments SummaryRenderer (const identity)
 
-sExpressionDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+sExpressionDiff :: DiffArguments'
 sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) (const identity)
 
-tocDiff :: DiffMode -> FilePath -> [FilePath] -> DiffArguments
+tocDiff :: DiffArguments'
 tocDiff = DiffArguments ToCRenderer declarationDecorator
 
 
-data ParseMode = ParseCommit String [FilePath] | ParsePaths [FilePath]
+data ParseMode = ParseCommit String [(FilePath, Maybe Language)] | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
 
 data ParseArguments where
@@ -63,10 +65,12 @@ data ParseArguments where
 
 deriving instance Show ParseArguments
 
-sExpressionParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
+type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
+
+sExpressionParseTree :: ParseArguments'
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
-jsonParseTree :: ParseMode -> FilePath -> [FilePath] -> ParseArguments
+jsonParseTree :: ParseArguments'
 jsonParseTree = ParseArguments JSONParseTreeRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
