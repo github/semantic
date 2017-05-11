@@ -13,7 +13,6 @@ module Patch
 , maybeFst
 , maybeSnd
 , mapPatch
-, patchType
 ) where
 
 import Data.Align
@@ -78,11 +77,6 @@ maybeFst = these Just (const Nothing) ((Just .) . const)
 maybeSnd :: These a b -> Maybe b
 maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
-patchType :: Patch a -> Text
-patchType patch = case patch of
-  Replace{} -> "modified"
-  Insert{} -> "added"
-  Delete{} -> "removed"
 
 -- Instances
 
