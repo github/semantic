@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, TypeOperators #-}
 module TOCSpec where
 
 import Data.Aeson
@@ -142,8 +142,8 @@ spec = parallel $ do
       output <- diffBlobPairs declarationDecorator ToCRenderer [blobs]
       output `shouldBe` "{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n"
 
-type Diff' = SyntaxDiff Text DefaultFields
-type Term' = SyntaxTerm Text DefaultFields
+type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
+type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = Prologue.length $ filter isValidSummary (diffTOC blankDiffBlobs diff)
@@ -152,15 +152,15 @@ numTocSummaries diff = Prologue.length $ filter isValidSummary (diffTOC blankDif
 programWithChange :: Term' -> Diff'
 programWithChange body = wrap (pure programInfo :< Indexed [ function' ])
   where
-    function' = wrap (pure functionInfo :< S.Function name' [] [ inserting body ] )
-    name' = wrap (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    function' = wrap (pure (Just (FunctionDeclaration "foo") :. functionInfo) :< S.Function name' [] [ inserting body ] )
+    name' = wrap (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = wrap (pure programInfo :< Indexed [ function', term' ])
   where
-    function' = wrap (pure functionInfo :< S.Function name' [] [] )
-    name' = wrap (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    function' = wrap (pure (Just (FunctionDeclaration "foo") :. functionInfo) :< S.Function name' [] [] )
+    name' = wrap (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -176,18 +176,18 @@ programOf :: Diff' -> Diff'
 programOf diff = wrap (pure programInfo :< Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = cofree $ functionInfo :< S.Function name' [] [body]
+functionOf name body = cofree $ (Just (FunctionDeclaration name) :. functionInfo) :< S.Function name' [] [body]
   where
-    name' = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
+    name' = cofree $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
 
-programInfo :: Record DefaultFields
-programInfo = Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
+programInfo :: Record (Maybe Declaration ': DefaultFields)
+programInfo = Nothing :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 functionInfo :: Record DefaultFields
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
-isMeaningfulTerm :: ListableF (Term (Syntax leaf)) (Record DefaultFields) -> Bool
+isMeaningfulTerm :: ListableF (Term (Syntax leaf)) a -> Bool
 isMeaningfulTerm a = case runCofree (unListableF a) of
   (_ :< S.Indexed _) -> False
   (_ :< S.Fixed _) -> False
@@ -196,7 +196,7 @@ isMeaningfulTerm a = case runCofree (unListableF a) of
   _ -> True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
-isMethodOrFunction :: ListableF (Term (Syntax leaf)) (Record DefaultFields) -> Bool
+isMethodOrFunction :: HasField fields Category => ListableF (Term (Syntax leaf)) (Record fields) -> Bool
 isMethodOrFunction a = case runCofree (unListableF a) of
   (_ :< S.Method{}) -> True
   (_ :< S.Function{}) -> True
@@ -211,11 +211,11 @@ blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
-blankDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
+blankDiff :: Diff'
 blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :< Leaf "\"a\"") ])
   where
-    arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
-    literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
+    arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
+    literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both SourceBlob
 blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just JavaScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just JavaScript))
