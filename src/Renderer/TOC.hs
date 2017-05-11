@@ -20,7 +20,9 @@ import Data.Aeson
 import Data.Align (crosswalk)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
+import Data.Functor.Listable
 import Data.Text (toLower)
+import Data.Text.Listable
 import Data.Record
 import Diff
 import Info
@@ -232,3 +234,9 @@ toCategoryName :: Category -> Text
 toCategoryName category = case category of
   C.SingletonMethod -> "Method"
   c -> show c
+
+instance Listable Declaration where
+  tiers
+    =  cons1 (MethodDeclaration . unListableText)
+    \/ cons1 (FunctionDeclaration . unListableText)
+    \/ cons1 (ErrorDeclaration . unListableText)
