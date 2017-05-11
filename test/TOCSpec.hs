@@ -9,6 +9,7 @@ import Data.Functor.Listable
 import Data.Maybe (fromJust)
 import Data.Record
 import Data.Text.Listable
+import Data.These
 import Diff
 import Info
 import Interpreter
@@ -42,8 +43,8 @@ spec = parallel $ do
     prop "produces an unchanged entry for identity diffs" $
       \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms term' term') `shouldBe` [Unchanged (lastValue term')]
 
-    prop "produces patched entries for relevant nodes within patches" $
-      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term (Syntax ()) Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` Patched <$> traverse (pure . lastValue) patch'
+    prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
+      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term (Syntax ()) Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff (Syntax ()) Int])) in
