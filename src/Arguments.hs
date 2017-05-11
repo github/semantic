@@ -23,21 +23,21 @@ data DiffArguments where
 
 deriving instance Show DiffArguments
 
-type Differ' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
+type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
 
-patchDiff :: Differ'
+patchDiff :: DiffArguments'
 patchDiff = DiffArguments PatchRenderer
 
-jsonDiff :: Differ'
+jsonDiff :: DiffArguments'
 jsonDiff = DiffArguments JSONDiffRenderer
 
-summaryDiff :: Differ'
+summaryDiff :: DiffArguments'
 summaryDiff = DiffArguments SummaryRenderer
 
-sExpressionDiff :: Differ'
+sExpressionDiff :: DiffArguments'
 sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly)
 
-tocDiff :: Differ'
+tocDiff :: DiffArguments'
 tocDiff = DiffArguments ToCRenderer
 
 
@@ -54,12 +54,12 @@ data ParseArguments where
 
 deriving instance Show ParseArguments
 
-type Parser' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
+type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
 
-sExpressionParseTree :: Parser'
+sExpressionParseTree :: ParseArguments'
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
-jsonParseTree :: Parser'
+jsonParseTree :: ParseArguments'
 jsonParseTree = ParseArguments JSONParseTreeRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
