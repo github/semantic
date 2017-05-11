@@ -68,6 +68,7 @@ data Summarizable
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: Text }
   | FunctionDeclaration { declarationIdentifier :: Text }
+  | ErrorDeclaration    { declarationIdentifier :: Text }
   deriving (Eq, Generic, NFData, Show)
 
 -- | Produce the annotations of nodes representing declarations.
@@ -87,6 +88,7 @@ declarationAlgebra source r = case tailF r of
     | S.Indexed [receiverParams] <- unwrap receiver
     , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
     | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
+  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange (headF r)) source))
   _ -> Nothing
   where getSource = toText . flip Source.slice source . byteRange . extract
 
