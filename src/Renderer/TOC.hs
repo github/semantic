@@ -23,6 +23,7 @@ import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
 import Data.Text (toLower)
 import Data.Text.Listable
+import Data.These
 import Data.Record
 import Diff
 import Info
@@ -100,15 +101,19 @@ declarationAlgebra source r = case tailF r of
 
 -- | An entry in a table of contents.
 data Entry a
-  = Unchanged a       -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
-  | Changed a         -- ^ An entry for a node containing changes.
-  | Patched (Patch a) -- ^ An entry for a change occurring inside a 'Patch'.
+  = Unchanged a -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
+  | Changed a   -- ^ An entry for a node containing changes.
+  | Inserted a  -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
+  | Deleted a   -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
+  | Replaced a  -- ^ An entry for a change occurring inside a 'Replace' 'Patch'.
   deriving (Eq, Show)
 
 entryPayload :: Entry a -> a
 entryPayload (Unchanged a) = a
 entryPayload (Changed a) = a
-entryPayload (Patched p) = afterOrBefore p
+entryPayload (Inserted a) = a
+entryPayload (Deleted a) = a
+entryPayload (Replaced a) = a
 
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
@@ -116,7 +121,7 @@ tableOfContentsBy :: Traversable f
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap Patched . crosswalk (cata termAlgebra))
+tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . foldMap (these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) . unPatch) . crosswalk (cata termAlgebra))
   where diffAlgebra r = case (selector (first Both.snd r), fold r) of
           (Just a, Nothing) -> Just [Unchanged a]
           (Just a, Just []) -> Just [Changed a]
@@ -144,7 +149,9 @@ entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), 
 entrySummary entry = case entry of
   Unchanged _ -> Nothing
   Changed a   -> Just (recordSummary a "modified")
-  Patched p   -> Just (recordSummary (afterOrBefore p) (patchType p))
+  Deleted a   -> Just (recordSummary a "deleted")
+  Inserted a  -> Just (recordSummary a "inserted")
+  Replaced a  -> Just (recordSummary a "replaced")
   where recordSummary record
           | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
           | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
