@@ -51,6 +51,8 @@ library
                      , Language.Ruby.Syntax
                      , Language.TypeScript
                      , Language.TypeScript.Syntax
+                     , Language.Python
+                     , Language.Python.Syntax
                      , Parser
                      , Patch
                      , Paths_semantic_diff
@@ -123,6 +125,7 @@ library
                      , ruby
                      , javascript
                      , typescript
+                     , python
                      , network
                      , clock
                      , yaml
