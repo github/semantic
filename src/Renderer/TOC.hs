@@ -91,7 +91,7 @@ data Entry a
   | Changed a   -- ^ An entry for a node containing changes.
   | Inserted a  -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
   | Deleted a   -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
-  | Replaced a  -- ^ An entry for a change occurring inside a 'Replace' 'Patch'.
+  | Replaced a  -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
   deriving (Eq, Show)
 
 entryPayload :: Entry a -> a
@@ -107,14 +107,14 @@ tableOfContentsBy :: Traversable f
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . foldMap patchEntries . crosswalk (cata termAlgebra))
+tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap patchEntry . crosswalk (cata termAlgebra))
   where diffAlgebra r = case (selector (first Both.snd r), fold r) of
           (Just a, Nothing) -> Just [Unchanged a]
           (Just a, Just []) -> Just [Changed a]
           (_     , entries) -> entries
         termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
-        patchEntries = these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) . unPatch
+        patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
 dedupe :: (HasField fields Category, HasField fields (Maybe Declaration)) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = foldl' go []
