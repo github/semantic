@@ -133,7 +133,7 @@ dedupe :: (HasField fields Category, HasField fields (Maybe Declaration)) => [En
 dedupe = foldl' go []
   where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
                 | (front, similar : back) <- find (similarMatch `on` entryPayload) x xs =
-                  front <> (similar : back)
+                  front <> (Replaced (entryPayload similar) : back)
                 | otherwise = xs <> [x]
 
         find p x = List.break (p x)
