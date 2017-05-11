@@ -161,16 +161,16 @@ programWithChangeOutsideFunction term = wrap (pure programInfo :< Indexed [ func
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
-programWithInsert name body = programOf $ Insert (functionOf name body)
+programWithInsert name body = programOf $ inserting (functionOf name body)
 
 programWithDelete :: Text -> Term' -> Diff'
-programWithDelete name body = programOf $ Delete (functionOf name body)
+programWithDelete name body = programOf $ deleting (functionOf name body)
 
 programWithReplace :: Text -> Term' -> Diff'
-programWithReplace name body = programOf $ Replace (functionOf name body) (functionOf (name <> "2") body)
+programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
 
-programOf :: Patch Term' -> Diff'
-programOf patch = wrap (pure programInfo :< Indexed [ pure patch ])
+programOf :: Diff' -> Diff'
+programOf diff = wrap (pure programInfo :< Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
 functionOf name body = cofree $ functionInfo :< S.Function name' [] [body]
