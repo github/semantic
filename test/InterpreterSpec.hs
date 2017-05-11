@@ -2,14 +2,11 @@
 module InterpreterSpec where
 
 import Category
-import Data.Array
 import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
-import RWS
 import Data.Record
 import Data.String
 import Diff
-import Info
 import Interpreter
 import Patch
 import Prologue

@@ -10,13 +10,10 @@ module SpecHelpers
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Listable
-import Data.Record
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Diff
-import Info
 import Language
-import Parser
 import Patch
 import Prologue hiding (readFile)
 import Renderer
