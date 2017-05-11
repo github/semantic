@@ -42,6 +42,9 @@ spec = parallel $ do
     prop "produces an unchanged entry for identity diffs" $
       \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms term' term') `shouldBe` [Unchanged (lastValue term')]
 
+    prop "produces patched entries for relevant nodes within patches" $
+      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term (Syntax ()) Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` Patched <$> traverse (pure . lastValue) patch'
+
   describe "diffTOC" $ do
     it "blank if there are no methods" $
       diffTOC blankDiffBlobs blankDiff `shouldBe` [ ]
