@@ -38,6 +38,7 @@ statement :: Assignment (Node Grammar) (Term Syntax Location)
 statement = expressionStatement
           <|> ifStatement
           <|> importStatement
+          <|> importFromStatement
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
@@ -49,6 +50,9 @@ expressionStatement = symbol ExpressionStatement *> children boolean
 
 importStatement :: Assignment (Node Grammar) (Term Syntax Location)
 importStatement = makeTerm <$ symbol ImportStatement <*> location <*> (Statement.Import <$> source)
+
+importFromStatement :: Assignment (Node Grammar) (Term Syntax Location)
+importFromStatement = makeTerm <$ symbol ImportFromStatement <*> location <*> (Statement.Import <$> source)
 
 
 ifStatement :: Assignment (Node Grammar) (Term Syntax Location)
