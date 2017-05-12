@@ -20,6 +20,7 @@ type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
    , Literal.Boolean
+   , Literal.String
    , Statement.If
    , Statement.Import
    , Syntax.Empty
@@ -28,7 +29,8 @@ type Syntax' =
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment (Node Grammar) [Term Syntax Location]
 assignment = symbol Module *> children (many (comment
-                                            <|> statement))
+                                            <|> statement
+                                            <|> literal))
 
 
 statement :: Assignment (Node Grammar) (Term Syntax Location)
@@ -37,12 +39,18 @@ statement = expressionStatement
           <|> importStatement
           <|> importFromStatement
 
+literal :: Assignment (Node Grammar) (Term Syntax Location)
+literal = string
+
+string :: Assignment (Node Grammar) (Term Syntax Location)
+string = makeTerm <$ symbol String <*> location <*> (Syntax.Empty <$ source)
+
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
 
 
 expressionStatement :: Assignment (Node Grammar) (Term Syntax Location)
-expressionStatement = symbol ExpressionStatement *> children boolean
+expressionStatement = symbol ExpressionStatement *> children (statement <|> literal)
 
 
 -- TODO Possibly match against children for dotted name and identifiers
