@@ -72,8 +72,8 @@ ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statemen
 
 
 boolean :: Assignment (Node Grammar) (Term Syntax Location)
-boolean =   makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
-        <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
+boolean =  makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
+       <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
 
 
 makeTerm :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
