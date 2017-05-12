@@ -155,6 +155,9 @@ leaf s f = (\ a -> cofree . (a :<) . inj . f) <$ symbol s <*> location <*> sourc
 optional :: Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
 optional a = a <|> term <*> pure Syntax.Empty
 
+emptyTerm :: Assignment (Node Grammar) (Term Syntax Location)
+emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+
 
 -- | An F-algebra on some carrier functor 'f'.
 type FAlgebra f a = f a -> a
