@@ -11,8 +11,9 @@ import Data.String
 import Diff
 import Info
 import Interpreter
+import Language
 import Patch
-import Prologue hiding (fst, snd)
+import Prologue hiding (fst, snd, readFile)
 import Renderer
 import Renderer.TOC
 import Source
@@ -111,12 +112,12 @@ spec = parallel $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       output <- diffBlobPairs ToCRenderer [blobs]
-      output `shouldBe` "{\"changes\":{\"ruby/methods.A.rb -> ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n"
+      output `shouldBe` "{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n"
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
       output <- diffBlobPairs ToCRenderer [blobs]
-      output `shouldBe` "{\"changes\":{},\"errors\":{\"ruby/methods.A.rb -> ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n"
+      output `shouldBe` "{\"changes\":{},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n"
 
 type Diff' = SyntaxDiff String DefaultFields
 type Term' = SyntaxTerm String DefaultFields
@@ -182,9 +183,7 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   _ -> False
 
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
-blobsForPaths paths = do
-  sources <- traverse (readFileToUnicode . ("test/fixtures/toc/" <>)) paths
-  pure $ SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
+blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
@@ -196,7 +195,7 @@ blankDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree
     literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both SourceBlob
-blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
+blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just JavaScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just JavaScript))
 
 unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
 unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff

@@ -4,7 +4,7 @@ module Info
 , HasDefaultFields
 , Range(..)
 , byteRange
-, setCharacterRange
+, setByteRange
 , Category(..)
 , category
 , setCategory
@@ -36,8 +36,8 @@ newtype SourceText = SourceText { unText :: Text }
 byteRange :: HasField fields Range => Record fields -> Range
 byteRange = getField
 
-setCharacterRange :: HasField fields Range => Record fields -> Range -> Record fields
-setCharacterRange = setField
+setByteRange :: HasField fields Range => Record fields -> Range -> Record fields
+setByteRange = setField
 
 category :: HasField fields Category => Record fields -> Category
 category = getField
