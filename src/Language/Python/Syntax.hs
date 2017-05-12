@@ -48,9 +48,11 @@ expressionStatement :: Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children boolean
 
 
+-- TODO Possibly match against children for dotted name and identifiers
 importStatement :: Assignment (Node Grammar) (Term Syntax Location)
 importStatement = makeTerm <$ symbol ImportStatement <*> location <*> (Statement.Import <$> source)
 
+-- TODO Possibly match against children nodes
 importFromStatement :: Assignment (Node Grammar) (Term Syntax Location)
 importFromStatement = makeTerm <$ symbol ImportFromStatement <*> location <*> (Statement.Import <$> source)
 
