@@ -2,15 +2,14 @@
 module DiffSpec where
 
 import Category
-import Data.Bifunctor.Join
 import Data.Functor.Listable
 import RWS
 import Data.String
 import Diff
 import Info
 import Interpreter
-import Patch
 import Prologue
+import SpecHelpers
 import Term
 import Test.Hspec
 import Test.Hspec.LeanCheck
@@ -35,6 +34,3 @@ spec = parallel $ do
     prop "recovers the after term" $
       \ a b -> let diff = stripDiff $ diffTerms (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
         afterTerm diff `shouldBe` Just (unListableF b)
-
-unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
-unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff

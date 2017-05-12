@@ -1,13 +1,14 @@
-{-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE DataKinds, TypeOperators #-}
 module TOCSpec where
 
 import Data.Aeson
 import Category as C
 import Data.Functor.Both
 import Data.Functor.Listable
-import RWS
 import Data.Record
-import Data.String
+import Data.Text.Listable
+import Data.These
 import Diff
 import Info
 import Interpreter
@@ -16,11 +17,12 @@ import Patch
 import Prologue hiding (fst, snd, readFile)
 import Renderer
 import Renderer.TOC
+import RWS
+import Semantic
 import Source
+import SpecHelpers
 import Syntax as S
 import Term
-import Semantic
-import SpecHelpers
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
@@ -28,46 +30,67 @@ import Test.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
+  describe "tableOfContentsBy" $ do
+    prop "drops all nodes with the constant Nothing function" $
+      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (unListableDiff diff :: Diff (Syntax ()) ()) `shouldBe` []
+
+    let diffSize = max 1 . sum . fmap (const 1)
+    let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
+    prop "includes all nodes with a constant Just function" $
+      \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
+
+    prop "produces an unchanged entry for identity diffs" $
+      \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms term' term') `shouldBe` [Unchanged (lastValue term')]
+
+    prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
+      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term (Syntax ()) Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
+
+    prop "produces changed entries for relevant nodes containing irrelevant patches" $
+      \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff (Syntax ()) Int])) in
+        tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
+        if Prologue.null diff' then [Unchanged 0]
+                               else replicate (Prologue.length diff') (Changed 0)
+
   describe "diffTOC" $ do
     it "blank if there are no methods" $
-      diffTOC blankDiffBlobs blankDiff `shouldBe` [ ]
+      diffTOC blankDiff `shouldBe` [ ]
 
     it "summarizes changed methods" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      Just diff <- diffBlobPair sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe`
+      Just diff <- diffBlobPair declarationDecorator sourceBlobs
+      diffTOC diff `shouldBe`
         [ JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
-        , JSONSummary $ InSummarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4))
+        , JSONSummary $ Summarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
         , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
-      Just diff <- diffBlobPair sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe`
-        [ JSONSummary $ InSummarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) ]
+      Just diff <- diffBlobPair declarationDecorator sourceBlobs
+      diffTOC diff `shouldBe`
+        [ JSONSummary $ Summarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
-      Just diff <- diffBlobPair sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe`
+      Just diff <- diffBlobPair declarationDecorator sourceBlobs
+      diffTOC diff `shouldBe`
         [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
-      Just diff <- diffBlobPair sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe`
+      Just diff <- diffBlobPair declarationDecorator sourceBlobs
+      diffTOC diff `shouldBe`
         [ JSONSummary $ Summarizable C.Method "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
-      Just diff <- diffBlobPair sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe`
-        [ JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) ]
+      Just diff <- diffBlobPair declarationDecorator sourceBlobs
+      diffTOC diff `shouldBe`
+        [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
-      Just diff <- diffBlobPair sourceBlobs
-      diffTOC sourceBlobs diff `shouldBe`
+      Just diff <- diffBlobPair declarationDecorator sourceBlobs
+      diffTOC diff `shouldBe`
         [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
     prop "inserts of methods and functions are summarized" $
@@ -97,11 +120,11 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
-        diffTOC blankDiffBlobs (diffTerms term term) `shouldBe` []
+        diffTOC (diffTerms term term) `shouldBe` []
 
   describe "JSONSummary" $ do
     it "encodes InSummarizable to JSON" $ do
-      let summary = JSONSummary $ InSummarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4))
+      let summary = JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
 
     it "encodes Summarizable to JSON" $ do
@@ -111,60 +134,60 @@ spec = parallel $ do
   describe "diff with ToCRenderer" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      output <- diffBlobPairs ToCRenderer [blobs]
+      output <- diffBlobPairs declarationDecorator ToCRenderer [blobs]
       output `shouldBe` "{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n"
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
-      output <- diffBlobPairs ToCRenderer [blobs]
-      output `shouldBe` "{\"changes\":{},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n"
+      output <- diffBlobPairs declarationDecorator ToCRenderer [blobs]
+      output `shouldBe` "{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n"
 
-type Diff' = SyntaxDiff String DefaultFields
-type Term' = SyntaxTerm String DefaultFields
+type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
+type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)
 
 numTocSummaries :: Diff' -> Int
-numTocSummaries diff = Prologue.length $ filter (not . isErrorSummary) (diffTOC blankDiffBlobs diff)
+numTocSummaries diff = Prologue.length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
-programWithChange body = free $ Free (pure programInfo :< Indexed [ function' ])
+programWithChange body = wrap (pure programInfo :< Indexed [ function' ])
   where
-    function' = free $ Free (pure functionInfo :< S.Function name' [] [ free $ Pure (Insert body) ] )
-    name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    function' = wrap (pure (Just (FunctionDeclaration "foo") :. functionInfo) :< S.Function name' [] [ inserting body ] )
+    name' = wrap (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
-programWithChangeOutsideFunction term = free $ Free (pure programInfo :< Indexed [ function', term' ])
+programWithChangeOutsideFunction term = wrap (pure programInfo :< Indexed [ function', term' ])
   where
-    function' = free $ Free (pure functionInfo :< S.Function name' [] [] )
-    name' = free $ Free (pure (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
-    term' = free $ Pure (Insert term)
+    function' = wrap (pure (Just (FunctionDeclaration "foo") :. functionInfo) :< S.Function name' [] [] )
+    name' = wrap (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    term' = inserting term
 
-programWithInsert :: String -> Term' -> Diff'
-programWithInsert name body = programOf $ Insert (functionOf name body)
+programWithInsert :: Text -> Term' -> Diff'
+programWithInsert name body = programOf $ inserting (functionOf name body)
 
-programWithDelete :: String -> Term' -> Diff'
-programWithDelete name body = programOf $ Delete (functionOf name body)
+programWithDelete :: Text -> Term' -> Diff'
+programWithDelete name body = programOf $ deleting (functionOf name body)
 
-programWithReplace :: String -> Term' -> Diff'
-programWithReplace name body = programOf $ Replace (functionOf name body) (functionOf (name <> "2") body)
+programWithReplace :: Text -> Term' -> Diff'
+programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
 
-programOf :: Patch Term' -> Diff'
-programOf patch = free $ Free (pure programInfo :< Indexed [ free $ Pure patch ])
+programOf :: Diff' -> Diff'
+programOf diff = wrap (pure programInfo :< Indexed [ diff ])
 
-functionOf :: String -> Term' -> Term'
-functionOf name body = cofree $ functionInfo :< S.Function name' [] [body]
+functionOf :: Text -> Term' -> Term'
+functionOf name body = cofree $ (Just (FunctionDeclaration name) :. functionInfo) :< S.Function name' [] [body]
   where
-    name' = cofree $ (Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
+    name' = cofree $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
 
-programInfo :: Record DefaultFields
-programInfo = Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
+programInfo :: Record (Maybe Declaration ': DefaultFields)
+programInfo = Nothing :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 functionInfo :: Record DefaultFields
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
-isMeaningfulTerm :: ListableF (Term (Syntax leaf)) (Record DefaultFields) -> Bool
+isMeaningfulTerm :: ListableF (Term (Syntax leaf)) a -> Bool
 isMeaningfulTerm a = case runCofree (unListableF a) of
   (_ :< S.Indexed _) -> False
   (_ :< S.Fixed _) -> False
@@ -173,7 +196,7 @@ isMeaningfulTerm a = case runCofree (unListableF a) of
   _ -> True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
-isMethodOrFunction :: ListableF (Term (Syntax leaf)) (Record DefaultFields) -> Bool
+isMethodOrFunction :: HasField fields Category => ListableF (Term (Syntax leaf)) (Record fields) -> Bool
 isMethodOrFunction a = case runCofree (unListableF a) of
   (_ :< S.Method{}) -> True
   (_ :< S.Function{}) -> True
@@ -188,14 +211,14 @@ blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
-blankDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
-blankDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
+blankDiff :: Diff'
+blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :< Leaf "\"a\"") ])
   where
-    arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
-    literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
+    arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
+    literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both SourceBlob
 blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just JavaScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just JavaScript))
 
-unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
-unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff
+instance Listable Text where
+  tiers = unListableText `mapT` tiers
