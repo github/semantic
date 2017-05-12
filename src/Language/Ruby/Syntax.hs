@@ -106,16 +106,16 @@ if' =  ifElsif If
   where ifElsif s = makeTerm <$ symbol s <*> location <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$ symbol Else <*> location <*> children (many statement))))
 
 unless :: Assignment (Node Grammar) (Term Syntax Location)
-unless =  makeTerm <$ symbol Unless         <*> location <*> children      (Statement.If <$> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$ symbol Else <*> location <*> children (many statement))))
-      <|> makeTerm <$ symbol UnlessModifier <*> location <*> children (flip Statement.If <$> statement <*> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> (makeTerm <$> location <*> pure Syntax.Empty))
+unless =  makeTerm <$ symbol Unless         <*> location <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$ symbol Else <*> location <*> children (many statement))))
+      <|> makeTerm <$ symbol UnlessModifier <*> location <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
 
 while :: Assignment (Node Grammar) (Term Syntax Location)
 while =  makeTerm <$ symbol While         <*> location <*> children      (Statement.While <$> statement <*> statements)
      <|> makeTerm <$ symbol WhileModifier <*> location <*> children (flip Statement.While <$> statement <*> statement)
 
 until :: Assignment (Node Grammar) (Term Syntax Location)
-until =  makeTerm <$ symbol Until         <*> location <*> children      (Statement.While <$> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> statements)
-     <|> makeTerm <$ symbol UntilModifier <*> location <*> children (flip Statement.While <$> statement <*> (makeTerm <$> location <*> (Expression.Not <$> statement)))
+until =  makeTerm <$ symbol Until         <*> location <*> children      (Statement.While <$> invert statement <*> statements)
+     <|> makeTerm <$ symbol UntilModifier <*> location <*> children (flip Statement.While <$> statement <*> invert statement)
 
 for :: Assignment (Node Grammar) (Term Syntax Location)
 for = makeTerm <$ symbol For <*> location <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
@@ -144,6 +144,9 @@ literal  =  makeTerm <$ symbol Language.Ruby.Syntax.True <*> location <*> (Liter
         <|> makeTerm <$ symbol Language.Ruby.Syntax.Integer <*> location <*> (Literal.Integer <$> source)
         <|> makeTerm <$ symbol Symbol <*> location <*>(Literal.Symbol <$> source)
         <|> makeTerm <$ symbol Range <*> location <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
+
+invert :: InUnion fs Expression.Boolean => Assignment (Node grammar) (Term (Union fs) Location) -> Assignment (Node grammar) (Term (Union fs) Location)
+invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 makeTerm :: InUnion fs f => a -> f (Term (Union fs) a) -> (Term (Union fs) a)
 makeTerm a f = cofree $ a :< inj f
