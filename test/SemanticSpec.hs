@@ -7,7 +7,6 @@ import Test.Hspec.Expectations.Pretty
 import Language
 import Syntax
 import Renderer
-import Renderer.SExpression
 import Source
 
 spec :: Spec
