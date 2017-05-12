@@ -36,17 +36,20 @@ instance Show DiffArguments where
 
 type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
 
+identityDecorator :: Source -> Term f a -> Term f a
+identityDecorator = const identity
+
 patchDiff :: DiffArguments'
-patchDiff = DiffArguments PatchRenderer (const identity)
+patchDiff = DiffArguments PatchRenderer identityDecorator
 
 jsonDiff :: DiffArguments'
-jsonDiff = DiffArguments JSONDiffRenderer (const identity)
+jsonDiff = DiffArguments JSONDiffRenderer identityDecorator
 
 summaryDiff :: DiffArguments'
-summaryDiff = DiffArguments SummaryRenderer (const identity)
+summaryDiff = DiffArguments SummaryRenderer identityDecorator
 
 sExpressionDiff :: DiffArguments'
-sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) (const identity)
+sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) identityDecorator
 
 tocDiff :: DiffArguments'
 tocDiff = DiffArguments ToCRenderer declarationDecorator
