@@ -24,6 +24,7 @@ type Syntax' =
   '[ Comment.Comment
    , Literal.Boolean
    , Statement.If
+   , Statement.Import
    , Syntax.Empty
    ]
 
@@ -36,6 +37,7 @@ assignment = symbol Module *> children (many (comment
 statement :: Assignment (Node Grammar) (Term Syntax Location)
 statement = expressionStatement
           <|> ifStatement
+          <|> importStatement
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
@@ -43,6 +45,10 @@ comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> sourc
 
 expressionStatement :: Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children boolean
+
+
+importStatement :: Assignment (Node Grammar) (Term Syntax Location)
+importStatement = makeTerm <$ symbol ImportStatement <*> location <*> (Statement.Import <$> source)
 
 
 ifStatement :: Assignment (Node Grammar) (Term Syntax Location)
@@ -57,7 +63,6 @@ ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statemen
 boolean :: Assignment (Node Grammar) (Term Syntax Location)
 boolean =   makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
         <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
-
 
 
 makeTerm :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
