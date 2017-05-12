@@ -142,7 +142,7 @@ literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal  =  makeTerm <$ symbol Language.Ruby.Syntax.True <*> location <*> (Literal.true <$ source)
         <|> makeTerm <$ symbol Language.Ruby.Syntax.False <*> location <*> (Literal.false <$ source)
         <|> makeTerm <$ symbol Language.Ruby.Syntax.Integer <*> location <*> (Literal.Integer <$> source)
-        <|> makeTerm <$ symbol Symbol <*> location <*>(Literal.Symbol <$> source)
+        <|> makeTerm <$ symbol Symbol <*> location <*> (Literal.Symbol <$> source)
         <|> makeTerm <$ symbol Range <*> location <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
 invert :: InUnion fs Expression.Boolean => Assignment (Node grammar) (Term (Union fs) Location) -> Assignment (Node grammar) (Term (Union fs) Location)
