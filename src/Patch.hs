@@ -7,15 +7,14 @@ module Patch
 , deleting
 , after
 , before
-, afterOrBefore
 , unPatch
 , patchSum
 , maybeFst
 , maybeSnd
 , mapPatch
-, patchType
 ) where
 
+import Data.Align
 import Data.Functor.Listable
 import Data.These
 import Prologue
@@ -51,12 +50,6 @@ after = maybeSnd . unPatch
 before :: Patch a -> Maybe a
 before = maybeFst . unPatch
 
-afterOrBefore :: Patch a -> Maybe a
-afterOrBefore patch = case (before patch, after patch) of
-  (_, Just after) -> Just after
-  (Just before, _) -> Just before
-  (_, _) -> Nothing
-
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
 unPatch (Replace a b) = These a b
@@ -80,11 +73,6 @@ maybeFst = these Just (const Nothing) ((Just .) . const)
 maybeSnd :: These a b -> Maybe b
 maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
-patchType :: Patch a -> Text
-patchType patch = case patch of
-  Replace{} -> "modified"
-  Insert{} -> "added"
-  Delete{} -> "removed"
 
 -- Instances
 
@@ -93,3 +81,8 @@ instance Listable1 Patch where
 
 instance Listable a => Listable (Patch a) where
   tiers = tiers1
+
+instance Crosswalk Patch where
+  crosswalk f (Replace a b) = alignWith (these Delete Insert Replace) (f a) (f b)
+  crosswalk f (Insert b) = Insert <$> f b
+  crosswalk f (Delete a) = Delete <$> f a
