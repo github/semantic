@@ -21,14 +21,21 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_python
 
 type Syntax = Union Syntax'
 type Syntax' =
-  '[Comment.Comment]
+  '[ Comment.Comment
+   , Literal.Boolean
+   ]
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment (Node Grammar) [Term Syntax Location]
-assignment = symbol Module *> children (many comment)
+assignment = symbol Module *> children (many (comment
+                                            <|> boolean))
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
 
 makeTerm :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
+
+boolean :: Assignment (Node Grammar) (Term Syntax Location)
+boolean =   makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
+        <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
