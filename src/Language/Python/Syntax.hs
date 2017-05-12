@@ -23,12 +23,15 @@ type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
    , Literal.Boolean
+   , Statement.If
+   , Syntax.Empty
    ]
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment (Node Grammar) [Term Syntax Location]
 assignment = symbol Module *> children (many (comment
-                                            <|> expressionStatement))
+                                            <|> expressionStatement
+                                            <|> ifStatement))
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
@@ -38,10 +41,14 @@ expressionStatement :: Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children boolean
 
 
+ifStatement :: Assignment (Node Grammar) (Term Syntax Location)
+ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statement.If <$> boolean <*> expressionStatement <*> (fromMaybe <$> (makeTerm <$> location <*> pure Syntax.Empty) <*> optional elseClause))
+  where elseClause = symbol ElseClause *> children expressionStatement
+
+
 boolean :: Assignment (Node Grammar) (Term Syntax Location)
 boolean =   makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
         <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
-
 
 
 
