@@ -6,4 +6,4 @@ import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Language
 
 -- | Statically-known rules corresponding to symbols in the grammar.
-tmkSymbolDatatypet (mkName "Grammar") tree_sitter_python
+mkSymbolDatatype (mkName "Grammar") tree_sitter_python
