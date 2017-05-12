@@ -24,6 +24,7 @@ type Syntax' =
    , Statement.If
    , Statement.Import
    , Syntax.Empty
+   , Statement.Return
    ]
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -38,6 +39,7 @@ statement = expressionStatement
           <|> ifStatement
           <|> importStatement
           <|> importFromStatement
+          <|> returnStatement
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal = string
@@ -60,6 +62,9 @@ importStatement = makeTerm <$ symbol ImportStatement <*> location <*> (Statement
 -- TODO Possibly match against children nodes
 importFromStatement :: Assignment (Node Grammar) (Term Syntax Location)
 importFromStatement = makeTerm <$ symbol ImportFromStatement <*> location <*> (Statement.Import <$> source)
+
+returnStatement :: Assignment (Node Grammar) (Term Syntax Location)
+returnStatement = makeTerm <$ symbol ReturnStatement <*> location <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))
 
 
 ifStatement :: Assignment (Node Grammar) (Term Syntax Location)
