@@ -146,6 +146,9 @@ literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
 term :: InUnion Syntax' f => Assignment (Node grammar) (f (Term Syntax Location) -> Term Syntax Location)
 term = (\ a f -> cofree $ a :< inj f) <$> location
 
+makeTerm :: InUnion fs f => a -> f (Term (Union fs) a) -> (Term (Union fs) a)
+makeTerm a f = cofree $ a :< inj f
+
 leaf :: (Enum symbol, Eq symbol, InUnion Syntax' f) => symbol -> (ByteString -> f (Term Syntax Location)) -> Assignment (Node symbol) (Term Syntax Location)
 leaf s f = (\ a -> cofree . (a :<) . inj . f) <$ symbol s <*> location <*> source
 
