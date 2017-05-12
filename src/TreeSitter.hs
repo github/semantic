@@ -20,7 +20,6 @@ import qualified Language.JavaScript as JS
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import qualified Language.Ruby.Syntax as Ruby
-import qualified Language.Python as Python
 import qualified Language.Python.Syntax as Python
 import Parser
 import Range
