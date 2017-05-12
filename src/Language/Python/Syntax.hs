@@ -30,8 +30,12 @@ type Syntax' =
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment (Node Grammar) [Term Syntax Location]
 assignment = symbol Module *> children (many (comment
-                                            <|> expressionStatement
-                                            <|> ifStatement))
+                                            <|> statement))
+
+
+statement :: Assignment (Node Grammar) (Term Syntax Location)
+statement = expressionStatement
+          <|> ifStatement
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
@@ -42,8 +46,12 @@ expressionStatement = symbol ExpressionStatement *> children boolean
 
 
 ifStatement :: Assignment (Node Grammar) (Term Syntax Location)
-ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statement.If <$> boolean <*> expressionStatement <*> (fromMaybe <$> (makeTerm <$> location <*> pure Syntax.Empty) <*> optional elseClause))
-  where elseClause = symbol ElseClause *> children expressionStatement
+ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statement.If <$> condition <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
+  where elseClause = symbol ElseClause *> children statement
+        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> condition <*> statement)
+        condition = boolean
+        optionalElse = fromMaybe <$> (makeTerm <$> location <*> pure Syntax.Empty) <*> optional elseClause
+        makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 
 boolean :: Assignment (Node Grammar) (Term Syntax Location)
