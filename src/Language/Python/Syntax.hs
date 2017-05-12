@@ -28,14 +28,22 @@ type Syntax' =
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment (Node Grammar) [Term Syntax Location]
 assignment = symbol Module *> children (many (comment
-                                            <|> boolean))
+                                            <|> expressionStatement))
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
 
-makeTerm :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
-makeTerm a f = cofree (a :< inj f)
+
+expressionStatement :: Assignment (Node Grammar) (Term Syntax Location)
+expressionStatement = symbol ExpressionStatement *> children boolean
+
 
 boolean :: Assignment (Node Grammar) (Term Syntax Location)
 boolean =   makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
         <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
+
+
+
+
+makeTerm :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
+makeTerm a f = cofree (a :< inj f)
