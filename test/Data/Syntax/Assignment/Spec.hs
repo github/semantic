@@ -12,7 +12,7 @@ import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 spec :: Spec
 spec = do
-  describe "Applicative" $ do
+  describe "Applicative" $
     it "matches in sequence" $
       runAssignment ((,) <$> red <*> red) (makeState "helloworld" [Rose (rec Red 0 5) [], Rose (rec Red 5 10) []]) `shouldBe` Result [] (Just (AssignmentState 10 (Info.SourcePos 1 11) "" [], (Out "hello", Out "world")))
 
@@ -52,16 +52,16 @@ spec = do
       () <$ runAssignment (children red) (makeState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result [] (Just ())
 
     it "does not match if its subrule does not match" $
-      (runAssignment (children red) (makeState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Result [ Error (Info.SourcePos 1 1) [Red] (Just Green) ] Nothing
+      runAssignment (children red) (makeState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]]) `shouldBe` Result [ Error (Info.SourcePos 1 1) [Red] (Just Green) ] Nothing
 
-    it "matches nested children" $ do
+    it "matches nested children" $
       runAssignment
         (symbol Red *> children (symbol Green *> children (symbol Blue *> source)))
         (makeState "1" [ Rose (rec Red 0 1) [ Rose (rec Green 0 1) [ Rose (rec Blue 0 1) [] ] ] ])
       `shouldBe`
         Result [] (Just (AssignmentState 1 (Info.SourcePos 1 2) "" [], "1"))
 
-    it "continues after children" $ do
+    it "continues after children" $
       resultValue (runAssignment
         (many (symbol Red *> children (symbol Green *> source)
            <|> symbol Blue *> source))
@@ -70,7 +70,7 @@ spec = do
       `shouldBe`
         Just (AssignmentState 2 (Info.SourcePos 1 3) "" [], ["B", "C"])
 
-    it "matches multiple nested children" $ do
+    it "matches multiple nested children" $
       runAssignment
         (symbol Red *> children (many (symbol Green *> children (symbol Blue *> source))))
         (makeState "12" [ Rose (rec Red 0 2) [ Rose (rec Green 0 1) [ Rose (rec Blue 0 1) [] ]
