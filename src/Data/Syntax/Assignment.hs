@@ -112,11 +112,11 @@ data AssignmentF node a where
 location :: Assignment (Node grammar) Location
 location = Location `Then` return
 
--- | Zero-width match of a node with the given symbol.
+-- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: (Enum symbol, Eq symbol) => symbol -> Assignment (Node symbol) ()
-symbol s = Choose (IntMap.singleton (fromEnum s) ()) `Then` return
+symbol :: (Enum symbol, Eq symbol) => symbol -> Assignment (Node symbol) Location
+symbol s = Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: Assignment symbol ByteString

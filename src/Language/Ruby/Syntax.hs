@@ -61,18 +61,18 @@ declaration :: Assignment (Node Grammar) (Term Syntax Location)
 declaration = comment <|> class' <|> method
 
 class' :: Assignment (Node Grammar) (Term Syntax Location)
-class' = makeTerm <$ symbol Class <*> location <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
+class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
   where superclass = pure <$ symbol Superclass <*> children constant
         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
 constant :: Assignment (Node Grammar) (Term Syntax Location)
-constant = makeTerm <$ symbol Constant <*> location <*> (Syntax.Identifier <$> source)
+constant = makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
 
 identifier :: Assignment (Node Grammar) (Term Syntax Location)
-identifier = makeTerm <$ symbol Identifier <*> location <*> (Syntax.Identifier <$> source)
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 method :: Assignment (Node Grammar) (Term Syntax Location)
-method = makeTerm <$ symbol Method <*> location <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
 
 statements :: Assignment (Node Grammar) (Term Syntax Location)
 statements = makeTerm <$> location <*> many statement
@@ -89,7 +89,7 @@ statement  =  exit Statement.Return Return
           <|> for
           <|> literal
           <|> assignment'
-  where exit construct sym = makeTerm <$ symbol sym <*> location <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
+  where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
 lvalue = identifier
@@ -98,52 +98,52 @@ expression :: Assignment (Node Grammar) (Term Syntax Location)
 expression = identifier <|> statement
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
-comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 if' :: Assignment (Node Grammar) (Term Syntax Location)
 if' =  ifElsif If
-   <|> makeTerm <$ symbol IfModifier     <*> location <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
-  where ifElsif s = makeTerm <$ symbol s <*> location <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$ symbol Else <*> location <*> children (many statement))))
+   <|> makeTerm <$> symbol IfModifier     <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
+  where ifElsif s = makeTerm <$> symbol s <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$> symbol Else <*> children (many statement))))
 
 unless :: Assignment (Node Grammar) (Term Syntax Location)
-unless =  makeTerm <$ symbol Unless         <*> location <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$ symbol Else <*> location <*> children (many statement))))
-      <|> makeTerm <$ symbol UnlessModifier <*> location <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
+unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
+      <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
 
 while :: Assignment (Node Grammar) (Term Syntax Location)
-while =  makeTerm <$ symbol While         <*> location <*> children      (Statement.While <$> statement <*> statements)
-     <|> makeTerm <$ symbol WhileModifier <*> location <*> children (flip Statement.While <$> statement <*> statement)
+while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
+     <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
 
 until :: Assignment (Node Grammar) (Term Syntax Location)
-until =  makeTerm <$ symbol Until         <*> location <*> children      (Statement.While <$> invert statement <*> statements)
-     <|> makeTerm <$ symbol UntilModifier <*> location <*> children (flip Statement.While <$> statement <*> invert statement)
+until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
+     <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
 
 for :: Assignment (Node Grammar) (Term Syntax Location)
-for = makeTerm <$ symbol For <*> location <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
 
 assignment' :: Assignment (Node Grammar) (Term Syntax Location)
 assignment'
-   =  makeTerm <$ symbol Assignment <*> location <*> children (Statement.Assignment <$> lvalue <*> expression)
-  <|> makeTerm <$ symbol OperatorAssignment <*> location <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
-         (makeTerm <$ symbol AnonPlusEqual               <*> location <*> (Expression.Plus var      <$> expression)
-      <|> makeTerm <$ symbol AnonMinusEqual              <*> location <*> (Expression.Minus var     <$> expression)
-      <|> makeTerm <$ symbol AnonStarEqual               <*> location <*> (Expression.Times var     <$> expression)
-      <|> makeTerm <$ symbol AnonStarStarEqual           <*> location <*> (Expression.Power var     <$> expression)
-      <|> makeTerm <$ symbol AnonSlashEqual              <*> location <*> (Expression.DividedBy var <$> expression)
-      <|> makeTerm <$ symbol AnonPipePipeEqual           <*> location <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$ symbol AnonPipeEqual               <*> location <*> (Expression.BOr var       <$> expression)
-      <|> makeTerm <$ symbol AnonAmpersandAmpersandEqual <*> location <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$ symbol AnonAmpersandEqual          <*> location <*> (Expression.BAnd var      <$> expression)
-      <|> makeTerm <$ symbol AnonPercentEqual            <*> location <*> (Expression.Modulo var    <$> expression)
-      <|> makeTerm <$ symbol AnonRAngleRAngleEqual       <*> location <*> (Expression.RShift var    <$> expression)
-      <|> makeTerm <$ symbol AnonLAngleLAngleEqual       <*> location <*> (Expression.LShift var    <$> expression)
-      <|> makeTerm <$ symbol AnonCaretEqual              <*> location <*> (Expression.BXOr var      <$> expression)))
+   =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lvalue <*> expression)
+  <|> makeTerm <$> symbol OperatorAssignment <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
+         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
+      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
+      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
+      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> expression)
+      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
+      <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
+      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
+      <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> expression)
+      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> expression)
+      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> expression)
+      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
+      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
+      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
-literal  =  makeTerm <$ symbol Language.Ruby.Syntax.True <*> location <*> (Literal.true <$ source)
-        <|> makeTerm <$ symbol Language.Ruby.Syntax.False <*> location <*> (Literal.false <$ source)
-        <|> makeTerm <$ symbol Language.Ruby.Syntax.Integer <*> location <*> (Literal.Integer <$> source)
-        <|> makeTerm <$ symbol Symbol <*> location <*> (Literal.Symbol <$> source)
-        <|> makeTerm <$ symbol Range <*> location <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
+literal  =  makeTerm <$> symbol Language.Ruby.Syntax.True <*> (Literal.true <$ source)
+        <|> makeTerm <$> symbol Language.Ruby.Syntax.False <*> (Literal.false <$ source)
+        <|> makeTerm <$> symbol Language.Ruby.Syntax.Integer <*> (Literal.Integer <$> source)
+        <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+        <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
 invert :: InUnion fs Expression.Boolean => Assignment (Node grammar) (Term (Union fs) Location) -> Assignment (Node grammar) (Term (Union fs) Location)
 invert term = makeTerm <$> location <*> fmap Expression.Not term
