@@ -3,6 +3,8 @@ module TreeSitter
 ( treeSitterParser
 , parseRubyToAST
 , parseRubyToTerm
+, parsePythonToAST
+, parsePythonToTerm
 , defaultTermAssignment
 ) where
 
@@ -18,6 +20,8 @@ import qualified Language.JavaScript as JS
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.Python as Python
+import qualified Language.Python.Syntax as Python
 import Parser
 import Range
 import Source
@@ -31,6 +35,7 @@ import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 import qualified Text.Parser.TreeSitter.Ruby as Ruby
+import qualified Text.Parser.TreeSitter.Python as Python
 import SourceSpan
 import Info
 
@@ -88,6 +93,45 @@ parseRubyToTerm source = do
     Just a -> pure (Just a)
     _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
+-- | Parse Python to AST. Intended for use in ghci, e.g.:
+--
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToAST . source
+parsePythonToAST :: Source -> IO (A.AST Python.Grammar)
+parsePythonToAST source = do
+  document <- ts_document_new
+  ts_document_set_language document Python.tree_sitter_python
+  root <- withCStringLen (toText source) $ \ (source, len) -> do
+    ts_document_set_input_string_with_length document source len
+    ts_document_parse_halt_on_error document
+    alloca (\ rootPtr -> do
+      ts_document_root_node_p document rootPtr
+      peek rootPtr)
+
+  ast <- anaM toAST root
+
+  ts_document_free document
+  pure ast
+  where toAST :: Node -> IO (A.RoseF (A.Node Python.Grammar) Node)
+        toAST node@Node{..} = do
+          let count = fromIntegral nodeChildCount
+          children <- allocaArray count $ \ childNodesPtr -> do
+            _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
+            peekArray count childNodesPtr
+          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
+
+        anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
+        anaM g = a where a = pure . embed <=< traverse a <=< g
+
+-- | Parse Python to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
+--
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToTerm . source
+parsePythonToTerm :: Source -> IO (Maybe [Term Python.Syntax A.Location])
+parsePythonToTerm source = do
+  ast <- parsePythonToAST source
+  let A.Result errors value = A.assign Python.assignment source ast
+  case value of
+    Just a -> pure (Just a)
+    _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record DefaultFields)
