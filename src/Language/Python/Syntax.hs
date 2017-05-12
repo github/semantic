@@ -2,12 +2,9 @@
 module Language.Python.Syntax where
 
 import Data.Functor.Union
-import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
-import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Language.Haskell.TH hiding (location)
