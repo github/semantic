@@ -37,3 +37,6 @@
 [submodule "languages/typescript/vendor/tree-sitter-typescript"]
 	path = languages/typescript/vendor/tree-sitter-typescript
 	url = https://github.com/tree-sitter/tree-sitter-typescript/
+[submodule "languages/python/vendor/tree-sitter-python"]
+	path = languages/python/vendor/tree-sitter-python
+	url = https://github.com/tree-sitter/tree-sitter-python.git
