@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE TypeSynonymInstances, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Diff where
 
@@ -24,10 +24,9 @@ diffCost :: (Foldable f, Functor f) => Diff f annotation -> Int
 diffCost = diffSum $ patchSum termSize
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: forall f annotation. Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> (Both annotation -> annotation) -> Diff f annotation -> Maybe (Term f annotation)
+mergeMaybe :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> (Both annotation -> annotation) -> Diff f annotation -> Maybe (Term f annotation)
 mergeMaybe transform extractAnnotation = iter algebra . fmap transform
-  where algebra :: TermF f (Both annotation) (Maybe (Term f annotation)) -> Maybe (Term f annotation)
-        algebra (annotations :< syntax) = cofree . (extractAnnotation annotations :<) <$> sequenceAlt syntax
+  where algebra (annotations :< syntax) = cofree . (extractAnnotation annotations :<) <$> sequenceAlt syntax
 
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
@@ -44,13 +43,8 @@ mapAnnotations :: (Functor f, Functor g)
                => (annotation -> annotation')
                -> Free (TermF f (g annotation))  (Patch (Term f annotation))
                -> Free (TermF f (g annotation')) (Patch (Term f annotation'))
-mapAnnotations f = iter (\ (h :< functor) -> wrap (fmap f h :< functor)) . fmap (pure . fmap (fmap f))
+mapAnnotations f = hoistFree (first (fmap f)) . fmap (fmap (fmap f))
 
--- | Map a function over the annotations of a single diff node, if it is in Free.
-modifyAnnotations :: (Functor f, Functor g) => (annotation -> annotation) -> Free (TermF f (g annotation)) a -> Free (TermF f (g annotation)) a
-modifyAnnotations f r = case runFree r of
-  Free (ga :< functor) -> wrap (fmap f ga :< functor)
-  _ -> r
 
 instance (NFData (f (Diff f a)), NFData (Cofree f a), NFData a, Functor f) => NFData (Diff f a) where
   rnf fa = case runFree fa of

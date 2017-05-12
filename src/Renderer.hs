@@ -1,8 +1,10 @@
-{-# LANGUAGE GADTs, MultiParamTypeClasses  #-}
+{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators #-}
 module Renderer
 ( DiffRenderer(..)
+, SExpressionFormat(..)
 , resolveDiffRenderer
 , runDiffRenderer
+, declarationDecorator
 , ParseTreeRenderer(..)
 , resolveParseTreeRenderer
 , runParseTreeRenderer
@@ -25,7 +27,7 @@ import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.Summary as R
 import Renderer.TOC as R
-import Source (SourceBlob(..))
+import Source (SourceBlob(..), Source)
 import Syntax as S
 import Term
 
@@ -35,7 +37,7 @@ data DiffRenderer fields output where
   JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer fields (Map Text Value)
   SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
-  ToCRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
+  ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => DiffRenderer fields Summaries
 
 resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output)
 resolveDiffRenderer renderer = case renderer of
@@ -47,6 +49,10 @@ resolveDiffRenderer renderer = case renderer of
 
 runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
 runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
+
+
+declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
+declarationDecorator = decoratorWithAlgebra . declarationAlgebra
 
 
 data ParseTreeRenderer fields output where

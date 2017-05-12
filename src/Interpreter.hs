@@ -17,11 +17,17 @@ import Syntax as S hiding (Return)
 import Term
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Maybe FeatureVector))
+diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = (runAlgorithm (decomposeWith algorithmWithTerms) .) . diff
+diffTerms a b = stripDiff (runAlgorithm (decomposeWith algorithmWithTerms) ((diff `on` defaultFeatureVectorDecorator getLabel) a b))
+
+-- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
+getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a -> (Category, Maybe leaf)
+getLabel (h :< t) = (Info.category h, case t of
+  Leaf s -> Just s
+  _ -> Nothing)
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
 runAlgorithm :: forall f result
