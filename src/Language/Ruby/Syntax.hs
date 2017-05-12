@@ -72,7 +72,10 @@ identifier :: Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$ symbol Identifier <*> location <*> (Syntax.Identifier <$> source)
 
 method :: Assignment (Node Grammar) (Term Syntax Location)
-method = makeTerm <$ symbol Method <*> location <*> children (Declaration.Method <$> identifier <*> pure [] <*> (makeTerm <$> location <*> many statement))
+method = makeTerm <$ symbol Method <*> location <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
+
+statements :: Assignment (Node Grammar) (Term Syntax Location)
+statements = makeTerm <$> location <*> many statement
 
 statement :: Assignment (Node Grammar) (Term Syntax Location)
 statement  =  exit Statement.Return Return
@@ -100,22 +103,22 @@ comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> sourc
 if' :: Assignment (Node Grammar) (Term Syntax Location)
 if' =  ifElsif If
    <|> makeTerm <$ symbol IfModifier     <*> location <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
-  where ifElsif s = makeTerm <$ symbol s <*> location <*> children      (Statement.If <$> statement <*> (makeTerm <$> location <*> many statement) <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$ symbol Else <*> location <*> children (many statement))))
+  where ifElsif s = makeTerm <$ symbol s <*> location <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$ symbol Else <*> location <*> children (many statement))))
 
 unless :: Assignment (Node Grammar) (Term Syntax Location)
-unless =  makeTerm <$ symbol Unless         <*> location <*> children      (Statement.If <$> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> (makeTerm <$> location <*> many statement) <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$ symbol Else <*> location <*> children (many statement))))
+unless =  makeTerm <$ symbol Unless         <*> location <*> children      (Statement.If <$> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$ symbol Else <*> location <*> children (many statement))))
       <|> makeTerm <$ symbol UnlessModifier <*> location <*> children (flip Statement.If <$> statement <*> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> (makeTerm <$> location <*> pure Syntax.Empty))
 
 while :: Assignment (Node Grammar) (Term Syntax Location)
-while =  makeTerm <$ symbol While         <*> location <*> children      (Statement.While <$> statement <*> (makeTerm <$> location <*> many statement))
+while =  makeTerm <$ symbol While         <*> location <*> children      (Statement.While <$> statement <*> statements)
      <|> makeTerm <$ symbol WhileModifier <*> location <*> children (flip Statement.While <$> statement <*> statement)
 
 until :: Assignment (Node Grammar) (Term Syntax Location)
-until =  makeTerm <$ symbol Until         <*> location <*> children      (Statement.While <$> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> (makeTerm <$> location <*> many statement))
+until =  makeTerm <$ symbol Until         <*> location <*> children      (Statement.While <$> (makeTerm <$> location <*> (Expression.Not <$> statement)) <*> statements)
      <|> makeTerm <$ symbol UntilModifier <*> location <*> children (flip Statement.While <$> statement <*> (makeTerm <$> location <*> (Expression.Not <$> statement)))
 
 for :: Assignment (Node Grammar) (Term Syntax Location)
-for = makeTerm <$ symbol For <*> location <*> children (Statement.ForEach <$> identifier <*> statement <*> (makeTerm <$> location <*> many statement))
+for = makeTerm <$ symbol For <*> location <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
 
 assignment' :: Assignment (Node Grammar) (Term Syntax Location)
 assignment'
