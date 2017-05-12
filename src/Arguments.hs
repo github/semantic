@@ -36,6 +36,7 @@ instance Show DiffArguments where
 
 type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
 
+-- | The identity decorator, i.e. a decorator which ignores the source and passes terms through unchanged.
 identityDecorator :: Source -> Term f a -> Term f a
 identityDecorator = const identity
 
