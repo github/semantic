@@ -110,13 +110,14 @@ parsePythonToAST source = do
 
   ts_document_free document
   pure ast
-  where toAST :: Node -> IO (A.RoseF (A.Node Python.Grammar) Node)
-        toAST node@Node{..} = do
-          let count = fromIntegral nodeChildCount
-          children <- allocaArray count $ \ childNodesPtr -> do
-            _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
-            peekArray count childNodesPtr
-          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
+
+toAST :: Enum grammar => Node -> IO (A.RoseF (A.Node grammar) Node)
+toAST node@Node{..} = do
+  let count = fromIntegral nodeChildCount
+  children <- allocaArray count $ \ childNodesPtr -> do
+    _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
+    peekArray count childNodesPtr
+  pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g
