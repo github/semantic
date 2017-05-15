@@ -69,16 +69,6 @@ parseRubyToAST source = do
 
   ts_document_free document
   pure ast
-  where toAST :: Node -> IO (A.RoseF (A.Node Ruby.Grammar) Node)
-        toAST node@Node{..} = do
-          let count = fromIntegral nodeChildCount
-          children <- allocaArray count $ \ childNodesPtr -> do
-            _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
-            peekArray count childNodesPtr
-          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
-
-        anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
-        anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 -- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
