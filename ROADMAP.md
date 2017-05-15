@@ -9,6 +9,7 @@ See also our [roadmap project][] for our current efforts.
 
 - [Run a resilient, scalable service](#run-a-resilient-scalable-service)
 - [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators--researchers)
+- [Serve more of our users](#serve-more-of-our-users)
 
 
 ### Run a resilient, scalable service
@@ -31,6 +32,16 @@ Task                   | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
 ----                   | ---    | ----------------- | -----------------------
 GraphQL parse tree API | @tclem |                   | ✅
 GraphQL diff API       |        |                   | 2
+
+
+### Serve more of our users
+
+We want to provide data useful to more of our users.
+
+Task           | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
+----           | ---        | ----------------- | -----------------------
+Python support | @rewinfrey | 2                 | 2
+
 
 
 ### GraphQL APIs
