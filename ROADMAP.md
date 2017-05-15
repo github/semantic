@@ -15,10 +15,12 @@ See also our [roadmap project][] for our current efforts.
 
 Our service should operate with a minimum of headaches. Our service should scale with GitHub’s customer base and our language support.
 
-Task                 | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
-----                 | ---    | ----------------- | -----------------------
-Production readiness | @tclem | 1                 | 3
+Task                    | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
+----                    | ---    | ----------------- | -----------------------
+Production readiness    | @tclem | 1                 | 3
+[Architecture review][] | @tclem | 1                 | ✅
 
+[Architecture review]: https://github.com/github/architecture/issues/12
 
 
 ### GraphQL APIs
@@ -83,7 +85,6 @@ Enables:
 
 ### Operability/Production readiness
 
-- Containerization/[-as-a-service architecture](https://github.com/github/semantic-diff/projects/8)
 - Caching
 - Performance
 - Security review of tree-sitter
