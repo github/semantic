@@ -9,7 +9,6 @@ See also our [roadmap project][] for our current efforts.
 
 - [Run a resilient, scalable service](#run-a-resilient-scalable-service)
 - [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators--researchers)
-- Help developers understand, [navigate][], and improve their code.
 
 
 ### Run a resilient, scalable service
@@ -116,4 +115,3 @@ Enables:
 
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
-[navigate]: https://github.com/github/semantic-diff/issues/909
