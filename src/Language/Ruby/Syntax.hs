@@ -12,7 +12,7 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Language.Haskell.TH hiding (location, Range(..))
-import Prologue hiding (for, get, Location, optional, state, unless)
+import Prologue hiding (for, get, Location, state, unless)
 import Term
 import Text.Parser.TreeSitter.Language
 import Text.Parser.TreeSitter.Ruby
@@ -61,18 +61,21 @@ declaration :: Assignment (Node Grammar) (Term Syntax Location)
 declaration = comment <|> class' <|> method
 
 class' :: Assignment (Node Grammar) (Term Syntax Location)
-class' = symbol Class *> term <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
+class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
   where superclass = pure <$ symbol Superclass <*> children constant
         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
 constant :: Assignment (Node Grammar) (Term Syntax Location)
-constant = leaf Constant Syntax.Identifier
+constant = makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
 
 identifier :: Assignment (Node Grammar) (Term Syntax Location)
-identifier = leaf Identifier Syntax.Identifier
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 method :: Assignment (Node Grammar) (Term Syntax Location)
-method = symbol Method *> term <*> children (Declaration.Method <$> identifier <*> pure [] <*> (term <*> many statement))
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
+
+statements :: Assignment (Node Grammar) (Term Syntax Location)
+statements = makeTerm <$> location <*> many statement
 
 statement :: Assignment (Node Grammar) (Term Syntax Location)
 statement  =  exit Statement.Return Return
@@ -86,7 +89,7 @@ statement  =  exit Statement.Return Return
           <|> for
           <|> literal
           <|> assignment'
-  where exit construct sym = symbol sym *> term <*> children (construct <$> optional (symbol ArgumentList *> children statement))
+  where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment (Node Grammar) (Term Syntax Location)
 lvalue = identifier
@@ -95,62 +98,61 @@ expression :: Assignment (Node Grammar) (Term Syntax Location)
 expression = identifier <|> statement
 
 comment :: Assignment (Node Grammar) (Term Syntax Location)
-comment = leaf Comment Comment.Comment
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 if' :: Assignment (Node Grammar) (Term Syntax Location)
 if' =  ifElsif If
-   <|> symbol IfModifier     *> term <*> children (flip Statement.If <$> statement <*> statement <*> (term <*> pure Syntax.Empty))
-  where ifElsif s = symbol s *> term <*> children      (Statement.If <$> statement <*> (term <*> many statement) <*> optional (ifElsif Elsif <|> symbol Else *> term <*> children (many statement)))
+   <|> makeTerm <$> symbol IfModifier     <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
+  where ifElsif s = makeTerm <$> symbol s <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$> symbol Else <*> children (many statement))))
 
 unless :: Assignment (Node Grammar) (Term Syntax Location)
-unless =  symbol Unless         *> term <*> children      (Statement.If <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement) <*> optional (symbol Else *> term <*> children (many statement)))
-      <|> symbol UnlessModifier *> term <*> children (flip Statement.If <$> statement <*> (term <*> (Expression.Not <$> statement)) <*> (term <*> pure Syntax.Empty))
+unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
+      <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
 
 while :: Assignment (Node Grammar) (Term Syntax Location)
-while =  symbol While         *> term <*> children      (Statement.While <$> statement <*> (term <*> many statement))
-     <|> symbol WhileModifier *> term <*> children (flip Statement.While <$> statement <*> statement)
+while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
+     <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
 
 until :: Assignment (Node Grammar) (Term Syntax Location)
-until =  symbol Until         *> term <*> children      (Statement.While <$> (term <*> (Expression.Not <$> statement)) <*> (term <*> many statement))
-     <|> symbol UntilModifier *> term <*> children (flip Statement.While <$> statement <*> (term <*> (Expression.Not <$> statement)))
+until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
+     <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
 
 for :: Assignment (Node Grammar) (Term Syntax Location)
-for = symbol For *> term <*> children (Statement.ForEach <$> identifier <*> statement <*> (term <*> many statement))
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
 
 assignment' :: Assignment (Node Grammar) (Term Syntax Location)
 assignment'
-   =  symbol Assignment *> term <*> children (Statement.Assignment <$> lvalue <*> expression)
-  <|> symbol OperatorAssignment *> term <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
-         (symbol AnonPlusEqual               *> term <*> (Expression.Plus var      <$> expression)
-      <|> symbol AnonMinusEqual              *> term <*> (Expression.Minus var     <$> expression)
-      <|> symbol AnonStarEqual               *> term <*> (Expression.Times var     <$> expression)
-      <|> symbol AnonStarStarEqual           *> term <*> (Expression.Power var     <$> expression)
-      <|> symbol AnonSlashEqual              *> term <*> (Expression.DividedBy var <$> expression)
-      <|> symbol AnonPipePipeEqual           *> term <*> (Expression.And var       <$> expression)
-      <|> symbol AnonPipeEqual               *> term <*> (Expression.BOr var       <$> expression)
-      <|> symbol AnonAmpersandAmpersandEqual *> term <*> (Expression.And var       <$> expression)
-      <|> symbol AnonAmpersandEqual          *> term <*> (Expression.BAnd var      <$> expression)
-      <|> symbol AnonPercentEqual            *> term <*> (Expression.Modulo var    <$> expression)
-      <|> symbol AnonRAngleRAngleEqual       *> term <*> (Expression.RShift var    <$> expression)
-      <|> symbol AnonLAngleLAngleEqual       *> term <*> (Expression.LShift var    <$> expression)
-      <|> symbol AnonCaretEqual              *> term <*> (Expression.BXOr var      <$> expression)))
+   =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lvalue <*> expression)
+  <|> makeTerm <$> symbol OperatorAssignment <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
+         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
+      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
+      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
+      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> expression)
+      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
+      <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
+      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
+      <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> expression)
+      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> expression)
+      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> expression)
+      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
+      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
+      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
-literal  =  leaf Language.Ruby.Syntax.True (const Literal.true)
-        <|> leaf Language.Ruby.Syntax.False (const Literal.false)
-        <|> leaf Language.Ruby.Syntax.Integer Literal.Integer
-        <|> leaf Symbol Literal.Symbol
-        <|> symbol Range *> term <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
+literal  =  makeTerm <$> symbol Language.Ruby.Syntax.True <*> (Literal.true <$ source)
+        <|> makeTerm <$> symbol Language.Ruby.Syntax.False <*> (Literal.false <$ source)
+        <|> makeTerm <$> symbol Language.Ruby.Syntax.Integer <*> (Literal.Integer <$> source)
+        <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+        <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
--- | Assignment of the current node’s annotation.
-term :: InUnion Syntax' f => Assignment (Node grammar) (f (Term Syntax Location) -> Term Syntax Location)
-term = (\ a f -> cofree $ a :< inj f) <$> location
+invert :: InUnion fs Expression.Boolean => Assignment (Node grammar) (Term (Union fs) Location) -> Assignment (Node grammar) (Term (Union fs) Location)
+invert term = makeTerm <$> location <*> fmap Expression.Not term
 
-leaf :: (Enum symbol, Eq symbol, InUnion Syntax' f) => symbol -> (ByteString -> f (Term Syntax Location)) -> Assignment (Node symbol) (Term Syntax Location)
-leaf s f = (\ a -> cofree . (a :<) . inj . f) <$ symbol s <*> location <*> source
+makeTerm :: InUnion fs f => a -> f (Term (Union fs) a) -> (Term (Union fs) a)
+makeTerm a f = cofree $ a :< inj f
 
-optional :: Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
-optional a = a <|> term <*> pure Syntax.Empty
+emptyTerm :: Assignment (Node Grammar) (Term Syntax Location)
+emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
 
 -- | An F-algebra on some carrier functor 'f'.
