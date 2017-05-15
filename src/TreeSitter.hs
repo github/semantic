@@ -72,10 +72,6 @@ parseRubyToAST source = do
             peekArray count childNodesPtr
           pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
 
-        anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
-        anaM g = a where a = pure . embed <=< traverse a <=< g
-
-
 -- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
 --   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
@@ -86,6 +82,10 @@ parseRubyToTerm source = do
   case value of
     Just a -> pure (Just a)
     _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
+
+
+anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
+anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 -- | Return a parser for a tree sitter language & document.
