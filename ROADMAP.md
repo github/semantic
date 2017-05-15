@@ -8,6 +8,7 @@ See also our [roadmap project][] for our current efforts.
 ## Objectives
 
 - [Run a resilient, scalable service](#run-a-resilient-scalable-service)
+- [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators-researchers)
 - Help developers understand, [navigate][], and improve their code.
 
 
@@ -21,6 +22,14 @@ Production readiness    | @tclem | 1                 | 3
 [Architecture review][] | @tclem | 1                 | ✅
 
 [Architecture review]: https://github.com/github/architecture/issues/12
+
+
+### Provide data about code to users, integrators, & researchers
+
+Task                   | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
+----                   | ---    | ----------------- | -----------------------
+GraphQL parse tree API | @tclem |                   | ✅
+GraphQL diff API       |        |                   | 2
 
 
 ### GraphQL APIs
