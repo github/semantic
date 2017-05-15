@@ -10,6 +10,7 @@ See also our [roadmap project][] for our current efforts.
 - [Run a resilient, scalable service](#run-a-resilient-scalable-service)
 - [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators--researchers)
 - [Serve more of our users](#serve-more-of-our-users)
+- [Provide more and better data](#provide-more-and-better-data)
 
 
 ### Run a resilient, scalable service
@@ -42,6 +43,14 @@ Task           | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
 ----           | ---        | ----------------- | -----------------------
 Python support | @rewinfrey | 2                 | 2
 
+
+### Provide more and better data
+
+We want to provide more, more accurate, and more useful data.
+
+Task                             | PRP     | Priority (1 to 3) | Amount of work (1 to 4)
+----                             | ---     | ----------------- | -----------------------
+À la carte syntax representation | @robrix | 2                 | 4
 
 
 ### GraphQL APIs
