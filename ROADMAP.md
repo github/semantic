@@ -7,7 +7,6 @@ Semantic Code produces data around code’s structure and meaning. This is made 
 
 - Production ready in Q2 FY2018.
 - Help developers understand, [navigate][], and improve their code.
-- Lower barriers to contributions, e.g. by eliminating conflicts from [renaming variables][].
 
 
 ### GraphQL APIs
@@ -96,4 +95,3 @@ See also our [roadmap project][].
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
 [navigate]: https://github.com/github/semantic-diff/issues/909
-[renaming variables]: https://github.com/github/semantic-diff/issues/91
