@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module TreeSitter
 ( treeSitterParser
-, parseRubyToAST
 , parseRubyToTerm
 , parsePythonToAST
 , parsePythonToTerm
@@ -51,11 +50,11 @@ treeSitterParser language grammar blob = do
     pure term
 
 
--- | Parse Ruby to AST. Intended for use in ghci, e.g.:
+-- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST . source
-parseRubyToAST :: Source -> IO (A.AST Ruby.Grammar)
-parseRubyToAST source = do
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
+parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
+parseRubyToTerm source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
   root <- withCStringLen (toText source) $ \ (source, len) -> do
@@ -68,15 +67,7 @@ parseRubyToAST source = do
   ast <- anaM toAST root
 
   ts_document_free document
-  pure ast
 
-
--- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
---
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
-parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
-parseRubyToTerm source = do
-  ast <- parseRubyToAST source
   let A.Result errors value = A.assign Ruby.assignment source ast
   case value of
     Just a -> pure (Just a)
