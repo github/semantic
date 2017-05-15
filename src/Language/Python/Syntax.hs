@@ -29,9 +29,11 @@ type Syntax' =
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment (Node Grammar) [Term Syntax Location]
-assignment = symbol Module *> children (many (comment
-                                            <|> statement
-                                            <|> literal))
+assignment = symbol Module *> children (many declaration)
+
+
+declaration :: Assignment (Node Grammar) (Term Syntax Location)
+declaration = comment <|> literal <|> statement
 
 
 statement :: Assignment (Node Grammar) (Term Syntax Location)
