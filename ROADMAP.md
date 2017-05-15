@@ -7,7 +7,7 @@ See also our [roadmap project][] for our current efforts.
 
 ## Objectives
 
-- Production ready in Q2 FY2018.
+- Run a resilient, scalable service
 - Help developers understand, [navigate][], and improve their code.
 
 
