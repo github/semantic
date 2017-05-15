@@ -7,7 +7,7 @@ See also our [roadmap project][] for our current efforts.
 
 ## Objectives
 
-- [Run a resilient, scalable service](#run-a-resilient--scalable-service)
+- [Run a resilient, scalable service](#run-a-resilient-scalable-service)
 - Help developers understand, [navigate][], and improve their code.
 
 
