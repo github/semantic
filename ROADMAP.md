@@ -7,8 +7,18 @@ See also our [roadmap project][] for our current efforts.
 
 ## Objectives
 
-- Run a resilient, scalable service
+- [Run a resilient, scalable service](#run-a-resilient--scalable-service)
 - Help developers understand, [navigate][], and improve their code.
+
+
+### Run a resilient, scalable service
+
+Our service should operate with a minimum of headaches. Our service should scale with GitHub’s customer base and our language support.
+
+Task                 | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
+----                 | ---    | ----------------- | -----------------------
+Production readiness | @tclem | 1                 | 3
+
 
 
 ### GraphQL APIs
