@@ -26,6 +26,8 @@ Production readiness    | @tclem | 1                 | 3
 
 ### Provide data about code to users, integrators, & researchers
 
+Our data should be readily available to consumers.
+
 Task                   | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
 ----                   | ---    | ----------------- | -----------------------
 GraphQL parse tree API | @tclem |                   | ✅
