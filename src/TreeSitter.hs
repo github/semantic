@@ -2,7 +2,6 @@
 module TreeSitter
 ( treeSitterParser
 , parseRubyToTerm
-, parsePythonToAST
 , parsePythonToTerm
 , defaultTermAssignment
 ) where
@@ -73,25 +72,6 @@ parseRubyToTerm source = do
     Just a -> pure (Just a)
     _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
--- | Parse Python to AST. Intended for use in ghci, e.g.:
---
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToAST . source
-parsePythonToAST :: Source -> IO (A.AST Python.Grammar)
-parsePythonToAST source = do
-  document <- ts_document_new
-  ts_document_set_language document Python.tree_sitter_python
-  root <- withCStringLen (toText source) $ \ (source, len) -> do
-    ts_document_set_input_string_with_length document source len
-    ts_document_parse_halt_on_error document
-    alloca (\ rootPtr -> do
-      ts_document_root_node_p document rootPtr
-      peek rootPtr)
-
-  ast <- anaM toAST root
-
-  ts_document_free document
-  pure ast
-
 toAST :: Enum grammar => Node -> IO (A.RoseF (A.Node grammar) Node)
 toAST node@Node{..} = do
   let count = fromIntegral nodeChildCount
@@ -108,7 +88,19 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 --   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToTerm . source
 parsePythonToTerm :: Source -> IO (Maybe [Term Python.Syntax A.Location])
 parsePythonToTerm source = do
-  ast <- parsePythonToAST source
+  document <- ts_document_new
+  ts_document_set_language document Python.tree_sitter_python
+  root <- withCStringLen (toText source) $ \ (source, len) -> do
+    ts_document_set_input_string_with_length document source len
+    ts_document_parse_halt_on_error document
+    alloca (\ rootPtr -> do
+      ts_document_root_node_p document rootPtr
+      peek rootPtr)
+
+  ast <- anaM toAST root
+
+  ts_document_free document
+
   let A.Result errors value = A.assign Python.assignment source ast
   case value of
     Just a -> pure (Just a)
