@@ -7,6 +7,7 @@ See also our [roadmap project][] for our current efforts.
 
 ## Objectives
 
+- Determine baselines
 - [Run a resilient, scalable service](#run-a-resilient-scalable-service)
 - [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators--researchers)
 - [Serve more of our users](#serve-more-of-our-users)
