@@ -2,6 +2,8 @@
 
 Semantic Code produces data around code’s structure and meaning. This is made available via GraphQL APIs, enabling others (both at GitHub and elsewhere) to build features.
 
+See also our [roadmap project][] for our current efforts.
+
 
 ## Objectives
 
@@ -90,8 +92,6 @@ Enables:
 - Production ready tree-sitter
 - ToC in Enterprise
 
-
-See also our [roadmap project][].
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
 [navigate]: https://github.com/github/semantic-diff/issues/909
