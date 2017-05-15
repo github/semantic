@@ -23,8 +23,9 @@ type Syntax' =
    , Literal.String
    , Statement.If
    , Statement.Import
-   , Syntax.Empty
    , Statement.Return
+   , Syntax.Empty
+   , Syntax.Identifier
    ]
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -42,6 +43,11 @@ statement = expressionStatement
           <|> importStatement
           <|> importFromStatement
           <|> returnStatement
+          <|> identifier
+
+
+identifier :: Assignment (Node Grammar) (Term Syntax Location)
+identifier = makeTerm <$ symbol Identifier <*> location <*> (Syntax.Identifier <$> source)
 
 literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal = string
