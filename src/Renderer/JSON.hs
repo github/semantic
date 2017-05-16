@@ -47,6 +47,7 @@ instance ToJSON a => ToJSONFields (Join (,) a) where
 
 instance ToJSON a => ToJSON (Join (,) a) where
   toJSON (Join (a, b)) = A.Array . Vector.fromList $ toJSON <$> [ a, b ]
+  toEncoding = foldable
 
 instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSON (Free f a) where
   toJSON splitDiff = case runFree splitDiff of
