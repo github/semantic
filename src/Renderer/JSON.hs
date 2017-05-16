@@ -31,15 +31,8 @@ json blobs diff = Map.fromList
   , ("paths", toJSON (path <$> blobs))
   ]
 
--- | A numbered 'a'.
-newtype NumberedLine a = NumberedLine (Int, a)
-
 instance StringConv (Map Text Value) ByteString where
   strConv _ = toS . (<> "\n") . encode
-
-instance ToJSONFields a => ToJSON (NumberedLine a) where
-  toJSON (NumberedLine (n, a)) = object $ "number" .= n : toJSONFields a
-  toEncoding (NumberedLine (n, a)) = pairs $ "number" .= n <> mconcat (toJSONFields a)
 
 instance ToJSON a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
