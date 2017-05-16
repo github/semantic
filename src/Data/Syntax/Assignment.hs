@@ -117,15 +117,15 @@ location = Location `Then` return
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
 symbol :: (Enum symbol, Eq symbol, HasCallStack) => symbol -> Assignment (Node symbol) Location
-symbol s = Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
+symbol s = let ?callStack = freezeCallStack callStack in Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment symbol ByteString
-source = Source `Then` return
+source = let ?callStack = freezeCallStack callStack in Source `Then` return
 
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment symbol a -> Assignment symbol a
-children forEach = Children forEach `Then` return
+children forEach = let ?callStack = freezeCallStack callStack in Children forEach `Then` return
 
 
 -- | A rose tree.
