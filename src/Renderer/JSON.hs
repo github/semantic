@@ -11,7 +11,6 @@ import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.Record
-import Data.These
 import Data.Vector as Vector hiding (toList)
 import Diff
 import Info
@@ -42,10 +41,6 @@ instance StringConv (Map Text Value) ByteString where
 instance ToJSONFields a => ToJSON (NumberedLine a) where
   toJSON (NumberedLine (n, a)) = object $ "number" .= n : toJSONFields a
   toEncoding (NumberedLine (n, a)) = pairs $ "number" .= n <> mconcat (toJSONFields a)
-
-instance ToJSON a => ToJSON (Join These a) where
-  toJSON (Join vs) = A.Array . Vector.fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
-  toEncoding = foldable
 
 instance ToJSON a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
