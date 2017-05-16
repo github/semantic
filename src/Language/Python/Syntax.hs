@@ -53,7 +53,9 @@ statement = expressionStatement
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expression = identifier <|> statement <|> unaryOperator
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (Expression.UMinus <$> integer)
+unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCompliment <$> (symbol AnonTilde *> integer)
+                                                              <|> Expression.UMinus      <$> (symbol AnonMinus *> integer)
+                                                              <|> Expression.UPlus       <$> (symbol AnonPlus  *> integer))
 
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
