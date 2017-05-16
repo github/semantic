@@ -7,6 +7,7 @@ import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import GHC.Stack
 import Language.Haskell.TH hiding (location)
 import Prologue hiding (Location)
 import Term
@@ -29,15 +30,15 @@ type Syntax' =
    ]
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: Assignment (Node Grammar) [Term Syntax Location]
+assignment :: HasCallStack => Assignment (Node Grammar) [Term Syntax Location]
 assignment = symbol Module *> children (many declaration)
 
 
-declaration :: Assignment (Node Grammar) (Term Syntax Location)
 declaration = comment <|> literal <|> statement
+declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 
 
-statement :: Assignment (Node Grammar) (Term Syntax Location)
+statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statement = expressionStatement
           <|> ifStatement
           <|> importStatement
@@ -46,36 +47,36 @@ statement = expressionStatement
           <|> identifier
 
 
-identifier :: Assignment (Node Grammar) (Term Syntax Location)
+identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$ symbol Identifier <*> location <*> (Syntax.Identifier <$> source)
 
-literal :: Assignment (Node Grammar) (Term Syntax Location)
 literal = string
+literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 
-string :: Assignment (Node Grammar) (Term Syntax Location)
+string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 string = makeTerm <$ symbol String <*> location <*> (Syntax.Empty <$ source)
 
-comment :: Assignment (Node Grammar) (Term Syntax Location)
+comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
 
 
-expressionStatement :: Assignment (Node Grammar) (Term Syntax Location)
+expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children (statement <|> literal)
 
 
 -- TODO Possibly match against children for dotted name and identifiers
-importStatement :: Assignment (Node Grammar) (Term Syntax Location)
+importStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 importStatement = makeTerm <$ symbol ImportStatement <*> location <*> (Statement.Import <$> source)
 
 -- TODO Possibly match against children nodes
-importFromStatement :: Assignment (Node Grammar) (Term Syntax Location)
+importFromStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 importFromStatement = makeTerm <$ symbol ImportFromStatement <*> location <*> (Statement.Import <$> source)
 
-returnStatement :: Assignment (Node Grammar) (Term Syntax Location)
+returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$ symbol ReturnStatement <*> location <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))
 
 
-ifStatement :: Assignment (Node Grammar) (Term Syntax Location)
+ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statement.If <$> condition <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
   where elseClause = symbol ElseClause *> children statement
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> condition <*> statement)
@@ -84,10 +85,10 @@ ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statemen
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 
-boolean :: Assignment (Node Grammar) (Term Syntax Location)
+boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 boolean =  makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
        <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
 
 
-makeTerm :: InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
+makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
