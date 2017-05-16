@@ -14,6 +14,15 @@ data Call a = Call { callFunction :: a, callParams :: [a] }
 instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
+-- | Unary operators
+data Unary a
+  = UPlus a
+  | UMinus a
+  | UCompliment a
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Unary where liftEq = genericLiftEq
+instance Show1 Unary where liftShowsPrec = genericLiftShowsPrec
 
 -- | Binary arithmetic operators.
 data Arithmetic a
