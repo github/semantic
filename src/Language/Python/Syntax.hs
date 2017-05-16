@@ -23,6 +23,7 @@ type Syntax' =
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
+   , Literal.None
    , Literal.String
    , Literal.TextElement
    , Statement.If
@@ -52,7 +53,7 @@ identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-literal = string <|> integer <|> float <|> boolean
+literal = string <|> integer <|> float <|> boolean <|> none
 
 -- TODO: Wrap `Literal.TextElement` with a `Litera.String`
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
@@ -96,6 +97,8 @@ boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 boolean =  makeTerm <$> symbol Language.Python.Syntax.True  <*> (Literal.true <$ source)
        <|> makeTerm <$> symbol Language.Python.Syntax.False <*> (Literal.false <$ source)
 
+none :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+none = makeTerm <$> symbol None <*> (Literal.None <$> source)
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)

@@ -78,6 +78,11 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
+newtype None a = None { noneContent :: ByteString }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 None where liftEq = genericLiftEq
+instance Show1 None where liftShowsPrec = genericLiftShowsPrec
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
