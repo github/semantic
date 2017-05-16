@@ -21,6 +21,7 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_python
 type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
+   , Expression.Tuple
    , Expression.Unary
    , Literal.Boolean
    , Literal.Float
