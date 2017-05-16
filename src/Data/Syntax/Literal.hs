@@ -38,6 +38,14 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 -- TODO: Float/Double literals.
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
+-- | A literal float of unspecified width.
+newtype Float a = Float { floatContent :: ByteString }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
+instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
+
+
 
 data Range a = Range { rangeStart :: a, rangeEnd :: a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
