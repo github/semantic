@@ -24,6 +24,7 @@ type Syntax' =
    , Literal.Float
    , Literal.Integer
    , Literal.String
+   , Literal.TextElement
    , Statement.If
    , Statement.Import
    , Statement.Return
@@ -53,8 +54,9 @@ identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 literal = string <|> integer <|> float <|> boolean
 
+-- TODO: Wrap `Literal.TextElement` with a `Litera.String`
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-string = makeTerm <$> symbol String <*> (Syntax.Empty <$ source)
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 float :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
