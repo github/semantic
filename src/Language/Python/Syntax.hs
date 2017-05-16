@@ -36,15 +36,13 @@ assignment :: HasCallStack => Assignment (Node Grammar) [Term Syntax Location]
 assignment = symbol Module *> children (many declaration)
 
 
-declaration = comment <|> literal <|> statement
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+declaration = comment <|> literal <|> statement <|> importStatement <|> importFromStatement
 
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statement = expressionStatement
           <|> ifStatement
-          <|> importStatement
-          <|> importFromStatement
           <|> returnStatement
           <|> identifier
 
