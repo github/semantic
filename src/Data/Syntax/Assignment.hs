@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and SourceSpan). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -146,12 +146,16 @@ type AST grammar = Rose (Node grammar)
 data Result symbol a = Result { resultErrors :: [Error symbol], resultValue :: Maybe a }
   deriving (Eq, Foldable, Functor, Traversable)
 
-data Error symbol = Error
-  { errorPos :: Info.SourcePos
-  , errorExpected :: [symbol]
-  , errorActual :: Maybe symbol
-  }
-  deriving (Eq, Show)
+data Error symbol where
+  Error
+    :: HasCallStack
+    => { errorPos :: Info.SourcePos
+       , errorExpected :: [symbol]
+       , errorActual :: Maybe symbol
+       } -> Error symbol
+
+deriving instance Eq symbol => Eq (Error symbol)
+deriving instance Show symbol => Show (Error symbol)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
