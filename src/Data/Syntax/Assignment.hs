@@ -178,10 +178,10 @@ showSourcePos :: Info.SourcePos -> ShowS
 showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
+assign :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCallStack) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
 assign assignment source = fmap snd . assignAllFrom assignment . makeState source . pure
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCallStack) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
@@ -189,7 +189,7 @@ assignAllFrom assignment state = case runAssignment assignment state of
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
+runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCallStack) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
