@@ -51,7 +51,7 @@ identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-literal = string <|> integer <|> float
+literal = string <|> integer <|> float <|> boolean
 
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 string = makeTerm <$> symbol String <*> (Syntax.Empty <$ source)
