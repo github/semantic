@@ -11,7 +11,6 @@ import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.Record
-import Data.Vector as Vector hiding (toList)
 import Diff
 import Info
 import Patch
@@ -46,7 +45,7 @@ instance ToJSON a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
 
 instance ToJSON a => ToJSON (Join (,) a) where
-  toJSON (Join (a, b)) = A.Array . Vector.fromList $ toJSON <$> [ a, b ]
+  toJSON = toJSON . toList
   toEncoding = foldable
 
 instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSON (Free f a) where
