@@ -86,6 +86,7 @@ import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Record
+import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
@@ -99,31 +100,31 @@ import Text.Show hiding (show)
 type Assignment node = Freer (AssignmentF node)
 
 data AssignmentF node a where
-  Location :: AssignmentF node Location
-  Source :: AssignmentF symbol ByteString
-  Children :: Assignment symbol a -> AssignmentF symbol a
-  Choose :: IntMap.IntMap a -> AssignmentF node a
-  Alt :: a -> a -> AssignmentF symbol a
-  Empty :: AssignmentF symbol a
+  Location :: HasCallStack => AssignmentF node Location
+  Source :: HasCallStack => AssignmentF symbol ByteString
+  Children :: HasCallStack => Assignment symbol a -> AssignmentF symbol a
+  Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF node a
+  Alt :: HasCallStack => a -> a -> AssignmentF symbol a
+  Empty :: HasCallStack => AssignmentF symbol a
 
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
-location :: Assignment (Node grammar) Location
+location :: HasCallStack => Assignment (Node grammar) Location
 location = Location `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: (Enum symbol, Eq symbol) => symbol -> Assignment (Node symbol) Location
+symbol :: (Enum symbol, Eq symbol, HasCallStack) => symbol -> Assignment (Node symbol) Location
 symbol s = Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
-source :: Assignment symbol ByteString
+source :: HasCallStack => Assignment symbol ByteString
 source = Source `Then` return
 
 -- | Match a node by applying an assignment to its children.
-children :: Assignment symbol a -> Assignment symbol a
+children :: HasCallStack => Assignment symbol a -> Assignment symbol a
 children forEach = Children forEach `Then` return
 
 
