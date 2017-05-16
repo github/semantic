@@ -1,9 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module TreeSitter
 ( treeSitterParser
-, parseRubyToAST
 , parseRubyToTerm
-, parsePythonToAST
 , parsePythonToTerm
 , defaultTermAssignment
 ) where
@@ -51,11 +49,11 @@ treeSitterParser language grammar blob = do
     pure term
 
 
--- | Parse Ruby to AST. Intended for use in ghci, e.g.:
+-- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToAST . source
-parseRubyToAST :: Source -> IO (A.AST Ruby.Grammar)
-parseRubyToAST source = do
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
+parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
+parseRubyToTerm source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
   root <- withCStringLen (toText source) $ \ (source, len) -> do
@@ -68,35 +66,17 @@ parseRubyToAST source = do
   ast <- anaM toAST root
 
   ts_document_free document
-  pure ast
-  where toAST :: Node -> IO (A.RoseF (A.Node Ruby.Grammar) Node)
-        toAST node@Node{..} = do
-          let count = fromIntegral nodeChildCount
-          children <- allocaArray count $ \ childNodesPtr -> do
-            _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
-            peekArray count childNodesPtr
-          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
 
-        anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
-        anaM g = a where a = pure . embed <=< traverse a <=< g
-
-
--- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
---
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
-parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
-parseRubyToTerm source = do
-  ast <- parseRubyToAST source
   let A.Result errors value = A.assign Ruby.assignment source ast
   case value of
     Just a -> pure (Just a)
     _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
--- | Parse Python to AST. Intended for use in ghci, e.g.:
+-- | Parse Python to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToAST . source
-parsePythonToAST :: Source -> IO (A.AST Python.Grammar)
-parsePythonToAST source = do
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToTerm . source
+parsePythonToTerm :: Source -> IO (Maybe [Term Python.Syntax A.Location])
+parsePythonToTerm source = do
   document <- ts_document_new
   ts_document_set_language document Python.tree_sitter_python
   root <- withCStringLen (toText source) $ \ (source, len) -> do
@@ -109,28 +89,22 @@ parsePythonToAST source = do
   ast <- anaM toAST root
 
   ts_document_free document
-  pure ast
-  where toAST :: Node -> IO (A.RoseF (A.Node Python.Grammar) Node)
-        toAST node@Node{..} = do
-          let count = fromIntegral nodeChildCount
-          children <- allocaArray count $ \ childNodesPtr -> do
-            _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
-            peekArray count childNodesPtr
-          pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
 
-        anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
-        anaM g = a where a = pure . embed <=< traverse a <=< g
-
--- | Parse Python to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
---
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToTerm . source
-parsePythonToTerm :: Source -> IO (Maybe [Term Python.Syntax A.Location])
-parsePythonToTerm source = do
-  ast <- parsePythonToAST source
   let A.Result errors value = A.assign Python.assignment source ast
   case value of
     Just a -> pure (Just a)
     _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
+
+toAST :: Enum grammar => Node -> IO (A.RoseF (A.Node grammar) Node)
+toAST node@Node{..} = do
+  let count = fromIntegral nodeChildCount
+  children <- allocaArray count $ \ childNodesPtr -> do
+    _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
+    peekArray count childNodesPtr
+  pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
+
+anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
+anaM g = a where a = pure . embed <=< traverse a <=< g
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record DefaultFields)
