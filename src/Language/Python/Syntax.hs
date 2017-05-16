@@ -31,7 +31,7 @@ type Syntax' =
    , Syntax.Identifier
    ]
 
--- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
+-- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: HasCallStack => Assignment (Node Grammar) [Term Syntax Location]
 assignment = symbol Module *> children (many declaration)
 
