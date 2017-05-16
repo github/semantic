@@ -55,7 +55,8 @@ tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = identifier <|> statement <|> unaryOperator
+expression = identifier <|> statement <|> unaryOperator <|> tuple <|> literal
+
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCompliment <$> (symbol AnonTilde *> integer)
                                                               <|> Expression.UMinus      <$> (symbol AnonMinus *> integer)
