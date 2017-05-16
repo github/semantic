@@ -48,23 +48,22 @@ statement = expressionStatement
 
 
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-identifier = makeTerm <$ symbol Identifier <*> location <*> (Syntax.Identifier <$> source)
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 literal = string <|> integer <|> float
 
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-string = makeTerm <$ symbol String <*> location <*> (Syntax.Empty <$ source)
+string = makeTerm <$> symbol String <*> (Syntax.Empty <$ source)
 
 float :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-float = makeTerm <$ symbol Float <*> location <*> (Literal.Float <$> source)
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 integer :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-integer = makeTerm <$ symbol Integer <*> location <*> (Literal.Integer <$> source)
+integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
 comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
-
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children (statement <|> literal)
@@ -72,18 +71,18 @@ expressionStatement = symbol ExpressionStatement *> children (statement <|> lite
 
 -- TODO Possibly match against children for dotted name and identifiers
 importStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-importStatement = makeTerm <$ symbol ImportStatement <*> location <*> (Statement.Import <$> source)
+importStatement = makeTerm <$> symbol ImportStatement <*> (Statement.Import <$> source)
 
 -- TODO Possibly match against children nodes
 importFromStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-importFromStatement = makeTerm <$ symbol ImportFromStatement <*> location <*> (Statement.Import <$> source)
+importFromStatement = makeTerm <$> symbol ImportFromStatement <*> (Statement.Import <$> source)
 
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-returnStatement = makeTerm <$ symbol ReturnStatement <*> location <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))
+returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))
 
 
 ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statement.If <$> condition <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> condition <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
   where elseClause = symbol ElseClause *> children statement
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> condition <*> statement)
         condition = boolean
@@ -92,8 +91,8 @@ ifStatement = makeTerm <$ symbol IfStatement <*> location <*> children (Statemen
 
 
 boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-boolean =  makeTerm <$ symbol Language.Python.Syntax.True <*> location <*> (Literal.true <$ source)
-       <|> makeTerm <$ symbol Language.Python.Syntax.False <*> location <*> (Literal.false <$ source)
+boolean =  makeTerm <$> symbol Language.Python.Syntax.True  <*> (Literal.true <$ source)
+       <|> makeTerm <$> symbol Language.Python.Syntax.False <*> (Literal.false <$ source)
 
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
