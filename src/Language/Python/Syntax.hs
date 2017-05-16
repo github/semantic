@@ -21,6 +21,8 @@ type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
    , Literal.Boolean
+   , Literal.Float
+   , Literal.Integer
    , Literal.String
    , Statement.If
    , Statement.Import
@@ -50,11 +52,17 @@ statement = expressionStatement
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$ symbol Identifier <*> location <*> (Syntax.Identifier <$> source)
 
-literal = string
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+literal = string <|> integer <|> float
 
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 string = makeTerm <$ symbol String <*> location <*> (Syntax.Empty <$ source)
+
+float :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+float = makeTerm <$ symbol Float <*> location <*> (Literal.Float <$> source)
+
+integer :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+integer = makeTerm <$ symbol Integer <*> location <*> (Literal.Integer <$> source)
 
 comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$ symbol Comment <*> location <*> (Comment.Comment <$> source)
