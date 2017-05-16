@@ -58,3 +58,10 @@ data Bitwise a
 
 instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
+
+-- | Tuple expressions.
+data Tuple a = Tuple { tupleContents :: ![a]}
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Tuple where liftEq = genericLiftEq
+instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec

@@ -50,6 +50,9 @@ statement = expressionStatement
           <|> returnStatement
           <|> identifier
 
+tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
+
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expression = identifier <|> statement <|> unaryOperator
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
