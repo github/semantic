@@ -14,7 +14,7 @@ data Call a = Call { callFunction :: a, callParams :: [a] }
 instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
--- | Unary operators
+-- | Unary operators.
 data Unary a
   = UPlus a
   | UMinus a
