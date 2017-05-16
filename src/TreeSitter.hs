@@ -51,7 +51,7 @@ treeSitterParser language grammar blob = do
 
 -- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" (Just Language.Ruby) >>= parseRubyToTerm . source
 parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
 parseRubyToTerm source = do
   document <- ts_document_new
@@ -74,7 +74,7 @@ parseRubyToTerm source = do
 
 -- | Parse Python to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parsePythonToTerm . source
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" (Just Language.Python) >>= parsePythonToTerm . source
 parsePythonToTerm :: Source -> IO (Maybe [Term Python.Syntax A.Location])
 parsePythonToTerm source = do
   document <- ts_document_new
