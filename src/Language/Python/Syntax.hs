@@ -5,6 +5,7 @@ import Data.Functor.Union
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import GHC.Stack
@@ -20,6 +21,7 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_python
 type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
+   , Expression.Unary
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
@@ -48,6 +50,10 @@ statement = expressionStatement
           <|> returnStatement
           <|> identifier
 
+expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+expression = identifier <|> statement <|> unaryOperator
+unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (Expression.UMinus <$> integer)
 
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
@@ -69,7 +75,7 @@ comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expressionStatement = symbol ExpressionStatement *> children (statement <|> literal)
+expressionStatement = symbol ExpressionStatement *> children (statement <|> literal <|> expression)
 
 
 -- TODO Possibly match against children for dotted name and identifiers
