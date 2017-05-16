@@ -16,6 +16,7 @@ data Language =
     | Markdown
     | Ruby
     | TypeScript
+    | Python
     deriving (Show, Eq, Read)
 
 -- | Returns a Language based on the file extension (including the ".").
@@ -29,6 +30,7 @@ languageForType mediaType = case mediaType of
     ".js" -> Just TypeScript
     ".ts" -> Just TypeScript
     ".tsx" -> Just TypeScript
+    ".py" -> Just Python
     _ -> Nothing
 
 toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
