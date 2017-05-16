@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
 ( json
