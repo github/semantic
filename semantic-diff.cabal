@@ -52,6 +52,7 @@ library
                      , Language.TypeScript
                      , Language.TypeScript.Syntax
                      , Language.Python
+                     , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
                      , Patch

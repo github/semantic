@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TemplateHaskell #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Language.Python.Syntax where
 
 import Data.Functor.Union
@@ -10,14 +10,9 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import GHC.Stack
-import Language.Haskell.TH hiding (location)
+import Language.Python.Grammar as Grammar
 import Prologue hiding (Location)
 import Term
-import Text.Parser.TreeSitter.Python
-import Text.Parser.TreeSitter.Language
-
--- | Statically-known rules corresponding to symbols in the grammar.
-mkSymbolDatatype (mkName "Grammar") tree_sitter_python
 
 type Syntax = Union Syntax'
 type Syntax' =
@@ -112,8 +107,8 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> con
 
 
 boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-boolean =  makeTerm <$> symbol Language.Python.Syntax.True  <*> (Literal.true <$ source)
-       <|> makeTerm <$> symbol Language.Python.Syntax.False <*> (Literal.false <$ source)
+boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
+       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
 none :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 none = makeTerm <$> symbol None <*> (Literal.None <$> source)
