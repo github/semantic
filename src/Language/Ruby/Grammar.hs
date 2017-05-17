@@ -2,7 +2,6 @@
 module Language.Ruby.Grammar where
 
 import Language.Haskell.TH
-import Prologue
 import Text.Parser.TreeSitter.Language
 import Text.Parser.TreeSitter.Ruby
 
