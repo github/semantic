@@ -198,6 +198,7 @@ runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Sh
 runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
+          (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols Nothing ] Nothing
           (Location, Rose (_ :. location) _ : _) -> yield location state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
