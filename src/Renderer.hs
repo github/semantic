@@ -25,7 +25,6 @@ import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
-import Renderer.Summary as R
 import Renderer.TOC as R
 import Source (SourceBlob(..), Source)
 import Syntax as S
@@ -35,7 +34,6 @@ import Term
 data DiffRenderer fields output where
   PatchRenderer :: HasField fields Range => DiffRenderer fields File
   JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer fields (Map Text Value)
-  SummaryRenderer :: HasDefaultFields fields => DiffRenderer fields Summaries
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => DiffRenderer fields Summaries
 
@@ -43,7 +41,6 @@ resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRend
 resolveDiffRenderer renderer = case renderer of
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
-  SummaryRenderer -> R.summary
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> R.toc
 
@@ -102,7 +99,6 @@ instance StringConv File ByteString where
 instance Show (DiffRenderer fields output) where
   showsPrec _ PatchRenderer = showString "PatchRenderer"
   showsPrec _ JSONDiffRenderer = showString "JSONDiffRenderer"
-  showsPrec _ SummaryRenderer = showString "SummaryRenderer"
   showsPrec d (SExpressionDiffRenderer format) = showsUnaryWith showsPrec "SExpressionDiffRenderer" d format
   showsPrec _ ToCRenderer = showString "ToCRenderer"
 
