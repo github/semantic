@@ -218,7 +218,7 @@ blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :<
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both SourceBlob
-blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just JavaScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just JavaScript))
+blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
 
 instance Listable Text where
   tiers = unListableText `mapT` tiers

@@ -43,11 +43,11 @@ library
                      , Interpreter
                      , Language
                      , Language.C
-                     , Language.JavaScript
                      , Language.Markdown
                      , Language.Go
                      , Language.Go.Syntax
                      , Language.Ruby
+                     , Language.Ruby.Grammar
                      , Language.Ruby.Syntax
                      , Language.TypeScript
                      , Language.TypeScript.Syntax
@@ -61,7 +61,6 @@ library
                      , Renderer
                      , Renderer.JSON
                      , Renderer.Patch
-                     , Renderer.Summary
                      , Renderer.SExpression
                      , Renderer.TOC
                      , RWS
@@ -123,7 +122,6 @@ library
                      , c
                      , go
                      , ruby
-                     , javascript
                      , typescript
                      , python
                      , network
@@ -157,7 +155,6 @@ test-suite test
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
-                     , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec
                      , PatchOutputSpec

@@ -1,7 +1,8 @@
-{-# LANGUAGE DeriveAnyClass, RankNTypes #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes #-}
 module Renderer.TOC
 ( toc
 , diffTOC
+, Summaries(..)
 , JSONSummary(..)
 , Summarizable(..)
 , isValidSummary
@@ -28,12 +29,24 @@ import Diff
 import Info
 import Patch
 import Prologue
-import Renderer.Summary (Summaries(..))
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Source hiding (null)
 import Syntax as S
 import Term
+
+data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
+  deriving Show
+
+instance Monoid Summaries where
+  mempty = Summaries mempty mempty
+  mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+
+instance StringConv Summaries ByteString where
+  strConv _ = toS . (<> "\n") . encode
+
+instance ToJSON Summaries where
+  toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
 data JSONSummary = JSONSummary { info :: Summarizable }
                  | ErrorSummary { error :: Text, errorSpan :: SourceSpan }

@@ -12,10 +12,9 @@ import Term
 data Language =
       C
     | Go
-    | JavaScript
     | Markdown
     | Ruby
-    | TypeScript
+    | TypeScript -- ^ Also JavaScript.
     | Python
     deriving (Show, Eq, Read)
 

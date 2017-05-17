@@ -14,7 +14,6 @@ import qualified Data.Syntax.Assignment as A
 import Language
 import qualified Language.C as C
 import qualified Language.Go as Go
-import qualified Language.JavaScript as JS
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import qualified Language.Ruby.Syntax as Ruby
@@ -106,6 +105,18 @@ toAST node@Node{..} = do
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g
 
+toAST :: Enum grammar => Node -> IO (A.RoseF (A.Node grammar) Node)
+toAST node@Node{..} = do
+  let count = fromIntegral nodeChildCount
+  children <- allocaArray count $ \ childNodesPtr -> do
+    _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
+    peekArray count childNodesPtr
+  pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
+
+anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
+anaM g = a where a = pure . embed <=< traverse a <=< g
+
+
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record DefaultFields)
 documentToTerm language document SourceBlob{..} = do
@@ -149,7 +160,6 @@ assignTerm language source annotation children allChildren =
     _ -> defaultTermAssignment source (category annotation) children allChildren
   where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
         assignTermByLanguage language = case language of
-          JavaScript -> JS.termAssignment
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
           Ruby -> Ruby.termAssignment
@@ -204,7 +214,6 @@ categoryForLanguageProductionName = withDefaults . byLanguage
       s -> productionMap s
 
     byLanguage language = case language of
-      JavaScript -> JS.categoryForJavaScriptProductionName
       C -> C.categoryForCProductionName
       Ruby -> Ruby.categoryForRubyName
       Language.Go -> Go.categoryForGoName
