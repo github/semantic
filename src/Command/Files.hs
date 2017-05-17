@@ -44,7 +44,13 @@ readBlobPairsFromHandle :: Handle -> IO [Both SourceBlob]
 readBlobPairsFromHandle = readFromHandle toSourceBlobPairs
   where
     toSourceBlobPairs BlobDiff{..} = toSourceBlobPair <$> blobs
-    toSourceBlobPair BlobPair{..} = fmap (maybe (emptySourceBlob path) toSourceBlob) (both before after)
+    toSourceBlobPair blobs@BlobPair{..} = fmap (maybe (emptySourceBlob' blobs) toSourceBlob) (both before after)
+
+    emptySourceBlob' :: BlobPair -> SourceBlob
+    emptySourceBlob' BlobPair{..} = emptySourceBlob $ case (before, after) of
+      (Just Blob{..}, _) -> path
+      (_, Just Blob{..}) -> path
+      _ -> ""
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: Handle -> IO [SourceBlob]
@@ -70,8 +76,7 @@ newtype BlobParse = BlobParse { blobs :: [Blob] }
   deriving (Show, Generic, FromJSON, ToJSON)
 
 data BlobPair = BlobPair
-  { path :: String
-  , before :: Maybe Blob
+  { before :: Maybe Blob
   , after :: Maybe Blob
   } deriving (Show, Generic, FromJSON, ToJSON)
 

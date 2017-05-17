@@ -1,6 +1,5 @@
 {
   "blobs": [{
-    "path": "method.rb",
     "before": {
       "path": "method.rb",
       "content": "def foo; end",
