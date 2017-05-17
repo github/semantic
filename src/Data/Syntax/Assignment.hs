@@ -72,6 +72,7 @@ module Data.Syntax.Assignment
 , AST
 , Result(..)
 , Error(..)
+, ErrorCause(..)
 , showError
 , assign
 , runAssignment
