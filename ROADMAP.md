@@ -35,6 +35,7 @@ Our data should be readily available to consumers.
 
 Task                   | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
 ----                   | ---    | ----------------- | -----------------------
+Table of contents      |        |                   | ✅
 GraphQL parse tree API | @tclem |                   | ✅
 GraphQL diff API       |        | 3                 | 2
 
@@ -115,14 +116,6 @@ Enables:
 - Performance improvements.
 - Resiliency improvements/maintenance/operational excellence.
 - Metrics. How does it perform, how are people using it, what data do people care about, what don’t they use at all.
-
-
-### ToC
-
-- Performance with large parse trees
-- Depends on improved operability
-- Production ready tree-sitter
-- ToC in Enterprise
 
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
