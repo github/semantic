@@ -38,6 +38,7 @@ readFile path lang = ReadFile path lang `Then` return
 readBlobPairsFromHandle :: Handle -> Command [Both SourceBlob]
 readBlobPairsFromHandle h = ReadBlobPairsFromHandle h `Then` return
 
+-- | Read JSON encoded blobs to SourceBlobs.
 readBlobsFromHandle :: Handle -> Command [SourceBlob]
 readBlobsFromHandle h = ReadBlobsFromHandle h `Then` return
 
