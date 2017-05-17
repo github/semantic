@@ -23,8 +23,8 @@ Our service should operate with a minimum of headaches. Our service should scale
 
 Task                    | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
 ----                    | ---    | ----------------- | -----------------------
-Production readiness    | @tclem | 1                 | 3
 [Architecture review][] | @tclem | 1                 | ✅
+Production readiness    | @tclem | 1                 | 3
 
 [Architecture review]: https://github.com/github/architecture/issues/12
 
