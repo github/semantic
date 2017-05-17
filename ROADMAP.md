@@ -7,12 +7,15 @@ See also our [roadmap project][] for our current efforts.
 
 ## Objectives
 
-- Determine baselines
+- [Determine baselines](#determine-baselines)
 - [Run a resilient, scalable service](#run-a-resilient-scalable-service)
 - [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators--researchers)
 - [Serve more of our users](#serve-more-of-our-users)
 - [Provide more and better data](#provide-more-and-better-data)
 
+### Determine baselines
+
+Measure our existing work’s performance, usage, &c. to determine baselines for future improvements.
 
 ### Run a resilient, scalable service
 
