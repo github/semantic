@@ -286,6 +286,12 @@ instance Show1 Error where
     where showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
             showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
 
+instance Show1 ErrorCause where
+  liftShowsPrec sp sl d e = case e of
+    UnexpectedSymbol expected actual -> showsBinaryWith (liftShowsPrec sp sl) sp "UnexpectedSymbol" d expected actual
+    UnexpectedEndOfInput expected -> showsUnaryWith (liftShowsPrec sp sl) "UnexpectedEndOfInput" d expected
+    ErrorNode -> showString "ErrorNode"
+
 instance Applicative (Result symbol) where
   pure = Result [] . Just
   Result e1 f <*> Result e2 a = Result (e1 <> e2) (f <*> a)
