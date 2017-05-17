@@ -150,8 +150,7 @@ data Error symbol where
   Error
     :: HasCallStack
     => { errorPos :: Info.SourcePos
-       , errorExpected :: [symbol]
-       , errorActual :: Maybe (Maybe symbol) -- ^ @Just x@ if there is a current node, where @x@ is the current node’s symbol (i.e. @Just s@ for symbols in the grammar, @Nothing@ for error nodes); @Nothing@ otherwise.
+       , errorCause :: ErrorCause symbol
        } -> Error symbol
 
 deriving instance Eq symbol => Eq (Error symbol)
@@ -170,10 +169,11 @@ showError source Error{..}
   . showString (prettyCallStack callStack) . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
-  where showExpectation = case (errorExpected, errorActual) of
-          ([], Nothing) -> showString "no rule to match at end of input nodes"
-          (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
-          (symbols, Just a) -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+  where showExpectation = case errorCause of
+          UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
+          UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
+          UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+          ErrorNode -> showString "error node"
         context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
@@ -196,7 +196,8 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCal
 assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
-    Rose (s :. _) _ :_ -> Result (if null es then [ Error (statePos state) [] (Just s) ] else es) Nothing
+    Rose (Just s :. _) _ :_ -> Result (if null es then [ Error (statePos state) (UnexpectedSymbol [] s) ] else es) Nothing
+    Rose (Nothing :. _) _ :_ -> Result (if null es then [ Error (statePos state) ErrorNode ] else es) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -204,7 +205,7 @@ runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Sh
 runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
-          (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols (Just Nothing) ] Nothing
+          (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) ErrorNode ] Nothing
           (Location, Rose (_ :. location) _ : _) -> yield location state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
@@ -214,8 +215,8 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Choose choices, Rose (Just symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          (_, []) -> Result [ Error statePos expectedSymbols Nothing ] Nothing
-          (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols (Just symbol) ] Nothing
+          (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
+          (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous initialState
                   _ -> initialState
@@ -282,9 +283,7 @@ instance (Show symbol, Show a) => Show (Result symbol a) where
   showsPrec = showsPrec2
 
 instance Show1 Error where
-  liftShowsPrec sp sl d (Error p e a) = showsTernaryWith showsPrec (liftShowsPrec sp sl) (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Error" d p e a
-    where showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
-            showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
+  liftShowsPrec sp sl d (Error p c) = showsBinaryWith showsPrec (liftShowsPrec sp sl) "Error" d p c
 
 instance Show1 ErrorCause where
   liftShowsPrec sp sl d e = case e of
