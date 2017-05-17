@@ -62,12 +62,10 @@ data DiffFixture = DiffFixture
 instance Listable DiffFixture where
   tiers = cons0 (DiffFixture (patchDiff pathMode "" []) patchOutput)
        \/ cons0 (DiffFixture (jsonDiff pathMode "" []) jsonOutput)
-       \/ cons0 (DiffFixture (summaryDiff pathMode "" []) summaryOutput)
        \/ cons0 (DiffFixture (sExpressionDiff pathMode "" []) sExpressionOutput)
        \/ cons0 (DiffFixture (tocDiff pathMode "" []) tocOutput)
        \/ cons0 (DiffFixture (patchDiff commitMode repo []) patchOutput')
        \/ cons0 (DiffFixture (jsonDiff commitMode repo []) jsonOutput')
-       \/ cons0 (DiffFixture (summaryDiff commitMode repo []) summaryOutput')
        \/ cons0 (DiffFixture (sExpressionDiff commitMode repo []) sExpressionOutput')
        \/ cons0 (DiffFixture (tocDiff commitMode repo []) tocOutput')
 
@@ -77,8 +75,6 @@ instance Listable DiffFixture where
 
       patchOutput = "diff --git a/test/fixtures/ruby/method-declaration.A.rb b/test/fixtures/ruby/method-declaration.B.rb\nindex 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644\n--- a/test/fixtures/ruby/method-declaration.A.rb\n+++ b/test/fixtures/ruby/method-declaration.B.rb\n@@ -1,3 +1,4 @@\n-def foo\n+def bar(a)\n+  baz\n end\n\n"
       patchOutput' = "diff --git a/methods.rb b/methods.rb\nnew file mode 100644\nindex 0000000000000000000000000000000000000000..ff7bbbe9495f61d9e1e58c597502d152bab1761e\n--- /dev/null\n+++ b/methods.rb\n+def foo\n+end\n\n"
-      summaryOutput = "{\"changes\":{\"test/fixtures/ruby/method-declaration.A.rb -> test/fixtures/ruby/method-declaration.B.rb\":[{\"span\":{\"replace\":[{\"start\":[1,5],\"end\":[1,8]},{\"start\":[1,5],\"end\":[1,8]}]},\"summary\":\"Replaced the 'foo' identifier with the 'bar' identifier in the 'bar(\226\128\166)' method\"},{\"span\":{\"insert\":{\"start\":[1,9],\"end\":[1,10]}},\"summary\":\"Added the 'a' identifier in the 'bar(\226\128\166)' method\"},{\"span\":{\"insert\":{\"start\":[2,3],\"end\":[2,6]}},\"summary\":\"Added the 'baz' identifier in the 'bar(\226\128\166)' method\"}]},\"errors\":{}}\n"
-      summaryOutput' = "{\"changes\":{\"methods.rb\":[{\"span\":{\"insert\":{\"start\":[1,1],\"end\":[2,4]}},\"summary\":\"Added the 'foo()' method\"}]},\"errors\":{}}\n"
 
       jsonOutput = "{\"diff\":{\"after\":{\"category\":\"Program\",\"sourceRange\":[0,21],\"sourceSpan\":{\"start\":[1,1],\"end\":[4,1]}},\"children\":[{\"after\":{\"category\":\"Method\",\"sourceRange\":[0,20],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,4]}},\"children\":[{\"replace\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}}]},{\"insert\":{\"category\":\"Params\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,9],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,10]}}],\"sourceRange\":[7,13],\"sourceSpan\":{\"start\":[1,8],\"end\":[2,3]}}},{\"insert\":{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[13,16],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,6]}}}],\"before\":{\"category\":\"Method\",\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}}}],\"before\":{\"category\":\"Program\",\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}}},\"oids\":[\"0000000000000000000000000000000000000000\",\"0000000000000000000000000000000000000000\"],\"paths\":[\"test/fixtures/ruby/method-declaration.A.rb\",\"test/fixtures/ruby/method-declaration.B.rb\"]}\n"
       jsonOutput' = "{\"diff\":{\"insert\":{\"category\":\"Program\",\"children\":[{\"category\":\"Method\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}}},\"oids\":[\"0000000000000000000000000000000000000000\",\"ff7bbbe9495f61d9e1e58c597502d152bab1761e\"],\"paths\":[\"methods.rb\",\"methods.rb\"]}\n"
