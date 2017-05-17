@@ -20,6 +20,7 @@ library
                      , Command
                      , Command.Files
                      , Command.Git
+                     , Command.Stdin
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic

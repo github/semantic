@@ -12,6 +12,7 @@ module Command
 
 import qualified Command.Files as Files
 import qualified Command.Git as Git
+import qualified Command.Stdin as Stdin
 import Control.Monad.Free.Freer
 import Control.Monad.IO.Class
 import Data.Functor.Both
@@ -59,7 +60,7 @@ readFilesAtSHAs gitDir alternates paths shas = ReadFilesAtSHAs gitDir alternates
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path lang -> Files.readFile path lang >>= yield
-  ReadStdin -> Files.readStdin >>= yield
+  ReadStdin -> Stdin.readStdin >>= yield
   ReadFilesAtSHA gitDir alternates paths sha -> Git.readFilesAtSHA gitDir alternates paths sha >>= yield
   ReadFilesAtSHAs gitDir alternates paths shas -> Git.readFilesAtSHAs gitDir alternates paths shas >>= yield
   LiftIO io -> io >>= yield
