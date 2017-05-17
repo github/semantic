@@ -159,7 +159,7 @@ deriving instance Show symbol => Show (Error symbol)
 
 data ErrorCause symbol
   = UnexpectedSymbol [symbol] symbol
-  | UnexpectedEndOfInput
+  | UnexpectedEndOfInput [symbol]
   | ErrorNode
   deriving (Eq, Show)
 
