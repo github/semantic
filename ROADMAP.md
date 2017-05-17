@@ -44,9 +44,10 @@ GraphQL diff API       |        | 3                 | 2
 
 We want to provide data useful to more of our users.
 
-Task           | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
-----           | ---        | ----------------- | -----------------------
-Python support | @rewinfrey | 2                 | 2
+Task              | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
+----              | ---        | ----------------- | -----------------------
+Python support    | @rewinfrey | 2                 | 2
+ToC in Enterprise | @joshvera  | 2                 | ?
 
 
 ### Provide more and better data
