@@ -136,7 +136,7 @@ data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
 type Location = Record '[Info.Range, Info.SourceSpan]
 
 -- | The label annotating a node in the AST, specified as the pairing of its symbol and location information.
-type Node grammar = Record '[grammar, Info.Range, Info.SourceSpan]
+type Node grammar = Record '[Maybe grammar, Info.Range, Info.SourceSpan]
 
 -- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
 type AST grammar = Rose (Node grammar)
@@ -190,7 +190,7 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCal
 assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
-    Rose (s :. _) _ :_ -> Result (if null es then [ Error (statePos state) [] (Just s) ] else es) Nothing
+    Rose (s :. _) _ :_ -> Result (if null es then [ Error (statePos state) [] s ] else es) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -204,11 +204,11 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
             Result _ (Just (state', a)) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result es Nothing -> Result es Nothing
-          (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          (Choose choices, Rose (Just symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (_, []) -> Result [ Error statePos expectedSymbols Nothing ] Nothing
-          (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols (Just symbol) ] Nothing
+          (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols symbol ] Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous initialState
                   _ -> initialState
@@ -218,7 +218,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
                 choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
-dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
+dropAnonymous state = state { stateNodes = dropWhile ((/= Just Regular) . fmap symbolType . rhead . roseValue) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: AssignmentState grammar -> AssignmentState grammar
