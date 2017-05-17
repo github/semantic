@@ -7,7 +7,6 @@ import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Data.Syntax.Assignment.Spec
 import qualified DiffSpec
-import qualified SummarySpec
 import qualified GitmonClientSpec
 import qualified InterpreterSpec
 import qualified PatchOutputSpec
@@ -30,7 +29,6 @@ main = hspec $ do
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
     describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec
     describe "Diff" DiffSpec.spec
-    describe "Summary" SummarySpec.spec
     describe "Interpreter" InterpreterSpec.spec
     describe "PatchOutput" PatchOutputSpec.spec
     describe "Range" RangeSpec.spec

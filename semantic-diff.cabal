@@ -60,7 +60,6 @@ library
                      , Renderer
                      , Renderer.JSON
                      , Renderer.Patch
-                     , Renderer.Summary
                      , Renderer.SExpression
                      , Renderer.TOC
                      , RWS
@@ -155,7 +154,6 @@ test-suite test
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
-                     , SummarySpec
                      , GitmonClientSpec
                      , InterpreterSpec
                      , PatchOutputSpec

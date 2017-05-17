@@ -55,11 +55,6 @@ spec = parallel $ do
       blobs `shouldBe` [both b b]
 
   describe "fetchDiffs" $ do
-    it "generates diff summaries for two shas" $ do
-      (errors, summaries) <- fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] (const identity) Renderer.SummaryRenderer
-      errors `shouldBe` Just (fromList [])
-      summaries `shouldBe` Just (fromList [("methods.rb", ["Added the 'foo()' method"])])
-
     it "generates toc summaries for two shas" $ do
       (errors, summaries) <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] declarationDecorator Renderer.ToCRenderer
       errors `shouldBe` Just (fromList [])
@@ -71,11 +66,11 @@ spec = parallel $ do
       summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
 
     it "errors with bad shas" $
-      fetchDiffsOutput summaryText "test/fixtures/git/examples/all-languages.git" "dead" "beef" [("methods.rb", Just Ruby)] (const identity) Renderer.SummaryRenderer
+      fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dead" "beef" [("methods.rb", Just Ruby)] declarationDecorator Renderer.ToCRenderer
         `shouldThrow` (== Git.BackendError "Could not lookup dead: Object not found - no match for prefix (dead000000000000000000000000000000000000)")
 
     it "errors with bad repo path" $
-      fetchDiffsOutput summaryText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] (const identity) Renderer.SummaryRenderer
+      fetchDiffsOutput termText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] declarationDecorator Renderer.ToCRenderer
         `shouldThrow` errorCall "Could not open repository \"test/fixtures/git/examples/not-a-repo.git\""
 
   where repoPath = "test/fixtures/git/examples/all-languages.git"
@@ -111,10 +106,6 @@ summaries f = parseMaybe $ \o -> do
                   let ys = fmap f s
                   pure (path, V.toList ys)
                 pure $ fromList xs
-
-summaryText :: Object -> Text
-summaryText o = fromMaybe (panic "key 'summary' not found") $
-  parseMaybe (.: "summary") o
 
 termText :: Object -> Text
 termText o = fromMaybe (panic "key 'term' not found") $
