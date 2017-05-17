@@ -19,6 +19,7 @@ type Syntax' =
   '[ Comment.Comment
    , Declaration.Import
    , Expression.Arithmetic
+   , Expression.Bitwise
    , Expression.Tuple
    , Expression.Unary
    , Literal.Boolean
@@ -60,7 +61,7 @@ unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCo
                                                               <|> Expression.UPlus       <$> (symbol AnonPlus  *> expression))
 
 binaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-binaryOperator = makeTerm <$> symbol BinaryOperator <*> children ( expression >>= \ lexpression -> arithmetic lexpression )
+binaryOperator = makeTerm <$> symbol BinaryOperator <*> children ( expression >>= \ lexpression -> (bitwise lexpression) )
   where
     arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expression)
                           <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expression)
@@ -69,6 +70,11 @@ binaryOperator = makeTerm <$> symbol BinaryOperator <*> children ( expression >>
                           <|> symbol AnonSlashSlash *> (Expression.DividedBy lexpression <$> expression)
                           <|> symbol AnonPercent *> (Expression.Modulo lexpression <$> expression)
                           <|> symbol AnonStarStar *> (Expression.Power lexpression <$> expression)
+    bitwise lexpression =  symbol AnonPipe *> (Expression.BOr lexpression <$> expression)
+                       <|> symbol AnonAmpersand *> (Expression.BAnd lexpression <$> expression)
+                       <|> symbol AnonCaret *> (Expression.BXOr lexpression <$> expression)
+                       <|> symbol AnonLAngleLAngle *> (Expression.LShift lexpression <$> expression)
+                       <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expression)
 
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
