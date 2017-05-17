@@ -51,7 +51,7 @@ runDiff DiffArguments{..} = do
   blobs <- runCommand $ case diffMode of
     DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
     DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
-    DiffStdin -> readHandle stdin
+    DiffStdin -> readBlobPairsFromHandle stdin
   Semantic.diffBlobPairs termDecorator diffRenderer blobs
 
 runParse :: ParseArguments -> IO ByteString

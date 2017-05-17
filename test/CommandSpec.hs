@@ -8,7 +8,6 @@ import Data.Map
 import Data.Maybe
 import Data.Record
 import Data.String
-import qualified Data.ByteString as B
 import Info (DefaultFields, HasDefaultFields)
 import Language
 import Prologue hiding (readFile, toList)
@@ -20,7 +19,6 @@ import Semantic
 import Term
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
-import System.IO (stdin)
 
 spec :: Spec
 spec = parallel $ do
@@ -33,17 +31,17 @@ spec = parallel $ do
       blob <- runCommand (readFile "this file should not exist" Nothing)
       nullBlob blob `shouldBe` True
 
-  describe "readHandle" $ do
+  describe "readBlobPairsFromHandle" $ do
     it "returns blobs for valid JSON encoded diff input" $ do
       h <- openFile "test/fixtures/input/test.json" ReadMode
-      blobs <- runCommand (readHandle h)
+      blobs <- runCommand (readBlobPairsFromHandle h)
       let a = sourceBlob "method.rb" (Just Ruby) (Source "def foo; end")
       let b = sourceBlob "method.rb" (Just Ruby) (Source "def bar(x); end")
       blobs `shouldBe` [both a b]
 
     it "throws on invalid input" $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode
-      runCommand (readHandle h) `shouldThrow` (== ExitFailure 1)
+      runCommand (readBlobPairsFromHandle h) `shouldThrow` (== ExitFailure 1)
 
   describe "readFilesAtSHA" $ do
     it "returns blobs for the specified paths" $ do

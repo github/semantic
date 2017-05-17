@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass #-}
 module Command.Files
 ( readFile
-, readHandle
+, readBlobPairsFromHandle
 , transcode
 , languageForFilePath
 ) where
@@ -40,8 +40,8 @@ languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . toS . takeExtension
 
 -- | Read JSON encoded blobs from a handle.
-readHandle :: Handle -> IO [Both SourceBlob]
-readHandle h = do
+readBlobPairsFromHandle :: Handle -> IO [Both SourceBlob]
+readBlobPairsFromHandle h = do
   input <- B.hGetContents h
   let request = decode (toS input) :: Maybe BlobDiff
   when (isNothing request) $ die ("invalid input on " <> show h <> ", expecting JSON")
