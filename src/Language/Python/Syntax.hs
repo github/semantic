@@ -68,11 +68,14 @@ identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-literal = string <|> integer <|> float <|> boolean <|> none
+literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString
 
 -- TODO: Wrap `Literal.TextElement` with a `Litera.String`
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+
+concatenatedString :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
 
 float :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
