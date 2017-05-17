@@ -157,6 +157,12 @@ data Error symbol where
 deriving instance Eq symbol => Eq (Error symbol)
 deriving instance Show symbol => Show (Error symbol)
 
+data ErrorCause symbol
+  = UnexpectedSymbol [symbol] symbol
+  | UnexpectedEndOfInput
+  | ErrorNode
+  deriving (Eq, Show)
+
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
