@@ -18,6 +18,7 @@ type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
    , Declaration.Import
+   , Expression.Arithmetic
    , Expression.Tuple
    , Expression.Unary
    , Literal.Boolean
@@ -51,13 +52,23 @@ tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = identifier <|> statement <|> unaryOperator <|> tuple <|> literal
+expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> tuple <|> literal
 
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCompliment <$> (symbol AnonTilde *> expression)
                                                               <|> Expression.UMinus      <$> (symbol AnonMinus *> expression)
                                                               <|> Expression.UPlus       <$> (symbol AnonPlus  *> expression))
 
+binaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+binaryOperator = makeTerm <$> symbol BinaryOperator <*> children ( expression >>= \ lexpression -> arithmetic lexpression )
+  where
+    arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expression)
+                          <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expression)
+                          <|> symbol AnonStar *> (Expression.Times lexpression <$> expression)
+                          <|> symbol AnonSlash *> (Expression.DividedBy lexpression <$> expression)
+                          <|> symbol AnonSlashSlash *> (Expression.DividedBy lexpression <$> expression)
+                          <|> symbol AnonPercent *> (Expression.Modulo lexpression <$> expression)
+                          <|> symbol AnonStarStar *> (Expression.Power lexpression <$> expression)
 
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
