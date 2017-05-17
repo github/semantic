@@ -26,7 +26,6 @@ import Syntax
 import Term
 import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
-import Text.Parser.TreeSitter.JavaScript
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
@@ -82,7 +81,7 @@ parserForLanguage :: Maybe Language -> Parser (Syntax Text) (Record DefaultField
 parserForLanguage Nothing = lineByLineParser
 parserForLanguage (Just language) = case language of
   C -> treeSitterParser C tree_sitter_c
-  JavaScript -> treeSitterParser JavaScript tree_sitter_javascript
+  JavaScript -> treeSitterParser TypeScript tree_sitter_typescript
   TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
   Markdown -> cmarkParser
   Ruby -> treeSitterParser Ruby tree_sitter_ruby
