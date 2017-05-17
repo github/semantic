@@ -19,6 +19,7 @@ type Syntax' =
   '[ Comment.Comment
    , Declaration.Import
    , Expression.Arithmetic
+   , Expression.Boolean
    , Expression.Bitwise
    , Expression.Tuple
    , Expression.Unary
@@ -77,6 +78,12 @@ binaryOperator = makeTerm <$> symbol BinaryOperator <*> children ( expression >>
                        <|> symbol AnonCaret *> (Expression.BXOr lexpression <$> expression)
                        <|> symbol AnonLAngleLAngle *> (Expression.LShift lexpression <$> expression)
                        <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expression)
+
+booleanOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= \ lexpression -> (booleanOperator' lexpression))
+  where
+    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expression)
+                                <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
 
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
