@@ -33,7 +33,7 @@ spec = parallel $ do
 
   describe "readBlobPairsFromHandle" $ do
     it "returns blobs for valid JSON encoded diff input" $ do
-      h <- openFile "test/fixtures/input/test.json" ReadMode
+      h <- openFile "test/fixtures/input/diff.json" ReadMode
       blobs <- runCommand (readBlobPairsFromHandle h)
       let a = sourceBlob "method.rb" (Just Ruby) (Source "def foo; end")
       let b = sourceBlob "method.rb" (Just Ruby) (Source "def bar(x); end")
@@ -42,6 +42,17 @@ spec = parallel $ do
     it "throws on invalid input" $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode
       runCommand (readBlobPairsFromHandle h) `shouldThrow` (== ExitFailure 1)
+
+  describe "readBlobsFromHandle" $ do
+    it "returns blobs for valid JSON encoded parse input" $ do
+      h <- openFile "test/fixtures/input/parse.json" ReadMode
+      blobs <- runCommand (readBlobsFromHandle h)
+      let a = sourceBlob "method.rb" (Just Ruby) (Source "def foo; end")
+      blobs `shouldBe` [a]
+
+    it "throws on invalid input" $ do
+      h <- openFile "test/fixtures/input/blank.json" ReadMode
+      runCommand (readBlobsFromHandle h) `shouldThrow` (== ExitFailure 1)
 
   describe "readFilesAtSHA" $ do
     it "returns blobs for the specified paths" $ do

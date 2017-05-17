@@ -1,24 +1,24 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields #-}
 module Command.Files
 ( readFile
 , readBlobPairsFromHandle
+, readBlobsFromHandle
 , transcode
 , languageForFilePath
 ) where
 
-import Prologue hiding (readFile)
-import Language
-import Source
-import System.FilePath
 import Control.Exception (catch, IOException)
-import qualified Data.Text.ICU.Convert as Convert
-import qualified Data.Text.ICU.Detect as Detect
-
-import qualified Control.Applicative as A
 import Data.Aeson
-import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.String
+import Language
+import Prologue hiding (readFile)
+import qualified Control.Applicative as A
+import qualified Data.ByteString as B
+import qualified Data.Text.ICU.Convert as Convert
+import qualified Data.Text.ICU.Detect as Detect
+import Source
+import System.FilePath
 
 
 -- | Read a file to a SourceBlob, transcoding to UTF-8 along the way.
@@ -39,16 +39,34 @@ transcode text = fromText <$> do
 languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . toS . takeExtension
 
--- | Read JSON encoded blobs from a handle.
+-- | Read JSON encoded blob pairs from a handle.
 readBlobPairsFromHandle :: Handle -> IO [Both SourceBlob]
-readBlobPairsFromHandle h = do
+readBlobPairsFromHandle = readFromHandle toSourceBlobPairs
+  where
+    toSourceBlobPairs BlobDiff{..} = toSourceBlobPair <$> blobs
+    toSourceBlobPair BlobPair{..} = fmap (maybe (emptySourceBlob path) toSourceBlob) (both before after)
+
+-- | Read JSON encoded blobs from a handle.
+readBlobsFromHandle :: Handle -> IO [SourceBlob]
+readBlobsFromHandle = readFromHandle toSourceBlobs
+  where
+    toSourceBlobs BlobParse{..} = fmap toSourceBlob blobs
+
+readFromHandle :: (FromJSON a, Monoid b) => (a -> b) -> Handle -> IO b
+readFromHandle f h = do
   input <- B.hGetContents h
-  let request = decode (toS input) :: Maybe BlobDiff
-  when (isNothing request) $ die ("invalid input on " <> show h <> ", expecting JSON")
-  pure $ maybe mempty sourceBlobs request
+  let d = decode (toS input)
+  when (isNothing d) $ die ("invalid input on " <> show h <> ", expecting JSON")
+  pure $ maybe mempty f d
+
+toSourceBlob :: Blob -> SourceBlob
+toSourceBlob Blob{..} = sourceBlob path (readMaybe language) (Source (utf8Text content))
 
 
 newtype BlobDiff = BlobDiff { blobs :: [BlobPair] }
+  deriving (Show, Generic, FromJSON, ToJSON)
+
+newtype BlobParse = BlobParse { blobs :: [Blob] }
   deriving (Show, Generic, FromJSON, ToJSON)
 
 data BlobPair = BlobPair
@@ -58,7 +76,8 @@ data BlobPair = BlobPair
   } deriving (Show, Generic, FromJSON, ToJSON)
 
 data Blob = Blob
-  { content :: BlobContent
+  { path :: String
+  , content :: BlobContent
   , language :: String
   } deriving (Show, Generic, FromJSON, ToJSON)
 
@@ -71,19 +90,3 @@ instance ToJSON BlobContent where
 instance FromJSON BlobContent where
   parseJSON (String t) = (pure . BlobContent . encodeUtf8) t
   parseJSON _ = A.empty
-
-sourceBlobs :: BlobDiff -> [Both SourceBlob]
-sourceBlobs BlobDiff{..} = toSourceBlob <$> blobs
-  where
-    toSourceBlob :: BlobPair -> Both SourceBlob
-    toSourceBlob BlobPair{..} = fmap (sourceBlob' path) (both before after)
-
-    sourceBlob' :: FilePath -> Maybe Blob -> SourceBlob
-    sourceBlob' path c = maybe (emptySourceBlob path) (sourceBlob path (language' c)) (source' c)
-
-    language' :: Maybe Blob -> Maybe Language
-    language' Nothing = Nothing
-    language' (Just Blob{..}) = readMaybe language
-
-    source' :: Maybe Blob -> Maybe Source
-    source' = fmap (Source . utf8Text . content)

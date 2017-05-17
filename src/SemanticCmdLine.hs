@@ -59,6 +59,7 @@ runParse ParseArguments{..} = do
   blobs <- runCommand $ case parseMode of
     ParsePaths paths -> traverse (uncurry readFile) paths
     ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
+    ParseStdin -> readBlobsFromHandle stdin
   Semantic.parseBlobs parseTreeRenderer blobs
 
 -- | A parser for the application's command-line arguments.
@@ -100,7 +101,8 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
                <$> some (argument filePathReader (metavar "FILES..."))
             <|> ParseCommit
                <$> option (eitherReader parseSha) (long "sha" <> metavar "SHA" <> help "Commit SHA")
-               <*> some (argument filePathReader (metavar "FILES...")) )
+               <*> some (argument filePathReader (metavar "FILES..."))
+            <|> pure ParseStdin )
          <*> pure gitDir
          <*> pure alternates )
 
