@@ -32,7 +32,6 @@ type Syntax' =
    , Literal.String
    , Literal.TextElement
    , Statement.If
-   , Statement.Import
    , Statement.Return
    , Syntax.Empty
    , Syntax.Identifier
