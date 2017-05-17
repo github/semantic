@@ -52,7 +52,7 @@ spec = do
       () <$ runAssignment (children red) (makeState "a" [Rose (rec Blue 0 1) [Rose (rec Red 0 1) []]]) `shouldBe` Result [] (Just ())
 
     it "does not match if its subrule does not match" $
-      (runAssignment (children red) (makeState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Result [ Error (Info.SourcePos 1 1) [Red] (Just Green) ] Nothing
+      (runAssignment (children red) (makeState "a" [Rose (rec Blue 0 1) [Rose (rec Green 0 1) []]])) `shouldBe` Result [ Error (Info.SourcePos 1 1) (UnexpectedSymbol [Red] Green) ] Nothing
 
     it "matches nested children" $ do
       runAssignment
