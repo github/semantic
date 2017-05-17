@@ -43,7 +43,7 @@ replacementSummary :: DiffSummary DiffInfo
 replacementSummary = DiffSummary { diffSummaryPatch = Replace (LeafInfo StringLiteral "a" $ sourceSpanBetween (1, 2) (1, 4)) (LeafInfo SymbolLiteral "b" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
 
 blobs :: Both SourceBlob
-blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just JavaScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just JavaScript))
+blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
 
 spec :: Spec
 spec = parallel $ do

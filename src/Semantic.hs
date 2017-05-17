@@ -81,7 +81,6 @@ parserForLanguage :: Maybe Language -> Parser (Syntax Text) (Record DefaultField
 parserForLanguage Nothing = lineByLineParser
 parserForLanguage (Just language) = case language of
   C -> treeSitterParser C tree_sitter_c
-  JavaScript -> treeSitterParser TypeScript tree_sitter_typescript
   TypeScript -> treeSitterParser TypeScript tree_sitter_typescript
   Markdown -> cmarkParser
   Ruby -> treeSitterParser Ruby tree_sitter_ruby
