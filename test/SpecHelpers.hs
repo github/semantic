@@ -4,25 +4,29 @@ module SpecHelpers
 , parseFilePath
 , readFile
 , languageForFilePath
+, unListableDiff
 ) where
 
-import Data.Functor.Both
-import Language
-import Prologue hiding (readFile)
 import qualified Data.ByteString as B
+import Data.Functor.Both
+import Data.Functor.Listable
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
+import Diff
+import Language
+import Patch
+import Prologue hiding (readFile)
 import Renderer
-import Renderer.SExpression
 import Semantic
 import Source
 import System.FilePath
+import Term
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
 diffFilePaths paths = do
   blobs <- pure <$> traverse readFile paths
-  diffBlobPairs (SExpressionDiffRenderer TreeOnly) blobs
+  diffBlobPairs (const identity) (SExpressionDiffRenderer TreeOnly) blobs
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
@@ -53,3 +57,7 @@ readFile path = do
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . toS . takeExtension
+
+-- | Extract a 'Diff' from a 'ListableF' enumerated by a property test.
+unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
+unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff

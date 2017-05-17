@@ -3,42 +3,57 @@
 module Arguments where
 
 import Data.Maybe
+import Data.Record
+import Data.String
+import Info
 import Language
-import Prelude
 import Prologue
 import Renderer
-import Renderer.SExpression
-import Info
+import Source
+import Syntax
+import Term
+import Text.Show
 
 data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
   deriving Show
 
 data DiffArguments where
-  DiffArguments :: (Monoid output, StringConv output ByteString) =>
-    { diffRenderer :: DiffRenderer DefaultFields output
+  DiffArguments :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) =>
+    { diffRenderer :: DiffRenderer fields output
+    , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
     , diffMode :: DiffMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
     } -> DiffArguments
 
-deriving instance Show DiffArguments
+instance Show DiffArguments where
+  showsPrec d DiffArguments{..} = showParen (d > 10) $ showString "DiffArguments { " . foldr (.) identity (intersperse (showString ", ") fields) . showString " }"
+    where fields = [ showString "diffRenderer " . shows diffRenderer
+                   , showString "termDecorator _"
+                   , showString "diffMode " . shows diffMode
+                   , showString "gitDir " . shows gitDir
+                   , showString "alternateObjectDirs " . shows alternateObjectDirs ]
 
 type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
 
+-- | The identity decorator, i.e. a decorator which ignores the source and passes terms through unchanged.
+identityDecorator :: Source -> Term f a -> Term f a
+identityDecorator = const identity
+
 patchDiff :: DiffArguments'
-patchDiff = DiffArguments PatchRenderer
+patchDiff = DiffArguments PatchRenderer identityDecorator
 
 jsonDiff :: DiffArguments'
-jsonDiff = DiffArguments JSONDiffRenderer
+jsonDiff = DiffArguments JSONDiffRenderer identityDecorator
 
 summaryDiff :: DiffArguments'
-summaryDiff = DiffArguments SummaryRenderer
+summaryDiff = DiffArguments SummaryRenderer identityDecorator
 
 sExpressionDiff :: DiffArguments'
-sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly)
+sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) identityDecorator
 
 tocDiff :: DiffArguments'
-tocDiff = DiffArguments ToCRenderer
+tocDiff = DiffArguments ToCRenderer declarationDecorator
 
 
 data ParseMode = ParseCommit String [(FilePath, Maybe Language)] | ParsePaths [(FilePath, Maybe Language)]
