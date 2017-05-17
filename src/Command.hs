@@ -3,7 +3,7 @@ module Command
 ( Command
 -- Constructors
 , readFile
-, readStdin
+, readHandle
 , readFilesAtSHA
 , readFilesAtSHAs
 -- Evaluation
@@ -12,7 +12,6 @@ module Command
 
 import qualified Command.Files as Files
 import qualified Command.Git as Git
-import qualified Command.Stdin as Stdin
 import Control.Monad.Free.Freer
 import Control.Monad.IO.Class
 import Data.Functor.Both
@@ -34,8 +33,8 @@ type Command = Freer CommandF
 readFile :: FilePath -> Maybe Language -> Command SourceBlob
 readFile path lang = ReadFile path lang `Then` return
 
-readStdin :: Command [Both SourceBlob]
-readStdin = ReadStdin `Then` return
+readHandle :: Handle -> Command [Both SourceBlob]
+readHandle h = ReadHandle h `Then` return
 
 -- | Read a list of files at the given commit SHA.
 readFilesAtSHA :: FilePath -- ^ GIT_DIR
@@ -60,7 +59,7 @@ readFilesAtSHAs gitDir alternates paths shas = ReadFilesAtSHAs gitDir alternates
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path lang -> Files.readFile path lang >>= yield
-  ReadStdin -> Stdin.readStdin >>= yield
+  ReadHandle h -> Files.readHandle h >>= yield
   ReadFilesAtSHA gitDir alternates paths sha -> Git.readFilesAtSHA gitDir alternates paths sha >>= yield
   ReadFilesAtSHAs gitDir alternates paths shas -> Git.readFilesAtSHAs gitDir alternates paths shas >>= yield
   LiftIO io -> io >>= yield
@@ -70,7 +69,7 @@ runCommand = iterFreerA $ \ command yield -> case command of
 
 data CommandF f where
   ReadFile :: FilePath -> Maybe Language -> CommandF SourceBlob
-  ReadStdin :: CommandF [Both SourceBlob]
+  ReadHandle :: Handle -> CommandF [Both SourceBlob]
   ReadFilesAtSHA :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> String -> CommandF [SourceBlob]
   ReadFilesAtSHAs :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> Both String -> CommandF [Both SourceBlob]
   LiftIO :: IO a -> CommandF a
@@ -81,7 +80,7 @@ instance MonadIO Command where
 instance Show1 CommandF where
   liftShowsPrec _ _ d command = case command of
     ReadFile path lang -> showsBinaryWith showsPrec showsPrec "ReadFile" d path lang
-    ReadStdin -> showString "ReadStdin"
+    ReadHandle h -> showsUnaryWith showsPrec "ReadHandle" d h
     ReadFilesAtSHA gitDir alternates paths sha -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHA" d gitDir alternates paths sha
     ReadFilesAtSHAs gitDir alternates paths shas -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHAs" d gitDir alternates paths shas
     LiftIO _ -> showsUnaryWith (const showChar) "LiftIO" d '_'
