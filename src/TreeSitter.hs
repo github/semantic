@@ -14,7 +14,6 @@ import qualified Data.Syntax.Assignment as A
 import Language
 import qualified Language.C as C
 import qualified Language.Go as Go
-import qualified Language.JavaScript as JS
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import qualified Language.Ruby.Syntax as Ruby
@@ -132,7 +131,6 @@ assignTerm language source annotation children allChildren =
     _ -> defaultTermAssignment source (category annotation) children allChildren
   where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
         assignTermByLanguage language = case language of
-          JavaScript -> JS.termAssignment
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
           Ruby -> Ruby.termAssignment
@@ -187,7 +185,6 @@ categoryForLanguageProductionName = withDefaults . byLanguage
       s -> productionMap s
 
     byLanguage language = case language of
-      JavaScript -> JS.categoryForJavaScriptProductionName
       C -> C.categoryForCProductionName
       Ruby -> Ruby.categoryForRubyName
       Language.Go -> Go.categoryForGoName

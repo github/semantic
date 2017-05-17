@@ -43,7 +43,6 @@ library
                      , Interpreter
                      , Language
                      , Language.C
-                     , Language.JavaScript
                      , Language.Markdown
                      , Language.Go
                      , Language.Go.Syntax
