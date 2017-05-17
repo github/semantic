@@ -27,6 +27,7 @@ import Term
 import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.JavaScript
+import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
@@ -87,6 +88,7 @@ parserForLanguage (Just language) = case language of
   Markdown -> cmarkParser
   Ruby -> treeSitterParser Ruby tree_sitter_ruby
   Language.Go -> treeSitterParser Language.Go tree_sitter_go
+  Python -> treeSitterParser Python tree_sitter_python
 
 
 -- Internal
