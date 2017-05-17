@@ -5,6 +5,7 @@ import Data.Functor.Union
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
@@ -21,6 +22,7 @@ mkSymbolDatatype (mkName "Grammar") tree_sitter_python
 type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
+   , Declaration.Import
    , Expression.Tuple
    , Expression.Unary
    , Literal.Boolean
@@ -42,7 +44,7 @@ assignment = symbol Module *> children (many declaration)
 
 
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-declaration = comment <|> literal <|> statement <|> importStatement <|> importFromStatement
+declaration = comment <|> literal <|> statement <|> import' <|> importFrom
 
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
@@ -87,12 +89,12 @@ expressionStatement = symbol ExpressionStatement *> children (statement <|> lite
 
 
 -- TODO Possibly match against children for dotted name and identifiers
-importStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-importStatement = makeTerm <$> symbol ImportStatement <*> (Statement.Import <$> source)
+import' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+import' = makeTerm <$> symbol ImportStatement <*> (Declaration.Import <$> source)
 
 -- TODO Possibly match against children nodes
-importFromStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-importFromStatement = makeTerm <$> symbol ImportFromStatement <*> (Statement.Import <$> source)
+importFrom :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+importFrom = makeTerm <$> symbol ImportFromStatement <*> (Declaration.Import <$> source)
 
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))

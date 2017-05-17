@@ -53,3 +53,12 @@ data Constructor a = Constructor { constructorName :: !a, constructorFields :: !
 
 instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | Import declarations.
+data Import a = Import { importContent :: ByteString }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
