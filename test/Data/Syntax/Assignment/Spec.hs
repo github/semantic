@@ -88,8 +88,8 @@ spec = do
     it "does not drop anonymous nodes when requested" $
       runAssignment ((,) <$> magenta <*> red) (makeState "magenta red" [Rose (rec Magenta 0 7) [], Rose (rec Red 8 11) []]) `shouldBe` Result [] (Just (AssignmentState 11 (Info.SourcePos 1 12) "" [], (Out "magenta", Out "red")))
 
-rec :: symbol -> Int -> Int -> Record '[symbol, Range, SourceSpan]
-rec symbol start end = symbol :. Range start end :. Info.SourceSpan (Info.SourcePos 1 (succ start)) (Info.SourcePos 1 (succ end)) :. Nil
+rec :: symbol -> Int -> Int -> Record '[Maybe symbol, Range, SourceSpan]
+rec symbol start end = Just symbol :. Range start end :. Info.SourceSpan (Info.SourcePos 1 (succ start)) (Info.SourcePos 1 (succ end)) :. Nil
 
 data Grammar = Red | Green | Blue | Magenta
   deriving (Enum, Eq, Show)
