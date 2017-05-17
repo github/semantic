@@ -81,7 +81,7 @@ toAST node@Node{..} = do
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g
 
-safeToEnum :: forall n. (Ix n, Bounded n, Enum n) => Int -> Maybe n
+safeToEnum :: forall n. (Bounded n, Enum n) => Int -> Maybe n
 safeToEnum n | (fromEnum (minBound :: n), fromEnum (maxBound :: n)) `inRange` n = Just (toEnum n)
              | otherwise = Nothing
 
