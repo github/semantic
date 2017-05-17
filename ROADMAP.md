@@ -33,7 +33,7 @@ Our data should be readily available to consumers.
 Task                   | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
 ----                   | ---    | ----------------- | -----------------------
 GraphQL parse tree API | @tclem |                   | ✅
-GraphQL diff API       |        |                   | 2
+GraphQL diff API       |        | 3                 | 2
 
 
 ### Serve more of our users
