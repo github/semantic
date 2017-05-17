@@ -77,7 +77,7 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
       <$> ( (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
            <|> flag' jsonDiff (long "json" <> help "Output a json diff")
            <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
-           <|> flag' tocDiff (long "toc" <> help "Output a table of contents diff summary") )
+           <|> flag' tocDiff (long "toc" <> help "Output a table of contents for a diff") )
          <*> (  DiffPaths
                <$> argument filePathReader (metavar "FILE_A")
                <*> argument filePathReader (metavar "FILE_B")
