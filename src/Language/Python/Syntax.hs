@@ -28,6 +28,7 @@ type Syntax' =
    , Literal.Integer
    , Literal.None
    , Literal.String
+   , Literal.Boolean
    , Literal.TextElement
    , Statement.If
    , Statement.Return
@@ -54,7 +55,13 @@ tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> tuple <|> literal
+expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> true <|> false
+
+true :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
+
+false :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCompliment <$> (symbol AnonTilde *> expression)
