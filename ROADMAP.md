@@ -106,18 +106,6 @@ Enables:
 - linking symbol references to declarations.
 
 
-### Language support
-
-- Python
-
-**Ongoing Work:**
-
-- Extend the set of supported languages, guided by data on language usage.
-- Provide/improve tooling for writing/testing tree-sitter grammars.
-- Review contributions to open-source grammars.
-- Automate as much as possible to keep us focused on the core. Can we reduce/offload this in other ways?
-
-
 ### Operability/Production readiness
 
 - Caching
