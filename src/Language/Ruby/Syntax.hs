@@ -1,5 +1,15 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TemplateHaskell, TypeOperators #-}
-module Language.Ruby.Syntax where
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators #-}
+module Language.Ruby.Syntax
+( assignment
+, Syntax
+, Grammar
+, FAlgebra
+, RAlgebra
+, fToR
+, identifierAlg
+, cyclomaticComplexityAlg
+, decoratorWithAlgebra
+) where
 
 import Data.Functor.Foldable (Base)
 import Data.Functor.Union
@@ -12,11 +22,9 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import GHC.Stack
-import Language.Haskell.TH hiding (location, Range(..))
+import Language.Ruby.Grammar as Grammar
 import Prologue hiding (for, get, Location, state, unless)
 import Term
-import Text.Parser.TreeSitter.Language
-import Text.Parser.TreeSitter.Ruby
 
 -- | The type of Ruby syntax.
 type Syntax = Union Syntax'
@@ -48,10 +56,6 @@ type Syntax' =
   , Syntax.Identifier
   , []
   ]
-
-
--- | Statically-known rules corresponding to symbols in the grammar.
-mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -140,9 +144,9 @@ assignment'
       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-literal  =  makeTerm <$> symbol Language.Ruby.Syntax.True <*> (Literal.true <$ source)
-        <|> makeTerm <$> symbol Language.Ruby.Syntax.False <*> (Literal.false <$ source)
-        <|> makeTerm <$> symbol Language.Ruby.Syntax.Integer <*> (Literal.Integer <$> source)
+literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
+        <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+        <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
         <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 

@@ -47,6 +47,7 @@ library
                      , Language.Go
                      , Language.Go.Syntax
                      , Language.Ruby
+                     , Language.Ruby.Grammar
                      , Language.Ruby.Syntax
                      , Language.TypeScript
                      , Language.TypeScript.Syntax
