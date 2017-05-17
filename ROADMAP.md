@@ -63,7 +63,6 @@ LSP integration                  | @joshvera | 2                 | 4
 - Parse tree.
   - Integration with code search 2.0
   - [Semantic notifications](https://github.com/github/semantic-diff/issues/744)
-- Diff.
 - Repository and/or project-level (semantic index)
   - Dependencies
   - Some sort of persistence to “link” together different parse trees/repositories/etc.
@@ -90,7 +89,6 @@ Enables:
 
 ### Semantic analysis
 
-- À la carte syntax
 - Cyclomatic complexity
 - Modular abstract interpreters
 - Type inference
