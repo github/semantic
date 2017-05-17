@@ -122,7 +122,6 @@ library
                      , c
                      , go
                      , ruby
-                     , javascript
                      , typescript
                      , python
                      , network
