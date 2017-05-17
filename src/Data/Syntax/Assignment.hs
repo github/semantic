@@ -159,7 +159,7 @@ deriving instance Show symbol => Show (Error symbol)
 data ErrorCause symbol
   = UnexpectedSymbol [symbol] symbol
   | UnexpectedEndOfInput [symbol]
-  | ErrorNode [symbol]
+  | ParseError [symbol]
   deriving (Eq, Show)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
@@ -173,7 +173,7 @@ showError source Error{..}
           UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
           UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
           UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
-          ErrorNode symbols -> showString "expected " . showSymbols symbols . showString ", but got error node"
+          ParseError symbols -> showString "expected " . showSymbols symbols . showString ", but got parse error"
         context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
@@ -197,7 +197,7 @@ assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
     Rose (Just s :. _) _ :_ -> Result (if null es then [ Error (statePos state) (UnexpectedSymbol [] s) ] else es) Nothing
-    Rose (Nothing :. _) _ :_ -> Result (if null es then [ Error (statePos state) (ErrorNode []) ] else es) Nothing
+    Rose (Nothing :. _) _ :_ -> Result (if null es then [ Error (statePos state) (ParseError []) ] else es) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -216,7 +216,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Alt a b, _) -> yield a state <|> yield b state
           (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
           (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
-          (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) (ErrorNode expectedSymbols) ] Nothing
+          (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) (ParseError expectedSymbols) ] Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous initialState
                   _ -> initialState
@@ -289,7 +289,7 @@ instance Show1 ErrorCause where
   liftShowsPrec sp sl d e = case e of
     UnexpectedSymbol expected actual -> showsBinaryWith (liftShowsPrec sp sl) sp "UnexpectedSymbol" d expected actual
     UnexpectedEndOfInput expected -> showsUnaryWith (liftShowsPrec sp sl) "UnexpectedEndOfInput" d expected
-    ErrorNode expected -> showsUnaryWith (liftShowsPrec sp sl) "ErrorNode" d expected
+    ParseError expected -> showsUnaryWith (liftShowsPrec sp sl) "ParseError" d expected
 
 instance Applicative (Result symbol) where
   pure = Result [] . Just
