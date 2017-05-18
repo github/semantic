@@ -27,15 +27,14 @@ type Syntax' =
    , Expression.Boolean
    , Expression.Bitwise
    , Expression.Call
-   , Expression.Tuple
    , Expression.Unary
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
    , Literal.None
    , Literal.String
-   , Literal.Boolean
    , Literal.TextElement
+   , Literal.Tuple
    , Redirect
    , Statement.Assignment
    , Statement.If
