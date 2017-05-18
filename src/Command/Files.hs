@@ -17,7 +17,7 @@ import qualified Control.Applicative as A
 import qualified Data.ByteString as B
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
-import Source
+import Source hiding (path)
 import System.FilePath
 
 
@@ -47,10 +47,7 @@ readBlobPairsFromHandle = readFromHandle toSourceBlobPairs
     toSourceBlobPair blobs@BlobPair{..} = fmap (maybe (emptySourceBlob' blobs) toSourceBlob) (both before after)
 
     emptySourceBlob' :: BlobPair -> SourceBlob
-    emptySourceBlob' BlobPair{..} = emptySourceBlob $ case (before, after) of
-      (Just Blob{..}, _) -> path
-      (_, Just Blob{..}) -> path
-      _ -> ""
+    emptySourceBlob' BlobPair{..} = emptySourceBlob (maybe "" path (before <|> after))
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: Handle -> IO [SourceBlob]
