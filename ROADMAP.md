@@ -16,6 +16,12 @@ See also our [roadmap project][] for our current efforts.
 
 Measure our existing work’s performance, usage, &c. to determine baselines for future improvements.
 
+Task                                | PRP | Priority (1 to 3) | Amount of work (1 to 4)
+----                                | --- | ----------------- | -----------------------
+Determine what baselines to measure |     |                   | ?
+Measure them                        |     |                   | ???
+
+
 ### Get our data into production
 
 Task                    | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
