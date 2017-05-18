@@ -1,6 +1,9 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Language.Python.Syntax where
 
+import Data.Align.Generic
+import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Show.Generic
 import Data.Functor.Union
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
@@ -9,6 +12,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import GHC.Generics
 import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Prologue hiding (Location)
@@ -32,12 +36,19 @@ type Syntax' =
    , Literal.String
    , Literal.Boolean
    , Literal.TextElement
+   , Redirect
    , Statement.Assignment
    , Statement.If
    , Statement.Return
    , Syntax.Empty
    , Syntax.Identifier
    ]
+
+data Redirect a = Redirect !a !a
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Redirect where liftEq = genericLiftEq
+instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: HasCallStack => Assignment (Node Grammar) [Term Syntax Location]
@@ -144,7 +155,13 @@ chevron = makeTerm <$> symbol Chevron <*> (Syntax.Empty <$ source)
 -- assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> (symbol AnonAssert *> pack "assert" <$> many expression))
 
 printStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-printStatement = makeTerm <$ symbol PrintStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier <$> source)) <*> (many expression))
+printStatement = symbol PrintStatement >>= \ location -> children (printKeyword >>= \ print ->
+      redirectCallTerm location print
+  <|> printCallTerm location print)
+  where
+    printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier <$> source)
+    redirectCallTerm location keyword = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location keyword)
+    printCallTerm location keyword = makeTerm location . Expression.Call keyword <$> many expression
 
 -- globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 -- globalStatement = makeTerm <$ symbol GlobalStatement <*> location <*> children (some identifier)
