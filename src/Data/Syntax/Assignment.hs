@@ -72,6 +72,7 @@ module Data.Syntax.Assignment
 , AST
 , Result(..)
 , Error(..)
+, ErrorCause(..)
 , showError
 , assign
 , runAssignment
@@ -136,7 +137,7 @@ data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
 type Location = Record '[Info.Range, Info.SourceSpan]
 
 -- | The label annotating a node in the AST, specified as the pairing of its symbol and location information.
-type Node grammar = Record '[grammar, Info.Range, Info.SourceSpan]
+type Node grammar = Record '[Maybe grammar, Info.Range, Info.SourceSpan]
 
 -- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
 type AST grammar = Rose (Node grammar)
@@ -150,12 +151,17 @@ data Error symbol where
   Error
     :: HasCallStack
     => { errorPos :: Info.SourcePos
-       , errorExpected :: [symbol]
-       , errorActual :: Maybe symbol
+       , errorCause :: ErrorCause symbol
        } -> Error symbol
 
 deriving instance Eq symbol => Eq (Error symbol)
 deriving instance Show symbol => Show (Error symbol)
+
+data ErrorCause symbol
+  = UnexpectedSymbol [symbol] symbol
+  | UnexpectedEndOfInput [symbol]
+  | ParseError [symbol]
+  deriving (Eq, Show)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
@@ -164,10 +170,11 @@ showError source Error{..}
   . showString (prettyCallStack callStack) . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
-  where showExpectation = case (errorExpected, errorActual) of
-          ([], Nothing) -> showString "no rule to match at end of input nodes"
-          (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
-          (symbols, Just a) -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+  where showExpectation = case errorCause of
+          UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
+          UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
+          UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+          ParseError symbols -> showString "expected " . showSymbols symbols . showString ", but got parse error"
         context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
@@ -190,7 +197,8 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCal
 assignAllFrom assignment state = case runAssignment assignment state of
   Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result [] (Just (state, a))
-    Rose (s :. _) _ :_ -> Result (if null es then [ Error (statePos state) [] (Just s) ] else es) Nothing
+    Rose (Just s :. _) _ :_ -> Result (if null es then [ Error (statePos state) (UnexpectedSymbol [] s) ] else es) Nothing
+    Rose (Nothing :. _) _ :_ -> Result (if null es then [ Error (statePos state) (ParseError []) ] else es) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -204,11 +212,12 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
             Result _ (Just (state', a)) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result es Nothing -> Result es Nothing
-          (Choose choices, Rose (symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          (Choose choices, Rose (Just symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          (_, []) -> Result [ Error statePos expectedSymbols Nothing ] Nothing
-          (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) expectedSymbols (Just symbol) ] Nothing
+          (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
+          (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
+          (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) (ParseError expectedSymbols) ] Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous initialState
                   _ -> initialState
@@ -218,7 +227,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
                 choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
-dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . rhead . roseValue) (stateNodes state) }
+dropAnonymous state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . rhead . roseValue) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: AssignmentState grammar -> AssignmentState grammar
@@ -275,9 +284,13 @@ instance (Show symbol, Show a) => Show (Result symbol a) where
   showsPrec = showsPrec2
 
 instance Show1 Error where
-  liftShowsPrec sp sl d (Error p e a) = showsTernaryWith showsPrec (liftShowsPrec sp sl) (liftShowsPrec sp sl) "Error" d p e a
-    where showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
-            showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
+  liftShowsPrec sp sl d (Error p c) = showsBinaryWith showsPrec (liftShowsPrec sp sl) "Error" d p c
+
+instance Show1 ErrorCause where
+  liftShowsPrec sp sl d e = case e of
+    UnexpectedSymbol expected actual -> showsBinaryWith (liftShowsPrec sp sl) sp "UnexpectedSymbol" d expected actual
+    UnexpectedEndOfInput expected -> showsUnaryWith (liftShowsPrec sp sl) "UnexpectedEndOfInput" d expected
+    ParseError expected -> showsUnaryWith (liftShowsPrec sp sl) "ParseError" d expected
 
 instance Applicative (Result symbol) where
   pure = Result [] . Just
