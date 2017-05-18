@@ -67,6 +67,7 @@ statement = expressionStatement
           <|> assignment'
           <|> printStatement
           <|> assertStatement
+          <|> globalStatement
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
@@ -163,8 +164,8 @@ printStatement = do
     redirectCallTerm location keyword = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location keyword)
     printCallTerm location keyword = makeTerm location . Expression.Call keyword <$> many expression
 
--- globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
--- globalStatement = makeTerm <$ symbol GlobalStatement <*> location <*> children (some identifier)
+globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+globalStatement = makeTerm <$ symbol GlobalStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
 
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))
