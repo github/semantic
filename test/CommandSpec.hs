@@ -35,22 +35,40 @@ spec = parallel $ do
     it "returns blobs for valid JSON encoded diff input" $ do
       h <- openFile "test/fixtures/input/diff.json" ReadMode
       blobs <- runCommand (readBlobPairsFromHandle h)
-      let a = sourceBlob "method.rb" (Just Ruby) (Source "def foo; end")
-      let b = sourceBlob "method.rb" (Just Ruby) (Source "def bar(x); end")
+      let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
+      let b = sourceBlob "method.rb" (Just Ruby) "def bar(x); end"
       blobs `shouldBe` [both a b]
 
-    it "throws on invalid input" $ do
+    it "returns blobs for unsupported language" $ do
+      h <- openFile "test/fixtures/input/diff-unsupported-language.json" ReadMode
+      blobs <- runCommand (readBlobPairsFromHandle h)
+      let a = emptySourceBlob "test.kt"
+      let b = sourceBlob "test.kt" Nothing "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
+      blobs `shouldBe` [both a b]
+
+    it "detects language based on filepath for empty language" $ do
+      h <- openFile "test/fixtures/input/diff-empty-language.json" ReadMode
+      blobs <- runCommand (readBlobPairsFromHandle h)
+      let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
+      let b = sourceBlob "method.rb" (Just Ruby) "def bar(x); end"
+      blobs `shouldBe` [both a b]
+
+    it "throws on blank input" $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode
       runCommand (readBlobPairsFromHandle h) `shouldThrow` (== ExitFailure 1)
+
+    it "throws if language field not given" $ do
+      h <- openFile "test/fixtures/input/diff-no-language.json" ReadMode
+      runCommand (readBlobsFromHandle h) `shouldThrow` (== ExitFailure 1)
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
       h <- openFile "test/fixtures/input/parse.json" ReadMode
       blobs <- runCommand (readBlobsFromHandle h)
-      let a = sourceBlob "method.rb" (Just Ruby) (Source "def foo; end")
+      let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
       blobs `shouldBe` [a]
 
-    it "throws on invalid input" $ do
+    it "throws on blank input" $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode
       runCommand (readBlobsFromHandle h) `shouldThrow` (== ExitFailure 1)
 

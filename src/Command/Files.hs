@@ -62,7 +62,10 @@ readFromHandle h = do
     Nothing -> die ("invalid input on " <> show h <> ", expecting JSON")
 
 toSourceBlob :: Blob -> SourceBlob
-toSourceBlob Blob{..} = sourceBlob path (readMaybe language) (Source (utf8Text content))
+toSourceBlob Blob{..} = sourceBlob path language' (Source (encodeUtf8 content))
+  where language' = case language of
+          "" -> languageForFilePath path
+          _ -> readMaybe language
 
 
 newtype BlobDiff = BlobDiff { blobs :: [BlobPair] }
@@ -78,16 +81,6 @@ data BlobPair = BlobPair
 
 data Blob = Blob
   { path :: String
-  , content :: BlobContent
+  , content :: Text
   , language :: String
   } deriving (Show, Generic, FromJSON, ToJSON)
-
-newtype BlobContent = BlobContent { utf8Text :: ByteString }
-  deriving (Eq, Show)
-
-instance ToJSON BlobContent where
-  toJSON = String . decodeUtf8 . utf8Text
-
-instance FromJSON BlobContent where
-  parseJSON (String t) = (pure . BlobContent . encodeUtf8) t
-  parseJSON _ = A.empty
