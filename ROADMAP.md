@@ -1,6 +1,6 @@
 # Semantic Code Q2 FY2018 Roadmap
 
-Semantic Code produces data around code’s structure and meaning. This is made available via GraphQL APIs, enabling others (both at GitHub and elsewhere) to build features.
+This quarter, we will focus on laying a foundation for future work.
 
 See also our [roadmap project][].
 
