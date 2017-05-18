@@ -22,6 +22,7 @@ type Syntax' =
    , Expression.Arithmetic
    , Expression.Boolean
    , Expression.Bitwise
+   , Expression.Call
    , Expression.Tuple
    , Expression.Unary
    , Literal.Boolean
@@ -53,6 +54,7 @@ statement = expressionStatement
           <|> returnStatement
           <|> identifier
           <|> assignment'
+          <|> printStatement
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
@@ -141,8 +143,8 @@ chevron = makeTerm <$> symbol Chevron <*> (Syntax.Empty <$ source)
 -- assertStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 -- assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> (symbol AnonAssert *> pack "assert" <$> many expression))
 
--- printStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
--- printStatement = makeTerm <$ symbol PrintStatement <*> location <*> children (Expression.Call (pack "print") <$> source)
+printStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+printStatement = makeTerm <$ symbol PrintStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier <$> source)) <*> (many expression))
 
 -- globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 -- globalStatement = makeTerm <$ symbol GlobalStatement <*> location <*> children (some identifier)
