@@ -38,14 +38,15 @@ ToC in Enterprise       | @joshvera  | 2                 | ?
 
 ### Improve our supported languages
 
-We will add support for Python, and improve our support for Ruby, Go, and JavaScript/TypeScript.
+We will add support for Python, improve our support for Ruby, Go, and JavaScript/TypeScript, and explore integration with LSP servers.
 
 Task                                | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
 ----                                | ---        | ----------------- | -----------------------
 À la carte assignment of Python     | @rewinfrey | 2                 | 2
-À la carte assignment of Go         |            |                   | 2
-À la carte assignment of Ruby       |            |                   | 2
-À la carte assignment of TypeScript |            |                   | 2
+À la carte assignment of Go         |            |                   | 2?
+À la carte assignment of Ruby       |            |                   | 2?
+À la carte assignment of TypeScript |            |                   | 2?
+🚀 LSP integration                   | @joshvera  | 2                 | 4?
 
 
 ### Provide more and better data
@@ -55,4 +56,3 @@ We want to provide more, more accurate, and more useful data.
 Task                           | PRP       | Priority (1 to 3) | Amount of work (1 to 4)
 ----                           | ---       | ----------------- | -----------------------
 Migration to à la carte syntax | @robrix   | 2                 | 2
-LSP integration                | @joshvera | 2                 | 4
