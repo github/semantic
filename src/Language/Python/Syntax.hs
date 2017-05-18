@@ -66,6 +66,7 @@ statement = expressionStatement
           <|> identifier
           <|> assignment'
           <|> printStatement
+          <|> assertStatement
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
@@ -148,8 +149,8 @@ importFrom = makeTerm <$> symbol ImportFromStatement <*> (Declaration.Import <$>
 
 
 -- TODO How to convert statements like this into a `Expression.Call`? The (pack "assert") produces a ByteString but that reduces the `Call` constructor to only accepting byteStrings.
--- assertStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
--- assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> (symbol AnonAssert *> pack "assert" <$> many expression))
+assertStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
 
 printStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 printStatement = do
