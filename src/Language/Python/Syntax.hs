@@ -69,7 +69,7 @@ statement = expressionStatement
           <|> globalStatement
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
+tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> true <|> false
