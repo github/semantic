@@ -40,9 +40,12 @@ ToC in Enterprise       | @joshvera  | 2                 | ?
 
 We will add support for Python, and improve our support for Ruby, Go, and JavaScript/TypeScript.
 
-Task              | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
-----              | ---        | ----------------- | -----------------------
-Python support    | @rewinfrey | 2                 | 2
+Task                                | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
+----                                | ---        | ----------------- | -----------------------
+À la carte assignment of Python     | @rewinfrey | 2                 | 2
+À la carte assignment of Go         |            |                   | 2
+À la carte assignment of Ruby       |            |                   | 2
+À la carte assignment of TypeScript |            |                   | 2
 
 
 ### Provide more and better data
