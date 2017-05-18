@@ -86,9 +86,10 @@ unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCo
                                                               <|> Expression.UPlus       <$> (symbol AnonPlus  *> expression))
 
 binaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-binaryOperator = symbol BinaryOperator >>= \ location -> exit location arithmetic <|> exit location bitwise
+binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>= \ lexpression ->
+      makeTerm location <$> arithmetic lexpression
+  <|> makeTerm location <$> bitwise lexpression)
   where
-    exit location constructor = children (expression >>= \ lexpression -> makeTerm location <$> constructor lexpression)
     arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expression)
                           <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expression)
                           <|> symbol AnonStar *> (Expression.Times lexpression <$> expression)
