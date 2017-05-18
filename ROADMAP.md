@@ -24,6 +24,8 @@ Measure them                         |     |                   | ???
 
 ### Get our data into production
 
+We will get our data into production and in front of customers.
+
 Task                    | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
 ----                    | ---    | ----------------- | -----------------------
 [Architecture review][] | @tclem | 1                 | ✅
