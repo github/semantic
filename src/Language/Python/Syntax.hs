@@ -155,9 +155,11 @@ chevron = makeTerm <$> symbol Chevron <*> (Syntax.Empty <$ source)
 -- assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> (symbol AnonAssert *> pack "assert" <$> many expression))
 
 printStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-printStatement = symbol PrintStatement >>= \ location -> children (printKeyword >>= \ print ->
-      redirectCallTerm location print
-  <|> printCallTerm location print)
+printStatement = do
+  location <- symbol PrintStatement
+  children $ do
+    print <- printKeyword
+    redirectCallTerm location print <|> printCallTerm location print
   where
     printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier <$> source)
     redirectCallTerm location keyword = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location keyword)
