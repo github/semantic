@@ -161,9 +161,9 @@ deriving instance Show symbol => Show (Error symbol)
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
   = showSourcePos errorPos . showString ": error: " . showExpectation . showChar '\n'
-  . showString (prettyCallStack callStack) . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
+  . showString (prettyCallStack callStack) . showChar '\n'
   where showExpectation = case (errorExpected, errorActual) of
           ([], Nothing) -> showString "no rule to match at end of input nodes"
           (symbols, Nothing) -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
