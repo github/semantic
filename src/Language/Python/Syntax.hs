@@ -30,6 +30,7 @@ type Syntax' =
    , Literal.String
    , Literal.Boolean
    , Literal.TextElement
+   , Statement.Assignment
    , Statement.If
    , Statement.Return
    , Syntax.Empty
@@ -50,6 +51,7 @@ statement = expressionStatement
           <|> ifStatement
           <|> returnStatement
           <|> identifier
+          <|> assignment'
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Expression.Tuple <$> (many expression))
@@ -92,6 +94,10 @@ booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression 
     booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expression)
                                 <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
 
+
+-- TODO: Handle multiple assignments
+assignment' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> (symbol ExpressionList *> children expression) <*> (symbol ExpressionList *> children expression))
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
