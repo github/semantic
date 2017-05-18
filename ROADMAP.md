@@ -14,7 +14,7 @@ See also our [roadmap project][] for our current efforts.
 
 ### Determine baselines
 
-Measure our existing work’s performance, usage, &c. to determine baselines for future improvements.
+We will select specific metrics believed to be key to our objectives, e.g. performance.
 
 Task                                 | PRP | Priority (1 to 3) | Amount of work (1 to 4)
 ----                                 | --- | ----------------- | -----------------------
