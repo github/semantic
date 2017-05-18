@@ -105,7 +105,7 @@ identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString
 
--- TODO: Wrap `Literal.TextElement` with a `Litera.String`
+-- TODO: Wrap `Literal.TextElement` with a `Literal.String`
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
