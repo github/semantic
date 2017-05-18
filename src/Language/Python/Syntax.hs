@@ -71,10 +71,10 @@ unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCo
                                                               <|> Expression.UMinus      <$> (symbol AnonMinus *> expression)
                                                               <|> Expression.UPlus       <$> (symbol AnonPlus  *> expression))
 
--- TODO: Consider a single BinaryOperator type? I'm unable to alternate on different types (arithmetic or bitwise). Alternatively,
--- we could change tree-sitter-python's grammar to separate binary operators into arithmetic and bitwise.
 binaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-binaryOperator = makeTerm <$> symbol BinaryOperator <*> children ( expression >>= \ lexpression -> (bitwise lexpression) )
+binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>= \ lexpression ->
+      makeTerm location <$> arithmetic lexpression
+  <|> makeTerm location <$> bitwise lexpression)
   where
     arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expression)
                           <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expression)
