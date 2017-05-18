@@ -52,7 +52,7 @@ Task                                | PRP        | Priority (1 to 3) | Amount of
 
 We want to provide more, more accurate, and more useful data.
 
-Task                             | PRP       | Priority (1 to 3) | Amount of work (1 to 4)
-----                             | ---       | ----------------- | -----------------------
-À la carte syntax representation | @robrix   | 2                 | 4
-LSP integration                  | @joshvera | 2                 | 4
+Task                           | PRP       | Priority (1 to 3) | Amount of work (1 to 4)
+----                           | ---       | ----------------- | -----------------------
+Migration to à la carte syntax | @robrix   | 2                 | 2
+LSP integration                | @joshvera | 2                 | 4
