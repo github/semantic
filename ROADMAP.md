@@ -16,10 +16,10 @@ See also our [roadmap project][].
 
 We will select specific metrics believed to be key to our objectives, e.g. performance.
 
-Task                                 | PRP | Priority (1 to 3) | Amount of work (1 to 4)
-----                                 | --- | ----------------- | -----------------------
-Determine which baselines to measure |     |                   | ?
-Measure them                         |     |                   | ???
+Task                      | PRP | Priority (1 to 3) | Amount of work (1 to 4)
+----                      | --- | ----------------- | -----------------------
+Determine what to measure |     |                   | ?
+Measure it                |     |                   | ???
 
 
 ### Get our data into production
