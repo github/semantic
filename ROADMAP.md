@@ -9,7 +9,7 @@ See also our [roadmap project][] for our current efforts.
 
 - [Determine baselines](#determine-baselines)
 - [Get our data into production](#get-our-data-into-production)
-- [Serve more of our users](#serve-more-of-our-users)
+- [Improve our supported languages](#improve-our-supported-languages)
 - [Provide more and better data](#provide-more-and-better-data)
 
 ### Determine baselines
@@ -36,9 +36,9 @@ GraphQL diff API        |            | 3                 | 2
 ToC in Enterprise       | @joshvera  | 2                 | ?
 
 
-### Serve more of our users
+### Improve our supported languages
 
-We want to provide data useful to more of our users.
+We will add support for Python, and improve our support for Ruby, Go, and JavaScript/TypeScript.
 
 Task              | PRP        | Priority (1 to 3) | Amount of work (1 to 4)
 ----              | ---        | ----------------- | -----------------------
