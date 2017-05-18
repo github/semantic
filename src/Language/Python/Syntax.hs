@@ -146,9 +146,6 @@ import' = makeTerm <$> symbol ImportStatement <*> (Declaration.Import <$> source
 importFrom :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 importFrom = makeTerm <$> symbol ImportFromStatement <*> (Declaration.Import <$> source)
 
--- TODO How should we assign chevron for print statements?
-chevron :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-chevron = makeTerm <$> symbol Chevron <*> (Syntax.Empty <$ source)
 
 -- TODO How to convert statements like this into a `Expression.Call`? The (pack "assert") produces a ByteString but that reduces the `Call` constructor to only accepting byteStrings.
 -- assertStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
