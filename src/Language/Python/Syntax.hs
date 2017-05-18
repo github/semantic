@@ -133,6 +133,9 @@ import' = makeTerm <$> symbol ImportStatement <*> (Declaration.Import <$> source
 importFrom :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 importFrom = makeTerm <$> symbol ImportFromStatement <*> (Declaration.Import <$> source)
 
+-- TODO How should we assign chevron for print statements?
+chevron :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+chevron = makeTerm <$> symbol Chevron <*> (Syntax.Empty <$ source)
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))
 
