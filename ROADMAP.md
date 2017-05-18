@@ -10,7 +10,6 @@ See also our [roadmap project][].
 - [Determine baselines](#determine-baselines)
 - [Get our data into production](#get-our-data-into-production)
 - [Improve our supported languages](#improve-our-supported-languages)
-- [Provide more and better data](#provide-more-and-better-data)
 
 ### Determine baselines
 
@@ -47,12 +46,4 @@ Task                                | PRP        | Priority (1 to 3) | Amount of
 À la carte assignment of Ruby       |            |                   | 2?
 À la carte assignment of TypeScript |            |                   | 2?
 🚀 LSP integration                   | @joshvera  | 2                 | 4?
-
-
-### Provide more and better data
-
-We want to provide more, more accurate, and more useful data.
-
-Task                           | PRP       | Priority (1 to 3) | Amount of work (1 to 4)
-----                           | ---       | ----------------- | -----------------------
-Migration to à la carte syntax | @robrix   | 2                 | 2
+Migration to à la carte syntax      | @robrix    | 2                 | 3
