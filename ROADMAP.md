@@ -9,7 +9,6 @@ See also our [roadmap project][] for our current efforts.
 
 - [Determine baselines](#determine-baselines)
 - [Get our data into production](#get-our-data-into-production)
-- [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators--researchers)
 - [Serve more of our users](#serve-more-of-our-users)
 - [Provide more and better data](#provide-more-and-better-data)
 
@@ -19,25 +18,13 @@ Measure our existing work’s performance, usage, &c. to determine baselines for
 
 ### Get our data into production
 
-Our service should operate with a minimum of headaches. Our service should scale with GitHub’s customer base and our language support.
-
 Task                    | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
 ----                    | ---    | ----------------- | -----------------------
 [Architecture review][] | @tclem | 1                 | ✅
 Production readiness    | @tclem | 1                 | 3
-
-[Architecture review]: https://github.com/github/architecture/issues/12
-
-
-### Provide data about code to users, integrators, & researchers
-
-Our data should be readily available to consumers.
-
-Task                   | PRP    | Priority (1 to 3) | Amount of work (1 to 4)
-----                   | ---    | ----------------- | -----------------------
-Table of contents      |        |                   | ✅
-GraphQL parse tree API | @tclem |                   | ✅
-GraphQL diff API       |        | 3                 | 2
+Table of contents       |        |                   | ✅
+GraphQL parse tree API  | @tclem |                   | ✅
+GraphQL diff API        |        | 3                 | 2
 
 
 ### Serve more of our users
