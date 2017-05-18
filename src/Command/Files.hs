@@ -13,7 +13,6 @@ import Data.Functor.Both
 import Data.String
 import Language
 import Prologue hiding (readFile)
-import qualified Control.Applicative as A
 import qualified Data.ByteString as B
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
