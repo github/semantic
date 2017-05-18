@@ -32,7 +32,7 @@ Production readiness    | @tclem     | 1                 | 3                    
 Table of contents       |            |                   | ✅                       |
 GraphQL parse tree API  | @tclem     |                   | ✅                       |
 GraphQL diff API        |            | 3                 | 2                       |
-ToC in Enterprise       | @joshvera  | 2                 | ?                       |
+ToC in Enterprise       | @joshvera  | 2                 | 2                       |
 
 
 ### Improve our supported languages
