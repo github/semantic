@@ -2,7 +2,7 @@
 
 Semantic Code produces data around code’s structure and meaning. This is made available via GraphQL APIs, enabling others (both at GitHub and elsewhere) to build features.
 
-See also our [roadmap project][] for our current efforts.
+See also our [roadmap project][].
 
 
 ## Objectives
