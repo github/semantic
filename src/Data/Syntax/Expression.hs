@@ -18,7 +18,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 data Unary a
   = UPlus a
   | UMinus a
-  | UCompliment a
+  | UComplement a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Unary where liftEq = genericLiftEq

@@ -67,7 +67,7 @@ false :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UCompliment <$> (symbol AnonTilde *> expression)
+unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UComplement <$> (symbol AnonTilde *> expression)
                                                               <|> Expression.UMinus      <$> (symbol AnonMinus *> expression)
                                                               <|> Expression.UPlus       <$> (symbol AnonPlus  *> expression))
 
