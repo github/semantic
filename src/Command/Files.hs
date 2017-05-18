@@ -9,13 +9,16 @@ module Command.Files
 
 import Control.Exception (catch, IOException)
 import Data.Aeson
+import Data.These
 import Data.Functor.Both
 import Data.String
 import Language
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
+import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
+import Prelude (fail)
 import Source hiding (path)
 import System.FilePath
 
@@ -43,10 +46,8 @@ readBlobPairsFromHandle :: Handle -> IO [Both SourceBlob]
 readBlobPairsFromHandle = fmap toSourceBlobPairs . readFromHandle
   where
     toSourceBlobPairs BlobDiff{..} = toSourceBlobPair <$> blobs
-    toSourceBlobPair blobs@BlobPair{..} = fmap (maybe (emptySourceBlob' blobs) toSourceBlob) (both before after)
-
-    emptySourceBlob' :: BlobPair -> SourceBlob
-    emptySourceBlob' BlobPair{..} = emptySourceBlob (maybe "" path (before <|> after))
+    toSourceBlobPair blobs = Join (fromThese empty empty (runJoin (toSourceBlob <$> blobs)))
+      where empty = emptySourceBlob (mergeThese const (runJoin (path <$> blobs)))
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: Handle -> IO [SourceBlob]
@@ -68,18 +69,24 @@ toSourceBlob Blob{..} = sourceBlob path language' (Source (encodeUtf8 content))
 
 
 newtype BlobDiff = BlobDiff { blobs :: [BlobPair] }
-  deriving (Show, Generic, FromJSON, ToJSON)
+  deriving (Show, Generic, FromJSON)
 
 newtype BlobParse = BlobParse { blobs :: [Blob] }
-  deriving (Show, Generic, FromJSON, ToJSON)
+  deriving (Show, Generic, FromJSON)
 
-data BlobPair = BlobPair
-  { before :: Maybe Blob
-  , after :: Maybe Blob
-  } deriving (Show, Generic, FromJSON, ToJSON)
+type BlobPair = Join These Blob
 
 data Blob = Blob
   { path :: String
   , content :: Text
   , language :: String
-  } deriving (Show, Generic, FromJSON, ToJSON)
+  } deriving (Show, Generic, FromJSON)
+
+instance FromJSON BlobPair where
+  parseJSON = withObject "BlobPair" (p . HM.toList)
+    where
+      p [("before", a), ("after", b)] = Join <$> (These <$> parseJSON a <*> parseJSON b)
+      p [("after", b), ("before", a)] = Join <$> (These <$> parseJSON a <*> parseJSON b)
+      p [("before", a)] = Join <$> This <$> parseJSON a
+      p [("after", b)] = Join <$> That <$> parseJSON b
+      p _ = fail "Expected object with 'before' and 'after' keys only"
