@@ -18,6 +18,7 @@ type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
    , Declaration.Import
+   , Declaration.Variable
    , Expression.Arithmetic
    , Expression.Boolean
    , Expression.Bitwise
