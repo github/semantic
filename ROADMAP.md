@@ -8,7 +8,7 @@ See also our [roadmap project][] for our current efforts.
 ## Objectives
 
 - [Determine baselines](#determine-baselines)
-- [Run a resilient, scalable service](#run-a-resilient-scalable-service)
+- [Get our data into production](#get-our-data-into-production)
 - [Provide data about code to users, integrators, & researchers](#provide-data-about-code-to-users-integrators--researchers)
 - [Serve more of our users](#serve-more-of-our-users)
 - [Provide more and better data](#provide-more-and-better-data)
@@ -17,7 +17,7 @@ See also our [roadmap project][] for our current efforts.
 
 Measure our existing work’s performance, usage, &c. to determine baselines for future improvements.
 
-### Run a resilient, scalable service
+### Get our data into production
 
 Our service should operate with a minimum of headaches. Our service should scale with GitHub’s customer base and our language support.
 
