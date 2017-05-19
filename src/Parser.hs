@@ -29,7 +29,7 @@ data Parser term where
   TypeScriptParser :: Parser (SyntaxTerm Text DefaultFields)
   LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
 
--- | Return a parser for a given langauge or the lineByLineParser parser.
+-- | Return a 'Langauge'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
 parserForLanguage :: Maybe Language -> Parser (SyntaxTerm Text DefaultFields)
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
