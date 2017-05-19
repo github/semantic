@@ -20,15 +20,15 @@ type RAlgebra f t a = f (t, a) -> a
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
 fToR f = f . fmap snd
 
-newtype Identifier' = Identifier' ByteString
+newtype Identifier = Identifier ByteString
   deriving (Eq, Show)
 
 -- | Produce the identifier for a given term, if any.
 --
 --   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
-identifierAlg :: (InUnion fs Syntax.Identifier, InUnion fs Declaration.Method, InUnion fs Declaration.Class, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier')
+identifierAlg :: (InUnion fs Syntax.Identifier, InUnion fs Declaration.Method, InUnion fs Declaration.Class, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier)
 identifierAlg (_ :< union) = case union of
-  _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier' s)
+  _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier s)
   _ | Just Declaration.Class{..} <- prj union -> classIdentifier
   _ | Just Declaration.Method{..} <- prj union -> methodName
   _ -> Nothing
