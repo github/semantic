@@ -105,7 +105,7 @@ binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>
                        <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expression)
 
 booleanOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= \ lexpression -> (booleanOperator' lexpression))
+booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= booleanOperator' )
   where
     booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expression)
                                 <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
