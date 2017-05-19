@@ -167,7 +167,7 @@ data ErrorCause symbol
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
-  = showSourcePos errorPos . showString ": " . withSGRCode [SetColor Foreground Vivid Red] "error" . showString ": " . showExpectation . showChar '\n'
+  = showSourcePos errorPos . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
   . showString (prettyCallStack callStack) . showChar '\n'
@@ -180,7 +180,7 @@ showError source Error{..}
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
         showSGRCode = showString . setSGRCode
-        withSGRCode code string = showSGRCode code . showString string . showSGRCode []
+        withSGRCode code s = showSGRCode code . s . showSGRCode []
 
 showSymbols :: Show symbol => [symbol] -> ShowS
 showSymbols [] = showString "end of input nodes"
