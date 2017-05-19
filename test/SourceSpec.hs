@@ -22,7 +22,7 @@ spec = parallel $ do
   describe "sourceSpanToRange" $ do
     prop "computes single-line ranges" . forAll (unListableByteString `mapT` tiers) $
       \ s -> let source = Source s
-                 spans = zipWith (\ i Range {..} -> SourceSpan (SourcePos i 0) (SourcePos i (end - start))) [0..] ranges
+                 spans = zipWith (\ i Range {..} -> SourceSpan (SourcePos i 1) (SourcePos i (succ (end - start)))) [1..] ranges
                  ranges = actualLineRanges source in
         sourceSpanToRange source <$> spans `shouldBe` ranges
 
@@ -36,10 +36,10 @@ spec = parallel $ do
 
   describe "totalSpan" $ do
     prop "covers single lines" $
-      \ n -> totalSpan (fromText (Text.replicate n "*")) `shouldBe` SourceSpan (SourcePos 0 0) (SourcePos 0 (max 0 n))
+      \ n -> totalSpan (fromText (Text.replicate n "*")) `shouldBe` SourceSpan (SourcePos 1 1) (SourcePos 1 (max 1 (succ n)))
 
     prop "covers multiple lines" $
-      \ n -> totalSpan (fromText (Text.intersperse '\n' (Text.replicate n "*"))) `shouldBe` SourceSpan (SourcePos 0 0) (SourcePos (max 0 (pred n)) (if n > 0 then 1 else 0))
+      \ n -> totalSpan (fromText (Text.intersperse '\n' (Text.replicate n "*"))) `shouldBe` SourceSpan (SourcePos 1 1) (SourcePos (max 1 n) (if n > 0 then 2 else 1))
 
   prop "preserves characters" . forAll (toTiers (list +| [chr 0xa0..chr 0x24f])) $
     \ c -> Text.unpack (toText (fromText (Text.singleton c))) `shouldBe` [c]
