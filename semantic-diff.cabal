@@ -30,6 +30,7 @@ library
                      , Data.Mergeable.Generic
                      , Data.Record
                      , Data.Syntax
+                     , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
