@@ -74,17 +74,11 @@ tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> true <|> false
+expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal
 
 -- TODO: Consider flattening single element lists
 expressionList :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionList = makeTerm <$> symbol ExpressionList <*> children (many expression)
-
-true :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
-
-false :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> bitwise location <|> children ( symbol AnonPlus *> expression )
