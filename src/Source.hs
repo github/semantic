@@ -122,8 +122,8 @@ rangeToSourceSpan source range = SourceSpan startPos endPos
   where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
         endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
         lineRanges = actualLineRanges (slice range source)
-        toStartPos line range = SourcePos line (start range)
-        toEndPos line range = SourcePos line (end range)
+        toStartPos line range = SourcePos line (succ (start range))
+        toEndPos line range = SourcePos line (succ (end range))
 
 -- | Return a 'Range' that covers the entire text.
 totalRange :: Source -> Range
