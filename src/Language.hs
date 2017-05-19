@@ -15,7 +15,7 @@ data Language where
   Markdown :: Language
   Ruby :: Language
   TypeScript :: Language -- ^ Also JavaScript.
-  deriving (Show, Eq, Read)
+    deriving (Show, Eq, Read)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
