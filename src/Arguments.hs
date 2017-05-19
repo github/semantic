@@ -14,7 +14,7 @@ import Syntax
 import Term
 import Text.Show
 
-data DiffMode = DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
+data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
   deriving Show
 
 data DiffArguments where
@@ -53,7 +53,7 @@ tocDiff :: DiffArguments'
 tocDiff = DiffArguments ToCRenderer declarationDecorator
 
 
-data ParseMode = ParseCommit String [(FilePath, Maybe Language)] | ParsePaths [(FilePath, Maybe Language)]
+data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
 
 data ParseArguments where
