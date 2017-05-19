@@ -33,14 +33,14 @@ import SourceSpan
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> SourceBlob -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
-treeSitterParser language grammar blob = do
+treeSitterParser :: Language -> Ptr TS.Language -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+treeSitterParser language grammar source = do
   document <- ts_document_new
   ts_document_set_language document grammar
-  withCStringLen (toText (source blob)) $ \ (sourceText, len) -> do
+  withCStringLen (toText source) $ \ (sourceText, len) -> do
     ts_document_set_input_string_with_length document sourceText len
     ts_document_parse_halt_on_error document
-    term <- documentToTerm language document (source blob)
+    term <- documentToTerm language document source
     ts_document_free document
     pure term
 

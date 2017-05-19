@@ -39,9 +39,9 @@ parserForLanguage (Just language) = case language of
   Ruby -> RubyParser
   Language.Go -> GoParser
 
-runParser :: Parser term -> SourceBlob -> IO term
+runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
-  ALaCarteRubyParser -> \ SourceBlob{..} -> do
+  ALaCarteRubyParser -> \ source -> do
     result <- parseRubyToTerm source
     pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj Empty)) result)
   CParser -> treeSitterParser C tree_sitter_c
@@ -52,8 +52,8 @@ runParser parser = case parser of
   LineByLineParser -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: SourceBlob -> IO (SyntaxTerm Text DefaultFields)
-lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
+lineByLineParser :: Source -> IO (SyntaxTerm Text DefaultFields)
+lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines source

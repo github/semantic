@@ -66,7 +66,7 @@ parseBlobs renderer blobs = do
 
 -- | Parse a SourceBlob.
 parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-parseBlob blob@SourceBlob{..} = runParser (parserForLanguage blobLanguage) blob
+parseBlob SourceBlob{..} = runParser (parserForLanguage blobLanguage) source
 
 
 -- Internal
