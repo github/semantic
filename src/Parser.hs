@@ -2,11 +2,13 @@
 module Parser where
 
 import Data.Record
+import Data.Syntax.Assignment (Location)
 import qualified Data.Text as T
 import Info hiding (Go)
 import Language
 import Language.Markdown
-import Prologue
+import qualified Language.Ruby.Syntax as Ruby
+import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
 import Term
@@ -17,6 +19,7 @@ import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
 
 data Parser term where
+  ALaCarteRubyParser :: Parser (Maybe (Term Ruby.Syntax Location))
   CParser :: Parser (SyntaxTerm Text DefaultFields)
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
@@ -36,6 +39,7 @@ parserForLanguage (Just language) = case language of
 
 runParser :: Parser term -> SourceBlob -> IO term
 runParser parser = case parser of
+  ALaCarteRubyParser -> parseRubyToTerm . source
   CParser -> treeSitterParser C tree_sitter_c
   GoParser -> treeSitterParser Go tree_sitter_go
   MarkdownParser -> cmarkParser
