@@ -92,6 +92,7 @@ import qualified Info
 import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
 import qualified Source (Source(..), drop, slice, sourceText, actualLines)
+import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
@@ -166,7 +167,7 @@ data ErrorCause symbol
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
-  = showSourcePos errorPos . showString ": error: " . showExpectation . showChar '\n'
+  = showSourcePos errorPos . showString ": " . showString (setSGRCode [SetColor Foreground Vivid Red]) . showString "error" . showString (setSGRCode []) . showString ": " . showExpectation . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
   . showString (prettyCallStack callStack) . showChar '\n'
