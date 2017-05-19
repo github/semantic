@@ -66,6 +66,7 @@ statement = expressionStatement
           <|> returnStatement
           <|> identifier
           <|> assignment'
+          <|> augmentedAssignment
           <|> printStatement
           <|> assertStatement
           <|> globalStatement
@@ -115,12 +116,31 @@ booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression 
     booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expression)
                                 <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
 
-
--- TODO: Handle multiple assignments
 assignment' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> (symbol ExpressionList *> children expression) <*> (symbol ExpressionList *> children expression))
+assignment' =
+  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
+
+augmentedAssignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+augmentedAssignment = makeTerm <$> symbol AugmentedAssignment <*> children (expressionList >>= \ lvalue -> Statement.Assignment lvalue <$>
+         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus lvalue      <$> rvalue)
+      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus lvalue     <$> rvalue)
+      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times lvalue     <$> rvalue)
+      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power lvalue     <$> rvalue)
+      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy lvalue <$> rvalue)
+      <|> makeTerm <$> symbol AnonSlashSlashEqual         <*> (Expression.DividedBy lvalue <$> rvalue)
+      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr lvalue       <$> rvalue)
+      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd lvalue      <$> rvalue)
+      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo lvalue    <$> rvalue)
+      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift lvalue    <$> rvalue)
+      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift lvalue    <$> rvalue)
+      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr lvalue      <$> rvalue)))
+
 yield :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> expressionList <|> emptyTerm ))
+
+rvalue :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+rvalue  = expressionList <|> assignment' <|> augmentedAssignment <|> yield
+
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
