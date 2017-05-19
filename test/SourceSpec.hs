@@ -34,11 +34,11 @@ spec = parallel $ do
       \ s -> let source = "*" <> s <> "*" in
         sourceSpanToRange source (insetSpan (totalSpan source)) `shouldBe` insetRange (totalRange source)
 
-    prop "dual to rangeToSourceSpan" $
+    prop "inverse of rangeToSourceSpan" $
       \ s -> sourceSpanToRange s (totalSpan s) `shouldBe` totalRange s
 
   describe "rangeToSourceSpan" $ do
-    prop "dual to sourceSpanToRange" $
+    prop "inverse of sourceSpanToRange" $
       \ s -> rangeToSourceSpan s (totalRange s) `shouldBe` totalSpan s
 
   describe "totalSpan" $ do
