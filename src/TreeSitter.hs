@@ -2,6 +2,7 @@
 module TreeSitter
 ( treeSitterParser
 , parseRubyToTerm
+, parsePythonToTerm
 , defaultTermAssignment
 ) where
 
@@ -17,6 +18,7 @@ import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.Python.Syntax as Python
 import Parser
 import Range
 import Source
@@ -30,6 +32,7 @@ import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 import qualified Text.Parser.TreeSitter.Ruby as Ruby
+import qualified Text.Parser.TreeSitter.Python as Python
 import SourceSpan
 import Info
 
@@ -48,7 +51,7 @@ treeSitterParser language grammar blob = do
 
 -- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" (Just Language.Ruby) >>= parseRubyToTerm . source
 parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
 parseRubyToTerm source = do
   document <- ts_document_new
@@ -69,6 +72,28 @@ parseRubyToTerm source = do
     Just a -> pure (Just a)
     _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
+-- | Parse Python to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
+--
+--   > Command.Files.readFile "/Users/rob/Desktop/test.rb" (Just Language.Python) >>= parsePythonToTerm . source
+parsePythonToTerm :: Source -> IO (Maybe [Term Python.Syntax A.Location])
+parsePythonToTerm source = do
+  document <- ts_document_new
+  ts_document_set_language document Python.tree_sitter_python
+  root <- withCStringLen (toText source) $ \ (source, len) -> do
+    ts_document_set_input_string_with_length document source len
+    ts_document_parse_halt_on_error document
+    alloca (\ rootPtr -> do
+      ts_document_root_node_p document rootPtr
+      peek rootPtr)
+
+  ast <- anaM toAST root
+
+  ts_document_free document
+
+  let A.Result errors value = A.assign Python.assignment source ast
+  case value of
+    Just a -> pure (Just a)
+    _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
 toAST :: (Bounded grammar, Enum grammar) => Node -> IO (A.RoseF (A.Node grammar) Node)
 toAST node@Node{..} = do

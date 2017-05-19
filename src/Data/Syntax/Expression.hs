@@ -14,7 +14,6 @@ data Call a = Call { callFunction :: a, callParams :: [a] }
 instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
-
 -- | Binary arithmetic operators.
 data Arithmetic a
   = Plus a a
@@ -23,6 +22,7 @@ data Arithmetic a
   | DividedBy a a
   | Modulo a a
   | Power a a
+  | Negate a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Arithmetic where liftEq = genericLiftEq
@@ -45,6 +45,7 @@ data Bitwise a
   | BXOr a a
   | LShift a a
   | RShift a a
+  | Complement a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Bitwise where liftEq = genericLiftEq
