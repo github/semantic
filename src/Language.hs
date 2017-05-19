@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs #-}
+{-# LANGUAGE DataKinds #-}
 module Language where
 
 import Data.Record
@@ -9,12 +9,12 @@ import qualified Syntax as S
 import Term
 
 -- | A programming language.
-data Language where
-  C :: Language
-  Go :: Language
-  Markdown :: Language
-  Ruby :: Language
-  TypeScript :: Language -- ^ Also JavaScript.
+data Language =
+      C
+    | Go
+    | Markdown
+    | Ruby
+    | TypeScript -- ^ Also JavaScript.
     deriving (Show, Eq, Read)
 
 -- | Returns a Language based on the file extension (including the ".").
