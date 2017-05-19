@@ -203,7 +203,7 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> con
   where elseClause = symbol ElseClause *> children statement
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> condition <*> statement)
         condition = boolean
-        optionalElse = fromMaybe <$> (makeTerm <$> location <*> pure Syntax.Empty) <*> optional elseClause
+        optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 
