@@ -30,7 +30,7 @@ type Syntax' =
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
-   , Literal.None
+   , Literal.Null
    , Literal.String
    , Literal.TextElement
    , Literal.Tuple
@@ -210,7 +210,7 @@ boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
        <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
 none :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-none = makeTerm <$> symbol None <*> (Literal.None <$> source)
+none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
