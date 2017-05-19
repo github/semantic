@@ -190,7 +190,7 @@ showSymbols [a, b, c] = shows a . showString ", " . shows b . showString ", or "
 showSymbols (h:t) = shows h . showString ", " . showSymbols t
 
 showSourcePos :: Info.SourcePos -> ShowS
-showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
+showSourcePos Info.SourcePos{..} = showParen True (showString "source") . showChar ':' . shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
 assign :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCallStack) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
