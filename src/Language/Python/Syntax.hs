@@ -184,7 +184,7 @@ printStatement = do
     printCallTerm location keyword = makeTerm location . Expression.Call keyword <$> many expression
 
 globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-globalStatement = makeTerm <$ symbol GlobalStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
+globalStatement = makeTerm <$ symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
 
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
