@@ -26,7 +26,7 @@ import TreeSitter
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
-  -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
+  -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
   AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Symbol grammar, Functor (Union fs))
                    => Parser (AST grammar)
                    -> Assignment (Node grammar) (Term (Union fs) Location)
