@@ -30,6 +30,7 @@ library
                      , Data.Mergeable.Generic
                      , Data.Record
                      , Data.Syntax
+                     , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
@@ -128,6 +129,7 @@ library
                      , network
                      , clock
                      , yaml
+                     , unordered-containers
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, StrictData
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -j
