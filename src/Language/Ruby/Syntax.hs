@@ -2,6 +2,7 @@
 module Language.Ruby.Syntax
 ( assignment
 , Syntax
+, Syntax'
 , Grammar
 ) where
 
