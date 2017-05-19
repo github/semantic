@@ -193,7 +193,7 @@ globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Locati
 globalStatement = makeTerm <$ symbol GlobalStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
 
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (symbol ExpressionList *> children (statement <|> literal)))
+returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
 
 
 ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
