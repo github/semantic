@@ -34,6 +34,13 @@ spec = parallel $ do
       \ s -> let source = Source ("*" <> s <> "*") in
         sourceSpanToRange source (insetSpan (totalSpan source)) `shouldBe` insetRange (totalRange source)
 
+    prop "dual to rangeToSourceSpan" $
+      \ s -> sourceSpanToRange s (totalSpan s) `shouldBe` totalRange s
+
+  describe "rangeToSourceSpan" $ do
+    prop "dual to sourceSpanToRange" $
+      \ s -> rangeToSourceSpan s (totalRange s) `shouldBe` totalSpan s
+
   describe "totalSpan" $ do
     prop "covers single lines" $
       \ n -> totalSpan (fromText (Text.replicate n "*")) `shouldBe` SourceSpan (SourcePos 1 1) (SourcePos 1 (max 1 (succ n)))
