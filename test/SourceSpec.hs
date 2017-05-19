@@ -1,7 +1,6 @@
 module SourceSpec where
 
 import qualified Data.Text as Text
-import qualified Prelude
 import Prologue hiding (list)
 import Range
 import Source
