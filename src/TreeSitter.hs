@@ -27,7 +27,6 @@ import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
-import qualified Text.Parser.TreeSitter.Ruby as Ruby
 import SourceSpan
 import Info
 
