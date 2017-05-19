@@ -75,6 +75,10 @@ tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expressi
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> true <|> false
 
+-- TODO: Consider flattening single element lists
+expressionList :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+expressionList = makeTerm <$> symbol ExpressionList <*> children (many expression)
+
 true :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
 
