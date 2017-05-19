@@ -46,8 +46,7 @@ treeSitterParser language grammar source = do
 
 -- | Parse 'Source' and assign , printing any assignment errors to stdout.
 parseToAST :: (Bounded grammar, Enum grammar) => Source -> IO (A.Rose (A.Node grammar))
-parseToAST source = do
-  document <- ts_document_new
+parseToAST source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document Ruby.tree_sitter_ruby
   root <- withCStringLen (toText source) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
@@ -56,11 +55,7 @@ parseToAST source = do
       ts_document_root_node_p document rootPtr
       peek rootPtr)
 
-  ast <- anaM toAST root
-
-  ts_document_free document
-
-  pure ast
+  anaM toAST root
 
 toAST :: (Bounded grammar, Enum grammar) => Node -> IO (A.RoseF (A.Node grammar) Node)
 toAST node@Node{..} = do
