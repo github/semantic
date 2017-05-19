@@ -14,6 +14,7 @@ import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
 import Term
+import qualified Text.Parser.TreeSitter as TS
 import Text.Parser.TreeSitter.Language (Symbol)
 import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
@@ -22,7 +23,7 @@ import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
 
 data Parser term where
-  ALaCarteParser :: (InUnion fs (Syntax.Error [Error grammar]), Bounded grammar, Enum grammar, Eq grammar, Symbol grammar) => Assignment (Node grammar) (Term (Union fs) Location) -> Parser (Term (Union fs) Location)
+  ALaCarteParser :: (InUnion fs (Syntax.Error [Error grammar]), Bounded grammar, Enum grammar, Eq grammar, Symbol grammar) => Ptr TS.Language -> Assignment (Node grammar) (Term (Union fs) Location) -> Parser (Term (Union fs) Location)
   CParser :: Parser (SyntaxTerm Text DefaultFields)
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
@@ -42,8 +43,8 @@ parserForLanguage (Just language) = case language of
 
 runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
-  ALaCarteParser assignment -> \ source -> do
-    ast <- parseToAST source
+  ALaCarteParser language assignment -> \ source -> do
+    ast <- parseToAST language source
     let Result errors term = assign assignment source ast
     pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) term)
   CParser -> treeSitterParser C tree_sitter_c

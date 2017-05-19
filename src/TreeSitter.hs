@@ -44,10 +44,10 @@ treeSitterParser language grammar source = do
     pure term
 
 
--- | Parse 'Source' and assign , printing any assignment errors to stdout.
-parseToAST :: (Bounded grammar, Enum grammar) => Source -> IO (A.Rose (A.Node grammar))
-parseToAST source = bracket ts_document_new ts_document_free $ \ document -> do
-  ts_document_set_language document Ruby.tree_sitter_ruby
+-- | Parse 'Source' with the given 'TS.Language' and return its AST.
+parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (A.AST grammar)
+parseToAST language source = bracket ts_document_new ts_document_free $ \ document -> do
+  ts_document_set_language document language
   root <- withCStringLen (toText source) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
     ts_document_parse_halt_on_error document
