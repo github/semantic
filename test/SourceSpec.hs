@@ -26,12 +26,12 @@ spec = parallel $ do
                  ranges = actualLineRanges source in
         sourceSpanToRange source <$> spans `shouldBe` ranges
 
-    prop "computes multi-line ranges" . forAll (unListableByteString `mapT` tiers) $
-      \ s -> let source = Source s in
+    prop "computes multi-line ranges" $
+      \ source ->
         sourceSpanToRange source (totalSpan source) `shouldBe` totalRange source
 
-    prop "computes sub-line ranges" . forAll (unListableByteString `mapT` tiers) $
-      \ s -> let source = Source ("*" <> s <> "*") in
+    prop "computes sub-line ranges" $
+      \ s -> let source = "*" <> s <> "*" in
         sourceSpanToRange source (insetSpan (totalSpan source)) `shouldBe` insetRange (totalRange source)
 
     prop "dual to rangeToSourceSpan" $
