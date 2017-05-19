@@ -5,6 +5,7 @@ import Data.Record
 import qualified Data.Text as T
 import Info hiding (Go)
 import Language
+import Language.Markdown
 import Prologue
 import Source
 import Syntax hiding (Go)
@@ -18,6 +19,7 @@ import TreeSitter
 data Parser term where
   CParser :: Parser (SyntaxTerm Text DefaultFields)
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
+  MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
   RubyParser :: Parser (SyntaxTerm Text DefaultFields)
   TypeScriptParser :: Parser (SyntaxTerm Text DefaultFields)
   LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
@@ -26,6 +28,7 @@ runParser :: Parser term -> SourceBlob -> IO term
 runParser parser = case parser of
   CParser -> treeSitterParser C tree_sitter_c
   GoParser -> treeSitterParser Go tree_sitter_go
+  MarkdownParser -> cmarkParser
   RubyParser -> treeSitterParser Ruby tree_sitter_ruby
   TypeScriptParser -> treeSitterParser TypeScript tree_sitter_typescript
   LineByLineParser -> lineByLineParser
