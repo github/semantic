@@ -195,3 +195,6 @@ none = makeTerm <$> symbol None <*> (Literal.None <$> source)
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
+
+emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
