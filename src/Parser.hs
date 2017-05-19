@@ -24,6 +24,7 @@ import TreeSitter
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
+  -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Symbol grammar, Functor (Union fs))
                    => Parser (AST grammar)
