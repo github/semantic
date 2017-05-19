@@ -35,8 +35,15 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
 -- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
--- TODO: Float/Double literals.
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
+
+-- | A literal float of unspecified width.
+newtype Float a = Float { floatContent :: ByteString }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
+instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
+
 
 
 data Range a = Range { rangeStart :: a, rangeEnd :: a }
@@ -71,6 +78,11 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
+data Null a = Null
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Null where liftEq = genericLiftEq
+instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -104,6 +116,12 @@ data KeyValue a = KeyValue { key :: !a, value :: !a }
 
 instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
+
+data Tuple a = Tuple { tupleContents :: ![a]}
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Tuple where liftEq = genericLiftEq
+instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
