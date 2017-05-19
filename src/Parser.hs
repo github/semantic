@@ -10,6 +10,7 @@ import qualified Data.Text as T
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
+import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Source
@@ -19,6 +20,7 @@ import qualified Text.Parser.TreeSitter as TS
 import Text.Parser.TreeSitter.Language (Symbol)
 import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
+import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
@@ -48,9 +50,13 @@ parserForLanguage (Just language) = case language of
   Markdown -> MarkdownParser
   Ruby -> TreeSitterParser Ruby tree_sitter_ruby
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
+  _ -> LineByLineParser
 
 rubyParser :: Parser (Term (Union (Syntax.Error [Error Ruby.Grammar] ': Ruby.Syntax')) Location)
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
+
+pythonParser :: Parser (Term (Union (Syntax.Error [Error Python.Grammar] ': Python.Syntax')) Location)
+pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
