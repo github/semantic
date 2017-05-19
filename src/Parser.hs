@@ -10,6 +10,7 @@ import qualified Data.Text as T
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
+import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
@@ -47,6 +48,9 @@ parserForLanguage (Just language) = case language of
   Markdown -> MarkdownParser
   Ruby -> TreeSitterParser Ruby tree_sitter_ruby
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
+
+rubyParser :: Parser (Term (Union (Syntax.Error [Error Ruby.Grammar] ': Ruby.Syntax')) Location)
+rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
 runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
