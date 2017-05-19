@@ -83,8 +83,8 @@ expressionList = makeTerm <$> symbol ExpressionList <*> children (many expressio
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> bitwise location <|> children ( symbol AnonPlus *> expression )
   where
-    arithmetic location = makeTerm location <$> Expression.Negate <$> children ( symbol AnonMinus *> expression )
-    bitwise location    = makeTerm location <$> Expression.Complement <$> children ( symbol AnonTilde *> expression )
+    arithmetic location = makeTerm location . Expression.Negate <$> children ( symbol AnonMinus *> expression )
+    bitwise location    = makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
 
 binaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>= \ lexpression ->
