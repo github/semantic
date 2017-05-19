@@ -3,6 +3,7 @@
 module Source where
 
 import qualified Data.ByteString as B
+import Data.List (span)
 import Data.String (IsString(..))
 import qualified Data.Text as T
 import Language
@@ -118,12 +119,13 @@ sourceSpanToRange source SourceSpan{..} = Range start end
         sumLengths = sum . fmap rangeLength
 
 rangeToSourceSpan :: Source -> Range -> SourceSpan
-rangeToSourceSpan source range = SourceSpan startPos endPos
-  where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
-        endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (Range 0 0) (snd <$> unsnoc lineRanges))
-        lineRanges = actualLineRangesWithin range source
-        toStartPos line range = SourcePos line (succ (start range))
-        toEndPos line range = SourcePos line (succ (end range))
+rangeToSourceSpan source (Range rangeStart rangeEnd) = SourceSpan startPos endPos
+  where startPos = SourcePos (succ (Prologue.length before)) (succ (rangeStart - start firstRange))
+        endPos = SourcePos (Prologue.length before + Prologue.length lineRanges) (succ (rangeEnd - start lastRange))
+        (before, rest) = span ((< rangeStart) . end) (actualLineRanges source)
+        (lineRanges, _) = span ((<= rangeEnd) . start) rest
+        Just firstRange = getFirst (foldMap (First . Just) lineRanges)
+        Just lastRange = getLast (foldMap (Last . Just) lineRanges)
 
 -- | Return a 'Range' that covers the entire text.
 totalRange :: Source -> Range
