@@ -64,6 +64,6 @@ lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([],
     lines = actualLines source
     root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
     sourceRange = Source.totalRange source
-    leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
-    annotateLeaves (accum, charIndex) line =
-      (accum <> [ leaf charIndex (Source.toText line) ] , charIndex + Source.length line)
+    leaf byteIndex line = (Range byteIndex (byteIndex + T.length line) :. Program :. rangeToSourceSpan source (Range byteIndex (byteIndex + T.length line)) :. Nil) :< Leaf line
+    annotateLeaves (accum, byteIndex) line =
+      (accum <> [ leaf byteIndex (Source.toText line) ] , byteIndex + Source.length line)
