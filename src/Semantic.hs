@@ -17,7 +17,6 @@ import Info
 import Interpreter
 import Language
 import Language.Markdown
-import Parser
 import Patch
 import Prologue
 import Renderer
@@ -77,7 +76,7 @@ parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
 parseBlob blob@SourceBlob{..} = parserForLanguage blobLanguage blob
 
 -- | Return a parser for a given langauge or the lineByLineParser parser.
-parserForLanguage :: Maybe Language -> Parser (Syntax Text) (Record DefaultFields)
+parserForLanguage :: Maybe Language -> SourceBlob -> IO (Cofree (Syntax Text) (Record DefaultFields))
 parserForLanguage Nothing = lineByLineParser
 parserForLanguage (Just language) = case language of
   C -> treeSitterParser C tree_sitter_c
@@ -95,7 +94,7 @@ renderConcurrently f diffs = do
   pure $ mconcat (outputs `using` parTraversable rseq)
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser (Syntax Text) (Record DefaultFields)
+lineByLineParser :: SourceBlob -> IO (Cofree (Syntax Text) (Record DefaultFields))
 lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
