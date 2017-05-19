@@ -14,7 +14,6 @@ import Data.Record
 import Diff
 import Info
 import Interpreter
-import Language
 import Patch
 import Parser
 import Prologue
@@ -68,16 +67,6 @@ parseBlobs renderer blobs = do
 -- | Parse a SourceBlob.
 parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
 parseBlob blob@SourceBlob{..} = runParser (parserForLanguage blobLanguage) blob
-
--- | Return a parser for a given langauge or the lineByLineParser parser.
-parserForLanguage :: Maybe Language -> Parser (SyntaxTerm Text DefaultFields)
-parserForLanguage Nothing = LineByLineParser
-parserForLanguage (Just language) = case language of
-  C -> CParser
-  TypeScript -> TypeScriptParser
-  Markdown -> MarkdownParser
-  Ruby -> RubyParser
-  Language.Go -> GoParser
 
 
 -- Internal
