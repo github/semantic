@@ -24,7 +24,10 @@ import TreeSitter
 
 data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Symbol grammar, Functor (Union fs)) => Parser (AST grammar) -> Assignment (Node grammar) (Term (Union fs) Location) -> Parser (Term (Union (Syntax.Error [Error grammar] ': fs)) Location)
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Symbol grammar, Functor (Union fs))
+                   => Parser (AST grammar)
+                   -> Assignment (Node grammar) (Term (Union fs) Location)
+                   -> Parser (Term (Union (Syntax.Error [Error grammar] ': fs)) Location)
   CParser :: Parser (SyntaxTerm Text DefaultFields)
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
