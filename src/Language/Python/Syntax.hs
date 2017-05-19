@@ -42,6 +42,7 @@ type Syntax' =
    , Statement.Yield
    , Syntax.Empty
    , Syntax.Identifier
+   , []
    ]
 
 data Redirect a = Redirect !a !a
