@@ -92,6 +92,7 @@ import qualified Info
 import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
 import qualified Source (Source(..), drop, slice, sourceText, actualLines)
+import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
 
@@ -166,10 +167,10 @@ data ErrorCause symbol
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
-  = showSourcePos errorPos . showString ": error: " . showExpectation . showChar '\n'
-  . showString (prettyCallStack callStack) . showChar '\n'
+  = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
-  . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
+  . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . withSGRCode [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
+  . showString (prettyCallStack callStack) . showChar '\n'
   where showExpectation = case errorCause of
           UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
           UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
@@ -178,6 +179,8 @@ showError source Error{..}
         context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
+        showSGRCode = showString . setSGRCode
+        withSGRCode code s = showSGRCode code . s . showSGRCode []
 
 showSymbols :: Show symbol => [symbol] -> ShowS
 showSymbols [] = showString "end of input nodes"
@@ -186,8 +189,8 @@ showSymbols [a, b] = shows a . showString " or " . shows b
 showSymbols [a, b, c] = shows a . showString ", " . shows b . showString ", or " . shows c
 showSymbols (h:t) = shows h . showString ", " . showSymbols t
 
-showSourcePos :: Info.SourcePos -> ShowS
-showSourcePos Info.SourcePos{..} = shows line . showChar ':' . shows column
+showSourcePos :: Maybe FilePath -> Info.SourcePos -> ShowS
+showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
 assign :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
