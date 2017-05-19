@@ -41,3 +41,12 @@ data Empty a = Empty
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
+
+
+-- | Syntax representing a parsing or assignment error.
+data Error error a = Error error
+  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+
+instance Eq error => GAlign (Error error)
+instance Eq error => Eq1 (Error error) where liftEq = genericLiftEq
+instance Show error => Show1 (Error error) where liftShowsPrec = genericLiftShowsPrec
