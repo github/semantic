@@ -51,8 +51,8 @@ instance Eq1 Redirect where liftEq = genericLiftEq
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
-assignment :: HasCallStack => Assignment (Node Grammar) [Term Syntax Location]
-assignment = symbol Module *> children (many declaration)
+assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
