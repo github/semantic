@@ -1,17 +1,27 @@
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields #-}
 module Command.Files
 ( readFile
+, readBlobPairsFromHandle
+, readBlobsFromHandle
 , transcode
 , languageForFilePath
 ) where
 
-import Prologue hiding (readFile)
-import Language
-import Source
-import qualified Data.ByteString as B
-import System.FilePath
 import Control.Exception (catch, IOException)
+import Data.Aeson
+import Data.These
+import Data.Functor.Both
+import Data.String
+import Language
+import Prologue hiding (readFile)
+import qualified Data.ByteString as B
+import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
+import Prelude (fail)
+import Source hiding (path)
+import System.FilePath
+
 
 -- | Read a file to a SourceBlob, transcoding to UTF-8 along the way.
 readFile :: FilePath -> Maybe Language -> IO SourceBlob
@@ -30,3 +40,52 @@ transcode text = fromText <$> do
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . toS . takeExtension
+
+-- | Read JSON encoded blob pairs from a handle.
+readBlobPairsFromHandle :: Handle -> IO [Both SourceBlob]
+readBlobPairsFromHandle = fmap toSourceBlobPairs . readFromHandle
+  where
+    toSourceBlobPairs BlobDiff{..} = toSourceBlobPair <$> blobs
+    toSourceBlobPair blobs = Join (fromThese empty empty (runJoin (toSourceBlob <$> blobs)))
+      where empty = emptySourceBlob (mergeThese const (runJoin (path <$> blobs)))
+
+-- | Read JSON encoded blobs from a handle.
+readBlobsFromHandle :: Handle -> IO [SourceBlob]
+readBlobsFromHandle = fmap toSourceBlobs . readFromHandle
+  where toSourceBlobs BlobParse{..} = fmap toSourceBlob blobs
+
+readFromHandle :: FromJSON a => Handle -> IO a
+readFromHandle h = do
+  input <- B.hGetContents h
+  case decode (toS input) of
+    Just d -> pure d
+    Nothing -> die ("invalid input on " <> show h <> ", expecting JSON")
+
+toSourceBlob :: Blob -> SourceBlob
+toSourceBlob Blob{..} = sourceBlob path language' (Source (encodeUtf8 content))
+  where language' = case language of
+          "" -> languageForFilePath path
+          _ -> readMaybe language
+
+
+newtype BlobDiff = BlobDiff { blobs :: [BlobPair] }
+  deriving (Show, Generic, FromJSON)
+
+newtype BlobParse = BlobParse { blobs :: [Blob] }
+  deriving (Show, Generic, FromJSON)
+
+type BlobPair = Join These Blob
+
+data Blob = Blob
+  { path :: String
+  , content :: Text
+  , language :: String
+  } deriving (Show, Generic, FromJSON)
+
+instance FromJSON BlobPair where
+  parseJSON = withObject "BlobPair" $ \o ->
+    case (HM.lookup "before" o, HM.lookup "after" o) of
+      (Just before, Just after) -> Join <$> (These <$> parseJSON before <*> parseJSON after)
+      (Just before, Nothing) -> Join . This <$> parseJSON before
+      (Nothing, Just after) -> Join . That <$> parseJSON after
+      _ -> fail "Expected object with 'before' and/or 'after' keys only"

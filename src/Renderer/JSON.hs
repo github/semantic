@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, MultiParamTypeClasses, DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
 ( json
@@ -6,20 +6,17 @@ module Renderer.JSON
 , ToJSONFields(..)
 ) where
 
-import Alignment
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.Record
-import Data.These
-import Data.Vector as Vector hiding (toList)
 import Diff
 import Info
+import Patch
 import Prologue hiding ((++))
 import qualified Data.Map as Map
 import Source
-import SplitDiff
 import Syntax as S
 
 --
@@ -28,29 +25,21 @@ import Syntax as S
 
 -- | Render a diff to a string representing its JSON.
 json :: (ToJSONFields (Record fields), HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
-json blobs diff = Map.fromList [
-  ("rows", toJSON (annotateRows (alignDiff (source <$> blobs) diff))),
-  ("oids", toJSON (oid <$> blobs)),
-  ("paths", toJSON (path <$> blobs)) ]
-  where annotateRows :: [Join These a] -> [Join These (NumberedLine a)]
-        annotateRows = fmap (fmap NumberedLine) . numberedRows
-
--- | A numbered 'a'.
-newtype NumberedLine a = NumberedLine (Int, a)
+json blobs diff = Map.fromList
+  [ ("diff", toJSON diff)
+  , ("oids", toJSON (oid <$> blobs))
+  , ("paths", toJSON (path <$> blobs))
+  ]
 
 instance StringConv (Map Text Value) ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-instance ToJSONFields a => ToJSON (NumberedLine a) where
-  toJSON (NumberedLine (n, a)) = object $ "number" .= n : toJSONFields a
-  toEncoding (NumberedLine (n, a)) = pairs $ "number" .= n <> mconcat (toJSONFields a)
-
-instance ToJSON a => ToJSON (Join These a) where
-  toJSON (Join vs) = A.Array . Vector.fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
-  toEncoding = foldable
+instance ToJSON a => ToJSONFields (Join (,) a) where
+  toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
 
 instance ToJSON a => ToJSON (Join (,) a) where
-  toJSON (Join (a, b)) = A.Array . Vector.fromList $ toJSON <$> [ a, b ]
+  toJSON = toJSON . toList
+  toEncoding = foldable
 
 instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSON (Free f a) where
   toJSON splitDiff = case runFree splitDiff of
@@ -72,6 +61,10 @@ instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ':
 
 instance ToJSONFields (Record '[]) where
   toJSONFields _ = []
+
+instance ToJSONFields (Record fs) => ToJSON (Record fs) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
 
 instance ToJSONFields Range where
   toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
@@ -101,10 +94,10 @@ instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (FreeF f a b) wher
   toJSONFields (Free f) = toJSONFields f
   toJSONFields (Pure a) = toJSONFields a
 
-instance ToJSON a => ToJSONFields (SplitPatch a) where
-  toJSONFields (SplitInsert a) = [ "insert" .= a ]
-  toJSONFields (SplitDelete a) = [ "delete" .= a ]
-  toJSONFields (SplitReplace a) = [ "replace" .= a ]
+instance ToJSON a => ToJSONFields (Patch a) where
+  toJSONFields (Insert a) = [ "insert" .= a ]
+  toJSONFields (Delete a) = [ "delete" .= a ]
+  toJSONFields (Replace a b) = [ "replace" .= [a, b] ]
 
 instance ToJSON a => ToJSONFields [a] where
   toJSONFields list = [ "children" .= list ]

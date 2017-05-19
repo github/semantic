@@ -3,6 +3,8 @@ module Command
 ( Command
 -- Constructors
 , readFile
+, readBlobPairsFromHandle
+, readBlobsFromHandle
 , readFilesAtSHA
 , readFilesAtSHAs
 -- Evaluation
@@ -32,6 +34,14 @@ type Command = Freer CommandF
 readFile :: FilePath -> Maybe Language -> Command SourceBlob
 readFile path lang = ReadFile path lang `Then` return
 
+-- | Read JSON encoded blob pairs to SourceBlobs.
+readBlobPairsFromHandle :: Handle -> Command [Both SourceBlob]
+readBlobPairsFromHandle h = ReadBlobPairsFromHandle h `Then` return
+
+-- | Read JSON encoded blobs to SourceBlobs.
+readBlobsFromHandle :: Handle -> Command [SourceBlob]
+readBlobsFromHandle h = ReadBlobsFromHandle h `Then` return
+
 -- | Read a list of files at the given commit SHA.
 readFilesAtSHA :: FilePath -- ^ GIT_DIR
                 -> [FilePath] -- ^ GIT_ALTERNATE_OBJECT_DIRECTORIES
@@ -55,6 +65,8 @@ readFilesAtSHAs gitDir alternates paths shas = ReadFilesAtSHAs gitDir alternates
 runCommand :: Command a -> IO a
 runCommand = iterFreerA $ \ command yield -> case command of
   ReadFile path lang -> Files.readFile path lang >>= yield
+  ReadBlobPairsFromHandle h -> Files.readBlobPairsFromHandle h >>= yield
+  ReadBlobsFromHandle h -> Files.readBlobsFromHandle h >>= yield
   ReadFilesAtSHA gitDir alternates paths sha -> Git.readFilesAtSHA gitDir alternates paths sha >>= yield
   ReadFilesAtSHAs gitDir alternates paths shas -> Git.readFilesAtSHAs gitDir alternates paths shas >>= yield
   LiftIO io -> io >>= yield
@@ -64,6 +76,8 @@ runCommand = iterFreerA $ \ command yield -> case command of
 
 data CommandF f where
   ReadFile :: FilePath -> Maybe Language -> CommandF SourceBlob
+  ReadBlobPairsFromHandle :: Handle -> CommandF [Both SourceBlob]
+  ReadBlobsFromHandle :: Handle -> CommandF [SourceBlob]
   ReadFilesAtSHA :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> String -> CommandF [SourceBlob]
   ReadFilesAtSHAs :: FilePath -> [FilePath] -> [(FilePath, Maybe Language)] -> Both String -> CommandF [Both SourceBlob]
   LiftIO :: IO a -> CommandF a
@@ -74,6 +88,8 @@ instance MonadIO Command where
 instance Show1 CommandF where
   liftShowsPrec _ _ d command = case command of
     ReadFile path lang -> showsBinaryWith showsPrec showsPrec "ReadFile" d path lang
+    ReadBlobPairsFromHandle h -> showsUnaryWith showsPrec "ReadBlobPairsFromHandle" d h
+    ReadBlobsFromHandle h -> showsUnaryWith showsPrec "ReadBlobsFromHandle" d h
     ReadFilesAtSHA gitDir alternates paths sha -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHA" d gitDir alternates paths sha
     ReadFilesAtSHAs gitDir alternates paths shas -> showsQuaternaryWith showsPrec showsPrec showsPrec showsPrec "ReadFilesAtSHAs" d gitDir alternates paths shas
     LiftIO _ -> showsUnaryWith (const showChar) "LiftIO" d '_'
