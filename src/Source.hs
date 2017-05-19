@@ -111,8 +111,8 @@ actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start ran
 
 -- | Compute the character range given a Source and a SourceSpan.
 sourceSpanToRange :: Source -> SourceSpan -> Range
-sourceSpanToRange source SourceSpan{..} = Range (pred start) (pred end)
-  where start = sumLengths leadingRanges + column spanStart
+sourceSpanToRange source SourceSpan{..} = Range start end
+  where start = pred (sumLengths leadingRanges + column spanStart)
         end = start + sumLengths (Prologue.take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
         (leadingRanges, remainingRanges) = splitAt (pred (line spanStart)) (actualLineRanges source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
