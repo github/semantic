@@ -1,0 +1,14 @@
+{
+  "blobs": [{
+    "before": {
+      "path": "method.rb",
+      "content": "def foo; end",
+      "language": "Ruby"
+    },
+    "after": {
+      "path": "method.rb",
+      "content": "def bar(x); end",
+      "language": "Ruby"
+    }
+  }]
+}

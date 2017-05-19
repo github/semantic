@@ -17,6 +17,7 @@ import System.Directory
 import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
+import System.IO (stdin)
 import Text.Regex
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
@@ -48,8 +49,9 @@ main = do
 runDiff :: DiffArguments -> IO ByteString
 runDiff DiffArguments{..} = do
   blobs <- runCommand $ case diffMode of
-   DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
-   DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
+    DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
+    DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
+    DiffStdin -> readBlobPairsFromHandle stdin
   Semantic.diffBlobPairs termDecorator diffRenderer blobs
 
 runParse :: ParseArguments -> IO ByteString
@@ -57,6 +59,7 @@ runParse ParseArguments{..} = do
   blobs <- runCommand $ case parseMode of
     ParsePaths paths -> traverse (uncurry readFile) paths
     ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
+    ParseStdin -> readBlobsFromHandle stdin
   Semantic.parseBlobs parseTreeRenderer blobs
 
 -- | A parser for the application's command-line arguments.
@@ -84,7 +87,8 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
             <|> DiffCommits
                <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
                <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
-               <*> many (argument filePathReader (metavar "FILES...")) )
+               <*> many (argument filePathReader (metavar "FILES..."))
+            <|> pure DiffStdin )
          <*> pure gitDir
          <*> pure alternates )
 
@@ -96,7 +100,8 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
                <$> some (argument filePathReader (metavar "FILES..."))
             <|> ParseCommit
                <$> option (eitherReader parseSha) (long "sha" <> metavar "SHA" <> help "Commit SHA")
-               <*> some (argument filePathReader (metavar "FILES...")) )
+               <*> some (argument filePathReader (metavar "FILES..."))
+            <|> pure ParseStdin )
          <*> pure gitDir
          <*> pure alternates )
 

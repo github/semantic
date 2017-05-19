@@ -18,9 +18,9 @@ import Data.Functor.Classes
 import Text.Show
 import Data.Map as Map hiding (null)
 import Data.Record
+import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
 import Info hiding (Identifier)
-import Language.Ruby.Syntax (RAlgebra, decoratorWithAlgebra)
 import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R

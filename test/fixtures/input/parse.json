@@ -1,0 +1,7 @@
+{
+  "blobs": [{
+    "path": "method.rb",
+    "content": "def foo; end",
+    "language": "Ruby"
+  }]
+}
