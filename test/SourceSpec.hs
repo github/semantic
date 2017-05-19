@@ -47,10 +47,6 @@ spec = parallel $ do
   prop "preserves strings" $
     \ s -> fromText (toText s) `shouldBe` s
 
-totalSpan :: Source -> SourceSpan
-totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (Prologue.length ranges)) (end lastRange - start lastRange))
-  where ranges = actualLineRanges (totalRange source) source
-        lastRange = Prelude.last ranges
 
 insetSpan :: SourceSpan -> SourceSpan
 insetSpan sourceSpan = sourceSpan { spanStart = (spanStart sourceSpan) { column = succ (column (spanStart sourceSpan)) }
