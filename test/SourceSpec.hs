@@ -35,11 +35,11 @@ spec = parallel $ do
         sourceSpanToRange source (insetSpan (totalSpan source)) `shouldBe` insetRange (totalRange source)
 
     prop "inverse of rangeToSourceSpan" $
-      \ s -> sourceSpanToRange s (totalSpan s) `shouldBe` totalRange s
+      \ a b -> let s = a <> "\n" <> b in sourceSpanToRange s (totalSpan s) `shouldBe` totalRange s
 
   describe "rangeToSourceSpan" $ do
     prop "inverse of sourceSpanToRange" $
-      \ s -> rangeToSourceSpan s (totalRange s) `shouldBe` totalSpan s
+      \ a b -> let s = a <> "\n" <> b in rangeToSourceSpan s (totalRange s) `shouldBe` totalSpan s
 
   describe "totalSpan" $ do
     prop "covers single lines" $
