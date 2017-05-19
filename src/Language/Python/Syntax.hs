@@ -39,6 +39,7 @@ type Syntax' =
    , Statement.Assignment
    , Statement.If
    , Statement.Return
+   , Statement.Yield
    , Syntax.Empty
    , Syntax.Identifier
    ]
@@ -113,6 +114,8 @@ booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression 
 -- TODO: Handle multiple assignments
 assignment' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> (symbol ExpressionList *> children expression) <*> (symbol ExpressionList *> children expression))
+yield :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> expressionList <|> emptyTerm ))
 identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
