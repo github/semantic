@@ -121,8 +121,8 @@ sourceSpanToRange source SourceSpan{..} = Range start end
 -- | Compute the 'SourceSpan' corresponding to a given byte 'Range' in a 'Source'.
 rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source (Range rangeStart rangeEnd) = SourceSpan startPos endPos
-  where startPos = SourcePos (succ (Prologue.length before)) (succ (rangeStart - start firstRange))
-        endPos = SourcePos (Prologue.length before + Prologue.length lineRanges) (succ (rangeEnd - start lastRange))
+  where startPos = SourcePos (Prologue.length before + 1)                          (rangeStart - start firstRange + 1)
+        endPos =   SourcePos (Prologue.length before + Prologue.length lineRanges) (rangeEnd   - start lastRange  + 1)
         (before, rest) = span ((< rangeStart) . end) (actualLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
         Just firstRange = getFirst (foldMap (First . Just) lineRanges)
