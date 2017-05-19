@@ -17,7 +17,6 @@ import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import qualified Language.Ruby.Syntax as Ruby
-import Parser
 import Range
 import Source
 import qualified Syntax
@@ -34,7 +33,7 @@ import SourceSpan
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record DefaultFields)
+treeSitterParser :: Language -> Ptr TS.Language -> SourceBlob -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
 treeSitterParser language grammar blob = do
   document <- ts_document_new
   ts_document_set_language document grammar
@@ -87,7 +86,7 @@ safeToEnum n | (fromEnum (minBound :: n), fromEnum (maxBound :: n)) `inRange` n 
 
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record DefaultFields)
+documentToTerm :: Language -> Ptr Document -> SourceBlob -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
 documentToTerm language document SourceBlob{..} = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
