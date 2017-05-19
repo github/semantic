@@ -35,6 +35,7 @@ data Parser term where
   CParser :: Parser (SyntaxTerm Text DefaultFields)
   -- | A tree-sitter parser for 'Go'.
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
+  -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
   -- | A tree-sitter parser for 'Ruby'.
   RubyParser :: Parser (SyntaxTerm Text DefaultFields)
