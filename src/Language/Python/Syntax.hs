@@ -175,8 +175,6 @@ import' = makeTerm <$> symbol ImportStatement <*> (Declaration.Import <$> source
 importFrom :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 importFrom = makeTerm <$> symbol ImportFromStatement <*> (Declaration.Import <$> source)
 
-
--- TODO How to convert statements like this into a `Expression.Call`? The (pack "assert") produces a ByteString but that reduces the `Call` constructor to only accepting byteStrings.
 assertStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
 
