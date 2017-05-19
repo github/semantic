@@ -1,19 +1,20 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeOperators #-}
 module Parser where
 
+import Data.Functor.Union
 import Data.Record
-import Data.Syntax (Empty(..))
-import Data.Syntax.Assignment (Location)
+import qualified Data.Syntax as Syntax
+import Data.Syntax.Assignment
 import Data.Functor.Union (inj)
 import qualified Data.Text as T
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
-import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
 import Term
+import Text.Parser.TreeSitter.Language (Symbol)
 import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.Ruby
@@ -21,7 +22,7 @@ import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
 
 data Parser term where
-  ALaCarteRubyParser :: Parser (Term Ruby.Syntax Location)
+  ALaCarteParser :: (InUnion fs (Syntax.Error [Error grammar]), Bounded grammar, Enum grammar, Eq grammar, Symbol grammar) => Assignment (Node grammar) (Term (Union fs) Location) -> Parser (Term (Union fs) Location)
   CParser :: Parser (SyntaxTerm Text DefaultFields)
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
@@ -41,9 +42,10 @@ parserForLanguage (Just language) = case language of
 
 runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
-  ALaCarteRubyParser -> \ source -> do
-    result <- parseRubyToTerm source
-    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj Empty)) result)
+  ALaCarteParser assignment -> \ source -> do
+    ast <- parseToAST source
+    let Result errors term = assign assignment source ast
+    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) term)
   CParser -> treeSitterParser C tree_sitter_c
   GoParser -> treeSitterParser Go tree_sitter_go
   MarkdownParser -> cmarkParser
