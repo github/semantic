@@ -83,10 +83,9 @@ data Blob = Blob
   } deriving (Show, Generic, FromJSON)
 
 instance FromJSON BlobPair where
-  parseJSON = withObject "BlobPair" (p . HM.toList)
-    where
-      p [("before", a), ("after", b)] = Join <$> (These <$> parseJSON a <*> parseJSON b)
-      p [("after", b), ("before", a)] = Join <$> (These <$> parseJSON a <*> parseJSON b)
-      p [("before", a)] = Join <$> This <$> parseJSON a
-      p [("after", b)] = Join <$> That <$> parseJSON b
-      p _ = fail "Expected object with 'before' and 'after' keys only"
+  parseJSON = withObject "BlobPair" $ \o ->
+    case (HM.lookup "before" o, HM.lookup "after" o) of
+      (Just before, Just after) -> Join <$> (These <$> parseJSON before <*> parseJSON after)
+      (Just before, Nothing) -> Join . This <$> parseJSON before
+      (Nothing, Just after) -> Join . That <$> parseJSON after
+      _ -> fail "Expected object with 'before' and/or 'after' keys only"
