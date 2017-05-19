@@ -22,6 +22,7 @@ import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 import TreeSitter
 
+-- | A parser from 'Source' onto some term type.
 data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Symbol grammar, Functor (Union fs))
