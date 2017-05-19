@@ -1,5 +1,10 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, GeneralizedNewtypeDeriving, TypeOperators #-}
-module Language.Python.Syntax where
+module Language.Python.Syntax
+( assignment
+, Syntax
+, Syntax'
+, Grammar
+) where
 
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
