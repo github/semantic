@@ -115,7 +115,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
   where start = pred (sumLengths leadingRanges + column spanStart)
         end = start + sumLengths (Prologue.take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
         (leadingRanges, remainingRanges) = splitAt (pred (line spanStart)) (actualLineRanges source)
-        sumLengths = sum . fmap (\ Range{..} -> end - start)
+        sumLengths = sum . fmap rangeLength
 
 rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range = SourceSpan startPos endPos
