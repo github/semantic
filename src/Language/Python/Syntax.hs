@@ -27,7 +27,6 @@ type Syntax' =
    , Expression.Boolean
    , Expression.Bitwise
    , Expression.Call
-   , Expression.Unary
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
@@ -88,9 +87,10 @@ false :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
 unaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-unaryOperator = makeTerm <$> symbol UnaryOperator <*> children (  Expression.UComplement <$> (symbol AnonTilde *> expression)
-                                                              <|> Expression.UMinus      <$> (symbol AnonMinus *> expression)
-                                                              <|> Expression.UPlus       <$> (symbol AnonPlus  *> expression))
+unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> bitwise location <|> children ( symbol AnonPlus *> expression )
+  where
+    arithmetic location = makeTerm location <$> Expression.Negate <$> children ( symbol AnonMinus *> expression )
+    bitwise location    = makeTerm location <$> Expression.Complement <$> children ( symbol AnonTilde *> expression )
 
 binaryOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>= \ lexpression ->
