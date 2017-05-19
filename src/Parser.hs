@@ -24,7 +24,7 @@ import TreeSitter
 
 data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
-  ALaCarteParser :: (InUnion fs (Syntax.Error [Error grammar]), Bounded grammar, Enum grammar, Eq grammar, Symbol grammar) => Parser (AST grammar) -> Assignment (Node grammar) (Term (Union fs) Location) -> Parser (Term (Union fs) Location)
+  ALaCarteParser :: (Bounded grammar, Enum grammar, Eq grammar, Symbol grammar, Functor (Union fs)) => Parser (AST grammar) -> Assignment (Node grammar) (Term (Union fs) Location) -> Parser (Term (Union (Syntax.Error [Error grammar] ': fs)) Location)
   CParser :: Parser (SyntaxTerm Text DefaultFields)
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
@@ -48,7 +48,7 @@ runParser parser = case parser of
   ALaCarteParser parser assignment -> \ source -> do
     ast <- runParser parser source
     let Result errors term = assign assignment source ast
-    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) term)
+    pure (maybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) (hoistCofree weaken) term)
   CParser -> treeSitterParser C tree_sitter_c
   GoParser -> treeSitterParser Go tree_sitter_go
   MarkdownParser -> cmarkParser
