@@ -28,7 +28,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Symbol grammar, Functor (Union fs))
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, Functor (Union fs))
                    => Parser (AST grammar)                                                -- ^ A parser producing 'AST'.
                    -> Assignment (Node grammar) (Term (Union fs) Location)                -- ^ An assignment from 'AST' onto 'Term's.
                    -> Parser (Term (Union (Syntax.Error [Error grammar] ': fs)) Location) -- ^ A parser of 'Term's, weakened to allow for 'Syntax.Error' cases.
@@ -58,6 +58,7 @@ runParser parser = case parser of
   AssignmentParser parser assignment -> \ source -> do
     ast <- runParser parser source
     let Result errors term = assign assignment source ast
+    traverse_ (putStr . ($ "") . showError source) errors
     pure (maybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) (hoistCofree weaken) term)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> cmarkParser
