@@ -37,10 +37,10 @@ treeSitterParser :: Language -> Ptr TS.Language -> SourceBlob -> IO (Term (Synta
 treeSitterParser language grammar blob = do
   document <- ts_document_new
   ts_document_set_language document grammar
-  withCStringLen (toText (source blob)) $ \ (source, len) -> do
-    ts_document_set_input_string_with_length document source len
+  withCStringLen (toText (source blob)) $ \ (sourceText, len) -> do
+    ts_document_set_input_string_with_length document sourceText len
     ts_document_parse_halt_on_error document
-    term <- documentToTerm language document blob
+    term <- documentToTerm language document (source blob)
     ts_document_free document
     pure term
 
@@ -86,8 +86,8 @@ safeToEnum n | (fromEnum (minBound :: n), fromEnum (maxBound :: n)) `inRange` n 
 
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> SourceBlob -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
-documentToTerm language document SourceBlob{..} = do
+documentToTerm :: Language -> Ptr Document -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+documentToTerm language document source = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
     peek rootPtr)
