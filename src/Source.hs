@@ -112,7 +112,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
         (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (Source.totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
--- | Return a range that covers the entire text.
+-- | Return a 'Range' that covers the entire text.
 totalRange :: Source -> Range
 totalRange = Range 0 . B.length . sourceText
 
