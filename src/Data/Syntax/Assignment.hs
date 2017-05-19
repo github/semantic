@@ -167,7 +167,7 @@ data ErrorCause symbol
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
 showError source Error{..}
-  = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation . showChar '\n'
+  = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . showChar '^' . showChar '\n'
   . showString (prettyCallStack callStack) . showChar '\n'
@@ -189,8 +189,8 @@ showSymbols [a, b] = shows a . showString " or " . shows b
 showSymbols [a, b, c] = shows a . showString ", " . shows b . showString ", or " . shows c
 showSymbols (h:t) = shows h . showString ", " . showSymbols t
 
-showSourcePos :: Info.SourcePos -> ShowS
-showSourcePos Info.SourcePos{..} = showParen True (showString "source") . showChar ':' . shows line . showChar ':' . shows column
+showSourcePos :: Maybe FilePath -> Info.SourcePos -> ShowS
+showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
 assign :: (Symbol grammar, Enum grammar, Eq grammar, Show grammar, HasCallStack) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
