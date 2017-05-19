@@ -51,8 +51,8 @@ type Syntax' =
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: HasCallStack => Assignment (Node Grammar) [Term Syntax Location]
-assignment = symbol Program *> children (many declaration)
+assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+assignment = makeTerm <$> symbol Program <*> children (many declaration)
 
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 declaration = comment <|> class' <|> method

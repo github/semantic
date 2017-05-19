@@ -48,7 +48,7 @@ treeSitterParser language grammar blob = do
 -- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
 --
 --   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
-parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
+parseRubyToTerm :: Source -> IO (Maybe (Term Ruby.Syntax A.Location))
 parseRubyToTerm source = do
   document <- ts_document_new
   ts_document_set_language document Ruby.tree_sitter_ruby
