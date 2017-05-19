@@ -5,13 +5,12 @@ import CMark
 import Data.Record
 import Data.Text
 import Info
-import Parser
 import Prologue
 import Source
 import Syntax
 
-cmarkParser :: Parser (Syntax Text) (Record DefaultFields)
-cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) (rangeToSourceSpan source $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+cmarkParser :: Source -> IO (Cofree (Syntax Text) (Record DefaultFields))
+cmarkParser source = pure . toTerm (totalRange source) (rangeToSourceSpan source $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
   where toTerm :: Range -> SourceSpan -> Node -> Cofree (Syntax Text) (Record DefaultFields)
         toTerm within withinSpan (Node position t children) =
           let

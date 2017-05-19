@@ -3,6 +3,7 @@
 module Source where
 
 import qualified Data.ByteString as B
+import Data.List (span)
 import Data.String (IsString(..))
 import qualified Data.Text as T
 import Language
@@ -99,30 +100,44 @@ actualLines = fmap Source . actualLines' . sourceText
               Nothing -> [ l ]
               Just (_, lines') -> (l <> B.singleton (toEnum (fromEnum '\n'))) : actualLines' lines'
 
--- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> Source -> [Range]
-actualLineRanges range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
+-- | Compute the 'Range's of each line in a 'Source'.
+actualLineRanges :: Source -> [Range]
+actualLineRanges = Prologue.drop 1 . scanl toRange (Range 0 0) . actualLines
   where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
 
--- | Compute the character range given a Source and a SourceSpan.
+-- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
+actualLineRangesWithin :: Range -> Source -> [Range]
+actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
+  where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
+
+-- | Compute the byte 'Range' corresponding to a given 'SourceSpan' in a 'Source'.
 sourceSpanToRange :: Source -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
-  where start = sumLengths leadingRanges + column spanStart
+  where start = pred (sumLengths leadingRanges + column spanStart)
         end = start + sumLengths (Prologue.take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
-        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (Source.totalRange source) source)
-        sumLengths = sum . fmap (\ Range{..} -> end - start)
+        (leadingRanges, remainingRanges) = splitAt (pred (line spanStart)) (actualLineRanges source)
+        sumLengths = sum . fmap rangeLength
 
--- | Return a range that covers the entire text.
+-- | Compute the 'SourceSpan' corresponding to a given byte 'Range' in a 'Source'.
+rangeToSourceSpan :: Source -> Range -> SourceSpan
+rangeToSourceSpan source (Range rangeStart rangeEnd) = SourceSpan startPos endPos
+  where startPos = SourcePos (firstLine + 1)                          (rangeStart - start firstRange + 1)
+        endPos =   SourcePos (firstLine + Prologue.length lineRanges) (rangeEnd   - start lastRange  + 1)
+        firstLine = Prologue.length before
+        (before, rest) = span ((< rangeStart) . end) (actualLineRanges source)
+        (lineRanges, _) = span ((<= rangeEnd) . start) rest
+        Just firstRange = getFirst (foldMap (First . Just) lineRanges)
+        Just lastRange = getLast (foldMap (Last . Just) lineRanges)
+
+-- | Return a 'Range' that covers the entire text.
 totalRange :: Source -> Range
 totalRange = Range 0 . B.length . sourceText
 
-rangeToSourceSpan :: Source -> Range -> SourceSpan
-rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
-  where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
-        endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
-        lineRanges = actualLineRanges range source
-        toStartPos line range = SourcePos line (start range)
-        toEndPos line range = SourcePos line (end range)
+-- | Return a 'SourceSpan' that covers the entire text.
+totalSpan :: Source -> SourceSpan
+totalSpan source = SourceSpan (SourcePos 1 1) (SourcePos (Prologue.length ranges) (succ (end lastRange - start lastRange)))
+  where ranges = actualLineRanges source
+        Just lastRange = getLast (foldMap (Last . Just) ranges)
 
 length :: Source -> Int
 length = B.length . sourceText

@@ -32,7 +32,7 @@ languageForType mediaType = case mediaType of
     ".py" -> Just Python
     _ -> Nothing
 
-toVarDeclOrAssignment :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
+toVarDeclOrAssignment :: HasField fields Category => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDeclOrAssignment child = case unwrap child of
   S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment [child'] assignment
   S.Indexed [child'] -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child']
@@ -40,7 +40,7 @@ toVarDeclOrAssignment child = case unwrap child of
   S.VarAssignment _ _ -> child
   _ -> toVarDecl child
 
-toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
+toVarDecl :: HasField fields Category => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child]
 
 toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
@@ -49,13 +49,13 @@ toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< 
 toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
 toTuple child = pure child
 
-toPublicFieldDefinition :: (HasField fields Category) => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
+toPublicFieldDefinition :: HasField fields Category => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
 toPublicFieldDefinition children = case break (\x -> category (extract x) == Identifier) children of
   (prev, [identifier, assignment]) -> Just $ S.VarAssignment (prev ++ [identifier]) assignment
   (_, [_]) -> Just $ S.VarDecl children
   _ -> Nothing
 
-toInterface :: (HasField fields Category) => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
+toInterface :: HasField fields Category => [SyntaxTerm Text fields] -> Maybe (S.Syntax Text (SyntaxTerm Text fields))
 toInterface (id : rest) = case break (\x -> category (extract x) == Other "object_type") rest of
   (clauses, [body]) -> Just $ S.Interface id clauses (toList (unwrap body))
   _ -> Nothing
