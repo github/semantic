@@ -99,9 +99,14 @@ actualLines = fmap Source . actualLines' . sourceText
               Nothing -> [ l ]
               Just (_, lines') -> (l <> B.singleton (toEnum (fromEnum '\n'))) : actualLines' lines'
 
--- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> Source -> [Range]
-actualLineRanges range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
+-- | Compute the 'Range's of each line in a 'Source'.
+actualLineRanges :: Source -> [Range]
+actualLineRanges = Prologue.drop 1 . scanl toRange (Range 0 0) . actualLines
+  where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
+
+-- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
+actualLineRangesWithin :: Range -> Source -> [Range]
+actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
 
 -- | Compute the character range given a Source and a SourceSpan.
@@ -109,7 +114,7 @@ sourceSpanToRange :: Source -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sumLengths leadingRanges + column spanStart
         end = start + sumLengths (Prologue.take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
-        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (Source.totalRange source) source)
+        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
 -- | Return a 'Range' that covers the entire text.
@@ -120,7 +125,7 @@ rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source range = SourceSpan startPos endPos
   where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
         endPos = toEndPos (Prologue.length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
-        lineRanges = actualLineRanges range source
+        lineRanges = actualLineRanges (slice range source)
         toStartPos line range = SourcePos line (start range)
         toEndPos line range = SourcePos line (end range)
 
