@@ -31,10 +31,14 @@ data Parser term where
                    => Parser (AST grammar)                                                -- ^ A parser producing 'AST'.
                    -> Assignment (Node grammar) (Term (Union fs) Location)                -- ^ An assignment from 'AST' onto 'Term's.
                    -> Parser (Term (Union (Syntax.Error [Error grammar] ': fs)) Location) -- ^ A parser of 'Term's, weakened to allow for 'Syntax.Error' cases.
+  -- | A tree-sitter parser for 'C'.
   CParser :: Parser (SyntaxTerm Text DefaultFields)
+  -- | A tree-sitter parser for 'Go'.
   GoParser :: Parser (SyntaxTerm Text DefaultFields)
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
+  -- | A tree-sitter parser for 'Ruby'.
   RubyParser :: Parser (SyntaxTerm Text DefaultFields)
+  -- | A tree-sitter parser for 'TypeScript'.
   TypeScriptParser :: Parser (SyntaxTerm Text DefaultFields)
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
