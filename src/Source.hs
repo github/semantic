@@ -110,7 +110,7 @@ actualLineRangesWithin :: Range -> Source -> [Range]
 actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
 
--- | Compute the character range given a Source and a SourceSpan.
+-- | Compute the byte 'Range' corresponding to a given 'SourceSpan' in a 'Source'.
 sourceSpanToRange :: Source -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = pred (sumLengths leadingRanges + column spanStart)
@@ -118,6 +118,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
         (leadingRanges, remainingRanges) = splitAt (pred (line spanStart)) (actualLineRanges source)
         sumLengths = sum . fmap rangeLength
 
+-- | Compute the 'SourceSpan' corresponding to a given byte 'Range' in a 'Source'.
 rangeToSourceSpan :: Source -> Range -> SourceSpan
 rangeToSourceSpan source (Range rangeStart rangeEnd) = SourceSpan startPos endPos
   where startPos = SourcePos (succ (Prologue.length before)) (succ (rangeStart - start firstRange))
