@@ -36,6 +36,7 @@ data Parser term where
   MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
   RubyParser :: Parser (SyntaxTerm Text DefaultFields)
   TypeScriptParser :: Parser (SyntaxTerm Text DefaultFields)
+  -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
 
 -- | Return a 'Langauge'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
