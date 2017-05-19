@@ -4,6 +4,7 @@ module Data.Functor.Union
 , wrapU
 , unwrapU
 , InUnion(..)
+, weaken
 ) where
 
 import Data.Align.Generic
@@ -31,6 +32,9 @@ unwrapU = prj . unwrap
 strengthen :: Union '[f] a -> f a
 strengthen (Here f) = f
 strengthen _ = panic "strengthening an empty union by some catastrophic failure of typechecking & assumptions"
+
+weaken :: Union fs a -> Union (f ': fs) a
+weaken = There
 
 
 -- Classes
