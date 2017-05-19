@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, ScopedTypeVariables #-}
 module TreeSitter
 ( treeSitterParser
 , parseRubyToTerm
@@ -9,6 +9,7 @@ module TreeSitter
 import Prologue hiding (Constructor)
 import Category
 import Data.Functor.Foldable hiding (Nil)
+import Data.Ix
 import Data.Record
 import qualified Data.Syntax.Assignment as A
 import Language
@@ -94,16 +95,20 @@ parsePythonToTerm source = do
     Just a -> pure (Just a)
     _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
 
-toAST :: Enum grammar => Node -> IO (A.RoseF (A.Node grammar) Node)
+toAST :: (Bounded grammar, Enum grammar) => Node -> IO (A.RoseF (A.Node grammar) Node)
 toAST node@Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
     _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
     peekArray count childNodesPtr
-  pure $ A.RoseF (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
+  pure $ A.RoseF (safeToEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g
+
+safeToEnum :: forall n. (Bounded n, Enum n) => Int -> Maybe n
+safeToEnum n | (fromEnum (minBound :: n), fromEnum (maxBound :: n)) `inRange` n = Just (toEnum n)
+             | otherwise = Nothing
 
 
 -- | Return a parser for a tree sitter language & document.
