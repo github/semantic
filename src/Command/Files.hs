@@ -85,6 +85,8 @@ data Blob = Blob
 instance FromJSON BlobPair where
   parseJSON = withObject "BlobPair" $ \o ->
     case (HM.lookup "before" o, HM.lookup "after" o) of
+      (Just Null, Just after) -> Join . That <$> parseJSON after
+      (Just before, Just Null) -> Join . This <$> parseJSON before
       (Just before, Just after) -> Join <$> (These <$> parseJSON before <*> parseJSON after)
       (Just before, Nothing) -> Join . This <$> parseJSON before
       (Nothing, Just after) -> Join . That <$> parseJSON after

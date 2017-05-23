@@ -6,6 +6,7 @@ import Data.Aeson.Types hiding (parse)
 import Data.Functor.Both as Both
 import Data.Map
 import Data.Maybe
+import Data.These
 import Data.Record
 import Data.String
 import Info (DefaultFields, HasDefaultFields)
@@ -32,25 +33,37 @@ spec = parallel $ do
       nullBlob blob `shouldBe` True
 
   describe "readBlobPairsFromHandle" $ do
+    let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
+    let b = sourceBlob "method.rb" (Just Ruby) "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
-      h <- openFile "test/fixtures/input/diff.json" ReadMode
-      blobs <- runCommand (readBlobPairsFromHandle h)
-      let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
-      let b = sourceBlob "method.rb" (Just Ruby) "def bar(x); end"
+      blobs <- blobsFromFilePath "test/fixtures/input/diff.json"
       blobs `shouldBe` [both a b]
+
+    it "returns blobs when there's no before" $ do
+      blobs <- blobsFromFilePath "test/fixtures/input/diff-no-before.json"
+      blobs `shouldBe` [both (emptySourceBlob "method.rb") b]
+
+    it "returns blobs when there's null before" $ do
+      blobs <- blobsFromFilePath "test/fixtures/input/diff-null-before.json"
+      blobs `shouldBe` [both (emptySourceBlob "method.rb") b]
+
+    it "returns blobs when there's no after" $ do
+      blobs <- blobsFromFilePath "test/fixtures/input/diff-no-after.json"
+      blobs `shouldBe` [both a (emptySourceBlob "method.rb")]
+
+    it "returns blobs when there's null after" $ do
+      blobs <- blobsFromFilePath "test/fixtures/input/diff-null-after.json"
+      blobs `shouldBe` [both a (emptySourceBlob "method.rb")]
+
 
     it "returns blobs for unsupported language" $ do
       h <- openFile "test/fixtures/input/diff-unsupported-language.json" ReadMode
       blobs <- runCommand (readBlobPairsFromHandle h)
-      let a = emptySourceBlob "test.kt"
-      let b = sourceBlob "test.kt" Nothing "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
-      blobs `shouldBe` [both a b]
+      let b' = sourceBlob "test.kt" Nothing "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
+      blobs `shouldBe` [both (emptySourceBlob "test.kt") b']
 
     it "detects language based on filepath for empty language" $ do
-      h <- openFile "test/fixtures/input/diff-empty-language.json" ReadMode
-      blobs <- runCommand (readBlobPairsFromHandle h)
-      let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
-      let b = sourceBlob "method.rb" (Just Ruby) "def bar(x); end"
+      blobs <- blobsFromFilePath "test/fixtures/input/diff-empty-language.json"
       blobs `shouldBe` [both a b]
 
     it "throws on blank input" $ do
@@ -119,6 +132,10 @@ spec = parallel $ do
           (both "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe")
           [ both (emptySourceBlob "methods.rb") methodsBlob ]
         methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)
+        blobsFromFilePath path = do
+          h <- openFile path ReadMode
+          blobs <- runCommand (readBlobPairsFromHandle h)
+          pure blobs
 
 data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
 
