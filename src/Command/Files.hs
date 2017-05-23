@@ -15,7 +15,6 @@ import Data.String
 import Language
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
-import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Prelude (fail)
@@ -83,11 +82,11 @@ data Blob = Blob
   } deriving (Show, Generic, FromJSON)
 
 instance FromJSON BlobPair where
-  parseJSON = withObject "BlobPair" $ \o ->
-    case (HM.lookup "before" o, HM.lookup "after" o) of
-      (Just Null, Just after) -> Join . That <$> parseJSON after
-      (Just before, Just Null) -> Join . This <$> parseJSON before
-      (Just before, Just after) -> Join <$> (These <$> parseJSON before <*> parseJSON after)
-      (Just before, Nothing) -> Join . This <$> parseJSON before
-      (Nothing, Just after) -> Join . That <$> parseJSON after
+  parseJSON = withObject "BlobPair" $ \o -> do
+    before <- o .:? "before"
+    after <- o .:? "after"
+    case (before, after) of
+      (Just b, Just a) -> pure $ Join (These b a)
+      (Just b, Nothing) -> pure $ Join (This b)
+      (Nothing, Just a) -> pure $ Join (That a)
       _ -> fail "Expected object with 'before' and/or 'after' keys only"
