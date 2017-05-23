@@ -6,7 +6,6 @@ import Data.Aeson.Types hiding (parse)
 import Data.Functor.Both as Both
 import Data.Map
 import Data.Maybe
-import Data.These
 import Data.Record
 import Data.String
 import Info (DefaultFields, HasDefaultFields)
