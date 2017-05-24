@@ -5,6 +5,7 @@ module Renderer
 , resolveDiffRenderer
 , runDiffRenderer
 , declarationDecorator
+, identifierDecorator
 , ParseTreeRenderer(..)
 , resolveParseTreeRenderer
 , runParseTreeRenderer
