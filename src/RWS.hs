@@ -181,7 +181,7 @@ findNearestNeighbourTo :: (Diff f fields -> Int) -- ^ A function computes a cons
                                 (MappedDiff f fields)
 findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b) = do
   (previousA, previousB, unmappedA, unmappedB) <- get
-  fromMaybe (insertion previousA previousB unmappedA unmappedB term) $ do
+  fromMaybe (insertion previousA unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
     foundA@(UnmappedTerm i _ a) <- nearestUnmapped editDistance canCompare (IntMap.filterWithKey (\ k _ ->
       isInMoveBounds previousA k)
@@ -230,13 +230,12 @@ defaultMoveBound = 2
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
 -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
 insertion :: Int
-          -> Int
           -> UnmappedTerms f fields
           -> UnmappedTerms f fields
           -> UnmappedTerm f fields
           -> State (Int, Int, UnmappedTerms f fields, UnmappedTerms f fields) (MappedDiff f fields)
-insertion previousA previousB unmappedA unmappedB (UnmappedTerm j _ b) = do
-  put (previousA, previousB, unmappedA, IntMap.delete j unmappedB)
+insertion previousA unmappedA unmappedB (UnmappedTerm j _ b) = do
+  put (previousA, j, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
 genFeaturizedTermsAndDiffs :: (Functor f, HasField fields (Maybe FeatureVector))
