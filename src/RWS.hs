@@ -391,4 +391,3 @@ instance Listable1 Gram where
 
 instance Listable a => Listable (Gram a) where
   tiers = tiers1
-
