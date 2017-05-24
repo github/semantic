@@ -187,7 +187,9 @@ findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b)
       isInMoveBounds previous k)
       unmappedA) (Both.fst kdTrees) term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare unmappedB (Both.snd kdTrees) foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare (IntMap.filterWithKey (\ k _ ->
+      isInMoveBounds previous k)
+      unmappedB) (Both.snd kdTrees) foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     guard (canCompare a b)
