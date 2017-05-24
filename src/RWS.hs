@@ -183,16 +183,16 @@ findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b)
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped editDistance canCompare (entriesInMoveBounds previous unmappedA) (Both.fst kdTrees) term
+    foundA@(UnmappedTerm i _ a) <- nearestUnmapped editDistance canCompare (termsWithinMoveBoundsFrom previous unmappedA) (Both.fst kdTrees) term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare (entriesInMoveBounds (pred j) unmappedB) (Both.snd kdTrees) foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare (termsWithinMoveBoundsFrom (pred j) unmappedB) (Both.snd kdTrees) foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     guard (canCompare a b)
     pure $! do
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These i j, These a b)
-    where entriesInMoveBounds bound = IntMap.filterWithKey (\ k _ -> isInMoveBounds bound k)
+    where termsWithinMoveBoundsFrom bound = IntMap.filterWithKey (\ k _ -> isInMoveBounds bound k)
 
 isInMoveBounds :: Int -> Int -> Bool
 isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
