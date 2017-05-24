@@ -51,15 +51,8 @@ runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
 declarationDecorator = decoratorWithAlgebra . declarationAlgebra
 
-
-data ParseTreeRenderer fields output where
-  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields [Value]
-
-resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
-resolveParseTreeRenderer renderer blob = case renderer of
-  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
-  JSONParseTreeRenderer -> R.jsonFile blob . decoratorWithAlgebra identifierAlg
+identifierDecorator :: Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record (Maybe Identifier ': fields))
+identifierDecorator = decoratorWithAlgebra identifierAlg
   where identifierAlg :: RAlgebra (CofreeF (Syntax Text) a) (Cofree (Syntax Text) a) (Maybe Identifier)
         identifierAlg (_ :< syntax) = case syntax of
           S.Assignment f _ -> identifier f
@@ -77,6 +70,15 @@ resolveParseTreeRenderer renderer blob = case renderer of
           S.VarAssignment f _ -> asum $ identifier <$> f
           _ -> Nothing
           where identifier = fmap Identifier . extractLeafValue . unwrap . fst
+
+data ParseTreeRenderer fields output where
+  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
+  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields [Value]
+
+resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
+resolveParseTreeRenderer renderer blob = case renderer of
+  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
+  JSONParseTreeRenderer -> R.jsonFile blob . identifierDecorator
 
 
 newtype Identifier = Identifier Text
