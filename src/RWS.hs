@@ -153,23 +153,23 @@ findNearestNeighboursToDiff :: (These (Term f (Record fields)) (Term f (Record f
                            -> ([(These Int Int, These (Term f (Record fields)) (Term f (Record fields)))], UnmappedTerms f fields)
 findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs = (diffs, remaining)
   where
-    (diffs, (_, _, remaining, _)) =
+    (diffs, (_, remaining, _)) =
       traverse (findNearestNeighbourToDiff' editDistance canCompare (toKdTree <$> Both.both featureAs featureBs)) allDiffs &
       fmap catMaybes &
-      (`runState` (minimumTermIndex featureAs, minimumTermIndex featureBs, toMap featureAs, toMap featureBs))
+      (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
 findNearestNeighbourToDiff' :: (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
                            -> Both.Both (KdTree Double (UnmappedTerm f fields))
                            -> TermOrIndexOrNone (UnmappedTerm f fields)
-                           -> State (Int, Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                           -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
                                     (Maybe (MappedDiff f fields))
 findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
   None -> pure Nothing
   Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
-  Index j -> do
-    (i, _, unA, unB) <- get
-    put (i, j, unA, unB)
+  Index i -> do
+    (_, unA, unB) <- get
+    put (i, unA, unB)
     pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
@@ -177,24 +177,24 @@ findNearestNeighbourTo :: (Diff f fields -> Int) -- ^ A function computes a cons
                        -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
                        -> Both.Both (KdTree Double (UnmappedTerm f fields))
                        -> UnmappedTerm f fields
-                       -> State (Int, Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                       -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
                                 (MappedDiff f fields)
 findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b) = do
-  (previousA, previousB, unmappedA, unmappedB) <- get
-  fromMaybe (insertion previousA previousB unmappedA unmappedB term) $ do
+  (previous, unmappedA, unmappedB) <- get
+  fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
     foundA@(UnmappedTerm i _ a) <- nearestUnmapped editDistance canCompare (IntMap.filterWithKey (\ k _ ->
-      isInMoveBounds previousA k)
+      isInMoveBounds previous k)
       unmappedA) (Both.fst kdTrees) term
     -- Look up the nearest `foundA` in `unmappedB`
     UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare (IntMap.filterWithKey (\ k _ ->
-      isInMoveBounds previousB k)
+      isInMoveBounds previous k)
       unmappedB) (Both.snd kdTrees) foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     guard (canCompare a b)
     pure $! do
-      put (i, j, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
+      put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These i j, These a b)
 
 isInMoveBounds :: Int -> Int -> Bool
@@ -230,13 +230,13 @@ defaultMoveBound = 2
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
 -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
 insertion :: Int
-          -> Int
-          -> UnmappedTerms f fields
-          -> UnmappedTerms f fields
-          -> UnmappedTerm f fields
-          -> State (Int, Int, UnmappedTerms f fields, UnmappedTerms f fields) (MappedDiff f fields)
-insertion previousA previousB unmappedA unmappedB (UnmappedTerm j _ b) = do
-  put (previousA, previousB, unmappedA, IntMap.delete j unmappedB)
+             -> UnmappedTerms f fields
+             -> UnmappedTerms f fields
+             -> UnmappedTerm f fields
+             -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                      (MappedDiff f fields)
+insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
+  put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
 genFeaturizedTermsAndDiffs :: (Functor f, HasField fields (Maybe FeatureVector))
