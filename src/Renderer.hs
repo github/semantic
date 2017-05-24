@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators #-}
 module Renderer
 ( DiffRenderer(..)
 , SExpressionFormat(..)
@@ -80,7 +80,7 @@ resolveParseTreeRenderer renderer blob = case renderer of
 
 
 newtype Identifier = Identifier Text
-  deriving (Eq, Show)
+  deriving (Eq, NFData, Show)
 
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]
