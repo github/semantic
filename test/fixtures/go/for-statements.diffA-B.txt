@@ -4,11 +4,15 @@
   (Function
     (Identifier)
     (Args)
-  {+(For
-      (FunctionCall
-        (Identifier))
-      (Other "goto_statement"
-        (Identifier)))+}
+  { (For
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier)
+          )(Other"goto_statement"(Identifier))))
+  ->(For
+    (FunctionCall
+      (Identifier))
+    (Other"goto_statement"(Identifier))) }
   {+(For
       (Other "expression_list"
         (Identifier))
@@ -30,14 +34,12 @@
       (FunctionCall
         (Identifier))
       (Continue))+}
-    (For
+  {+(For
       (ExpressionStatements
         (FunctionCall
           (Identifier)
-        {+(Identifier)+})
-      {+(Break)+}
-      {-(Other "goto_statement"
-          (Identifier))-}))
+          (Identifier))
+      (Break)))+}
   {-(For
       (VarDecl
         (Other "expression_list"

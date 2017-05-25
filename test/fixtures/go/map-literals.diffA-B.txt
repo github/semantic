@@ -14,13 +14,13 @@
               (Identifier)
             { (Identifier)
             ->(Identifier) })
-          {+(Pair
-              (StringLiteral)
-              (StringLiteral))+}
             (Pair
             { (StringLiteral)
             ->(StringLiteral) }
-              (StringLiteral))
-          {-(Pair
-              (StringLiteral)
-              (StringLiteral))-}))))))
+            { (StringLiteral)
+            ->(StringLiteral) })
+            (Pair
+            { (StringLiteral)
+            ->(StringLiteral) }
+            { (StringLiteral)
+            ->(StringLiteral) })))))))

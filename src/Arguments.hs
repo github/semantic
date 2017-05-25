@@ -46,7 +46,7 @@ patchDiff :: DiffArguments'
 patchDiff = DiffArguments PatchRenderer identityDecorator
 
 jsonDiff :: DiffArguments'
-jsonDiff = DiffArguments JSONDiffRenderer identityDecorator
+jsonDiff = DiffArguments JSONDiffRenderer (const identifierDecorator)
 
 sExpressionDiff :: DiffArguments'
 sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) identityDecorator

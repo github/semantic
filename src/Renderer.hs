@@ -1,10 +1,11 @@
-{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators #-}
 module Renderer
 ( Renderer(..)
 , SExpressionFormat(..)
 , resolveRenderer
 , runRenderer
 , declarationDecorator
+, identifierDecorator
 , Summaries(..)
 , File(..)
 ) where
@@ -42,7 +43,14 @@ resolveRenderer renderer input = case renderer of
   SExpressionDiffRenderer format -> uncurry (R.sExpression format) input
   ToCRenderer -> uncurry R.toc input
   SExpressionParseTreeRenderer format -> uncurry (R.sExpressionParseTree format) input
-  JSONParseTreeRenderer -> let (blob, term) = input in R.jsonFile blob (decoratorWithAlgebra identifierAlg term)
+  JSONParseTreeRenderer -> let (blob, term) = input in R.jsonFile blob (identifierDecorator term)
+
+
+declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
+declarationDecorator = decoratorWithAlgebra . declarationAlgebra
+
+identifierDecorator :: Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record (Maybe Identifier ': fields))
+identifierDecorator = decoratorWithAlgebra identifierAlg
   where identifierAlg :: RAlgebra (CofreeF (Syntax Text) a) (Cofree (Syntax Text) a) (Maybe Identifier)
         identifierAlg (_ :< syntax) = case syntax of
           S.Assignment f _ -> identifier f
@@ -65,12 +73,8 @@ runRenderer :: (Monoid output, StringConv output ByteString) => Renderer input o
 runRenderer = foldMap . resolveRenderer
 
 
-declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
-declarationDecorator = decoratorWithAlgebra . declarationAlgebra
-
-
 newtype Identifier = Identifier Text
-  deriving (Eq, Show)
+  deriving (Eq, NFData, Show)
 
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]
