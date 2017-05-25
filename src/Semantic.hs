@@ -4,7 +4,6 @@ module Semantic
 , diffBlobPair
 , parseBlobs
 , parseBlob
-, parserForLanguage
 ) where
 
 import Control.Parallel.Strategies
