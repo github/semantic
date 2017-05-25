@@ -46,7 +46,7 @@ patchDiff :: DiffArguments'
 patchDiff = DiffArguments PatchRenderer identityDecorator
 
 jsonDiff :: DiffArguments'
-jsonDiff = DiffArguments JSONDiffRenderer (const identifierDecorator)
+jsonDiff = DiffArguments JSONRenderer (const identifierDecorator)
 
 sExpressionDiff :: DiffArguments'
 sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) identityDecorator
@@ -74,7 +74,7 @@ sExpressionParseTree :: ParseArguments'
 sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
 
 jsonParseTree :: ParseArguments'
-jsonParseTree = ParseArguments JSONParseTreeRenderer
+jsonParseTree = ParseArguments JSONRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show

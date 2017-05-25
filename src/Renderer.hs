@@ -10,7 +10,7 @@ module Renderer
 , File(..)
 ) where
 
-import Data.Aeson (Value, (.=))
+import Data.Aeson (ToJSON, Value, (.=))
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Classes
 import Text.Show
@@ -30,20 +30,18 @@ import Term
 
 data Renderer input output where
   PatchRenderer :: HasField fields Range => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) File
-  JSONDiffRenderer :: ToJSONFields (Record fields) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) [Value]
+  JSONRenderer :: (ToJSON a, Foldable t) => Renderer (t SourceBlob, a) [Value]
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) ByteString
-  JSONParseTreeRenderer :: ToJSONFields (Record fields) => Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) [Value]
 
 resolveRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
 resolveRenderer renderer input = case renderer of
   PatchRenderer -> File (uncurry R.patch input)
-  JSONDiffRenderer -> uncurry R.json input
+  JSONRenderer -> uncurry R.json input
   SExpressionDiffRenderer format -> uncurry (R.sExpression format) input
   ToCRenderer -> uncurry R.toc input
   SExpressionParseTreeRenderer format -> uncurry (R.sExpressionParseTree format) (first runIdentity input)
-  JSONParseTreeRenderer -> let (Identity blob, term) = input in R.jsonFile blob (identifierDecorator term)
 
 
 declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
@@ -87,11 +85,10 @@ instance StringConv File ByteString where
 
 instance Show (Renderer input output) where
   showsPrec _ PatchRenderer = showString "PatchRenderer"
-  showsPrec _ JSONDiffRenderer = showString "JSONDiffRenderer"
+  showsPrec _ JSONRenderer = showString "JSONRenderer"
   showsPrec d (SExpressionDiffRenderer format) = showsUnaryWith showsPrec "SExpressionDiffRenderer" d format
   showsPrec _ ToCRenderer = showString "ToCRenderer"
   showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
-  showsPrec _ JSONParseTreeRenderer = showString "JSONParseTreeRenderer"
 
 instance Monoid File where
   mempty = File mempty
