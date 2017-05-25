@@ -31,11 +31,11 @@ import Term
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 -- | Diff a list of SourceBlob pairs to produce ByteString output using the specified renderer.
-diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> DiffRenderer (Diff (Syntax Text) (Record fields)) output -> [Both SourceBlob] -> IO ByteString
+diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) output -> [Both SourceBlob] -> IO ByteString
 diffBlobPairs decorator renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
-  toS <$> renderConcurrently (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> renderConcurrently (resolveRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
       diff <- diffBlobPair decorator blobPair
@@ -54,10 +54,10 @@ diffBlobPair decorator blobs = do
     runDiff terms = runBothWith diffTerms (terms `using` parTraversable rdeepseq)
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
-parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer (Term (Syntax Text) (Record DefaultFields)) output -> [SourceBlob] -> IO ByteString
+parseBlobs :: (Monoid output, StringConv output ByteString) => Renderer (SourceBlob, Term (Syntax Text) (Record DefaultFields)) output -> [SourceBlob] -> IO ByteString
 parseBlobs renderer blobs = do
   terms <- traverse go (filter (not . nonExistentBlob) blobs)
-  toS <$> renderConcurrently (resolveParseTreeRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
+  toS <$> renderConcurrently (resolveRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
       term <- parseBlob blob
@@ -70,7 +70,7 @@ parseBlob SourceBlob{..} = runParser (parserForLanguage blobLanguage) source
 
 -- Internal
 
-renderConcurrently :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
+renderConcurrently :: (Monoid output, StringConv output ByteString) => (input -> output) -> [input] -> IO output
 renderConcurrently f diffs = do
-  outputs <- Async.mapConcurrently (pure . uncurry f) diffs
+  outputs <- Async.mapConcurrently (pure . f) diffs
   pure $ mconcat (outputs `using` parTraversable rseq)

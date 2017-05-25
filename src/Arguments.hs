@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
+import Data.Functor.Both (Both)
 import Data.Maybe
 import Data.Record
 import Data.String
@@ -20,7 +21,7 @@ data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language
 
 data DiffArguments where
   DiffArguments :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) =>
-    { diffRenderer :: DiffRenderer (Diff (Syntax Text) (Record fields)) output
+    { diffRenderer :: Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) output
     , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
     , diffMode :: DiffMode
     , gitDir :: FilePath
@@ -59,7 +60,7 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
 
 data ParseArguments where
   ParseArguments :: (Monoid output, StringConv output ByteString) =>
-    { parseTreeRenderer :: ParseTreeRenderer (Term (Syntax Text) (Record DefaultFields)) output
+    { parseTreeRenderer :: Renderer (SourceBlob, Term (Syntax Text) (Record DefaultFields)) output
     , parseMode :: ParseMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
