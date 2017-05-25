@@ -8,6 +8,7 @@ import Data.Map
 import Data.Maybe
 import Data.Record
 import Data.String
+import Diff
 import Info (DefaultFields, HasDefaultFields)
 import Language
 import Prologue hiding (readFile, toList)
@@ -138,7 +139,7 @@ spec = parallel $ do
 
 data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
 
-fetchDiffsOutput :: (HasDefaultFields fields, NFData (Record fields)) => (Object -> Text) -> FilePath -> String -> String -> [(FilePath, Maybe Language)] -> (Source -> SyntaxTerm Text DefaultFields -> SyntaxTerm Text fields) -> DiffRenderer fields Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
+fetchDiffsOutput :: (HasDefaultFields fields, NFData (Record fields)) => (Object -> Text) -> FilePath -> String -> String -> [(FilePath, Maybe Language)] -> (Source -> SyntaxTerm Text DefaultFields -> SyntaxTerm Text fields) -> Renderer (Both SourceBlob, SyntaxDiff Text fields) Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
 fetchDiffsOutput f gitDir sha1 sha2 filePaths decorator renderer = do
   blobs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
   results <- Semantic.diffBlobPairs decorator renderer blobs
