@@ -31,20 +31,20 @@ import Syntax as S
 import Term
 
 
-data DiffRenderer fields output where
-  PatchRenderer :: HasField fields Range => DiffRenderer fields File
-  JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer fields (Map Text Value)
-  SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
-  ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => DiffRenderer fields Summaries
+data DiffRenderer diff output where
+  PatchRenderer :: HasField fields Range => DiffRenderer (Diff (Syntax Text) (Record fields)) File
+  JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => DiffRenderer (Diff (Syntax Text) (Record fields)) (Map Text Value)
+  SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer (Diff (Syntax Text) (Record fields)) ByteString
+  ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => DiffRenderer (Diff (Syntax Text) (Record fields)) Summaries
 
-resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output
+resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer diff output -> Both SourceBlob -> diff -> output
 resolveDiffRenderer renderer = case renderer of
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
   SExpressionDiffRenderer format -> R.sExpression format
   ToCRenderer -> R.toc
 
-runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> [(Both SourceBlob, Diff (Syntax Text) (Record fields))] -> output
+runDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer diff output -> [(Both SourceBlob, diff)] -> output
 runDiffRenderer = foldMap . uncurry . resolveDiffRenderer
 
 

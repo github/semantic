@@ -5,6 +5,7 @@ module Arguments where
 import Data.Maybe
 import Data.Record
 import Data.String
+import Diff
 import Info
 import Language
 import Prologue
@@ -19,7 +20,7 @@ data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language
 
 data DiffArguments where
   DiffArguments :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) =>
-    { diffRenderer :: DiffRenderer fields output
+    { diffRenderer :: DiffRenderer (Diff (Syntax Text) (Record fields)) output
     , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
     , diffMode :: DiffMode
     , gitDir :: FilePath

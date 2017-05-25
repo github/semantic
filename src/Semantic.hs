@@ -31,7 +31,7 @@ import Term
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 -- | Diff a list of SourceBlob pairs to produce ByteString output using the specified renderer.
-diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> DiffRenderer fields output -> [Both SourceBlob] -> IO ByteString
+diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> DiffRenderer (Diff (Syntax Text) (Record fields)) output -> [Both SourceBlob] -> IO ByteString
 diffBlobPairs decorator renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
