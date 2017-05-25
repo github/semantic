@@ -13,7 +13,6 @@ import Data.Aeson (Value, (.=))
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Classes
 import Text.Show
-import Data.Map as Map hiding (null)
 import Data.Record
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
@@ -30,7 +29,7 @@ import Term
 
 data Renderer input output where
   PatchRenderer :: HasField fields Range => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) File
-  JSONDiffRenderer :: ToJSONFields (Record fields) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) (Map Text Value)
+  JSONDiffRenderer :: ToJSONFields (Record fields) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) [Value]
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (SourceBlob, Term (Syntax Text) (Record fields)) ByteString

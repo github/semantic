@@ -15,7 +15,6 @@ import Diff
 import Info
 import Patch
 import Prologue hiding ((++))
-import qualified Data.Map as Map
 import Source
 import Syntax as S
 
@@ -24,15 +23,12 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-json :: ToJSONFields (Record fields) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
-json blobs diff = Map.fromList
-  [ ("diff", toJSON diff)
-  , ("oids", toJSON (oid <$> blobs))
-  , ("paths", toJSON (path <$> blobs))
+json :: ToJSONFields (Record fields) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [Value]
+json blobs diff = pure $ object
+  [ "diff" .= toJSON diff
+  , "oids" .= toJSON (oid <$> blobs)
+  , "paths" .= toJSON (path <$> blobs)
   ]
-
-instance StringConv (Map Text Value) ByteString where
-  strConv _ = toS . (<> "\n") . encode
 
 instance ToJSON a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
