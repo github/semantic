@@ -30,11 +30,11 @@ import Term
 
 data Renderer input output where
   PatchRenderer :: HasField fields Range => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) File
-  JSONDiffRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) (Map Text Value)
+  JSONDiffRenderer :: ToJSONFields (Record fields) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) (Map Text Value)
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (SourceBlob, Term (Syntax Text) (Record fields)) ByteString
-  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => Renderer (SourceBlob, Term (Syntax Text) (Record fields)) [Value]
+  JSONParseTreeRenderer :: ToJSONFields (Record fields) => Renderer (SourceBlob, Term (Syntax Text) (Record fields)) [Value]
 
 resolveRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
 resolveRenderer renderer input = case renderer of

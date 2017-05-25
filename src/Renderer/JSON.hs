@@ -24,7 +24,7 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-json :: (ToJSONFields (Record fields), HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
+json :: ToJSONFields (Record fields) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
 json blobs diff = Map.fromList
   [ ("diff", toJSON diff)
   , ("oids", toJSON (oid <$> blobs))
