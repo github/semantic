@@ -9,9 +9,7 @@ module Renderer.JSON
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
-import Data.Functor.Both
 import Data.Record
-import Diff
 import Info
 import Patch
 import Prologue hiding ((++))
@@ -23,11 +21,11 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-json :: ToJSONFields (Record fields) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> [Value]
-json blobs diff = pure $ object
-  [ "diff" .= toJSON diff
-  , "oids" .= toJSON (oid <$> blobs)
-  , "paths" .= toJSON (path <$> blobs)
+json :: (ToJSON a, Foldable t) => t SourceBlob -> a -> [Value]
+json blobs root = pure $ object
+  [ "root" .= toJSON root
+  , "oids" .= toJSON (oid <$> toList blobs)
+  , "paths" .= toJSON (path <$> toList blobs)
   ]
 
 instance ToJSON a => ToJSONFields (Join (,) a) where
