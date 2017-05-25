@@ -58,7 +58,7 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
 
 data ParseArguments where
   ParseArguments :: (Monoid output, StringConv output ByteString) =>
-    { parseTreeRenderer :: ParseTreeRenderer DefaultFields output
+    { parseTreeRenderer :: ParseTreeRenderer (Term (Syntax Text) (Record DefaultFields)) output
     , parseMode :: ParseMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]

@@ -52,11 +52,11 @@ declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> T
 declarationDecorator = decoratorWithAlgebra . declarationAlgebra
 
 
-data ParseTreeRenderer fields output where
-  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer fields ByteString
-  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer fields [Value]
+data ParseTreeRenderer term output where
+  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> ParseTreeRenderer (Term (Syntax Text) (Record fields)) ByteString
+  JSONParseTreeRenderer :: (ToJSONFields (Record fields), HasField fields Range) => ParseTreeRenderer (Term (Syntax Text) (Record fields)) [Value]
 
-resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> SourceBlob -> Term (Syntax Text) (Record fields) -> output
+resolveParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer term output -> SourceBlob -> term -> output
 resolveParseTreeRenderer renderer blob = case renderer of
   SExpressionParseTreeRenderer format -> R.sExpressionParseTree format blob
   JSONParseTreeRenderer -> R.jsonFile blob . decoratorWithAlgebra identifierAlg
@@ -86,7 +86,7 @@ instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]
 
 
-runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer fields output -> [(SourceBlob, Term (Syntax Text) (Record fields))] -> output
+runParseTreeRenderer :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer term output -> [(SourceBlob, term)] -> output
 runParseTreeRenderer = foldMap . uncurry . resolveParseTreeRenderer
 
 
