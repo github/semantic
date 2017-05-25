@@ -37,7 +37,7 @@ data DiffRenderer fields output where
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> DiffRenderer fields ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => DiffRenderer fields Summaries
 
-resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> (Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output)
+resolveDiffRenderer :: (Monoid output, StringConv output ByteString) => DiffRenderer fields output -> Both SourceBlob -> Diff (Syntax Text) (Record fields) -> output
 resolveDiffRenderer renderer = case renderer of
   PatchRenderer -> (File .) . R.patch
   JSONDiffRenderer -> R.json
