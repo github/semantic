@@ -54,14 +54,14 @@ diffBlobPair decorator blobs = do
     runDiff terms = runBothWith diffTerms (terms `using` parTraversable rdeepseq)
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
-parseBlobs :: (Monoid output, StringConv output ByteString) => Renderer (SourceBlob, Term (Syntax Text) (Record DefaultFields)) output -> [SourceBlob] -> IO ByteString
+parseBlobs :: (Monoid output, StringConv output ByteString) => Renderer (Identity SourceBlob, Term (Syntax Text) (Record DefaultFields)) output -> [SourceBlob] -> IO ByteString
 parseBlobs renderer blobs = do
   terms <- traverse go (filter (not . nonExistentBlob) blobs)
   toS <$> renderConcurrently (resolveRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
       term <- parseBlob blob
-      pure (blob, term)
+      pure (Identity blob, term)
 
 -- | Parse a SourceBlob.
 parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))

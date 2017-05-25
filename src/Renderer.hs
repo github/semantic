@@ -33,8 +33,8 @@ data Renderer input output where
   JSONDiffRenderer :: ToJSONFields (Record fields) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) [Value]
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
-  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (SourceBlob, Term (Syntax Text) (Record fields)) ByteString
-  JSONParseTreeRenderer :: ToJSONFields (Record fields) => Renderer (SourceBlob, Term (Syntax Text) (Record fields)) [Value]
+  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) ByteString
+  JSONParseTreeRenderer :: ToJSONFields (Record fields) => Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) [Value]
 
 resolveRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
 resolveRenderer renderer input = case renderer of
@@ -42,8 +42,8 @@ resolveRenderer renderer input = case renderer of
   JSONDiffRenderer -> uncurry R.json input
   SExpressionDiffRenderer format -> uncurry (R.sExpression format) input
   ToCRenderer -> uncurry R.toc input
-  SExpressionParseTreeRenderer format -> uncurry (R.sExpressionParseTree format) input
-  JSONParseTreeRenderer -> let (blob, term) = input in R.jsonFile blob (identifierDecorator term)
+  SExpressionParseTreeRenderer format -> uncurry (R.sExpressionParseTree format) (first runIdentity input)
+  JSONParseTreeRenderer -> let (Identity blob, term) = input in R.jsonFile blob (identifierDecorator term)
 
 
 declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
