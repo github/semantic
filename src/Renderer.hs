@@ -26,7 +26,7 @@ import Term
 
 
 data Renderer input output where
-  PatchRenderer :: HasField fields Range => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) File
+  PatchRenderer :: (HasField fields Range, Traversable f) => Renderer (Both SourceBlob, Diff f (Record fields)) File
   JSONRenderer :: (ToJSON a, Foldable t) => Renderer (t SourceBlob, a) [Value]
   SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Renderer (Both SourceBlob, Diff f (Record fields)) ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
