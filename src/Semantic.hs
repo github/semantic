@@ -35,7 +35,7 @@ diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields C
 diffBlobPairs decorator renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
-  renderConcurrently (pure . runRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
+  renderConcurrently (pure . runRenderer renderer) diffs'
   where
     go blobPair = do
       diff <- diffBlobPair decorator blobPair
