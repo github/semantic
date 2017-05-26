@@ -35,7 +35,7 @@ diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields C
 diffBlobPairs decorator renderer blobs = do
   diffs <- Async.mapConcurrently go blobs
   let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
-  toS <$> renderConcurrently (pure . runRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
+  renderConcurrently (pure . runRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blobPair = do
       diff <- diffBlobPair decorator blobPair
@@ -56,7 +56,7 @@ diffBlobPair decorator blobs = do
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output -> [SourceBlob] -> IO ByteString
 parseBlobs decorator renderer blobs =
-  toS <$> renderConcurrently (fmap (runRenderer renderer) . parse) (filter (not . nonExistentBlob) blobs)
+  renderConcurrently (fmap (runRenderer renderer) . parse) (filter (not . nonExistentBlob) blobs)
   where
     parse blob = do
       term <- decorator (source blob) <$> runParser (parserForLanguage (blobLanguage blob)) (source blob)
@@ -69,7 +69,7 @@ parseBlob decorator SourceBlob{..} = decorator source <$> runParser (parserForLa
 
 -- Internal
 
-renderConcurrently :: (Monoid output, StringConv output ByteString) => (input -> IO output) -> [input] -> IO output
+renderConcurrently :: (Monoid output, StringConv output ByteString) => (input -> IO output) -> [input] -> IO ByteString
 renderConcurrently f diffs = do
   outputs <- Async.mapConcurrently f diffs
-  pure $ mconcat (outputs `using` parTraversable rseq)
+  pure $ toS (mconcat (outputs `using` parTraversable rseq))
