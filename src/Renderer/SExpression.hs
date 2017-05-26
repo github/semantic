@@ -8,7 +8,6 @@ import Data.Bifunctor.Join
 import Data.ByteString hiding (foldr, spanEnd)
 import Data.Record
 import Prologue hiding (replicate, encodeUtf8)
-import Category as C
 import Diff
 import Patch
 import Info
