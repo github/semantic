@@ -46,8 +46,8 @@ diffBlobPair decorator blobs = do
   terms <- Async.mapConcurrently (parseBlob decorator) blobs
   pure $ case (runJoin blobs, runJoin terms) of
     ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> Nothing
-                            | nonExistentBlob right -> Just . pure $ Delete a
-                            | nonExistentBlob left -> Just . pure $ Insert b
+                            | nonExistentBlob right -> Just $ deleting a
+                            | nonExistentBlob left -> Just $ inserting b
                             | otherwise -> Just $ runDiff (both a b)
   where
     runDiff terms = runBothWith diffTerms terms
