@@ -55,9 +55,8 @@ diffBlobPair decorator blobs = do
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output -> [SourceBlob] -> IO ByteString
-parseBlobs decorator renderer blobs = do
-  terms <- traverse go (filter (not . nonExistentBlob) blobs)
-  toS <$> renderConcurrently (pure . runRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
+parseBlobs decorator renderer blobs =
+  toS <$> renderConcurrently (fmap (runRenderer renderer) . go) (filter (not . nonExistentBlob) blobs)
   where
     go blob = do
       term <- decorator (source blob) <$> runParser (parserForLanguage (blobLanguage blob)) (source blob)
