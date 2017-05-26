@@ -60,7 +60,7 @@ parseBlobs decorator renderer blobs = do
   toS <$> renderConcurrently (runRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
-      term <- parseBlob decorator blob
+      term <- decorator (source blob) <$> runParser (parserForLanguage (blobLanguage blob)) (source blob)
       pure (Identity blob, term)
 
 -- | Parse a SourceBlob.
