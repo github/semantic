@@ -51,7 +51,7 @@ diffBlobPair decorator blobs = do
                             | nonExistentBlob left -> Just . pure $ Insert b
                             | otherwise -> Just $ runDiff (both a b)
   where
-    runDiff terms = runBothWith diffTerms (terms `using` parTraversable rdeepseq)
+    runDiff terms = runBothWith diffTerms terms
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output -> [SourceBlob] -> IO ByteString
