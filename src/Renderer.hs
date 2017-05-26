@@ -35,12 +35,12 @@ data Renderer input output where
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) ByteString
 
 runRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
-runRenderer renderer input = case renderer of
-  PatchRenderer -> File (uncurry R.patch input)
-  JSONRenderer -> uncurry R.json input
-  SExpressionDiffRenderer format -> uncurry (R.sExpression format) input
-  ToCRenderer -> uncurry R.toc input
-  SExpressionParseTreeRenderer format -> uncurry (R.sExpressionParseTree format) (first runIdentity input)
+runRenderer renderer = case renderer of
+  PatchRenderer -> File . uncurry R.patch
+  JSONRenderer -> uncurry R.json
+  SExpressionDiffRenderer format -> uncurry (R.sExpression format)
+  ToCRenderer -> uncurry R.toc
+  SExpressionParseTreeRenderer format -> uncurry (R.sExpressionParseTree format) . first runIdentity
 
 
 declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
