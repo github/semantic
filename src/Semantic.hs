@@ -58,7 +58,7 @@ parseBlobs decorator renderer blobs =
   renderConcurrently parseAndRender (filter (not . nonExistentBlob) blobs)
   where
     parseAndRender blob = do
-      term <- decorator (source blob) <$> runParser (parserForLanguage (blobLanguage blob)) (source blob)
+      term <- parseBlob decorator blob
       pure $! runRenderer renderer (Identity blob, term)
 
 -- | Parse a SourceBlob.
