@@ -59,8 +59,8 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
   deriving Show
 
 data ParseArguments where
-  ParseArguments :: (Monoid output, StringConv output ByteString) =>
-    { parseTreeRenderer :: Renderer (Identity SourceBlob, Term (Syntax Text) (Record DefaultFields)) output
+  ParseArguments :: (Monoid output, StringConv output ByteString, NFData (Record fields)) =>
+    { parseTreeRenderer :: Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output
     , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
     , parseMode :: ParseMode
     , gitDir :: FilePath

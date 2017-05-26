@@ -60,7 +60,7 @@ runParse ParseArguments{..} = do
     ParsePaths paths -> traverse (uncurry readFile) paths
     ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
     ParseStdin -> readBlobsFromHandle stdin
-  Semantic.parseBlobs parseTreeRenderer blobs
+  Semantic.parseBlobs termDecorator parseTreeRenderer blobs
 
 -- | A parser for the application's command-line arguments.
 arguments :: FilePath -> [FilePath] -> ParserInfo Arguments

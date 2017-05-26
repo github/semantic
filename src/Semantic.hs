@@ -44,8 +44,8 @@ diffBlobPairs decorator renderer blobs = do
 -- | Diff a pair of SourceBlobs.
 diffBlobPair :: (HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record fields)))
 diffBlobPair decorator blobs = do
-  terms <- Async.mapConcurrently parseBlob blobs
-  pure $ case (runJoin blobs, runJoin (decorator . source <$> blobs <*> terms)) of
+  terms <- Async.mapConcurrently (parseBlob decorator) blobs
+  pure $ case (runJoin blobs, runJoin terms) of
     ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> Nothing
                             | nonExistentBlob right -> Just . pure $ Delete a
                             | nonExistentBlob left -> Just . pure $ Insert b
@@ -54,18 +54,18 @@ diffBlobPair decorator blobs = do
     runDiff terms = runBothWith diffTerms (terms `using` parTraversable rdeepseq)
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
-parseBlobs :: (Monoid output, StringConv output ByteString) => Renderer (Identity SourceBlob, Term (Syntax Text) (Record DefaultFields)) output -> [SourceBlob] -> IO ByteString
-parseBlobs renderer blobs = do
+parseBlobs :: (Monoid output, StringConv output ByteString, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output -> [SourceBlob] -> IO ByteString
+parseBlobs decorator renderer blobs = do
   terms <- traverse go (filter (not . nonExistentBlob) blobs)
   toS <$> renderConcurrently (runRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
   where
     go blob = do
-      term <- parseBlob blob
+      term <- parseBlob decorator blob
       pure (Identity blob, term)
 
 -- | Parse a SourceBlob.
-parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-parseBlob SourceBlob{..} = runParser (parserForLanguage blobLanguage) source
+parseBlob :: NFData (Record fields) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> SourceBlob -> IO (Term (Syntax Text) (Record fields))
+parseBlob decorator SourceBlob{..} = decorator source <$> runParser (parserForLanguage blobLanguage) source
 
 
 -- Internal
