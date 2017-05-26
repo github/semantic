@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes, UndecidableInstances #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
@@ -61,20 +61,27 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
 data ParseArguments where
   ParseArguments :: (Monoid output, StringConv output ByteString) =>
     { parseTreeRenderer :: Renderer (Identity SourceBlob, Term (Syntax Text) (Record DefaultFields)) output
+    , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
     , parseMode :: ParseMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
     } -> ParseArguments
 
-deriving instance Show ParseArguments
+instance Show ParseArguments where
+  showsPrec d ParseArguments{..} = showParen (d > 10) $ showString "ParseArguments { " . foldr (.) identity (intersperse (showString ", ") fields) . showString " }"
+    where fields = [ showString "parseTreeRenderer " . shows parseTreeRenderer
+                   , showString "termDecorator _"
+                   , showString "parseMode " . shows parseMode
+                   , showString "gitDir " . shows gitDir
+                   , showString "alternateObjectDirs " . shows alternateObjectDirs ]
 
 type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
 
 sExpressionParseTree :: ParseArguments'
-sExpressionParseTree = ParseArguments SExpressionParseTreeRenderer
+sExpressionParseTree = ParseArguments SExpressionParseTreeRenderer identityDecorator
 
 jsonParseTree :: ParseArguments'
-jsonParseTree = ParseArguments JSONRenderer
+jsonParseTree = ParseArguments JSONRenderer (const identifierDecorator)
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
