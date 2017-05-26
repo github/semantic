@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
 ( json
-, jsonFile
 , ToJSONFields(..)
 ) where
 
@@ -99,19 +98,5 @@ instance ToJSON a => ToJSONFields [a] where
 instance ToJSON recur => ToJSONFields (Syntax leaf recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
 
-
---
--- Parse Trees
---
-
-data File a = File { filePath :: FilePath, fileContent :: a }
-  deriving (Generic, Show)
-
-instance ToJSON a => ToJSON (File a) where
-  toJSON File{..} = object [ "filePath" .= filePath, "programNode" .= fileContent ]
-
 instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
-
-jsonFile :: ToJSON a => SourceBlob -> a -> [Value]
-jsonFile SourceBlob{..} = pure . toJSON . File path
