@@ -2,7 +2,6 @@
 module Renderer
 ( Renderer(..)
 , SExpressionFormat(..)
-, resolveRenderer
 , runRenderer
 , declarationDecorator
 , identifierDecorator
@@ -35,8 +34,8 @@ data Renderer input output where
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan) => SExpressionFormat -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) ByteString
 
-resolveRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
-resolveRenderer renderer input = case renderer of
+runRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
+runRenderer renderer input = case renderer of
   PatchRenderer -> File (uncurry R.patch input)
   JSONRenderer -> uncurry R.json input
   SExpressionDiffRenderer format -> uncurry (R.sExpression format) input
@@ -66,10 +65,6 @@ identifierDecorator = decoratorWithAlgebra identifierAlg
           S.VarAssignment f _ -> asum $ identifier <$> f
           _ -> Nothing
           where identifier = fmap Identifier . extractLeafValue . unwrap . fst
-
-runRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> [input] -> output
-runRenderer = foldMap . resolveRenderer
-
 
 newtype Identifier = Identifier Text
   deriving (Eq, NFData, Show)
