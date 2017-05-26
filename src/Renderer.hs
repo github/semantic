@@ -38,9 +38,9 @@ runRenderer :: (Monoid output, StringConv output ByteString) => Renderer input o
 runRenderer renderer = case renderer of
   PatchRenderer -> File . uncurry R.patch
   JSONRenderer -> uncurry R.json
-  SExpressionDiffRenderer format -> uncurry (R.sExpression format)
+  SExpressionDiffRenderer format -> R.sExpression format . snd
   ToCRenderer -> uncurry R.toc
-  SExpressionParseTreeRenderer format -> uncurry (R.sExpressionParseTree format) . first runIdentity
+  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format . snd
 
 
 declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))

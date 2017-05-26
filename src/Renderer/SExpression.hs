@@ -7,26 +7,24 @@ module Renderer.SExpression
 
 import Data.Bifunctor.Join
 import Data.ByteString hiding (foldr, spanEnd)
-import Data.Functor.Both
 import Data.Record
 import Prologue hiding (replicate, encodeUtf8)
 import Category as C
 import Diff
 import Patch
 import Info
-import Source
 import Term
 
 data SExpressionFormat = TreeOnly | TreeAndRanges
   deriving (Show)
 
 -- | Returns a ByteString SExpression formatted diff.
-sExpression :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> Both SourceBlob -> Diff f (Record fields) -> ByteString
-sExpression format _ diff = printDiff diff 0 format <> "\n"
+sExpression :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> Diff f (Record fields) -> ByteString
+sExpression format diff = printDiff diff 0 format <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
-sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> SourceBlob -> Term f (Record fields) -> ByteString
-sExpressionParseTree format _ term = printTerm term 0 format <> "\n"
+sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> Term f (Record fields) -> ByteString
+sExpressionParseTree format term = printTerm term 0 format <> "\n"
 
 printDiff :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Diff f (Record fields) -> Int -> SExpressionFormat -> ByteString
 printDiff diff level format = case runFree diff of
