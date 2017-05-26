@@ -6,7 +6,6 @@ module Semantic
 , parseBlob
 ) where
 
-import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Data.Functor.Both
 import Data.Record
@@ -71,4 +70,4 @@ parseBlob decorator SourceBlob{..} = decorator source <$> runParser (parserForLa
 renderConcurrently :: (Monoid output, StringConv output ByteString) => (input -> IO output) -> [input] -> IO ByteString
 renderConcurrently f diffs = do
   outputs <- Async.mapConcurrently f diffs
-  pure $ toS (mconcat (outputs `using` parTraversable rseq))
+  pure $ toS (mconcat outputs)
