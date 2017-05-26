@@ -20,7 +20,7 @@ data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language
   deriving Show
 
 data DiffArguments where
-  DiffArguments :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) =>
+  DiffArguments :: (Monoid output, StringConv output ByteString, HasField fields Category) =>
     { diffRenderer :: Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) output
     , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
     , diffMode :: DiffMode
@@ -59,7 +59,7 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
   deriving Show
 
 data ParseArguments where
-  ParseArguments :: (Monoid output, StringConv output ByteString, NFData (Record fields)) =>
+  ParseArguments :: (Monoid output, StringConv output ByteString) =>
     { parseTreeRenderer :: Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output
     , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
     , parseMode :: ParseMode
