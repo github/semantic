@@ -4,6 +4,7 @@ module Parser where
 import Data.Functor.Union
 import Data.Record
 import qualified Data.Syntax as Syntax
+import Data.Syntax.Algebra
 import Data.Syntax.Assignment
 import Data.Functor.Union (inj)
 import qualified Data.Text as T
@@ -34,6 +35,8 @@ data Parser term where
                    => Parser (AST grammar)                                                -- ^ A parser producing 'AST'.
                    -> Assignment (Node grammar) (Term (Union fs) Location)                -- ^ An assignment from 'AST' onto 'Term's.
                    -> Parser (Term (Union (Syntax.Error [Error grammar] ': fs)) Location) -- ^ A parser of 'Term's, weakened to allow for 'Syntax.Error' cases.
+  -- | A parser which decorates the result of another parser.
+  DecoratorParser :: Functor f => (Source -> RAlgebra (TermF f (Record fields)) (Term f (Record fields)) a) -> Parser (Term f (Record fields)) -> Parser (Term f (Record (a ': fields)))
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
@@ -66,6 +69,9 @@ runParser parser = case parser of
     let Result errors term = assign assignment source ast
     traverse_ (putStr . ($ "") . showError source) errors
     pure (maybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) (hoistCofree weaken) term)
+  DecoratorParser algebra parser -> \ source -> do
+    term <- runParser parser source
+    pure (decoratorWithAlgebra (algebra source) term)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> cmarkParser
   LineByLineParser -> lineByLineParser
