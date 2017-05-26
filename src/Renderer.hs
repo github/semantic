@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators #-}
 module Renderer
 ( Renderer(..)
-, SExpressionFormat(..)
 , runRenderer
 , declarationDecorator
 , identifierDecorator
@@ -11,7 +10,6 @@ module Renderer
 
 import Data.Aeson (ToJSON, Value, (.=))
 import Data.Functor.Both hiding (fst, snd)
-import Data.Functor.Classes
 import Text.Show
 import Data.Record
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
@@ -30,17 +28,17 @@ import Term
 data Renderer input output where
   PatchRenderer :: HasField fields Range => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) File
   JSONRenderer :: (ToJSON a, Foldable t) => Renderer (t SourceBlob, a) [Value]
-  SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> Renderer (Both SourceBlob, Diff f (Record fields)) ByteString
+  SExpressionDiffRenderer :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Renderer (Both SourceBlob, Diff f (Record fields)) ByteString
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
-  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => SExpressionFormat -> Renderer (Identity SourceBlob, Term f (Record fields)) ByteString
+  SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Renderer (Identity SourceBlob, Term f (Record fields)) ByteString
 
 runRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
 runRenderer renderer = case renderer of
   PatchRenderer -> File . uncurry R.patch
   JSONRenderer -> uncurry R.json
-  SExpressionDiffRenderer format -> R.sExpression format . snd
+  SExpressionDiffRenderer -> R.sExpression . snd
   ToCRenderer -> uncurry R.toc
-  SExpressionParseTreeRenderer format -> R.sExpressionParseTree format . snd
+  SExpressionParseTreeRenderer -> R.sExpressionParseTree . snd
 
 
 declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
@@ -81,9 +79,9 @@ instance StringConv File ByteString where
 instance Show (Renderer input output) where
   showsPrec _ PatchRenderer = showString "PatchRenderer"
   showsPrec _ JSONRenderer = showString "JSONRenderer"
-  showsPrec d (SExpressionDiffRenderer format) = showsUnaryWith showsPrec "SExpressionDiffRenderer" d format
+  showsPrec _ SExpressionDiffRenderer = showString "SExpressionDiffRenderer"
   showsPrec _ ToCRenderer = showString "ToCRenderer"
-  showsPrec d (SExpressionParseTreeRenderer format) = showsUnaryWith showsPrec "SExpressionParseTreeRenderer" d format
+  showsPrec _ SExpressionParseTreeRenderer = showString "SExpressionParseTreeRenderer"
 
 instance Monoid File where
   mempty = File mempty

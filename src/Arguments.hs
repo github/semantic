@@ -49,7 +49,7 @@ jsonDiff :: DiffArguments'
 jsonDiff = DiffArguments JSONRenderer (const identifierDecorator)
 
 sExpressionDiff :: DiffArguments'
-sExpressionDiff = DiffArguments (SExpressionDiffRenderer TreeOnly) identityDecorator
+sExpressionDiff = DiffArguments SExpressionDiffRenderer identityDecorator
 
 tocDiff :: DiffArguments'
 tocDiff = DiffArguments ToCRenderer declarationDecorator
@@ -71,7 +71,7 @@ deriving instance Show ParseArguments
 type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
 
 sExpressionParseTree :: ParseArguments'
-sExpressionParseTree = ParseArguments (SExpressionParseTreeRenderer TreeOnly)
+sExpressionParseTree = ParseArguments SExpressionParseTreeRenderer
 
 jsonParseTree :: ParseArguments'
 jsonParseTree = ParseArguments JSONRenderer
