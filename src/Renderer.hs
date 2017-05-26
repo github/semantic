@@ -41,7 +41,7 @@ runRenderer renderer = case renderer of
   SExpressionParseTreeRenderer -> R.sExpressionParseTree . snd
 
 
-declarationDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record (Maybe Declaration ': DefaultFields))
+declarationDecorator :: HasField fields Range => Source -> Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record (Maybe Declaration ': fields))
 declarationDecorator = decoratorWithAlgebra . declarationAlgebra
 
 identifierDecorator :: Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record (Maybe Identifier ': fields))
