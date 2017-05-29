@@ -11,7 +11,6 @@ module Semantic.Task
 , render
 , distribute
 , distributeFor
-, parseAndRenderBlob
 , parseDiffAndRenderBlobs
 , runTask
 ) where
@@ -20,11 +19,8 @@ import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Aeson (Value)
 import Data.Functor.Both as Both
-import Data.Record
 import Diff
-import qualified Info
 import Interpreter
-import qualified Language
 import Parser
 import Prologue
 import Renderer
@@ -69,29 +65,6 @@ distribute tasks = Distribute tasks `Then` return
 distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
 distributeFor inputs toTask = Distribute (fmap toTask inputs) `Then` return
 
-
-parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
-parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
-  Just Language.Python -> do
-    term <- parse pythonParser source
-    term' <- decorate (case decorator of
-      IdentityDecorator -> const identity
-      IdentifierDecorator -> const identity) source term
-    case renderer of
-      JSON -> render JSONRenderer (Identity blob, term')
-      SExpression -> render SExpressionParseTreeRenderer (Identity blob, fmap (Info.Other "Term" :. ) term')
-  language -> do
-    term <- parse (parserForLanguage language) source
-    case decorator of
-      IdentifierDecorator -> do
-        term' <- decorate (const identifierDecorator) source term
-        render (case renderer of
-          JSON -> JSONRenderer
-          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term')
-      IdentityDecorator ->
-        render (case renderer of
-          JSON -> JSONRenderer
-          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term)
 
 parseDiffAndRenderBlobs :: NamedDecorator -> NamedRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobs decorator renderer blobs = do

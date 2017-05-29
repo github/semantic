@@ -13,6 +13,7 @@ import Data.Record
 import Diff
 import Info
 import Interpreter
+import qualified Language
 import Patch
 import Parser
 import Prologue
@@ -55,6 +56,30 @@ diffBlobPair decorator blobs = do
 
 parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> NamedRenderer output -> t SourceBlob -> Task ByteString
 parseAndRenderBlobs decorator renderer = fmap (toS . fold) . distribute . fmap (parseAndRenderBlob decorator renderer)
+
+parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
+parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
+  Just Language.Python -> do
+    term <- parse pythonParser source
+    term' <- decorate (case decorator of
+      IdentityDecorator -> const identity
+      IdentifierDecorator -> const identity) source term
+    case renderer of
+      JSON -> render JSONRenderer (Identity blob, term')
+      SExpression -> render SExpressionParseTreeRenderer (Identity blob, fmap (Info.Other "Term" :. ) term')
+  language -> do
+    term <- parse (parserForLanguage language) source
+    case decorator of
+      IdentifierDecorator -> do
+        term' <- decorate (const identifierDecorator) source term
+        render (case renderer of
+          JSON -> JSONRenderer
+          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term')
+      IdentityDecorator ->
+        render (case renderer of
+          JSON -> JSONRenderer
+          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term)
+
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output -> [SourceBlob] -> IO ByteString
