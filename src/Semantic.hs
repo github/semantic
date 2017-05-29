@@ -75,6 +75,8 @@ data TaskF output where
 type Task = Freer TaskF
 
 
+data NamedDecorator = IdentifierDecorator
+
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
 
