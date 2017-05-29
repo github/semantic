@@ -1,6 +1,8 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeOperators #-}
 module Renderer
-( renderPatch
+( DiffRenderer(..)
+, TermRenderer(..)
+, renderPatch
 , renderSExpressionDiff
 , renderSExpressionTerm
 , renderJSON
@@ -11,7 +13,7 @@ module Renderer
 , File(..)
 ) where
 
-import Data.Aeson ((.=))
+import Data.Aeson (Value, (.=))
 import Text.Show
 import Data.Record
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
@@ -24,6 +26,22 @@ import Renderer.TOC as R
 import Source (Source)
 import Syntax as S
 import Term
+
+data DiffRenderer output where
+  PatchDiffRenderer :: DiffRenderer File
+  ToCDiffRenderer :: DiffRenderer Summaries
+  JSONDiffRenderer :: DiffRenderer [Value]
+  SExpressionDiffRenderer :: DiffRenderer ByteString
+
+deriving instance Eq (DiffRenderer output)
+deriving instance Show (DiffRenderer output)
+
+data TermRenderer output where
+  JSONTermRenderer :: TermRenderer [Value]
+  SExpressionTermRenderer :: TermRenderer ByteString
+
+deriving instance Eq (TermRenderer output)
+deriving instance Show (TermRenderer output)
 
 
 declarationDecorator :: HasField fields Range => Source -> Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record (Maybe Declaration ': fields))

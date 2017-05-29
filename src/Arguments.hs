@@ -6,7 +6,7 @@ import Data.Maybe
 import Data.String
 import Language
 import Prologue
-import Semantic.Task
+import Renderer
 import Text.Show
 
 data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)

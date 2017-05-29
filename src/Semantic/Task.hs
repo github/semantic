@@ -1,10 +1,8 @@
-{-# LANGUAGE GADTs, StandaloneDeriving #-}
+{-# LANGUAGE GADTs #-}
 module Semantic.Task
 ( Task
 , Decorator
 , Differ
-, DiffRenderer(..)
-, TermRenderer(..)
 , parse
 , decorate
 , diff
@@ -17,12 +15,10 @@ module Semantic.Task
 
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
-import Data.Aeson (Value)
 import Data.Functor.Both as Both
 import Diff
 import Parser
 import Prologue
-import Renderer (File, Summaries)
 import Source
 import Term
 
@@ -41,22 +37,6 @@ type Differ f a = Both (Term f a) -> Diff f a
 
 type Renderer i o = i -> o
 
-
-data DiffRenderer output where
-  PatchDiffRenderer :: DiffRenderer File
-  ToCDiffRenderer :: DiffRenderer Summaries
-  JSONDiffRenderer :: DiffRenderer [Value]
-  SExpressionDiffRenderer :: DiffRenderer ByteString
-
-deriving instance Eq (DiffRenderer output)
-deriving instance Show (DiffRenderer output)
-
-data TermRenderer output where
-  JSONTermRenderer :: TermRenderer [Value]
-  SExpressionTermRenderer :: TermRenderer ByteString
-
-deriving instance Eq (TermRenderer output)
-deriving instance Show (TermRenderer output)
 
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
