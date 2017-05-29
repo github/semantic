@@ -3,6 +3,7 @@ module Semantic
 ( diffBlobPairs
 , diffBlobPair
 , parseAndRenderBlobs
+, parseAndRenderBlob
 , parseDiffAndRenderBlobPair
 , parseBlobs
 , parseBlob
