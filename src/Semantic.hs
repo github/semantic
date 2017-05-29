@@ -22,6 +22,7 @@ import Renderer
 import Source
 import Syntax
 import Term
+import Text.Parser.TreeSitter.TypeScript
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -97,12 +98,17 @@ distribute tasks = Distribute tasks `Then` return
 
 
 parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
-parseAndRenderBlob decorator renderer blob@SourceBlob{..} = do
-  term <- case blobLanguage of
-    Just Language.Python -> parse pythonParser source
-  term' <- decorate (const identity) source term
-  render (case renderer of
-    JSON -> JSONRenderer) (Identity blob, term')
+parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
+  Just Language.Python -> do
+    term <- parse pythonParser source
+    term' <- decorate (const identity) source term
+    render (case renderer of
+      JSON -> JSONRenderer) (Identity blob, term')
+  Just Language.TypeScript -> do
+    term <- parse (TreeSitterParser Language.TypeScript tree_sitter_typescript) source
+    term' <- decorate (const identity) source term
+    render (case renderer of
+      JSON -> JSONRenderer) (Identity blob, term')
 
 
 runTask :: Task a -> IO a
