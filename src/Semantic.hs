@@ -6,6 +6,7 @@ module Semantic
 , parseBlob
 ) where
 
+import Data.Aeson (Value)
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Functor.Both
@@ -76,6 +77,9 @@ type Task = Freer TaskF
 
 
 data NamedDecorator = IdentifierDecorator
+
+data NamedRenderer output where
+  JSON :: NamedRenderer [Value]
 
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
