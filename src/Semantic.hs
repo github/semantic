@@ -90,6 +90,11 @@ parseDiffAndRenderBlobPairs renderer = fmap toS . distributeFoldMap (parseDiffAn
 
 parseDiffAndRenderBlobPair :: Monoid output => DiffRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobPair renderer blobs = case renderer of
+  ToCDiffRenderer -> do
+    terms <- distributeFor blobs $ \ blob -> do
+      term <- parseSource blob
+      pure $! declarationDecorator (source blob) term
+    diffAndRender (runRenderer ToCRenderer) terms
   JSONDiffRenderer -> do
     terms <- distributeFor blobs (fmap identifierDecorator . parseSource)
     diffAndRender (runRenderer JSONRenderer) terms

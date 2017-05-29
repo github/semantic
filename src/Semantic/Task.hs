@@ -23,7 +23,7 @@ import Data.Functor.Both as Both
 import Diff
 import Parser
 import Prologue
-import Renderer (File)
+import Renderer (File, Summaries)
 import Source
 import Term
 
@@ -48,6 +48,7 @@ data NamedDecorator = IdentifierDecorator | IdentityDecorator
 
 data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
+  ToCDiffRenderer :: DiffRenderer Summaries
   JSONDiffRenderer :: DiffRenderer [Value]
   SExpressionDiffRenderer :: DiffRenderer ByteString
 
