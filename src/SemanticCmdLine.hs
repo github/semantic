@@ -20,7 +20,7 @@ import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 import System.IO (stdin)
 import Text.Regex
-import qualified Semantic (parseAndRenderBlobs, diffBlobPairs)
+import qualified Semantic (parseAndRenderBlobs, parseDiffAndRenderBlobPairs)
 
 main :: IO ()
 main = do
@@ -53,7 +53,7 @@ runDiff DiffArguments{..} = do
     DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
     DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
     DiffStdin -> readBlobPairsFromHandle stdin
-  Semantic.diffBlobPairs termDecorator diffRenderer blobs
+  Task.runTask $ Semantic.parseDiffAndRenderBlobPairs diffRenderer blobs
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do

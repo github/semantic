@@ -2,28 +2,19 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
-import Data.Functor.Both (Both)
 import Data.Maybe
-import Data.Record
 import Data.String
-import Diff
-import Info
 import Language
 import Prologue
-import Renderer
 import qualified Semantic.Task as Task
-import Source
-import Syntax
-import Term
 import Text.Show
 
 data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
   deriving Show
 
 data DiffArguments where
-  DiffArguments :: (Monoid output, StringConv output ByteString, HasField fields Category) =>
-    { diffRenderer :: Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) output
-    , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
+  DiffArguments :: (Monoid output, StringConv output ByteString) =>
+    { diffRenderer :: Task.DiffRenderer output
     , diffMode :: DiffMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
@@ -39,21 +30,17 @@ instance Show DiffArguments where
 
 type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
 
--- | The identity decorator, i.e. a decorator which ignores the source and passes terms through unchanged.
-identityDecorator :: Source -> Term f a -> Term f a
-identityDecorator = const identity
-
 patchDiff :: DiffArguments'
-patchDiff = DiffArguments PatchRenderer identityDecorator
+patchDiff = DiffArguments Task.PatchDiffRenderer
 
 jsonDiff :: DiffArguments'
-jsonDiff = DiffArguments JSONRenderer (const identifierDecorator)
+jsonDiff = DiffArguments Task.JSONDiffRenderer
 
 sExpressionDiff :: DiffArguments'
-sExpressionDiff = DiffArguments SExpressionDiffRenderer identityDecorator
+sExpressionDiff = DiffArguments Task.SExpressionDiffRenderer
 
 tocDiff :: DiffArguments'
-tocDiff = DiffArguments ToCRenderer declarationDecorator
+tocDiff = DiffArguments Task.ToCDiffRenderer
 
 
 data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | ParsePaths [(FilePath, Maybe Language)]
