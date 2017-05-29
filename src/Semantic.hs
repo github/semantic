@@ -6,6 +6,7 @@ module Semantic
 , parseAndRenderBlob
 , parseDiffAndRenderBlobPairs
 , parseDiffAndRenderBlobPair
+, diffAndRenderTermPair
 , parseBlobs
 , parseBlob
 ) where
