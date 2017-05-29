@@ -94,17 +94,17 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       pure $! declarationDecorator (source blob) term
-    diffAndRender blobs (runBothWith diffTerms) (runRenderer ToCRenderer) terms
+    diffAndRenderTermPair blobs (runBothWith diffTerms) (runRenderer ToCRenderer) terms
   JSONDiffRenderer -> do
     terms <- distributeFor blobs (fmap identifierDecorator . parseSource)
-    diffAndRender blobs (runBothWith diffTerms) (runRenderer JSONRenderer) terms
-  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender blobs (runBothWith diffTerms) (runRenderer PatchRenderer)
-  Task.SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender blobs (runBothWith diffTerms) (runRenderer Renderer.SExpressionDiffRenderer)
+    diffAndRenderTermPair blobs (runBothWith diffTerms) (runRenderer JSONRenderer) terms
+  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (runRenderer PatchRenderer)
+  Task.SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (runRenderer Renderer.SExpressionDiffRenderer)
   where languages = blobLanguage <$> blobs
         parseSource = parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) . source
 
-diffAndRender :: (Monoid output, Functor f) => Both SourceBlob -> Differ f a -> ((Both SourceBlob, Diff f a) -> output) -> Both (Term f a) -> Task output
-diffAndRender blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
+diffAndRenderTermPair :: (Monoid output, Functor f) => Both SourceBlob -> Differ f a -> ((Both SourceBlob, Diff f a) -> output) -> Both (Term f a) -> Task output
+diffAndRenderTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
   (True, True) -> pure mempty
   (_, True) -> render renderer (blobs, deleting (Both.fst terms))
   (True, _) -> render renderer (blobs, inserting (Both.snd terms))
