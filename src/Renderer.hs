@@ -39,6 +39,7 @@ deriving instance Show (DiffRenderer output)
 data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   SExpressionTermRenderer :: TermRenderer ByteString
+  SourceTermRenderer :: TermRenderer Source
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)

@@ -35,11 +35,13 @@ parseAndRenderBlob renderer blob@SourceBlob{..} = case blobLanguage of
     case renderer of
       JSONTermRenderer -> render (uncurry renderJSON) (Identity blob, term)
       SExpressionTermRenderer -> render renderSExpressionTerm (fmap (Info.Other "Term" :. ) term)
+      SourceTermRenderer -> pure source
   language -> do
     term <- parse (parserForLanguage language) source
     case renderer of
       JSONTermRenderer -> decorate (const identifierDecorator) source term >>= render (uncurry renderJSON) . (,) (Identity blob)
       SExpressionTermRenderer -> render renderSExpressionTerm term
+      SourceTermRenderer -> pure source
 
 
 parseDiffAndRenderBlobPair :: Monoid output => DiffRenderer output -> Both SourceBlob -> Task output
