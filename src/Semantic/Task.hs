@@ -74,7 +74,7 @@ distribute :: Traversable t => t (Task output) -> Task (t output)
 distribute tasks = Distribute tasks `Then` return
 
 distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
-distributeFor inputs toTask = Distribute (fmap toTask inputs) `Then` return
+distributeFor inputs toTask = distribute (fmap toTask inputs)
 
 
 runTask :: Task a -> IO a
