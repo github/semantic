@@ -7,6 +7,7 @@ module Semantic
 ) where
 
 import qualified Control.Concurrent.Async as Async
+import Control.Monad.Free.Freer
 import Data.Functor.Both
 import Data.Record
 import Diff
@@ -64,6 +65,14 @@ parseBlob :: (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Synta
 parseBlob decorator SourceBlob{..} = decorator source <$> runParser (parserForLanguage blobLanguage) source
 
 type Decorator input output = Source -> input -> output
+
+
+data TaskF output where
+  Parse :: Parser term -> Source -> TaskF term
+  Decorate :: Decorator term term' -> Source -> term -> TaskF term'
+  Render :: Monoid output => Renderer input output -> input -> TaskF output
+
+type Task = Freer TaskF
 
 
 -- Internal
