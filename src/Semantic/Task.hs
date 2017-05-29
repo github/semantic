@@ -3,7 +3,6 @@ module Semantic.Task
 ( Task
 , Decorator
 , Differ
-, NamedDecorator(..)
 , DiffRenderer(..)
 , TermRenderer(..)
 , parse
@@ -42,9 +41,6 @@ type Differ f a = Both (Term f a) -> Diff f a
 
 type Renderer i o = i -> o
 
-
-data NamedDecorator = IdentifierDecorator | IdentityDecorator
-  deriving (Eq, Show)
 
 data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
