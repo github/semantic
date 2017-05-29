@@ -22,7 +22,6 @@ import Data.Functor.Both as Both
 import Diff
 import Parser
 import Prologue
-import Renderer
 import Source
 import Term
 
@@ -38,6 +37,8 @@ type Task = Freer TaskF
 type Decorator input output = Source -> input -> output
 
 type Differ f a = Both (Term f a) -> Diff f a
+
+type Renderer i o = i -> o
 
 
 data NamedDecorator = IdentifierDecorator | IdentityDecorator
@@ -74,5 +75,5 @@ runTask = iterFreerA $ \ task yield -> case task of
   Parse parser source -> runParser parser source >>= yield
   Decorate decorator source term -> yield (decorator source term)
   Diff differ terms -> yield (differ terms)
-  Render renderer input -> yield (runRenderer renderer input)
+  Render renderer input -> yield (renderer input)
   Distribute tasks -> Async.mapConcurrently runTask tasks >>= yield

@@ -67,20 +67,20 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
       IdentityDecorator -> const identity
       IdentifierDecorator -> const identity) source term
     case renderer of
-      JSONTermRenderer -> render JSONRenderer (Identity blob, term')
-      SExpressionTermRenderer -> render SExpressionParseTreeRenderer (Identity blob, fmap (Info.Other "Term" :. ) term')
+      JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term')
+      SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, fmap (Info.Other "Term" :. ) term')
   language -> do
     term <- parse (parserForLanguage language) source
     case decorator of
       IdentifierDecorator -> do
         term' <- decorate (const identifierDecorator) source term
-        render (case renderer of
-          JSONTermRenderer -> JSONRenderer
-          SExpressionTermRenderer -> SExpressionParseTreeRenderer) (Identity blob, term')
+        case renderer of
+          JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term')
+          SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term')
       IdentityDecorator ->
-        render (case renderer of
-          JSONTermRenderer -> JSONRenderer
-          SExpressionTermRenderer -> SExpressionParseTreeRenderer) (Identity blob, term)
+        case renderer of
+          JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term)
+          SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term)
 
 
 parseDiffAndRenderBlobs :: NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
@@ -92,9 +92,9 @@ parseDiffAndRenderBlobs decorator renderer blobs = do
       IdentityDecorator -> pure term
       IdentifierDecorator -> decorate (const identity) (source blob) term
   diffed <- diff (runBothWith diffTerms) terms
-  render (case renderer of
-    JSONDiffRenderer -> JSONRenderer
-    Task.SExpressionDiffRenderer -> Renderer.SExpressionDiffRenderer) (blobs, diffed)
+  case renderer of
+    JSONDiffRenderer -> render (runRenderer JSONRenderer) (blobs, diffed)
+    Task.SExpressionDiffRenderer -> render (runRenderer Renderer.SExpressionDiffRenderer) (blobs, diffed)
 
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
