@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
@@ -164,3 +164,6 @@ instance Listable ListableByteString where
             , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
             , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
             , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.
+
+instance StringConv Source ByteString where
+  strConv _ = sourceText
