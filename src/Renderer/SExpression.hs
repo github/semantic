@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, OverloadedStrings #-}
 module Renderer.SExpression
-( sExpression
-, sExpressionParseTree
+( renderSExpressionDiff
+, renderSExpressionTerm
 ) where
 
 import Data.Bifunctor.Join
@@ -14,12 +14,12 @@ import Info
 import Term
 
 -- | Returns a ByteString SExpression formatted diff.
-sExpression :: (HasField fields Category, Foldable f) => Diff f (Record fields) -> ByteString
-sExpression diff = printDiff diff 0 <> "\n"
+renderSExpressionDiff :: (HasField fields Category, Foldable f) => Diff f (Record fields) -> ByteString
+renderSExpressionDiff diff = printDiff diff 0 <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
-sExpressionParseTree :: (HasField fields Category, Foldable f) => Term f (Record fields) -> ByteString
-sExpressionParseTree term = printTerm term 0 <> "\n"
+renderSExpressionTerm :: (HasField fields Category, Foldable f) => Term f (Record fields) -> ByteString
+renderSExpressionTerm term = printTerm term 0 <> "\n"
 
 printDiff :: (HasField fields Category, Foldable f) => Diff f (Record fields) -> Int -> ByteString
 printDiff diff level = case runFree diff of

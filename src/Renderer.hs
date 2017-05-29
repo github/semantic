@@ -36,9 +36,9 @@ runRenderer :: Renderer input output -> input -> output
 runRenderer renderer = case renderer of
   PatchRenderer -> File . uncurry R.patch
   JSONRenderer -> uncurry R.json
-  SExpressionDiffRenderer -> R.sExpression . snd
+  SExpressionDiffRenderer -> R.renderSExpressionDiff . snd
   ToCRenderer -> uncurry R.toc
-  SExpressionParseTreeRenderer -> R.sExpressionParseTree . snd
+  SExpressionParseTreeRenderer -> R.renderSExpressionTerm . snd
 
 
 declarationDecorator :: HasField fields Range => Source -> Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record (Maybe Declaration ': fields))
