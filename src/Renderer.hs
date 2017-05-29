@@ -15,9 +15,7 @@ module Renderer
 
 import Data.Aeson (Value, (.=))
 import Text.Show
-import Data.Record
 import Data.Syntax.Algebra (RAlgebra)
-import Info hiding (Identifier)
 import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
@@ -25,7 +23,6 @@ import Renderer.SExpression as R
 import Renderer.TOC as R
 import Source (Source)
 import Syntax as S
-import Term
 
 data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
