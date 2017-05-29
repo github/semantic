@@ -49,7 +49,8 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
       JSON -> JSONRenderer) (Identity blob, term')
   language -> do
     term <- parse (parserForLanguage language) source
-    term' <- decorate (const identity) source term
+    term' <- decorate (case decorator of
+      IdentifierDecorator -> const identifierDecorator) source term
     render (case renderer of
       JSON -> JSONRenderer) (Identity blob, term')
 
