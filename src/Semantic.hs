@@ -88,7 +88,7 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
 parseDiffAndRenderBlobPairs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> DiffRenderer output -> t (Both SourceBlob) -> Task ByteString
 parseDiffAndRenderBlobPairs decorator renderer = fmap (toS . fold) . distribute . fmap (parseDiffAndRenderBlobPair decorator renderer)
 
-parseDiffAndRenderBlobPair :: NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
+parseDiffAndRenderBlobPair :: Monoid output => NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobPair decorator renderer blobs = do
   let languages = blobLanguage <$> blobs
   terms <- distributeFor blobs $ \ blob -> do
@@ -96,10 +96,14 @@ parseDiffAndRenderBlobPair decorator renderer blobs = do
     case decorator of
       IdentityDecorator -> pure term
       IdentifierDecorator -> decorate (const identity) (source blob) term
-  diffed <- diff (runBothWith diffTerms) terms
-  case renderer of
-    JSONDiffRenderer -> render (runRenderer JSONRenderer) (blobs, diffed)
-    Task.SExpressionDiffRenderer -> render (runRenderer Renderer.SExpressionDiffRenderer) (blobs, diffed)
+  case runJoin (nonExistentBlob <$> blobs) of
+    (True, True) -> pure mempty
+    (_, True) -> renderDiff (deleting (Both.fst terms))
+    (True, _) -> renderDiff (inserting (Both.snd terms))
+    _ -> diff (runBothWith diffTerms) terms >>= renderDiff
+  where renderDiff diff = case renderer of
+          JSONDiffRenderer -> render (runRenderer JSONRenderer) (blobs, diff)
+          Task.SExpressionDiffRenderer -> render (runRenderer Renderer.SExpressionDiffRenderer) (blobs, diff)
 
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
