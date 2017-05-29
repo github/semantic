@@ -54,6 +54,7 @@ diffBlobPair decorator blobs = do
   where
     runDiff terms = runBothWith diffTerms terms
 
+
 parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> NamedRenderer output -> t SourceBlob -> Task ByteString
 parseAndRenderBlobs decorator renderer = fmap (toS . fold) . distribute . fmap (parseAndRenderBlob decorator renderer)
 
