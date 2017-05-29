@@ -32,7 +32,7 @@ data Renderer input output where
   ToCRenderer :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Renderer (Both SourceBlob, Diff (Syntax Text) (Record fields)) Summaries
   SExpressionParseTreeRenderer :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Renderer (Identity SourceBlob, Term f (Record fields)) ByteString
 
-runRenderer :: (Monoid output, StringConv output ByteString) => Renderer input output -> input -> output
+runRenderer :: Monoid output => Renderer input output -> input -> output
 runRenderer renderer = case renderer of
   PatchRenderer -> File . uncurry R.patch
   JSONRenderer -> uncurry R.json
