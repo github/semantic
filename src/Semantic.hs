@@ -59,31 +59,21 @@ diffBlobPair decorator blobs = do
     runDiff terms = runBothWith diffTerms terms
 
 
-parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> TermRenderer output -> t SourceBlob -> Task ByteString
-parseAndRenderBlobs decorator renderer = fmap toS . distributeFoldMap (parseAndRenderBlob decorator renderer)
+parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => TermRenderer output -> t SourceBlob -> Task ByteString
+parseAndRenderBlobs renderer = fmap toS . distributeFoldMap (parseAndRenderBlob renderer)
 
-parseAndRenderBlob :: NamedDecorator -> TermRenderer output -> SourceBlob -> Task output
-parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
+parseAndRenderBlob :: TermRenderer output -> SourceBlob -> Task output
+parseAndRenderBlob renderer blob@SourceBlob{..} = case blobLanguage of
   Just Language.Python -> do
     term <- parse pythonParser source
-    term' <- decorate (case decorator of
-      IdentityDecorator -> const identity
-      IdentifierDecorator -> const identity) source term
     case renderer of
-      JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term')
-      SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, fmap (Info.Other "Term" :. ) term')
+      JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term)
+      SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, fmap (Info.Other "Term" :. ) term)
   language -> do
     term <- parse (parserForLanguage language) source
-    case decorator of
-      IdentifierDecorator -> do
-        term' <- decorate (const identifierDecorator) source term
-        case renderer of
-          JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term')
-          SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term')
-      IdentityDecorator ->
-        case renderer of
-          JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term)
-          SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term)
+    case renderer of
+      JSONTermRenderer -> decorate (const identifierDecorator) source term >>= render (runRenderer JSONRenderer) . (,) (Identity blob)
+      SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term)
 
 
 parseDiffAndRenderBlobPairs :: (Traversable t, Monoid output, StringConv output ByteString) => DiffRenderer output -> t (Both SourceBlob) -> Task ByteString

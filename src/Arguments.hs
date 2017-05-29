@@ -49,7 +49,6 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
 data ParseArguments where
   ParseArguments :: (Monoid output, StringConv output ByteString) =>
     { parseTreeRenderer :: Task.TermRenderer output
-    , termDecorator :: Task.NamedDecorator
     , parseMode :: ParseMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
@@ -66,10 +65,10 @@ instance Show ParseArguments where
 type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
 
 sExpressionParseTree :: ParseArguments'
-sExpressionParseTree = ParseArguments Task.SExpressionTermRenderer Task.IdentityDecorator
+sExpressionParseTree = ParseArguments Task.SExpressionTermRenderer
 
 jsonParseTree :: ParseArguments'
-jsonParseTree = ParseArguments Task.JSONTermRenderer Task.IdentifierDecorator
+jsonParseTree = ParseArguments Task.JSONTermRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
