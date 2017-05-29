@@ -24,7 +24,7 @@ import Syntax as S
 json :: (ToJSON a, Foldable t) => t SourceBlob -> a -> [Value]
 json blobs root = pure $ object
   [ "root" .= toJSON root
-  , "oids" .= toJSON (oid <$> toList blobs)
+  , "oids" .= toJSON (decodeUtf8 . oid <$> toList blobs)
   , "paths" .= toJSON (path <$> toList blobs)
   ]
 

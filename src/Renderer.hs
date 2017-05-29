@@ -70,11 +70,11 @@ newtype Identifier = Identifier Text
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]
 
-newtype File = File { unFile :: Text }
+newtype File = File { unFile :: ByteString }
   deriving Show
 
 instance StringConv File ByteString where
-  strConv _ = encodeUtf8 . unFile
+  strConv _ = unFile
 
 instance Show (Renderer input output) where
   showsPrec _ PatchRenderer = showString "PatchRenderer"

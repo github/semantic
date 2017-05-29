@@ -17,7 +17,7 @@ import Test.LeanCheck
 -- | The source, oid, path, and Maybe SourceKind of a blob.
 data SourceBlob = SourceBlob
   { source :: Source -- ^ The UTF-8 encoded source text of the blob.
-  , oid :: T.Text -- ^ The Git object ID (SHA-1) of the blob.
+  , oid :: ByteString -- ^ The Git object ID (SHA-1) of the blob.
   , path :: FilePath -- ^ The file path to the blob.
   , blobKind :: Maybe SourceKind -- ^ The kind of blob, Nothing denotes a blob that doesn't exist (e.g. on one side of a diff for adding a new file or deleting a file).
   , blobLanguage :: Maybe Language -- ^ The language of this blob. Nothing denotes a langauge we don't support yet.
@@ -31,7 +31,7 @@ newtype Source = Source { sourceText :: B.ByteString }
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
-modeToDigits :: SourceKind -> Text
+modeToDigits :: SourceKind -> ByteString
 modeToDigits (PlainBlob mode) = toS $ showOct mode ""
 modeToDigits (ExecutableBlob mode) = toS $ showOct mode ""
 modeToDigits (SymlinkBlob mode) = toS $ showOct mode ""
@@ -58,7 +58,7 @@ idOrEmptySourceBlob blob = if isNothing (blobKind blob)
                            then blob { oid = nullOid, blobKind = Nothing }
                            else blob
 
-nullOid :: T.Text
+nullOid :: ByteString
 nullOid = "0000000000000000000000000000000000000000"
 
 empty :: Source
