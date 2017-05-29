@@ -37,7 +37,7 @@ runRenderer renderer = case renderer of
   PatchRenderer -> uncurry R.renderPatch
   JSONRenderer -> uncurry R.renderJSON
   SExpressionDiffRenderer -> R.renderSExpressionDiff . snd
-  ToCRenderer -> uncurry R.toc
+  ToCRenderer -> uncurry R.renderToC
   SExpressionParseTreeRenderer -> R.renderSExpressionTerm . snd
 
 
