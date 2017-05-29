@@ -4,6 +4,7 @@ module Semantic
 , diffBlobPair
 , parseAndRenderBlobs
 , parseAndRenderBlob
+, parseDiffAndRenderBlobPairs
 , parseDiffAndRenderBlobPair
 , parseBlobs
 , parseBlob
@@ -83,6 +84,9 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
           JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term)
           SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term)
 
+
+parseDiffAndRenderBlobPairs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> DiffRenderer output -> t (Both SourceBlob) -> Task ByteString
+parseDiffAndRenderBlobPairs decorator renderer = fmap (toS . fold) . distribute . fmap (parseDiffAndRenderBlobPair decorator renderer)
 
 parseDiffAndRenderBlobPair :: NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobPair decorator renderer blobs = do
