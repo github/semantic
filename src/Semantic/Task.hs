@@ -44,7 +44,9 @@ parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Ta
 parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
   Just Language.Python -> do
     term <- parse pythonParser source
-    term' <- decorate (const identity) source term
+    term' <- decorate (case decorator of
+      IdentityDecorator -> const identity
+      IdentifierDecorator -> const identity) source term
     render (case renderer of
       JSON -> JSONRenderer) (Identity blob, term')
   language -> do
