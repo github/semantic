@@ -102,6 +102,7 @@ parseDiffAndRenderBlobPair decorator renderer blobs = do
     (True, _) -> renderDiff (inserting (Both.snd terms))
     _ -> diff (runBothWith diffTerms) terms >>= renderDiff
   where renderDiff diff = case renderer of
+          PatchDiffRenderer -> render (runRenderer PatchRenderer) (blobs, diff)
           JSONDiffRenderer -> render (runRenderer JSONRenderer) (blobs, diff)
           Task.SExpressionDiffRenderer -> render (runRenderer Renderer.SExpressionDiffRenderer) (blobs, diff)
 
