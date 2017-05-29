@@ -2,6 +2,7 @@
 module Semantic
 ( diffBlobPairs
 , diffBlobPair
+, parseAndRenderBlobs
 , parseBlobs
 , parseBlob
 ) where
@@ -16,6 +17,7 @@ import Patch
 import Parser
 import Prologue
 import Renderer
+import Semantic.Task
 import Source
 import Syntax
 import Term
@@ -50,6 +52,9 @@ diffBlobPair decorator blobs = do
                             | otherwise -> Just $ runDiff (both a b)
   where
     runDiff terms = runBothWith diffTerms terms
+
+parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> NamedRenderer output -> t SourceBlob -> Task ByteString
+parseAndRenderBlobs decorator renderer = fmap (toS . fold) . distribute . fmap (parseAndRenderBlob decorator renderer)
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output -> [SourceBlob] -> IO ByteString
