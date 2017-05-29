@@ -72,7 +72,7 @@ type Decorator input output = Source -> input -> output
 data TaskF output where
   Parse :: Parser term -> Source -> TaskF term
   Decorate :: Decorator term term' -> Source -> term -> TaskF term'
-  Render :: Monoid output => Renderer input output -> input -> TaskF output
+  Render :: Renderer input output -> input -> TaskF output
 
 type Task = Freer TaskF
 
@@ -88,10 +88,10 @@ parse parser source = Parse parser source `Then` return
 decorate :: Decorator term term' -> Source -> term -> Task term'
 decorate decorator source term = Decorate decorator source term `Then` return
 
-render :: Monoid output => Renderer input output -> input -> Task output
+render :: Renderer input output -> input -> Task output
 render renderer input = Render renderer input `Then` return
 
-parseAndRenderBlob :: Monoid output => NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
+parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob decorator renderer blob@SourceBlob{..} = do
   term <- parse (case blobLanguage of
     Just Language.Python -> pythonParser) source
