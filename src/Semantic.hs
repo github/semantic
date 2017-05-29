@@ -73,6 +73,7 @@ data TaskF output where
   Parse :: Parser term -> Source -> TaskF term
   Decorate :: Decorator term term' -> Source -> term -> TaskF term'
   Render :: Renderer input output -> input -> TaskF output
+  Distribute :: Monoid output => [Task output] -> TaskF output
 
 type Task = Freer TaskF
 
@@ -91,6 +92,9 @@ decorate decorator source term = Decorate decorator source term `Then` return
 render :: Renderer input output -> input -> Task output
 render renderer input = Render renderer input `Then` return
 
+distribute :: Monoid output => [Task output] -> Task output
+distribute tasks = Distribute tasks `Then` return
+
 parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob decorator renderer blob@SourceBlob{..} = do
   term <- parse (case blobLanguage of
@@ -105,6 +109,9 @@ runTask = iterFreerA $ \ task yield -> case task of
   Parse parser source -> runParser parser source >>= yield
   Decorate decorator source term -> yield (decorator source term)
   Render renderer input -> yield (runRenderer renderer input)
+  Distribute tasks -> do
+    results <- Async.mapConcurrently runTask tasks
+    yield (mconcat results)
 
 
 -- Internal
