@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, StandaloneDeriving #-}
 module Semantic.Task
 ( Task
 , Decorator
@@ -48,9 +48,15 @@ data DiffRenderer output where
   JSONDiffRenderer :: DiffRenderer [Value]
   SExpressionDiffRenderer :: DiffRenderer ByteString
 
+deriving instance Eq (DiffRenderer output)
+deriving instance Show (DiffRenderer output)
+
 data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   SExpressionTermRenderer :: TermRenderer ByteString
+
+deriving instance Eq (TermRenderer output)
+deriving instance Show (TermRenderer output)
 
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
