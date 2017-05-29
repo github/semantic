@@ -98,8 +98,8 @@ distribute tasks = Distribute tasks `Then` return
 
 parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob decorator renderer blob@SourceBlob{..} = do
-  term <- parse (case blobLanguage of
-    Just Language.Python -> pythonParser) source
+  term <- case blobLanguage of
+    Just Language.Python -> parse pythonParser source
   term' <- decorate (const identity) source term
   render (case renderer of
     JSON -> JSONRenderer) (Identity blob, term')
