@@ -35,7 +35,7 @@ data Renderer input output where
 runRenderer :: Renderer input output -> input -> output
 runRenderer renderer = case renderer of
   PatchRenderer -> uncurry R.renderPatch
-  JSONRenderer -> uncurry R.json
+  JSONRenderer -> uncurry R.renderJSON
   SExpressionDiffRenderer -> R.renderSExpressionDiff . snd
   ToCRenderer -> uncurry R.toc
   SExpressionParseTreeRenderer -> R.renderSExpressionTerm . snd

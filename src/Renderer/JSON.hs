@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
-( json
+( renderJSON
 , ToJSONFields(..)
 ) where
 
@@ -21,8 +21,8 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-json :: (ToJSON a, Foldable t) => t SourceBlob -> a -> [Value]
-json blobs root = pure $ object
+renderJSON :: (ToJSON a, Foldable t) => t SourceBlob -> a -> [Value]
+renderJSON blobs root = pure $ object
   [ "root" .= toJSON root
   , "oids" .= toJSON (decodeUtf8 . oid <$> toList blobs)
   , "paths" .= toJSON (path <$> toList blobs)
