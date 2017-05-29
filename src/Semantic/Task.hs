@@ -1,5 +1,13 @@
 {-# LANGUAGE GADTs #-}
-module Semantic.Task where
+module Semantic.Task
+( Task
+, parse
+, decorate
+, render
+, distribute
+, parseAndRenderBlob
+, runTask
+) where
 
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
