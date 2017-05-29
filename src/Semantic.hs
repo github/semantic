@@ -3,7 +3,7 @@ module Semantic
 ( diffBlobPairs
 , diffBlobPair
 , parseAndRenderBlobs
-, parseDiffAndRenderBlobs
+, parseDiffAndRenderBlobPair
 , parseBlobs
 , parseBlob
 ) where
@@ -83,8 +83,8 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
           SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term)
 
 
-parseDiffAndRenderBlobs :: NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
-parseDiffAndRenderBlobs decorator renderer blobs = do
+parseDiffAndRenderBlobPair :: NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
+parseDiffAndRenderBlobPair decorator renderer blobs = do
   let languages = blobLanguage <$> blobs
   terms <- distributeFor blobs $ \ blob -> do
     term <- parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) (source blob)
