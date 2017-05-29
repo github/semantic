@@ -3,6 +3,8 @@ module Semantic.Task
 ( Task
 , Decorator
 , Differ
+, NamedDecorator(..)
+, NamedRenderer(..)
 , parse
 , decorate
 , diff
