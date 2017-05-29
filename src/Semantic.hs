@@ -100,6 +100,13 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = do
     JSON -> JSONRenderer) (Identity blob, term')
 
 
+runTask :: Task a -> IO a
+runTask = iterFreerA $ \ task yield -> case task of
+  Parse parser source -> runParser parser source >>= yield
+  Decorate decorator source term -> yield (decorator source term)
+  Render renderer input -> yield (runRenderer renderer input)
+
+
 -- Internal
 
 renderConcurrently :: (Monoid output, StringConv output ByteString) => (input -> IO output) -> [input] -> IO ByteString
