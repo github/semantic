@@ -1,8 +1,6 @@
 {-# LANGUAGE GADTs #-}
 module Semantic
-( parseAndRenderBlobs
-, parseAndRenderBlob
-, parseDiffAndRenderBlobPairs
+( parseAndRenderBlob
 , parseDiffAndRenderBlobPair
 , diffAndRenderTermPair
 ) where
@@ -30,9 +28,6 @@ import Term
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
-parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => TermRenderer output -> t SourceBlob -> Task ByteString
-parseAndRenderBlobs renderer = fmap toS . distributeFoldMap (parseAndRenderBlob renderer)
-
 parseAndRenderBlob :: TermRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob renderer blob@SourceBlob{..} = case blobLanguage of
   Just Language.Python -> do
@@ -46,9 +41,6 @@ parseAndRenderBlob renderer blob@SourceBlob{..} = case blobLanguage of
       JSONTermRenderer -> decorate (const identifierDecorator) source term >>= render (uncurry renderJSON) . (,) (Identity blob)
       SExpressionTermRenderer -> render renderSExpressionTerm term
 
-
-parseDiffAndRenderBlobPairs :: (Traversable t, Monoid output, StringConv output ByteString) => DiffRenderer output -> t (Both SourceBlob) -> Task ByteString
-parseDiffAndRenderBlobPairs renderer = fmap toS . distributeFoldMap (parseDiffAndRenderBlobPair renderer)
 
 parseDiffAndRenderBlobPair :: Monoid output => DiffRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobPair renderer blobs = case renderer of
