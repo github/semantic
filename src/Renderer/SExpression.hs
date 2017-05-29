@@ -14,14 +14,14 @@ import Info
 import Term
 
 -- | Returns a ByteString SExpression formatted diff.
-sExpression :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Diff f (Record fields) -> ByteString
+sExpression :: (HasField fields Category, Foldable f) => Diff f (Record fields) -> ByteString
 sExpression diff = printDiff diff 0 <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
-sExpressionParseTree :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Term f (Record fields) -> ByteString
+sExpressionParseTree :: (HasField fields Category, Foldable f) => Term f (Record fields) -> ByteString
 sExpressionParseTree term = printTerm term 0 <> "\n"
 
-printDiff :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Diff f (Record fields) -> Int -> ByteString
+printDiff :: (HasField fields Category, Foldable f) => Diff f (Record fields) -> Int -> ByteString
 printDiff diff level = case runFree diff of
   (Pure patch) -> case patch of
     Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "+}"
@@ -36,17 +36,17 @@ printDiff diff level = case runFree diff of
           | n < 1 = "\n"
           | otherwise = "\n" <> replicate (2 * n) space
 
-printTerm :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Term f (Record fields) -> Int -> ByteString
+printTerm :: (HasField fields Category, Foldable f) => Term f (Record fields) -> Int -> ByteString
 printTerm term level = go term level 0
   where
     pad :: Int -> Int -> ByteString
     pad p n | n < 1 = ""
             | otherwise = "\n" <> replicate (2 * (p + n)) space
-    go :: (HasField fields Category, HasField fields SourceSpan, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
+    go :: (HasField fields Category, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
     go term parentLevel level = case runCofree term of
       (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
 
-showAnnotation :: (HasField fields Category, HasField fields SourceSpan) => Record fields -> ByteString
+showAnnotation :: HasField fields Category => Record fields -> ByteString
 showAnnotation = toS . category
 
 space :: Word8
