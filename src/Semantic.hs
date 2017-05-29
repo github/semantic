@@ -39,7 +39,7 @@ parseAndRenderBlob renderer blob@SourceBlob{..} = case blobLanguage of
   language -> do
     term <- parse (parserForLanguage language) source
     case renderer of
-      JSONTermRenderer -> decorate (const identifierDecorator) source term >>= render (uncurry renderJSON) . (,) (Identity blob)
+      JSONTermRenderer -> decorate identifierAlgebra term >>= render (uncurry renderJSON) . (,) (Identity blob)
       SExpressionTermRenderer -> render renderSExpressionTerm term
       SourceTermRenderer -> pure source
 
@@ -49,10 +49,10 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
   ToCDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
-      pure $! declarationDecorator (source blob) term
+      decorate (declarationAlgebra (source blob)) term
     diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderToC) terms
   JSONDiffRenderer -> do
-    terms <- distributeFor blobs (fmap identifierDecorator . parseSource)
+    terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
     diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderJSON) terms
   PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderPatch)
   SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . Prologue.snd)

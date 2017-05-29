@@ -1,7 +1,7 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
 module Semantic.Task
 ( Task
-, Decorator
+, RAlgebra
 , Differ
 , parse
 , decorate
@@ -16,6 +16,8 @@ module Semantic.Task
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Functor.Both as Both
+import Data.Record
+import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
 import Parser
 import Prologue
@@ -24,14 +26,12 @@ import Term
 
 data TaskF output where
   Parse :: Parser term -> Source -> TaskF term
-  Decorate :: Decorator term term' -> Source -> term -> TaskF term'
+  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
 
 type Task = Freer TaskF
-
-type Decorator input output = Source -> input -> output
 
 type Differ f a = Both (Term f a) -> Diff f a
 
@@ -41,8 +41,8 @@ type Renderer i o = i -> o
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
 
-decorate :: Decorator term term' -> Source -> term -> Task term'
-decorate decorator source term = Decorate decorator source term `Then` return
+decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+decorate algebra term = Decorate algebra term `Then` return
 
 diff :: Differ f a -> Both (Term f a) -> Task (Diff f a)
 diff differ terms = Diff differ terms `Then` return
@@ -63,7 +63,7 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
   Parse parser source -> runParser parser source >>= yield
-  Decorate decorator source term -> yield (decorator source term)
+  Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
   Render renderer input -> yield (renderer input)
   Distribute tasks -> Async.mapConcurrently runTask tasks >>= yield
