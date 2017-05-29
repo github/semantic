@@ -10,14 +10,16 @@ module Semantic.Task
 , distribute
 , distributeFor
 , parseAndRenderBlob
+, parseDiffAndRenderBlobs
 , runTask
 ) where
 
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Aeson (Value)
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Diff
+import Interpreter
 import qualified Language
 import Parser
 import Prologue
@@ -82,6 +84,18 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
       IdentityDecorator ->
         render (case renderer of
           JSON -> JSONRenderer) (Identity blob, term)
+
+parseDiffAndRenderBlobs :: NamedDecorator -> NamedRenderer output -> Both SourceBlob -> Task output
+parseDiffAndRenderBlobs decorator renderer blobs = do
+  let languages = blobLanguage <$> blobs
+  terms <- distributeFor blobs $ \ blob -> do
+    term <- parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) (source blob)
+    case decorator of
+      IdentityDecorator -> pure term
+      IdentifierDecorator -> decorate (const identity) (source blob) term
+  diffed <- diff (runBothWith diffTerms) terms
+  render (case renderer of
+    JSON -> JSONRenderer) (blobs, diffed)
 
 
 runTask :: Task a -> IO a
