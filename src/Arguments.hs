@@ -6,7 +6,7 @@ import Data.Maybe
 import Data.String
 import Language
 import Prologue
-import qualified Semantic.Task as Task
+import Semantic.Task
 import Text.Show
 
 data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
@@ -14,7 +14,7 @@ data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language
 
 data DiffArguments where
   DiffArguments :: (Monoid output, StringConv output ByteString) =>
-    { diffRenderer :: Task.DiffRenderer output
+    { diffRenderer :: DiffRenderer output
     , diffMode :: DiffMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
@@ -31,16 +31,16 @@ instance Show DiffArguments where
 type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
 
 patchDiff :: DiffArguments'
-patchDiff = DiffArguments Task.PatchDiffRenderer
+patchDiff = DiffArguments PatchDiffRenderer
 
 jsonDiff :: DiffArguments'
-jsonDiff = DiffArguments Task.JSONDiffRenderer
+jsonDiff = DiffArguments JSONDiffRenderer
 
 sExpressionDiff :: DiffArguments'
-sExpressionDiff = DiffArguments Task.SExpressionDiffRenderer
+sExpressionDiff = DiffArguments SExpressionDiffRenderer
 
 tocDiff :: DiffArguments'
-tocDiff = DiffArguments Task.ToCDiffRenderer
+tocDiff = DiffArguments ToCDiffRenderer
 
 
 data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | ParsePaths [(FilePath, Maybe Language)]
@@ -48,7 +48,7 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
 
 data ParseArguments where
   ParseArguments :: (Monoid output, StringConv output ByteString) =>
-    { parseTreeRenderer :: Task.TermRenderer output
+    { parseTreeRenderer :: TermRenderer output
     , parseMode :: ParseMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
@@ -65,10 +65,10 @@ instance Show ParseArguments where
 type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
 
 sExpressionParseTree :: ParseArguments'
-sExpressionParseTree = ParseArguments Task.SExpressionTermRenderer
+sExpressionParseTree = ParseArguments SExpressionTermRenderer
 
 jsonParseTree :: ParseArguments'
-jsonParseTree = ParseArguments Task.JSONTermRenderer
+jsonParseTree = ParseArguments JSONTermRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
