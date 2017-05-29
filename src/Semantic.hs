@@ -38,7 +38,7 @@ parseAndRenderBlob renderer blob@SourceBlob{..} = case blobLanguage of
   Just Language.Python -> do
     term <- parse pythonParser source
     case renderer of
-      JSONTermRenderer -> render (runRenderer JSONRenderer) (Identity blob, term)
+      JSONTermRenderer -> render (uncurry renderJSON) (Identity blob, term)
       SExpressionTermRenderer -> render renderSExpressionTerm (fmap (Info.Other "Term" :. ) term)
   language -> do
     term <- parse (parserForLanguage language) source
