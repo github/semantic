@@ -18,7 +18,9 @@ import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Aeson (Value)
 import Data.Functor.Both as Both
+import Data.Record
 import Diff
+import qualified Info
 import Interpreter
 import qualified Language
 import Parser
@@ -45,6 +47,7 @@ data NamedDecorator = IdentifierDecorator | IdentityDecorator
 
 data NamedRenderer output where
   JSON :: NamedRenderer [Value]
+  SExpression :: NamedRenderer ByteString
 
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
@@ -72,18 +75,21 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
     term' <- decorate (case decorator of
       IdentityDecorator -> const identity
       IdentifierDecorator -> const identity) source term
-    render (case renderer of
-      JSON -> JSONRenderer) (Identity blob, term')
+    case renderer of
+      JSON -> render JSONRenderer (Identity blob, term')
+      SExpression -> render SExpressionParseTreeRenderer (Identity blob, fmap (Info.Other "Term" :. ) term')
   language -> do
     term <- parse (parserForLanguage language) source
     case decorator of
       IdentifierDecorator -> do
         term' <- decorate (const identifierDecorator) source term
         render (case renderer of
-          JSON -> JSONRenderer) (Identity blob, term')
+          JSON -> JSONRenderer
+          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term')
       IdentityDecorator ->
         render (case renderer of
-          JSON -> JSONRenderer) (Identity blob, term)
+          JSON -> JSONRenderer
+          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term)
 
 parseDiffAndRenderBlobs :: NamedDecorator -> NamedRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobs decorator renderer blobs = do
@@ -95,7 +101,8 @@ parseDiffAndRenderBlobs decorator renderer blobs = do
       IdentifierDecorator -> decorate (const identity) (source blob) term
   diffed <- diff (runBothWith diffTerms) terms
   render (case renderer of
-    JSON -> JSONRenderer) (blobs, diffed)
+    JSON -> JSONRenderer
+    SExpression -> SExpressionDiffRenderer) (blobs, diffed)
 
 
 runTask :: Task a -> IO a
