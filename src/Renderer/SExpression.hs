@@ -23,11 +23,11 @@ sExpressionParseTree term = printTerm term 0 <> "\n"
 
 printDiff :: (HasField fields Category, Foldable f) => Diff f (Record fields) -> Int -> ByteString
 printDiff diff level = case runFree diff of
-  (Pure patch) -> case patch of
+  Pure patch -> case patch of
     Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "+}"
     Delete term -> pad (level - 1) <> "{-" <> printTerm term level <> "-}"
     Replace a b -> pad (level - 1) <> "{ " <> printTerm a level <> pad (level - 1) <> "->" <> printTerm b level <> " }"
-  (Free (Join (_, annotation) :< syntax)) -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
+  Free (Join (_, annotation) :< syntax) -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
   where
     pad' :: Int -> ByteString
     pad' n = if n < 1 then "" else pad n
