@@ -94,18 +94,18 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       pure $! declarationDecorator (source blob) term
-    diffAndRender (runRenderer ToCRenderer) terms
+    diffAndRender (runBothWith diffTerms) (runRenderer ToCRenderer) terms
   JSONDiffRenderer -> do
     terms <- distributeFor blobs (fmap identifierDecorator . parseSource)
-    diffAndRender (runRenderer JSONRenderer) terms
-  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender (runRenderer PatchRenderer)
-  Task.SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender (runRenderer Renderer.SExpressionDiffRenderer)
-  where diffAndRender :: (Monoid output, HasField fields Category) => ((Both SourceBlob, SyntaxDiff Text fields) -> output) -> Both (SyntaxTerm Text fields) -> Task output
-        diffAndRender renderer terms = case runJoin (nonExistentBlob <$> blobs) of
+    diffAndRender (runBothWith diffTerms) (runRenderer JSONRenderer) terms
+  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender (runBothWith diffTerms) (runRenderer PatchRenderer)
+  Task.SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender (runBothWith diffTerms) (runRenderer Renderer.SExpressionDiffRenderer)
+  where diffAndRender :: (Monoid output, Functor f) => Differ f a -> ((Both SourceBlob, Diff f a) -> output) -> Both (Term f a) -> Task output
+        diffAndRender differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
           (True, True) -> pure mempty
           (_, True) -> render renderer (blobs, deleting (Both.fst terms))
           (True, _) -> render renderer (blobs, inserting (Both.snd terms))
-          _ -> diff (runBothWith diffTerms) terms >>= render renderer . (,) blobs
+          _ -> diff differ terms >>= render renderer . (,) blobs
         languages = blobLanguage <$> blobs
         parseSource = parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) . source
 
