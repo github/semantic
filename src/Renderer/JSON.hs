@@ -8,6 +8,7 @@ module Renderer.JSON
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
+import Data.Functor.Union
 import Data.Record
 import Info
 import Patch
@@ -97,6 +98,13 @@ instance ToJSON a => ToJSONFields [a] where
 
 instance ToJSON recur => ToJSONFields (Syntax leaf recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
+
+instance (Foldable f, ToJSON a, ToJSONFields (Union fs a)) => ToJSONFields (Union (f ': fs) a) where
+  toJSONFields (Here f) = [ "children" .= toList f ]
+  toJSONFields (There fs) = toJSONFields fs
+
+instance ToJSONFields (Union '[] a) where
+  toJSONFields _ = []
 
 instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
