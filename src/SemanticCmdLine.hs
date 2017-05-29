@@ -13,13 +13,14 @@ import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
+import qualified Semantic.Task as Task
 import System.Directory
 import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 import System.IO (stdin)
 import Text.Regex
-import qualified Semantic (parseBlobs, diffBlobPairs)
+import qualified Semantic (parseAndRenderBlobs, diffBlobPairs)
 
 main :: IO ()
 main = do
@@ -60,7 +61,7 @@ runParse ParseArguments{..} = do
     ParsePaths paths -> traverse (uncurry readFile) paths
     ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
     ParseStdin -> readBlobsFromHandle stdin
-  Semantic.parseBlobs termDecorator parseTreeRenderer blobs
+  Task.runTask $ Semantic.parseAndRenderBlobs termDecorator parseTreeRenderer blobs
 
 -- | A parser for the application's command-line arguments.
 arguments :: FilePath -> [FilePath] -> ParserInfo Arguments

@@ -11,6 +11,7 @@ import Info
 import Language
 import Prologue
 import Renderer
+import qualified Semantic.Task as Task
 import Source
 import Syntax
 import Term
@@ -60,8 +61,8 @@ data ParseMode = ParseStdin | ParseCommit String [(FilePath, Maybe Language)] | 
 
 data ParseArguments where
   ParseArguments :: (Monoid output, StringConv output ByteString) =>
-    { parseTreeRenderer :: Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output
-    , termDecorator :: Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)
+    { parseTreeRenderer :: Task.TermRenderer output
+    , termDecorator :: Task.NamedDecorator
     , parseMode :: ParseMode
     , gitDir :: FilePath
     , alternateObjectDirs :: [FilePath]
@@ -78,10 +79,10 @@ instance Show ParseArguments where
 type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
 
 sExpressionParseTree :: ParseArguments'
-sExpressionParseTree = ParseArguments SExpressionParseTreeRenderer identityDecorator
+sExpressionParseTree = ParseArguments Task.SExpressionTermRenderer Task.IdentityDecorator
 
 jsonParseTree :: ParseArguments'
-jsonParseTree = ParseArguments JSONRenderer (const identifierDecorator)
+jsonParseTree = ParseArguments Task.JSONTermRenderer Task.IdentifierDecorator
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
