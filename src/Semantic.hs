@@ -29,19 +29,14 @@ import Term
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 parseAndRenderBlob :: TermRenderer output -> SourceBlob -> Task output
-parseAndRenderBlob renderer blob@SourceBlob{..} = case blobLanguage of
-  Just Language.Python -> do
-    term <- parse pythonParser source
-    case renderer of
-      JSONTermRenderer -> render (uncurry renderJSON) (Identity blob, term)
-      SExpressionTermRenderer -> render renderSExpressionTerm (fmap (Info.Other "Term" :. ) term)
-      SourceTermRenderer -> pure source
-  language -> do
-    term <- parse (parserForLanguage language) source
-    case renderer of
-      JSONTermRenderer -> decorate identifierAlgebra term >>= render (uncurry renderJSON) . (,) (Identity blob)
-      SExpressionTermRenderer -> render renderSExpressionTerm term
-      SourceTermRenderer -> pure source
+parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
+  JSONTermRenderer -> case blobLanguage of
+    Just Language.Python -> parse pythonParser source >>= render (renderJSON (Identity blob))
+    language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSON (Identity blob))
+  SExpressionTermRenderer -> case blobLanguage of
+    Just Language.Python -> parse pythonParser source >>= render renderSExpressionTerm . fmap (Info.Other "Term" :. )
+    language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm
+  SourceTermRenderer -> pure source
 
 
 parseDiffAndRenderBlobPair :: Monoid output => DiffRenderer output -> Both SourceBlob -> Task output
