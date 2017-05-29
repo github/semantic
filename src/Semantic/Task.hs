@@ -42,6 +42,7 @@ type Renderer i o = i -> o
 
 
 data NamedDecorator = IdentifierDecorator | IdentityDecorator
+  deriving (Eq, Show)
 
 data DiffRenderer output where
   JSONDiffRenderer :: DiffRenderer [Value]
