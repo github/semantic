@@ -8,6 +8,7 @@ module Semantic.Task
 , diff
 , render
 , distribute
+, distributeFor
 , parseAndRenderBlob
 , runTask
 ) where
@@ -57,6 +58,9 @@ render renderer input = Render renderer input `Then` return
 
 distribute :: Traversable t => t (Task output) -> Task (t output)
 distribute tasks = Distribute tasks `Then` return
+
+distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
+distributeFor inputs toTask = Distribute (fmap toTask inputs) `Then` return
 
 
 parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
