@@ -19,7 +19,7 @@ import Patch
 import Parser
 import Prologue
 import Renderer
-import Semantic.Task
+import Semantic.Task as Task
 import Source
 import Syntax
 import Term
@@ -56,10 +56,10 @@ diffBlobPair decorator blobs = do
     runDiff terms = runBothWith diffTerms terms
 
 
-parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> NamedRenderer output -> t SourceBlob -> Task ByteString
+parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> TermRenderer output -> t SourceBlob -> Task ByteString
 parseAndRenderBlobs decorator renderer = fmap (toS . fold) . distribute . fmap (parseAndRenderBlob decorator renderer)
 
-parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
+parseAndRenderBlob :: NamedDecorator -> TermRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
   Just Language.Python -> do
     term <- parse pythonParser source
@@ -67,23 +67,23 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
       IdentityDecorator -> const identity
       IdentifierDecorator -> const identity) source term
     case renderer of
-      JSON -> render JSONRenderer (Identity blob, term')
-      SExpression -> render SExpressionParseTreeRenderer (Identity blob, fmap (Info.Other "Term" :. ) term')
+      JSONTermRenderer -> render JSONRenderer (Identity blob, term')
+      SExpressionTermRenderer -> render SExpressionParseTreeRenderer (Identity blob, fmap (Info.Other "Term" :. ) term')
   language -> do
     term <- parse (parserForLanguage language) source
     case decorator of
       IdentifierDecorator -> do
         term' <- decorate (const identifierDecorator) source term
         render (case renderer of
-          JSON -> JSONRenderer
-          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term')
+          JSONTermRenderer -> JSONRenderer
+          SExpressionTermRenderer -> SExpressionParseTreeRenderer) (Identity blob, term')
       IdentityDecorator ->
         render (case renderer of
-          JSON -> JSONRenderer
-          SExpression -> SExpressionParseTreeRenderer) (Identity blob, term)
+          JSONTermRenderer -> JSONRenderer
+          SExpressionTermRenderer -> SExpressionParseTreeRenderer) (Identity blob, term)
 
 
-parseDiffAndRenderBlobs :: NamedDecorator -> NamedRenderer output -> Both SourceBlob -> Task output
+parseDiffAndRenderBlobs :: NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobs decorator renderer blobs = do
   let languages = blobLanguage <$> blobs
   terms <- distributeFor blobs $ \ blob -> do
@@ -93,8 +93,8 @@ parseDiffAndRenderBlobs decorator renderer blobs = do
       IdentifierDecorator -> decorate (const identity) (source blob) term
   diffed <- diff (runBothWith diffTerms) terms
   render (case renderer of
-    JSON -> JSONRenderer
-    SExpression -> SExpressionDiffRenderer) (blobs, diffed)
+    JSONDiffRenderer -> JSONRenderer
+    Task.SExpressionDiffRenderer -> Renderer.SExpressionDiffRenderer) (blobs, diffed)
 
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.

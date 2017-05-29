@@ -4,7 +4,8 @@ module Semantic.Task
 , Decorator
 , Differ
 , NamedDecorator(..)
-, NamedRenderer(..)
+, DiffRenderer(..)
+, TermRenderer(..)
 , parse
 , decorate
 , diff
@@ -41,9 +42,13 @@ type Differ f a = Both (Term f a) -> Diff f a
 
 data NamedDecorator = IdentifierDecorator | IdentityDecorator
 
-data NamedRenderer output where
-  JSON :: NamedRenderer [Value]
-  SExpression :: NamedRenderer ByteString
+data DiffRenderer output where
+  JSONDiffRenderer :: DiffRenderer [Value]
+  SExpressionDiffRenderer :: DiffRenderer ByteString
+
+data TermRenderer output where
+  JSONTermRenderer :: TermRenderer [Value]
+  SExpressionTermRenderer :: TermRenderer ByteString
 
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
