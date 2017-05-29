@@ -22,7 +22,7 @@ data TaskF output where
 type Task = Freer TaskF
 
 
-data NamedDecorator = IdentifierDecorator
+data NamedDecorator = IdentifierDecorator | IdentityDecorator
 
 data NamedRenderer output where
   JSON :: NamedRenderer [Value]
@@ -49,10 +49,14 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
       JSON -> JSONRenderer) (Identity blob, term')
   language -> do
     term <- parse (parserForLanguage language) source
-    term' <- decorate (case decorator of
-      IdentifierDecorator -> const identifierDecorator) source term
-    render (case renderer of
-      JSON -> JSONRenderer) (Identity blob, term')
+    case decorator of
+      IdentifierDecorator -> do
+        term' <- decorate (const identifierDecorator) source term
+        render (case renderer of
+          JSON -> JSONRenderer) (Identity blob, term')
+      IdentityDecorator ->
+        render (case renderer of
+          JSON -> JSONRenderer) (Identity blob, term)
 
 
 runTask :: Task a -> IO a
