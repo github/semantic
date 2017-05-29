@@ -85,27 +85,24 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
           SExpressionTermRenderer -> render (runRenderer SExpressionParseTreeRenderer) (Identity blob, term)
 
 
-parseDiffAndRenderBlobPairs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> DiffRenderer output -> t (Both SourceBlob) -> Task ByteString
-parseDiffAndRenderBlobPairs decorator renderer = fmap toS . distributeFoldMap (parseDiffAndRenderBlobPair decorator renderer)
+parseDiffAndRenderBlobPairs :: (Traversable t, Monoid output, StringConv output ByteString) => DiffRenderer output -> t (Both SourceBlob) -> Task ByteString
+parseDiffAndRenderBlobPairs renderer = fmap toS . distributeFoldMap (parseDiffAndRenderBlobPair renderer)
 
-parseDiffAndRenderBlobPair :: Monoid output => NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
-parseDiffAndRenderBlobPair decorator renderer blobs = do
-  let languages = blobLanguage <$> blobs
-  terms <- distributeFor blobs $ \ blob -> do
-    term <- parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) (source blob)
-    case decorator of
-      IdentityDecorator -> pure term
-      IdentifierDecorator -> decorate (const identity) (source blob) term
-  case runJoin (nonExistentBlob <$> blobs) of
-    (True, True) -> pure mempty
-    (_, True) -> renderDiff (deleting (Both.fst terms))
-    (True, _) -> renderDiff (inserting (Both.snd terms))
-    _ -> diff (runBothWith diffTerms) terms >>= renderDiff
-  where renderDiff diff = case renderer of
-          PatchDiffRenderer -> render (runRenderer PatchRenderer) (blobs, diff)
-          JSONDiffRenderer -> render (runRenderer JSONRenderer) (blobs, diff)
-          Task.SExpressionDiffRenderer -> render (runRenderer Renderer.SExpressionDiffRenderer) (blobs, diff)
-
+parseDiffAndRenderBlobPair :: Monoid output => DiffRenderer output -> Both SourceBlob -> Task output
+parseDiffAndRenderBlobPair renderer blobs = case renderer of
+  JSONDiffRenderer -> do
+    terms <- distributeFor blobs (fmap identifierDecorator . parseSource)
+    diffAndRender (runRenderer JSONRenderer) terms
+  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender (runRenderer PatchRenderer)
+  Task.SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRender (runRenderer Renderer.SExpressionDiffRenderer)
+  where diffAndRender :: (Monoid output, HasField fields Category) => ((Both SourceBlob, SyntaxDiff Text fields) -> output) -> Both (SyntaxTerm Text fields) -> Task output
+        diffAndRender renderer terms = case runJoin (nonExistentBlob <$> blobs) of
+          (True, True) -> pure mempty
+          (_, True) -> render renderer (blobs, deleting (Both.fst terms))
+          (True, _) -> render renderer (blobs, inserting (Both.snd terms))
+          _ -> diff (runBothWith diffTerms) terms >>= render renderer . (,) blobs
+        languages = blobLanguage <$> blobs
+        parseSource = parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) . source
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
 parseBlobs :: (Monoid output, StringConv output ByteString) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Renderer (Identity SourceBlob, Term (Syntax Text) (Record fields)) output -> [SourceBlob] -> IO ByteString
