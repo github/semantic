@@ -22,7 +22,6 @@ import Renderer
 import Source
 import Syntax
 import Term
-import Text.Parser.TreeSitter.TypeScript
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -104,8 +103,8 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
     term' <- decorate (const identity) source term
     render (case renderer of
       JSON -> JSONRenderer) (Identity blob, term')
-  Just Language.TypeScript -> do
-    term <- parse (TreeSitterParser Language.TypeScript tree_sitter_typescript) source
+  language -> do
+    term <- parse (parserForLanguage language) source
     term' <- decorate (const identity) source term
     render (case renderer of
       JSON -> JSONRenderer) (Identity blob, term')
