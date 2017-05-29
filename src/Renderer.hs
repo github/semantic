@@ -1,6 +1,11 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators #-}
 module Renderer
 ( Renderer(..)
+, renderPatch
+, renderSExpressionDiff
+, renderSExpressionTerm
+, renderJSON
+, renderToC
 , runRenderer
 , declarationDecorator
 , identifierDecorator
