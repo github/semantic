@@ -24,6 +24,12 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Should we replace this with Function and differentiate by context?
 -- TODO: How should we distinguish class/instance methods?
 
+data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Variable where liftEq = genericLiftEq
+instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
+
 
 data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classScope :: ![a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -47,3 +53,12 @@ data Constructor a = Constructor { constructorName :: !a, constructorFields :: !
 
 instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | Import declarations.
+data Import a = Import { importContent :: ByteString }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+

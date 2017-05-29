@@ -53,6 +53,7 @@ library
                      , Language.TypeScript
                      , Language.TypeScript.Syntax
                      , Language.Python
+                     , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
                      , Patch
@@ -82,6 +83,7 @@ library
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , aeson-pretty
+                     , ansi-terminal
                      , array
                      , async-pool
                      , async

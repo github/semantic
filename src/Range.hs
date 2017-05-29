@@ -13,10 +13,6 @@ import Test.LeanCheck
 data Range = Range { start :: Int, end :: Int }
   deriving (Eq, Show, Generic, NFData)
 
--- | Make a range at a given index.
-rangeAt :: Int -> Range
-rangeAt a = Range a a
-
 -- | Return the length of the range.
 rangeLength :: Range -> Int
 rangeLength range = end range - start range

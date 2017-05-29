@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, ScopedTypeVariables #-}
 module TreeSitter
 ( treeSitterParser
-, parseRubyToTerm
+, parseToAST
 , defaultTermAssignment
 ) where
 
@@ -16,8 +16,6 @@ import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
-import qualified Language.Ruby.Syntax as Ruby
-import Parser
 import Range
 import Source
 import qualified Syntax
@@ -29,30 +27,24 @@ import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
-import qualified Text.Parser.TreeSitter.Ruby as Ruby
 import SourceSpan
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record DefaultFields)
-treeSitterParser language grammar blob = do
-  document <- ts_document_new
+treeSitterParser :: Language -> Ptr TS.Language -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+treeSitterParser language grammar source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document grammar
-  withCStringLen (toText (source blob)) $ \ (source, len) -> do
-    ts_document_set_input_string_with_length document source len
+  withCStringLen (toText source) $ \ (sourceText, len) -> do
+    ts_document_set_input_string_with_length document sourceText len
     ts_document_parse_halt_on_error document
-    term <- documentToTerm language document blob
-    ts_document_free document
+    term <- documentToTerm language document source
     pure term
 
 
--- | Parse Ruby to a list of Terms, printing any assignment errors to stdout. Intended for use in ghci, e.g.:
---
---   > Command.Files.readFile "/Users/rob/Desktop/test.rb" >>= parseRubyToTerm . source
-parseRubyToTerm :: Source -> IO (Maybe [Term Ruby.Syntax A.Location])
-parseRubyToTerm source = do
-  document <- ts_document_new
-  ts_document_set_language document Ruby.tree_sitter_ruby
+-- | Parse 'Source' with the given 'TS.Language' and return its AST.
+parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (A.AST grammar)
+parseToAST language source = bracket ts_document_new ts_document_free $ \ document -> do
+  ts_document_set_language document language
   root <- withCStringLen (toText source) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
     ts_document_parse_halt_on_error document
@@ -60,15 +52,7 @@ parseRubyToTerm source = do
       ts_document_root_node_p document rootPtr
       peek rootPtr)
 
-  ast <- anaM toAST root
-
-  ts_document_free document
-
-  let A.Result errors value = A.assign Ruby.assignment source ast
-  case value of
-    Just a -> pure (Just a)
-    _ -> traverse_ (putStrLn . ($ "") . A.showError source) errors >> pure Nothing
-
+  anaM toAST root
 
 toAST :: (Bounded grammar, Enum grammar) => Node -> IO (A.RoseF (A.Node grammar) Node)
 toAST node@Node{..} = do
@@ -87,8 +71,8 @@ safeToEnum n | (fromEnum (minBound :: n), fromEnum (maxBound :: n)) `inRange` n 
 
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record DefaultFields)
-documentToTerm language document SourceBlob{..} = do
+documentToTerm :: Language -> Ptr Document -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+documentToTerm language document source = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
     peek rootPtr)
