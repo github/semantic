@@ -12,6 +12,7 @@ module Semantic.Task
 , render
 , distribute
 , distributeFor
+, distributeFoldMap
 , runTask
 ) where
 
@@ -75,6 +76,9 @@ distribute tasks = Distribute tasks `Then` return
 
 distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
 distributeFor inputs toTask = distribute (fmap toTask inputs)
+
+distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
+distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 
 runTask :: Task a -> IO a
