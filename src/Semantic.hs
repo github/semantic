@@ -59,7 +59,7 @@ diffBlobPair decorator blobs = do
 
 
 parseAndRenderBlobs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> TermRenderer output -> t SourceBlob -> Task ByteString
-parseAndRenderBlobs decorator renderer = fmap (toS . fold) . distribute . fmap (parseAndRenderBlob decorator renderer)
+parseAndRenderBlobs decorator renderer = fmap toS . distributeFoldMap (parseAndRenderBlob decorator renderer)
 
 parseAndRenderBlob :: NamedDecorator -> TermRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
@@ -86,7 +86,7 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
 
 
 parseDiffAndRenderBlobPairs :: (Traversable t, Monoid output, StringConv output ByteString) => NamedDecorator -> DiffRenderer output -> t (Both SourceBlob) -> Task ByteString
-parseDiffAndRenderBlobPairs decorator renderer = fmap (toS . fold) . distribute . fmap (parseDiffAndRenderBlobPair decorator renderer)
+parseDiffAndRenderBlobPairs decorator renderer = fmap toS . distributeFoldMap (parseDiffAndRenderBlobPair decorator renderer)
 
 parseDiffAndRenderBlobPair :: Monoid output => NamedDecorator -> DiffRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobPair decorator renderer blobs = do
