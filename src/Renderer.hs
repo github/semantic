@@ -34,7 +34,7 @@ data Renderer input output where
 
 runRenderer :: Renderer input output -> input -> output
 runRenderer renderer = case renderer of
-  PatchRenderer -> File . uncurry R.patch
+  PatchRenderer -> uncurry R.renderPatch
   JSONRenderer -> uncurry R.json
   SExpressionDiffRenderer -> R.renderSExpressionDiff . snd
   ToCRenderer -> uncurry R.toc
@@ -70,19 +70,9 @@ newtype Identifier = Identifier Text
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]
 
-newtype File = File { unFile :: ByteString }
-  deriving Show
-
-instance StringConv File ByteString where
-  strConv _ = unFile
-
 instance Show (Renderer input output) where
   showsPrec _ PatchRenderer = showString "PatchRenderer"
   showsPrec _ JSONRenderer = showString "JSONRenderer"
   showsPrec _ SExpressionDiffRenderer = showString "SExpressionDiffRenderer"
   showsPrec _ ToCRenderer = showString "ToCRenderer"
   showsPrec _ SExpressionParseTreeRenderer = showString "SExpressionParseTreeRenderer"
-
-instance Monoid File where
-  mempty = File mempty
-  mappend (File a) (File b) = File (a <> "\n" <> b)

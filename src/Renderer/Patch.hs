@@ -1,8 +1,10 @@
-module Renderer.Patch (
-  patch,
-  hunks,
-  Hunk(..),
-  truncatePatch
+{-# LANGUAGE MultiParamTypeClasses #-}
+module Renderer.Patch
+( renderPatch
+, File(..)
+, hunks
+, Hunk(..)
+, truncatePatch
 ) where
 
 import Alignment
@@ -25,11 +27,22 @@ truncatePatch :: Both SourceBlob -> ByteString
 truncatePatch blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: (HasField fields Range, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> ByteString
-patch blobs diff = if not (ByteString.null text) && ByteString.last text /= '\n'
+renderPatch :: (HasField fields Range, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> File
+renderPatch blobs diff = File $ if not (ByteString.null text) && ByteString.last text /= '\n'
   then text <> "\n\\ No newline at end of file\n"
   else text
   where text = header blobs <> mconcat (showHunk blobs <$> hunks diff blobs)
+
+newtype File = File { unFile :: ByteString }
+  deriving Show
+
+instance Monoid File where
+  mempty = File mempty
+  mappend (File a) (File b) = File (a <> "\n" <> b)
+
+instance StringConv File ByteString where
+  strConv _ = unFile
+
 
 -- | A hunk in a patch, including the offset, changes, and context.
 data Hunk a = Hunk { offset :: Both (Sum Int), changes :: [Change a], trailingContext :: [Join These a] }
