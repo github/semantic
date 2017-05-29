@@ -14,6 +14,7 @@ import Data.Record
 import Diff
 import Info
 import Interpreter
+import qualified Language
 import Patch
 import Parser
 import Prologue
@@ -89,6 +90,15 @@ decorate decorator source term = Decorate decorator source term `Then` return
 
 render :: Monoid output => Renderer input output -> input -> Task output
 render renderer input = Render renderer input `Then` return
+
+parseAndRenderBlob :: Monoid output => NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
+parseAndRenderBlob decorator renderer blob@SourceBlob{..} = do
+  term <- parse (case blobLanguage of
+    Just Language.Python -> pythonParser) source
+  term' <- decorate (const identity) source term
+  render (case renderer of
+    JSON -> JSONRenderer) (Identity blob, term')
+
 
 -- Internal
 
