@@ -75,6 +75,15 @@ data TaskF output where
 type Task = Freer TaskF
 
 
+parse :: Parser term -> Source -> Task term
+parse parser source = Parse parser source `Then` return
+
+decorate :: Decorator term term' -> Source -> term -> Task term'
+decorate decorator source term = Decorate decorator source term `Then` return
+
+render :: Monoid output => Renderer input output -> input -> Task output
+render renderer input = Render renderer input `Then` return
+
 -- Internal
 
 renderConcurrently :: (Monoid output, StringConv output ByteString) => (input -> IO output) -> [input] -> IO ByteString
