@@ -95,6 +95,7 @@ render renderer input = Render renderer input `Then` return
 distribute :: Monoid output => [Task output] -> Task output
 distribute tasks = Distribute tasks `Then` return
 
+
 parseAndRenderBlob :: NamedDecorator -> NamedRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob decorator renderer blob@SourceBlob{..} = do
   term <- parse (case blobLanguage of
