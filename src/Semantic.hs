@@ -63,6 +63,8 @@ parseBlobs decorator renderer blobs = renderConcurrently parseAndRender (filter 
 parseBlob :: (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> SourceBlob -> IO (Term (Syntax Text) (Record fields))
 parseBlob decorator SourceBlob{..} = decorator source <$> runParser (parserForLanguage blobLanguage) source
 
+type Decorator input output = Source -> input -> output
+
 
 -- Internal
 
