@@ -3,12 +3,13 @@ module Semantic
 ( diffBlobPairs
 , diffBlobPair
 , parseAndRenderBlobs
+, parseDiffAndRenderBlobs
 , parseBlobs
 , parseBlob
 ) where
 
 import qualified Control.Concurrent.Async as Async
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Data.Record
 import Diff
 import Info
@@ -80,6 +81,20 @@ parseAndRenderBlob decorator renderer blob@SourceBlob{..} = case blobLanguage of
         render (case renderer of
           JSON -> JSONRenderer
           SExpression -> SExpressionParseTreeRenderer) (Identity blob, term)
+
+
+parseDiffAndRenderBlobs :: NamedDecorator -> NamedRenderer output -> Both SourceBlob -> Task output
+parseDiffAndRenderBlobs decorator renderer blobs = do
+  let languages = blobLanguage <$> blobs
+  terms <- distributeFor blobs $ \ blob -> do
+    term <- parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) (source blob)
+    case decorator of
+      IdentityDecorator -> pure term
+      IdentifierDecorator -> decorate (const identity) (source blob) term
+  diffed <- diff (runBothWith diffTerms) terms
+  render (case renderer of
+    JSON -> JSONRenderer
+    SExpression -> SExpressionDiffRenderer) (blobs, diffed)
 
 
 -- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.

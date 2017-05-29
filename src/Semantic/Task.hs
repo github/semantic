@@ -11,7 +11,6 @@ module Semantic.Task
 , render
 , distribute
 , distributeFor
-, parseDiffAndRenderBlobs
 , runTask
 ) where
 
@@ -20,7 +19,6 @@ import Control.Monad.Free.Freer
 import Data.Aeson (Value)
 import Data.Functor.Both as Both
 import Diff
-import Interpreter
 import Parser
 import Prologue
 import Renderer
@@ -64,20 +62,6 @@ distribute tasks = Distribute tasks `Then` return
 
 distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
 distributeFor inputs toTask = Distribute (fmap toTask inputs) `Then` return
-
-
-parseDiffAndRenderBlobs :: NamedDecorator -> NamedRenderer output -> Both SourceBlob -> Task output
-parseDiffAndRenderBlobs decorator renderer blobs = do
-  let languages = blobLanguage <$> blobs
-  terms <- distributeFor blobs $ \ blob -> do
-    term <- parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) (source blob)
-    case decorator of
-      IdentityDecorator -> pure term
-      IdentifierDecorator -> decorate (const identity) (source blob) term
-  diffed <- diff (runBothWith diffTerms) terms
-  render (case renderer of
-    JSON -> JSONRenderer
-    SExpression -> SExpressionDiffRenderer) (blobs, diffed)
 
 
 runTask :: Task a -> IO a
