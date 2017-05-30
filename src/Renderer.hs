@@ -37,7 +37,7 @@ data DiffRenderer output where
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
-  -- | “Render” by returning the computed 'SyntaxDiff'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for the ToC spec.
+  -- | “Render” by returning the computed 'SyntaxDiff'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for TOCSpec.hs.
   IdentityDiffRenderer :: DiffRenderer (SyntaxDiff Text (Maybe Declaration ': DefaultFields))
 
 deriving instance Eq (DiffRenderer output)
@@ -45,8 +45,11 @@ deriving instance Show (DiffRenderer output)
 
 -- | Specification of renderers for terms, producing output in the parameter type.
 data TermRenderer output where
+  -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
   JSONTermRenderer :: TermRenderer [Value]
+  -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
+  -- | “Render” by returning the computed 'SyntaxTerm'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for SemanticSpec.hs.
   IdentityTermRenderer :: TermRenderer (Maybe (SyntaxTerm Text DefaultFields))
 
 deriving instance Eq (TermRenderer output)
