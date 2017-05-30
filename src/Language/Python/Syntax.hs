@@ -32,6 +32,7 @@ type Syntax' =
    , Expression.Boolean
    , Expression.Bitwise
    , Expression.Call
+   , Expression.MemberAccess
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
@@ -163,7 +164,7 @@ comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expressionStatement = symbol ExpressionStatement *> children (statement <|> literal <|> expression)
+expressionStatement = symbol ExpressionStatement *> children (statement <|> literal <|> expression <|> memberAccess)
 
 
 -- TODO Possibly match against children for dotted name and identifiers
@@ -216,3 +217,6 @@ makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+
+memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+memberAccess = makeTerm <$> symbol Attribute <*> children (expression >>= (\lhs -> (Expression.MemberAccess lhs) <$> identifier))
