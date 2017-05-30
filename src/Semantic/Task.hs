@@ -57,12 +57,21 @@ diff differ terms = Diff differ terms `Then` return
 render :: Renderer input output -> input -> Task output
 render renderer input = Render renderer input `Then` return
 
+-- | Distribute a 'Traversable' container of 'Task's over the available cores (i.e. execute them concurrently), collecting their results.
+--
+--   This is a concurrent analogue of 'sequenceA'.
 distribute :: Traversable t => t (Task output) -> Task (t output)
 distribute tasks = Distribute tasks `Then` return
 
+-- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
+--
+--   This is a concurrent analogue of 'for' or 'traverse' (with the arguments flipped).
 distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
 distributeFor inputs toTask = distribute (fmap toTask inputs)
 
+-- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), combining the results 'Monoid'ally into a final value.
+--
+--   This is a concurrent analogue of 'foldMap'.
 distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
