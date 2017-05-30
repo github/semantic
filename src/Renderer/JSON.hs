@@ -69,9 +69,6 @@ instance ToJSONFields Category where
 instance ToJSONFields SourceSpan where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
-instance ToJSONFields SourceText where
-  toJSONFields (SourceText t) = [ "sourceText" .= t ]
-
 instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
 
