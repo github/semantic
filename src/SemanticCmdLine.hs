@@ -53,7 +53,7 @@ runDiff DiffArguments{..} = do
     DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
     DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
     DiffStdin -> readBlobPairsFromHandle stdin
-  Task.runTask . fmap toS $ Task.distributeFoldMap (Semantic.parseDiffAndRenderBlobPair diffRenderer) blobs
+  Task.runTask . fmap toS $ Task.distributeFoldMap (fmap (fromMaybe mempty) . Semantic.parseDiffAndRenderBlobPair diffRenderer) blobs
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do
