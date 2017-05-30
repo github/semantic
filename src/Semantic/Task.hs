@@ -13,6 +13,7 @@ module Semantic.Task
 , runTask
 ) where
 
+import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Functor.Both as Both
@@ -83,4 +84,4 @@ runTask = iterFreerA $ \ task yield -> case task of
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
   Render renderer input -> yield (renderer input)
-  Distribute tasks -> Async.mapConcurrently runTask tasks >>= yield
+  Distribute tasks -> Async.mapConcurrently runTask tasks >>= yield . withStrategy (parTraversable rseq)
