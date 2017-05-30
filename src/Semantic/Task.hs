@@ -63,6 +63,7 @@ distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 
+-- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
   Parse parser source -> runParser parser source >>= yield
