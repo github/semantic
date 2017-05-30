@@ -41,15 +41,19 @@ type Differ f a = Both (Term f a) -> Diff f a
 type Renderer i o = i -> o
 
 
+-- | A 'Task' which parses 'Source' with the given 'Parser'.
 parse :: Parser term -> Source -> Task term
 parse parser source = Parse parser source `Then` return
 
+-- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
 decorate algebra term = Decorate algebra term `Then` return
 
+-- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
 diff :: Differ f a -> Both (Term f a) -> Task (Diff f a)
 diff differ terms = Diff differ terms `Then` return
 
+-- | A 'Task' which renders some input using the supplied 'Renderer' function.
 render :: Renderer input output -> input -> Task output
 render renderer input = Render renderer input `Then` return
 
