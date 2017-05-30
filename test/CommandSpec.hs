@@ -8,8 +8,6 @@ import Data.Map
 import Data.Maybe
 import Data.Record
 import Data.String
-import Diff
-import Info (DefaultFields, HasDefaultFields)
 import Language
 import Prologue hiding (readFile, toList)
 import qualified Data.Vector as V
@@ -18,7 +16,6 @@ import Renderer hiding (errors)
 import Source
 import Semantic
 import Semantic.Task
-import Term
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 
