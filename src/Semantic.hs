@@ -52,6 +52,11 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
     diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderJSON) terms
   PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderPatch)
   SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . Prologue.snd)
+  IdentityDiffRenderer -> do
+    terms <- distributeFor blobs $ \ blob -> do
+      term <- parseSource blob
+      decorate (declarationAlgebra (source blob)) term
+    diffAndRenderTermPair blobs (runBothWith diffTerms) Prologue.snd terms
   where languages = blobLanguage <$> blobs
         parseSource = parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) . source
 

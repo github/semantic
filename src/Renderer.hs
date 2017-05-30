@@ -15,6 +15,8 @@ module Renderer
 
 import Data.Aeson (Value, (.=))
 import Data.Syntax.Algebra (RAlgebra)
+import Diff (SyntaxDiff)
+import Info (DefaultFields)
 import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
@@ -27,6 +29,7 @@ data DiffRenderer output where
   ToCDiffRenderer :: DiffRenderer Summaries
   JSONDiffRenderer :: DiffRenderer [Value]
   SExpressionDiffRenderer :: DiffRenderer ByteString
+  IdentityDiffRenderer :: DiffRenderer (SyntaxDiff Text (Maybe Declaration ': DefaultFields))
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
