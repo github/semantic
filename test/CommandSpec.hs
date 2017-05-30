@@ -17,6 +17,7 @@ import qualified Git.Types as Git
 import Renderer hiding (errors)
 import Source
 import Semantic
+import Semantic.Task
 import Term
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
@@ -110,21 +111,21 @@ spec = parallel $ do
 
   describe "fetchDiffs" $ do
     it "generates toc summaries for two shas" $ do
-      (errors, summaries) <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] declarationDecorator Renderer.ToCRenderer
-      errors `shouldBe` Just (fromList [])
-      summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
+      Summaries summaries errors <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)]
+      errors `shouldBe` fromList []
+      summaries `shouldBe` fromList [("methods.rb", ["foo"])]
 
     it "generates toc summaries for two shas inferring paths" $ do
-      (errors, summaries) <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [] declarationDecorator Renderer.ToCRenderer
-      errors `shouldBe` Just (fromList [])
-      summaries `shouldBe` Just (fromList [("methods.rb", ["foo"])])
+      Summaries summaries errors <- fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" []
+      errors `shouldBe` fromList []
+      summaries `shouldBe` fromList [("methods.rb", ["foo"])]
 
     it "errors with bad shas" $
-      fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dead" "beef" [("methods.rb", Just Ruby)] declarationDecorator Renderer.ToCRenderer
+      fetchDiffsOutput termText "test/fixtures/git/examples/all-languages.git" "dead" "beef" [("methods.rb", Just Ruby)]
         `shouldThrow` (== Git.BackendError "Could not lookup dead: Object not found - no match for prefix (dead000000000000000000000000000000000000)")
 
     it "errors with bad repo path" $
-      fetchDiffsOutput termText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)] declarationDecorator Renderer.ToCRenderer
+      fetchDiffsOutput termText "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)]
         `shouldThrow` errorCall "Could not open repository \"test/fixtures/git/examples/not-a-repo.git\""
 
   where repoPath = "test/fixtures/git/examples/all-languages.git"
@@ -139,12 +140,10 @@ spec = parallel $ do
 
 data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
 
-fetchDiffsOutput :: (HasDefaultFields fields, NFData (Record fields)) => (Object -> Text) -> FilePath -> String -> String -> [(FilePath, Maybe Language)] -> (Source -> SyntaxTerm Text DefaultFields -> SyntaxTerm Text fields) -> Renderer (Both SourceBlob, SyntaxDiff Text fields) Summaries -> IO (Maybe (Map Text Value), Maybe (Map Text [Text]))
-fetchDiffsOutput f gitDir sha1 sha2 filePaths decorator renderer = do
-  blobs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
-  results <- Semantic.diffBlobPairs decorator renderer blobs
-  let json = fromJust (decode (toS results))
-  pure (errors json, summaries f json)
+fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [(FilePath, Maybe Language)] -> IO Summaries
+fetchDiffsOutput f gitDir sha1 sha2 filePaths = do
+  blobPairs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
+  runTask $ distributeFoldMap (Semantic.parseDiffAndRenderBlobPair Renderer.ToCDiffRenderer) blobPairs
 
 -- Diff Summaries payloads look like this:
 -- {
