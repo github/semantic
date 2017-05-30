@@ -27,6 +27,7 @@ import Renderer.TOC as R
 import Syntax as S
 import Term (SyntaxTerm)
 
+-- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
   ToCDiffRenderer :: DiffRenderer Summaries
@@ -37,6 +38,7 @@ data DiffRenderer output where
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
 
+-- | Specification of renderers for terms, producing output in the parameter type.
 data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   SExpressionTermRenderer :: TermRenderer ByteString
