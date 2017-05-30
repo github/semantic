@@ -31,10 +31,13 @@ data TaskF output where
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
 
+-- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Freer TaskF
 
+-- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ f a = Both (Term f a) -> Diff f a
 
+-- | A function to render terms or diffs.
 type Renderer i o = i -> o
 
 
