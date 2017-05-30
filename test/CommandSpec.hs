@@ -141,29 +141,3 @@ fetchDiffsOutput :: FilePath -> String -> String -> [(FilePath, Maybe Language)]
 fetchDiffsOutput gitDir sha1 sha2 filePaths = do
   blobPairs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
   fromMaybe mempty <$> runTask (distributeFoldMap (Semantic.parseDiffAndRenderBlobPair Renderer.ToCDiffRenderer) blobPairs)
-
--- Diff Summaries payloads look like this:
--- {
---  "changes": { "methods.rb": [{ "span":{"insert":{"start":[1,1],"end":[2,4]}}, "summary":"Added the 'foo()' method" }] },
--- "errors":{}
--- }
--- TOC Summaries payloads look like this:
--- {
--- "changes": { "methods.rb": [{ "span":{"start":[1,1],"end":[2,4]}, "category":"Method", "term":"foo", "changeType":"added" }]
--- },
--- "errors":{}
--- }
-summaries :: (Object -> Text) -> Object -> Maybe (Map Text [Text])
-summaries f = parseMaybe $ \o -> do
-                changes <- o .: "changes" :: Parser (Map Text (V.Vector Object))
-                xs <- for (toList changes) $ \(path, s) -> do
-                  let ys = fmap f s
-                  pure (path, V.toList ys)
-                pure $ fromList xs
-
-termText :: Object -> Text
-termText o = fromMaybe (panic "key 'term' not found") $
-  parseMaybe (.: "term") o
-
-errors :: Object -> Maybe (Map Text Value)
-errors = parseMaybe (.: "errors")
