@@ -2,15 +2,12 @@ module CommandSpec where
 
 import Command
 import Data.Aeson
-import Data.Aeson.Types hiding (parse)
 import Data.Functor.Both as Both
 import Data.Map as Map
 import Data.Maybe
-import Data.Record
 import Data.String
 import Language
 import Prologue hiding (readFile, toList)
-import qualified Data.Vector as V
 import qualified Git.Types as Git
 import Renderer hiding (errors)
 import Source
