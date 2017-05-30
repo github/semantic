@@ -79,7 +79,7 @@ tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal
+expression = statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal
 
 -- TODO: Consider flattening single element lists
 expressionList :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)

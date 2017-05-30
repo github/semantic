@@ -1,0 +1,413 @@
+src/Language/Python/Syntax.hs:17:1-54: Splicing declarations
+    mkSymbolDatatype (mkName "Grammar") tree_sitter_python
+  ======>
+    data Grammar
+      = END |
+        HiddenNewline |
+        HiddenIndent |
+        HiddenDedent |
+        AnonPrint |
+        AnonExec |
+        AnonImport |
+        AnonFrom |
+        AnonDot |
+        AnonLParen |
+        AnonRParen |
+        AnonComma |
+        AnonAs |
+        AnonStar |
+        AnonRAngleRAngle |
+        AnonAssert |
+        AnonReturn |
+        AnonDel |
+        AnonRaise |
+        PassStatement |
+        BreakStatement |
+        ContinueStatement |
+        AnonIf |
+        AnonColon |
+        AnonElif |
+        AnonElse |
+        AnonFor |
+        AnonIn |
+        AnonWhile |
+        AnonTry |
+        AnonExcept |
+        AnonFinally |
+        AnonWith |
+        AnonAsync |
+        AnonDef |
+        AnonMinusRAngle |
+        AnonEqual |
+        AnonGlobal |
+        AnonNonlocal |
+        AnonClass |
+        AnonAt |
+        AnonNot |
+        AnonAnd |
+        AnonOr |
+        AnonPlus |
+        AnonMinus |
+        AnonSlash |
+        AnonPercent |
+        AnonSlashSlash |
+        AnonStarStar |
+        AnonPipe |
+        AnonAmpersand |
+        AnonCaret |
+        AnonLAngleLAngle |
+        AnonTilde |
+        AnonLAngle |
+        AnonLAngleEqual |
+        AnonEqualEqual |
+        AnonBangEqual |
+        AnonRAngleEqual |
+        AnonRAngle |
+        AnonLAngleRAngle |
+        AnonIs |
+        AnonLambda |
+        AnonPlusEqual |
+        AnonMinusEqual |
+        AnonStarEqual |
+        AnonSlashEqual |
+        AnonSlashSlashEqual |
+        AnonPercentEqual |
+        AnonStarStarEqual |
+        AnonRAngleRAngleEqual |
+        AnonLAngleLAngleEqual |
+        AnonAmpersandEqual |
+        AnonCaretEqual |
+        AnonPipeEqual |
+        AnonYield |
+        AnonLBracket |
+        AnonRBracket |
+        Ellipsis |
+        AnonLBrace |
+        AnonRBrace |
+        String |
+        Integer |
+        Float |
+        Identifier |
+        True |
+        False |
+        None |
+        AnonAwait |
+        Comment |
+        HiddenSemicolon |
+        Module |
+        HiddenStatement |
+        HiddenSimpleStatement |
+        KeywordIdentifier |
+        ImportStatement |
+        ImportFromStatement |
+        HiddenImportList |
+        AliasedImport |
+        WildcardImport |
+        PrintStatement |
+        Chevron |
+        AssertStatement |
+        ExpressionStatement |
+        ReturnStatement |
+        DeleteStatement |
+        RaiseStatement |
+        HiddenCompoundStatement |
+        IfStatement |
+        ElifClause |
+        ElseClause |
+        ForStatement |
+        WhileStatement |
+        TryStatement |
+        ExceptClause |
+        FinallyClause |
+        WithStatement |
+        WithItem |
+        AsyncFunctionDefinition |
+        FunctionDefinition |
+        HiddenFunctionDefinition |
+        Parameters |
+        HiddenParameters |
+        DefaultParameter |
+        TypedDefaultParameter |
+        ListSplatParameter |
+        DictionarySplatParameter |
+        GlobalStatement |
+        NonlocalStatement |
+        ExecStatement |
+        ClassDefinition |
+        ArgumentList |
+        DecoratedDefinition |
+        Decorator |
+        HiddenSuite |
+        Variables |
+        ExpressionList |
+        DottedName |
+        HiddenExpression |
+        HiddenPrimaryExpression |
+        NotOperator |
+        BooleanOperator |
+        BinaryOperator |
+        UnaryOperator |
+        ComparisonOperator |
+        Lambda |
+        Assignment |
+        AugmentedAssignment |
+        HiddenRightHandSide |
+        Yield |
+        Attribute |
+        Subscript |
+        Slice |
+        Call |
+        TypedParameter |
+        Type |
+        KeywordArgument |
+        ListSplatArgument |
+        DictionarySplatArgument |
+        List |
+        ListComprehension |
+        HiddenListComprehension |
+        Dictionary |
+        DictionaryComprehension |
+        Pair |
+        HiddenDictionaryComprehension |
+        Set |
+        SetComprehension |
+        HiddenSetComprehension |
+        Tuple |
+        GeneratorExpression |
+        HiddenGeneratorExpression |
+        ConditionalExpression |
+        ConcatenatedString |
+        Await |
+        AuxModuleRepeat1 |
+        AuxHiddenStatementRepeat1 |
+        AuxHiddenStatementRepeat2 |
+        AuxImportFromStatementRepeat1 |
+        AuxHiddenImportListRepeat1 |
+        AuxPrintStatementRepeat1 |
+        AuxIfStatementRepeat1 |
+        AuxTryStatementRepeat1 |
+        AuxWithStatementRepeat1 |
+        AuxHiddenParametersRepeat1 |
+        AuxGlobalStatementRepeat1 |
+        AuxArgumentListRepeat1 |
+        AuxDecoratedDefinitionRepeat1 |
+        AuxVariablesRepeat1 |
+        AuxDottedNameRepeat1 |
+        AuxComparisonOperatorRepeat1 |
+        AuxSubscriptRepeat1 |
+        AuxDictionaryRepeat1 |
+        AuxConcatenatedStringRepeat1
+      deriving (Show, Eq, Enum, Ord)
+    instance Symbol Grammar where
+      symbolType Language.Python.Syntax.END = Regular
+      symbolType Language.Python.Syntax.HiddenNewline = Regular
+      symbolType Language.Python.Syntax.HiddenIndent = Regular
+      symbolType Language.Python.Syntax.HiddenDedent = Regular
+      symbolType Language.Python.Syntax.AnonPrint = Anonymous
+      symbolType Language.Python.Syntax.AnonExec = Anonymous
+      symbolType Language.Python.Syntax.AnonImport = Anonymous
+      symbolType Language.Python.Syntax.AnonFrom = Anonymous
+      symbolType Language.Python.Syntax.AnonDot = Anonymous
+      symbolType Language.Python.Syntax.AnonLParen = Anonymous
+      symbolType Language.Python.Syntax.AnonRParen = Anonymous
+      symbolType Language.Python.Syntax.AnonComma = Anonymous
+      symbolType Language.Python.Syntax.AnonAs = Anonymous
+      symbolType Language.Python.Syntax.AnonStar = Anonymous
+      symbolType Language.Python.Syntax.AnonRAngleRAngle = Anonymous
+      symbolType Language.Python.Syntax.AnonAssert = Anonymous
+      symbolType Language.Python.Syntax.AnonReturn = Anonymous
+      symbolType Language.Python.Syntax.AnonDel = Anonymous
+      symbolType Language.Python.Syntax.AnonRaise = Anonymous
+      symbolType Language.Python.Syntax.PassStatement = Regular
+      symbolType Language.Python.Syntax.BreakStatement = Regular
+      symbolType Language.Python.Syntax.ContinueStatement = Regular
+      symbolType Language.Python.Syntax.AnonIf = Anonymous
+      symbolType Language.Python.Syntax.AnonColon = Anonymous
+      symbolType Language.Python.Syntax.AnonElif = Anonymous
+      symbolType Language.Python.Syntax.AnonElse = Anonymous
+      symbolType Language.Python.Syntax.AnonFor = Anonymous
+      symbolType Language.Python.Syntax.AnonIn = Anonymous
+      symbolType Language.Python.Syntax.AnonWhile = Anonymous
+      symbolType Language.Python.Syntax.AnonTry = Anonymous
+      symbolType Language.Python.Syntax.AnonExcept = Anonymous
+      symbolType Language.Python.Syntax.AnonFinally = Anonymous
+      symbolType Language.Python.Syntax.AnonWith = Anonymous
+      symbolType Language.Python.Syntax.AnonAsync = Anonymous
+      symbolType Language.Python.Syntax.AnonDef = Anonymous
+      symbolType Language.Python.Syntax.AnonMinusRAngle = Anonymous
+      symbolType Language.Python.Syntax.AnonEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonGlobal = Anonymous
+      symbolType Language.Python.Syntax.AnonNonlocal = Anonymous
+      symbolType Language.Python.Syntax.AnonClass = Anonymous
+      symbolType Language.Python.Syntax.AnonAt = Anonymous
+      symbolType Language.Python.Syntax.AnonNot = Anonymous
+      symbolType Language.Python.Syntax.AnonAnd = Anonymous
+      symbolType Language.Python.Syntax.AnonOr = Anonymous
+      symbolType Language.Python.Syntax.AnonPlus = Anonymous
+      symbolType Language.Python.Syntax.AnonMinus = Anonymous
+      symbolType Language.Python.Syntax.AnonSlash = Anonymous
+      symbolType Language.Python.Syntax.AnonPercent = Anonymous
+      symbolType Language.Python.Syntax.AnonSlashSlash = Anonymous
+      symbolType Language.Python.Syntax.AnonStarStar = Anonymous
+      symbolType Language.Python.Syntax.AnonPipe = Anonymous
+      symbolType Language.Python.Syntax.AnonAmpersand = Anonymous
+      symbolType Language.Python.Syntax.AnonCaret = Anonymous
+      symbolType Language.Python.Syntax.AnonLAngleLAngle = Anonymous
+      symbolType Language.Python.Syntax.AnonTilde = Anonymous
+      symbolType Language.Python.Syntax.AnonLAngle = Anonymous
+      symbolType Language.Python.Syntax.AnonLAngleEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonEqualEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonBangEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonRAngleEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonRAngle = Anonymous
+      symbolType Language.Python.Syntax.AnonLAngleRAngle = Anonymous
+      symbolType Language.Python.Syntax.AnonIs = Anonymous
+      symbolType Language.Python.Syntax.AnonLambda = Anonymous
+      symbolType Language.Python.Syntax.AnonPlusEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonMinusEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonStarEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonSlashEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonSlashSlashEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonPercentEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonStarStarEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonRAngleRAngleEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonLAngleLAngleEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonAmpersandEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonCaretEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonPipeEqual = Anonymous
+      symbolType Language.Python.Syntax.AnonYield = Anonymous
+      symbolType Language.Python.Syntax.AnonLBracket = Anonymous
+      symbolType Language.Python.Syntax.AnonRBracket = Anonymous
+      symbolType Language.Python.Syntax.Ellipsis = Regular
+      symbolType Language.Python.Syntax.AnonLBrace = Anonymous
+      symbolType Language.Python.Syntax.AnonRBrace = Anonymous
+      symbolType Language.Python.Syntax.String = Regular
+      symbolType Language.Python.Syntax.Integer = Regular
+      symbolType Language.Python.Syntax.Float = Regular
+      symbolType Language.Python.Syntax.Identifier = Regular
+      symbolType Language.Python.Syntax.True = Regular
+      symbolType Language.Python.Syntax.False = Regular
+      symbolType Language.Python.Syntax.None = Regular
+      symbolType Language.Python.Syntax.AnonAwait = Anonymous
+      symbolType Language.Python.Syntax.Comment = Regular
+      symbolType Language.Python.Syntax.HiddenSemicolon = Regular
+      symbolType Language.Python.Syntax.Module = Regular
+      symbolType Language.Python.Syntax.HiddenStatement = Regular
+      symbolType Language.Python.Syntax.HiddenSimpleStatement = Regular
+      symbolType Language.Python.Syntax.KeywordIdentifier = Regular
+      symbolType Language.Python.Syntax.ImportStatement = Regular
+      symbolType Language.Python.Syntax.ImportFromStatement = Regular
+      symbolType Language.Python.Syntax.HiddenImportList = Regular
+      symbolType Language.Python.Syntax.AliasedImport = Regular
+      symbolType Language.Python.Syntax.WildcardImport = Regular
+      symbolType Language.Python.Syntax.PrintStatement = Regular
+      symbolType Language.Python.Syntax.Chevron = Regular
+      symbolType Language.Python.Syntax.AssertStatement = Regular
+      symbolType Language.Python.Syntax.ExpressionStatement = Regular
+      symbolType Language.Python.Syntax.ReturnStatement = Regular
+      symbolType Language.Python.Syntax.DeleteStatement = Regular
+      symbolType Language.Python.Syntax.RaiseStatement = Regular
+      symbolType Language.Python.Syntax.HiddenCompoundStatement = Regular
+      symbolType Language.Python.Syntax.IfStatement = Regular
+      symbolType Language.Python.Syntax.ElifClause = Regular
+      symbolType Language.Python.Syntax.ElseClause = Regular
+      symbolType Language.Python.Syntax.ForStatement = Regular
+      symbolType Language.Python.Syntax.WhileStatement = Regular
+      symbolType Language.Python.Syntax.TryStatement = Regular
+      symbolType Language.Python.Syntax.ExceptClause = Regular
+      symbolType Language.Python.Syntax.FinallyClause = Regular
+      symbolType Language.Python.Syntax.WithStatement = Regular
+      symbolType Language.Python.Syntax.WithItem = Regular
+      symbolType Language.Python.Syntax.AsyncFunctionDefinition = Regular
+      symbolType Language.Python.Syntax.FunctionDefinition = Regular
+      symbolType Language.Python.Syntax.HiddenFunctionDefinition
+        = Regular
+      symbolType Language.Python.Syntax.Parameters = Regular
+      symbolType Language.Python.Syntax.HiddenParameters = Regular
+      symbolType Language.Python.Syntax.DefaultParameter = Regular
+      symbolType Language.Python.Syntax.TypedDefaultParameter = Regular
+      symbolType Language.Python.Syntax.ListSplatParameter = Regular
+      symbolType Language.Python.Syntax.DictionarySplatParameter
+        = Regular
+      symbolType Language.Python.Syntax.GlobalStatement = Regular
+      symbolType Language.Python.Syntax.NonlocalStatement = Regular
+      symbolType Language.Python.Syntax.ExecStatement = Regular
+      symbolType Language.Python.Syntax.ClassDefinition = Regular
+      symbolType Language.Python.Syntax.ArgumentList = Regular
+      symbolType Language.Python.Syntax.DecoratedDefinition = Regular
+      symbolType Language.Python.Syntax.Decorator = Regular
+      symbolType Language.Python.Syntax.HiddenSuite = Regular
+      symbolType Language.Python.Syntax.Variables = Regular
+      symbolType Language.Python.Syntax.ExpressionList = Regular
+      symbolType Language.Python.Syntax.DottedName = Regular
+      symbolType Language.Python.Syntax.HiddenExpression = Regular
+      symbolType Language.Python.Syntax.HiddenPrimaryExpression = Regular
+      symbolType Language.Python.Syntax.NotOperator = Regular
+      symbolType Language.Python.Syntax.BooleanOperator = Regular
+      symbolType Language.Python.Syntax.BinaryOperator = Regular
+      symbolType Language.Python.Syntax.UnaryOperator = Regular
+      symbolType Language.Python.Syntax.ComparisonOperator = Regular
+      symbolType Language.Python.Syntax.Lambda = Regular
+      symbolType Language.Python.Syntax.Assignment = Regular
+      symbolType Language.Python.Syntax.AugmentedAssignment = Regular
+      symbolType Language.Python.Syntax.HiddenRightHandSide = Regular
+      symbolType Language.Python.Syntax.Yield = Regular
+      symbolType Language.Python.Syntax.Attribute = Regular
+      symbolType Language.Python.Syntax.Subscript = Regular
+      symbolType Language.Python.Syntax.Slice = Regular
+      symbolType Language.Python.Syntax.Call = Regular
+      symbolType Language.Python.Syntax.TypedParameter = Regular
+      symbolType Language.Python.Syntax.Type = Regular
+      symbolType Language.Python.Syntax.KeywordArgument = Regular
+      symbolType Language.Python.Syntax.ListSplatArgument = Regular
+      symbolType Language.Python.Syntax.DictionarySplatArgument = Regular
+      symbolType Language.Python.Syntax.List = Regular
+      symbolType Language.Python.Syntax.ListComprehension = Regular
+      symbolType Language.Python.Syntax.HiddenListComprehension = Regular
+      symbolType Language.Python.Syntax.Dictionary = Regular
+      symbolType Language.Python.Syntax.DictionaryComprehension = Regular
+      symbolType Language.Python.Syntax.Pair = Regular
+      symbolType Language.Python.Syntax.HiddenDictionaryComprehension
+        = Regular
+      symbolType Language.Python.Syntax.Set = Regular
+      symbolType Language.Python.Syntax.SetComprehension = Regular
+      symbolType Language.Python.Syntax.HiddenSetComprehension = Regular
+      symbolType Language.Python.Syntax.Tuple = Regular
+      symbolType Language.Python.Syntax.GeneratorExpression = Regular
+      symbolType Language.Python.Syntax.HiddenGeneratorExpression
+        = Regular
+      symbolType Language.Python.Syntax.ConditionalExpression = Regular
+      symbolType Language.Python.Syntax.ConcatenatedString = Regular
+      symbolType Language.Python.Syntax.Await = Regular
+      symbolType Language.Python.Syntax.AuxModuleRepeat1 = Auxiliary
+      symbolType Language.Python.Syntax.AuxHiddenStatementRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxHiddenStatementRepeat2
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxImportFromStatementRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxHiddenImportListRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxPrintStatementRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxIfStatementRepeat1 = Auxiliary
+      symbolType Language.Python.Syntax.AuxTryStatementRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxWithStatementRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxHiddenParametersRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxGlobalStatementRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxArgumentListRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxDecoratedDefinitionRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxVariablesRepeat1 = Auxiliary
+      symbolType Language.Python.Syntax.AuxDottedNameRepeat1 = Auxiliary
+      symbolType Language.Python.Syntax.AuxComparisonOperatorRepeat1
+        = Auxiliary
+      symbolType Language.Python.Syntax.AuxSubscriptRepeat1 = Auxiliary
+      symbolType Language.Python.Syntax.AuxDictionaryRepeat1 = Auxiliary
+      symbolType Language.Python.Syntax.AuxConcatenatedStringRepeat1
+        = Auxiliary

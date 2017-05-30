@@ -30,6 +30,7 @@ import qualified Text.Parser.TreeSitter as TS
 import SourceSpan
 import Info
 
+
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
 treeSitterParser :: Language -> Ptr TS.Language -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
 treeSitterParser language grammar source = bracket ts_document_new ts_document_free $ \ document -> do
@@ -39,7 +40,6 @@ treeSitterParser language grammar source = bracket ts_document_new ts_document_f
     ts_document_parse_halt_on_error document
     term <- documentToTerm language document source
     pure term
-
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (A.AST grammar)

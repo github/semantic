@@ -50,3 +50,11 @@ data Bitwise a
 
 instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
+
+-- | Member Access
+data MemberAccess a
+  = MemberAccess a a
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 MemberAccess where liftEq = genericLiftEq
+instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
