@@ -143,7 +143,7 @@ data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob]
 fetchDiffsOutput :: (Object -> Text) -> FilePath -> String -> String -> [(FilePath, Maybe Language)] -> IO Summaries
 fetchDiffsOutput f gitDir sha1 sha2 filePaths = do
   blobPairs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
-  runTask $ distributeFoldMap (Semantic.parseDiffAndRenderBlobPair Renderer.ToCDiffRenderer) blobPairs
+  fromMaybe mempty <$> runTask (distributeFoldMap (Semantic.parseDiffAndRenderBlobPair Renderer.ToCDiffRenderer) blobPairs)
 
 -- Diff Summaries payloads look like this:
 -- {
