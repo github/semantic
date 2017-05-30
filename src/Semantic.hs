@@ -37,7 +37,6 @@ parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
   SExpressionTermRenderer -> case blobLanguage of
     Just Language.Python -> parse pythonParser source >>= render renderSExpressionTerm . fmap (Info.Other "Term" :.)
     language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm
-  SourceTermRenderer -> pure source
 
 
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.

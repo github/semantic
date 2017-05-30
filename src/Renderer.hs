@@ -21,7 +21,6 @@ import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.TOC as R
-import Source (Source)
 import Syntax as S
 
 data DiffRenderer output where
@@ -36,7 +35,6 @@ deriving instance Show (DiffRenderer output)
 data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   SExpressionTermRenderer :: TermRenderer ByteString
-  SourceTermRenderer :: TermRenderer Source
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
