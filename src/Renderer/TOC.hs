@@ -36,7 +36,7 @@ import Syntax as S
 import Term
 
 data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
-  deriving Show
+  deriving (Eq, Show)
 
 instance Monoid Summaries where
   mempty = Summaries mempty mempty
