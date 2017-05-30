@@ -4,7 +4,7 @@ import Command
 import Data.Aeson
 import Data.Aeson.Types hiding (parse)
 import Data.Functor.Both as Both
-import Data.Map
+import Data.Map as Map
 import Data.Maybe
 import Data.Record
 import Data.String
@@ -110,12 +110,12 @@ spec = parallel $ do
     it "generates toc summaries for two shas" $ do
       Summaries summaries errors <- fetchDiffsOutput "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)]
       errors `shouldBe` fromList []
-      summaries `shouldBe` fromList [("methods.rb", ["foo"])]
+      summaries `shouldBe` fromList [("methods.rb", [methodsObject])]
 
     it "generates toc summaries for two shas inferring paths" $ do
       Summaries summaries errors <- fetchDiffsOutput "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" []
       errors `shouldBe` fromList []
-      summaries `shouldBe` fromList [("methods.rb", ["foo"])]
+      summaries `shouldBe` fromList [("methods.rb", [methodsObject])]
 
     it "errors with bad shas" $
       fetchDiffsOutput "test/fixtures/git/examples/all-languages.git" "dead" "beef" [("methods.rb", Just Ruby)]
@@ -130,6 +130,7 @@ spec = parallel $ do
           (both "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe")
           [ both (emptySourceBlob "methods.rb") methodsBlob ]
         methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)
+        methodsObject = object [ "span" .= object [ "start" .= [ 1, 1 :: Int ], "end" .= [ 2, 4 :: Int ] ], "category" .= ("Method" :: Text), "term" .= ("foo" :: Text), "changeType" .= ("added" :: Text) ]
         blobsFromFilePath path = do
           h <- openFile path ReadMode
           blobs <- runCommand (readBlobPairsFromHandle h)
