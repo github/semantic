@@ -7,13 +7,13 @@
   (Function
     (Identifier)
     (Args
-    {+(ParameterDecl
-        (Identifier)
-        (Identifier))+}
       (ParameterDecl
-        (Identifier)
+      { (Identifier)
+      ->(Identifier) }
       { (Identifier)
       ->(Identifier) })
-    {-(ParameterDecl
-        (Identifier)
-        (Identifier))-})))
+      (ParameterDecl
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))))
