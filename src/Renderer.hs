@@ -5,7 +5,8 @@ module Renderer
 , renderPatch
 , renderSExpressionDiff
 , renderSExpressionTerm
-, renderJSON
+, renderJSONDiff
+, renderJSONTerm
 , renderToC
 , declarationAlgebra
 , identifierAlgebra
@@ -14,6 +15,7 @@ module Renderer
 ) where
 
 import Data.Aeson (Value, (.=))
+import qualified Data.Map as Map
 import Data.Syntax.Algebra (RAlgebra)
 import Diff (SyntaxDiff)
 import Info (DefaultFields)
@@ -28,7 +30,7 @@ import Term (SyntaxTerm)
 data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
   ToCDiffRenderer :: DiffRenderer Summaries
-  JSONDiffRenderer :: DiffRenderer [Value]
+  JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   SExpressionDiffRenderer :: DiffRenderer ByteString
   IdentityDiffRenderer :: DiffRenderer (SyntaxDiff Text (Maybe Declaration ': DefaultFields))
 

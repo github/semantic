@@ -32,8 +32,8 @@ import Term
 parseAndRenderBlob :: TermRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
   JSONTermRenderer -> case blobLanguage of
-    Just Language.Python -> parse pythonParser source >>= render (renderJSON (Identity blob))
-    language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSON (Identity blob))
+    Just Language.Python -> parse pythonParser source >>= render (renderJSONTerm blob)
+    language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   SExpressionTermRenderer -> case blobLanguage of
     Just Language.Python -> parse pythonParser source >>= render renderSExpressionTerm . fmap (Info.Other "Term" :.)
     language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm
@@ -52,7 +52,7 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
     diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderToC) terms
   JSONDiffRenderer -> do
     terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
-    diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderJSON) terms
+    diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderJSONDiff) terms
   PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderPatch)
   SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . Prologue.snd)
   IdentityDiffRenderer -> do

@@ -1,14 +1,17 @@
 {-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
-( renderJSON
+( renderJSONDiff
+, renderJSONTerm
 , ToJSONFields(..)
 ) where
 
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
+import Data.Functor.Both (Both)
 import Data.Functor.Union
+import qualified Data.Map as Map
 import Data.Record
 import Info
 import Patch
@@ -21,12 +24,15 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-renderJSON :: (ToJSON a, Foldable t) => t SourceBlob -> a -> [Value]
-renderJSON blobs root = pure $ object
-  [ "root" .= toJSON root
-  , "oids" .= toJSON (decodeUtf8 . oid <$> toList blobs)
-  , "paths" .= toJSON (path <$> toList blobs)
+renderJSONDiff :: ToJSON a => Both SourceBlob -> a -> Map.Map Text Value
+renderJSONDiff blobs diff = Map.fromList
+  [ ("diff", toJSON diff)
+  , ("oids", toJSON (decodeUtf8 . oid <$> toList blobs))
+  , ("paths", toJSON (path <$> toList blobs))
   ]
+
+instance StringConv (Map Text Value) ByteString where
+  strConv _ = toS . (<> "\n") . encode
 
 instance ToJSON a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
@@ -103,5 +109,14 @@ instance (Foldable f, ToJSON a, ToJSONFields (Union fs a)) => ToJSONFields (Unio
 instance ToJSONFields (Union '[] a) where
   toJSONFields _ = []
 
+data File a = File { filePath :: FilePath, fileContent :: a }
+  deriving (Generic, Show)
+
+instance ToJSON a => ToJSON (File a) where
+  toJSON File{..} = object [ "filePath" .= filePath, "programNode" .= fileContent ]
+
 instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
+
+renderJSONTerm :: ToJSON a => SourceBlob -> a -> [Value]
+renderJSONTerm SourceBlob{..} = pure . toJSON . File path
