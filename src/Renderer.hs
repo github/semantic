@@ -23,6 +23,7 @@ import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.TOC as R
 import Syntax as S
+import Term (SyntaxTerm)
 
 data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
@@ -37,6 +38,7 @@ deriving instance Show (DiffRenderer output)
 data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   SExpressionTermRenderer :: TermRenderer ByteString
+  IdentityTermRenderer :: TermRenderer (Maybe (SyntaxTerm Text DefaultFields))
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
