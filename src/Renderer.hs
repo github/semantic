@@ -29,10 +29,15 @@ import Term (SyntaxTerm)
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
+  -- | Render to git-diff-compatible textual output.
   PatchDiffRenderer :: DiffRenderer File
+  -- | Compute a table of contents for the diff & encode it as JSON.
   ToCDiffRenderer :: DiffRenderer Summaries
+  -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
+  -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
+  -- | “Render” by returning the computed 'SyntaxDiff'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for the ToC spec.
   IdentityDiffRenderer :: DiffRenderer (SyntaxDiff Text (Maybe Declaration ': DefaultFields))
 
 deriving instance Eq (DiffRenderer output)
