@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Arguments where
 
@@ -7,7 +7,6 @@ import Data.String
 import Language
 import Prologue
 import Renderer
-import Text.Show
 
 data DiffMode = DiffStdin | DiffCommits String String [(FilePath, Maybe Language)] | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
   deriving Show
@@ -20,13 +19,7 @@ data DiffArguments where
     , alternateObjectDirs :: [FilePath]
     } -> DiffArguments
 
-instance Show DiffArguments where
-  showsPrec d DiffArguments{..} = showParen (d > 10) $ showString "DiffArguments { " . foldr (.) identity (intersperse (showString ", ") fields) . showString " }"
-    where fields = [ showString "diffRenderer " . shows diffRenderer
-                   , showString "termDecorator _"
-                   , showString "diffMode " . shows diffMode
-                   , showString "gitDir " . shows gitDir
-                   , showString "alternateObjectDirs " . shows alternateObjectDirs ]
+deriving instance Show DiffArguments
 
 type DiffArguments' = DiffMode -> FilePath -> [FilePath] -> DiffArguments
 
@@ -54,13 +47,7 @@ data ParseArguments where
     , alternateObjectDirs :: [FilePath]
     } -> ParseArguments
 
-instance Show ParseArguments where
-  showsPrec d ParseArguments{..} = showParen (d > 10) $ showString "ParseArguments { " . foldr (.) identity (intersperse (showString ", ") fields) . showString " }"
-    where fields = [ showString "parseTreeRenderer " . shows parseTreeRenderer
-                   , showString "termDecorator _"
-                   , showString "parseMode " . shows parseMode
-                   , showString "gitDir " . shows gitDir
-                   , showString "alternateObjectDirs " . shows alternateObjectDirs ]
+deriving instance Show ParseArguments
 
 type ParseArguments' = ParseMode -> FilePath -> [FilePath] -> ParseArguments
 
