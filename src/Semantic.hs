@@ -28,6 +28,7 @@ import Term
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
+-- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
 parseAndRenderBlob :: TermRenderer output -> SourceBlob -> Task output
 parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
   JSONTermRenderer -> case blobLanguage of
@@ -39,6 +40,7 @@ parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
   SourceTermRenderer -> pure source
 
 
+-- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
 parseDiffAndRenderBlobPair :: Monoid output => DiffRenderer output -> Both SourceBlob -> Task output
 parseDiffAndRenderBlobPair renderer blobs = case renderer of
   ToCDiffRenderer -> do
@@ -54,6 +56,7 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
   where languages = blobLanguage <$> blobs
         parseSource = parse (if runBothWith (==) languages then parserForLanguage (Both.fst languages) else LineByLineParser) . source
 
+-- | A task to diff a pair of 'Term's and render the 'Diff', producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
 diffAndRenderTermPair :: (Monoid output, Functor f) => Both SourceBlob -> Differ f a -> ((Both SourceBlob, Diff f a) -> output) -> Both (Term f a) -> Task output
 diffAndRenderTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
   (True, True) -> pure mempty
