@@ -197,9 +197,9 @@ returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> 
 
 
 ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> condition <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
   where elseClause = symbol ElseClause *> children statement
-        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> condition <*> statement)
+        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
         condition = boolean
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
