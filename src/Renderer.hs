@@ -14,7 +14,6 @@ module Renderer
 ) where
 
 import Data.Aeson (Value, (.=))
-import Text.Show
 import Data.Syntax.Algebra (RAlgebra)
 import Prologue
 import Renderer.JSON as R
@@ -22,6 +21,7 @@ import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.TOC as R
 import Syntax as S
+import Text.Show
 
 data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
