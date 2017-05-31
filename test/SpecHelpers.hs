@@ -27,13 +27,13 @@ import Term
 diffFilePaths :: Both FilePath -> IO ByteString
 diffFilePaths paths = do
   blobs <- traverse readFile paths
-  fromMaybe mempty <$> runTask (parseDiffAndRenderBlobPair SExpressionDiffRenderer blobs)
+  fromMaybe mempty <$> runTask (diffBlobPair SExpressionDiffRenderer blobs)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
 parseFilePath path = do
   blob <- readFile path
-  runTask (parseAndRenderBlob SExpressionTermRenderer blob)
+  runTask (parseBlob SExpressionTermRenderer blob)
 
 -- | Read a file to a SourceBlob.
 --

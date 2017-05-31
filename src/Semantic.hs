@@ -1,7 +1,9 @@
 {-# LANGUAGE GADTs #-}
 module Semantic
-( parseAndRenderBlob
-, parseDiffAndRenderBlobPair
+( parseBlobs
+, parseBlob
+, diffBlobPairs
+, diffBlobPair
 , diffAndRenderTermPair
 ) where
 
@@ -28,9 +30,12 @@ import Term
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
+parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [SourceBlob] -> Task ByteString
+parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter (not . nonExistentBlob)
+
 -- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
-parseAndRenderBlob :: TermRenderer output -> SourceBlob -> Task output
-parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
+parseBlob :: TermRenderer output -> SourceBlob -> Task output
+parseBlob renderer blob@SourceBlob{..} = case renderer of
   JSONTermRenderer -> case blobLanguage of
     Just Language.Python -> parse pythonParser source >>= render (renderJSONTerm blob)
     language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
@@ -42,9 +47,12 @@ parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
     language -> Just <$> parse (parserForLanguage language) source
 
 
+diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both SourceBlob] -> Task ByteString
+diffBlobPairs renderer = fmap toS . distributeFoldMap (fmap (fromMaybe mempty) . diffBlobPair renderer)
+
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
-parseDiffAndRenderBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
-parseDiffAndRenderBlobPair renderer blobs = case renderer of
+diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
+diffBlobPair renderer blobs = case renderer of
   ToCDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
