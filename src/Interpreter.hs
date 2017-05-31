@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Interpreter
 ( diffTerms
+, decoratingWith
 , diffTermsWith
 , runAlgorithm
 , runAlgorithmSteps
