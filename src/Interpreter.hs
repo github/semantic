@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
 module Interpreter
 ( diffTerms
+, diffTermsWith
 , runAlgorithm
 , runAlgorithmSteps
 ) where
