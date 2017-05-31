@@ -4,7 +4,7 @@ module Semantic
 , parseBlob
 , diffBlobPairs
 , diffBlobPair
-, diffAndRenderTermPair
+, diffTermPair
 ) where
 
 import Data.Functor.Both as Both
@@ -57,25 +57,25 @@ diffBlobPair renderer blobs = case renderer of
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
-    diffAndRenderTermPair blobs (runBothWith diffTerms) (renderToC blobs) terms
+    diffTermPair blobs (runBothWith diffTerms) (renderToC blobs) terms
   JSONDiffRenderer -> do
     terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
-    diffAndRenderTermPair blobs (runBothWith diffTerms) (renderJSONDiff blobs) terms
-  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderPatch blobs)
+    diffTermPair blobs (runBothWith diffTerms) (renderJSONDiff blobs) terms
+  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) (renderPatch blobs)
   SExpressionDiffRenderer -> case effectiveLanguage of
-    Just Language.Python -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith replacing) renderSExpressionDiff
-    _ -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) renderSExpressionDiff
+    Just Language.Python -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith replacing) renderSExpressionDiff
+    _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) renderSExpressionDiff
   IdentityDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
-    diffAndRenderTermPair blobs (runBothWith diffTerms) identity terms
+    diffTermPair blobs (runBothWith diffTerms) identity terms
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         parseSource = parse (parserForLanguage effectiveLanguage) . source
 
 -- | A task to diff a pair of 'Term's and render the 'Diff', producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
-diffAndRenderTermPair :: Functor f => Both SourceBlob -> Differ f a -> (Diff f a -> output) -> Both (Term f a) -> Task (Maybe output)
-diffAndRenderTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
+diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> (Diff f a -> output) -> Both (Term f a) -> Task (Maybe output)
+diffTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
   (True, True) -> pure Nothing
   (_, True) -> Just <$> render renderer (deleting (Both.fst terms))
   (True, _) -> Just <$> render renderer (inserting (Both.snd terms))

@@ -27,9 +27,9 @@ spec = parallel $ do
       output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
       output `shouldBe` "(Program\n  (Method\n    (Identifier)))\n"
 
-  describe "diffAndRenderTermPair" $ do
+  describe "diffTermPair" $ do
     it "produces Nothing when both blobs are missing" $ do
-      result <- runTask (diffAndRenderTermPair (pure (emptySourceBlob "/foo")) (runBothWith replacing) (const ("non-empty" :: ByteString)) (pure (cofree (() :< []))))
+      result <- runTask (diffTermPair (pure (emptySourceBlob "/foo")) (runBothWith replacing) (const ("non-empty" :: ByteString)) (pure (cofree (() :< []))))
       result `shouldBe` Nothing
 
   where
