@@ -128,7 +128,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
     annotate = wrap . (both (extract t1) (extract t2) :<)
 
 
--- | Test whether two terms are comparable.
+-- | Test whether two terms are comparable by their Category.
 comparableByCategory :: (Functor f, HasField fields Category) => ComparabilityRelation f fields
 comparableByCategory a b = category (headF a) == category (headF b)
 
