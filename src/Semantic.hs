@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Semantic
 ( parseBlob
-, parseDiffAndRenderBlobPair
+, diffBlobPair
 , diffAndRenderTermPair
 ) where
 
@@ -43,8 +43,8 @@ parseBlob renderer blob@SourceBlob{..} = case renderer of
 
 
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
-parseDiffAndRenderBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
-parseDiffAndRenderBlobPair renderer blobs = case renderer of
+diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
+diffBlobPair renderer blobs = case renderer of
   ToCDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
