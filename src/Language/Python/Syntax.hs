@@ -79,6 +79,9 @@ statement = expressionStatement
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
 
+expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+expressionStatement = symbol ExpressionStatement *> children expression
+
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expression = statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> memberAccess
 
@@ -163,8 +166,6 @@ integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expressionStatement = symbol ExpressionStatement *> children (statement <|> literal <|> expression <|> memberAccess)
 
 
 -- TODO Possibly match against children for dotted name and identifiers
