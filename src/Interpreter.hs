@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Interpreter
 ( diffTerms
 , diffTermsWith
@@ -26,7 +26,13 @@ diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms a b = stripDiff ((diffTermsWith algorithmWithTerms `on` defaultFeatureVectorDecorator getLabel) a b)
+diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms)
+
+decoratingWith :: (Hashable label, Traversable f)
+               => (forall a. TermF f (Record fields) a -> label)
+               -> (Term f (Record (Maybe FeatureVector ': fields)) -> Term f (Record (Maybe FeatureVector ': fields)) -> Diff f (Record (Maybe FeatureVector ': fields)))
+               -> Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
+decoratingWith getLabel differ = (stripDiff .) . (differ `on` defaultFeatureVectorDecorator getLabel)
 
 diffTermsWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector), HasField fields Category)
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
