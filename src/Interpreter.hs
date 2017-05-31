@@ -1,5 +1,9 @@
 {-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
-module Interpreter (diffTerms, runAlgorithm, runAlgorithmSteps) where
+module Interpreter
+( diffTerms
+, runAlgorithm
+, runAlgorithmSteps
+) where
 
 import Algorithm
 import Control.Monad.Free.Freer
