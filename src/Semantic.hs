@@ -21,6 +21,7 @@ import Renderer
 import Semantic.Task as Task
 import Source
 import Term
+import Text.Show
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -41,7 +42,7 @@ parseBlob renderer blob@SourceBlob{..} = case renderer of
     Just Language.Python -> parse pythonParser source >>= render (renderJSONTerm blob)
     language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   SExpressionTermRenderer -> case blobLanguage of
-    Just Language.Python -> parse pythonParser source >>= decorate constructorLabel >>= render renderSExpressionTerm
+    Just Language.Python -> parse pythonParser source >>= decorate (Literally . constructorLabel) >>= render renderSExpressionTerm . fmap ((:. Nil) . rhead)
     language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm . fmap ((:. Nil) . category)
   IdentityTermRenderer -> case blobLanguage of
     Just Language.Python -> pure Nothing
@@ -81,3 +82,8 @@ diffTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blo
   (_, True) -> Just <$> render renderer (deleting (Both.fst terms))
   (True, _) -> Just <$> render renderer (inserting (Both.snd terms))
   _ -> diff differ terms >>= fmap Just . render renderer
+
+newtype Literally = Literally ByteString
+
+instance Show Literally where
+  showsPrec _ (Literally s) = showString (toS s)
