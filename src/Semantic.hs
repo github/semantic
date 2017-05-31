@@ -2,6 +2,7 @@
 module Semantic
 ( parseBlobs
 , parseBlob
+, diffBlobPairs
 , diffBlobPair
 , diffAndRenderTermPair
 ) where
@@ -45,6 +46,9 @@ parseBlob renderer blob@SourceBlob{..} = case renderer of
     Just Language.Python -> pure Nothing
     language -> Just <$> parse (parserForLanguage language) source
 
+
+diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both SourceBlob] -> Task ByteString
+diffBlobPairs renderer = fmap toS . distributeFoldMap (fmap (fromMaybe mempty) . diffBlobPair renderer)
 
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
