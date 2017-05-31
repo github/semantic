@@ -87,6 +87,7 @@ expression = statement
           <|> literal
           <|> memberAccess
           <|> subscript
+          <|> call
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
@@ -217,6 +218,9 @@ memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAcce
 
 subscript :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> expression <*> many expression)
+
+call :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <* symbol ArgumentList <*> children (many expression))
 
 boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
