@@ -61,10 +61,8 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
-
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 declaration = comment <|> literal <|> statement <|> import' <|> importFrom
-
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statement = expressionStatement
@@ -77,14 +75,21 @@ statement = expressionStatement
           <|> assertStatement
           <|> globalStatement
 
-tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
-
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children expression
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> memberAccess <|> subscript
+expression = statement
+          <|> unaryOperator
+          <|> binaryOperator
+          <|> booleanOperator
+          <|> tuple
+          <|> literal
+          <|> memberAccess
+          <|> subscript
+
+tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
 
 -- TODO: Consider flattening single element lists
 expressionList :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
