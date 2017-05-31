@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
 module RWS (
     rws
+  , ComparabilityRelation
   , FeatureVector
   , stripDiff
   , defaultFeatureVectorDecorator
@@ -36,6 +37,8 @@ import Diff (mapAnnotations)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 
+type ComparabilityRelation f fields = forall a b. TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
+
 type FeatureVector = Array Int Double
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
@@ -50,7 +53,7 @@ data TermOrIndexOrNone term = Term term | Index Int | None
 
 rws :: (HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f)
     => (Diff f fields -> Int)
-    -> (Term f (Record fields) -> Term f (Record fields) -> Bool)
+    -> ComparabilityRelation f fields
     -> t (Term f (Record fields))
     -> t (Term f (Record fields))
     -> RWSEditScript f fields
@@ -93,7 +96,7 @@ type RWSEditScript f fields = [Diff f fields]
 
 run :: (Eq1 f, Functor f, HasField fields Category, HasField fields (Maybe FeatureVector), Foldable t)
     => (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-    -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
+    -> ComparabilityRelation f fields -- ^ A relation determining whether two terms can be compared.
     -> t (Term f (Record fields))
     -> t (Term f (Record fields))
     -> Eff (RWS f fields ': e) (RWSEditScript f fields)
@@ -146,7 +149,7 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
       These _ _ -> (before, after)
 
 findNearestNeighboursToDiff :: (These (Term f (Record fields)) (Term f (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-                           -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
+                           -> ComparabilityRelation f fields -- ^ A relation determining whether two terms can be compared.
                            -> [TermOrIndexOrNone (UnmappedTerm f fields)]
                            -> [UnmappedTerm f fields]
                            -> [UnmappedTerm f fields]
@@ -159,7 +162,7 @@ findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
       (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
 findNearestNeighbourToDiff' :: (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-                           -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
+                           -> ComparabilityRelation f fields -- ^ A relation determining whether two terms can be compared.
                            -> Both.Both (KdTree Double (UnmappedTerm f fields))
                            -> TermOrIndexOrNone (UnmappedTerm f fields)
                            -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
@@ -174,7 +177,7 @@ findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case ter
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-                       -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
+                       -> ComparabilityRelation f fields -- ^ A relation determining whether two terms can be compared.
                        -> Both.Both (KdTree Double (UnmappedTerm f fields))
                        -> UnmappedTerm f fields
                        -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
@@ -188,7 +191,7 @@ findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b)
     UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare (termsWithinMoveBoundsFrom (pred j) unmappedB) (Both.snd kdTrees) foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
-    guard (canCompare a b)
+    guard (canCompareTerms canCompare a b)
     pure $! do
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These i j, These a b)
@@ -204,15 +207,15 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 -- cf §4.2 of RWS-Diff
 nearestUnmapped
   :: (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-  -> (Term f (Record fields) -> Term f (Record fields) -> Bool) -- ^ A relation determining whether two terms can be compared.
+  -> ComparabilityRelation f fields -- ^ A relation determining whether two terms can be compared.
   -> UnmappedTerms f fields -- ^ A set of terms eligible for matching against.
   -> KdTree Double (UnmappedTerm f fields) -- ^ The k-d tree to look up nearest neighbours within.
   -> UnmappedTerm f fields -- ^ The term to find the nearest neighbour to.
   -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
 nearestUnmapped editDistance canCompare unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable editDistance canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
 
-editDistanceIfComparable :: Bounded t => (These a b -> t) -> (a -> b -> Bool) -> a -> b -> t
-editDistanceIfComparable editDistance canCompare a b = if canCompare a b
+editDistanceIfComparable :: Bounded t => (These (Term f (Record fields)) (Term f (Record fields)) -> t) -> ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> t
+editDistanceIfComparable editDistance canCompare a b = if canCompareTerms canCompare a b
   then editDistance (These a b)
   else maxBound
 
@@ -366,6 +369,9 @@ unitVector d hash = fmap (* invMagnitude) uniform
     uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
     invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) uniform))
     components = sequenceA (replicate d (liftRand randomDouble))
+
+canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
+canCompareTerms canCompare = canCompare `on` runCofree
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
