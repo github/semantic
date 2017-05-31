@@ -221,8 +221,6 @@ integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-
-
 -- TODO Possibly match against children for dotted name and identifiers
 import' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
