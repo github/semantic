@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Semantic
-( parseBlob
+( parseBlobs
+, parseBlob
 , diffBlobPair
 , diffAndRenderTermPair
 ) where
@@ -27,6 +28,9 @@ import Term
 --   - No knowledge of the filesystem or Git.
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
+
+parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [SourceBlob] -> Task ByteString
+parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter (not . nonExistentBlob)
 
 -- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> SourceBlob -> Task output
