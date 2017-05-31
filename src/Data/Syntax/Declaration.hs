@@ -56,7 +56,7 @@ instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = generic
 
 
 -- | Import declarations.
-data Import a = Import { importContent :: ByteString }
+data Import a = Import { importContent :: ![a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
