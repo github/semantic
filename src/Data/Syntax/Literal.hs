@@ -4,7 +4,6 @@ module Data.Syntax.Literal where
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Syntax.Comment
 import Data.Functor.Union
 import GHC.Generics
 import Prologue hiding (Set)
