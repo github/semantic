@@ -45,7 +45,6 @@ instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
 
-
 data Range a = Range { rangeStart :: a, rangeEnd :: a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -124,12 +123,14 @@ data Tuple a = Tuple { tupleContents :: ![a]}
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
--- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
--- TODO: Regexp literals.
 
 data Set a = Set { setElements :: [a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Set where liftEq = genericLiftEq
 instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
+-- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
+-- TODO: Regexp literals.
+
