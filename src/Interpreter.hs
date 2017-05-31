@@ -27,7 +27,7 @@ diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparable)
+diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
 decoratingWith :: (Hashable label, Traversable f)
                => (forall a. TermF f (Record fields) a -> label)
@@ -129,8 +129,8 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 
 -- | Test whether two terms are comparable.
-comparable :: (Functor f, HasField fields Category) => ComparabilityRelation f fields
-comparable a b = category (headF a) == category (headF b)
+comparableByCategory :: (Functor f, HasField fields Category) => ComparabilityRelation f fields
+comparableByCategory a b = category (headF a) == category (headF b)
 
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
