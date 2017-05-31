@@ -7,7 +7,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.Syntax.Comment
 import Data.Functor.Union
 import GHC.Generics
-import Prologue
+import Prologue hiding (Set)
 
 -- Boolean
 
@@ -117,6 +117,7 @@ data KeyValue a = KeyValue { key :: !a, value :: !a }
 instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
+
 data Tuple a = Tuple { tupleContents :: ![a]}
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -126,3 +127,9 @@ instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
 -- TODO: Regexp literals.
+
+data Set a = Set { setElements :: [a] }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Set where liftEq = genericLiftEq
+instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
