@@ -43,7 +43,7 @@ spec = parallel $ do
       let (a, b) = (decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf ("a" :: String)) ])), decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf "b") ]))) in
       fmap (bimap stripTerm stripTerm) (rws editDistance canCompare [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
-  where canCompare = (==) `on` extract
+  where canCompare a b = headF a == headF b
 
         decorate :: SyntaxTerm leaf '[Category] -> SyntaxTerm leaf '[Maybe FeatureVector, Category]
         decorate = defaultFeatureVectorDecorator (category . headF)
