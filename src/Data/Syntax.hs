@@ -50,3 +50,11 @@ data Error error a = Error error
 instance Eq error => GAlign (Error error)
 instance Eq error => Eq1 (Error error) where liftEq = genericLiftEq
 instance Show error => Show1 (Error error) where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | Ellipsis
+data Ellipsis a = Ellipsis ByteString
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Ellipsis where liftEq = genericLiftEq
+instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec

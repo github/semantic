@@ -51,6 +51,7 @@ type Syntax' =
    , Statement.If
    , Statement.Return
    , Statement.Yield
+   , Syntax.Ellipsis
    , Syntax.Empty
    , Syntax.Identifier
    , []
@@ -96,6 +97,10 @@ expression = statement
           <|> call
           <|> keywordIdentifier
           <|> notOperator
+          <|> ellipsis
+
+ellipsis :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+ellipsis = makeTerm <$> symbol Ellipsis <*> (Syntax.Ellipsis <$> source)
 
 comparisonOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comparisonOperator = symbol ComparisonOperator >>= \ location -> children (expression >>= \ lexpression -> makeTerm location <$> makeComparison lexpression)
