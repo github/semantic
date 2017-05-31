@@ -80,7 +80,7 @@ tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal
+expression = statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> memberAccess
 
 -- TODO: Consider flattening single element lists
 expressionList :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
@@ -203,6 +203,10 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> exp
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
+memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> (flip (foldr makeMemberAccess) <$> many nestedAttribute <*> expression) <*> expression)
+  where makeMemberAccess (loc, makeRest) rest = makeTerm loc (makeRest rest)
+        nestedAttribute = (,) <$ symbol Attribute <*> location <*> children (Expression.MemberAccess <$> expression)
 
 boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
@@ -216,6 +220,3 @@ makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
-
-memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-memberAccess = makeTerm <$> symbol Attribute <*> children (expression >>= (\lhs -> (Expression.MemberAccess lhs) <$> identifier))
