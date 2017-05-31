@@ -42,7 +42,7 @@ parseBlob renderer blob@SourceBlob{..} = case renderer of
     language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   SExpressionTermRenderer -> case blobLanguage of
     Just Language.Python -> parse pythonParser source >>= decorate constructorLabel >>= render renderSExpressionTerm
-    language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm . fmap (\ r -> category r :. Nil)
+    language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm . fmap ((:. Nil) . category)
   IdentityTermRenderer -> case blobLanguage of
     Just Language.Python -> pure Nothing
     language -> Just <$> parse (parserForLanguage language) source
