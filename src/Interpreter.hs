@@ -39,7 +39,7 @@ diffTermsWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe Feature
               -> Term f (Record fields)
               -> Term f (Record fields)
               -> Diff f (Record fields)
-diffTermsWith refine a b = runAlgorithm (decomposeWith refine) (diff a b)
+diffTermsWith refine a b = runAlgorithm (decomposeWith refine comparable) (diff a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a -> (Category, Maybe leaf)
@@ -66,11 +66,12 @@ runAlgorithmSteps decompose = go
           step `Then` yield -> algorithm : go (decompose step >>= yield)
 
 -- | Decompose a step of an algorithm into the next steps to perform using a helper function.
-decomposeWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector), HasField fields Category)
+decomposeWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
+              -> ComparabilityRelation f fields
               -> AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result
               -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
-decomposeWith algorithmWithTerms step = case step of
+decomposeWith algorithmWithTerms comparable step = case step of
   Diff t1 t2 -> algorithmWithTerms t1 t2
   Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
     Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
@@ -126,8 +127,8 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 
 -- | Test whether two terms are comparable.
-comparable :: (Functor f, HasField fields Category) => Term f (Record fields) -> Term f (Record fields) -> Bool
-comparable = (==) `on` category . extract
+comparable :: (Functor f, HasField fields Category) => TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
+comparable a b = category (headF a) == category (headF b)
 
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
