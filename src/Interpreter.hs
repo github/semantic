@@ -129,7 +129,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 
 -- | Test whether two terms are comparable.
-comparable :: (Functor f, HasField fields Category) => TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
+comparable :: (Functor f, HasField fields Category) => ComparabilityRelation f fields
 comparable a b = category (headF a) == category (headF b)
 
 
