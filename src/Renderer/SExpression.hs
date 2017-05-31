@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables, OverloadedStrings #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Renderer.SExpression
 ( renderSExpressionDiff
 , renderSExpressionTerm
