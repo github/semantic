@@ -97,7 +97,7 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 -- Collections
 
-newtype Array a = Array { arrayElements :: [Union '[Identity, Comment] a] }
+newtype Array a = Array { arrayElements :: [a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Array where liftEq = genericLiftEq

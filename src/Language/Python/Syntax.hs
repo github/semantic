@@ -34,6 +34,7 @@ type Syntax' =
    , Expression.Call
    , Expression.MemberAccess
    , Expression.Subscript
+   , Literal.Array
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
@@ -155,7 +156,10 @@ identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString
+literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString <|> list'
+
+list' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
 
 -- TODO: Wrap `Literal.TextElement` with a `Literal.String`
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
