@@ -129,7 +129,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 
 -- | Test whether two terms are comparable by their Category.
-comparableByCategory :: (Functor f, HasField fields Category) => ComparabilityRelation f fields
+comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
 comparableByCategory a b = category (headF a) == category (headF b)
 
 
