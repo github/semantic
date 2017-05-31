@@ -37,7 +37,9 @@ type Syntax' =
    , Literal.Array
    , Literal.Boolean
    , Literal.Float
+   , Literal.Hash
    , Literal.Integer
+   , Literal.KeyValue
    , Literal.Null
    , Literal.String
    , Literal.TextElement
@@ -156,7 +158,11 @@ identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString <|> list'
+literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString <|> list' <|> dictionary
+
+dictionary :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many pairs)
+  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
 
 list' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)

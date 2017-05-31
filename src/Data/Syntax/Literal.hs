@@ -104,7 +104,7 @@ instance Eq1 Array where liftEq = genericLiftEq
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 
-newtype Hash a = Hash { hashElements :: [Union '[KeyValue, Comment] a] }
+newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Hash where liftEq = genericLiftEq
