@@ -54,7 +54,9 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
     terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
     diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderJSONDiff) terms
   PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderPatch)
-  SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . Prologue.snd)
+  SExpressionDiffRenderer -> case effectiveLanguage of
+    Just Language.Python -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith replacing) (renderSExpressionDiff . Prologue.snd)
+    _ -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . Prologue.snd)
   IdentityDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
