@@ -373,6 +373,11 @@ unitVector d hash = fmap (* invMagnitude) uniform
 canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
 canCompareTerms canCompare = canCompare `on` runCofree
 
+equalTerms :: Eq1 f => ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
+equalTerms canCompare = go
+  where go a b = canCompareTerms canCompare a b && liftEq go (tailF (runCofree a)) (tailF (runCofree b))
+
+
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
 stripTerm = fmap rtail
