@@ -49,26 +49,26 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
-    diffAndRenderTermPair blobs (runBothWith diffTerms) renderToC terms
+    diffAndRenderTermPair blobs (runBothWith diffTerms) (renderToC blobs) terms
   JSONDiffRenderer -> do
     terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
-    diffAndRenderTermPair blobs (runBothWith diffTerms) renderJSONDiff terms
-  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) renderPatch
+    diffAndRenderTermPair blobs (runBothWith diffTerms) (renderJSONDiff blobs) terms
+  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderPatch blobs)
   SExpressionDiffRenderer -> case effectiveLanguage of
-    Just Language.Python -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith replacing) (const renderSExpressionDiff)
-    _ -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (const renderSExpressionDiff)
+    Just Language.Python -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith replacing) renderSExpressionDiff
+    _ -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) renderSExpressionDiff
   IdentityDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
-    diffAndRenderTermPair blobs (runBothWith diffTerms) (const identity) terms
+    diffAndRenderTermPair blobs (runBothWith diffTerms) identity terms
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         parseSource = parse (parserForLanguage effectiveLanguage) . source
 
 -- | A task to diff a pair of 'Term's and render the 'Diff', producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
-diffAndRenderTermPair :: Functor f => Both SourceBlob -> Differ f a -> (Both SourceBlob -> Diff f a -> output) -> Both (Term f a) -> Task (Maybe output)
+diffAndRenderTermPair :: Functor f => Both SourceBlob -> Differ f a -> (Diff f a -> output) -> Both (Term f a) -> Task (Maybe output)
 diffAndRenderTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
   (True, True) -> pure Nothing
-  (_, True) -> Just <$> render (renderer blobs) (deleting (Both.fst terms))
-  (True, _) -> Just <$> render (renderer blobs) (inserting (Both.snd terms))
-  _ -> diff differ terms >>= fmap Just . render (renderer blobs)
+  (_, True) -> Just <$> render renderer (deleting (Both.fst terms))
+  (True, _) -> Just <$> render renderer (inserting (Both.snd terms))
+  _ -> diff differ terms >>= fmap Just . render renderer
