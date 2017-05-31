@@ -58,3 +58,12 @@ data MemberAccess a
 
 instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
+
+-- | Subscript (e.g a[1])
+data Subscript a
+  = Subscript a [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Subscript where liftEq = genericLiftEq
+instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
+

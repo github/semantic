@@ -33,6 +33,7 @@ type Syntax' =
    , Expression.Bitwise
    , Expression.Call
    , Expression.MemberAccess
+   , Expression.Subscript
    , Literal.Boolean
    , Literal.Float
    , Literal.Integer
@@ -83,7 +84,7 @@ expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Lo
 expressionStatement = symbol ExpressionStatement *> children expression
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> memberAccess
+expression = statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal <|> memberAccess <|> subscript
 
 -- TODO: Consider flattening single element lists
 expressionList :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
@@ -208,6 +209,9 @@ memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> (flip (foldr makeMemberAccess) <$> many nestedAttribute <*> expression) <*> expression)
   where makeMemberAccess (loc, makeRest) rest = makeTerm loc (makeRest rest)
         nestedAttribute = (,) <$ symbol Attribute <*> location <*> children (Expression.MemberAccess <$> expression)
+
+subscript :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> expression <*> many expression)
 
 boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
