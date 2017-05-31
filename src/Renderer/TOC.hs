@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes #-}
 module Renderer.TOC
-( toc
+( renderToC
 , diffTOC
 , Summaries(..)
 , JSONSummary(..)
@@ -36,7 +36,7 @@ import Syntax as S
 import Term
 
 data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
-  deriving Show
+  deriving (Eq, Show)
 
 instance Monoid Summaries where
   mempty = Summaries mempty mempty
@@ -148,8 +148,8 @@ entrySummary entry = case entry of
           | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
           | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
-toc :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
-toc blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
+renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = toS $ case runJoin (path <$> blobs) of

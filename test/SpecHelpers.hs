@@ -18,6 +18,7 @@ import Patch
 import Prologue hiding (readFile)
 import Renderer
 import Semantic
+import Semantic.Task
 import Source
 import System.FilePath
 import Term
@@ -25,14 +26,14 @@ import Term
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
 diffFilePaths paths = do
-  blobs <- pure <$> traverse readFile paths
-  diffBlobPairs (const identity) (SExpressionDiffRenderer TreeOnly) blobs
+  blobs <- traverse readFile paths
+  fromMaybe mempty <$> runTask (diffBlobPair SExpressionDiffRenderer blobs)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
 parseFilePath path = do
   blob <- readFile path
-  parseBlobs (SExpressionParseTreeRenderer TreeOnly) [blob]
+  runTask (parseBlob SExpressionTermRenderer blob)
 
 -- | Read a file to a SourceBlob.
 --

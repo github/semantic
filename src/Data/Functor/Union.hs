@@ -1,6 +1,6 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, PolyKinds, TypeFamilies, TypeOperators #-}
 module Data.Functor.Union
-( Union
+( Union(..)
 , wrapU
 , unwrapU
 , InUnion(..)
