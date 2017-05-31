@@ -33,6 +33,7 @@ type Syntax' =
    , Expression.Bitwise
    , Expression.Call
    , Expression.Comparison
+   , Expression.DottedName
    , Expression.MemberAccess
    , Expression.Subscript
    , Literal.Array
@@ -98,6 +99,10 @@ expression = statement
           <|> keywordIdentifier
           <|> notOperator
           <|> ellipsis
+          <|> dottedName
+
+dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+dottedName = makeTerm <$> symbol DottedName <*> children (Expression.DottedName <$> many expression)
 
 ellipsis :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 ellipsis = makeTerm <$> symbol Ellipsis <*> (Syntax.Ellipsis <$> source)
@@ -220,11 +225,11 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 -- TODO Possibly match against children for dotted name and identifiers
 import' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-import' = makeTerm <$> symbol ImportStatement <*> (Declaration.Import <$> source)
+import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
 
 -- TODO Possibly match against children nodes
 importFrom :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-importFrom = makeTerm <$> symbol ImportFromStatement <*> (Declaration.Import <$> source)
+importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
 
 assertStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)

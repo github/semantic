@@ -84,3 +84,11 @@ data Subscript a
 
 instance Eq1 Subscript where liftEq = genericLiftEq
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
+
+-- | Dotted Name (e.g. a.b in Python)
+data DottedName a
+  = DottedName ![a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 DottedName where liftEq = genericLiftEq
+instance Show1 DottedName where liftShowsPrec = genericLiftShowsPrec
