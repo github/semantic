@@ -60,8 +60,8 @@ parseDiffAndRenderBlobPair renderer blobs = case renderer of
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
     diffAndRenderTermPair blobs (runBothWith diffTerms) Prologue.snd terms
-  where languages = blobLanguage <$> blobs
-        parseSource = parse (parserForLanguage (runBothWith (<|>) languages)) . source
+  where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
+        parseSource = parse (parserForLanguage effectiveLanguage) . source
 
 -- | A task to diff a pair of 'Term's and render the 'Diff', producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
 diffAndRenderTermPair :: Functor f => Both SourceBlob -> Differ f a -> ((Both SourceBlob, Diff f a) -> output) -> Both (Term f a) -> Task (Maybe output)
