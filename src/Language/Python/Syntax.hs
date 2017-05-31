@@ -92,6 +92,10 @@ expression = statement
           <|> memberAccess
           <|> subscript
           <|> call
+          <|> keywordIdentifier
+
+keywordIdentifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+keywordIdentifier = makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
