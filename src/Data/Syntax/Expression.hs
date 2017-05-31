@@ -14,6 +14,24 @@ data Call a = Call { callFunction :: a, callParams :: [a] }
 instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
+
+data Comparison a
+  = LessThan a a
+  | LessThanEqual a a
+  | GreaterThan a a
+  | GreaterThanEqual a a
+  | Equal a a
+  | NotEqual a a
+  | In a a
+  | NotIn a a
+  | Is a a
+  | IsNot a a
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Comparison where liftEq = genericLiftEq
+instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
+
+
 -- | Binary arithmetic operators.
 data Arithmetic a
   = Plus a a
@@ -66,4 +84,3 @@ data Subscript a
 
 instance Eq1 Subscript where liftEq = genericLiftEq
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
-

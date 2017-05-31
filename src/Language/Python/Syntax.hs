@@ -32,6 +32,7 @@ type Syntax' =
    , Expression.Boolean
    , Expression.Bitwise
    , Expression.Call
+   , Expression.Comparison
    , Expression.MemberAccess
    , Expression.Subscript
    , Literal.Array
@@ -87,6 +88,7 @@ expression = statement
           <|> unaryOperator
           <|> binaryOperator
           <|> booleanOperator
+          <|> comparisonOperator
           <|> tuple
           <|> literal
           <|> memberAccess
@@ -94,6 +96,20 @@ expression = statement
           <|> call
           <|> keywordIdentifier
           <|> notOperator
+
+comparisonOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+comparisonOperator = symbol ComparisonOperator >>= \ location -> children (expression >>= \ lexpression -> makeTerm location <$> makeComparison lexpression)
+  where
+    makeComparison lexpression = symbol AnonLAngle       *> (Expression.LessThan lexpression <$> expression)
+                              <|> symbol AnonLAngleEqual *> (Expression.LessThanEqual lexpression <$> expression)
+                              <|> symbol AnonRAngle      *> (Expression.GreaterThan lexpression <$> expression)
+                              <|> symbol AnonRAngleEqual *> (Expression.GreaterThanEqual lexpression <$> expression)
+                              <|> symbol AnonEqualEqual  *> (Expression.Equal lexpression <$> expression)
+                              <|> symbol AnonBangEqual   *> (Expression.NotEqual lexpression <$> expression)
+                              <|> symbol AnonIn          *> (Expression.In lexpression <$> expression)
+                              <|> symbol AnonNot         *> (Expression.NotIn lexpression <$> expression)
+                              <|> symbol AnonIs          *> (Expression.Is lexpression <$> expression)
+                              -- TODO Add AnonIsNot and AnonNotIn
 
 notOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
