@@ -21,7 +21,7 @@ import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO.Error (IOError)
 import System.IO (stdin)
 import Text.Regex
-import qualified Semantic (parseAndRenderBlob, parseDiffAndRenderBlobPair)
+import qualified Semantic (parseBlob, parseDiffAndRenderBlobPair)
 
 main :: IO ()
 main = do
@@ -62,7 +62,7 @@ runParse ParseArguments{..} = do
     ParsePaths paths -> traverse (uncurry readFile) paths
     ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
     ParseStdin -> readBlobsFromHandle stdin
-  Task.runTask . fmap toS $ Task.distributeFoldMap (Semantic.parseAndRenderBlob parseTreeRenderer) (filter (not . nonExistentBlob) blobs)
+  Task.runTask . fmap toS $ Task.distributeFoldMap (Semantic.parseBlob parseTreeRenderer) (filter (not . nonExistentBlob) blobs)
 
 -- | A parser for the application's command-line arguments.
 arguments :: FilePath -> [FilePath] -> ParserInfo Arguments

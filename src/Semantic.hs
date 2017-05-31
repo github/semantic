@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs #-}
 module Semantic
-( parseAndRenderBlob
+( parseBlob
 , parseDiffAndRenderBlobPair
 , diffAndRenderTermPair
 ) where
@@ -29,8 +29,8 @@ import Term
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 -- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
-parseAndRenderBlob :: TermRenderer output -> SourceBlob -> Task output
-parseAndRenderBlob renderer blob@SourceBlob{..} = case renderer of
+parseBlob :: TermRenderer output -> SourceBlob -> Task output
+parseBlob renderer blob@SourceBlob{..} = case renderer of
   JSONTermRenderer -> case blobLanguage of
     Just Language.Python -> parse pythonParser source >>= render (renderJSONTerm blob)
     language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)

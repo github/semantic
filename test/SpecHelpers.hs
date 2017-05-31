@@ -33,7 +33,7 @@ diffFilePaths paths = do
 parseFilePath :: FilePath -> IO ByteString
 parseFilePath path = do
   blob <- readFile path
-  runTask (parseAndRenderBlob SExpressionTermRenderer blob)
+  runTask (parseBlob SExpressionTermRenderer blob)
 
 -- | Read a file to a SourceBlob.
 --

@@ -14,17 +14,17 @@ import Test.Hspec.Expectations.Pretty
 
 spec :: Spec
 spec = parallel $ do
-  describe "parseAndRenderBlob" $ do
+  describe "parseBlob" $ do
     it "parses in the specified language" $ do
-      Just term <- runTask $ parseAndRenderBlob IdentityTermRenderer methodsBlob
+      Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob
       void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
 
     it "parses line by line if not given a language" $ do
-      Just term <- runTask $ parseAndRenderBlob IdentityTermRenderer methodsBlob { blobLanguage = Nothing }
+      Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob { blobLanguage = Nothing }
       void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
 
     it "renders with the specified renderer" $ do
-      output <- runTask $ parseAndRenderBlob SExpressionTermRenderer methodsBlob
+      output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
       output `shouldBe` "(Program\n  (Method\n    (Identifier)))\n"
 
   describe "diffAndRenderTermPair" $ do
