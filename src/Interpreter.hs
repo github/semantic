@@ -4,6 +4,7 @@ module Interpreter
 , decoratingWith
 , diffTermsWith
 , comparableByGAlign
+, constructorLabel
 , runAlgorithm
 , runAlgorithmSteps
 ) where
@@ -12,7 +13,7 @@ import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
-import Data.Functor.Classes (Eq1)
+import Data.Functor.Classes (Eq1, Show1 (liftShowsPrec))
 import RWS
 import Data.Record
 import Data.These
@@ -49,6 +50,9 @@ getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a ->
 getLabel (h :< t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
+
+constructorLabel :: Show1 f => TermF f a b -> ByteString
+constructorLabel (_ :< f) = toS (liftShowsPrec (\ _ _ _ -> "") (\ _ _ -> "") 0 f "")
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
 runAlgorithm :: forall f result
