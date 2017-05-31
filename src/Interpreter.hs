@@ -3,6 +3,7 @@ module Interpreter
 ( diffTerms
 , decoratingWith
 , diffTermsWith
+, comparableByGAlign
 , runAlgorithm
 , runAlgorithmSteps
 ) where
@@ -131,6 +132,9 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
 comparableByCategory a b = category (headF a) == category (headF b)
+
+comparableByGAlign :: GAlign f => ComparabilityRelation f fields
+comparableByGAlign (_ :< a) (_ :< b) = isJust (galign a b)
 
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
