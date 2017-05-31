@@ -27,7 +27,7 @@ diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
   => SyntaxTerm leaf fields -- ^ A term representing the old state.
   -> SyntaxTerm leaf fields -- ^ A term representing the new state.
   -> SyntaxDiff leaf fields
-diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms)
+diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparable)
 
 decoratingWith :: (Hashable label, Traversable f)
                => (forall a. TermF f (Record fields) a -> label)
@@ -35,12 +35,13 @@ decoratingWith :: (Hashable label, Traversable f)
                -> Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
 decoratingWith getLabel differ = (stripDiff .) . (differ `on` defaultFeatureVectorDecorator getLabel)
 
-diffTermsWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector), HasField fields Category)
+diffTermsWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
+              -> ComparabilityRelation f fields
               -> Term f (Record fields)
               -> Term f (Record fields)
               -> Diff f (Record fields)
-diffTermsWith refine a b = runAlgorithm (decomposeWith refine comparable) (diff a b)
+diffTermsWith refine comparable a b = runAlgorithm (decomposeWith refine comparable) (diff a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a -> (Category, Maybe leaf)
