@@ -47,6 +47,7 @@ printTerm term level = go term level 0
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString
 showAnnotation Nil = ""
+showAnnotation (only :. Nil) = show only
 showAnnotation (first :. rest) = show first <> " " <> showAnnotation rest
 
 space :: Word8
