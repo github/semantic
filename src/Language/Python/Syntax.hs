@@ -93,6 +93,10 @@ expression = statement
           <|> subscript
           <|> call
           <|> keywordIdentifier
+          <|> notOperator
+
+notOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
 
 keywordIdentifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 keywordIdentifier = makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
