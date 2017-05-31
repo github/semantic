@@ -66,7 +66,7 @@ diffBlobPair renderer blobs = case renderer of
   PatchDiffRenderer -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) (renderPatch blobs)
   SExpressionDiffRenderer -> case effectiveLanguage of
     Just Language.Python -> distributeFor blobs (parse pythonParser . source) >>= diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) renderSExpressionDiff
-    _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) renderSExpressionDiff
+    _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . mapAnnotations ((:. Nil) . category))
   IdentityDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
