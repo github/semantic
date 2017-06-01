@@ -28,21 +28,21 @@ import Term
 diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
   => Both (SyntaxTerm leaf fields) -- ^ A pair of terms representing the old and new state, respectively.
   -> SyntaxDiff leaf fields
-diffTerms = runBothWith (decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory))
+diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
 decoratingWith :: (Hashable label, Traversable f)
                => (forall a. TermF f (Record fields) a -> label)
-               -> (Term f (Record (Maybe FeatureVector ': fields)) -> Term f (Record (Maybe FeatureVector ': fields)) -> Diff f (Record (Maybe FeatureVector ': fields)))
-               -> Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
-decoratingWith getLabel differ = (stripDiff .) . (differ `on` defaultFeatureVectorDecorator getLabel)
+               -> (Both (Term f (Record (Maybe FeatureVector ': fields))) -> Diff f (Record (Maybe FeatureVector ': fields)))
+               -> Both (Term f (Record fields))
+               -> Diff f (Record fields)
+decoratingWith getLabel differ = stripDiff . differ . fmap (defaultFeatureVectorDecorator getLabel)
 
 diffTermsWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
               -> ComparabilityRelation f fields
-              -> Term f (Record fields)
-              -> Term f (Record fields)
+              -> Both (Term f (Record fields))
               -> Diff f (Record fields)
-diffTermsWith refine comparable a b = runAlgorithm (decomposeWith refine comparable) (diff a b)
+diffTermsWith refine comparable (Join (a, b)) = runAlgorithm (decomposeWith refine comparable) (diff a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a -> (Category, Maybe leaf)

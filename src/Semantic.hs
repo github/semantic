@@ -70,7 +70,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run parse diff renderer = distributeFor blobs (parse . source) >>= diffTermPair blobs diff >>= traverse (render renderer)
 
         diffLinearly :: (Eq1 f, GAlign f, Show1 f, Traversable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
-        diffLinearly = runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))
+        diffLinearly = decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's and 'Nothing' if neither blob exists.
 diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> Both (Term f a) -> Task (Maybe (Diff f a))
