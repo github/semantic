@@ -105,6 +105,7 @@ expression = statement
           <|> await
           <|> lambda
           <|> generatorExpression
+          <|> listComprehension
 
 dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
@@ -292,6 +293,11 @@ generatorExpression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Lo
 generatorExpression = makeTerm <$> symbol GeneratorExpression <*> children (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression) <*> (flip (foldr makeGeneratorExpression) <$> many nestedGeneratorExpression <*> expression))
   where makeGeneratorExpression (loc, makeRest) rest = makeTerm loc (makeRest rest)
         nestedGeneratorExpression = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
+
+listComprehension :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+listComprehension = makeTerm <$> symbol ListComprehension <*> children (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression) <*> (flip (foldr makeListComprehension) <$> many nestedListComprehension <*> expression))
+  where makeListComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
+        nestedListComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
