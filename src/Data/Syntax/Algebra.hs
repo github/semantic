@@ -27,6 +27,14 @@ type RAlgebra f t a = f (t, a) -> a
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
 fToR f = f . fmap snd
 
+-- | Lift an algebra into a decorator for terms annotated with records.
+decoratorWithAlgebra :: Functor f
+                     => RAlgebra (Base (Term f (Record fs))) (Term f (Record fs)) a -- ^ An F-algebra on terms.
+                     -> Term f (Record fs) -- ^ A term to decorate with values produced by the F-algebra.
+                     -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the F-algebra.
+decoratorWithAlgebra alg = para $ \ c@(a :< f) -> cofree $ (alg (fmap (second (rhead . extract)) c) :. a) :< fmap snd f
+
+
 newtype Identifier = Identifier ByteString
   deriving (Eq, Show)
 
@@ -55,10 +63,3 @@ cyclomaticComplexityAlg (_ :< union) = case union of
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
-
--- | Lift an algebra into a decorator for terms annotated with records.
-decoratorWithAlgebra :: Functor f
-                     => RAlgebra (Base (Term f (Record fs))) (Term f (Record fs)) a -- ^ An F-algebra on terms.
-                     -> Term f (Record fs) -- ^ A term to decorate with values produced by the F-algebra.
-                     -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the F-algebra.
-decoratorWithAlgebra alg = para $ \ c@(a :< f) -> cofree $ (alg (fmap (second (rhead . extract)) c) :. a) :< fmap snd f
