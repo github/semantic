@@ -266,9 +266,7 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> exp
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> (flip (foldr makeMemberAccess) <$> many nestedAttribute <*> expression) <*> expression)
-  where makeMemberAccess (loc, makeRest) rest = makeTerm loc (makeRest rest)
-        nestedAttribute = (,) <$ symbol Attribute <*> location <*> children (Expression.MemberAccess <$> expression)
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> expression)
 
 subscript :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> expression <*> many expression)
