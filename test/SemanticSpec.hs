@@ -29,7 +29,7 @@ spec = parallel $ do
 
   describe "diffTermPair" $ do
     it "produces Nothing when both blobs are missing" $ do
-      result <- runTask (diffTermPair (pure (emptySourceBlob "/foo")) (runBothWith replacing) (const ("non-empty" :: ByteString)) (pure (cofree (() :< []))))
+      result <- runTask (diffTermPair (pure (emptySourceBlob "/foo")) (runBothWith replacing) (pure (cofree (() :< []))))
       result `shouldBe` Nothing
 
   where

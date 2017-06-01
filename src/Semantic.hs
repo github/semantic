@@ -59,35 +59,39 @@ diffBlobPair renderer blobs = case renderer of
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
-    diffTermPair blobs (runBothWith diffTerms) (renderToC blobs) terms
+    diff <- diffTermPair blobs (runBothWith diffTerms) terms
+    traverse (render (renderToC blobs)) diff
   JSONDiffRenderer -> case effectiveLanguage of
     Just Language.Python -> do
       terms <- distributeFor blobs (parse pythonParser . source)
-      diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) (renderJSONDiff blobs) terms
+      diff <- diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) terms
+      traverse (render (renderJSONDiff blobs)) diff
     _ -> do
       terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
-      diffTermPair blobs (runBothWith diffTerms) (renderJSONDiff blobs) terms
-  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) (renderPatch blobs)
+      diff <- diffTermPair blobs (runBothWith diffTerms) terms
+      traverse (render (renderJSONDiff blobs)) diff
+  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderPatch blobs))
   SExpressionDiffRenderer -> case effectiveLanguage of
     Just Language.Python -> do
       terms <- distributeFor blobs (decorate (Literally . constructorLabel) <=< parse pythonParser . source)
-      diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead)) terms
-    _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . mapAnnotations ((:. Nil) . category))
+      diff <- diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) terms
+      traverse (render (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead))) diff
+    _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderSExpressionDiff . mapAnnotations ((:. Nil) . category)))
   IdentityDiffRenderer -> do
     terms <- distributeFor blobs $ \ blob -> do
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
-    diffTermPair blobs (runBothWith diffTerms) identity terms
+    diffTermPair blobs (runBothWith diffTerms) terms
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         parseSource = parse (parserForLanguage effectiveLanguage) . source
 
--- | A task to diff a pair of 'Term's and render the 'Diff', producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
-diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> (Diff f a -> output) -> Both (Term f a) -> Task (Maybe output)
-diffTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
+-- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's and 'Nothing' if neither blob exists.
+diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> Both (Term f a) -> Task (Maybe (Diff f a))
+diffTermPair blobs differ terms = case runJoin (nonExistentBlob <$> blobs) of
   (True, True) -> pure Nothing
-  (_, True) -> Just <$> render renderer (deleting (Both.fst terms))
-  (True, _) -> Just <$> render renderer (inserting (Both.snd terms))
-  _ -> diff differ terms >>= fmap Just . render renderer
+  (_, True) -> pure (Just (deleting (Both.fst terms)))
+  (True, _) -> pure (Just (inserting (Both.snd terms)))
+  _ -> Just <$> diff differ terms
 
 newtype Literally = Literally ByteString
 
