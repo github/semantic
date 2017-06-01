@@ -50,6 +50,9 @@ getLabel (h :< t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
 
+-- | Compute a 'ByteString' label for a 'Show1'able 'Term'.
+--
+--   This uses 'liftShowsPrec' to produce the 'ByteString', with the effect that constant fields will be included and parametric fields will not be.
 constructorLabel :: Show1 f => TermF f a b -> ByteString
 constructorLabel (_ :< f) = toS (liftShowsPrec (const (const identity)) (const identity) 0 f "")
 
@@ -136,6 +139,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
 comparableByCategory a b = category (headF a) == category (headF b)
 
+-- | Test whether two terms are comparable by their constructor.
 comparableByGAlign :: GAlign f => ComparabilityRelation f fields
 comparableByGAlign (_ :< a) (_ :< b) = isJust (galign a b)
 
