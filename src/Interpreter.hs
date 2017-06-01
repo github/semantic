@@ -37,11 +37,12 @@ decoratingWith :: (Hashable label, Traversable f)
                -> Diff f (Record fields)
 decoratingWith getLabel differ = stripDiff . differ . fmap (defaultFeatureVectorDecorator getLabel)
 
+-- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
-              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
-              -> ComparabilityRelation f fields
-              -> Both (Term f (Record fields))
-              -> Diff f (Record fields)
+              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields))) -- ^ A function producing syntax-directed continuations of the algorithm.
+              -> ComparabilityRelation f fields -- ^ A relation on terms used to determine comparability and equality.
+              -> Both (Term f (Record fields)) -- ^ A pair of terms.
+              -> Diff f (Record fields) -- ^ The resulting diff.
 diffTermsWith refine comparable (Join (a, b)) = runAlgorithm (decomposeWith refine comparable) (diff a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
