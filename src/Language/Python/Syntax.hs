@@ -33,7 +33,7 @@ type Syntax' =
    , Expression.Bitwise
    , Expression.Call
    , Expression.Comparison
-   , Expression.DottedName
+   , Expression.ScopeResolution
    , Expression.MemberAccess
    , Expression.Subscript
    , Literal.Array
@@ -103,7 +103,7 @@ expression = statement
           <|> await
 
 dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-dottedName = makeTerm <$> symbol DottedName <*> children (Expression.DottedName <$> many expression)
+dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
 ellipsis :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 ellipsis = makeTerm <$> symbol Ellipsis <*> (Syntax.Ellipsis <$> source)
