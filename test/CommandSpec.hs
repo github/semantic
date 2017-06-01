@@ -87,7 +87,7 @@ spec = parallel $ do
 
     it "returns emptySourceBlob if path doesn't exist at sha" $ do
       blobs <- runCommand (readFilesAtSHA repoPath [] [("methods.rb", Just Ruby)] (Both.fst (shas methodsFixture)))
-      nonExistentBlob <$> blobs `shouldBe` [True]
+      blobExists <$> blobs `shouldBe` [False]
 
   describe "readFilesAtSHAs" $ do
     it "returns blobs for the specified paths" $ do
