@@ -3,7 +3,7 @@ module Interpreter
 ( diffTerms
 , decoratingWith
 , diffTermsWith
-, comparableByGAlign
+, comparableByConstructor
 , constructorLabel
 , runAlgorithm
 , runAlgorithmSteps
@@ -140,8 +140,8 @@ comparableByCategory :: HasField fields Category => ComparabilityRelation f fiel
 comparableByCategory a b = category (headF a) == category (headF b)
 
 -- | Test whether two terms are comparable by their constructor.
-comparableByGAlign :: GAlign f => ComparabilityRelation f fields
-comparableByGAlign (_ :< a) (_ :< b) = isJust (galign a b)
+comparableByConstructor :: GAlign f => ComparabilityRelation f fields
+comparableByConstructor (_ :< a) (_ :< b) = isJust (galign a b)
 
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
