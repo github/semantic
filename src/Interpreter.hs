@@ -26,10 +26,9 @@ import Term
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
 diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
-  => SyntaxTerm leaf fields -- ^ A term representing the old state.
-  -> SyntaxTerm leaf fields -- ^ A term representing the new state.
+  => Both (SyntaxTerm leaf fields) -- ^ A pair of terms representing the old and new state, respectively.
   -> SyntaxDiff leaf fields
-diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
+diffTerms = runBothWith (decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory))
 
 decoratingWith :: (Hashable label, Traversable f)
                => (forall a. TermF f (Record fields) a -> label)
