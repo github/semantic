@@ -117,10 +117,10 @@ comparisonOperator = symbol ComparisonOperator >>= \ location -> children (expre
                               <|> symbol AnonRAngleEqual *> (Expression.GreaterThanEqual lexpression <$> expression)
                               <|> symbol AnonEqualEqual  *> (Expression.Equal lexpression <$> expression)
                               <|> symbol AnonBangEqual   *> (Expression.NotEqual lexpression <$> expression)
-                              <|> symbol AnonIn          *> (Expression.In lexpression <$> expression)
                               <|> symbol AnonNot         *> (Expression.NotIn lexpression <$> expression)
-                              <|> symbol AnonIs          *> (Expression.Is lexpression <$> expression)
-                              -- TODO Add AnonIsNot and AnonNotIn
+                              <|> symbol AnonIn          *> (Expression.In lexpression <$> expression)
+                              <|> symbol AnonIs          *> (Expression.IsNot lexpression <$ symbol AnonNot <*> expression
+                                                           <|> Expression.Is lexpression <$> expression)
 
 notOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
