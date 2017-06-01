@@ -1,50 +1,49 @@
-# Roadmap
+# Semantic Code Q2 FY2018 Roadmap
 
-This is the long form version of our [roadmap project][].
+This quarter, we will focus on laying a foundation for future work.
 
-## Things we are currently doing:
+See also our [roadmap project][].
 
-1. [Diff summaries][] for C & JavaScript. Q3 2016 or so.
 
-  - Modelling the abstract semantics of the supported languages. Good summaries require us to know what different parts of the syntax represent.
-  - Performance/responsiveness. We need to be able to produce diffs more quickly, and without unicorns. Some of this will involve front-end work (e.g. requesting summaries out-of-band).
+## Objectives
 
-2. [Semantic diffs][] on .com for C & JavaScript. Q4 2016 or so.
+- [Determine baselines](#determine-baselines)
+- [Get our data into production](#get-our-data-into-production)
+- [Improve our supported languages](#improve-our-supported-languages)
 
-  - Performance, as above.
-  - Resilience. A fault in `semantic-diff` should not break anything else.
-  - Metrics. We need to know how it’s behaving in the wild to know what to do about it. This also includes operational metrics such as health checks.
+### Determine baselines
 
-## Follow-up things:
+We will select specific metrics believed to be key to our objectives, e.g. performance.
 
-1. Add support for more languages: [Ruby][], etc.
-2. [Detecting & rendering moves][moves].
-3. [Merging][].
-4. Refining the diff summaries we produce.
+Task                      | PRP | Priority (1 to 3) | Amount of work (1 to 4) | Score
+----                      | --- | ----------------- | ----------------------- | -----
+Determine what to measure |     |                   | ?                       |
+Measure it                |     |                   | ???                     |
 
-## Things we would like to do:
 
-1. [Interactively refining diffs][interactive].
-2. [Filtering][] diffs.
-3. Diff [table of contents][].
-4. [Jump to symbol definition][].
-5. Eliminate conflicts from renaming [variables][].
+### Get our data into production
 
-## Things we would like to do modulo interest/support from other teams:
+We will get our data into production and in front of customers.
 
-1. APIs/tooling for data science & engineering teams.
-2. Collect data on our heuristics &c. and refine them via e.g. ML.
-3. Diffs as a [service][].
+Task                    | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score
+----                    | ---        | ----------------- | ----------------------- | -----
+[Architecture review][] | @tclem     | 1                 | ✅                       |
+Production readiness    | @tclem     | 1                 | 3                       |
+Table of contents       |            |                   | ✅                       |
+GraphQL parse tree API  | @tclem     |                   | ✅                       |
+GraphQL diff API        |            | 3                 | 2                       |
+ToC in Enterprise       | @joshvera  | 2                 | 2                       |
 
-[roadmap project]: https://github.com/github/semantic-diff/projects/5
-[Diff summaries]: https://github.com/github/semantic-diff/milestones/Summer%20Eyes
-[Semantic diffs]: https://github.com/github/semantic-diff/milestones/Dot%20Calm
-[Ruby]: https://github.com/github/semantic-diff/issues/282
-[moves]: https://github.com/github/semantic-diff/issues/389
-[Merging]: https://github.com/github/semantic-diff/issues/431
-[interactive]: https://github.com/github/semantic-diff/issues/130
-[Filtering]: https://github.com/github/semantic-diff/issues/428
-[table of contents]: https://github.com/github/semantic-diff/issues/16
-[Jump to symbol definition]: https://github.com/github/semantic-diff/issues/6
-[variables]: https://github.com/github/semantic-diff/issues/91
-[service]: https://github.com/github/platform/blob/master/services/README.md
+
+### Improve our supported languages
+
+We will add support for Python, improve our support for Ruby, Go, and JavaScript/TypeScript, and explore integration with LSP servers.
+
+Task                                | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score
+----                                | ---        | ----------------- | ----------------------- | -----
+À la carte assignment of Python     | @rewinfrey | 2                 | 2                       |
+À la carte assignment of Go         |            |                   | 2?                      |
+À la carte assignment of Ruby       |            |                   | 2?                      |
+À la carte assignment of TypeScript |            |                   | 2?                      |
+🚀 LSP integration                   | @joshvera  | 2                 | 4?                      |
+Migration to à la carte syntax      | @robrix    | 2                 | 3                       |
