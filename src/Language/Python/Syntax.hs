@@ -282,7 +282,10 @@ none :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
 lambda :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> many identifier <*> expression)
+lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> lambdaIdentifier <*> lambdaParameters <*> lambdaBody)
+  where lambdaIdentifier = makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
+        lambdaParameters = many identifier
+        lambdaBody = expression
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
