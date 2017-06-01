@@ -26,6 +26,7 @@ import Term
 type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
+   , Declaration.Function
    , Declaration.Import
    , Declaration.Variable
    , Expression.Arithmetic
@@ -101,6 +102,7 @@ expression = statement
           <|> ellipsis
           <|> dottedName
           <|> await
+          <|> lambda
 
 dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
@@ -278,6 +280,9 @@ boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
 
 none :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
+
+lambda :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> many identifier <*> expression)
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
