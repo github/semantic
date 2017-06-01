@@ -8,7 +8,9 @@ module Semantic
 ) where
 
 import Algorithm hiding (diff)
+import Data.Align.Generic (GAlign)
 import Data.Functor.Both as Both
+import Data.Functor.Classes (Eq1, Show1)
 import Data.Record
 import Diff
 import Info
@@ -64,7 +66,7 @@ diffBlobPair renderer blobs = case renderer of
   JSONDiffRenderer -> case effectiveLanguage of
     Just Language.Python -> do
       terms <- distributeFor blobs (parse pythonParser . source)
-      diff <- diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) terms
+      diff <- diffTermPair blobs diffLinearly terms
       traverse (render (renderJSONDiff blobs)) diff
     _ -> do
       terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
@@ -73,13 +75,13 @@ diffBlobPair renderer blobs = case renderer of
   PatchDiffRenderer -> case effectiveLanguage of
     Just Language.Python -> do
       terms <- distributeFor blobs (parse pythonParser . source)
-      diff <- diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) terms
+      diff <- diffTermPair blobs diffLinearly terms
       traverse (render (renderPatch blobs)) diff
     _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderPatch blobs))
   SExpressionDiffRenderer -> case effectiveLanguage of
     Just Language.Python -> do
       terms <- distributeFor blobs (decorate (Literally . constructorLabel) <=< parse pythonParser . source)
-      diff <- diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) terms
+      diff <- diffTermPair blobs diffLinearly terms
       traverse (render (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead))) diff
     _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderSExpressionDiff . mapAnnotations ((:. Nil) . category)))
   IdentityDiffRenderer -> do
@@ -89,6 +91,9 @@ diffBlobPair renderer blobs = case renderer of
     diffTermPair blobs (runBothWith diffTerms) terms
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         parseSource = parse (parserForLanguage effectiveLanguage) . source
+
+        diffLinearly :: (Eq1 f, GAlign f, Show1 f, Traversable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
+        diffLinearly = runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's and 'Nothing' if neither blob exists.
 diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> Both (Term f a) -> Task (Maybe (Diff f a))
