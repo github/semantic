@@ -51,7 +51,7 @@ getLabel (h :< t) = (Info.category h, case t of
   _ -> Nothing)
 
 constructorLabel :: Show1 f => TermF f a b -> ByteString
-constructorLabel (_ :< f) = toS (liftShowsPrec (\ _ _ _ -> "") (\ _ _ -> "") 0 f "")
+constructorLabel (_ :< f) = toS (liftShowsPrec (const (const identity)) (const identity) 0 f "")
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
 runAlgorithm :: forall f result
