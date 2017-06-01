@@ -4,8 +4,8 @@ module Data.Syntax.Algebra
 , RAlgebra
 , fToR
 , decoratorWithAlgebra
-, identifierAlg
-, cyclomaticComplexityAlg
+, identifierAlgebra
+, cyclomaticComplexityAlgebra
 ) where
 
 import Data.Functor.Foldable
@@ -41,8 +41,8 @@ newtype Identifier = Identifier ByteString
 -- | Produce the identifier for a given term, if any.
 --
 --   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
-identifierAlg :: (InUnion fs Syntax.Identifier, InUnion fs Declaration.Method, InUnion fs Declaration.Class, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier)
-identifierAlg (_ :< union) = case union of
+identifierAlgebra :: (InUnion fs Syntax.Identifier, InUnion fs Declaration.Method, InUnion fs Declaration.Class, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier)
+identifierAlgebra (_ :< union) = case union of
   _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier s)
   _ | Just Declaration.Class{..} <- prj union -> classIdentifier
   _ | Just Declaration.Method{..} <- prj union -> methodName
@@ -57,8 +57,8 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   TODO: Explicit returns at the end of methods should only count once.
 --   TODO: Anonymous functions should not increase parent scope’s complexity.
 --   TODO: Inner functions should not increase parent scope’s complexity.
-cyclomaticComplexityAlg :: (InUnion fs Declaration.Method, InUnion fs Statement.Return, InUnion fs Statement.Yield, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
-cyclomaticComplexityAlg (_ :< union) = case union of
+cyclomaticComplexityAlgebra :: (InUnion fs Declaration.Method, InUnion fs Statement.Return, InUnion fs Statement.Yield, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
+cyclomaticComplexityAlgebra (_ :< union) = case union of
   _ | Just Declaration.Method{} <- prj union -> succ (sum union)
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
