@@ -50,10 +50,10 @@ parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
 
 
 diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both SourceBlob] -> Task ByteString
-diffBlobPairs renderer = fmap toS . distributeFoldMap (fmap (fromMaybe mempty) . diffBlobPair renderer)
+diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
 
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
-diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
+diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (declarationAlgebra source)) diffTerms (renderToC blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderJSONDiff blobs)
@@ -62,23 +62,22 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (Literally . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead))
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations ((:. Nil) . category))
-  (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (declarationAlgebra source)) diffTerms identity
+  (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (declarationAlgebra source)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         syntaxParser = parserForLanguage effectiveLanguage
 
-        run :: Functor f => (Source -> Task (Term f a)) -> (Both (Term f a) -> Diff f a) -> (Diff f a -> output) -> Task (Maybe output)
-        run parse diff renderer = distributeFor blobs (parse . source) >>= diffTermPair blobs diff >>= traverse (render renderer)
+        run :: Functor f => (Source -> Task (Term f a)) -> (Both (Term f a) -> Diff f a) -> (Diff f a -> output) -> Task output
+        run parse diff renderer = distributeFor blobs (parse . source) >>= diffTermPair blobs diff >>= render renderer
 
         diffLinearly :: (Eq1 f, GAlign f, Show1 f, Traversable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
         diffLinearly = decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign)
 
--- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's and 'Nothing' if neither blob exists.
-diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> Both (Term f a) -> Task (Maybe (Diff f a))
+-- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
+diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> Both (Term f a) -> Task (Diff f a)
 diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
-  (True, True) -> Just <$> diff differ terms
-  (True, False) -> pure (Just (deleting (Both.fst terms)))
-  (False, True) -> pure (Just (inserting (Both.snd terms)))
-  (False, False) -> pure Nothing
+  (True, False) -> pure (deleting (Both.fst terms))
+  (False, True) -> pure (inserting (Both.snd terms))
+  _ -> diff differ terms
 
 newtype Literally = Literally ByteString
 
