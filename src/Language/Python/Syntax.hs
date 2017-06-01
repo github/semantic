@@ -26,6 +26,7 @@ import Term
 type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
+   , Declaration.Comprehension
    , Declaration.Function
    , Declaration.Import
    , Declaration.Variable
@@ -103,6 +104,7 @@ expression = statement
           <|> dottedName
           <|> await
           <|> lambda
+          <|> generatorExpression
 
 dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
@@ -286,6 +288,9 @@ lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> lambd
   where lambdaIdentifier = makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
         lambdaParameters = many identifier
         lambdaBody = expression
+
+generatorExpression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+generatorExpression = makeTerm <$> symbol GeneratorExpression <*> children (Declaration.Comprehension <$> expression <* symbol AnonFor <* symbol Variables <*> children (many expression) <* symbol AnonIn <*> expression)
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
