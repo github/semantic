@@ -57,38 +57,17 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (fmap (fromMaybe mempty) .
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
 diffBlobPair renderer blobs = case renderer of
-  ToCDiffRenderer -> do
-    terms <- distributeFor blobs $ \ blob -> do
-      term <- parseSource blob
-      decorate (declarationAlgebra (source blob)) term
-    diff <- diffTermPair blobs (runBothWith diffTerms) terms
-    traverse (render (renderToC blobs)) diff
+  ToCDiffRenderer -> distributeFor blobs (\ blob -> parseSource blob >>= decorate (declarationAlgebra (source blob))) >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderToC blobs))
   JSONDiffRenderer -> case effectiveLanguage of
-    Just Language.Python -> do
-      terms <- distributeFor blobs (parse pythonParser . source)
-      diff <- diffTermPair blobs diffLinearly terms
-      traverse (render (renderJSONDiff blobs)) diff
-    _ -> do
-      terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
-      diff <- diffTermPair blobs (runBothWith diffTerms) terms
-      traverse (render (renderJSONDiff blobs)) diff
+    Just Language.Python -> distributeFor blobs (parse pythonParser . source) >>= diffTermPair blobs diffLinearly >>= traverse (render (renderJSONDiff blobs))
+    _ -> distributeFor blobs (decorate identifierAlgebra <=< parseSource) >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderJSONDiff blobs))
   PatchDiffRenderer -> case effectiveLanguage of
-    Just Language.Python -> do
-      terms <- distributeFor blobs (parse pythonParser . source)
-      diff <- diffTermPair blobs diffLinearly terms
-      traverse (render (renderPatch blobs)) diff
+    Just Language.Python -> distributeFor blobs (parse pythonParser . source) >>= diffTermPair blobs diffLinearly >>= traverse (render (renderPatch blobs))
     _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderPatch blobs))
   SExpressionDiffRenderer -> case effectiveLanguage of
-    Just Language.Python -> do
-      terms <- distributeFor blobs (decorate (Literally . constructorLabel) <=< parse pythonParser . source)
-      diff <- diffTermPair blobs diffLinearly terms
-      traverse (render (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead))) diff
+    Just Language.Python -> distributeFor blobs (decorate (Literally . constructorLabel) <=< parse pythonParser . source) >>= diffTermPair blobs diffLinearly >>= traverse (render (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead)))
     _ -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) >>= traverse (render (renderSExpressionDiff . mapAnnotations ((:. Nil) . category)))
-  IdentityDiffRenderer -> do
-    terms <- distributeFor blobs $ \ blob -> do
-      term <- parseSource blob
-      decorate (declarationAlgebra (source blob)) term
-    diffTermPair blobs (runBothWith diffTerms) terms
+  IdentityDiffRenderer -> distributeFor blobs (\ blob -> parseSource blob >>= decorate (declarationAlgebra (source blob))) >>= diffTermPair blobs (runBothWith diffTerms)
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         parseSource = parse (parserForLanguage effectiveLanguage) . source
 
