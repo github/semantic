@@ -35,7 +35,7 @@ import Text.Show
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [SourceBlob] -> Task ByteString
-parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter (not . nonExistentBlob)
+parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter blobExists
 
 -- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> SourceBlob -> Task output
@@ -74,11 +74,11 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's and 'Nothing' if neither blob exists.
 diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> Both (Term f a) -> Task (Maybe (Diff f a))
-diffTermPair blobs differ terms = case runJoin (nonExistentBlob <$> blobs) of
-  (True, True) -> pure Nothing
-  (_, True) -> pure (Just (deleting (Both.fst terms)))
-  (True, _) -> pure (Just (inserting (Both.snd terms)))
-  _ -> Just <$> diff differ terms
+diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
+  (True, True) -> Just <$> diff differ terms
+  (True, False) -> pure (Just (deleting (Both.fst terms)))
+  (False, True) -> pure (Just (inserting (Both.snd terms)))
+  (False, False) -> pure Nothing
 
 newtype Literally = Literally ByteString
 
