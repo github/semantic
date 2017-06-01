@@ -108,6 +108,7 @@ data AssignmentF node a where
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF node a
   Alt :: HasCallStack => a -> a -> AssignmentF symbol a
   Empty :: HasCallStack => AssignmentF symbol a
+  Throw :: HasCallStack => Error symbol -> AssignmentF (Node symbol) a
 
 -- | Zero-width production of the current location.
 --
@@ -218,6 +219,7 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Choose choices, Rose (Just symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
+          (Throw e, _) -> Result [ e ] Nothing
           (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
           (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
           (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) (ParseError expectedSymbols) ] Nothing
@@ -271,6 +273,7 @@ instance Show symbol => Show1 (AssignmentF (Node symbol)) where
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
+    Throw e -> showsUnaryWith showsPrec "Throw" d e
 
 type instance Base (Rose a) = RoseF a
 
