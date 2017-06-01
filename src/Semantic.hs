@@ -39,16 +39,14 @@ parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter
 
 -- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> SourceBlob -> Task output
-parseBlob renderer blob@SourceBlob{..} = case renderer of
-  JSONTermRenderer -> case blobLanguage of
-    Just Language.Python -> parse pythonParser source >>= render (renderJSONTerm blob)
-    language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
-  SExpressionTermRenderer -> case blobLanguage of
-    Just Language.Python -> parse pythonParser source >>= decorate (Literally . constructorLabel) >>= render renderSExpressionTerm . fmap ((:. Nil) . rhead)
-    language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm . fmap ((:. Nil) . category)
-  IdentityTermRenderer -> case blobLanguage of
-    Just Language.Python -> pure Nothing
-    language -> Just <$> parse (parserForLanguage language) source
+parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
+  (JSONTermRenderer, Just Language.Python) -> parse pythonParser source >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, _) -> parse syntaxParser source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
+  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (Literally . constructorLabel) >>= render renderSExpressionTerm . fmap ((:. Nil) . rhead)
+  (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap ((:. Nil) . category)
+  (IdentityTermRenderer, Just Language.Python) -> pure Nothing
+  (IdentityTermRenderer, _) -> Just <$> parse syntaxParser source
+  where syntaxParser = parserForLanguage blobLanguage
 
 
 diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both SourceBlob] -> Task ByteString
