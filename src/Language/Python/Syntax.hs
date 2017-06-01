@@ -292,8 +292,10 @@ comprehension :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location
 comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehensionSyntax constructor expression)
              <|> makeTerm <$> symbol ListComprehension <*> children (comprehensionSyntax constructor expression)
              <|> makeTerm <$> symbol SetComprehension <*> children (comprehensionSyntax constructor expression)
+             <|> makeTerm <$> symbol DictionaryComprehension <*> children (comprehensionSyntax constructor keyValue)
   where
     constructor = Declaration.Comprehension
+    keyValue = makeTerm <$> location <*> (Literal.KeyValue <$> expression <*> expression)
     comprehensionSyntax constructor preceeding = constructor <$> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
     makeComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
     nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
