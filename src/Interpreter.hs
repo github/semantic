@@ -30,6 +30,7 @@ diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
   -> SyntaxDiff leaf fields
 diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
+-- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
 decoratingWith :: (Hashable label, Traversable f)
                => (forall a. TermF f (Record fields) a -> label)
                -> (Both (Term f (Record (Maybe FeatureVector ': fields))) -> Diff f (Record (Maybe FeatureVector ': fields)))
