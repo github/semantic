@@ -60,9 +60,13 @@ diffBlobPair renderer blobs = case renderer of
       term <- parseSource blob
       decorate (declarationAlgebra (source blob)) term
     diffTermPair blobs (runBothWith diffTerms) (renderToC blobs) terms
-  JSONDiffRenderer -> do
-    terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
-    diffTermPair blobs (runBothWith diffTerms) (renderJSONDiff blobs) terms
+  JSONDiffRenderer -> case effectiveLanguage of
+    Just Language.Python -> do
+      terms <- distributeFor blobs (parse pythonParser . source)
+      diffTermPair blobs (runBothWith (decoratingWith constructorLabel (diffTermsWith linearly comparableByGAlign))) (renderJSONDiff blobs) terms
+    _ -> do
+      terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
+      diffTermPair blobs (runBothWith diffTerms) (renderJSONDiff blobs) terms
   PatchDiffRenderer -> distributeFor blobs parseSource >>= diffTermPair blobs (runBothWith diffTerms) (renderPatch blobs)
   SExpressionDiffRenderer -> case effectiveLanguage of
     Just Language.Python -> do
