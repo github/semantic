@@ -272,7 +272,7 @@ subscript :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> expression <*> many expression)
 
 call :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <*> (many generatorExpression
+call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <*> (many comprehension
                                                                                 <|> symbol ArgumentList *> children (many expression)))
 
 boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
