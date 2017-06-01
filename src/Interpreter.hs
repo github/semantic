@@ -39,12 +39,22 @@ decoratingWith :: (Hashable label, Traversable f)
 decoratingWith getLabel differ = stripDiff . differ . fmap (defaultFeatureVectorDecorator getLabel)
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
-diffTermsWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
+diffTermsWith :: forall f fields . (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields))) -- ^ A function producing syntax-directed continuations of the algorithm.
               -> ComparabilityRelation f fields -- ^ A relation on terms used to determine comparability and equality.
               -> Both (Term f (Record fields)) -- ^ A pair of terms.
               -> Diff f (Record fields) -- ^ The resulting diff.
-diffTermsWith refine comparable (Join (a, b)) = runAlgorithm (decomposeWith refine comparable) (diff a b)
+diffTermsWith refine comparable (Join (a, b)) = runAlgorithm decompose (diff a b)
+  where decompose :: AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
+        decompose step = case step of
+          Diff t1 t2 -> refine t1 t2
+          Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
+            Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
+            _ -> byReplacing t1 t2
+          RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
+          Delete a -> pure (deleting a)
+          Insert b -> pure (inserting b)
+          Replace a b -> pure (replacing a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a -> (Category, Maybe leaf)
@@ -75,22 +85,6 @@ runAlgorithmSteps decompose = go
   where go algorithm = case algorithm of
           Return a -> [Return a]
           step `Then` yield -> algorithm : go (decompose step >>= yield)
-
--- | Decompose a step of an algorithm into the next steps to perform using a helper function.
-decomposeWith :: (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
-              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields)))
-              -> ComparabilityRelation f fields
-              -> AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result
-              -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
-decomposeWith algorithmWithTerms comparable step = case step of
-  Diff t1 t2 -> algorithmWithTerms t1 t2
-  Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-    Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
-    _ -> byReplacing t1 t2
-  RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
-  Delete a -> pure (deleting a)
-  Insert b -> pure (inserting b)
-  Replace a b -> pure (replacing a b)
 
 
 -- | Construct an algorithm to diff a pair of terms.
