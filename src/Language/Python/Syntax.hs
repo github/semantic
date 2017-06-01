@@ -291,7 +291,9 @@ lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> lambd
         lambdaBody = expression
 
 generatorExpression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-generatorExpression = makeTerm <$> symbol GeneratorExpression <*> children (Declaration.Comprehension <$> expression <* symbol AnonFor <* symbol Variables <*> children (many expression) <* symbol AnonIn <*> expression)
+generatorExpression = makeTerm <$> symbol GeneratorExpression <*> children (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression) <*> (flip (foldr makeGeneratorExpression) <$> many nestedGeneratorExpression <*> expression))
+  where makeGeneratorExpression (loc, makeRest) rest = makeTerm loc (makeRest rest)
+        nestedGeneratorExpression = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
