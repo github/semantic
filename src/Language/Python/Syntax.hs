@@ -100,6 +100,7 @@ expression = statement
           <|> notOperator
           <|> ellipsis
           <|> dottedName
+          <|> await
 
 dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.DottedName <$> many expression)
@@ -245,6 +246,9 @@ printStatement = do
 
 globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
+
+await :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier <$> source)) <*> many expression)
 
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
