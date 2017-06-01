@@ -1,5 +1,12 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators #-}
-module Data.Syntax.Algebra where
+module Data.Syntax.Algebra
+( FAlgebra
+, RAlgebra
+, fToR
+, decoratorWithAlgebra
+, identifierAlg
+, cyclomaticComplexityAlg
+) where
 
 import Data.Functor.Foldable
 import Data.Functor.Union
