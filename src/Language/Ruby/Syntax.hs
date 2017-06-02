@@ -57,7 +57,7 @@ assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assignment = makeTerm <$> symbol Program <*> children (many declaration)
 
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-declaration = comment <|> class' <|> method
+declaration = (comment <|> class' <|> method) `catchError` \ error -> makeTerm <$> location <*> (Syntax.Error [error] <$ source)
 
 class' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
