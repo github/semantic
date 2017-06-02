@@ -109,7 +109,7 @@ data AssignmentF node a where
   Alt :: HasCallStack => a -> a -> AssignmentF symbol a
   Empty :: HasCallStack => AssignmentF symbol a
   Throw :: HasCallStack => Error symbol -> AssignmentF (Node symbol) a
-  Catch :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> a) -> AssignmentF (Node symbol) a
+  Catch :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> AssignmentF (Node symbol) a
 
 -- | Zero-width production of the current location.
 --
@@ -223,7 +223,9 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Throw e, _) -> Result [ e ] Nothing
           (Catch during handler, _) -> case assignAllFrom during state of
             Result _ (Just (state', a)) -> yield a state'
-            Result (e:_) Nothing -> yield (handler e) state
+            Result (e:_) Nothing -> case assignAllFrom (handler e) state of
+              Result _ (Just (state', a)) -> yield a state'
+              Result es Nothing -> Result es Nothing
             Result [] Nothing -> Result [] Nothing
           (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
           (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
