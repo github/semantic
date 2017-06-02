@@ -66,6 +66,7 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
+, catchError
 , Rose(..)
 , RoseF(..)
 , Node
@@ -89,7 +90,7 @@ import Data.List.NonEmpty (nonEmpty)
 import Data.Record
 import GHC.Stack
 import qualified Info
-import Prologue hiding (Alt, get, Location, state)
+import Prologue hiding (Alt, get, Location, state, catchError)
 import Range (offsetRange)
 import qualified Source (Source(..), drop, slice, sourceText, actualLines)
 import System.Console.ANSI
@@ -130,6 +131,9 @@ source = withFrozenCallStack $ Source `Then` return
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment symbol a -> Assignment symbol a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
+
+catchError :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> Assignment (Node symbol) a
+catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
 
 
 -- | A rose tree.
