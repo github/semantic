@@ -77,7 +77,8 @@ statements :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statements = makeTerm <$> location <*> many statement
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-statement  =  exit Statement.Return Return
+statement  = handleError
+           $  exit Statement.Return Return
           <|> exit Statement.Yield Yield
           <|> exit Statement.Break Break
           <|> exit Statement.Continue Next
