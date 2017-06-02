@@ -111,7 +111,7 @@ dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
 ellipsis :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-ellipsis = makeTerm <$> symbol Ellipsis <*> (Syntax.Ellipsis <$> source)
+ellipsis = makeTerm <$> symbol Ellipsis <*> (Syntax.Ellipsis <$ source)
 
 comparisonOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comparisonOperator = symbol ComparisonOperator >>= \ location -> children (expression >>= \ lexpression -> makeTerm location <$> makeComparison lexpression)

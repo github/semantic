@@ -53,7 +53,7 @@ instance Show error => Show1 (Error error) where liftShowsPrec = genericLiftShow
 
 
 -- | Ellipsis
-data Ellipsis a = Ellipsis ByteString
+data Ellipsis a = Ellipsis
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
