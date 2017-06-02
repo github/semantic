@@ -116,14 +116,14 @@ instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 
-data Tuple a = Tuple { tupleContents :: ![a]}
+newtype Tuple a = Tuple { tupleContents :: [a]}
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 
-data Set a = Set { setElements :: [a] }
+newtype Set a = Set { setElements :: [a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Set where liftEq = genericLiftEq
