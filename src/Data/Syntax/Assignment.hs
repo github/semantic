@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and SourceSpan). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -66,7 +66,6 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
-, catchError
 , Rose(..)
 , RoseF(..)
 , Node
@@ -90,7 +89,7 @@ import Data.List.NonEmpty (nonEmpty)
 import Data.Record
 import GHC.Stack
 import qualified Info
-import Prologue hiding (Alt, get, Location, state, catchError)
+import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
 import qualified Source (Source(..), drop, slice, sourceText, actualLines)
 import System.Console.ANSI
@@ -131,9 +130,6 @@ source = withFrozenCallStack $ Source `Then` return
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment symbol a -> Assignment symbol a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
-
-catchError :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> Assignment (Node symbol) a
-catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
 
 
 -- | A rose tree.
@@ -318,3 +314,10 @@ instance Alternative (Result symbol) where
   empty = Result [] Nothing
   Result e (Just a) <|> _ = Result e (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <> e2) b
+
+instance MonadError (Error symbol) (Assignment (Node symbol)) where
+  throwError :: HasCallStack => Error symbol -> Assignment (Node symbol) a
+  throwError error = withFrozenCallStack $ Throw error `Then` return
+
+  catchError :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> Assignment (Node symbol) a
+  catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
