@@ -71,7 +71,7 @@ assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-declaration = comment <|> literal <|> statement <|> import' <|> importFrom
+declaration = comment <|> statement <|> expression
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statement = expressionStatement
@@ -83,6 +83,8 @@ statement = expressionStatement
           <|> printStatement
           <|> assertStatement
           <|> globalStatement
+          <|> import'
+          <|> importFrom
 
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children expression
