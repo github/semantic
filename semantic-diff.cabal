@@ -67,6 +67,7 @@ library
                      , Renderer.TOC
                      , RWS
                      , Semantic
+                     , Semantic.Task
                      , SemanticCmdLine
                      , SES
                      , SES.Myers

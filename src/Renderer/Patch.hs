@@ -1,16 +1,18 @@
-module Renderer.Patch (
-  patch,
-  hunks,
-  Hunk(..),
-  truncatePatch
+{-# LANGUAGE MultiParamTypeClasses #-}
+module Renderer.Patch
+( renderPatch
+, File(..)
+, hunks
+, Hunk(..)
+, truncatePatch
 ) where
 
 import Alignment
 import Data.Bifunctor.Join
+import qualified Data.ByteString.Char8 as ByteString
 import Data.Functor.Both as Both
 import Data.List (span, unzip)
 import Data.Record
-import qualified Data.Text as Text
 import Data.These
 import Diff
 import Patch
@@ -18,19 +20,29 @@ import Prologue hiding (fst, snd)
 import Range
 import qualified Source
 import Source hiding (break, drop, length, null, take)
-import Syntax
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
-truncatePatch :: Both SourceBlob -> Text
+truncatePatch :: Both SourceBlob -> ByteString
 truncatePatch blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: HasField fields Range => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Text
-patch blobs diff = if not (Text.null text) && Text.last text /= '\n'
+renderPatch :: (HasField fields Range, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> File
+renderPatch blobs diff = File $ if not (ByteString.null text) && ByteString.last text /= '\n'
   then text <> "\n\\ No newline at end of file\n"
   else text
   where text = header blobs <> mconcat (showHunk blobs <$> hunks diff blobs)
+
+newtype File = File { unFile :: ByteString }
+  deriving Show
+
+instance Monoid File where
+  mempty = File mempty
+  mappend (File a) (File b) = File (a <> "\n" <> b)
+
+instance StringConv File ByteString where
+  strConv _ = unFile
+
 
 -- | A hunk in a patch, including the offset, changes, and context.
 data Hunk a = Hunk { offset :: Both (Sum Int), changes :: [Change a], trailingContext :: [Join These a] }
@@ -53,7 +65,7 @@ rowIncrement :: Join These a -> Both (Sum Int)
 rowIncrement = Join . fromThese (Sum 0) (Sum 0) . runJoin . (Sum 1 <$)
 
 -- | Given the before and after sources, render a hunk to a string.
-showHunk :: Functor f => HasField fields Range => Both SourceBlob -> Hunk (SplitDiff f (Record fields)) -> Text
+showHunk :: Functor f => HasField fields Range => Both SourceBlob -> Hunk (SplitDiff f (Record fields)) -> ByteString
 showHunk blobs hunk = maybeOffsetHeader <>
   mconcat (showChange sources <$> changes hunk) <>
   showLines (snd sources) ' ' (maybeSnd . runJoin <$> trailingContext hunk)
@@ -66,37 +78,37 @@ showHunk blobs hunk = maybeOffsetHeader <>
         (offsetA, offsetB) = runJoin . fmap (show . getSum) $ offset hunk
 
 -- | Given the before and after sources, render a change to a string.
-showChange :: Functor f => HasField fields Range => Both Source -> Change (SplitDiff f (Record fields)) -> Text
+showChange :: Functor f => HasField fields Range => Both Source -> Change (SplitDiff f (Record fields)) -> ByteString
 showChange sources change = showLines (snd sources) ' ' (maybeSnd . runJoin <$> context change) <> deleted <> inserted
   where (deleted, inserted) = runJoin $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (fromThese Nothing Nothing . runJoin . fmap Just <$> contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
-showLines :: Functor f => HasField fields Range => Source -> Char -> [Maybe (SplitDiff f (Record fields))] -> Text
+showLines :: Functor f => HasField fields Range => Source -> Char -> [Maybe (SplitDiff f (Record fields))] -> ByteString
 showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine source <$> lines
   where prepend "" = ""
-        prepend source = Text.singleton prefix <> source
+        prepend source = ByteString.singleton prefix <> source
 
 -- | Given a source, render a line to a string.
-showLine :: Functor f => HasField fields Range => Source -> Maybe (SplitDiff f (Record fields)) -> Maybe Text
-showLine source line | Just line <- line = Just . toText . (`slice` source) $ getRange line
+showLine :: Functor f => HasField fields Range => Source -> Maybe (SplitDiff f (Record fields)) -> Maybe ByteString
+showLine source line | Just line <- line = Just . sourceText . (`slice` source) $ getRange line
                      | otherwise = Nothing
 
 -- | Returns the header given two source blobs and a hunk.
-header :: Both SourceBlob -> Text
-header blobs = Text.intercalate "\n" ([filepathHeader, fileModeHeader] <> maybeFilepaths) <> "\n"
+header :: Both SourceBlob -> ByteString
+header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> maybeFilepaths) <> "\n"
   where filepathHeader = "diff --git a/" <> pathA <> " b/" <> pathB
         fileModeHeader = case (modeA, modeB) of
-          (Nothing, Just mode) -> Text.intercalate "\n" [ "new file mode " <> modeToDigits mode, blobOidHeader ]
-          (Just mode, Nothing) -> Text.intercalate "\n" [ "deleted file mode " <> modeToDigits mode, blobOidHeader ]
+          (Nothing, Just mode) -> ByteString.intercalate "\n" [ "new file mode " <> modeToDigits mode, blobOidHeader ]
+          (Just mode, Nothing) -> ByteString.intercalate "\n" [ "deleted file mode " <> modeToDigits mode, blobOidHeader ]
           (Just mode, Just other) | mode == other -> "index " <> oidA <> ".." <> oidB <> " " <> modeToDigits mode
-          (Just mode1, Just mode2) -> Text.intercalate "\n" [
+          (Just mode1, Just mode2) -> ByteString.intercalate "\n" [
             "old mode " <> modeToDigits mode1,
             "new mode " <> modeToDigits mode2,
             blobOidHeader
             ]
           (Nothing, Nothing) -> ""
         blobOidHeader = "index " <> oidA <> ".." <> oidB
-        modeHeader :: Text -> Maybe SourceKind -> Text -> Text
+        modeHeader :: ByteString -> Maybe SourceKind -> ByteString -> ByteString
         modeHeader ty maybeMode path = case maybeMode of
            Just _ -> ty <> "/" <> path
            Nothing -> "/dev/null"

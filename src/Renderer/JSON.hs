@@ -1,21 +1,21 @@
 {-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
-( json
-, jsonFile
+( renderJSONDiff
+, renderJSONTerm
 , ToJSONFields(..)
 ) where
 
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
-import Data.Functor.Both
+import Data.Functor.Both (Both)
+import Data.Functor.Union
+import qualified Data.Map as Map
 import Data.Record
-import Diff
 import Info
 import Patch
 import Prologue hiding ((++))
-import qualified Data.Map as Map
 import Source
 import Syntax as S
 
@@ -24,11 +24,11 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-json :: (ToJSONFields (Record fields), HasField fields Range) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Map Text Value
-json blobs diff = Map.fromList
+renderJSONDiff :: ToJSON a => Both SourceBlob -> a -> Map.Map Text Value
+renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
-  , ("oids", toJSON (oid <$> blobs))
-  , ("paths", toJSON (path <$> blobs))
+  , ("oids", toJSON (decodeUtf8 . oid <$> toList blobs))
+  , ("paths", toJSON (path <$> toList blobs))
   ]
 
 instance StringConv (Map Text Value) ByteString where
@@ -75,9 +75,6 @@ instance ToJSONFields Category where
 instance ToJSONFields SourceSpan where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
-instance ToJSONFields SourceText where
-  toJSONFields (SourceText t) = [ "sourceText" .= t ]
-
 instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
 
@@ -105,10 +102,12 @@ instance ToJSON a => ToJSONFields [a] where
 instance ToJSON recur => ToJSONFields (Syntax leaf recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
 
+instance (Foldable f, ToJSON a, ToJSONFields (Union fs a)) => ToJSONFields (Union (f ': fs) a) where
+  toJSONFields (Here f) = [ "children" .= toList f ]
+  toJSONFields (There fs) = toJSONFields fs
 
---
--- Parse Trees
---
+instance ToJSONFields (Union '[] a) where
+  toJSONFields _ = []
 
 data File a = File { filePath :: FilePath, fileContent :: a }
   deriving (Generic, Show)
@@ -119,5 +118,5 @@ instance ToJSON a => ToJSON (File a) where
 instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-jsonFile :: ToJSON a => SourceBlob -> a -> [Value]
-jsonFile SourceBlob{..} = pure . toJSON . File path
+renderJSONTerm :: ToJSON a => SourceBlob -> a -> [Value]
+renderJSONTerm SourceBlob{..} = pure . toJSON . File path
