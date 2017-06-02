@@ -109,7 +109,7 @@ data AssignmentF node a where
   Alt :: HasCallStack => a -> a -> AssignmentF symbol a
   Empty :: HasCallStack => AssignmentF symbol a
   Throw :: HasCallStack => Error symbol -> AssignmentF (Node symbol) a
-  Catch :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> AssignmentF (Node symbol) a
+  Catch :: HasCallStack => a -> (Error symbol -> a) -> AssignmentF (Node symbol) a
 
 -- | Zero-width production of the current location.
 --
@@ -221,11 +221,9 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result [ e ] Nothing
-          (Catch during handler, _) -> case assignAllFrom during state of
-            Result _ (Just (state', a)) -> yield a state'
-            Result (e:_) Nothing -> case assignAllFrom (handler e) state of
-              Result _ (Just (state', a)) -> yield a state'
-              Result es Nothing -> Result es Nothing
+          (Catch during handler, _) -> case yield during state of
+            Result _ (Just (state', a)) -> Result [] (Just (state', a))
+            Result (e:_) Nothing -> yield (handler e) state
             Result [] Nothing -> Result [] Nothing
           (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
           (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
@@ -281,7 +279,7 @@ instance Show symbol => Show1 (AssignmentF (Node symbol)) where
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
     Throw e -> showsUnaryWith showsPrec "Throw" d e
-    Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
+    Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
 
 type instance Base (Rose a) = RoseF a
 
@@ -320,4 +318,4 @@ instance MonadError (Error symbol) (Assignment (Node symbol)) where
   throwError error = withFrozenCallStack $ Throw error `Then` return
 
   catchError :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> Assignment (Node symbol) a
-  catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
+  catchError during handler = withFrozenCallStack $ Catch during handler `Then` identity
