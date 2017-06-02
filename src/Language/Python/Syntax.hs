@@ -116,9 +116,9 @@ ellipsis :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 ellipsis = makeTerm <$> symbol Ellipsis <*> (Syntax.Ellipsis <$ source)
 
 comparisonOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-comparisonOperator = symbol ComparisonOperator >>= \ location -> children (expression >>= \ lexpression -> makeTerm location <$> makeComparison lexpression)
+comparisonOperator = makeTerm <$> symbol ComparisonOperator <*> children (expression >>= \ lexpression -> makeComparison lexpression)
   where
-    makeComparison lexpression = symbol AnonLAngle       *> (Expression.LessThan lexpression <$> expression)
+    makeComparison lexpression =  symbol AnonLAngle      *> (Expression.LessThan lexpression <$> expression)
                               <|> symbol AnonLAngleEqual *> (Expression.LessThanEqual lexpression <$> expression)
                               <|> symbol AnonRAngle      *> (Expression.GreaterThan lexpression <$> expression)
                               <|> symbol AnonRAngleEqual *> (Expression.GreaterThanEqual lexpression <$> expression)
@@ -126,8 +126,8 @@ comparisonOperator = symbol ComparisonOperator >>= \ location -> children (expre
                               <|> symbol AnonBangEqual   *> (Expression.NotEqual lexpression <$> expression)
                               <|> symbol AnonNot         *> (Expression.NotIn lexpression <$> expression)
                               <|> symbol AnonIn          *> (Expression.In lexpression <$> expression)
-                              <|> symbol AnonIs          *> (Expression.IsNot lexpression <$ symbol AnonNot <*> expression
-                                                           <|> Expression.Is lexpression <$> expression)
+                              <|> symbol AnonIs          *> (source *> symbol AnonNot *> (Expression.IsNot lexpression <$> expression)
+                                                           <|> (Expression.Is lexpression <$> expression))
 
 notOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
