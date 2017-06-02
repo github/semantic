@@ -155,4 +155,6 @@ emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
 handleError :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
-handleError = (`catchError` \ error -> makeTerm <$> location <*> (Syntax.Error [error] <$ source))
+handleError = flip catchError $ \ error -> case errorCause error of
+  UnexpectedEndOfInput _ -> throwError error
+  _ -> makeTerm <$> location <*> (Syntax.Error [error] <$ source)
