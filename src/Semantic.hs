@@ -1,25 +1,24 @@
 {-# LANGUAGE GADTs #-}
 module Semantic
-( diffBlobPairs
-, diffBlobPair
-, parseBlobs
+( parseBlobs
 , parseBlob
-, parserForLanguage
+, diffBlobPairs
+, diffBlobPair
+, diffAndRenderTermPair
 ) where
 
-import Control.Parallel.Strategies
-import qualified Control.Concurrent.Async as Async
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Data.Record
 import Diff
 import Info
 import Interpreter
+import qualified Language
 import Patch
 import Parser
 import Prologue
 import Renderer
+import Semantic.Task as Task
 import Source
-import Syntax
 import Term
 
 -- This is the primary interface to the Semantic library which provides two
@@ -31,47 +30,51 @@ import Term
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
--- | Diff a list of SourceBlob pairs to produce ByteString output using the specified renderer.
-diffBlobPairs :: (Monoid output, StringConv output ByteString, HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> DiffRenderer fields output -> [Both SourceBlob] -> IO ByteString
-diffBlobPairs decorator renderer blobs = do
-  diffs <- Async.mapConcurrently go blobs
-  let diffs' = diffs >>= \ (blobs, diff) -> (,) blobs <$> toList diff
-  toS <$> renderConcurrently (resolveDiffRenderer renderer) (diffs' `using` parTraversable (parTuple2 r0 rdeepseq))
-  where
-    go blobPair = do
-      diff <- diffBlobPair decorator blobPair
-      pure (blobPair, diff)
+parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [SourceBlob] -> Task ByteString
+parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter (not . nonExistentBlob)
 
--- | Diff a pair of SourceBlobs.
-diffBlobPair :: (HasField fields Category, NFData (Record fields)) => (Source -> Term (Syntax Text) (Record DefaultFields) -> Term (Syntax Text) (Record fields)) -> Both SourceBlob -> IO (Maybe (Diff (Syntax Text) (Record fields)))
-diffBlobPair decorator blobs = do
-  terms <- Async.mapConcurrently parseBlob blobs
-  pure $ case (runJoin blobs, runJoin (decorator . source <$> blobs <*> terms)) of
-    ((left, right), (a, b)) | nonExistentBlob left && nonExistentBlob right -> Nothing
-                            | nonExistentBlob right -> Just . pure $ Delete a
-                            | nonExistentBlob left -> Just . pure $ Insert b
-                            | otherwise -> Just $ runDiff (both a b)
-  where
-    runDiff terms = runBothWith diffTerms (terms `using` parTraversable rdeepseq)
-
--- | Parse a list of SourceBlobs and use the specified renderer to produce ByteString output.
-parseBlobs :: (Monoid output, StringConv output ByteString) => ParseTreeRenderer DefaultFields output -> [SourceBlob] -> IO ByteString
-parseBlobs renderer blobs = do
-  terms <- traverse go (filter (not . nonExistentBlob) blobs)
-  toS <$> renderConcurrently (resolveParseTreeRenderer renderer) (terms `using` parTraversable (parTuple2 r0 rdeepseq))
-  where
-    go blob = do
-      term <- parseBlob blob
-      pure (blob, term)
-
--- | Parse a SourceBlob.
-parseBlob :: SourceBlob -> IO (Term (Syntax Text) (Record DefaultFields))
-parseBlob SourceBlob{..} = runParser (parserForLanguage blobLanguage) source
+-- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
+parseBlob :: TermRenderer output -> SourceBlob -> Task output
+parseBlob renderer blob@SourceBlob{..} = case renderer of
+  JSONTermRenderer -> case blobLanguage of
+    Just Language.Python -> parse pythonParser source >>= render (renderJSONTerm blob)
+    language -> parse (parserForLanguage language) source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
+  SExpressionTermRenderer -> case blobLanguage of
+    Just Language.Python -> parse pythonParser source >>= render renderSExpressionTerm . fmap (Info.Other "Term" :.)
+    language -> parse (parserForLanguage language) source >>= render renderSExpressionTerm
+  IdentityTermRenderer -> case blobLanguage of
+    Just Language.Python -> pure Nothing
+    language -> Just <$> parse (parserForLanguage language) source
 
 
--- Internal
+diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both SourceBlob] -> Task ByteString
+diffBlobPairs renderer = fmap toS . distributeFoldMap (fmap (fromMaybe mempty) . diffBlobPair renderer)
 
-renderConcurrently :: (Monoid output, StringConv output ByteString) => (a -> b -> output) -> [(a, b)] -> IO output
-renderConcurrently f diffs = do
-  outputs <- Async.mapConcurrently (pure . uncurry f) diffs
-  pure $ mconcat (outputs `using` parTraversable rseq)
+-- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
+diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task (Maybe output)
+diffBlobPair renderer blobs = case renderer of
+  ToCDiffRenderer -> do
+    terms <- distributeFor blobs $ \ blob -> do
+      term <- parseSource blob
+      decorate (declarationAlgebra (source blob)) term
+    diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderToC) terms
+  JSONDiffRenderer -> do
+    terms <- distributeFor blobs (decorate identifierAlgebra <=< parseSource)
+    diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderJSONDiff) terms
+  PatchDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (uncurry renderPatch)
+  SExpressionDiffRenderer -> distributeFor blobs parseSource >>= diffAndRenderTermPair blobs (runBothWith diffTerms) (renderSExpressionDiff . Prologue.snd)
+  IdentityDiffRenderer -> do
+    terms <- distributeFor blobs $ \ blob -> do
+      term <- parseSource blob
+      decorate (declarationAlgebra (source blob)) term
+    diffAndRenderTermPair blobs (runBothWith diffTerms) Prologue.snd terms
+  where languages = blobLanguage <$> blobs
+        parseSource = parse (parserForLanguage (runBothWith (<|>) languages)) . source
+
+-- | A task to diff a pair of 'Term's and render the 'Diff', producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
+diffAndRenderTermPair :: Functor f => Both SourceBlob -> Differ f a -> ((Both SourceBlob, Diff f a) -> output) -> Both (Term f a) -> Task (Maybe output)
+diffAndRenderTermPair blobs differ renderer terms = case runJoin (nonExistentBlob <$> blobs) of
+  (True, True) -> pure Nothing
+  (_, True) -> Just <$> render renderer (blobs, deleting (Both.fst terms))
+  (True, _) -> Just <$> render renderer (blobs, inserting (Both.snd terms))
+  _ -> diff differ terms >>= fmap Just . render renderer . (,) blobs
