@@ -105,6 +105,7 @@ expression = statement
           <|> await
           <|> lambda
           <|> comprehension
+          <|> conditionalExpression
 
 dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
@@ -298,6 +299,9 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
     comprehensionDeclaration preceeding = Declaration.Comprehension <$> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
     makeComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
     nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
+
+conditionalExpression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+conditionalExpression = symbol ConditionalExpression >>= \ loc -> children (call >>= \ thenBranch -> identifier >>= \ conditional -> makeTerm loc <$> (Statement.If conditional thenBranch <$> emptyTerm))
 
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
