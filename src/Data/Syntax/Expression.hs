@@ -24,8 +24,6 @@ data Comparison a
   | NotEqual !a !a
   | In !a !a
   | NotIn !a !a
-  | Is !a !a
-  | IsNot !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Comparison where liftEq = genericLiftEq
