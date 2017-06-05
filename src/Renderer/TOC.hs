@@ -136,7 +136,7 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
                       | otherwise = fold r
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
-dedupe :: (HasField fields Category, HasField fields (Maybe Declaration)) => [Entry (Record fields)] -> [Entry (Record fields)]
+dedupe :: HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = foldl' go []
   where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
                 | (front, similar : back) <- find (similarMatch `on` entryPayload) x xs =
