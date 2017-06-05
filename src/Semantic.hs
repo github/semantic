@@ -42,7 +42,7 @@ parseBlob :: TermRenderer output -> SourceBlob -> Task output
 parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser source >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
-  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (Literally . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser source
@@ -60,7 +60,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
-  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (Literally . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (ConstructorLabel . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
   (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (declarationAlgebra source)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
@@ -83,11 +83,11 @@ diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
 keepCategory = (:. Nil) . category
 
-keepConstructorLabel :: Record (Literally ': fields) -> Record '[Literally]
+keepConstructorLabel :: Record (ConstructorLabel ': fields) -> Record '[ConstructorLabel]
 keepConstructorLabel = (:. Nil) . rhead
 
 
-newtype Literally = Literally ByteString
+newtype ConstructorLabel = ConstructorLabel ByteString
 
-instance Show Literally where
-  showsPrec _ (Literally s) = showString (toS s)
+instance Show ConstructorLabel where
+  showsPrec _ (ConstructorLabel s) = showString (toS s)
