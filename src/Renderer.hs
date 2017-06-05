@@ -8,6 +8,7 @@ module Renderer
 , renderJSONDiff
 , renderJSONTerm
 , renderToC
+, declarationAlgebra
 , syntaxDeclarationAlgebra
 , identifierAlgebra
 , Summaries(..)

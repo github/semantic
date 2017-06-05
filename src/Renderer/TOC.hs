@@ -8,6 +8,7 @@ module Renderer.TOC
 , isValidSummary
 , Declaration(..)
 , declaration
+, declarationAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
@@ -21,6 +22,8 @@ import Data.Align (crosswalk)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
+import Data.Functor.Union
+import Data.Proxy
 import Data.Text (toLower)
 import Data.Text.Listable
 import Data.These
@@ -33,6 +36,8 @@ import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Source hiding (null)
 import Syntax as S
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Declaration as Declaration
 import Term
 
 data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
@@ -92,6 +97,19 @@ syntaxDeclarationAlgebra source r = case tailF r of
     | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
   S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange (headF r)) source))
   _ -> Nothing
+  where getSource = toText . flip Source.slice source . byteRange . extract
+
+-- | Compute 'Declaration's for methods and functions.
+declarationAlgebra :: (InUnion fs Declaration.Function, InUnion fs Declaration.Method, InUnion fs (Syntax.Error error), Show error, Functor (Union fs), HasField fields Range)
+                   => Proxy error
+                   -> Source
+                   -> TermF (Union fs) (Record fields) (Term (Union fs) (Record fields), Maybe Declaration)
+                   -> Maybe Declaration
+declarationAlgebra proxy source r
+  | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource identifier)
+  | Just (Declaration.Method (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource identifier)
+  | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
+  | otherwise = Nothing
   where getSource = toText . flip Source.slice source . byteRange . extract
 
 
