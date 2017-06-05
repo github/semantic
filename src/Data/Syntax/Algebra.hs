@@ -30,8 +30,8 @@ fToR f = f . fmap snd
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f
                      => RAlgebra (Base (Term f (Record fs))) (Term f (Record fs)) a -- ^ An R-algebra on terms.
-                     -> Term f (Record fs) -- ^ A term to decorate with values produced by the F-algebra.
-                     -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the F-algebra.
+                     -> Term f (Record fs) -- ^ A term to decorate with values produced by the R-algebra.
+                     -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the R-algebra.
 decoratorWithAlgebra alg = para $ \ c@(a :< f) -> cofree $ (alg (fmap (second (rhead . extract)) c) :. a) :< fmap snd f
 
 
