@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DataKinds, GADTs #-}
 module Semantic
 ( parseBlobs
 , parseBlob
@@ -43,7 +43,7 @@ parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser source >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (Literally . constructorLabel) >>= render renderSExpressionTerm . fmap ((:. Nil) . rhead)
-  (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap ((:. Nil) . category)
+  (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser source
   where syntaxParser = parserForLanguage blobLanguage
@@ -61,7 +61,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (Literally . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead))
-  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations ((:. Nil) . category))
+  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
   (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (declarationAlgebra source)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         syntaxParser = parserForLanguage effectiveLanguage
@@ -78,6 +78,11 @@ diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting (Both.fst terms))
   (False, True) -> pure (inserting (Both.snd terms))
   _ -> diff differ terms
+
+
+keepCategory :: HasField fields Category => Record fields -> Record '[Category]
+keepCategory = (:. Nil) . category
+
 
 newtype Literally = Literally ByteString
 
