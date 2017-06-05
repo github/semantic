@@ -158,7 +158,7 @@ entrySummary entry = case entry of
   Inserted a  -> Just (recordSummary a "added")
   Replaced a  -> Just (recordSummary a "modified")
   where recordSummary record
-          | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
+          | Just (ErrorDeclaration text) <- getDeclaration record = const (ErrorSummary text (sourceSpan record))
           | otherwise = JSONSummary (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
