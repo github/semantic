@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
 module Semantic
 ( parseBlobs
 , parseBlob
@@ -42,8 +42,8 @@ parseBlob :: TermRenderer output -> SourceBlob -> Task output
 parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser source >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
-  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (Literally . constructorLabel) >>= render renderSExpressionTerm . fmap ((:. Nil) . rhead)
-  (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap ((:. Nil) . category)
+  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser source
   where syntaxParser = parserForLanguage blobLanguage
@@ -60,8 +60,8 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
-  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (Literally . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations ((:. Nil) . rhead))
-  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations ((:. Nil) . category))
+  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (ConstructorLabel . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
+  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
   (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         syntaxParser = parserForLanguage effectiveLanguage
@@ -79,7 +79,15 @@ diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
   (False, True) -> pure (inserting (Both.snd terms))
   _ -> diff differ terms
 
-newtype Literally = Literally ByteString
 
-instance Show Literally where
-  showsPrec _ (Literally s) = showString (toS s)
+keepCategory :: HasField fields Category => Record fields -> Record '[Category]
+keepCategory = (:. Nil) . category
+
+keepConstructorLabel :: Record (ConstructorLabel ': fields) -> Record '[ConstructorLabel]
+keepConstructorLabel = (:. Nil) . rhead
+
+
+newtype ConstructorLabel = ConstructorLabel ByteString
+
+instance Show ConstructorLabel where
+  showsPrec _ (ConstructorLabel s) = showString (toS s)

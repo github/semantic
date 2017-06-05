@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and SourceSpan). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -109,6 +109,8 @@ data AssignmentF node a where
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF node a
   Alt :: HasCallStack => a -> a -> AssignmentF symbol a
   Empty :: HasCallStack => AssignmentF symbol a
+  Throw :: HasCallStack => Error symbol -> AssignmentF (Node symbol) a
+  Catch :: HasCallStack => a -> (Error symbol -> a) -> AssignmentF (Node symbol) a
 
 -- | Zero-width production of the current location.
 --
@@ -221,6 +223,11 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Choose choices, Rose (Just symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
+          (Throw e, _) -> Result [ e ] Nothing
+          (Catch during handler, _) -> case yield during state of
+            Result _ (Just (state', a)) -> Result [] (Just (state', a))
+            Result (e:_) Nothing -> yield (handler e) state
+            Result [] Nothing -> Result [] Nothing
           (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
           (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
           (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) (ParseError expectedSymbols) ] Nothing
@@ -274,6 +281,8 @@ instance Show symbol => Show1 (AssignmentF (Node symbol)) where
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
+    Throw e -> showsUnaryWith showsPrec "Throw" d e
+    Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
 
 type instance Base (Rose a) = RoseF a
 
@@ -306,3 +315,10 @@ instance Alternative (Result symbol) where
   empty = Result [] Nothing
   Result e (Just a) <|> _ = Result e (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <> e2) b
+
+instance MonadError (Error symbol) (Assignment (Node symbol)) where
+  throwError :: HasCallStack => Error symbol -> Assignment (Node symbol) a
+  throwError error = withFrozenCallStack $ Throw error `Then` return
+
+  catchError :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> Assignment (Node symbol) a
+  catchError during handler = withFrozenCallStack $ Catch during handler `Then` identity
