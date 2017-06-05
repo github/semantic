@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
 module Data.Record where
 
 import Data.Functor.Listable
@@ -29,6 +29,10 @@ rtail (_ :. tail) = tail
 class HasField (fields :: [*]) (field :: *) where
   getField :: Record fields -> field
   setField :: Record fields -> field -> Record fields
+
+type family ConstrainAll (toConstraint :: * -> Constraint) (fs :: [*]) :: Constraint where
+  ConstrainAll toConstraint (f ': fs) = (toConstraint f, ConstrainAll toConstraint fs)
+  ConstrainAll _ '[] = ()
 
 
 -- Instances

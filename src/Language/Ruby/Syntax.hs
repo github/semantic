@@ -46,6 +46,7 @@ type Syntax' =
   , Statement.While
   , Statement.Yield
   , Syntax.Empty
+  , Syntax.Error [Error Grammar]
   , Syntax.Identifier
   , []
   ]
@@ -56,7 +57,7 @@ assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assignment = makeTerm <$> symbol Program <*> children (many declaration)
 
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-declaration = comment <|> class' <|> method
+declaration = handleError $ comment <|> class' <|> method
 
 class' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
@@ -76,7 +77,8 @@ statements :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statements = makeTerm <$> location <*> many statement
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-statement  =  exit Statement.Return Return
+statement  = handleError
+           $  exit Statement.Return Return
           <|> exit Statement.Yield Yield
           <|> exit Statement.Break Break
           <|> exit Statement.Continue Next
@@ -151,3 +153,8 @@ makeTerm a f = cofree $ a :< inj f
 
 emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+
+handleError :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
+handleError = flip catchError $ \ error -> case errorCause error of
+  UnexpectedEndOfInput _ -> throwError error
+  _ -> makeTerm <$> location <*> (Syntax.Error [error] <$ source)

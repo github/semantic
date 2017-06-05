@@ -56,6 +56,7 @@ type Syntax' =
    , Statement.Yield
    , Syntax.Ellipsis
    , Syntax.Empty
+   , Syntax.Error [Error Grammar]
    , Syntax.Identifier
    , []
    ]

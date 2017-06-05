@@ -49,7 +49,7 @@ data Boolean a
   = Or !a !a
   | And !a !a
   | Not !a
-  deriving (Eq, Foldable, Functor, Generic1, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
