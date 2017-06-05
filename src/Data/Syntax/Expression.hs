@@ -21,8 +21,6 @@ data Comparison a
   | GreaterThan !a !a
   | GreaterThanEqual !a !a
   | Equal !a !a
-  | Member !a !a
-  | NotMember !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Comparison where liftEq = genericLiftEq
@@ -77,6 +75,7 @@ instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 -- | Subscript (e.g a[1])
 data Subscript a
   = Subscript !a ![a]
+  | Member !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Subscript where liftEq = genericLiftEq

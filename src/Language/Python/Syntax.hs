@@ -125,11 +125,11 @@ comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression
                                   <|> makeTerm loc <$ symbol AnonRAngleEqual <*> (Expression.GreaterThanEqual lexpression <$> expression)
                                   <|> makeTerm loc <$ symbol AnonEqualEqual  <*> (Expression.Equal lexpression <$> expression)
                                   <|> makeTerm loc <$ symbol AnonBangEqual   <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
-                                  <|> makeTerm loc <$ symbol AnonNot         <*> (Expression.NotMember lexpression <$> expression)
+                                  <|> makeTerm loc <$ symbol AnonNot         <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Member lexpression <$> expression)))
                                   <|> makeTerm loc <$ symbol AnonIn          <*> (Expression.Member lexpression <$> expression)
-                                                                               -- source is used here to push the cursor to the next node to enable matching against `AnonNot`
-                                  <|> makeTerm loc <$ symbol AnonIs          <*> (source *> symbol AnonNot *> (Expression.NotEqual lexpression <$> expression)
-                                                                                <|> (Expression.Equal lexpression <$> expression))
+                                                    -- source is used here to push the cursor to the next node to enable matching against `AnonNot`
+                                  <|> symbol AnonIs *> source *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
+                                                                <|> (makeTerm loc <$> Expression.Equal lexpression <$> expression))
 
 notOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
