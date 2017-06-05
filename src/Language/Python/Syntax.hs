@@ -4,6 +4,7 @@ module Language.Python.Syntax
 , Syntax
 , Syntax'
 , Grammar
+, Error
 ) where
 
 import Data.Align.Generic
@@ -11,7 +12,8 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Functor.Union
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment
+import Data.Syntax.Assignment hiding (Error)
+import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -45,10 +47,12 @@ type Syntax' =
    , Statement.Return
    , Statement.Yield
    , Syntax.Empty
-   , Syntax.Error [Error Grammar]
+   , Syntax.Error [Error]
    , Syntax.Identifier
    , []
    ]
+
+type Error = Assignment.Error Grammar
 
 data Redirect a = Redirect !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
