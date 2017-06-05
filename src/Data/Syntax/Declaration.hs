@@ -56,7 +56,7 @@ instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = generic
 
 
 -- | Comprehension (e.g. ((a for b in c) in Python)
-data Comprehension a = Comprehension { result :: !a, intermediate :: ![a], base :: !a }
+data Comprehension a = Comprehension { comprehensionMap :: !a, comprehensionBindings :: ![a], comprehensionContext :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Comprehension where liftEq = genericLiftEq
