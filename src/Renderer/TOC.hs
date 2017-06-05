@@ -4,7 +4,6 @@ module Renderer.TOC
 , diffTOC
 , Summaries(..)
 , JSONSummary(..)
-, Summarizable(..)
 , isValidSummary
 , Declaration(..)
 , declaration
@@ -55,26 +54,22 @@ instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
 data JSONSummary
-  = JSONSummary { info :: Summarizable }
+  = JSONSummary
+    { summaryCategory :: Category
+    , summaryTermName :: Text
+    , summarySourceSpan :: SourceSpan
+    , summaryChangeType :: Text
+    }
   | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
   deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
-  toJSON (JSONSummary Summarizable{..}) = object [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
+  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= toCategoryName summaryCategory, "term" .= summaryTermName, "span" .= summarySourceSpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
 isValidSummary :: JSONSummary -> Bool
 isValidSummary ErrorSummary{} = False
 isValidSummary _ = True
-
-data Summarizable
-  = Summarizable
-    { summarizableCategory :: Category
-    , summarizableTermName :: Text
-    , summarizableSourceSpan :: SourceSpan
-    , summarizableChangeType :: Text
-    }
-  deriving (Eq, Show)
 
 -- | A declaration’s identifier and type.
 data Declaration
@@ -163,7 +158,7 @@ entrySummary entry = case entry of
   Replaced a  -> Just (recordSummary a "modified")
   where recordSummary record
           | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
-          | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
+          | otherwise = JSONSummary (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
