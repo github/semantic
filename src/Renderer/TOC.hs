@@ -153,13 +153,13 @@ dedupe = foldl' go []
 entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
   Unchanged _ -> Nothing
-  Changed a   -> Just (recordSummary a "modified")
-  Deleted a   -> Just (recordSummary a "removed")
-  Inserted a  -> Just (recordSummary a "added")
-  Replaced a  -> Just (recordSummary a "modified")
+  Changed a   -> recordSummary a "modified"
+  Deleted a   -> recordSummary a "removed"
+  Inserted a  -> recordSummary a "added"
+  Replaced a  -> recordSummary a "modified"
   where recordSummary record = case getDeclaration record of
-          Just (ErrorDeclaration text) -> const (ErrorSummary text (sourceSpan record))
-          declaration -> JSONSummary (toCategoryName (category record)) (maybe "" declarationIdentifier declaration) (sourceSpan record)
+          Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
+          declaration -> Just . JSONSummary (toCategoryName (category record)) (maybe "" declarationIdentifier declaration) (sourceSpan record)
 
 renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
