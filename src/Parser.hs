@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables #-}
 module Parser where
 
 import Data.Functor.Union
@@ -30,10 +30,10 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, Functor (Union fs))
-                   => Parser (AST grammar)                                                -- ^ A parser producing 'AST'.
-                   -> Assignment (Node grammar) (Term (Union fs) Location)                -- ^ An assignment from 'AST' onto 'Term's.
-                   -> Parser (Term (Union (Syntax.Error [Error grammar] ': fs)) Location) -- ^ A parser of 'Term's, weakened to allow for 'Syntax.Error' cases.
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error [Error grammar]))
+                   => Parser (AST grammar)                                 -- ^ A parser producing 'AST'.
+                   -> Assignment (Node grammar) (Term (Union fs) Location) -- ^ An assignment from 'AST' onto 'Term's.
+                   -> Parser (Term (Union fs) Location)                    -- ^ A parser of 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
@@ -52,10 +52,10 @@ parserForLanguage (Just language) = case language of
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
   _ -> LineByLineParser
 
-rubyParser :: Parser (Term (Union (Syntax.Error [Error Ruby.Grammar] ': Ruby.Syntax')) Location)
+rubyParser :: Parser (Term (Union Ruby.Syntax') Location)
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-pythonParser :: Parser (Term (Union (Syntax.Error [Error Python.Grammar] ': Python.Syntax')) Location)
+pythonParser :: Parser (Term (Union Python.Syntax') Location)
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 runParser :: Parser term -> Source -> IO term
@@ -65,7 +65,7 @@ runParser parser = case parser of
     ast <- runParser parser source
     let Result errors term = assign assignment source ast
     traverse_ (putStr . ($ "") . showError source) errors
-    pure (maybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) (hoistCofree weaken) term)
+    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) term)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> cmarkParser
   LineByLineParser -> lineByLineParser
