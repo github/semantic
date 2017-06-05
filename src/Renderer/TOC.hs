@@ -15,7 +15,6 @@ module Renderer.TOC
 , entrySummary
 ) where
 
-import Category as C
 import Data.Aeson
 import Data.Align (crosswalk)
 import Data.Functor.Both hiding (fst, snd)
@@ -162,7 +161,7 @@ entrySummary entry = case entry of
           Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
           Nothing -> const Nothing
 
-renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
+renderToC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -172,7 +171,7 @@ renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValid
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Diff f (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
