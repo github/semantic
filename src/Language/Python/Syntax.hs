@@ -54,12 +54,20 @@ type Syntax' =
    , Statement.If
    , Statement.Return
    , Statement.Yield
-   , Syntax.Ellipsis
+   , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
    , Syntax.Error [Error Grammar]
    , Syntax.Identifier
    , []
    ]
+
+-- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
+data Ellipsis a = Ellipsis
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Ellipsis where liftEq = genericLiftEq
+instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
+
 
 data Redirect a = Redirect !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -114,7 +122,7 @@ dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
 ellipsis :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-ellipsis = makeTerm <$> symbol Ellipsis <*> (Syntax.Ellipsis <$ source)
+ellipsis = makeTerm <$> symbol Grammar.Ellipsis <*> (Language.Python.Syntax.Ellipsis <$ source)
 
 comparisonOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression >>= \ lexpression -> makeComparison loc lexpression)
