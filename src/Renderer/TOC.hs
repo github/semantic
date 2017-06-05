@@ -146,7 +146,7 @@ dedupe = foldl' go []
         find p x = List.break (p x)
         exactMatch = (==) `on` getDeclaration
         similarMatch a b = sameCategory a b && similarDeclaration a b
-        sameCategory = (==) `on` category
+        sameCategory = (==) `on` fmap toCategoryName . getDeclaration
         similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
