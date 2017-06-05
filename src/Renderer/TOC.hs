@@ -150,7 +150,7 @@ dedupe = foldl' go []
         similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
-entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
+entrySummary :: (HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
   Unchanged _ -> Nothing
   Changed a   -> recordSummary a "modified"
