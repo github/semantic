@@ -54,9 +54,10 @@ instance StringConv Summaries ByteString where
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
-data JSONSummary = JSONSummary { info :: Summarizable }
-                 | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
-                 deriving (Generic, Eq, Show)
+data JSONSummary
+  = JSONSummary { info :: Summarizable }
+  | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
+  deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
   toJSON (JSONSummary Summarizable{..}) = object [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
