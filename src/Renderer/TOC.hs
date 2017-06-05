@@ -82,7 +82,7 @@ getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe 
 getDeclaration = getField
 
 -- | Produce the annotations of nodes representing declarations.
-declaration :: (HasField fields (Maybe Declaration), HasField fields Category) => TermF f (Record fields) a -> Maybe (Record fields)
+declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
 declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
