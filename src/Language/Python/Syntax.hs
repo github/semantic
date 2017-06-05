@@ -47,7 +47,7 @@ type Syntax' =
    , Statement.Return
    , Statement.Yield
    , Syntax.Empty
-   , Syntax.Error [Error]
+   , Syntax.Error Error
    , Syntax.Identifier
    , []
    ]

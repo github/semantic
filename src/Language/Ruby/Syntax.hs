@@ -48,7 +48,7 @@ type Syntax' =
   , Statement.While
   , Statement.Yield
   , Syntax.Empty
-  , Syntax.Error [Error]
+  , Syntax.Error Error
   , Syntax.Identifier
   , []
   ]
@@ -161,4 +161,4 @@ emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 handleError :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
 handleError = flip catchError $ \ error -> case errorCause error of
   UnexpectedEndOfInput _ -> throwError error
-  _ -> makeTerm <$> location <*> (Syntax.Error [error] <$ source)
+  _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
