@@ -77,10 +77,8 @@ data Declaration
   deriving (Eq, Generic, NFData, Show)
 
 -- | Produce the annotations of nodes representing declarations.
-declaration :: (HasField fields (Maybe Declaration), HasField fields Category) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
-declaration (annotation :< syntax)
-  | S.ParseError{} <- syntax = Just (setCategory annotation C.ParseError)
-  | otherwise                = annotation <$ (getField annotation :: Maybe Declaration)
+declaration :: (HasField fields (Maybe Declaration), HasField fields Category) => TermF f (Record fields) a -> Maybe (Record fields)
+declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
