@@ -36,7 +36,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 
 -- | A relation on 'Term's, guaranteed constant-time in the size of the 'Term' by parametricity.
 --
---   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subtermwise.
+--   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation f fields = forall a b. TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
 
 type FeatureVector = Array Int Double
