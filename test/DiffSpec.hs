@@ -2,6 +2,7 @@
 module DiffSpec where
 
 import Category
+import Data.Functor.Both
 import Data.Functor.Listable
 import RWS
 import Data.String
@@ -23,14 +24,14 @@ spec = parallel $ do
 
   prop "equal terms produce identity diffs" $
     \ a -> let term = decorate (unListableF a :: SyntaxTerm String '[Category]) in
-      diffCost (diffTerms term term) `shouldBe` 0
+      diffCost (diffTerms (pure term)) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = stripDiff $ diffTerms (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
+      \ a b -> let diff = diffTerms (unListableF <$> both a b :: Both (SyntaxTerm String '[Category])) in
         beforeTerm diff `shouldBe` Just (unListableF a)
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = stripDiff $ diffTerms (decorate (unListableF a)) (decorate (unListableF b :: SyntaxTerm String '[Category])) in
+      \ a b -> let diff = diffTerms (unListableF <$> both a b :: Both (SyntaxTerm String '[Category])) in
         afterTerm diff `shouldBe` Just (unListableF b)
