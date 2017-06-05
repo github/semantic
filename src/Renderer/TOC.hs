@@ -157,9 +157,9 @@ entrySummary entry = case entry of
   Deleted a   -> Just (recordSummary a "removed")
   Inserted a  -> Just (recordSummary a "added")
   Replaced a  -> Just (recordSummary a "modified")
-  where recordSummary record
-          | Just (ErrorDeclaration text) <- getDeclaration record = const (ErrorSummary text (sourceSpan record))
-          | otherwise = JSONSummary (toCategoryName (category record)) (maybe "" declarationIdentifier (getDeclaration record)) (sourceSpan record)
+  where recordSummary record = case getDeclaration record of
+          Just (ErrorDeclaration text) -> const (ErrorSummary text (sourceSpan record))
+          declaration -> JSONSummary (toCategoryName (category record)) (maybe "" declarationIdentifier declaration) (sourceSpan record)
 
 renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
