@@ -166,21 +166,23 @@ data ErrorCause symbol
 
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show symbol => Source.Source -> Error symbol -> ShowS
-showError source Error{..}
-  = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation . showChar '\n'
+showError source error@Error{..}
+  = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n'
   . showString context -- actualLines results include line endings, so no newline here
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . withSGRCode [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
   . showString (prettyCallStack callStack) . showChar '\n'
-  where showExpectation = case errorCause of
-          UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
-          UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
-          UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
-          ParseError symbols -> showString "expected " . showSymbols symbols . showString ", but got parse error"
-        context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
+  where context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
         showSGRCode = showString . setSGRCode
         withSGRCode code s = showSGRCode code . s . showSGRCode []
+
+showExpectation :: Show symbol => Error symbol -> ShowS
+showExpectation Error{..} = case errorCause of
+  UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
+  UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
+  UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+  ParseError symbols -> showString "expected " . showSymbols symbols . showString ", but got parse error"
 
 showSymbols :: Show symbol => [symbol] -> ShowS
 showSymbols [] = showString "end of input nodes"
