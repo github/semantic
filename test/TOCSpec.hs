@@ -124,11 +124,11 @@ spec = parallel $ do
         diffTOC (diffTerms (pure term)) `shouldBe` []
 
   describe "JSONSummary" $ do
-    it "encodes InSummarizable to JSON" $ do
+    it "encodes modified summaries to JSON" $ do
       let summary = JSONSummary C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
 
-    it "encodes Summarizable to JSON" $ do
+    it "encodes added summaries to JSON" $ do
       let summary = JSONSummary C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
 
