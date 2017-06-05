@@ -146,7 +146,7 @@ entrySummary entry = case entry of
           | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
           | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
-renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -156,7 +156,7 @@ renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValid
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
