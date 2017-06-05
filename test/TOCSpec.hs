@@ -41,7 +41,7 @@ spec = parallel $ do
       \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
     prop "produces an unchanged entry for identity diffs" $
-      \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms term' term') `shouldBe` [Unchanged (lastValue term')]
+      \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ patch -> let patch' = (unListableF <$> patch :: Patch (Term (Syntax ()) Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
@@ -121,7 +121,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
-        diffTOC (diffTerms term term) `shouldBe` []
+        diffTOC (diffTerms (pure term)) `shouldBe` []
 
   describe "JSONSummary" $ do
     it "encodes InSummarizable to JSON" $ do
@@ -136,12 +136,12 @@ spec = parallel $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      fmap toS output `shouldBe` Just ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
+      toS output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      fmap toS output `shouldBe` Just ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n" :: ByteString)
+      toS output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n" :: ByteString)
 
 type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
 type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)

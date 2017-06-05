@@ -27,10 +27,14 @@ spec = parallel $ do
       output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
       output `shouldBe` "(Program\n  (Method\n    (Identifier)))\n"
 
-  describe "diffAndRenderTermPair" $ do
-    it "produces Nothing when both blobs are missing" $ do
-      result <- runTask (diffAndRenderTermPair (pure (emptySourceBlob "/foo")) (runBothWith replacing) (const ("non-empty" :: ByteString)) (pure (cofree (() :< []))))
-      result `shouldBe` Nothing
+  describe "diffTermPair" $ do
+    it "produces an Insert when the first blob is missing" $ do
+      result <- runTask (diffTermPair (both (emptySourceBlob "/foo") (sourceBlob "/foo" Nothing "")) (runBothWith replacing) (pure (cofree (() :< []))))
+      (() <$) <$> result `shouldBe` pure (Insert ())
+
+    it "produces a Delete when the second blob is missing" $ do
+      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptySourceBlob "/foo")) (runBothWith replacing) (pure (cofree (() :< []))))
+      (() <$) <$> result `shouldBe` pure (Delete ())
 
   where
     methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)

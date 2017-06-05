@@ -46,8 +46,8 @@ emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothi
 nullBlob :: SourceBlob -> Bool
 nullBlob SourceBlob{..} = oid == nullOid || Source.null source
 
-nonExistentBlob :: SourceBlob -> Bool
-nonExistentBlob SourceBlob{..} = isNothing blobKind
+blobExists :: SourceBlob -> Bool
+blobExists SourceBlob{..} = isJust blobKind
 
 sourceBlob :: FilePath -> Maybe Language -> Source -> SourceBlob
 sourceBlob filepath language source = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob) language
