@@ -55,7 +55,7 @@ instance ToJSON Summaries where
 
 data JSONSummary
   = JSONSummary
-    { summaryCategory :: Category
+    { summaryCategoryName :: Text
     , summaryTermName :: Text
     , summarySourceSpan :: SourceSpan
     , summaryChangeType :: Text
@@ -64,7 +64,7 @@ data JSONSummary
   deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
-  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= toCategoryName summaryCategory, "term" .= summaryTermName, "span" .= summarySourceSpan ]
+  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySourceSpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
 isValidSummary :: JSONSummary -> Bool
@@ -159,7 +159,7 @@ entrySummary entry = case entry of
   Replaced a  -> Just (recordSummary a "modified")
   where recordSummary record
           | Just (ErrorDeclaration text) <- getDeclaration record = const (ErrorSummary text (sourceSpan record))
-          | otherwise = JSONSummary (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
+          | otherwise = JSONSummary (toCategoryName (category record)) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
 
 renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
