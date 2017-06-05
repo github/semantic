@@ -36,6 +36,7 @@ import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Source hiding (null)
 import Syntax as S
+import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Term
@@ -87,7 +88,7 @@ declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Decl
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
-syntaxDeclarationAlgebra :: HasField fields Range => Source -> TermF (Syntax Text) (Record fields) (Term (Syntax Text) (Record fields), Maybe Declaration) -> Maybe Declaration
+syntaxDeclarationAlgebra :: HasField fields Range => Source -> RAlgebra (SyntaxTermF Text fields) (SyntaxTerm Text fields) (Maybe Declaration)
 syntaxDeclarationAlgebra source r = case tailF r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
@@ -103,8 +104,7 @@ syntaxDeclarationAlgebra source r = case tailF r of
 declarationAlgebra :: (InUnion fs Declaration.Function, InUnion fs Declaration.Method, InUnion fs (Syntax.Error error), Show error, Functor (Union fs), HasField fields Range)
                    => Proxy error
                    -> Source
-                   -> TermF (Union fs) (Record fields) (Term (Union fs) (Record fields), Maybe Declaration)
-                   -> Maybe Declaration
+                   -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 declarationAlgebra proxy source r
   | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource identifier)
   | Just (Declaration.Method (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource identifier)
