@@ -63,9 +63,9 @@ runParser parser = case parser of
   ASTParser language -> parseToAST language
   AssignmentParser parser assignment -> \ source -> do
     ast <- runParser parser source
-    let Result errors term = assign assignment source ast
-    traverse_ (putStr . ($ "") . showError source) errors
-    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) (head errors))))) term)
+    let Result err term = assign assignment source ast
+    traverse_ (putStr . ($ "") . showError source) err
+    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))) term)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> cmarkParser
   LineByLineParser -> lineByLineParser

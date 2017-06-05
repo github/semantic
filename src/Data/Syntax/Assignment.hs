@@ -148,7 +148,7 @@ type AST grammar = Rose (Node grammar)
 
 
 -- | The result of assignment, possibly containing an error.
-data Result symbol a = Result { resultErrors :: [Error symbol], resultValue :: Maybe a }
+data Result symbol a = Result { resultErrors :: Maybe (Error symbol), resultValue :: Maybe a }
   deriving (Eq, Foldable, Functor, Traversable)
 
 data Error symbol where
@@ -203,15 +203,15 @@ assign assignment source = fmap snd . assignAllFrom assignment . makeState sourc
 
 assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
-  Result es (Just (state, a)) -> case stateNodes (dropAnonymous state) of
-    [] -> Result [] (Just (state, a))
-    Rose (Just s :. _) _ :_ -> Result (if null es then [ Error (statePos state) (UnexpectedSymbol [] s) ] else es) Nothing
-    Rose (Nothing :. _) _ :_ -> Result (if null es then [ Error (statePos state) (ParseError []) ] else es) Nothing
+  Result err (Just (state, a)) -> case stateNodes (dropAnonymous state) of
+    [] -> Result Nothing (Just (state, a))
+    Rose (Just s :. _) _ :_ -> Result (err <|> Just (Error (statePos state) (UnexpectedSymbol [] s))) Nothing
+    Rose (Nothing :. _) _ :_ -> Result (err <|> Just (Error (statePos state) (ParseError []))) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
-runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
+runAssignment = iterFreer run . fmap (\ a state -> pure (state, a))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, Rose (_ :. location) _ : _) -> yield location state
@@ -219,18 +219,16 @@ runAssignment = iterFreer run . fmap (\ a state -> Result [] (Just (state, a)))
           (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
           (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
             Result _ (Just (state', a)) -> yield a (advanceState state' { stateNodes = stateNodes })
-            Result es Nothing -> Result es Nothing
+            Result err Nothing -> Result err Nothing
           (Choose choices, Rose (Just symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
-          (Throw e, _) -> Result [ e ] Nothing
+          (Throw e, _) -> Result (Just e) Nothing
           (Catch during handler, _) -> case yield during state of
-            Result _ (Just (state', a)) -> Result [] (Just (state', a))
-            Result (e:_) Nothing -> yield (handler e) state
-            Result [] Nothing -> Result [] Nothing
-          (_, []) -> Result [ Error statePos (UnexpectedEndOfInput expectedSymbols) ] Nothing
-          (_, Rose (Just symbol :. _ :. nodeSpan :. Nil) _:_) -> Result [ Error (Info.spanStart nodeSpan) (UnexpectedSymbol expectedSymbols symbol) ] Nothing
-          (_, Rose (Nothing :. _ :. nodeSpan :. Nil) _ : _) -> Result [ Error (Info.spanStart nodeSpan) (ParseError expectedSymbols) ] Nothing
+            Result _ (Just (state', a)) -> Result Nothing (Just (state', a))
+            Result err Nothing -> maybe (Result Nothing Nothing) (flip yield state . handler) err
+          (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
+          (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result (Just (maybe (Error (Info.spanStart nodeSpan) (ParseError expectedSymbols)) (Error (Info.spanStart nodeSpan) . UnexpectedSymbol expectedSymbols) symbol)) Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous initialState
                   _ -> initialState
@@ -308,13 +306,13 @@ instance Show1 ErrorCause where
     ParseError expected -> showsUnaryWith (liftShowsPrec sp sl) "ParseError" d expected
 
 instance Applicative (Result symbol) where
-  pure = Result [] . Just
-  Result e1 f <*> Result e2 a = Result (e1 <> e2) (f <*> a)
+  pure = Result Nothing . Just
+  Result e1 f <*> Result e2 a = Result (e1 <|> e2) (f <*> a)
 
 instance Alternative (Result symbol) where
-  empty = Result [] Nothing
+  empty = Result Nothing Nothing
   Result e (Just a) <|> _ = Result e (Just a)
-  Result e1 Nothing <|> Result e2 b = Result (e1 <> e2) b
+  Result e1 Nothing <|> Result e2 b = Result (e1 <|> e2) b
 
 instance MonadError (Error symbol) (Assignment (Node symbol)) where
   throwError :: HasCallStack => Error symbol -> Assignment (Node symbol) a
