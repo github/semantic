@@ -21,7 +21,6 @@ data Comparison a
   | GreaterThan !a !a
   | GreaterThanEqual !a !a
   | Equal !a !a
-  | NotEqual !a !a
   | Member !a !a
   | NotMember !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
