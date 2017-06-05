@@ -159,7 +159,7 @@ entrySummary entry = case entry of
   Replaced a  -> recordSummary a "modified"
   where recordSummary record = case getDeclaration record of
           Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
-          Just declaration -> Just . JSONSummary (toCategoryName (category record)) (declarationIdentifier declaration) (sourceSpan record)
+          Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
           Nothing -> const Nothing
 
 renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
@@ -176,10 +176,11 @@ diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasFi
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
-toCategoryName :: Category -> Text
-toCategoryName category = case category of
-  C.SingletonMethod -> "Method"
-  c -> show c
+toCategoryName :: Declaration -> Text
+toCategoryName declaration = case declaration of
+  FunctionDeclaration _ -> "Function"
+  MethodDeclaration _ -> "Method"
+  ErrorDeclaration _ -> "ParseError"
 
 instance Listable Declaration where
   tiers
