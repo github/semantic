@@ -78,6 +78,9 @@ data Declaration
   | ErrorDeclaration    { declarationIdentifier :: Text }
   deriving (Eq, Generic, NFData, Show)
 
+getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
+getDeclaration = getField
+
 -- | Produce the annotations of nodes representing declarations.
 declaration :: (HasField fields (Maybe Declaration), HasField fields Category) => TermF f (Record fields) a -> Maybe (Record fields)
 declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
@@ -145,8 +148,6 @@ dedupe = foldl' go []
         similarMatch a b = sameCategory a b && similarDeclaration a b
         sameCategory = (==) `on` category
         similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
-        getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
-        getDeclaration = getField
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
 entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
