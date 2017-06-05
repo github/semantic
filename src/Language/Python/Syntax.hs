@@ -83,40 +83,40 @@ declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 declaration = comment <|> statement <|> expression
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-statement = expressionStatement
-          <|> ifStatement
-          <|> returnStatement
-          <|> identifier
+statement = assertStatement
           <|> assignment'
           <|> augmentedAssignment
-          <|> printStatement
-          <|> assertStatement
+          <|> expressionStatement
           <|> globalStatement
+          <|> ifStatement
+          <|> identifier
           <|> import'
           <|> importFrom
+          <|> printStatement
+          <|> returnStatement
 
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children expression
 
 expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = statement
-          <|> unaryOperator
+expression = await
           <|> binaryOperator
           <|> booleanOperator
-          <|> comparisonOperator
-          <|> tuple
-          <|> literal
-          <|> memberAccess
-          <|> subscript
           <|> call
-          <|> keywordIdentifier
-          <|> notOperator
-          <|> ellipsis
-          <|> dottedName
-          <|> await
-          <|> lambda
+          <|> comparisonOperator
           <|> comprehension
           <|> conditionalExpression
+          <|> dottedName
+          <|> ellipsis
+          <|> lambda
+          <|> keywordIdentifier
+          <|> literal
+          <|> memberAccess
+          <|> notOperator
+          <|> subscript
+          <|> statement
+          <|> tuple
+          <|> unaryOperator
 
 dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
