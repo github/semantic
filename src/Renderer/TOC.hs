@@ -8,7 +8,7 @@ module Renderer.TOC
 , isValidSummary
 , Declaration(..)
 , declaration
-, declarationAlgebra
+, syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
 , dedupe
@@ -83,9 +83,9 @@ declaration (annotation :< syntax)
   | otherwise                = annotation <$ (getField annotation :: Maybe Declaration)
 
 
--- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: HasField fields Range => Source -> TermF (Syntax Text) (Record fields) (Term (Syntax Text) (Record fields), Maybe Declaration) -> Maybe Declaration
-declarationAlgebra source r = case tailF r of
+-- | Compute 'Declaration's for methods and functions in 'Syntax'.
+syntaxDeclarationAlgebra :: HasField fields Range => Source -> TermF (Syntax Text) (Record fields) (Term (Syntax Text) (Record fields), Maybe Declaration) -> Maybe Declaration
+syntaxDeclarationAlgebra source r = case tailF r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
