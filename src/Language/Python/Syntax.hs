@@ -80,7 +80,7 @@ assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-declaration = comment <|> statement <|> expression
+declaration = handleError $ comment <|> statement <|> expression
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statement = assertStatement
@@ -320,3 +320,8 @@ makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+
+handleError :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
+handleError = flip catchError $ \ error -> case errorCause error of
+  UnexpectedEndOfInput _ -> throwError error
+  _ -> makeTerm <$> location <*> (Syntax.Error [error] <$ source)
