@@ -159,7 +159,8 @@ entrySummary entry = case entry of
   Replaced a  -> recordSummary a "modified"
   where recordSummary record = case getDeclaration record of
           Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
-          declaration -> Just . JSONSummary (toCategoryName (category record)) (maybe "" declarationIdentifier declaration) (sourceSpan record)
+          Just declaration -> Just . JSONSummary (toCategoryName (category record)) (declarationIdentifier declaration) (sourceSpan record)
+          Nothing -> const Nothing
 
 renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
