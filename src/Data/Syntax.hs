@@ -50,5 +50,3 @@ data Error error a = Error error
 instance Eq error => GAlign (Error error)
 instance Eq error => Eq1 (Error error) where liftEq = genericLiftEq
 instance Show error => Show1 (Error error) where liftShowsPrec = genericLiftShowsPrec
-
-
