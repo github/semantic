@@ -68,10 +68,13 @@ runParser parser = case parser of
       Just term -> do
         traverse_ (putStr . ($ "") . showError source) (toList err <> termErrors term)
         pure term
-      Nothing -> pure $! cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
+      Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> cmarkParser
   LineByLineParser -> lineByLineParser
+
+errorTerm :: InUnion fs (Syntax.Error (Error grammar)) => Source -> Maybe (Error grammar) -> Term (Union fs) Location
+errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
 
 termErrors :: (InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs)) => Term (Union fs) a -> [Error grammar]
 termErrors = cata $ \ (_ :< s) -> case s of
