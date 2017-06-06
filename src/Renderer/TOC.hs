@@ -4,23 +4,24 @@ module Renderer.TOC
 , diffTOC
 , Summaries(..)
 , JSONSummary(..)
-, Summarizable(..)
 , isValidSummary
 , Declaration(..)
 , declaration
 , declarationAlgebra
+, syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
 , dedupe
 , entrySummary
 ) where
 
-import Category as C
 import Data.Aeson
 import Data.Align (crosswalk)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
+import Data.Functor.Union
+import Data.Proxy
 import Data.Text (toLower)
 import Data.Text.Listable
 import Data.These
@@ -33,6 +34,9 @@ import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Source hiding (null)
 import Syntax as S
+import Data.Syntax.Algebra (RAlgebra)
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Declaration as Declaration
 import Term
 
 data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
@@ -48,26 +52,23 @@ instance StringConv Summaries ByteString where
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
-data JSONSummary = JSONSummary { info :: Summarizable }
-                 | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
-                 deriving (Generic, Eq, Show)
+data JSONSummary
+  = JSONSummary
+    { summaryCategoryName :: Text
+    , summaryTermName :: Text
+    , summarySourceSpan :: SourceSpan
+    , summaryChangeType :: Text
+    }
+  | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
+  deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
-  toJSON (JSONSummary Summarizable{..}) = object [ "changeType" .= summarizableChangeType, "category" .= toCategoryName summarizableCategory, "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
+  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySourceSpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
 isValidSummary :: JSONSummary -> Bool
 isValidSummary ErrorSummary{} = False
 isValidSummary _ = True
-
-data Summarizable
-  = Summarizable
-    { summarizableCategory :: Category
-    , summarizableTermName :: Text
-    , summarizableSourceSpan :: SourceSpan
-    , summarizableChangeType :: Text
-    }
-  deriving (Eq, Show)
 
 -- | A declaration’s identifier and type.
 data Declaration
@@ -76,16 +77,17 @@ data Declaration
   | ErrorDeclaration    { declarationIdentifier :: Text }
   deriving (Eq, Generic, NFData, Show)
 
+getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
+getDeclaration = getField
+
 -- | Produce the annotations of nodes representing declarations.
-declaration :: (HasField fields (Maybe Declaration), HasField fields Category) => TermF (Syntax Text) (Record fields) a -> Maybe (Record fields)
-declaration (annotation :< syntax)
-  | S.ParseError{} <- syntax = Just (setCategory annotation C.ParseError)
-  | otherwise                = annotation <$ (getField annotation :: Maybe Declaration)
+declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
+declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
--- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: HasField fields Range => Source -> TermF (Syntax Text) (Record fields) (Term (Syntax Text) (Record fields), Maybe Declaration) -> Maybe Declaration
-declarationAlgebra source r = case tailF r of
+-- | Compute 'Declaration's for methods and functions in 'Syntax'.
+syntaxDeclarationAlgebra :: HasField fields Range => Source -> RAlgebra (SyntaxTermF Text fields) (SyntaxTerm Text fields) (Maybe Declaration)
+syntaxDeclarationAlgebra source r = case tailF r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
@@ -94,6 +96,18 @@ declarationAlgebra source r = case tailF r of
     | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
   S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange (headF r)) source))
   _ -> Nothing
+  where getSource = toText . flip Source.slice source . byteRange . extract
+
+-- | Compute 'Declaration's for methods and functions.
+declarationAlgebra :: (InUnion fs Declaration.Function, InUnion fs Declaration.Method, InUnion fs (Syntax.Error error), Show error, Functor (Union fs), HasField fields Range)
+                   => Proxy error
+                   -> Source
+                   -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
+declarationAlgebra proxy source r
+  | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource identifier)
+  | Just (Declaration.Method (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource identifier)
+  | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
+  | otherwise = Nothing
   where getSource = toText . flip Source.slice source . byteRange . extract
 
 
@@ -121,7 +135,7 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
                       | otherwise = fold r
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
-dedupe :: (HasField fields Category, HasField fields (Maybe Declaration)) => [Entry (Record fields)] -> [Entry (Record fields)]
+dedupe :: HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = foldl' go []
   where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
                 | (front, similar : back) <- find (similarMatch `on` entryPayload) x xs =
@@ -131,24 +145,23 @@ dedupe = foldl' go []
         find p x = List.break (p x)
         exactMatch = (==) `on` getDeclaration
         similarMatch a b = sameCategory a b && similarDeclaration a b
-        sameCategory = (==) `on` category
+        sameCategory = (==) `on` fmap toCategoryName . getDeclaration
         similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
-        getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
-        getDeclaration = getField
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
-entrySummary :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
+entrySummary :: (HasField fields (Maybe Declaration), HasField fields SourceSpan) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
   Unchanged _ -> Nothing
-  Changed a   -> Just (recordSummary a "modified")
-  Deleted a   -> Just (recordSummary a "removed")
-  Inserted a  -> Just (recordSummary a "added")
-  Replaced a  -> Just (recordSummary a "modified")
-  where recordSummary record
-          | C.ParseError <- category record = const (ErrorSummary (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record))
-          | otherwise = JSONSummary . Summarizable (category record) (maybe "" declarationIdentifier (getField record :: Maybe Declaration)) (sourceSpan record)
+  Changed a   -> recordSummary a "modified"
+  Deleted a   -> recordSummary a "removed"
+  Inserted a  -> recordSummary a "added"
+  Replaced a  -> recordSummary a "modified"
+  where recordSummary record = case getDeclaration record of
+          Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
+          Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
+          Nothing -> const Nothing
 
-renderToC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Both SourceBlob -> Diff (Syntax Text) (Record fields) -> Summaries
+renderToC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -158,14 +171,15 @@ renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValid
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-diffTOC :: (HasField fields Category, HasField fields (Maybe Declaration), HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 -- The user-facing category name
-toCategoryName :: Category -> Text
-toCategoryName category = case category of
-  C.SingletonMethod -> "Method"
-  c -> show c
+toCategoryName :: Declaration -> Text
+toCategoryName declaration = case declaration of
+  FunctionDeclaration _ -> "Function"
+  MethodDeclaration _ -> "Method"
+  ErrorDeclaration _ -> "ParseError"
 
 instance Listable Declaration where
   tiers
