@@ -70,6 +70,11 @@ runParser parser = case parser of
   MarkdownParser -> cmarkParser
   LineByLineParser -> lineByLineParser
 
+termErrors :: (InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs)) => Term (Union fs) a -> [Error grammar]
+termErrors = cata $ \ (_ :< s) -> case s of
+  _ | Just (Syntax.Error err) <- prj s -> [err]
+  _ -> []
+
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> IO (SyntaxTerm Text DefaultFields)
 lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
