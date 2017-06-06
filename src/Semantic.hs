@@ -11,11 +11,15 @@ import Algorithm hiding (diff)
 import Data.Align.Generic (GAlign)
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
+import Data.Functor.Union
+import Data.Proxy
 import Data.Record
+import qualified Data.Syntax.Declaration as Declaration
 import Diff
 import Info
 import Interpreter
 import qualified Language
+import qualified Language.Python.Syntax as Python
 import Patch
 import Parser
 import Prologue
@@ -55,14 +59,15 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . 
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
-  (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (declarationAlgebra source)) diffTerms (renderToC blobs)
+  (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source  >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToC blobs)
+  (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms (renderToC blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderJSONDiff blobs)
   (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (ConstructorLabel . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
-  (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (declarationAlgebra source)) diffTerms Just
+  (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         syntaxParser = parserForLanguage effectiveLanguage
 

@@ -9,6 +9,7 @@ module Renderer
 , renderJSONTerm
 , renderToC
 , declarationAlgebra
+, syntaxDeclarationAlgebra
 , identifierAlgebra
 , Summaries(..)
 , File(..)

@@ -30,7 +30,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error [Error grammar]))
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)))
                    => Parser (AST grammar)                                 -- ^ A parser producing 'AST'.
                    -> Assignment (Node grammar) (Term (Union fs) Location) -- ^ An assignment from 'AST' onto 'Term's.
                    -> Parser (Term (Union fs) Location)                    -- ^ A parser of 'Term's.
@@ -63,9 +63,9 @@ runParser parser = case parser of
   ASTParser language -> parseToAST language
   AssignmentParser parser assignment -> \ source -> do
     ast <- runParser parser source
-    let Result errors term = assign assignment source ast
-    traverse_ (putStr . ($ "") . showError source) errors
-    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error errors))) term)
+    let Result err term = assign assignment source ast
+    traverse_ (putStr . ($ "") . showError source) err
+    pure (fromMaybe (cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))) term)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> cmarkParser
   LineByLineParser -> lineByLineParser

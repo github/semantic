@@ -60,39 +60,39 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
       diffTOC diff `shouldBe`
-        [ JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
-        , JSONSummary $ Summarizable C.Method "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
-        , JSONSummary $ Summarizable C.Method "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
+        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
+        , JSONSummary "Method" "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
       diffTOC diff `shouldBe`
-        [ JSONSummary $ Summarizable C.Function "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
+        [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
       diffTOC diff `shouldBe`
-        [ JSONSummary $ Summarizable C.Function "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
+        [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
       diffTOC diff `shouldBe`
-        [ JSONSummary $ Summarizable C.Method "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
+        [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
       diffTOC diff `shouldBe`
-        [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
+        [ JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
       diffTOC diff `shouldBe`
-        [ JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
+        [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
     prop "inserts of methods and functions are summarized" $
       \name body ->
@@ -124,12 +124,12 @@ spec = parallel $ do
         diffTOC (diffTerms (pure term)) `shouldBe` []
 
   describe "JSONSummary" $ do
-    it "encodes InSummarizable to JSON" $ do
-      let summary = JSONSummary $ Summarizable C.Method "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified"
+    it "encodes modified summaries to JSON" $ do
+      let summary = JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
 
-    it "encodes Summarizable to JSON" $ do
-      let summary = JSONSummary $ Summarizable C.SingletonMethod "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+    it "encodes added summaries to JSON" $ do
+      let summary = JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
 
   describe "diff with ToCDiffRenderer" $ do

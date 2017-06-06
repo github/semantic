@@ -4,6 +4,7 @@ module Language.Python.Syntax
 , Syntax
 , Syntax'
 , Grammar
+, Error
 ) where
 
 import Data.Align.Generic
@@ -11,7 +12,8 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Functor.Union
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment
+import Data.Syntax.Assignment hiding (Error)
+import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -56,10 +58,12 @@ type Syntax' =
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
-   , Syntax.Error [Error Grammar]
+   , Syntax.Error Error
    , Syntax.Identifier
    , []
    ]
+
+type Error = Assignment.Error Grammar
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
@@ -324,4 +328,4 @@ emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 handleError :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
 handleError = flip catchError $ \ error -> case errorCause error of
   UnexpectedEndOfInput _ -> throwError error
-  _ -> makeTerm <$> location <*> (Syntax.Error [error] <$ source)
+  _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
