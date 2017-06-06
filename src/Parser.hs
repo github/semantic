@@ -66,7 +66,7 @@ runParser parser = case parser of
     let Result err term = assign assignment source ast
     case term of
       Just term -> do
-        traverse_ (putStr . ($ "") . showError source) (toList err <> termErrors term)
+        traverse_ (putStr . showError source) (toList err <> termErrors term)
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
