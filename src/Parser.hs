@@ -15,6 +15,7 @@ import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
+import System.Console.ANSI
 import Term
 import qualified Text.Parser.TreeSitter as TS
 import Text.Parser.TreeSitter.Language (Symbol)
@@ -23,6 +24,7 @@ import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
+import Text.Show
 import TreeSitter
 
 -- | A parser from 'Source' onto some term type.
@@ -66,12 +68,17 @@ runParser parser = case parser of
     let Result err term = assign assignment source ast
     case term of
       Just term -> do
-        traverse_ (putStrLn . showError source) (toList err <> termErrors term)
+        let errors = toList err <> termErrors term
+        traverse_ (putStrLn . showError source) errors
+        unless (Prologue.null errors) $
+          putStrLn (withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ "")
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> cmarkParser
   LineByLineParser -> lineByLineParser
+  where showSGRCode = showString . setSGRCode
+        withSGRCode code s = showSGRCode code . s . showSGRCode []
 
 errorTerm :: InUnion fs (Syntax.Error (Error grammar)) => Source -> Maybe (Error grammar) -> Term (Union fs) Location
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
