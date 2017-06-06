@@ -30,7 +30,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs))
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs))
                    => Parser (AST grammar)                                 -- ^ A parser producing 'AST'.
                    -> Assignment (Node grammar) (Term (Union fs) Location) -- ^ An assignment from 'AST' onto 'Term's.
                    -> Parser (Term (Union fs) Location)                    -- ^ A parser of 'Term's.
@@ -76,10 +76,10 @@ runParser parser = case parser of
 errorTerm :: InUnion fs (Syntax.Error (Error grammar)) => Source -> Maybe (Error grammar) -> Term (Union fs) Location
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
 
-termErrors :: (InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs)) => Term (Union fs) a -> [Error grammar]
+termErrors :: (InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
 termErrors = cata $ \ (_ :< s) -> case s of
   _ | Just (Syntax.Error err) <- prj s -> [err]
-  _ -> []
+  _ -> fold s
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> IO (SyntaxTerm Text DefaultFields)
