@@ -64,10 +64,9 @@ runParser parser = case parser of
   AssignmentParser parser assignment -> \ source -> do
     ast <- runParser parser source
     let Result err term = assign assignment source ast
-    traverse_ (putStr . ($ "") . showError source) err
     case term of
       Just term -> do
-        traverse_ (putStr . ($ "") . showError source) (termErrors term `asTypeOf` toList err)
+        traverse_ (putStr . ($ "") . showError source) (toList err <> termErrors term)
         pure term
       Nothing -> pure $! cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
