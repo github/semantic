@@ -28,16 +28,26 @@ import Term
 type Syntax = Union Syntax'
 type Syntax' =
   '[ Comment.Comment
+   , Declaration.Comprehension
+   , Declaration.Function
    , Declaration.Import
    , Declaration.Variable
    , Expression.Arithmetic
    , Expression.Boolean
    , Expression.Bitwise
    , Expression.Call
+   , Expression.Comparison
+   , Expression.ScopeResolution
+   , Expression.MemberAccess
+   , Expression.Subscript
+   , Literal.Array
    , Literal.Boolean
    , Literal.Float
+   , Literal.Hash
    , Literal.Integer
+   , Literal.KeyValue
    , Literal.Null
+   , Literal.Set
    , Literal.String
    , Literal.TextElement
    , Literal.Tuple
@@ -46,6 +56,7 @@ type Syntax' =
    , Statement.If
    , Statement.Return
    , Statement.Yield
+   , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
    , Syntax.Error Error
    , Syntax.Identifier
@@ -53,6 +64,14 @@ type Syntax' =
    ]
 
 type Error = Assignment.Error Grammar
+
+-- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
+data Ellipsis a = Ellipsis
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Ellipsis where liftEq = genericLiftEq
+instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
+
 
 data Redirect a = Redirect !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -64,27 +83,74 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
-
 declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-declaration = comment <|> literal <|> statement <|> import' <|> importFrom
-
+declaration = handleError $ comment <|> statement <|> expression
 
 statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-statement = expressionStatement
-          <|> ifStatement
-          <|> returnStatement
-          <|> identifier
+statement = assertStatement
           <|> assignment'
           <|> augmentedAssignment
-          <|> printStatement
-          <|> assertStatement
+          <|> expressionStatement
           <|> globalStatement
+          <|> ifStatement
+          <|> identifier
+          <|> import'
+          <|> importFrom
+          <|> printStatement
+          <|> returnStatement
+
+expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+expressionStatement = symbol ExpressionStatement *> children expression
+
+expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+expression = await
+          <|> binaryOperator
+          <|> booleanOperator
+          <|> call
+          <|> comparisonOperator
+          <|> comprehension
+          <|> conditionalExpression
+          <|> dottedName
+          <|> ellipsis
+          <|> lambda
+          <|> keywordIdentifier
+          <|> literal
+          <|> memberAccess
+          <|> notOperator
+          <|> subscript
+          <|> statement
+          <|> tuple
+          <|> unaryOperator
+
+dottedName :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
+
+ellipsis :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+ellipsis = makeTerm <$> symbol Grammar.Ellipsis <*> (Language.Python.Syntax.Ellipsis <$ source)
+
+comparisonOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression >>= \ lexpression -> makeComparison loc lexpression)
+  where
+    makeComparison loc lexpression =  makeTerm loc <$ symbol AnonLAngle      <*> (Expression.LessThan lexpression <$> expression)
+                                  <|> makeTerm loc <$ symbol AnonLAngleEqual <*> (Expression.LessThanEqual lexpression <$> expression)
+                                  <|> makeTerm loc <$ symbol AnonRAngle      <*> (Expression.GreaterThan lexpression <$> expression)
+                                  <|> makeTerm loc <$ symbol AnonRAngleEqual <*> (Expression.GreaterThanEqual lexpression <$> expression)
+                                  <|> makeTerm loc <$ symbol AnonEqualEqual  <*> (Expression.Equal lexpression <$> expression)
+                                  <|> makeTerm loc <$ symbol AnonBangEqual   <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
+                                  <|> makeTerm loc <$ symbol AnonNot         <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Member lexpression <$> expression)))
+                                  <|> makeTerm loc <$ symbol AnonIn          <*> (Expression.Member lexpression <$> expression)
+                                                    -- source is used here to push the cursor to the next node to enable matching against `AnonNot`
+                                  <|> symbol AnonIs *> source *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
+                                                                <|> (makeTerm loc <$> Expression.Equal lexpression <$> expression))
+
+notOperator :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
+
+keywordIdentifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+keywordIdentifier = makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
 
 tuple :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
-
-expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expression = identifier <|> statement <|> unaryOperator <|> binaryOperator <|> booleanOperator <|> tuple <|> literal
 
 -- TODO: Consider flattening single element lists
 expressionList :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
@@ -149,7 +215,17 @@ identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString
+literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString <|> list' <|> dictionary <|> set
+
+set :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
+
+dictionary :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many pairs)
+  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+
+list' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
 
 -- TODO: Wrap `Literal.TextElement` with a `Literal.String`
 string :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
@@ -167,17 +243,13 @@ integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-expressionStatement = symbol ExpressionStatement *> children (statement <|> literal <|> expression)
-
-
 -- TODO Possibly match against children for dotted name and identifiers
 import' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-import' = makeTerm <$> symbol ImportStatement <*> (Declaration.Import <$> source)
+import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
 
 -- TODO Possibly match against children nodes
 importFrom :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-importFrom = makeTerm <$> symbol ImportFromStatement <*> (Declaration.Import <$> source)
+importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
 
 assertStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
@@ -196,18 +268,29 @@ printStatement = do
 globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
 
+await :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier <$> source)) <*> many expression)
+
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
 
 
 ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> condition <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
   where elseClause = symbol ElseClause *> children statement
-        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> condition <*> statement)
-        condition = boolean
+        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
+memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> expression)
+
+subscript :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> expression <*> many expression)
+
+call :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <*> (symbol ArgumentList *> children (many expression)
+                                                                                <|> some comprehension))
 
 boolean :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
@@ -216,8 +299,33 @@ boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
 none :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
+lambda :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> lambdaIdentifier <*> lambdaParameters <*> lambdaBody)
+  where lambdaIdentifier = makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
+        lambdaParameters = many identifier
+        lambdaBody = expression
+
+comprehension :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehensionDeclaration expression)
+             <|> makeTerm <$> symbol ListComprehension <*> children (comprehensionDeclaration expression)
+             <|> makeTerm <$> symbol SetComprehension <*> children (comprehensionDeclaration expression)
+             <|> makeTerm <$> symbol DictionaryComprehension <*> children (comprehensionDeclaration keyValue)
+  where
+    keyValue = makeTerm <$> location <*> (Literal.KeyValue <$> expression <*> expression)
+    comprehensionDeclaration preceeding = Declaration.Comprehension <$> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
+    makeComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
+    nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
+
+conditionalExpression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
+
 makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+
+handleError :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
+handleError = flip catchError $ \ error -> case errorCause error of
+  UnexpectedEndOfInput _ -> throwError error
+  _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
