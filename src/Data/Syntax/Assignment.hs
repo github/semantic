@@ -148,7 +148,7 @@ type AST grammar = Rose (Node grammar)
 
 
 -- | The result of assignment, possibly containing an error.
-data Result symbol a = Result { resultErrors :: Maybe (Error symbol), resultValue :: Maybe a }
+data Result symbol a = Result { resultError :: Maybe (Error symbol), resultValue :: Maybe a }
   deriving (Eq, Foldable, Functor, Traversable)
 
 data Error symbol where
