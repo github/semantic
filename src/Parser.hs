@@ -43,7 +43,7 @@ data Parser term where
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
 
--- | Return a 'Langauge'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
+-- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
 parserForLanguage :: Maybe Language -> Parser (SyntaxTerm Text DefaultFields)
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
