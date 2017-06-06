@@ -82,6 +82,7 @@ module Data.Syntax.Assignment
 ) where
 
 import Control.Monad.Free.Freer
+import Data.ByteString (isSuffixOf)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
@@ -172,11 +173,11 @@ data ErrorCause symbol
 showError :: Show symbol => Source.Source -> Error symbol -> String
 showError source error@Error{..}
   = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n'
-  . showString context -- actualLines results include line endings, so no newline here
+  . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
   . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . withSGRCode [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
   . showString (prettyCallStack callStack)
   $ ""
-  where context = maybe "\n" (toS . Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
+  where context = maybe "\n" (Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
         showSGRCode = showString . setSGRCode
