@@ -66,8 +66,7 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
-, Rose(..)
-, RoseF(..)
+, Rose
 , Node
 , AST
 , Result(..)
@@ -84,7 +83,6 @@ module Data.Syntax.Assignment
 import Control.Monad.Free.Freer
 import Data.ByteString (isSuffixOf)
 import Data.Functor.Classes
-import Data.Functor.Foldable hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
@@ -136,8 +134,7 @@ children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 
 -- | A rose tree.
-data Rose a = Rose { roseValue :: !a, roseChildren :: ![Rose a] }
-  deriving (Eq, Functor, Show)
+type Rose = Cofree []
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = Record '[Info.Range, Info.SourceSpan]
@@ -208,8 +205,7 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Ass
 assignAllFrom assignment state = case runAssignment assignment state of
   Result err (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result Nothing (Just (state, a))
-    Rose (Just s :. _) _ :_ -> Result (err <|> Just (Error (statePos state) (UnexpectedSymbol [] s))) Nothing
-    Rose (Nothing :. _) _ :_ -> Result (err <|> Just (Error (statePos state) (ParseError []))) Nothing
+    node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (rhead (extract node))))) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -217,13 +213,13 @@ runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, Ha
 runAssignment = iterFreer run . fmap (\ a state -> pure (state, a))
   where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
-          (Location, Rose (_ :. location) _ : _) -> yield location state
+          (Location, node : _) -> yield (rtail (extract node)) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
-          (Source, Rose (_ :. range :. _) _ : _) -> yield (Source.sourceText (Source.slice (offsetRange range (negate stateOffset)) stateSource)) (advanceState state)
-          (Children childAssignment, Rose _ children : _) -> case assignAllFrom childAssignment state { stateNodes = children } of
+          (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (extract node)) (negate stateOffset)) stateSource)) (advanceState state)
+          (Children childAssignment, node : _) -> case assignAllFrom childAssignment state { stateNodes = unwrap node } of
             Result _ (Just (state', a)) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
-          (Choose choices, Rose (Just symbol :. _) _ : _) | Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          (Choose choices, node : _) | (Just symbol :. _) :< _ <- runCofree node, Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
@@ -231,7 +227,7 @@ runAssignment = iterFreer run . fmap (\ a state -> pure (state, a))
             Result _ (Just (state', a)) -> Result Nothing (Just (state', a))
             Result err Nothing -> maybe (Result Nothing Nothing) (flip yield state . handler) err
           (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
-          (_, Rose (symbol :. _ :. nodeSpan :. Nil) _:_) -> Result (Just (maybe (Error (Info.spanStart nodeSpan) (ParseError expectedSymbols)) (Error (Info.spanStart nodeSpan) . UnexpectedSymbol expectedSymbols) symbol)) Nothing
+          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (extract node) in Result (Just (maybe (Error startPos (ParseError expectedSymbols)) (Error startPos . UnexpectedSymbol expectedSymbols) (rhead (extract node)))) Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous initialState
                   _ -> initialState
@@ -241,12 +237,12 @@ runAssignment = iterFreer run . fmap (\ a state -> pure (state, a))
                 choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
 
 dropAnonymous :: Symbol grammar => AssignmentState grammar -> AssignmentState grammar
-dropAnonymous state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . rhead . roseValue) (stateNodes state) }
+dropAnonymous state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . rhead . extract) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: AssignmentState grammar -> AssignmentState grammar
 advanceState state@AssignmentState{..}
-  | Rose (_ :. range :. span :. _) _ : rest <- stateNodes = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  | node : rest <- stateNodes, (_ :. range :. span :. _) :< _ <- runCofree node = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -284,14 +280,6 @@ instance Show symbol => Show1 (AssignmentF (Node symbol)) where
     Empty -> showString "Empty"
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
-
-type instance Base (Rose a) = RoseF a
-
-data RoseF a f = RoseF a [f]
-  deriving (Eq, Foldable, Functor, Show, Traversable)
-
-instance Recursive (Rose a) where project (Rose a as) = RoseF a as
-instance Corecursive (Rose a) where embed (RoseF a as) = Rose a as
 
 instance Show2 Result where
   liftShowsPrec2 sp1 sl1 sp2 sl2 d (Result es a) = showsBinaryWith (liftShowsPrec (liftShowsPrec sp1 sl1) (liftShowList sp1 sl1)) (liftShowsPrec sp2 sl2) "Result" d es a
