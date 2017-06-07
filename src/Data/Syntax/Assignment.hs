@@ -66,7 +66,6 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
-, AST
 , Result(..)
 , Error(..)
 , ErrorCause(..)
@@ -134,10 +133,6 @@ children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = '[Info.Range, Info.SourceSpan]
-
--- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
-type AST grammar = Cofree [] (Record (Maybe grammar ': Location))
-
 
 -- | The result of assignment, possibly containing an error.
 data Result grammar a = Result { resultError :: Maybe (Error grammar), resultValue :: Maybe a }
