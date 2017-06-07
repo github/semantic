@@ -33,9 +33,9 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
   AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs))
-                   => Parser (AST grammar)                                 -- ^ A parser producing 'AST'.
-                   -> Assignment (Node grammar) (Term (Union fs) Location) -- ^ An assignment from 'AST' onto 'Term's.
-                   -> Parser (Term (Union fs) Location)                    -- ^ A parser of 'Term's.
+                   => Parser (AST grammar)                          -- ^ A parser producing 'AST'.
+                   -> Assignment grammar (Term (Union fs) Location) -- ^ An assignment from 'AST' onto 'Term's.
+                   -> Parser (Term (Union fs) Location)             -- ^ A parser of 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.

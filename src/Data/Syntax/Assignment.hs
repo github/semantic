@@ -109,19 +109,19 @@ data AssignmentF node a where
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF node a
   Alt :: HasCallStack => a -> a -> AssignmentF symbol a
   Empty :: HasCallStack => AssignmentF symbol a
-  Throw :: HasCallStack => Error symbol -> AssignmentF (Node symbol) a
-  Catch :: HasCallStack => a -> (Error symbol -> a) -> AssignmentF (Node symbol) a
+  Throw :: HasCallStack => Error symbol -> AssignmentF symbol a
+  Catch :: HasCallStack => a -> (Error symbol -> a) -> AssignmentF symbol a
 
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
-location :: HasCallStack => Assignment (Node grammar) Location
+location :: HasCallStack => Assignment grammar Location
 location = Location `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: (Enum symbol, Eq symbol, HasCallStack) => symbol -> Assignment (Node symbol) Location
+symbol :: (Enum symbol, Eq symbol, HasCallStack) => symbol -> Assignment symbol Location
 symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
@@ -198,10 +198,10 @@ showSourcePos :: Maybe FilePath -> Info.SourcePos -> ShowS
 showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment (Node grammar) a -> Source.Source -> AST grammar -> Result grammar a
+assign :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment grammar a -> Source.Source -> AST grammar -> Result grammar a
 assign assignment source = fmap snd . assignAllFrom assignment . makeState source . pure
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment grammar a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 assignAllFrom assignment state = case runAssignment assignment state of
   Result err (Just (state, a)) -> case stateNodes (dropAnonymous state) of
     [] -> Result Nothing (Just (state, a))
@@ -209,9 +209,9 @@ assignAllFrom assignment state = case runAssignment assignment state of
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment (Node grammar) a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
+runAssignment :: forall grammar a. (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment grammar a -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
 runAssignment = iterFreer run . fmap (\ a state -> pure (state, a))
-  where run :: AssignmentF (Node grammar) x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
+  where run :: AssignmentF grammar x -> (x -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)) -> AssignmentState grammar -> Result grammar (AssignmentState grammar, a)
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, node : _) -> yield (rtail (extract node)) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
@@ -260,17 +260,17 @@ makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) source nodes
 
 -- Instances
 
-instance Enum symbol => Alternative (Assignment (Node symbol)) where
-  empty :: HasCallStack => Assignment (Node symbol) a
+instance Enum symbol => Alternative (Assignment symbol) where
+  empty :: HasCallStack => Assignment symbol a
   empty = Empty `Then` return
-  (<|>) :: HasCallStack => Assignment (Node symbol) a -> Assignment (Node symbol) a -> Assignment (Node symbol) a
+  (<|>) :: HasCallStack => Assignment symbol a -> Assignment symbol a -> Assignment symbol a
   a <|> b = case (a, b) of
     (_, Empty `Then` _) -> a
     (Empty `Then` _, _) -> b
     (Choose choices1 `Then` continue1, Choose choices2 `Then` continue2) -> Choose (IntMap.union (fmap continue1 choices1) (fmap continue2 choices2)) `Then` identity
     _ -> wrap $ Alt a b
 
-instance Show symbol => Show1 (AssignmentF (Node symbol)) where
+instance Show symbol => Show1 (AssignmentF symbol) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
@@ -305,9 +305,9 @@ instance Alternative (Result symbol) where
   Result e (Just a) <|> _ = Result e (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <|> e2) b
 
-instance MonadError (Error symbol) (Assignment (Node symbol)) where
-  throwError :: HasCallStack => Error symbol -> Assignment (Node symbol) a
+instance MonadError (Error symbol) (Assignment symbol) where
+  throwError :: HasCallStack => Error symbol -> Assignment symbol a
   throwError error = withFrozenCallStack $ Throw error `Then` return
 
-  catchError :: HasCallStack => Assignment (Node symbol) a -> (Error symbol -> Assignment (Node symbol) a) -> Assignment (Node symbol) a
+  catchError :: HasCallStack => Assignment symbol a -> (Error symbol -> Assignment symbol a) -> Assignment symbol a
   catchError during handler = withFrozenCallStack $ Catch during handler `Then` identity
