@@ -85,7 +85,10 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = makeTerm <$> symbol Grammar.List <*> children (many blockElement)
+list = makeTerm <$> symbol Grammar.List <*> children (many item)
+
+item :: Assignment
+item = symbol Grammar.Item *> children blockElement
 
 heading :: Assignment
 heading = makeTerm <$> symbol Grammar.Heading <*> (Heading <$> withNode (\ ((Grammar.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
