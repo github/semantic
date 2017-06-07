@@ -22,6 +22,7 @@ import qualified Term
 type Syntax =
   '[ Markup.Document
    -- Block elements
+   , Markup.BlockQuote
    , Markup.Heading
    , Markup.OrderedList
    , Markup.Paragraph
@@ -47,7 +48,7 @@ assignment = makeTerm <$> symbol Document <*> children (Markup.Document <$> many
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph <|> list <|> heading
+blockElement = paragraph <|> list <|> heading <|> blockQuote
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -62,6 +63,9 @@ item = symbol Item *> children blockElement
 
 heading :: Assignment
 heading = makeTerm <$> symbol Heading <*> (Markup.Heading <$> project (\ ((CMark.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
+
+blockQuote :: Assignment
+blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 
 -- Inline elements

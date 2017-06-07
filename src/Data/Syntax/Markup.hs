@@ -41,6 +41,12 @@ newtype OrderedList a = OrderedList [a]
 instance Eq1 OrderedList where liftEq = genericLiftEq
 instance Show1 OrderedList where liftShowsPrec = genericLiftShowsPrec
 
+newtype BlockQuote a = BlockQuote [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 BlockQuote where liftEq = genericLiftEq
+instance Show1 BlockQuote where liftShowsPrec = genericLiftShowsPrec
+
 
 -- Inline elements
 
