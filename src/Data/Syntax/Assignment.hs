@@ -230,7 +230,7 @@ runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
             Result _ (Just (a, state')) -> pure (a, state')
             Result err Nothing -> maybe empty (flip yield state . handler) err
           (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
-          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (rtail (extract node)) in Result (Just (maybe (Error startPos (ParseError expectedSymbols)) (Error startPos . UnexpectedSymbol expectedSymbols) (toSymbol (runCofree node)))) Nothing
+          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (rtail (extract node)) in Result (Error startPos . UnexpectedSymbol expectedSymbols <$> toSymbol (runCofree node) <|> Just (Error startPos (ParseError expectedSymbols))) Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous toSymbol initialState
                   _ -> initialState
