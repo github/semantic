@@ -28,6 +28,7 @@ type Syntax =
    , Markup.Paragraph
    , Markup.UnorderedList
    -- Inline elements
+   , Markup.Code
    , Markup.Emphasis
    , Markup.Image
    , Markup.Link
@@ -72,7 +73,7 @@ blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> 
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = strong <|> emphasis <|> text <|> link <|> image
+inlineElement = strong <|> emphasis <|> text <|> link <|> image <|> code
 
 strong :: Assignment
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
@@ -88,6 +89,9 @@ link = makeTerm <$> symbol Link <*> (uncurry Markup.Link <$> project (\ (((CMark
 
 image :: Assignment
 image = makeTerm <$> symbol Image <*> (uncurry Markup.Image <$> project (\ (((CMark.IMAGE url title) :. _) :< _) -> (toS url, toS title))) <* source
+
+code :: Assignment
+code = makeTerm <$> symbol Code <*> (Markup.Code <$> source)
 
 
 -- Implementation details
