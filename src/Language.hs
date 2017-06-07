@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, DeriveGeneric #-}
 module Language where
 
 import Data.Record
@@ -16,7 +16,7 @@ data Language =
     | Ruby
     | TypeScript -- ^ Also JavaScript.
     | Python
-    deriving (Show, Eq, Read)
+    deriving (Show, Eq, Read, Generic)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language

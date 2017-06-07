@@ -14,6 +14,7 @@ import Data.Functor.Union
 import qualified Data.Map as Map
 import Data.Record
 import Info
+import Language
 import Patch
 import Prologue hiding ((++))
 import Source
@@ -109,14 +110,16 @@ instance (Foldable f, ToJSON a, ToJSONFields (Union fs a)) => ToJSONFields (Unio
 instance ToJSONFields (Union '[] a) where
   toJSONFields _ = []
 
-data File a = File { filePath :: FilePath, fileContent :: a }
+data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
 
+instance ToJSON Language
+
 instance ToJSON a => ToJSON (File a) where
-  toJSON File{..} = object [ "filePath" .= filePath, "programNode" .= fileContent ]
+  toJSON File{..} = object [ "filePath" .= filePath, "language" .= fileLanguage, "programNode" .= fileContent ]
 
 instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
 
 renderJSONTerm :: ToJSON a => SourceBlob -> a -> [Value]
-renderJSONTerm SourceBlob{..} = pure . toJSON . File path
+renderJSONTerm SourceBlob{..} = pure . toJSON . File path blobLanguage
