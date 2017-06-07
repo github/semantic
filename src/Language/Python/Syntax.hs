@@ -95,6 +95,7 @@ statement = assertStatement
           <|> assignment'
           <|> augmentedAssignment
           <|> breakStatement
+          <|> continueStatement
           <|> deleteStatement
           <|> expressionStatement
           <|> globalStatement
@@ -302,6 +303,9 @@ passStatement = makeTerm <$> symbol PassStatement <*> (Statement.NoOp <$> (makeT
 
 breakStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 breakStatement = makeTerm <$> symbol BreakStatement <*> (Statement.Break <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
+
+continueStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+continueStatement = makeTerm <$> symbol ContinueStatement <*> (Statement.Continue <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
 
 memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> expression)
