@@ -21,13 +21,17 @@ import qualified Term
 
 type Syntax =
   '[ Markup.Document
-   , Markup.Emphasis
+   -- Block elements
    , Markup.Heading
+   , Markup.OrderedList
    , Markup.Paragraph
+   , Markup.UnorderedList
+   -- Inline elements
+   , Markup.Emphasis
    , Markup.Strong
    , Markup.Text
+   -- Assignment errors; cmark does not provide parse errors.
    , Syntax.Error Error
-   , []
    ]
 
 type Error = Assignment.Error Grammar.Grammar
@@ -46,7 +50,9 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = makeTerm <$> symbol Grammar.List <*> children (many item)
+list = (cofree .) . (:<) <$> symbol Grammar.List <*> (project (\ (((CMark.LIST CMark.ListAttributes{..}) :. _) :< _) -> case listType of
+  CMark.BULLET_LIST -> inj . Markup.UnorderedList
+  CMark.ORDERED_LIST -> inj . Markup.OrderedList) <*> children (many item))
 
 item :: Assignment
 item = symbol Grammar.Item *> children blockElement
