@@ -12,8 +12,25 @@ import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
   = Document
+  | ThematicBreak
   | Paragraph
+  | BlockQuote
+  | HTMLBlock
+  | CustomBlock
+  | CodeBlock
   | Heading
+  | List
+  | Item
+  | Text
+  | SoftBreak
+  | LineBreak
+  | HTMLInline
+  | CustomInline
+  | Code
+  | Emphasis
+  | Strong
+  | Link
+  | Image
   deriving (Bounded, Enum, Eq, Ord, Show)
 
 cmarkParser :: Source -> IO (Cofree (Syntax Text) (Record DefaultFields))
