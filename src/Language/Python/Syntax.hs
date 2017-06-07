@@ -91,6 +91,7 @@ statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statement = assertStatement
           <|> assignment'
           <|> augmentedAssignment
+          <|> deleteStatement
           <|> expressionStatement
           <|> globalStatement
           <|> ifStatement
@@ -100,7 +101,6 @@ statement = assertStatement
           <|> printStatement
           <|> raiseStatement
           <|> returnStatement
-          <|> deleteStatement
 
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children expression
