@@ -3,7 +3,6 @@ module Language.Markdown
 ( Grammar(..)
 , cmarkParser
 , toGrammar
-, NodeType(..)
 ) where
 
 import CMark

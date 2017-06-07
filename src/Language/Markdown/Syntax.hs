@@ -15,7 +15,7 @@ import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Markup as Markup
 import qualified Data.Syntax as Syntax
 import GHC.Stack
-import qualified Language.Markdown as Grammar (Grammar(..), NodeType(..))
+import qualified Language.Markdown as Grammar (Grammar(..))
 import Prologue hiding (Location, list)
 import qualified Term
 
@@ -52,7 +52,7 @@ item :: Assignment
 item = symbol Grammar.Item *> children blockElement
 
 heading :: Assignment
-heading = makeTerm <$> symbol Grammar.Heading <*> (Markup.Heading <$> project (\ ((Grammar.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
+heading = makeTerm <$> symbol Grammar.Heading <*> (Markup.Heading <$> project (\ ((CMark.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
 
 
 -- Inline elements
