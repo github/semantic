@@ -2,7 +2,6 @@
 module Language.Python.Syntax
 ( assignment
 , Syntax
-, Syntax'
 , Grammar
 , Error
 ) where
@@ -26,8 +25,7 @@ import Language.Python.Grammar as Grammar
 import Prologue hiding (Location)
 import Term
 
-type Syntax = Union Syntax'
-type Syntax' =
+type Syntax =
   '[ Comment.Comment
    , Declaration.Comprehension
    , Declaration.Function
@@ -81,13 +79,13 @@ instance Eq1 Redirect where liftEq = genericLiftEq
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
-assignment :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+assignment :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
-declaration :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+declaration :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 declaration = handleError $ comment <|> statement <|> expression
 
-statement :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+statement :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 statement = assertStatement
           <|> assignment'
           <|> augmentedAssignment
@@ -100,10 +98,10 @@ statement = assertStatement
           <|> printStatement
           <|> returnStatement
 
-expressionStatement :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+expressionStatement :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 expressionStatement = symbol ExpressionStatement *> children expression
 
-expression :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+expression :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 expression = await
           <|> binaryOperator
           <|> booleanOperator
@@ -123,13 +121,13 @@ expression = await
           <|> tuple
           <|> unaryOperator
 
-dottedName :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+dottedName :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
-ellipsis :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+ellipsis :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 ellipsis = makeTerm <$> symbol Grammar.Ellipsis <*> (Language.Python.Syntax.Ellipsis <$ source)
 
-comparisonOperator :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+comparisonOperator :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression >>= \ lexpression -> makeComparison loc lexpression)
   where
     makeComparison loc lexpression =  makeTerm loc <$ symbol AnonLAngle      <*> (Expression.LessThan lexpression <$> expression)
@@ -144,26 +142,26 @@ comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression
                                   <|> symbol AnonIs *> source *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
                                                                 <|> (makeTerm loc <$> Expression.Equal lexpression <$> expression))
 
-notOperator :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+notOperator :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
 
-keywordIdentifier :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+keywordIdentifier :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 keywordIdentifier = makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
 
-tuple :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+tuple :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
 
 -- TODO: Consider flattening single element lists
-expressionList :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+expressionList :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 expressionList = makeTerm <$> symbol ExpressionList <*> children (many expression)
 
-unaryOperator :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+unaryOperator :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> bitwise location <|> children ( symbol AnonPlus *> expression )
   where
     arithmetic location = makeTerm location . Expression.Negate <$> children ( symbol AnonMinus *> expression )
     bitwise location    = makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
 
-binaryOperator :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+binaryOperator :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>= \ lexpression ->
       makeTerm location <$> arithmetic lexpression
   <|> makeTerm location <$> bitwise lexpression)
@@ -181,17 +179,17 @@ binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>
                        <|> symbol AnonLAngleLAngle *> (Expression.LShift lexpression <$> expression)
                        <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expression)
 
-booleanOperator :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+booleanOperator :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= booleanOperator' )
   where
     booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expression)
                                 <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
 
-assignment' :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+assignment' :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 assignment' =
   makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
 
-augmentedAssignment :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+augmentedAssignment :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 augmentedAssignment = makeTerm <$> symbol AugmentedAssignment <*> children (expressionList >>= \ lvalue -> Statement.Assignment lvalue <$>
          (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus lvalue      <$> rvalue)
       <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus lvalue     <$> rvalue)
@@ -206,56 +204,56 @@ augmentedAssignment = makeTerm <$> symbol AugmentedAssignment <*> children (expr
       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift lvalue    <$> rvalue)
       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr lvalue      <$> rvalue)))
 
-yield :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+yield :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> expressionList <|> emptyTerm ))
 
-rvalue :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+rvalue :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 rvalue  = expressionList <|> assignment' <|> augmentedAssignment <|> yield
 
-identifier :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+identifier :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
-literal :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+literal :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString <|> list' <|> dictionary <|> set
 
-set :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+set :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
 
-dictionary :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+dictionary :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many pairs)
   where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
 
-list' :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+list' :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
 
 -- TODO: Wrap `Literal.TextElement` with a `Literal.String`
-string :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+string :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
-concatenatedString :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+concatenatedString :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
 
-float :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+float :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
-integer :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+integer :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
-comment :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+comment :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 -- TODO Possibly match against children for dotted name and identifiers
-import' :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+import' :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
 
 -- TODO Possibly match against children nodes
-importFrom :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+importFrom :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
 
-assertStatement :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+assertStatement :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
 
-printStatement :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+printStatement :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 printStatement = do
   location <- symbol PrintStatement
   children $ do
@@ -266,47 +264,47 @@ printStatement = do
     redirectCallTerm location keyword = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location keyword)
     printCallTerm location keyword = makeTerm location . Expression.Call keyword <$> many expression
 
-globalStatement :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+globalStatement :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
 
-await :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+await :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier <$> source)) <*> many expression)
 
-returnStatement :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+returnStatement :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
 
 
-ifStatement :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+ifStatement :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
   where elseClause = symbol ElseClause *> children statement
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
-memberAccess :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+memberAccess :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> expression)
 
-subscript :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+subscript :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> expression <*> many expression)
 
-call :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+call :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <*> (symbol ArgumentList *> children (many expression)
                                                                                 <|> some comprehension))
 
-boolean :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+boolean :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
        <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
-none :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+none :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
-lambda :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+lambda :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> lambdaIdentifier <*> lambdaParameters <*> lambdaBody)
   where lambdaIdentifier = makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
         lambdaParameters = many identifier
         lambdaBody = expression
 
-comprehension :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+comprehension :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehensionDeclaration expression)
              <|> makeTerm <$> symbol ListComprehension <*> children (comprehensionDeclaration expression)
              <|> makeTerm <$> symbol SetComprehension <*> children (comprehensionDeclaration expression)
@@ -317,16 +315,16 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
     makeComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
     nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
 
-conditionalExpression :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+conditionalExpression :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
 
-makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
+makeTerm :: (HasCallStack, InUnion fs f) => a -> f (Term (Union fs) a) -> Term (Union fs) a
 makeTerm a f = cofree (a :< inj f)
 
-emptyTerm :: HasCallStack => Assignment Grammar (Term Syntax (Record Location))
+emptyTerm :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location))
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
-handleError :: HasCallStack => Assignment Grammar (Term Syntax (Record Location)) -> Assignment Grammar (Term Syntax (Record Location))
+handleError :: HasCallStack => Assignment Grammar (Term (Union Syntax) (Record Location)) -> Assignment Grammar (Term (Union Syntax) (Record Location))
 handleError = flip catchError $ \ error -> case errorCause error of
   UnexpectedEndOfInput _ -> throwError error
   _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
