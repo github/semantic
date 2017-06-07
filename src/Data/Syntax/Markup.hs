@@ -68,13 +68,13 @@ newtype Text a = Text ByteString
 instance Eq1 Text where liftEq = genericLiftEq
 instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
 
-data Link a = Link { linkURL :: ByteString, linkTitle :: ByteString }
+data Link a = Link { linkURL :: ByteString, linkTitle :: Maybe ByteString }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Link where liftEq = genericLiftEq
 instance Show1 Link where liftShowsPrec = genericLiftShowsPrec
 
-data Image a = Image { imageURL :: ByteString, imageTitle :: ByteString }
+data Image a = Image { imageURL :: ByteString, imageTitle :: Maybe ByteString }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Image where liftEq = genericLiftEq

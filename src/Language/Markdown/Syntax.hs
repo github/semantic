@@ -71,7 +71,7 @@ blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code <$> project (\ (((CMark.CODE_BLOCK language _) :. _) :< _) -> if Text.null language then Nothing else Just (toS language)) <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code <$> project (\ (((CMark.CODE_BLOCK language _) :. _) :< _) -> nullText language) <*> source)
 
 
 -- Inline elements
@@ -89,10 +89,10 @@ text :: Assignment
 text = makeTerm <$> symbol Text <*> (Markup.Text <$> source)
 
 link :: Assignment
-link = makeTerm <$> symbol Link <*> (uncurry Markup.Link <$> project (\ (((CMark.LINK url title) :. _) :< _) -> (toS url, toS title))) <* source
+link = makeTerm <$> symbol Link <*> (uncurry Markup.Link <$> project (\ (((CMark.LINK url title) :. _) :< _) -> (toS url, nullText title))) <* source
 
 image :: Assignment
-image = makeTerm <$> symbol Image <*> (uncurry Markup.Image <$> project (\ (((CMark.IMAGE url title) :. _) :< _) -> (toS url, toS title))) <* source
+image = makeTerm <$> symbol Image <*> (uncurry Markup.Image <$> project (\ (((CMark.IMAGE url title) :. _) :< _) -> (toS url, nullText title))) <* source
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
@@ -102,3 +102,6 @@ code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
 
 makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
+
+nullText :: Text.Text -> Maybe ByteString
+nullText text = if Text.null text then Nothing else Just (toS text)
