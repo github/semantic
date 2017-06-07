@@ -19,7 +19,7 @@ import GHC.Stack
 import qualified Language.Markdown as Grammar (Grammar(..))
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax as Syntax
-import Prologue hiding (Location)
+import Prologue hiding (Location, Text)
 import qualified Term
 
 type Syntax =
@@ -27,6 +27,7 @@ type Syntax =
    , Paragraph
    , Strong
    , Emphasis
+   , Text
    , Syntax.Error Error
    ]
 
@@ -54,6 +55,12 @@ newtype Emphasis a = Emphasis [a]
 instance Eq1 Emphasis where liftEq = genericLiftEq
 instance Show1 Emphasis where liftShowsPrec = genericLiftShowsPrec
 
+newtype Text a = Text ByteString
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Text where liftEq = genericLiftEq
+instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
+
 type Error = Assignment.Error Grammar.Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMark.NodeType ': Location))) Grammar.Grammar Term
@@ -62,7 +69,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Grammar.Document <*> children (Document <$> many paragraph)
 
 inlineElement :: Assignment
-inlineElement = strong <|> emphasis
+inlineElement = strong <|> emphasis <|> text
 
 strong :: Assignment
 strong = makeTerm <$> symbol Grammar.Strong <*> children (Strong <$> many inlineElement)
@@ -73,6 +80,8 @@ emphasis = makeTerm <$> symbol Grammar.Strong <*> children (Strong <$> many inli
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
 
+text :: Assignment
+text = makeTerm <$> symbol Grammar.Text <*> (Text <$> source)
 
 makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
