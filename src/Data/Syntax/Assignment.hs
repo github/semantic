@@ -102,7 +102,7 @@ import Text.Show hiding (show)
 --   This is essentially a parser.
 type Assignment grammar = Freer (AssignmentF grammar)
 
-data AssignmentF node a where
+data AssignmentF grammar a where
   Location :: HasCallStack => AssignmentF grammar Location
   Source :: HasCallStack => AssignmentF grammar ByteString
   Children :: HasCallStack => Assignment grammar a -> AssignmentF grammar a
