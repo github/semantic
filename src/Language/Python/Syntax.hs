@@ -53,6 +53,7 @@ type Syntax' =
    , Literal.Tuple
    , Redirect
    , Statement.Assignment
+   , Statement.Break
    , Statement.Continue
    , Statement.If
    , Statement.Return
@@ -92,6 +93,7 @@ statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 statement = assertStatement
           <|> assignment'
           <|> augmentedAssignment
+          <|> breakStatement
           <|> deleteStatement
           <|> expressionStatement
           <|> globalStatement
@@ -296,6 +298,9 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> exp
 
 passStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 passStatement = makeTerm <$> symbol PassStatement <*> (Statement.Continue <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
+
+breakStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+breakStatement = makeTerm <$> symbol BreakStatement <*> (Statement.Break <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
 
 memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> expression)
