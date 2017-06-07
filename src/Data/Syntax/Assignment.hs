@@ -235,9 +235,9 @@ dropAnonymous :: Symbol grammar => (forall x. CofreeF f a x -> Maybe grammar) ->
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . runCofree) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
-advanceState :: AssignmentState (Cofree f (Record (node ': Location))) -> AssignmentState (Cofree f (Record (node ': Location)))
+advanceState :: Functor f => AssignmentState (Cofree f (Record (node ': Location))) -> AssignmentState (Cofree f (Record (node ': Location)))
 advanceState state@AssignmentState{..}
-  | node : rest <- stateNodes, (_ :. range :. span :. _) :< _ <- runCofree node = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  | node : rest <- stateNodes, _ :. range :. span :. _ <- extract node = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
