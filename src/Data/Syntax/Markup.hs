@@ -91,3 +91,9 @@ data Code a = Code { codeLanguage :: Maybe ByteString, codeContent :: ByteString
 
 instance Eq1 Code where liftEq = genericLiftEq
 instance Show1 Code where liftShowsPrec = genericLiftShowsPrec
+
+data LineBreak a = LineBreak
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 LineBreak where liftEq = genericLiftEq
+instance Show1 LineBreak where liftShowsPrec = genericLiftShowsPrec

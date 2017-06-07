@@ -33,6 +33,7 @@ type Syntax =
    , Markup.Code
    , Markup.Emphasis
    , Markup.Image
+   , Markup.LineBreak
    , Markup.Link
    , Markup.Strong
    , Markup.Text
@@ -81,7 +82,7 @@ thematicBreak = makeTerm <$> symbol ThematicBreak <*> (Markup.ThematicBreak <$ s
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = strong <|> emphasis <|> text <|> link <|> image <|> code
+inlineElement = strong <|> emphasis <|> text <|> link <|> image <|> code <|> lineBreak <|> softBreak
 
 strong :: Assignment
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
@@ -100,6 +101,12 @@ image = makeTerm <$> symbol Image <*> (uncurry Markup.Image <$> project (\ (((CM
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
+
+lineBreak :: Assignment
+lineBreak = makeTerm <$> symbol LineBreak <*> (Markup.LineBreak <$ source)
+
+softBreak :: Assignment
+softBreak = makeTerm <$> symbol SoftBreak <*> (Markup.LineBreak <$ source)
 
 
 -- Implementation details
