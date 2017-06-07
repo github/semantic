@@ -45,7 +45,7 @@ cmarkParser source = pure . toTerm (totalRange source) (totalSpan source) $ comm
               span = maybe withinSpan toSpan position
           in cofree $ (t :. range :. span :. Nil) :< (toTerm range span <$> children)
 
-        toSpan PosInfo{..} = SourceSpan (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) endColumn)
+        toSpan PosInfo{..} = SourceSpan (SourcePos startLine startColumn) (SourcePos endLine (succ endColumn))
 
 toGrammar :: NodeType -> Grammar
 toGrammar DOCUMENT{} = Document
