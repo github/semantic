@@ -249,7 +249,7 @@ data AssignmentState term = AssignmentState
   }
   deriving (Eq, Show)
 
-makeState :: Source.Source -> [Cofree [] (Record (node ': Location))] -> AssignmentState (Cofree [] (Record (node ': Location)))
+makeState :: Source.Source -> [term] -> AssignmentState term
 makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) source nodes
 
 
