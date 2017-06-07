@@ -103,6 +103,7 @@ type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
 data AssignmentF ast grammar a where
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
+  WithNode :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF ast grammar a
@@ -269,6 +270,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
 instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
+    WithNode projection -> showsUnaryWith (const (const (showChar '_'))) "WithNode" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
