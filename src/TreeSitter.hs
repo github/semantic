@@ -54,7 +54,7 @@ parseToAST language source = bracket ts_document_new ts_document_free $ \ docume
 
   anaM toAST root
 
-toAST :: (Bounded grammar, Enum grammar) => Node -> IO (CofreeF [] (A.Node grammar) Node)
+toAST :: (Bounded grammar, Enum grammar) => Node -> IO (Base (A.AST grammar) Node)
 toAST node@Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do

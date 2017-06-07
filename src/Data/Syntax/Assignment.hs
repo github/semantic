@@ -66,7 +66,6 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
-, Node
 , AST
 , Result(..)
 , Error(..)
@@ -135,11 +134,8 @@ children forEach = withFrozenCallStack $ Children forEach `Then` return
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = '[Info.Range, Info.SourceSpan]
 
--- | The label annotating a node in the AST, specified as the pairing of its symbol and location information.
-type Node grammar = Record (Maybe grammar ': Location)
-
 -- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
-type AST grammar = Cofree [] (Node grammar)
+type AST grammar = Cofree [] (Record (Maybe grammar ': Location))
 
 
 -- | The result of assignment, possibly containing an error.
