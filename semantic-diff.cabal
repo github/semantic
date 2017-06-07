@@ -45,6 +45,7 @@ library
                      , Language
                      , Language.C
                      , Language.Markdown
+                     , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Syntax
                      , Language.Ruby
