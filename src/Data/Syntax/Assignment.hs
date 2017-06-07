@@ -193,10 +193,10 @@ showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "inter
 assign :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment grammar a -> Source.Source -> AST grammar -> Result grammar a
 assign = assignBy (rhead . headF)
 
-assignBy :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record (node ': Location)) x -> Maybe grammar) -> Assignment grammar a -> Source.Source -> Cofree [] (Record '[node, Info.Range, Info.SourceSpan]) -> Result grammar a
+assignBy :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record fields) x -> Maybe grammar) -> Assignment grammar a -> Source.Source -> Cofree [] (Record fields) -> Result grammar a
 assignBy toSymbol assignment source = fmap fst . assignAllFrom toSymbol assignment . makeState source . pure
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record (node ': Location)) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree [] (Record (node ': Location))) -> Result grammar (a, AssignmentState (Cofree [] (Record (node ': Location))))
+assignAllFrom :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))
 assignAllFrom toSymbol assignment state = case runAssignment toSymbol assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous toSymbol state) of
     [] -> pure (a, state)
@@ -204,13 +204,13 @@ assignAllFrom toSymbol assignment state = case runAssignment toSymbol assignment
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar node a. (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record (node ': Location)) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree [] (Record (node ': Location))) -> Result grammar (a, AssignmentState (Cofree [] (Record (node ': Location))))
+runAssignment :: forall grammar fields a. (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))
 runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
-  where run :: AssignmentF grammar x -> (x -> AssignmentState (Cofree [] (Record (node ': Location))) -> Result grammar (a, AssignmentState (Cofree [] (Record (node ': Location))))) -> AssignmentState (Cofree [] (Record (node ': Location))) -> Result grammar (a, AssignmentState (Cofree [] (Record (node ': Location))))
+  where run :: AssignmentF grammar x -> (x -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))) -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))
         run assignment yield initialState = case (assignment, stateNodes) of
-          (Location, node : _) -> yield (rtail (extract node)) state
+          (Location, node : _) -> yield (Info.byteRange (extract node) :. Info.sourceSpan (extract node) :. Nil) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
-          (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (rtail (extract node))) (negate stateOffset)) stateSource)) (advanceState state)
+          (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (extract node)) (negate stateOffset)) stateSource)) (advanceState state)
           (Children childAssignment, node : _) -> case assignAllFrom toSymbol childAssignment state { stateNodes = unwrap node } of
             Result _ (Just (a, state')) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
@@ -222,7 +222,7 @@ runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
             Result _ (Just (a, state')) -> pure (a, state')
             Result err Nothing -> maybe empty (flip yield state . handler) err
           (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
-          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (rtail (extract node)) in Result (Error startPos . UnexpectedSymbol expectedSymbols <$> toSymbol (runCofree node) <|> Just (Error startPos (ParseError expectedSymbols))) Nothing
+          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (extract node) in Result (Error startPos . UnexpectedSymbol expectedSymbols <$> toSymbol (runCofree node) <|> Just (Error startPos (ParseError expectedSymbols))) Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous toSymbol initialState
                   _ -> initialState
@@ -235,9 +235,11 @@ dropAnonymous :: Symbol grammar => (forall x. CofreeF f a x -> Maybe grammar) ->
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . runCofree) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
-advanceState :: Functor f => AssignmentState (Cofree f (Record (node ': Location))) -> AssignmentState (Cofree f (Record (node ': Location)))
+advanceState :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Functor f) => AssignmentState (Cofree f (Record fields)) -> AssignmentState (Cofree f (Record fields))
 advanceState state@AssignmentState{..}
-  | node : rest <- stateNodes, _ :. range :. span :. _ <- extract node = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  | node : rest <- stateNodes
+  , range <- Info.byteRange (extract node)
+  , span <- Info.sourceSpan (extract node) = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
