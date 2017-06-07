@@ -14,6 +14,7 @@ import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Markup as Markup
 import qualified Data.Syntax as Syntax
+import qualified Data.Text as Text
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
 import Prologue hiding (Location, link, list)
@@ -70,7 +71,7 @@ blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code . Just . toS <$> project (\ (((CMark.CODE_BLOCK language _) :. _) :< _) -> language) <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code <$> project (\ (((CMark.CODE_BLOCK language _) :. _) :< _) -> if Text.null language then Nothing else Just (toS language)) <*> source)
 
 
 -- Inline elements
