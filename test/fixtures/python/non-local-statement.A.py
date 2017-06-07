@@ -1,0 +1,2 @@
+nonlocal a
+
