@@ -73,3 +73,9 @@ data Link a = Link { linkURL :: ByteString, linkTitle :: ByteString }
 
 instance Eq1 Link where liftEq = genericLiftEq
 instance Show1 Link where liftShowsPrec = genericLiftShowsPrec
+
+data Image a = Image { imageURL :: ByteString, imageTitle :: ByteString }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Image where liftEq = genericLiftEq
+instance Show1 Image where liftShowsPrec = genericLiftShowsPrec
