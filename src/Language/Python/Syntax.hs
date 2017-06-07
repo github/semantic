@@ -53,6 +53,7 @@ type Syntax' =
    , Literal.Tuple
    , Redirect
    , Statement.Assignment
+   , Statement.Continue
    , Statement.If
    , Statement.Return
    , Statement.Throw
@@ -98,6 +99,7 @@ statement = assertStatement
           <|> identifier
           <|> import'
           <|> importFrom
+          <|> passStatement
           <|> printStatement
           <|> raiseStatement
           <|> returnStatement
@@ -291,6 +293,9 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> exp
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
+
+passStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+passStatement = makeTerm <$> symbol PassStatement <*> (Statement.Continue <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
 
 memberAccess :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> expression)
