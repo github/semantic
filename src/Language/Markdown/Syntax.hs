@@ -68,6 +68,14 @@ type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMar
 assignment :: Assignment
 assignment = makeTerm <$> symbol Grammar.Document <*> children (Document <$> many paragraph)
 
+-- Block elements
+
+paragraph :: Assignment
+paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
+
+
+-- Inline elements
+
 inlineElement :: Assignment
 inlineElement = strong <|> emphasis <|> text
 
@@ -77,11 +85,9 @@ strong = makeTerm <$> symbol Grammar.Strong <*> children (Strong <$> many inline
 emphasis :: Assignment
 emphasis = makeTerm <$> symbol Grammar.Emphasis <*> children (Emphasis <$> many inlineElement)
 
-paragraph :: Assignment
-paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
-
 text :: Assignment
 text = makeTerm <$> symbol Grammar.Text <*> (Text <$> source)
+
 
 makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
