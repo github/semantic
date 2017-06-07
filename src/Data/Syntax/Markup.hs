@@ -29,6 +29,18 @@ data Heading a = Heading { headingLevel :: Int, headingContent :: [a] }
 instance Eq1 Heading where liftEq = genericLiftEq
 instance Show1 Heading where liftShowsPrec = genericLiftShowsPrec
 
+newtype UnorderedList a = UnorderedList [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 UnorderedList where liftEq = genericLiftEq
+instance Show1 UnorderedList where liftShowsPrec = genericLiftShowsPrec
+
+newtype OrderedList a = OrderedList [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 OrderedList where liftEq = genericLiftEq
+instance Show1 OrderedList where liftShowsPrec = genericLiftShowsPrec
+
 
 -- Inline elements
 
