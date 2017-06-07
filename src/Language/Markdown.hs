@@ -63,6 +63,28 @@ cmarkParser source = pure . toTerm (totalRange source) (rangeToSourceSpan source
         toCategory t = Other (show t)
         toSpan PosInfo{..} = SourceSpan (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) endColumn)
 
+toGrammar :: NodeType -> Grammar
+toGrammar DOCUMENT{} = Document
+toGrammar THEMATIC_BREAK{} = ThematicBreak
+toGrammar PARAGRAPH{} = Paragraph
+toGrammar BLOCK_QUOTE{} = BlockQuote
+toGrammar HTML_BLOCK{} = HTMLBlock
+toGrammar CUSTOM_BLOCK{} = CustomBlock
+toGrammar CODE_BLOCK{} = CodeBlock
+toGrammar HEADING{} = Heading
+toGrammar LIST{} = List
+toGrammar ITEM{} = Item
+toGrammar TEXT{} = Text
+toGrammar SOFTBREAK{} = SoftBreak
+toGrammar LINEBREAK{} = LineBreak
+toGrammar HTML_INLINE{} = HTMLInline
+toGrammar CUSTOM_INLINE{} = CustomInline
+toGrammar CODE{} = Code
+toGrammar EMPH{} = Emphasis
+toGrammar STRONG{} = Strong
+toGrammar LINK{} = Link
+toGrammar IMAGE{} = Image
+
 
 instance Symbol Grammar where
   symbolType _ = Regular
