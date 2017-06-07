@@ -65,7 +65,7 @@ type Syntax =
 
 type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = Assignment.Assignment Grammar Term
+type Assignment = Assignment.Assignment (AST Grammar) Grammar Term
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis

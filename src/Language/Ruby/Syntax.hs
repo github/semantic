@@ -55,7 +55,7 @@ type Syntax =
 
 type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = Assignment.Assignment Grammar Term
+type Assignment = Assignment.Assignment (AST Grammar) Grammar Term
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -151,7 +151,7 @@ literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
         <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
-invert :: (InUnion fs Expression.Boolean, HasCallStack) => Assignment.Assignment grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment grammar (Term.Term (Union fs) (Record Location))
+invert :: (InUnion fs Expression.Boolean, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a

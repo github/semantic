@@ -62,6 +62,7 @@
 module Data.Syntax.Assignment
 ( Assignment
 , Location
+, AST
 , location
 , symbol
 , source
@@ -98,41 +99,44 @@ import Text.Show hiding (show)
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment grammar = Freer (AssignmentF grammar)
+type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
-data AssignmentF grammar a where
-  Location :: HasCallStack => AssignmentF grammar (Record Location)
-  Source :: HasCallStack => AssignmentF grammar ByteString
-  Children :: HasCallStack => Assignment grammar a -> AssignmentF grammar a
-  Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF grammar a
-  Alt :: HasCallStack => a -> a -> AssignmentF grammar a
-  Empty :: HasCallStack => AssignmentF grammar a
-  Throw :: HasCallStack => Error grammar -> AssignmentF grammar a
-  Catch :: HasCallStack => a -> (Error grammar -> a) -> AssignmentF grammar a
+data AssignmentF ast grammar a where
+  Location :: HasCallStack => AssignmentF ast grammar (Record Location)
+  Source :: HasCallStack => AssignmentF ast grammar ByteString
+  Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
+  Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF ast grammar a
+  Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
+  Empty :: HasCallStack => AssignmentF ast grammar a
+  Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
+  Catch :: HasCallStack => a -> (Error grammar -> a) -> AssignmentF ast grammar a
 
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
-location :: HasCallStack => Assignment grammar (Record Location)
+location :: HasCallStack => Assignment ast grammar (Record Location)
 location = Location `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment grammar (Record Location)
+symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
-source :: HasCallStack => Assignment grammar ByteString
+source :: HasCallStack => Assignment ast grammar ByteString
 source = withFrozenCallStack $ Source `Then` return
 
 -- | Match a node by applying an assignment to its children.
-children :: HasCallStack => Assignment grammar a -> Assignment grammar a
+children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = '[Info.Range, Info.SourceSpan]
+
+-- | An AST node labelled with symbols and source location.
+type AST grammar = Cofree [] (Record (Maybe grammar ': Location))
 
 -- | The result of assignment, possibly containing an error.
 data Result grammar a = Result { resultError :: Maybe (Error grammar), resultValue :: Maybe a }
@@ -186,13 +190,13 @@ showSourcePos :: Maybe FilePath -> Info.SourcePos -> ShowS
 showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (HasField fields Info.Range, HasField fields Info.SourceSpan, HasField fields (Maybe grammar), Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => Assignment grammar a -> Source.Source -> Cofree f (Record fields) -> Result grammar a
+assign :: (HasField fields Info.Range, HasField fields Info.SourceSpan, HasField fields (Maybe grammar), Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => Assignment (Cofree f (Record fields)) grammar a -> Source.Source -> Cofree f (Record fields) -> Result grammar a
 assign = assignBy (\ (r :< _) -> getField r :. getField r :. getField r :. Nil)
 
-assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack) => (forall x. Base ast x -> Record (Maybe grammar ': Location)) -> Assignment grammar a -> Source.Source -> ast -> Result grammar a
+assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack) => (forall x. Base ast x -> Record (Maybe grammar ': Location)) -> Assignment ast grammar a -> Source.Source -> ast -> Result grammar a
 assignBy toRecord assignment source = fmap fst . assignAllFrom toRecord assignment . makeState source . pure
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack) => (forall x. Base ast x -> Record (Maybe grammar ': Location)) -> Assignment grammar a -> AssignmentState ast -> Result grammar (a, AssignmentState ast)
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack) => (forall x. Base ast x -> Record (Maybe grammar ': Location)) -> Assignment ast grammar a -> AssignmentState ast -> Result grammar (a, AssignmentState ast)
 assignAllFrom toRecord assignment state = case runAssignment toRecord assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous (rhead . toRecord) state) of
     [] -> pure (a, state)
@@ -200,9 +204,9 @@ assignAllFrom toRecord assignment state = case runAssignment toRecord assignment
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack) => (forall x. Base ast x -> Record (Maybe grammar ': Location)) -> Assignment grammar a -> AssignmentState ast -> Result grammar (a, AssignmentState ast)
+runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack) => (forall x. Base ast x -> Record (Maybe grammar ': Location)) -> Assignment ast grammar a -> AssignmentState ast -> Result grammar (a, AssignmentState ast)
 runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
-  where run :: AssignmentF grammar x -> (x -> AssignmentState ast -> Result grammar (a, AssignmentState ast)) -> AssignmentState ast -> Result grammar (a, AssignmentState ast)
+  where run :: AssignmentF ast grammar x -> (x -> AssignmentState ast -> Result grammar (a, AssignmentState ast)) -> AssignmentState ast -> Result grammar (a, AssignmentState ast)
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, node : _) -> yield (rtail (toRecord (project node))) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
@@ -252,17 +256,17 @@ makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) source nodes
 
 -- Instances
 
-instance Enum grammar => Alternative (Assignment grammar) where
-  empty :: HasCallStack => Assignment grammar a
+instance Enum grammar => Alternative (Assignment ast grammar) where
+  empty :: HasCallStack => Assignment ast grammar a
   empty = Empty `Then` return
-  (<|>) :: HasCallStack => Assignment grammar a -> Assignment grammar a -> Assignment grammar a
+  (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   a <|> b = case (a, b) of
     (_, Empty `Then` _) -> a
     (Empty `Then` _, _) -> b
     (Choose choices1 `Then` continue1, Choose choices2 `Then` continue2) -> Choose (IntMap.union (fmap continue1 choices1) (fmap continue2 choices2)) `Then` identity
     _ -> wrap $ Alt a b
 
-instance Show grammar => Show1 (AssignmentF grammar) where
+instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
@@ -297,9 +301,9 @@ instance Alternative (Result grammar) where
   Result e (Just a) <|> _ = Result e (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <|> e2) b
 
-instance MonadError (Error grammar) (Assignment grammar) where
-  throwError :: HasCallStack => Error grammar -> Assignment grammar a
+instance MonadError (Error grammar) (Assignment ast grammar) where
+  throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
   throwError error = withFrozenCallStack $ Throw error `Then` return
 
-  catchError :: HasCallStack => Assignment grammar a -> (Error grammar -> Assignment grammar a) -> Assignment grammar a
+  catchError :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = withFrozenCallStack $ Catch during handler `Then` identity
