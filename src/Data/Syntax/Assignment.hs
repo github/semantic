@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and SourceSpan). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -199,20 +199,20 @@ showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "inter
 
 -- | Run an assignment over an AST exhaustively.
 assign :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment grammar a -> Source.Source -> AST grammar -> Result grammar a
-assign = assignBy identity
+assign = assignBy (rhead . headF)
 
-assignBy :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (node -> Maybe grammar) -> Assignment grammar a -> Source.Source -> Cofree [] (Record '[node, Info.Range, Info.SourceSpan]) -> Result grammar a
+assignBy :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record '[ node, Info.Range, Info.SourceSpan ]) x -> Maybe grammar) -> Assignment grammar a -> Source.Source -> Cofree [] (Record '[node, Info.Range, Info.SourceSpan]) -> Result grammar a
 assignBy toSymbol assignment source = fmap snd . assignAllFrom toSymbol assignment . makeState source . pure
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (node -> Maybe grammar) -> Assignment grammar a -> AssignmentState node -> Result grammar (AssignmentState node, a)
+assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record '[ node, Info.Range, Info.SourceSpan ]) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState node -> Result grammar (AssignmentState node, a)
 assignAllFrom toSymbol assignment state = case runAssignment toSymbol assignment state of
   Result err (Just (state, a)) -> case stateNodes (dropAnonymous toSymbol state) of
     [] -> Result Nothing (Just (state, a))
-    node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (toSymbol (rhead (extract node)))))) Nothing
+    node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (toSymbol (runCofree node))))) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar node a. (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (node -> Maybe grammar) -> Assignment grammar a -> AssignmentState node -> Result grammar (AssignmentState node, a)
+runAssignment :: forall grammar node a. (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record '[ node, Info.Range, Info.SourceSpan ]) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState node -> Result grammar (AssignmentState node, a)
 runAssignment toSymbol = iterFreer run . fmap (\ a state -> pure (state, a))
   where run :: AssignmentF grammar x -> (x -> AssignmentState node -> Result grammar (AssignmentState node, a)) -> AssignmentState node -> Result grammar (AssignmentState node, a)
         run assignment yield initialState = case (assignment, stateNodes) of
@@ -222,7 +222,7 @@ runAssignment toSymbol = iterFreer run . fmap (\ a state -> pure (state, a))
           (Children childAssignment, node : _) -> case assignAllFrom toSymbol childAssignment state { stateNodes = unwrap node } of
             Result _ (Just (state', a)) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
-          (Choose choices, node : _) | Just symbol <- toSymbol (rhead (extract node)), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          (Choose choices, node : _) | Just symbol <- toSymbol (runCofree node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
@@ -230,7 +230,7 @@ runAssignment toSymbol = iterFreer run . fmap (\ a state -> pure (state, a))
             Result _ (Just (state', a)) -> Result Nothing (Just (state', a))
             Result err Nothing -> maybe (Result Nothing Nothing) (flip yield state . handler) err
           (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
-          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (rtail (extract node)) in Result (Just (maybe (Error startPos (ParseError expectedSymbols)) (Error startPos . UnexpectedSymbol expectedSymbols) (toSymbol (rhead (extract node))))) Nothing
+          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (rtail (extract node)) in Result (Just (maybe (Error startPos (ParseError expectedSymbols)) (Error startPos . UnexpectedSymbol expectedSymbols) (toSymbol (runCofree node)))) Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous toSymbol initialState
                   _ -> initialState
@@ -239,8 +239,8 @@ runAssignment toSymbol = iterFreer run . fmap (\ a state -> pure (state, a))
                   _ -> []
                 choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
 
-dropAnonymous :: Symbol grammar => (node -> Maybe grammar) -> AssignmentState node -> AssignmentState node
-dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . rhead . extract) (stateNodes state) }
+dropAnonymous :: Symbol grammar => (forall x. CofreeF [] (Record '[ node, Info.Range, Info.SourceSpan ]) x -> Maybe grammar) -> AssignmentState node -> AssignmentState node
+dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . runCofree) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: AssignmentState node -> AssignmentState node
