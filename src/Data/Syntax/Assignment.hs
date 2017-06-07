@@ -207,7 +207,7 @@ assignBy toSymbol assignment source = fmap fst . assignAllFrom toSymbol assignme
 assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record '[ node, Info.Range, Info.SourceSpan ]) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState node -> Result grammar (a, AssignmentState node)
 assignAllFrom toSymbol assignment state = case runAssignment toSymbol assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous toSymbol state) of
-    [] -> Result Nothing (Just (a, state))
+    [] -> pure (a, state)
     node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (toSymbol (runCofree node))))) Nothing
   r -> r
 
@@ -227,8 +227,8 @@ runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
           (Catch during handler, _) -> case yield during state of
-            Result _ (Just (a, state')) -> Result Nothing (Just (a, state'))
-            Result err Nothing -> maybe (Result Nothing Nothing) (flip yield state . handler) err
+            Result _ (Just (a, state')) -> pure (a, state')
+            Result err Nothing -> maybe empty (flip yield state . handler) err
           (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
           (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (rtail (extract node)) in Result (Just (maybe (Error startPos (ParseError expectedSymbols)) (Error startPos . UnexpectedSymbol expectedSymbols) (toSymbol (runCofree node)))) Nothing
           where state@AssignmentState{..} = case assignment of
