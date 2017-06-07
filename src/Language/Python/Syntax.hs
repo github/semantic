@@ -98,6 +98,7 @@ statement = assertStatement
           <|> importFrom
           <|> printStatement
           <|> returnStatement
+          <|> deleteStatement
 
 expressionStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 expressionStatement = symbol ExpressionStatement *> children expression
@@ -274,6 +275,9 @@ await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$
 returnStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
 
+deleteStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> deleteIdentifier <* symbol ExpressionList <*> children (many expression))
+  where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier <$> source)
 
 ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
