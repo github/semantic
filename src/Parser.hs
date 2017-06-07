@@ -1,15 +1,17 @@
-{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Parser where
 
 import Data.Functor.Union
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
+import Data.Functor.Foldable hiding (fold, Nil)
 import Data.Functor.Union (inj)
 import qualified Data.Text as T
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
+import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
@@ -32,10 +34,11 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (Cofree [] (Record (Maybe grammar ': Location)))
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs))
-                   => Parser (AST grammar)                                                 -- ^ A parser producing 'AST'.
-                   -> Assignment (AST grammar) grammar (Term (Union fs) (Record Location)) -- ^ An assignment from 'AST' onto 'Term's.
-                   -> Parser (Term (Union fs) (Record Location))                           -- ^ A parser producing 'Term's.
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs), Recursive ast, Foldable (Base ast))
+                   => Parser ast                                                   -- ^ A parser producing AST.
+                   -> (forall x. Base ast x -> Record (Maybe grammar ': Location)) -- ^ A function extracting the symbol and location.
+                   -> Assignment ast grammar (Term (Union fs) (Record Location))   -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (Term (Union fs) (Record Location))                   -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
@@ -54,17 +57,17 @@ parserForLanguage (Just language) = case language of
   _ -> LineByLineParser
 
 rubyParser :: Parser Ruby.Term
-rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
+rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) headF Ruby.assignment
 
 pythonParser :: Parser Python.Term
-pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+pythonParser = AssignmentParser (ASTParser tree_sitter_python) headF Python.assignment
 
 runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
   ASTParser language -> parseToAST language
-  AssignmentParser parser assignment -> \ source -> do
+  AssignmentParser parser by assignment -> \ source -> do
     ast <- runParser parser source
-    let Result err term = assign assignment source ast
+    let Result err term = assignBy by assignment source ast
     case term of
       Just term -> do
         let errors = toList err <> termErrors term
