@@ -74,6 +74,7 @@ module Data.Syntax.Assignment
 , showError
 , showExpectation
 , assign
+, assignBy
 , runAssignment
 , AssignmentState(..)
 , makeState
