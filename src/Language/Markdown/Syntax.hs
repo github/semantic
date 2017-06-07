@@ -46,4 +46,14 @@ type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMark.NodeType ': Location))) Grammar.Grammar Term
 
 assignment :: Assignment
-assignment = empty
+assignment = makeTerm <$> symbol Grammar.Document <*> children (Document <$> many paragraph)
+
+inlineElement :: Assignment
+inlineElement = empty
+
+paragraph :: Assignment
+paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
+
+
+makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
+makeTerm a f = cofree $ a :< inj f
