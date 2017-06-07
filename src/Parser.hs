@@ -62,6 +62,9 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) headF Ruby.assignment
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) headF Python.assignment
 
+markdownParser :: Parser Markdown.Term
+markdownParser = AssignmentParser MarkdownParser (\ ((nodeType :. location) :< _) -> Just (toGrammar nodeType) :. location) Markdown.assignment
+
 runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
   ASTParser language -> parseToAST language
