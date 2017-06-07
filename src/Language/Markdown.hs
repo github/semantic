@@ -8,6 +8,13 @@ import Info
 import Prologue
 import Source
 import Syntax
+import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
+
+data Grammar
+  = Document
+  | Paragraph
+  | Heading
+  deriving (Bounded, Enum, Eq, Ord, Show)
 
 cmarkParser :: Source -> IO (Cofree (Syntax Text) (Record DefaultFields))
 cmarkParser source = pure . toTerm (totalRange source) (rangeToSourceSpan source $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
@@ -38,3 +45,7 @@ cmarkParser source = pure . toTerm (totalRange source) (rangeToSourceSpan source
         toCategory IMAGE{} = Other "image"
         toCategory t = Other (show t)
         toSpan PosInfo{..} = SourceSpan (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) endColumn)
+
+
+instance Symbol Grammar where
+  symbolType _ = Regular

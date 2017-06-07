@@ -16,19 +16,10 @@ import Data.Record
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import GHC.Generics
 import GHC.Stack
+import Language.Markdown as Grammar (Grammar(..))
 import qualified Data.Syntax.Assignment as Assignment
 import Prologue hiding (Location)
 import qualified Term
-import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
-
-data Grammar
-  = Document'
-  | Paragraph'
-  | Heading
-  deriving (Bounded, Enum, Eq, Ord, Show)
-
-instance Symbol Grammar where
-  symbolType _ = Regular
 
 type Syntax =
   '[ Document
