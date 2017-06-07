@@ -81,6 +81,7 @@ module Data.Syntax.Assignment
 import Control.Monad.Free.Freer
 import Data.ByteString (isSuffixOf)
 import Data.Functor.Classes
+import Data.Functor.Foldable hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
@@ -231,8 +232,8 @@ runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
                   _ -> []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
 
-dropAnonymous :: Symbol grammar => (forall x. CofreeF f a x -> Maybe grammar) -> AssignmentState (Cofree f a) -> AssignmentState (Cofree f a)
-dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . runCofree) (stateNodes state) }
+dropAnonymous :: (Symbol grammar, Recursive term) => (forall x. Base term x -> Maybe grammar) -> AssignmentState term -> AssignmentState term
+dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . project) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Functor f) => AssignmentState (Cofree f (Record fields)) -> AssignmentState (Cofree f (Record fields))
