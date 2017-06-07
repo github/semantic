@@ -19,7 +19,7 @@ import GHC.Stack
 import qualified Language.Markdown as Grammar (Grammar(..))
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax as Syntax
-import Prologue hiding (Location, Text)
+import Prologue hiding (Location, Text, list)
 import qualified Term
 
 type Syntax =
@@ -29,6 +29,7 @@ type Syntax =
    , Emphasis
    , Text
    , Syntax.Error Error
+   , []
    ]
 
 newtype Document a = Document [a]
@@ -71,10 +72,13 @@ assignment = makeTerm <$> symbol Grammar.Document <*> children (Document <$> man
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph
+blockElement = paragraph <|> list
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
+
+list :: Assignment
+list = makeTerm <$> symbol Grammar.List <*> children (many blockElement)
 
 
 -- Inline elements
