@@ -189,28 +189,28 @@ showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "inter
 assign :: (HasField fields Info.Range, HasField fields Info.SourceSpan, HasField fields (Maybe grammar), Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => Assignment grammar a -> Source.Source -> Cofree f (Record fields) -> Result grammar a
 assign = assignBy (getField . headF)
 
-assignBy :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => (forall x. CofreeF f (Record fields) x -> Maybe grammar) -> Assignment grammar a -> Source.Source -> Cofree f (Record fields) -> Result grammar a
+assignBy :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Comonad w, Recursive (w (Record fields)), Foldable (Base (w (Record fields))), HasCallStack) => (forall x. Base (w (Record fields)) x -> Maybe grammar) -> Assignment grammar a -> Source.Source -> w (Record fields) -> Result grammar a
 assignBy toSymbol assignment source = fmap fst . assignAllFrom toSymbol assignment . makeState source . pure
 
-assignAllFrom :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => (forall x. CofreeF f (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))
+assignAllFrom :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Comonad w, Recursive (w (Record fields)), Foldable (Base (w (Record fields))), HasCallStack) => (forall x. Base (w (Record fields)) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (w (Record fields)) -> Result grammar (a, AssignmentState (w (Record fields)))
 assignAllFrom toSymbol assignment state = case runAssignment toSymbol assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous toSymbol state) of
     [] -> pure (a, state)
-    node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (toSymbol (runCofree node))))) Nothing
+    node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (toSymbol (project node))))) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar fields f a. (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => (forall x. CofreeF f (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))
+runAssignment :: forall grammar fields a w. (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Comonad w, Recursive (w (Record fields)), Foldable (Base (w (Record fields))), HasCallStack) => (forall x. Base (w (Record fields)) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (w (Record fields)) -> Result grammar (a, AssignmentState (w (Record fields)))
 runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
-  where run :: AssignmentF grammar x -> (x -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))) -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))
+  where run :: AssignmentF grammar x -> (x -> AssignmentState (w (Record fields)) -> Result grammar (a, AssignmentState (w (Record fields)))) -> AssignmentState (w (Record fields)) -> Result grammar (a, AssignmentState (w (Record fields)))
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, node : _) -> yield (Info.byteRange (extract node) :. Info.sourceSpan (extract node) :. Nil) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (extract node)) (negate stateOffset)) stateSource)) (advanceState state)
-          (Children childAssignment, node : _) -> case assignAllFrom toSymbol childAssignment state { stateNodes = toList (unwrap node) } of
+          (Children childAssignment, node : _) -> case assignAllFrom toSymbol childAssignment state { stateNodes = toList (project node) } of
             Result _ (Just (a, state')) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
-          (Choose choices, node : _) | Just symbol <- toSymbol (runCofree node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          (Choose choices, node : _) | Just symbol <- toSymbol (project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
@@ -218,7 +218,7 @@ runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
             Result _ (Just (a, state')) -> pure (a, state')
             Result err Nothing -> maybe empty (flip yield state . handler) err
           (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
-          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (extract node) in Result (Error startPos . UnexpectedSymbol expectedSymbols <$> toSymbol (runCofree node) <|> Just (Error startPos (ParseError expectedSymbols))) Nothing
+          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (extract node) in Result (Error startPos . UnexpectedSymbol expectedSymbols <$> toSymbol (project node) <|> Just (Error startPos (ParseError expectedSymbols))) Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous toSymbol initialState
                   _ -> initialState
@@ -231,7 +231,7 @@ dropAnonymous :: (Symbol grammar, Recursive term) => (forall x. Base term x -> M
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . project) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
-advanceState :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Functor f) => AssignmentState (Cofree f (Record fields)) -> AssignmentState (Cofree f (Record fields))
+advanceState :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Comonad w) => AssignmentState (w (Record fields)) -> AssignmentState (w (Record fields))
 advanceState state@AssignmentState{..}
   | node : rest <- stateNodes
   , range <- Info.byteRange (extract node)
