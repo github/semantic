@@ -2,7 +2,7 @@
 module Language.Markdown.Syntax
 ( assignment
 , Syntax
-, Grammar
+, Grammar.Grammar
 , Error
 , Term
 ) where
@@ -16,7 +16,7 @@ import Data.Record
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import GHC.Generics
 import GHC.Stack
-import Language.Markdown as Grammar (Grammar(..))
+import qualified Language.Markdown as Grammar (Grammar(..))
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import Prologue hiding (Location)
@@ -41,9 +41,9 @@ instance Eq1 Paragraph where liftEq = genericLiftEq
 instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
 
 
-type Error = Assignment.Error Grammar
+type Error = Assignment.Error Grammar.Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMark.NodeType ': Location))) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMark.NodeType ': Location))) Grammar.Grammar Term
 
 assignment :: Assignment
 assignment = empty
