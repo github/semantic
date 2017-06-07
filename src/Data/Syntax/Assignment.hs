@@ -191,13 +191,13 @@ showSourcePos :: Maybe FilePath -> Info.SourcePos -> ShowS
 showSourcePos path Info.SourcePos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows line . showChar ':' . shows column
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => Assignment grammar a -> Source.Source -> AST grammar -> Result grammar a
-assign = assignBy (rhead . headF)
+assign :: (HasField fields Info.Range, HasField fields Info.SourceSpan, HasField fields (Maybe grammar), Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => Assignment grammar a -> Source.Source -> Cofree f (Record fields) -> Result grammar a
+assign = assignBy (getField . headF)
 
-assignBy :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record fields) x -> Maybe grammar) -> Assignment grammar a -> Source.Source -> Cofree [] (Record fields) -> Result grammar a
+assignBy :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => (forall x. CofreeF f (Record fields) x -> Maybe grammar) -> Assignment grammar a -> Source.Source -> Cofree f (Record fields) -> Result grammar a
 assignBy toSymbol assignment source = fmap fst . assignAllFrom toSymbol assignment . makeState source . pure
 
-assignAllFrom :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))
+assignAllFrom :: (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => (forall x. CofreeF f (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))
 assignAllFrom toSymbol assignment state = case runAssignment toSymbol assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous toSymbol state) of
     [] -> pure (a, state)
@@ -205,14 +205,14 @@ assignAllFrom toSymbol assignment state = case runAssignment toSymbol assignment
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
-runAssignment :: forall grammar fields a. (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, HasCallStack) => (forall x. CofreeF [] (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))
+runAssignment :: forall grammar fields f a. (HasField fields Info.Range, HasField fields Info.SourceSpan, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack) => (forall x. CofreeF f (Record fields) x -> Maybe grammar) -> Assignment grammar a -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))
 runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
-  where run :: AssignmentF grammar x -> (x -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))) -> AssignmentState (Cofree [] (Record fields)) -> Result grammar (a, AssignmentState (Cofree [] (Record fields)))
+  where run :: AssignmentF grammar x -> (x -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))) -> AssignmentState (Cofree f (Record fields)) -> Result grammar (a, AssignmentState (Cofree f (Record fields)))
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, node : _) -> yield (Info.byteRange (extract node) :. Info.sourceSpan (extract node) :. Nil) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
           (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (extract node)) (negate stateOffset)) stateSource)) (advanceState state)
-          (Children childAssignment, node : _) -> case assignAllFrom toSymbol childAssignment state { stateNodes = unwrap node } of
+          (Children childAssignment, node : _) -> case assignAllFrom toSymbol childAssignment state { stateNodes = toList (unwrap node) } of
             Result _ (Just (a, state')) -> yield a (advanceState state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
           (Choose choices, node : _) | Just symbol <- toSymbol (runCofree node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
