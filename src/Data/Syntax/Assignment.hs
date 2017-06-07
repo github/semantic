@@ -64,7 +64,7 @@ module Data.Syntax.Assignment
 , Location
 , AST
 , location
-, withNode
+, Data.Syntax.Assignment.project
 , symbol
 , source
 , children
@@ -83,7 +83,7 @@ module Data.Syntax.Assignment
 import Control.Monad.Free.Freer
 import Data.ByteString (isSuffixOf)
 import Data.Functor.Classes
-import Data.Functor.Foldable hiding (Nil)
+import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
@@ -105,7 +105,7 @@ type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
 data AssignmentF ast grammar a where
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
-  WithNode :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar a
+  Project :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF ast grammar a
@@ -122,9 +122,9 @@ location = Location `Then` return
 
 -- | Zero-width projection of the current node.
 --
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (withNode f *> b)' is fine, but 'many (withNode f)' is not.
-withNode :: HasCallStack => (forall x. Base ast x -> a) -> Assignment ast grammar a
-withNode projection = WithNode projection `Then` return
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (project f *> b)' is fine, but 'many (project f)' is not.
+project :: HasCallStack => (forall x. Base ast x -> a) -> Assignment ast grammar a
+project projection = Project projection `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
@@ -209,7 +209,7 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Folda
 assignAllFrom toRecord assignment state = case runAssignment toRecord assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous (rhead . toRecord) state) of
     [] -> pure (a, state)
-    node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (rhead (toRecord (project node)))))) Nothing
+    node : _ -> Result (err <|> Just (Error (statePos state) (maybe (ParseError []) (UnexpectedSymbol []) (rhead (toRecord (F.project node)))))) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -217,14 +217,14 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
 runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
   where run :: AssignmentF ast grammar x -> (x -> AssignmentState ast -> Result grammar (a, AssignmentState ast)) -> AssignmentState ast -> Result grammar (a, AssignmentState ast)
         run assignment yield initialState = case (assignment, stateNodes) of
-          (Location, node : _) -> yield (rtail (toRecord (project node))) state
+          (Location, node : _) -> yield (rtail (toRecord (F.project node))) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
-          (WithNode projection, node : _) -> yield (projection (project node)) state
-          (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (toRecord (project node))) (negate stateOffset)) stateSource)) (advanceState (rtail . toRecord) state)
-          (Children childAssignment, node : _) -> case assignAllFrom toRecord childAssignment state { stateNodes = toList (project node) } of
+          (Project projection, node : _) -> yield (projection (F.project node)) state
+          (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (toRecord (F.project node))) (negate stateOffset)) stateSource)) (advanceState (rtail . toRecord) state)
+          (Children childAssignment, node : _) -> case assignAllFrom toRecord childAssignment state { stateNodes = toList (F.project node) } of
             Result _ (Just (a, state')) -> yield a (advanceState (rtail . toRecord) state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
-          (Choose choices, node : _) | Just symbol :. _ <- toRecord (project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          (Choose choices, node : _) | Just symbol :. _ <- toRecord (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
@@ -232,7 +232,7 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
             Result _ (Just (a, state')) -> pure (a, state')
             Result err Nothing -> maybe empty (flip yield state . handler) err
           (_, []) -> Result (Just (Error statePos (UnexpectedEndOfInput expectedSymbols))) Nothing
-          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (toRecord (project node)) in Result (Error startPos . UnexpectedSymbol expectedSymbols <$> rhead (toRecord (project node)) <|> Just (Error startPos (ParseError expectedSymbols))) Nothing
+          (_, node:_) -> let Info.SourceSpan startPos _ = Info.sourceSpan (toRecord (F.project node)) in Result (Error startPos . UnexpectedSymbol expectedSymbols <$> rhead (toRecord (F.project node)) <|> Just (Error startPos (ParseError expectedSymbols))) Nothing
           where state@AssignmentState{..} = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous (rhead . toRecord) initialState
                   _ -> initialState
@@ -242,13 +242,13 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Maybe grammar) -> AssignmentState ast -> AssignmentState ast
-dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . project) (stateNodes state) }
+dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . F.project) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes & its corresponding bytes off of stateSource, and updating stateOffset & statePos to its end. Exhausted 'AssignmentState's (those without any remaining nodes) are returned unchanged.
 advanceState :: Recursive ast => (forall x. Base ast x -> Record Location) -> AssignmentState ast -> AssignmentState ast
 advanceState toLocation state@AssignmentState{..}
   | node : rest <- stateNodes
-  , range :. span :. Nil <- toLocation (project node) = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  , range :. span :. Nil <- toLocation (F.project node) = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -279,7 +279,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
 instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
-    WithNode projection -> showsUnaryWith (const (const (showChar '_'))) "WithNode" d projection
+    Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)

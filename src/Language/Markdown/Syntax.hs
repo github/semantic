@@ -91,7 +91,7 @@ item :: Assignment
 item = symbol Grammar.Item *> children blockElement
 
 heading :: Assignment
-heading = makeTerm <$> symbol Grammar.Heading <*> (Heading <$> withNode (\ ((Grammar.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
+heading = makeTerm <$> symbol Grammar.Heading <*> (Heading <$> project (\ ((Grammar.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
 
 
 -- Inline elements
