@@ -75,7 +75,7 @@ strong :: Assignment
 strong = makeTerm <$> symbol Grammar.Strong <*> children (Strong <$> many inlineElement)
 
 emphasis :: Assignment
-emphasis = makeTerm <$> symbol Grammar.Strong <*> children (Strong <$> many inlineElement)
+emphasis = makeTerm <$> symbol Grammar.Emphasis <*> children (Emphasis <$> many inlineElement)
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
