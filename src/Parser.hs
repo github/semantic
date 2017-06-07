@@ -33,9 +33,9 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
   AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs))
-                   => Parser (AST grammar)                          -- ^ A parser producing 'AST'.
-                   -> Assignment grammar (Term (Union fs) Location) -- ^ An assignment from 'AST' onto 'Term's.
-                   -> Parser (Term (Union fs) Location)             -- ^ A parser of 'Term's.
+                   => Parser (AST grammar)                                   -- ^ A parser producing 'AST'.
+                   -> Assignment grammar (Term (Union fs) (Record Location)) -- ^ An assignment from 'AST' onto 'Term's.
+                   -> Parser (Term (Union fs) (Record Location))             -- ^ A parser of 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
@@ -54,10 +54,10 @@ parserForLanguage (Just language) = case language of
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
   _ -> LineByLineParser
 
-rubyParser :: Parser (Term (Union Ruby.Syntax') Location)
+rubyParser :: Parser (Term (Union Ruby.Syntax') (Record Location))
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-pythonParser :: Parser (Term (Union Python.Syntax') Location)
+pythonParser :: Parser (Term (Union Python.Syntax') (Record Location))
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 runParser :: Parser term -> Source -> IO term
@@ -80,7 +80,7 @@ runParser parser = case parser of
   where showSGRCode = showString . setSGRCode
         withSGRCode code s = showSGRCode code . s . showSGRCode []
 
-errorTerm :: InUnion fs (Syntax.Error (Error grammar)) => Source -> Maybe (Error grammar) -> Term (Union fs) Location
+errorTerm :: InUnion fs (Syntax.Error (Error grammar)) => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
 
 termErrors :: (InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and SourceSpan). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -102,7 +102,7 @@ import Text.Show hiding (show)
 type Assignment grammar = Freer (AssignmentF grammar)
 
 data AssignmentF grammar a where
-  Location :: HasCallStack => AssignmentF grammar Location
+  Location :: HasCallStack => AssignmentF grammar (Record Location)
   Source :: HasCallStack => AssignmentF grammar ByteString
   Children :: HasCallStack => Assignment grammar a -> AssignmentF grammar a
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF grammar a
@@ -114,13 +114,13 @@ data AssignmentF grammar a where
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and SourceSpan at the current offset. Otherwise, it will be the Range and SourceSpan of the current node.
-location :: HasCallStack => Assignment grammar Location
+location :: HasCallStack => Assignment grammar (Record Location)
 location = Location `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment grammar Location
+symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment grammar (Record Location)
 symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
@@ -133,10 +133,10 @@ children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
-type Location = Record '[Info.Range, Info.SourceSpan]
+type Location = '[Info.Range, Info.SourceSpan]
 
 -- | The label annotating a node in the AST, specified as the pairing of its symbol and location information.
-type Node grammar = Record '[Maybe grammar, Info.Range, Info.SourceSpan]
+type Node grammar = Record (Maybe grammar ': Location)
 
 -- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
 type AST grammar = Cofree [] (Node grammar)
