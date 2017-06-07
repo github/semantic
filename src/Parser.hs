@@ -71,9 +71,10 @@ runParser parser = case parser of
   AssignmentParser parser by assignment -> \ source -> do
     ast <- runParser parser source
     let Result err term = assignBy by assignment source ast
+    traverse_ (putStrLn . showError source) (toList err)
     case term of
       Just term -> do
-        let errors = toList err <> termErrors term
+        let errors = termErrors term `asTypeOf` toList err
         traverse_ (putStrLn . showError source) errors
         unless (Prologue.null errors) $
           putStrLn (withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ "")
