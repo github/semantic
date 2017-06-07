@@ -35,7 +35,7 @@ data Parser term where
   AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs), Traversable f)
                    => Parser (Cofree f (Record (Maybe grammar ': Location))) -- ^ A parser producing 'AST'.
                    -> Assignment grammar (Term (Union fs) (Record Location)) -- ^ An assignment from 'AST' onto 'Term's.
-                   -> Parser (Term (Union fs) (Record Location))             -- ^ A parser of 'Term's.
+                   -> Parser (Term (Union fs) (Record Location))             -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
