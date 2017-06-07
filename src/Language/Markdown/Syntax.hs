@@ -16,7 +16,7 @@ import qualified Data.Syntax.Markup as Markup
 import qualified Data.Syntax as Syntax
 import GHC.Stack
 import qualified Language.Markdown as Grammar (Grammar(..))
-import Prologue hiding (Location, list)
+import Prologue hiding (Location, link, list)
 import qualified Term
 
 type Syntax =
@@ -28,6 +28,7 @@ type Syntax =
    , Markup.UnorderedList
    -- Inline elements
    , Markup.Emphasis
+   , Markup.Link
    , Markup.Strong
    , Markup.Text
    -- Assignment errors; cmark does not provide parse errors.
@@ -66,7 +67,7 @@ heading = makeTerm <$> symbol Grammar.Heading <*> (Markup.Heading <$> project (\
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = strong <|> emphasis <|> text
+inlineElement = strong <|> emphasis <|> text <|> link
 
 strong :: Assignment
 strong = makeTerm <$> symbol Grammar.Strong <*> children (Markup.Strong <$> many inlineElement)
@@ -76,6 +77,9 @@ emphasis = makeTerm <$> symbol Grammar.Emphasis <*> children (Markup.Emphasis <$
 
 text :: Assignment
 text = makeTerm <$> symbol Grammar.Text <*> (Markup.Text <$> source)
+
+link :: Assignment
+link = makeTerm <$> symbol Grammar.Link <*> (uncurry Markup.Link <$> project (\ (((CMark.LINK url title) :. _) :< _) -> (toS url, toS title))) <* source
 
 
 makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a

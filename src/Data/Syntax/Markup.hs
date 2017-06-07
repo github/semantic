@@ -61,3 +61,9 @@ newtype Text a = Text ByteString
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
+
+data Link a = Link { linkURL :: ByteString, linkTitle :: ByteString }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Link where liftEq = genericLiftEq
+instance Show1 Link where liftShowsPrec = genericLiftShowsPrec
