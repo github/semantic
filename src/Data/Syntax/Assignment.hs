@@ -66,7 +66,6 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
-, Rose
 , Node
 , AST
 , Result(..)
@@ -133,9 +132,6 @@ children :: HasCallStack => Assignment grammar a -> Assignment grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 
--- | A rose tree.
-type Rose = Cofree []
-
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = Record '[Info.Range, Info.SourceSpan]
 
@@ -143,7 +139,7 @@ type Location = Record '[Info.Range, Info.SourceSpan]
 type Node grammar = Record '[Maybe grammar, Info.Range, Info.SourceSpan]
 
 -- | An abstract syntax tree in some 'grammar', with symbols and location information annotating each node.
-type AST grammar = Rose (Node grammar)
+type AST grammar = Cofree [] (Node grammar)
 
 
 -- | The result of assignment, possibly containing an error.
