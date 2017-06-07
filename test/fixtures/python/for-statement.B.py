@@ -7,4 +7,3 @@ for line, j in lines:
     print character
 else:
   print y
-

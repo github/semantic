@@ -5,4 +5,3 @@ class D(method1):
 class B:
   def b(self):
     return c
-

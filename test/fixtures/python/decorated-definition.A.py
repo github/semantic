@@ -9,4 +9,3 @@ class C:
   @a(1, b=True, *b, **c)
   def f():
     g
-

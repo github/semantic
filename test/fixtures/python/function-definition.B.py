@@ -6,4 +6,3 @@ def c():
 
 def d(e):
   a
-

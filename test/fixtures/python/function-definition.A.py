@@ -6,4 +6,3 @@ def c(d):
 
 def g(g, h,):
   i
-

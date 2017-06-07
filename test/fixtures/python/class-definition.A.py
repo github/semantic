@@ -8,4 +8,3 @@ class C():
 class B(method1):
   def method1(self):
     return
-

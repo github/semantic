@@ -6,4 +6,3 @@ class D:
   @a(2, c=True, *a, **d)
   def f():
     g
-

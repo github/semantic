@@ -13,4 +13,3 @@ try:
   a
 finally:
   b
-

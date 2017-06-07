@@ -6,4 +6,3 @@ async def a():
 
 async def d(c):
   e
-
