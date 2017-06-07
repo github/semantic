@@ -54,10 +54,10 @@ parserForLanguage (Just language) = case language of
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
   _ -> LineByLineParser
 
-rubyParser :: Parser (Term (Union Ruby.Syntax) (Record Location))
+rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-pythonParser :: Parser (Term (Union Python.Syntax) (Record Location))
+pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 runParser :: Parser term -> Source -> IO term
