@@ -50,7 +50,7 @@ assignment = makeTerm <$> symbol Document <*> children (Markup.Document <$> many
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph <|> list <|> heading <|> blockQuote
+blockElement = paragraph <|> list <|> heading <|> blockQuote <|> codeBlock
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -68,6 +68,9 @@ heading = makeTerm <$> symbol Heading <*> (Markup.Heading <$> project (\ ((CMark
 
 blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
+
+codeBlock :: Assignment
+codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code . Just . toS <$> project (\ (((CMark.CODE_BLOCK language _) :. _) :< _) -> language) <*> source)
 
 
 -- Inline elements
