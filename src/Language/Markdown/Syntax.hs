@@ -82,5 +82,7 @@ link :: Assignment
 link = makeTerm <$> symbol Grammar.Link <*> (uncurry Markup.Link <$> project (\ (((CMark.LINK url title) :. _) :< _) -> (toS url, toS title))) <* source
 
 
+-- Implementation details
+
 makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
