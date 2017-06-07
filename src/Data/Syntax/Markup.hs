@@ -80,7 +80,7 @@ data Image a = Image { imageURL :: ByteString, imageTitle :: ByteString }
 instance Eq1 Image where liftEq = genericLiftEq
 instance Show1 Image where liftShowsPrec = genericLiftShowsPrec
 
-data Code a = Code ByteString
+data Code a = Code { codeLanguage :: Maybe ByteString, codeContent :: ByteString }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Code where liftEq = genericLiftEq

@@ -91,7 +91,7 @@ image :: Assignment
 image = makeTerm <$> symbol Image <*> (uncurry Markup.Image <$> project (\ (((CMark.IMAGE url title) :. _) :< _) -> (toS url, toS title))) <* source
 
 code :: Assignment
-code = makeTerm <$> symbol Code <*> (Markup.Code <$> source)
+code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
 
 
 -- Implementation details
