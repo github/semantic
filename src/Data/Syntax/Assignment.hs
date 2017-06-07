@@ -237,7 +237,7 @@ runAssignment toSymbol = iterFreer run . fmap ((pure .) . (,))
                 expectedSymbols = case assignment of
                   Choose choices -> choiceSymbols choices
                   _ -> []
-                choiceSymbols choices = ((toEnum :: Int -> grammar) <$> IntMap.keys choices)
+                choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
 
 dropAnonymous :: Symbol grammar => (forall x. CofreeF [] (Record '[ node, Info.Range, Info.SourceSpan ]) x -> Maybe grammar) -> AssignmentState node -> AssignmentState node
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . runCofree) (stateNodes state) }
