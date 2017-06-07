@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, RankNTypes #-}
 module Language.Ruby.Syntax
 ( assignment
 , Syntax
@@ -55,34 +55,34 @@ type Syntax =
 
 type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = Assignment.Assignment (AST Grammar) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: HasCallStack => Assignment
+assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (many declaration)
 
-declaration :: HasCallStack => Assignment
+declaration :: Assignment
 declaration = handleError $ comment <|> class' <|> method
 
-class' :: HasCallStack => Assignment
+class' :: Assignment
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
   where superclass = pure <$ symbol Superclass <*> children constant
         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
-constant :: HasCallStack => Assignment
+constant :: Assignment
 constant = makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
 
-identifier :: HasCallStack => Assignment
+identifier :: Assignment
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
-method :: HasCallStack => Assignment
+method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
 
-statements :: HasCallStack => Assignment
+statements :: Assignment
 statements = makeTerm <$> location <*> many statement
 
-statement :: HasCallStack => Assignment
+statement :: Assignment
 statement  = handleError
            $  exit Statement.Return Return
           <|> exit Statement.Yield Yield
@@ -97,36 +97,36 @@ statement  = handleError
           <|> assignment'
   where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
-lvalue :: HasCallStack => Assignment
+lvalue :: Assignment
 lvalue = identifier
 
-expression :: HasCallStack => Assignment
+expression :: Assignment
 expression = identifier <|> statement
 
-comment :: HasCallStack => Assignment
+comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-if' :: HasCallStack => Assignment
+if' :: Assignment
 if' =  ifElsif If
    <|> makeTerm <$> symbol IfModifier     <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
   where ifElsif s = makeTerm <$> symbol s <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$> symbol Else <*> children (many statement))))
 
-unless :: HasCallStack => Assignment
+unless :: Assignment
 unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
 
-while :: HasCallStack => Assignment
+while :: Assignment
 while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
      <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
 
-until :: HasCallStack => Assignment
+until :: Assignment
 until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
      <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
 
-for :: HasCallStack => Assignment
+for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
 
-assignment' :: HasCallStack => Assignment
+assignment' :: Assignment
 assignment'
    =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lvalue <*> expression)
   <|> makeTerm <$> symbol OperatorAssignment <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
@@ -144,7 +144,7 @@ assignment'
       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
-literal :: HasCallStack => Assignment
+literal :: Assignment
 literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
         <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
         <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
@@ -157,10 +157,10 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
 
-emptyTerm :: HasCallStack => Assignment
+emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
-handleError :: HasCallStack => Assignment -> Assignment
+handleError :: Assignment -> Assignment
 handleError = flip catchError $ \ error -> case errorCause error of
   UnexpectedEndOfInput _ -> throwError error
   _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
