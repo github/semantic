@@ -38,8 +38,10 @@ type Error = Assignment.Error Grammar.Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMark.NodeType ': Location))) Grammar.Grammar Term
 
+
 assignment :: Assignment
 assignment = makeTerm <$> symbol Grammar.Document <*> children (Markup.Document <$> many blockElement)
+
 
 -- Block elements
 
