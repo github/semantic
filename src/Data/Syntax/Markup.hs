@@ -7,11 +7,15 @@ import Data.Functor.Classes.Show.Generic
 import GHC.Generics
 import Prologue hiding (Text)
 
+
 newtype Document a = Document [a]
  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Document where liftEq = genericLiftEq
 instance Show1 Document where liftShowsPrec = genericLiftShowsPrec
+
+
+-- Block elements
 
 newtype Paragraph a = Paragraph [a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -24,6 +28,9 @@ data Heading a = Heading { headingLevel :: Int, headingContent :: [a] }
 
 instance Eq1 Heading where liftEq = genericLiftEq
 instance Show1 Heading where liftShowsPrec = genericLiftShowsPrec
+
+
+-- Inline elements
 
 newtype Strong a = Strong [a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
