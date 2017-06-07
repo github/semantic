@@ -211,6 +211,7 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
         run assignment yield initialState = case (assignment, stateNodes) of
           (Location, node : _) -> yield (rtail (toRecord (project node))) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.SourceSpan statePos statePos :. Nil) state
+          (WithNode projection, node : _) -> yield (projection (project node)) state
           (Source, node : _) -> yield (Source.sourceText (Source.slice (offsetRange (Info.byteRange (toRecord (project node))) (negate stateOffset)) stateSource)) (advanceState (rtail . toRecord) state)
           (Children childAssignment, node : _) -> case assignAllFrom toRecord childAssignment state { stateNodes = toList (project node) } of
             Result _ (Just (a, state')) -> yield a (advanceState (rtail . toRecord) state' { stateNodes = stateNodes })
