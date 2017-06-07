@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, GADTs, RankNTypes, TypeOperators #-}
 module Language.Markdown.Syntax
 ( assignment
 , Syntax
@@ -16,7 +16,7 @@ import Data.Record
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import GHC.Generics
 import GHC.Stack
-import qualified Language.Markdown as Grammar (Grammar(..))
+import qualified Language.Markdown as Grammar (Grammar(..), NodeType(..))
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import Prologue hiding (Location, Text, list)
@@ -25,6 +25,7 @@ import qualified Term
 type Syntax =
   '[ Document
    , Paragraph
+   , Heading
    , Strong
    , Emphasis
    , Text
@@ -43,6 +44,12 @@ newtype Paragraph a = Paragraph [a]
 
 instance Eq1 Paragraph where liftEq = genericLiftEq
 instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
+
+data Heading a = Heading { headingLevel :: Int, headingContent :: [a] }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Heading where liftEq = genericLiftEq
+instance Show1 Heading where liftShowsPrec = genericLiftShowsPrec
 
 newtype Strong a = Strong [a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -72,13 +79,16 @@ assignment = makeTerm <$> symbol Grammar.Document <*> children (Document <$> man
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph <|> list
+blockElement = paragraph <|> list <|> heading
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
 
 list :: Assignment
 list = makeTerm <$> symbol Grammar.List <*> children (many blockElement)
+
+heading :: Assignment
+heading = makeTerm <$> symbol Grammar.Heading <*> (Heading <$> withNode (\ ((Grammar.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
 
 
 -- Inline elements
