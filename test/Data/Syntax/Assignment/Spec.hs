@@ -101,14 +101,14 @@ instance Symbol Grammar where
 data Out = Out ByteString
   deriving (Eq, Show)
 
-red :: Assignment (Node Grammar) Out
+red :: Assignment Grammar Out
 red = Out <$ symbol Red <*> source
 
-green :: Assignment (Node Grammar) Out
+green :: Assignment Grammar Out
 green = Out <$ symbol Green <*> source
 
-blue :: Assignment (Node Grammar) Out
+blue :: Assignment Grammar Out
 blue = Out <$ symbol Blue <*> source
 
-magenta :: Assignment (Node Grammar) Out
+magenta :: Assignment Grammar Out
 magenta = Out <$ symbol Magenta <*> source
