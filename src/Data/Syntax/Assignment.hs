@@ -100,17 +100,17 @@ import Text.Show hiding (show)
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment node = Freer (AssignmentF node)
+type Assignment grammar = Freer (AssignmentF grammar)
 
 data AssignmentF node a where
-  Location :: HasCallStack => AssignmentF node Location
-  Source :: HasCallStack => AssignmentF symbol ByteString
-  Children :: HasCallStack => Assignment symbol a -> AssignmentF symbol a
-  Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF node a
-  Alt :: HasCallStack => a -> a -> AssignmentF symbol a
-  Empty :: HasCallStack => AssignmentF symbol a
-  Throw :: HasCallStack => Error symbol -> AssignmentF symbol a
-  Catch :: HasCallStack => a -> (Error symbol -> a) -> AssignmentF symbol a
+  Location :: HasCallStack => AssignmentF grammar Location
+  Source :: HasCallStack => AssignmentF grammar ByteString
+  Children :: HasCallStack => Assignment grammar a -> AssignmentF grammar a
+  Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF grammar a
+  Alt :: HasCallStack => a -> a -> AssignmentF grammar a
+  Empty :: HasCallStack => AssignmentF grammar a
+  Throw :: HasCallStack => Error grammar -> AssignmentF grammar a
+  Catch :: HasCallStack => a -> (Error grammar -> a) -> AssignmentF grammar a
 
 -- | Zero-width production of the current location.
 --
@@ -121,15 +121,15 @@ location = Location `Then` return
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
-symbol :: (Enum symbol, Eq symbol, HasCallStack) => symbol -> Assignment symbol Location
+symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment grammar Location
 symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
-source :: HasCallStack => Assignment symbol ByteString
+source :: HasCallStack => Assignment grammar ByteString
 source = withFrozenCallStack $ Source `Then` return
 
 -- | Match a node by applying an assignment to its children.
-children :: HasCallStack => Assignment symbol a -> Assignment symbol a
+children :: HasCallStack => Assignment grammar a -> Assignment grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 
@@ -147,27 +147,27 @@ type AST grammar = Rose (Node grammar)
 
 
 -- | The result of assignment, possibly containing an error.
-data Result symbol a = Result { resultError :: Maybe (Error symbol), resultValue :: Maybe a }
+data Result grammar a = Result { resultError :: Maybe (Error grammar), resultValue :: Maybe a }
   deriving (Eq, Foldable, Functor, Traversable)
 
-data Error symbol where
+data Error grammar where
   Error
     :: HasCallStack
     => { errorPos :: Info.SourcePos
-       , errorCause :: ErrorCause symbol
-       } -> Error symbol
+       , errorCause :: ErrorCause grammar
+       } -> Error grammar
 
-deriving instance Eq symbol => Eq (Error symbol)
-deriving instance Show symbol => Show (Error symbol)
+deriving instance Eq grammar => Eq (Error grammar)
+deriving instance Show grammar => Show (Error grammar)
 
-data ErrorCause symbol
-  = UnexpectedSymbol [symbol] symbol
-  | UnexpectedEndOfInput [symbol]
-  | ParseError [symbol]
+data ErrorCause grammar
+  = UnexpectedSymbol [grammar] grammar
+  | UnexpectedEndOfInput [grammar]
+  | ParseError [grammar]
   deriving (Eq, Show)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
-showError :: Show symbol => Source.Source -> Error symbol -> String
+showError :: Show grammar => Source.Source -> Error grammar -> String
 showError source error@Error{..}
   = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n'
   . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
@@ -180,14 +180,14 @@ showError source error@Error{..}
         showSGRCode = showString . setSGRCode
         withSGRCode code s = showSGRCode code . s . showSGRCode []
 
-showExpectation :: Show symbol => Error symbol -> ShowS
+showExpectation :: Show grammar => Error grammar -> ShowS
 showExpectation Error{..} = case errorCause of
   UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
   UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
   UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
   ParseError symbols -> showString "expected " . showSymbols symbols . showString ", but got parse error"
 
-showSymbols :: Show symbol => [symbol] -> ShowS
+showSymbols :: Show grammar => [grammar] -> ShowS
 showSymbols [] = showString "end of input nodes"
 showSymbols [symbol] = shows symbol
 showSymbols [a, b] = shows a . showString " or " . shows b
@@ -260,17 +260,17 @@ makeState source nodes = AssignmentState 0 (Info.SourcePos 1 1) source nodes
 
 -- Instances
 
-instance Enum symbol => Alternative (Assignment symbol) where
-  empty :: HasCallStack => Assignment symbol a
+instance Enum grammar => Alternative (Assignment grammar) where
+  empty :: HasCallStack => Assignment grammar a
   empty = Empty `Then` return
-  (<|>) :: HasCallStack => Assignment symbol a -> Assignment symbol a -> Assignment symbol a
+  (<|>) :: HasCallStack => Assignment grammar a -> Assignment grammar a -> Assignment grammar a
   a <|> b = case (a, b) of
     (_, Empty `Then` _) -> a
     (Empty `Then` _, _) -> b
     (Choose choices1 `Then` continue1, Choose choices2 `Then` continue2) -> Choose (IntMap.union (fmap continue1 choices1) (fmap continue2 choices2)) `Then` identity
     _ -> wrap $ Alt a b
 
-instance Show symbol => Show1 (AssignmentF symbol) where
+instance Show grammar => Show1 (AssignmentF grammar) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.SourceSpan (Info.SourcePos 0 0) (Info.SourcePos 0 0) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
@@ -284,7 +284,7 @@ instance Show symbol => Show1 (AssignmentF symbol) where
 instance Show2 Result where
   liftShowsPrec2 sp1 sl1 sp2 sl2 d (Result es a) = showsBinaryWith (liftShowsPrec (liftShowsPrec sp1 sl1) (liftShowList sp1 sl1)) (liftShowsPrec sp2 sl2) "Result" d es a
 
-instance (Show symbol, Show a) => Show (Result symbol a) where
+instance (Show grammar, Show a) => Show (Result grammar a) where
   showsPrec = showsPrec2
 
 instance Show1 Error where
@@ -296,18 +296,18 @@ instance Show1 ErrorCause where
     UnexpectedEndOfInput expected -> showsUnaryWith (liftShowsPrec sp sl) "UnexpectedEndOfInput" d expected
     ParseError expected -> showsUnaryWith (liftShowsPrec sp sl) "ParseError" d expected
 
-instance Applicative (Result symbol) where
+instance Applicative (Result grammar) where
   pure = Result Nothing . Just
   Result e1 f <*> Result e2 a = Result (e1 <|> e2) (f <*> a)
 
-instance Alternative (Result symbol) where
+instance Alternative (Result grammar) where
   empty = Result Nothing Nothing
   Result e (Just a) <|> _ = Result e (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <|> e2) b
 
-instance MonadError (Error symbol) (Assignment symbol) where
-  throwError :: HasCallStack => Error symbol -> Assignment symbol a
+instance MonadError (Error grammar) (Assignment grammar) where
+  throwError :: HasCallStack => Error grammar -> Assignment grammar a
   throwError error = withFrozenCallStack $ Throw error `Then` return
 
-  catchError :: HasCallStack => Assignment symbol a -> (Error symbol -> Assignment symbol a) -> Assignment symbol a
+  catchError :: HasCallStack => Assignment grammar a -> (Error grammar -> Assignment grammar a) -> Assignment grammar a
   catchError during handler = withFrozenCallStack $ Catch during handler `Then` identity
