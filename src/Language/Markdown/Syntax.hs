@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
 module Language.Markdown.Syntax
 ( assignment
 , Syntax
@@ -41,7 +41,7 @@ instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
 
 type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment CMark.NodeType Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMark.NodeType ': Location))) Grammar Term
 
 assignment :: Assignment
 assignment = empty
