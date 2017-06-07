@@ -47,6 +47,12 @@ newtype BlockQuote a = BlockQuote [a]
 instance Eq1 BlockQuote where liftEq = genericLiftEq
 instance Show1 BlockQuote where liftShowsPrec = genericLiftShowsPrec
 
+data ThematicBreak a = ThematicBreak
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ThematicBreak where liftEq = genericLiftEq
+instance Show1 ThematicBreak where liftShowsPrec = genericLiftShowsPrec
+
 
 -- Inline elements
 

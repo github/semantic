@@ -27,6 +27,7 @@ type Syntax =
    , Markup.Heading
    , Markup.OrderedList
    , Markup.Paragraph
+   , Markup.ThematicBreak
    , Markup.UnorderedList
    -- Inline elements
    , Markup.Code
@@ -51,7 +52,7 @@ assignment = makeTerm <$> symbol Document <*> children (Markup.Document <$> many
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph <|> list <|> heading <|> blockQuote <|> codeBlock
+blockElement = paragraph <|> list <|> heading <|> blockQuote <|> codeBlock <|> thematicBreak
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -72,6 +73,9 @@ blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> 
 
 codeBlock :: Assignment
 codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code <$> project (\ (((CMark.CODE_BLOCK language _) :. _) :< _) -> nullText language) <*> source)
+
+thematicBreak :: Assignment
+thematicBreak = makeTerm <$> symbol ThematicBreak <*> (Markup.ThematicBreak <$ source)
 
 
 -- Inline elements
