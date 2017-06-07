@@ -14,11 +14,11 @@ import Data.Functor.Classes.Show.Generic
 import Data.Functor.Union
 import Data.Record
 import Data.Syntax.Assignment hiding (Assignment, Error)
+import qualified Data.Syntax.Assignment as Assignment
+import qualified Data.Syntax as Syntax
 import GHC.Generics
 import GHC.Stack
 import qualified Language.Markdown as Grammar (Grammar(..), NodeType(..))
-import qualified Data.Syntax.Assignment as Assignment
-import qualified Data.Syntax as Syntax
 import Prologue hiding (Location, Text, list)
 import qualified Term
 
