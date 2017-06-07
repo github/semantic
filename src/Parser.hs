@@ -39,7 +39,7 @@ data Parser term where
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (SyntaxTerm Text DefaultFields)
+  MarkdownParser :: Parser (Cofree [] (Record (NodeType ': Location)))
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
 
@@ -49,7 +49,6 @@ parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
   C -> TreeSitterParser C tree_sitter_c
   Go -> TreeSitterParser Go tree_sitter_go
-  Markdown -> MarkdownParser
   Ruby -> TreeSitterParser Ruby tree_sitter_ruby
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
   _ -> LineByLineParser

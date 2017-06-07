@@ -1,13 +1,17 @@
-{-# LANGUAGE DataKinds #-}
-module Language.Markdown where
+{-# LANGUAGE DataKinds, TypeOperators #-}
+module Language.Markdown
+( Grammar(..)
+, cmarkParser
+, toGrammar
+, NodeType
+) where
 
 import CMark
 import Data.Record
-import Data.Text
+import Data.Syntax.Assignment (Location)
 import Info
-import Prologue
+import Prologue hiding (Location)
 import Source
-import Syntax
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
@@ -33,34 +37,14 @@ data Grammar
   | Image
   deriving (Bounded, Enum, Eq, Ord, Show)
 
-cmarkParser :: Source -> IO (Cofree (Syntax Text) (Record DefaultFields))
-cmarkParser source = pure . toTerm (totalRange source) (rangeToSourceSpan source $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
-  where toTerm :: Range -> SourceSpan -> Node -> Cofree (Syntax Text) (Record DefaultFields)
+cmarkParser :: Source -> IO (Cofree [] (Record (NodeType ': Location)))
+cmarkParser source = pure . toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+  where toTerm :: Range -> SourceSpan -> Node -> Cofree [] (Record (NodeType ': Location))
         toTerm within withinSpan (Node position t children) =
-          let
-            range = maybe within (sourceSpanToRange source . toSpan) position
-            span = maybe withinSpan toSpan position
-          in
-            cofree $ (range :. toCategory t :. span :. Nil) :< case t of
-          -- Leaves
-          CODE text -> Leaf text
-          TEXT text -> Leaf text
-          CODE_BLOCK _ text -> Leaf text
-          -- Branches
-          _ -> Indexed (toTerm range span <$> children)
+          let range = maybe within (sourceSpanToRange source . toSpan) position
+              span = maybe withinSpan toSpan position
+          in cofree $ (t :. range :. span :. Nil) :< (toTerm range span <$> children)
 
-        toCategory :: NodeType -> Category
-        toCategory (TEXT _) = Other "text"
-        toCategory (CODE _) = Other "code"
-        toCategory (HTML_BLOCK _) = Other "html"
-        toCategory (HTML_INLINE _) = Other "html"
-        toCategory (HEADING _) = Other "heading"
-        toCategory (LIST ListAttributes{..}) = Other $ case listType of
-          BULLET_LIST -> "unordered list"
-          ORDERED_LIST -> "ordered list"
-        toCategory LINK{} = Other "link"
-        toCategory IMAGE{} = Other "image"
-        toCategory t = Other (show t)
         toSpan PosInfo{..} = SourceSpan (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) endColumn)
 
 toGrammar :: NodeType -> Grammar
