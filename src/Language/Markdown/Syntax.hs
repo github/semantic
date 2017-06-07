@@ -18,12 +18,14 @@ import GHC.Generics
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
 import qualified Data.Syntax.Assignment as Assignment
+import qualified Data.Syntax as Syntax
 import Prologue hiding (Location)
 import qualified Term
 
 type Syntax =
   '[ Document
    , Paragraph
+   , Syntax.Error Error
    ]
 
 newtype Document a = Document [a]
