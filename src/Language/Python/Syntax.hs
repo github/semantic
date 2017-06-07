@@ -55,6 +55,7 @@ type Syntax' =
    , Statement.Assignment
    , Statement.If
    , Statement.Return
+   , Statement.Throw
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
@@ -97,6 +98,7 @@ statement = assertStatement
           <|> import'
           <|> importFrom
           <|> printStatement
+          <|> raiseStatement
           <|> returnStatement
           <|> deleteStatement
 
@@ -113,6 +115,7 @@ expression = await
           <|> conditionalExpression
           <|> dottedName
           <|> ellipsis
+          <|> expressionList
           <|> lambda
           <|> keywordIdentifier
           <|> literal
@@ -278,6 +281,9 @@ returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> 
 deleteStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> deleteIdentifier <* symbol ExpressionList <*> children (many expression))
   where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier <$> source)
+
+raiseStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> (many expression))
 
 ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
