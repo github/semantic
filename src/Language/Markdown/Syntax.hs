@@ -25,6 +25,8 @@ import qualified Term
 type Syntax =
   '[ Document
    , Paragraph
+   , Strong
+   , Emphasis
    , Syntax.Error Error
    ]
 
@@ -40,6 +42,17 @@ newtype Paragraph a = Paragraph [a]
 instance Eq1 Paragraph where liftEq = genericLiftEq
 instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
 
+newtype Strong a = Strong [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Strong where liftEq = genericLiftEq
+instance Show1 Strong where liftShowsPrec = genericLiftShowsPrec
+
+newtype Emphasis a = Emphasis [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Emphasis where liftEq = genericLiftEq
+instance Show1 Emphasis where liftShowsPrec = genericLiftShowsPrec
 
 type Error = Assignment.Error Grammar.Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
@@ -49,7 +62,13 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Grammar.Document <*> children (Document <$> many paragraph)
 
 inlineElement :: Assignment
-inlineElement = empty
+inlineElement = strong <|> emphasis
+
+strong :: Assignment
+strong = makeTerm <$> symbol Grammar.Strong <*> children (Strong <$> many inlineElement)
+
+emphasis :: Assignment
+emphasis = makeTerm <$> symbol Grammar.Strong <*> children (Strong <$> many inlineElement)
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Grammar.Paragraph <*> children (Paragraph <$> many inlineElement)
