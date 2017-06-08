@@ -103,6 +103,7 @@ statement = assertStatement
           <|> identifier
           <|> import'
           <|> importFrom
+          <|> nonlocalStatement
           <|> passStatement
           <|> printStatement
           <|> raiseStatement
@@ -274,6 +275,9 @@ printStatement = do
     printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier <$> source)
     redirectCallTerm location keyword = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location keyword)
     printCallTerm location keyword = makeTerm location . Expression.Call keyword <$> many expression
+
+nonlocalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier <$> source)) <*> many identifier)
 
 globalStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
