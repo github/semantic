@@ -53,6 +53,12 @@ data ThematicBreak a = ThematicBreak
 instance Eq1 ThematicBreak where liftEq = genericLiftEq
 instance Show1 ThematicBreak where liftShowsPrec = genericLiftShowsPrec
 
+data HTMLBlock a = HTMLBlock ByteString
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 HTMLBlock where liftEq = genericLiftEq
+instance Show1 HTMLBlock where liftShowsPrec = genericLiftShowsPrec
+
 
 -- Inline elements
 
