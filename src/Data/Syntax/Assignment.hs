@@ -60,22 +60,27 @@
 --
 --   Therefore, in addition to the rule of thumb for committed choices (see above), try to match 'Regular' symbols up front, and only match 'Anonymous' ones in the middle of a chain. That will ensure that you don’t have to make redundant effort to explicitly skip 'Anonymous' nodes ahead of multiple alternatives, and can instead rely on them being automatically skipped except when explicitly required.
 module Data.Syntax.Assignment
+-- Types
 ( Assignment
 , Location
 , AST
+-- Combinators
 , location
 , Data.Syntax.Assignment.project
 , symbol
 , source
 , children
+-- Results
 , Result(..)
 , Error(..)
 , ErrorCause(..)
 , showError
 , showExpectation
+-- Running
 , assign
 , assignBy
 , runAssignment
+-- Implementation details (for testing)
 , AssignmentState(..)
 , makeState
 ) where
