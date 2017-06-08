@@ -30,6 +30,12 @@ newtype Pattern a = Pattern a
 instance Eq1 Pattern where liftEq = genericLiftEq
 instance Show1 Pattern where liftShowsPrec = genericLiftShowsPrec
 
+-- | Evaluate (e.g. exec in Python, or eval in Ruby)
+data Evaluate a = Evaluate { evaluateExpression :: !a, evaluateContext :: !(Maybe [a]) }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Evaluate where liftEq = genericLiftEq
+instance Show1 Evaluate where liftShowsPrec = genericLiftShowsPrec
 
 -- Assignment
 

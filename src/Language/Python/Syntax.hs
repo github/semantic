@@ -55,6 +55,7 @@ type Syntax' =
    , Statement.Assignment
    , Statement.Break
    , Statement.Continue
+   , Statement.Evaluate
    , Statement.If
    , Statement.NoOp
    , Statement.Return
@@ -97,6 +98,7 @@ statement = assertStatement
           <|> breakStatement
           <|> continueStatement
           <|> deleteStatement
+          <|> execStatement
           <|> expressionStatement
           <|> globalStatement
           <|> ifStatement
@@ -301,6 +303,9 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> exp
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
+
+execStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+execStatement = makeTerm <$> symbol ExecStatement <*> children (Statement.Evaluate <$> string <*> (optional (many expression)))
 
 passStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 passStatement = makeTerm <$> symbol PassStatement <*> (Statement.NoOp <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
