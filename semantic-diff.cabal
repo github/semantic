@@ -36,6 +36,7 @@ library
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
+                     , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Text.Listable
@@ -45,6 +46,7 @@ library
                      , Language
                      , Language.C
                      , Language.Markdown
+                     , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Syntax
                      , Language.Ruby
