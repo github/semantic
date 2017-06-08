@@ -13,10 +13,11 @@ import Term
 data Language =
       C
     | Go
+    | JavaScript
     | Markdown
-    | Ruby
-    | TypeScript -- ^ Also JavaScript.
     | Python
+    | Ruby
+    | TypeScript
     deriving (Show, Eq, Read, Generic, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
