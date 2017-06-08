@@ -294,7 +294,7 @@ deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.C
   where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier <$> source)
 
 raiseStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> (makeTerm <$> location <*> (many expression)))
+raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> (makeTerm <$> location <*> many expression))
 
 ifStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
