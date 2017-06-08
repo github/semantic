@@ -150,6 +150,7 @@ expression = await
 forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.ForEach <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression))
 
+-- TODO: Assign while else clauses
 whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (makeTerm <$> location <*> many expression))
 
