@@ -52,6 +52,7 @@ parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
   C -> TreeSitterParser C tree_sitter_c
   Go -> TreeSitterParser Go tree_sitter_go
+  JavaScript -> TreeSitterParser TypeScript tree_sitter_typescript
   Ruby -> TreeSitterParser Ruby tree_sitter_ruby
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
   _ -> LineByLineParser

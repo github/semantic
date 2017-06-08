@@ -53,8 +53,12 @@ type Syntax =
    , Literal.Tuple
    , Redirect
    , Statement.Assignment
+   , Statement.Break
+   , Statement.Continue
    , Statement.If
+   , Statement.NoOp
    , Statement.Return
+   , Statement.Throw
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
@@ -92,13 +96,20 @@ statement :: Assignment
 statement = assertStatement
           <|> assignment'
           <|> augmentedAssignment
+          <|> breakStatement
+          <|> continueStatement
+          <|> deleteStatement
+          <|> execStatement
           <|> expressionStatement
           <|> globalStatement
           <|> ifStatement
           <|> identifier
           <|> import'
           <|> importFrom
+          <|> nonlocalStatement
+          <|> passStatement
           <|> printStatement
+          <|> raiseStatement
           <|> returnStatement
 
 expressionStatement :: Assignment
@@ -114,6 +125,7 @@ expression = await
           <|> conditionalExpression
           <|> dottedName
           <|> ellipsis
+          <|> expressionList
           <|> lambda
           <|> keywordIdentifier
           <|> literal
@@ -267,6 +279,9 @@ printStatement = do
     redirectCallTerm location keyword = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location keyword)
     printCallTerm location keyword = makeTerm location . Expression.Call keyword <$> many expression
 
+nonlocalStatement :: Assignment
+nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier <$> source)) <*> many identifier)
+
 globalStatement :: Assignment
 globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier)
 
@@ -276,6 +291,12 @@ await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
 
+deleteStatement :: Assignment
+deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> deleteIdentifier <* symbol ExpressionList <*> children (many expression))
+  where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier <$> source)
+
+raiseStatement :: Assignment
+raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> (makeTerm <$> location <*> many expression))
 
 ifStatement :: Assignment
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
@@ -283,6 +304,18 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> exp
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
+
+execStatement :: Assignment
+execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> many (string <|> expression))
+
+passStatement :: Assignment
+passStatement = makeTerm <$> symbol PassStatement <*> (Statement.NoOp <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
+
+breakStatement :: Assignment
+breakStatement = makeTerm <$> symbol BreakStatement <*> (Statement.Break <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
+
+continueStatement :: Assignment
+continueStatement = makeTerm <$> symbol ContinueStatement <*> (Statement.Continue <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
 
 memberAccess :: Assignment
 memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> expression)
