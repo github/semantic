@@ -113,8 +113,6 @@ instance ToJSONFields (Union '[] a) where
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
 
-instance ToJSON Language
-
 instance ToJSON a => ToJSON (File a) where
   toJSON File{..} = object [ "filePath" .= filePath, "language" .= fileLanguage, "programNode" .= fileContent ]
 

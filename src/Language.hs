@@ -1,6 +1,7 @@
-{-# LANGUAGE DataKinds, DeriveGeneric #-}
+{-# LANGUAGE DataKinds, DeriveGeneric, DeriveAnyClass #-}
 module Language where
 
+import Data.Aeson
 import Data.Record
 import Data.String
 import Info
@@ -16,7 +17,7 @@ data Language =
     | Ruby
     | TypeScript -- ^ Also JavaScript.
     | Python
-    deriving (Show, Eq, Read, Generic)
+    deriving (Show, Eq, Read, Generic, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
