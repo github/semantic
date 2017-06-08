@@ -55,7 +55,6 @@ type Syntax' =
    , Statement.Assignment
    , Statement.Break
    , Statement.Continue
-   , Statement.Evaluate
    , Statement.If
    , Statement.NoOp
    , Statement.Return
@@ -305,7 +304,7 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> exp
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 execStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
-execStatement = makeTerm <$> symbol ExecStatement <*> children (Statement.Evaluate <$> string <*> (optional (many expression)))
+execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> (many (string <|> expression)))
 
 passStatement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 passStatement = makeTerm <$> symbol PassStatement <*> (Statement.NoOp <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)))
