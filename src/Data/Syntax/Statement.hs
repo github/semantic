@@ -110,8 +110,6 @@ instance Show1 Throw where liftShowsPrec = genericLiftShowsPrec
 
 data Try with a = Try !a ![with a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
--- deriving instance (Eq a, Eq (with a)) => Eq (Try with a)
--- deriving instance (Show a, Show (with a)) => Show (Try with a)
 
 instance Eq1 with => Eq1 (Try with) where liftEq = genericLiftEq
 instance Show1 with => Show1 (Try with) where liftShowsPrec = genericLiftShowsPrec
