@@ -60,6 +60,7 @@ type Syntax =
    , Statement.NoOp
    , Statement.Return
    , Statement.Throw
+   , Statement.While
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
@@ -113,6 +114,7 @@ statement = assertStatement
           <|> printStatement
           <|> raiseStatement
           <|> returnStatement
+          <|> whileStatement
 
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children expression
@@ -141,6 +143,9 @@ expression = await
 -- TODO: Assign for else clauses
 forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.ForEach <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression))
+
+whileStatement :: Assignment
+whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (makeTerm <$> location <*> many expression))
 
 dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
