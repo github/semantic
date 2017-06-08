@@ -40,6 +40,7 @@ type Syntax =
    , Markup.Text
    -- Assignment errors; cmark does not provide parse errors.
    , Syntax.Error Error
+   , []
    ]
 
 type Error = Assignment.Error Grammar
@@ -65,7 +66,7 @@ list = (cofree .) . (:<) <$> symbol List <*> (project (\ (((CMark.LIST CMark.Lis
   CMark.ORDERED_LIST -> inj . Markup.OrderedList) <*> children (many item))
 
 item :: Assignment
-item = symbol Item *> children blockElement
+item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 heading :: Assignment
 heading = makeTerm <$> symbol Heading <*> (Markup.Heading <$> project (\ ((CMark.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
