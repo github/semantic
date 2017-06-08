@@ -8,6 +8,7 @@ module Renderer.TOC
 , Declaration(..)
 , declaration
 , declarationAlgebra
+, markupSectionAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
@@ -37,6 +38,7 @@ import Syntax as S
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Markup as Markup
 import Term
 
 data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
@@ -74,6 +76,7 @@ isValidSummary _ = True
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: Text }
   | FunctionDeclaration { declarationIdentifier :: Text }
+  | SectionDeclaration  { declarationIdentifier :: Text }
   | ErrorDeclaration    { declarationIdentifier :: Text }
   deriving (Eq, Generic, NFData, Show)
 
@@ -106,6 +109,17 @@ declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syn
 declarationAlgebra proxy source r
   | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource identifier)
   | Just (Declaration.Method (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource identifier)
+  | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
+  | otherwise = Nothing
+  where getSource = toText . flip Source.slice source . byteRange . extract
+
+-- | Compute 'Declaration's with the headings of 'Markup.Section's.
+markupSectionAlgebra :: (InUnion fs Markup.Section, InUnion fs (Syntax.Error error), HasField fields Range, Show error, Functor (Union fs))
+                     => Proxy error
+                     -> Source
+                     -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
+markupSectionAlgebra proxy source r
+  | Just (Markup.Section (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (getSource heading)
   | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
   | otherwise = Nothing
   where getSource = toText . flip Source.slice source . byteRange . extract
@@ -179,6 +193,7 @@ toCategoryName :: Declaration -> Text
 toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
   MethodDeclaration _ -> "Method"
+  SectionDeclaration _ -> "Section"
   ErrorDeclaration _ -> "ParseError"
 
 instance Listable Declaration where
