@@ -90,7 +90,7 @@ statement  = handleError
           <|> exit Statement.Continue Next
           <|> if'
           <|> unless
-          <|> while
+          <|> Language.Ruby.Syntax.while
           <|> until
           <|> for
           <|> literal

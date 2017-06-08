@@ -70,6 +70,7 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
+, while
 -- Results
 , Result(..)
 , Error(..)
@@ -144,6 +145,13 @@ source = withFrozenCallStack $ Source `Then` return
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
+
+-- | Collect a list of values until one fails a predicate.
+while :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
+while predicate step = many $ do
+  result <- step
+  guard (predicate result)
+  pure result
 
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
