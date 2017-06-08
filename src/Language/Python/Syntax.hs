@@ -62,6 +62,7 @@ type Syntax =
    , Statement.NoOp
    , Statement.Return
    , Statement.Throw
+   , Statement.Try
    , Statement.While
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
@@ -118,6 +119,7 @@ statement = assertStatement
           <|> printStatement
           <|> raiseStatement
           <|> returnStatement
+          <|> tryStatement
           <|> whileStatement
 
 expressionStatement :: Assignment
@@ -150,6 +152,10 @@ forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.ForEach 
 
 whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (makeTerm <$> location <*> many expression))
+
+-- TODO:: Assign try else clauses
+tryStatement :: Assignment
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many expression))
 
 exceptClause :: Assignment
 exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> optional (makeTerm <$> location <*> many expression <* symbol AnonColon) <*> expression)
