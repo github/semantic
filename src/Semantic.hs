@@ -63,7 +63,7 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . 
 diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, Just Language.Markdown) -> pure mempty
-  (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source  >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToC blobs)
+  (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToC blobs)
   (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms (renderToC blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderJSONDiff blobs)
