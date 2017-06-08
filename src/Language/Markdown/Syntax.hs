@@ -70,12 +70,7 @@ item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 section :: Assignment
-section = makeTerm <$> symbol Heading <*> do
-  headingTerm <- heading
-  fmap (Markup.Section headingTerm) . many $ do
-    element <- blockElement
-    guard (level headingTerm < level element)
-    pure element
+section = makeTerm <$> symbol Heading <*> (heading >>= \ headingTerm -> Markup.Section headingTerm <$> while (((<) `on` level) headingTerm) blockElement)
   where heading = makeTerm <$> symbol Heading <*> (Markup.Heading <$> project (\ ((CMark.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
         level term = case term of
           _ | Just section <- prj (unwrap term) -> level (Markup.sectionHeading section)
