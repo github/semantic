@@ -114,7 +114,7 @@ declarationAlgebra proxy source r
   where getSource = toText . flip Source.slice source . byteRange . extract
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (InUnion fs Markup.Section, InUnion fs (Syntax.Error error), HasField fields Range, Show error, Functor (Union fs))
+markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error error :< fs, HasField fields Range, Show error, Functor (Union fs))
                      => Proxy error
                      -> Source
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
