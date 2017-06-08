@@ -17,7 +17,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Text as Text
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
-import Prologue hiding (Location, link, list)
+import Prologue hiding (Location, link, list, section)
 import qualified Term
 
 type Syntax =
@@ -28,6 +28,7 @@ type Syntax =
    , Markup.HTMLBlock
    , Markup.OrderedList
    , Markup.Paragraph
+   , Markup.Section
    , Markup.ThematicBreak
    , Markup.UnorderedList
    -- Inline elements
@@ -55,7 +56,7 @@ assignment = makeTerm <$> symbol Document <*> children (Markup.Document <$> many
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph <|> list <|> heading <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock
+blockElement = paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -68,8 +69,18 @@ list = (cofree .) . (:<) <$> symbol List <*> (project (\ (((CMark.LIST CMark.Lis
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
-heading :: Assignment
-heading = makeTerm <$> symbol Heading <*> (Markup.Heading <$> project (\ ((CMark.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
+section :: Assignment
+section = makeTerm <$> symbol Heading <*> do
+  headingTerm <- heading
+  fmap (Markup.Section headingTerm) . many $ do
+    element <- blockElement
+    guard (level headingTerm < level element)
+    pure element
+  where heading = makeTerm <$> symbol Heading <*> (Markup.Heading <$> project (\ ((CMark.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
+        level term = case term of
+          _ | Just section <- prj (unwrap term) -> level (Markup.sectionHeading section)
+          _ | Just heading <- prj (unwrap term) -> Markup.headingLevel heading
+          _ -> maxBound
 
 blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
