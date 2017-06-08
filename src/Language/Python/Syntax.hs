@@ -55,6 +55,7 @@ type Syntax =
    , Statement.Assignment
    , Statement.Break
    , Statement.Continue
+   , Statement.ForEach
    , Statement.If
    , Statement.NoOp
    , Statement.Return
@@ -101,6 +102,7 @@ statement = assertStatement
           <|> deleteStatement
           <|> execStatement
           <|> expressionStatement
+          <|> forStatement
           <|> globalStatement
           <|> ifStatement
           <|> identifier
@@ -135,6 +137,10 @@ expression = await
           <|> statement
           <|> tuple
           <|> unaryOperator
+
+-- TODO: Assign for else clauses
+forStatement :: Assignment
+forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.ForEach <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression))
 
 dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
