@@ -160,6 +160,7 @@ tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> 
 
 exceptClause :: Assignment
 exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> optional (makeTerm <$> location <*> many expression <* symbol AnonColon) <*> expression)
+
 finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
 dottedName :: Assignment
