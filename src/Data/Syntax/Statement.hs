@@ -108,11 +108,11 @@ newtype Throw a = Throw a
 instance Eq1 Throw where liftEq = genericLiftEq
 instance Show1 Throw where liftShowsPrec = genericLiftShowsPrec
 
-data Try with a = Try !a ![with a]
+data Try a = Try !a ![a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
-instance Eq1 with => Eq1 (Try with) where liftEq = genericLiftEq
-instance Show1 with => Show1 (Try with) where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Try where liftEq = genericLiftEq
+instance Show1 Try where liftShowsPrec = genericLiftShowsPrec
 
 data Catch a = Catch !(Maybe a) !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)

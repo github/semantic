@@ -55,6 +55,7 @@ type Syntax =
    , Statement.Assignment
    , Statement.Break
    , Statement.Continue
+   , Statement.Finally
    , Statement.ForEach
    , Statement.If
    , Statement.NoOp
@@ -103,6 +104,7 @@ statement = assertStatement
           <|> deleteStatement
           <|> execStatement
           <|> expressionStatement
+          <|> finallyClause
           <|> forStatement
           <|> globalStatement
           <|> ifStatement
@@ -147,6 +149,8 @@ forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.ForEach 
 whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (makeTerm <$> location <*> many expression))
 
+finallyClause :: Assignment
+finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
 dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
