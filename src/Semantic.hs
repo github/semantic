@@ -45,10 +45,13 @@ parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter
 parseBlob :: TermRenderer output -> SourceBlob -> Task output
 parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser source >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
+  (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser source
   where syntaxParser = parserForLanguage blobLanguage
 
