@@ -1,15 +1,16 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, RankNTypes #-}
 module Language.Ruby.Syntax
 ( assignment
 , Syntax
-, Syntax'
 , Grammar
 , Error
+, Term
 ) where
 
 import Data.Functor.Union
+import Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment hiding (Error)
+import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -19,11 +20,10 @@ import qualified Data.Syntax.Statement as Statement
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
 import Prologue hiding (for, get, Location, state, unless)
-import Term
+import qualified Term
 
 -- | The type of Ruby syntax.
-type Syntax = Union Syntax'
-type Syntax' =
+type Syntax =
   '[Comment.Comment
   , Declaration.Class
   , Declaration.Method
@@ -54,33 +54,35 @@ type Syntax' =
   ]
 
 type Error = Assignment.Error Grammar
+type Term = Term.Term (Union Syntax) (Record Location)
+type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
-assignment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (many declaration)
 
-declaration :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+declaration :: Assignment
 declaration = handleError $ comment <|> class' <|> method
 
-class' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+class' :: Assignment
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
   where superclass = pure <$ symbol Superclass <*> children constant
         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
-constant :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+constant :: Assignment
 constant = makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
 
-identifier :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+identifier :: Assignment
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
-method :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
 
-statements :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+statements :: Assignment
 statements = makeTerm <$> location <*> many statement
 
-statement :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+statement :: Assignment
 statement  = handleError
            $  exit Statement.Return Return
           <|> exit Statement.Yield Yield
@@ -88,43 +90,43 @@ statement  = handleError
           <|> exit Statement.Continue Next
           <|> if'
           <|> unless
-          <|> while
+          <|> Language.Ruby.Syntax.while
           <|> until
           <|> for
           <|> literal
           <|> assignment'
   where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
-lvalue :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+lvalue :: Assignment
 lvalue = identifier
 
-expression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+expression :: Assignment
 expression = identifier <|> statement
 
-comment :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-if' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+if' :: Assignment
 if' =  ifElsif If
    <|> makeTerm <$> symbol IfModifier     <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
   where ifElsif s = makeTerm <$> symbol s <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$> symbol Else <*> children (many statement))))
 
-unless :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+unless :: Assignment
 unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
 
-while :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+while :: Assignment
 while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
      <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
 
-until :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+until :: Assignment
 until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
      <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
 
-for :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
 
-assignment' :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+assignment' :: Assignment
 assignment'
    =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lvalue <*> expression)
   <|> makeTerm <$> symbol OperatorAssignment <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
@@ -142,23 +144,23 @@ assignment'
       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
-literal :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+literal :: Assignment
 literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
         <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
         <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
         <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
-invert :: (InUnion fs Expression.Boolean, HasCallStack) => Assignment (Node grammar) (Term (Union fs) Location) -> Assignment (Node grammar) (Term (Union fs) Location)
+invert :: (InUnion fs Expression.Boolean, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
 
-makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term (Union fs) a) -> (Term (Union fs) a)
+makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
 
-emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
+emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
-handleError :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location) -> Assignment (Node Grammar) (Term Syntax Location)
+handleError :: Assignment -> Assignment
 handleError = flip catchError $ \ error -> case errorCause error of
   UnexpectedEndOfInput _ -> throwError error
   _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
