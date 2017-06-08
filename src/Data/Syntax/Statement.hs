@@ -102,7 +102,7 @@ instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 -- Exception handling
 
-newtype Throw a = Throw [a]
+newtype Throw a = Throw a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Throw where liftEq = genericLiftEq
