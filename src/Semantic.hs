@@ -19,6 +19,7 @@ import Diff
 import Info
 import Interpreter
 import qualified Language
+import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import Patch
 import Parser
@@ -62,7 +63,7 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . 
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
-  (ToCDiffRenderer, Just Language.Markdown) -> pure mempty
+  (ToCDiffRenderer, Just Language.Markdown) -> run (\ source -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source)) diffLinearly (renderToC blobs)
   (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToC blobs)
   (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms (renderToC blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderJSONDiff blobs)
