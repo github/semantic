@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
 module Renderer.TOC
 ( renderToC
 , diffTOC
@@ -20,12 +20,12 @@ import Data.Align (crosswalk)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
-import Data.Functor.Union
 import Data.Proxy
+import Data.Record
 import Data.Text (toLower)
 import Data.Text.Listable
 import Data.These
-import Data.Record
+import Data.Union
 import Diff
 import Info
 import Patch
@@ -99,7 +99,7 @@ syntaxDeclarationAlgebra source r = case tailF r of
   where getSource = toText . flip Source.slice source . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (InUnion fs Declaration.Function, InUnion fs Declaration.Method, InUnion fs (Syntax.Error error), Show error, Functor (Union fs), HasField fields Range)
+declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error error :< fs, Show error, Functor (Union fs), HasField fields Range)
                    => Proxy error
                    -> Source
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)

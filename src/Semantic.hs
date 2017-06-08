@@ -11,10 +11,10 @@ import Algorithm hiding (diff)
 import Data.Align.Generic (GAlign)
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
-import Data.Functor.Union
 import Data.Proxy
 import Data.Record
 import qualified Data.Syntax.Declaration as Declaration
+import Data.Union
 import Diff
 import Info
 import Interpreter

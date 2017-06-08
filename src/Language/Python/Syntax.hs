@@ -10,7 +10,6 @@ module Language.Python.Syntax
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Functor.Union
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -19,6 +18,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import Data.Union
 import GHC.Generics
 import GHC.Stack
 import Language.Python.Grammar as Grammar
@@ -319,7 +319,7 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
 conditionalExpression :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
 
-makeTerm :: HasCallStack => InUnion Syntax' f => a -> f (Term Syntax a) -> Term Syntax a
+makeTerm :: HasCallStack => f :< Syntax' => a -> f (Term Syntax a) -> Term Syntax a
 makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: HasCallStack => Assignment (Node Grammar) (Term Syntax Location)

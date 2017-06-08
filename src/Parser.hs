@@ -1,12 +1,11 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
 module Parser where
 
-import Data.Functor.Union
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
-import Data.Functor.Union (inj)
 import qualified Data.Text as T
+import Data.Union
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
@@ -32,7 +31,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs))
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, Syntax.Error (Error grammar) :< fs, Traversable (Union fs))
                    => Parser (AST grammar)                                 -- ^ A parser producing 'AST'.
                    -> Assignment (Node grammar) (Term (Union fs) Location) -- ^ An assignment from 'AST' onto 'Term's.
                    -> Parser (Term (Union fs) Location)                    -- ^ A parser of 'Term's.
@@ -80,10 +79,10 @@ runParser parser = case parser of
   where showSGRCode = showString . setSGRCode
         withSGRCode code s = showSGRCode code . s . showSGRCode []
 
-errorTerm :: InUnion fs (Syntax.Error (Error grammar)) => Source -> Maybe (Error grammar) -> Term (Union fs) Location
+errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) Location
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
 
-termErrors :: (InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
+termErrors :: (Syntax.Error (Error grammar) :< fs, Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
 termErrors = cata $ \ (_ :< s) -> case s of
   _ | Just (Syntax.Error err) <- prj s -> [err]
   _ -> fold s
