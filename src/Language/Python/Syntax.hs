@@ -362,7 +362,7 @@ none :: Assignment
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
 lambda :: Assignment
-lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> lambdaIdentifier <*> lambdaParameters <*> lambdaBody)
+lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function Nothing <$> lambdaIdentifier <*> lambdaParameters <*> lambdaBody)
   where lambdaIdentifier = makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
         lambdaParameters = many identifier
         lambdaBody = expression
