@@ -96,7 +96,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ comment <|> statement <|> expression
+declaration = handleError $ asyncFunctionDefinition <|> comment <|> functionDefinition <|> statement <|> expression
 
 statement :: Assignment
 statement = assertStatement
@@ -127,8 +127,7 @@ expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children expression
 
 expression :: Assignment
-expression = asyncFunctionDefinition
-          <|> await
+expression = await
           <|> binaryOperator
           <|> booleanOperator
           <|> call
@@ -164,6 +163,14 @@ tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> 
 
 asyncFunctionDefinition :: Assignment
 asyncFunctionDefinition = makeTerm <$> symbol AsyncFunctionDefinition <*> children (do
+  functionName' <- identifier
+  functionParameters <- (symbol Parameters *> children (many expression))
+  functionType <- optional (type')
+  functionBody <- expressionStatement
+  return $ Declaration.Function functionType functionName' functionParameters functionBody)
+
+functionDefinition :: Assignment
+functionDefinition = makeTerm <$> symbol FunctionDefinition <*> children (do
   functionName' <- identifier
   functionParameters <- (symbol Parameters *> children (many expression))
   functionType <- optional (type')
