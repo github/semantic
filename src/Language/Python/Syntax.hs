@@ -154,7 +154,7 @@ forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.ForEach 
 whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (makeTerm <$> location <*> many expression))
 
--- TODO:: Assign try else clauses
+-- TODO: Assign try else clauses
 tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many expression))
 
