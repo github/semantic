@@ -32,6 +32,13 @@ newtype Identifier a = Identifier ByteString
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
+-- | A typed identifier of some other construct, differentiated from `Identifier` with a type parameter (e.g. a typed variable or typed function parameter)
+data TypedIdentifier a = TypedIdentifier { typedIdentifierType :: !a, typedIdentifierName :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypedIdentifier where liftEq = genericLiftEq
+instance Show1 TypedIdentifier where liftShowsPrec = genericLiftShowsPrec
+
 
 -- | Empty syntax, with essentially no-op semantics.
 --
