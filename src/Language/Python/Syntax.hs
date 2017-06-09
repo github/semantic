@@ -28,6 +28,7 @@ import qualified Term
 
 type Syntax =
   '[ Comment.Comment
+   , Declaration.Class
    , Declaration.Comprehension
    , Declaration.Function
    , Declaration.Import
@@ -96,7 +97,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ comment <|> statement <|> expression <|> functionDefinition
+declaration = handleError $ classDefinition <|> comment <|> functionDefinition <|> expression <|> statement
 
 statement :: Assignment
 statement = assertStatement
@@ -172,6 +173,11 @@ functionDefinition =  makeTerm <$> symbol FunctionDefinition      <*> children f
       functionType <- optional (type')
       functionBody <- expressionStatement
       return $ Declaration.Function functionType functionName' functionParameters functionBody
+
+classDefinition :: Assignment
+classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> (many declaration))
+  where argumentList = symbol ArgumentList *> children (many expression)
+                    <|> pure []
 
 typedParameter :: Assignment
 typedParameter = makeTerm <$> symbol TypedParameter <*> children (flip Syntax.TypedIdentifier <$> identifier <*> type')
