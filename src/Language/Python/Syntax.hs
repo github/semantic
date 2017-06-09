@@ -96,7 +96,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ asyncFunctionDefinition <|> comment <|> functionDefinition <|> statement <|> expression
+declaration = handleError $ comment <|> statement <|> expression <|> functionDefinition
 
 statement :: Assignment
 statement = assertStatement
@@ -161,21 +161,17 @@ whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.Whil
 tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many expression))
 
-asyncFunctionDefinition :: Assignment
-asyncFunctionDefinition = makeTerm <$> symbol AsyncFunctionDefinition <*> children (do
-  functionName' <- identifier
-  functionParameters <- (symbol Parameters *> children (many expression))
-  functionType <- optional (type')
-  functionBody <- expressionStatement
-  return $ Declaration.Function functionType functionName' functionParameters functionBody)
-
+-- TODO: Assign the 'async' portion
 functionDefinition :: Assignment
-functionDefinition = makeTerm <$> symbol FunctionDefinition <*> children (do
-  functionName' <- identifier
-  functionParameters <- (symbol Parameters *> children (many expression))
-  functionType <- optional (type')
-  functionBody <- expressionStatement
-  return $ Declaration.Function functionType functionName' functionParameters functionBody)
+functionDefinition =  makeTerm <$> symbol FunctionDefinition      <*> children functionDefinition'
+                  <|> makeTerm <$> symbol AsyncFunctionDefinition <*> children functionDefinition'
+  where
+    functionDefinition' = do
+      functionName' <- identifier
+      functionParameters <- (symbol Parameters *> children (many expression))
+      functionType <- optional (type')
+      functionBody <- expressionStatement
+      return $ Declaration.Function functionType functionName' functionParameters functionBody
 
 typedParameter :: Assignment
 typedParameter = makeTerm <$> symbol TypedParameter <*> children (flip Syntax.TypedIdentifier <$> identifier <*> type')
