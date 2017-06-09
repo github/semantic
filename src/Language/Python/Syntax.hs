@@ -69,6 +69,7 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error Error
    , Syntax.Identifier
+   , Syntax.TypedIdentifier
    , []
    ]
 
@@ -126,7 +127,8 @@ expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children expression
 
 expression :: Assignment
-expression = await
+expression = asyncFunctionDefinition
+          <|> await
           <|> binaryOperator
           <|> booleanOperator
           <|> call
@@ -144,6 +146,8 @@ expression = await
           <|> subscript
           <|> statement
           <|> tuple
+          <|> type'
+          <|> typedParameter
           <|> unaryOperator
 
 -- TODO: Assign for else clauses
@@ -158,11 +162,29 @@ whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.Whil
 tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many expression))
 
+asyncFunctionDefinition :: Assignment
+asyncFunctionDefinition = makeTerm <$> symbol AsyncFunctionDefinition <*> children (do
+  functionName' <- identifier
+  functionParameters <- (symbol Parameters *> children (many expression))
+  functionType <- optional (type')
+  functionBody <- expressionStatement
+  return $ Declaration.Function functionType functionName' functionParameters functionBody)
+
+typedParameter :: Assignment
+typedParameter = makeTerm <$> symbol TypedParameter <*> children (flip Syntax.TypedIdentifier <$> identifier <*> type')
+
+type' :: Assignment
+type' = symbol Type *> children (expression)
+
+parameters :: Assignment
+parameters = makeTerm <$> symbol Parameters <*> children (many expression)
+
 exceptClause :: Assignment
 exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> optional (makeTerm <$> location <*> many expression <* symbol AnonColon) <*> expression)
 
 finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
+
 dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
