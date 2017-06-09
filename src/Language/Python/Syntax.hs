@@ -171,7 +171,7 @@ functionDefinition =  makeTerm <$> symbol FunctionDefinition      <*> children f
       functionName' <- identifier
       functionParameters <- (symbol Parameters *> children (many expression))
       functionType <- optional (type')
-      functionBody <- expressionStatement
+      functionBody <- makeTerm <$> location <*> many expression
       return $ Declaration.Function functionType functionName' functionParameters functionBody
 
 classDefinition :: Assignment
