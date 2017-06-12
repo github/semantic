@@ -82,7 +82,7 @@ runParser parser = case parser of
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
-  MarkdownParser -> cmarkParser
+  MarkdownParser -> pure . cmarkParser
   LineByLineParser -> lineByLineParser
   where showSGRCode = showString . setSGRCode
         withSGRCode code s = showSGRCode code . s . showSGRCode []
