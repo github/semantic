@@ -8,13 +8,13 @@ module Language.Markdown.Syntax
 ) where
 
 import qualified CMark
-import Data.Functor.Union
 import Data.Record
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Markup as Markup
 import qualified Data.Syntax as Syntax
 import qualified Data.Text as Text
+import Data.Union
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
 import Prologue hiding (Location, link, list, section)
@@ -122,7 +122,7 @@ softBreak = makeTerm <$> symbol SoftBreak <*> (Markup.LineBreak <$ source)
 
 -- Implementation details
 
-makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
+makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
 
 nullText :: Text.Text -> Maybe ByteString
