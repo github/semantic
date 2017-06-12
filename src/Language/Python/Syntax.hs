@@ -183,7 +183,7 @@ typedParameter :: Assignment
 typedParameter = makeTerm <$> symbol TypedParameter <*> children (flip Syntax.TypedIdentifier <$> identifier <*> type')
 
 type' :: Assignment
-type' = symbol Type *> children (expression)
+type' = symbol Type *> children expression
 
 exceptClause :: Assignment
 exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> optional (makeTerm <$> location <*> many expression <* symbol AnonColon) <*> expression)
