@@ -320,6 +320,9 @@ import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <
 importFrom :: Assignment
 importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
 
+statements :: Assignment
+statements = makeTerm <$> location <*> many statement
+
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
 
