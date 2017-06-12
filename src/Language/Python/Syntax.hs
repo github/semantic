@@ -169,9 +169,9 @@ functionDefinition =  makeTerm <$> symbol FunctionDefinition      <*> children f
   where
     functionDefinition' = do
       functionName' <- identifier
-      functionParameters <- (symbol Parameters *> children (many expression))
-      functionType <- optional (type')
-      functionBody <- makeTerm <$> location <*> many expression
+      functionParameters <- symbol Parameters *> children (many expression)
+      functionType <- optional type'
+      functionBody <- statements
       return $ Declaration.Function functionType functionName' functionParameters functionBody
 
 classDefinition :: Assignment
