@@ -10,9 +10,9 @@ import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
 import Data.Functor.Both (Both)
-import Data.Functor.Union
 import qualified Data.Map as Map
 import Data.Record
+import Data.Union
 import Info
 import Language
 import Patch
@@ -104,8 +104,9 @@ instance ToJSON recur => ToJSONFields (Syntax leaf recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
 
 instance (Foldable f, ToJSON a, ToJSONFields (Union fs a)) => ToJSONFields (Union (f ': fs) a) where
-  toJSONFields (Here f) = [ "children" .= toList f ]
-  toJSONFields (There fs) = toJSONFields fs
+  toJSONFields u = case decompose u of
+    Left u' -> toJSONFields u'
+    Right r -> [ "children" .= toList r ]
 
 instance ToJSONFields (Union '[] a) where
   toJSONFields _ = []

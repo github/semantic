@@ -4,7 +4,7 @@ module Data.Syntax.Literal where
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Functor.Union
+import Data.Union
 import GHC.Generics
 import Prologue hiding (Set)
 
@@ -132,4 +132,3 @@ instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
 -- TODO: Regexp literals.
-

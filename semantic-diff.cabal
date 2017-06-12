@@ -25,7 +25,6 @@ library
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.Functor.Listable
-                     , Data.Functor.Union
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.Record
