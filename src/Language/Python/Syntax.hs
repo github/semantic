@@ -344,7 +344,7 @@ await :: Assignment
 await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier <$> source)) <*> many expression)
 
 returnStatement :: Assignment
-returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
+returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expressionList <|> emptyTerm))
 
 deleteStatement :: Assignment
 deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> deleteIdentifier <* symbol ExpressionList <*> children (many expression))
