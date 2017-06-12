@@ -2,13 +2,12 @@
 module Parser where
 
 import qualified CMark
-import Data.Functor.Union
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import Data.Functor.Foldable hiding (fold, Nil)
-import Data.Functor.Union (inj)
 import qualified Data.Text as T
+import Data.Union
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
@@ -35,7 +34,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (Cofree [] (Record (Maybe grammar ': Location)))
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, InUnion fs (Syntax.Error (Error grammar)), Traversable (Union fs), Recursive ast, Foldable (Base ast))
+  AssignmentParser :: (Bounded grammar, Enum grammar, Eq grammar, Show grammar, Symbol grammar, Syntax.Error (Error grammar) :< fs, Traversable (Union fs), Recursive ast, Foldable (Base ast))
                    => Parser ast                                                   -- ^ A parser producing AST.
                    -> (forall x. Base ast x -> Record (Maybe grammar ': Location)) -- ^ A function extracting the symbol and location.
                    -> Assignment ast grammar (Term (Union fs) (Record Location))   -- ^ An assignment from AST onto 'Term's.
@@ -88,10 +87,10 @@ runParser parser = case parser of
   where showSGRCode = showString . setSGRCode
         withSGRCode code s = showSGRCode code . s . showSGRCode []
 
-errorTerm :: InUnion fs (Syntax.Error (Error grammar)) => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
+errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
 
-termErrors :: (InUnion fs (Syntax.Error (Error grammar)), Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
+termErrors :: (Syntax.Error (Error grammar) :< fs, Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
 termErrors = cata $ \ (_ :< s) -> case s of
   _ | Just (Syntax.Error err) <- prj s -> [err]
   _ -> fold s

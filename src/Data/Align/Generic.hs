@@ -1,9 +1,10 @@
-{-# LANGUAGE DefaultSignatures, TypeOperators #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, TypeOperators #-}
 module Data.Align.Generic where
 
 import Control.Monad
 import Data.Align
 import Data.These
+import Data.Union
 import GHC.Generics
 import Prologue
 
@@ -28,6 +29,20 @@ instance GAlign Maybe where
   galignWith = galignWithAlign
 instance GAlign Identity where
   galignWith f (Identity a) (Identity b) = Just (Identity (f (These a b)))
+
+instance (GAlign f, GAlign (Union fs)) => GAlign (Union (f ': fs)) where
+  galign u1 u2 = case (decompose u1, decompose u2) of
+    (Left u1', Left u2') -> weaken <$> galign u1' u2'
+    (Right r1, Right r2) -> inj <$> galign r1 r2
+    _ -> Nothing
+  galignWith f u1 u2 = case (decompose u1, decompose u2) of
+    (Left u1', Left u2') -> weaken <$> galignWith f u1' u2'
+    (Right r1, Right r2) -> inj <$> galignWith f r1 r2
+    _ -> Nothing
+
+instance GAlign (Union '[]) where
+  galign _ _ = Nothing
+  galignWith _ _ _ = Nothing
 
 -- | Implements a function suitable for use as the definition of 'galign' for 'Align'able functors.
 galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))

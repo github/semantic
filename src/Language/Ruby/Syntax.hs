@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Ruby.Syntax
 ( assignment
 , Syntax
@@ -7,7 +7,6 @@ module Language.Ruby.Syntax
 , Term
 ) where
 
-import Data.Functor.Union
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
@@ -17,6 +16,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import Data.Union
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
 import Prologue hiding (for, get, Location, state, unless)
@@ -151,10 +151,10 @@ literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
         <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
-invert :: (InUnion fs Expression.Boolean, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
+invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
 
-makeTerm :: (InUnion fs f, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
+makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
 
 emptyTerm :: Assignment
