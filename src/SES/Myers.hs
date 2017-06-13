@@ -11,7 +11,6 @@ module SES.Myers
 , MyersState(..)
 ) where
 
-import Control.Exception
 import qualified Data.Array as Array
 import Data.Ix
 import Data.Functor.Classes
@@ -53,7 +52,7 @@ data Endpoint a b = Endpoint { x :: !Int, y :: !Int, script :: !(EditScript a b)
 -- API
 
 -- | Compute the shortest edit script using Myers’ algorithm.
-ses :: (HasCallStack, Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript a b
+ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript a b
 ses eq as bs = let graph = makeEditGraph as bs in evalState (runSES eq graph) (emptyStateForGraph graph)
 
 
@@ -65,10 +64,8 @@ runSES eq (EditGraph as bs)
   | null bs = return (This <$> toList as)
   | null as = return (That <$> toList bs)
   | otherwise = do
-    result <- for [0..(length as + length bs)] (searchUpToD . Distance)
-    case result of
-      Just (script, _) -> return (reverse script)
-      _ -> fail "no shortest edit script found in edit graph (this is a bug in SES.Myers)."
+    Just (script, _) <- for [0..(length as + length bs)] (searchUpToD . Distance)
+    return (reverse script)
   where
         -- | Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD (Distance d) =
@@ -149,16 +146,9 @@ for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 {-# INLINE for #-}
 
 
--- | Throw a failure. Used to indicate an error in the implementation of Myers’ algorithm.
-fail :: (HasCallStack, Monad m) => String -> m a
-fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
-  throw (MyersException s callStack)
-
 -- | Bounds-checked indexing of arrays, preserving the call stack.
 (!) :: (HasCallStack, Ix i, Show i) => Array.Array i a -> i -> a
-v ! i | inRange (Array.bounds v) i = v Array.! i
-      | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
-          throw (MyersException ("index " <> show i <> " out of bounds") callStack)
+v ! i = v Array.! i
 
 
 -- | Lifted showing of arrays.
@@ -186,10 +176,6 @@ liftShowsEditScript sa sb _ = showListWith (liftShowsThese sa sb 0)
 liftShowsEndpoint :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> Endpoint a b -> ShowS
 liftShowsEndpoint sp1 sp2 d (Endpoint x y script) = showsTernaryWith showsPrec showsPrec (liftShowsEditScript sp1 sp2) "Endpoint" d x y script
 
--- | Exceptions in Myers’ algorithm, along with a description and call stack.
-data MyersException = MyersException String CallStack
-  deriving (Typeable)
-
 
 -- Instances
 
@@ -203,8 +189,3 @@ instance Show2 EditGraph where
 
 instance Show2 Endpoint where
   liftShowsPrec2 sp1 _ sp2 _ = liftShowsEndpoint sp1 sp2
-
-instance Exception MyersException
-
-instance Show MyersException where
-  showsPrec _ (MyersException s c) = showString "Exception: " . showString s . showChar '\n' . showString (prettyCallStack c)
