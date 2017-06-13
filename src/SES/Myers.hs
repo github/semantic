@@ -85,7 +85,7 @@ runSES eq (EditGraph as bs)
           v <- get
           let getK k = let (x, script) = v ! k in Endpoint x (x - unDiagonal k) script
           let (n, m) = (length as, length bs)
-          let endpoint = slideFrom $! if d == 0 || k < negate m || k > n then
+          let endpoint@(Endpoint x' _ script) = slideFrom $! if d == 0 || k < negate m || k > n then
                 -- The top-left corner, or otherwise out-of-bounds.
                 Endpoint 0 0 []
               else if k == negate d || k == negate m then
@@ -102,8 +102,7 @@ runSES eq (EditGraph as bs)
               else
                 -- The upper/right extent of the search region or edit graph, whichever is smaller.
                 moveRightFrom (getK (Diagonal (pred k)))
-          let Endpoint x _ script = endpoint
-          put (v Array.// [(Diagonal k, (x, script))])
+          put (v Array.// [(Diagonal k, (x', script))])
           return endpoint
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
