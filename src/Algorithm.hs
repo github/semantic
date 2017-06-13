@@ -2,8 +2,10 @@
 module Algorithm where
 
 import Control.Monad.Free.Freer
+import Data.Functor.Classes
 import Data.These
 import Prologue hiding (liftF)
+import Text.Show
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term diff result where
@@ -61,3 +63,13 @@ byInserting = liftF . Insert
 -- | Replace one term with another.
 byReplacing :: term -> term -> Algorithm term diff diff
 byReplacing = (liftF .) . Replace
+
+
+instance Show term => Show1 (AlgorithmF term diff) where
+  liftShowsPrec _ _ d algorithm = case algorithm of
+    Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
+    Linear t1 t2 -> showsBinaryWith showsPrec showsPrec "Linear" d t1 t2
+    RWS as bs -> showsBinaryWith showsPrec showsPrec "RWS" d as bs
+    Delete t1 -> showsUnaryWith showsPrec "Delete" d t1
+    Insert t2 -> showsUnaryWith showsPrec "Insert" d t2
+    Replace t1 t2 -> showsBinaryWith showsPrec showsPrec "Replace" d t1 t2
