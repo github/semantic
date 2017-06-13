@@ -83,24 +83,25 @@ runSES eq (EditGraph as bs)
         -- | Move onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and slide down any diagonal edges eagerly.
         moveFromAdjacent (Distance d) (Diagonal k) = do
           v <- gets unMyersState
+          let getK k = let (x, script) = v ! k in Endpoint x (x - unDiagonal k) script
           let (n, m) = (length as, length bs)
           from <- if d == 0 || k < negate m || k > n then
             -- The top-left corner, or otherwise out-of-bounds.
             return (Endpoint 0 0 [])
           else if k == negate d || k == negate m then
             -- The lower/left extent of the search region or edit graph, whichever is smaller.
-            moveDownFrom <$> getK v (Diagonal (succ k))
+            return (moveDownFrom (getK (Diagonal (succ k))))
           else if k /= d && k /= n then do
             -- Somewhere in the interior of the search region and edit graph.
-            prev <- getK v (Diagonal (pred k))
-            next <- getK v (Diagonal (succ k))
+            let prev = getK (Diagonal (pred k))
+            let next = getK (Diagonal (succ k))
             return $! if x prev < x next then
               moveDownFrom next
             else
               moveRightFrom prev
           else
             -- The upper/right extent of the search region or edit graph, whichever is smaller.
-            moveRightFrom <$> getK v (Diagonal (pred k))
+            return (moveRightFrom (getK (Diagonal (pred k))))
           endpoint <- slideFrom from
           setK v (Diagonal k) endpoint
           return endpoint
@@ -110,10 +111,6 @@ runSES eq (EditGraph as bs)
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
         moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < length as then This (as ! x) : script else script)
-
-        -- | Return the maximum extent reached and path taken along a given diagonal.
-        getK v k =
-          let (x, script) = v ! k in return (Endpoint x (x - unDiagonal k) script)
 
         -- | Update the maximum extent reached and path taken along a given diagonal.
         setK v k (Endpoint x _ script) =
