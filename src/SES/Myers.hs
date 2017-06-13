@@ -64,9 +64,10 @@ runSES eq (EditGraph as bs)
   | null bs = return (This <$> toList as)
   | null as = return (That <$> toList bs)
   | otherwise = do
-    Just (script, _) <- for [0..(length as + length bs)] (searchUpToD . Distance)
+    Just (script, _) <- for [0..(n + m)] (searchUpToD . Distance)
     return (reverse script)
-  where
+  where (n, m) = (length as, length bs)
+
         -- | Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD (Distance d) =
           for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK (Distance d) . Diagonal)
@@ -75,7 +76,7 @@ runSES eq (EditGraph as bs)
         -- | Search an edit graph for the shortest edit script along a specific diagonal.
         searchAlongK d k = do
           Endpoint x y script <- moveFromAdjacent d k
-          return $! if x >= length as && y >= length bs then
+          return $! if x >= n && y >= m then
             Just (script, d)
           else
             Nothing
@@ -84,7 +85,6 @@ runSES eq (EditGraph as bs)
         moveFromAdjacent (Distance d) (Diagonal k) = do
           v <- get
           let getK k = let (x, script) = v ! k in Endpoint x (x - unDiagonal k) script
-          let (n, m) = (length as, length bs)
           let endpoint@(Endpoint x' _ script) = slideFrom $! if d == 0 || k < negate m || k > n then
                 -- The top-left corner, or otherwise out-of-bounds.
                 Endpoint 0 0 []
@@ -106,15 +106,15 @@ runSES eq (EditGraph as bs)
           return endpoint
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
-        moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < length bs then That (bs ! y) : script else script)
+        moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-        moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < length as then This (as ! x) : script else script)
+        moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < n then This (as ! x) : script else script)
 
         -- | Slide down any diagonal edges from a given vertex.
         slideFrom (Endpoint x y script)
-          | x >= 0, x < length as
-          , y >= 0, y < length bs
+          | x >= 0, x < n
+          , y >= 0, y < m
           , a <- as ! x
           , b <- bs ! y
           , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
