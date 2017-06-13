@@ -75,10 +75,10 @@ runSES eq (EditGraph as bs)
         -- | Search an edit graph for the shortest edit script along a specific diagonal.
         searchAlongK d k = do
           Endpoint x y script <- moveFromAdjacent d k
-          if x >= length as && y >= length bs then
-            return (Just (script, d))
+          return $! if x >= length as && y >= length bs then
+            Just (script, d)
           else
-            return Nothing
+            Nothing
 
         -- | Move onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and slide down any diagonal edges eagerly.
         moveFromAdjacent (Distance d) (Diagonal k) = do
