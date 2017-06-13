@@ -78,7 +78,6 @@ runSES eq (EditGraph as bs)
         searchUpToD (Distance d) =
           for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK (Distance d) . Diagonal)
           where (n, m) = (length as, length bs)
-        {-# INLINE searchUpToD #-}
 
         -- | Search an edit graph for the shortest edit script along a specific diagonal.
         searchAlongK d k = do
@@ -87,7 +86,6 @@ runSES eq (EditGraph as bs)
             return (Just (script, d))
           else
             return Nothing
-        {-# INLINE searchAlongK #-}
 
         -- | Move onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and slide down any diagonal edges eagerly.
         moveFromAdjacent (Distance d) (Diagonal k) = do
@@ -112,27 +110,22 @@ runSES eq (EditGraph as bs)
           endpoint <- slideFrom from
           setK (Diagonal k) endpoint
           return endpoint
-        {-# INLINE moveFromAdjacent #-}
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
         moveDownFrom (Endpoint x y script) = return (Endpoint x (succ y) (if y < length bs then That (bs ! y) : script else script))
-        {-# INLINE moveDownFrom #-}
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
         moveRightFrom (Endpoint x y script) = return (Endpoint (succ x) y (if x < length as then This (as ! x) : script else script))
-        {-# INLINE moveRightFrom #-}
 
         -- | Return the maximum extent reached and path taken along a given diagonal.
         getK k = do
           v <- checkK k
           let (x, script) = v ! k in return (Endpoint x (x - unDiagonal k) script)
-        {-# INLINE getK #-}
 
         -- | Update the maximum extent reached and path taken along a given diagonal.
         setK k (Endpoint x _ script) = do
           v <- checkK k
           put (MyersState (v Array.// [(k, (x, script))]))
-        {-# INLINE setK #-}
 
         -- | Slide down any diagonal edges from a given vertex.
         slideFrom (Endpoint x y script)
@@ -142,7 +135,6 @@ runSES eq (EditGraph as bs)
           , b <- bs ! y
           , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
           | otherwise = return (Endpoint       x        y               script)
-        {-# INLINE slideFrom #-}
 
 
 -- Implementation details
