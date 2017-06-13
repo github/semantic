@@ -102,7 +102,7 @@ runSES eq (EditGraph as bs)
             -- The upper/right extent of the search region or edit graph, whichever is smaller.
             moveRightFrom <$> getK v (Diagonal (pred k))
           endpoint <- slideFrom from
-          setK (Diagonal k) endpoint
+          setK v (Diagonal k) endpoint
           return endpoint
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
@@ -116,8 +116,8 @@ runSES eq (EditGraph as bs)
           let (x, script) = v ! k in return (Endpoint x (x - unDiagonal k) script)
 
         -- | Update the maximum extent reached and path taken along a given diagonal.
-        setK k (Endpoint x _ script) =
-          modify (MyersState . (Array.// [(k, (x, script))]) . unMyersState)
+        setK v k (Endpoint x _ script) =
+          put (MyersState (v Array.// [(k, (x, script))]))
 
         -- | Slide down any diagonal edges from a given vertex.
         slideFrom (Endpoint x y script)
