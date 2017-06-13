@@ -57,6 +57,8 @@ rws :: (HasField fields (Maybe FeatureVector), Functor f, Eq1 f)
     -> [Term f (Record fields)]
     -> [Term f (Record fields)]
     -> RWSEditScript f fields
+rws _            _          as [] = This <$> as
+rws _            _          [] bs = That <$> bs
 rws editDistance canCompare as bs = Eff.run . RWS.run editDistance canCompare as bs $ do
   sesDiffs <- ses'
   (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs' sesDiffs
