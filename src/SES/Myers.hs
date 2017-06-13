@@ -11,13 +11,13 @@ module SES.Myers
 , MyersState(..)
 ) where
 
+import Data.Array ((!))
 import qualified Data.Array as Array
 import Data.Ix
 import Data.Functor.Classes
 import Data.String
 import Data.These
 import GHC.Show hiding (show)
-import GHC.Stack
 import Prologue hiding (for, error)
 import Text.Show (showListWith)
 
@@ -144,11 +144,6 @@ emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
 for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 {-# INLINE for #-}
-
-
--- | Bounds-checked indexing of arrays, preserving the call stack.
-(!) :: (HasCallStack, Ix i, Show i) => Array.Array i a -> i -> a
-v ! i = v Array.! i
 
 
 -- | Lifted showing of arrays.
