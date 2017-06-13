@@ -8,7 +8,7 @@ module SES.Myers
 , Diagonal(..)
 , Endpoint(..)
 , ses
-, MyersState(..)
+, MyersState
 ) where
 
 import Data.Array ((!))
@@ -82,7 +82,7 @@ runSES eq (EditGraph as bs)
 
         -- | Move onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and slide down any diagonal edges eagerly.
         moveFromAdjacent (Distance d) (Diagonal k) = do
-          v <- gets unMyersState
+          v <- get
           let getK k = let (x, script) = v ! k in Endpoint x (x - unDiagonal k) script
           let (n, m) = (length as, length bs)
           from <- if d == 0 || k < negate m || k > n then
@@ -104,7 +104,7 @@ runSES eq (EditGraph as bs)
             return (moveRightFrom (getK (Diagonal (pred k))))
           endpoint <- slideFrom from
           let Endpoint x _ script = endpoint
-          put (MyersState (v Array.// [(Diagonal k, (x, script))]))
+          put (v Array.// [(Diagonal k, (x, script))])
           return endpoint
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
@@ -126,13 +126,12 @@ runSES eq (EditGraph as bs)
 -- Implementation details
 
 -- | The state stored by Myers’ algorithm; an array of m + n + 1 values indicating the maximum x-index reached and path taken along each diagonal.
-newtype MyersState a b = MyersState { unMyersState :: Array.Array Diagonal (Int, EditScript a b) }
-  deriving (Eq, Show)
+type MyersState a b = Array.Array Diagonal (Int, EditScript a b)
 
 -- | Compute the empty state of length m + n + 1 for a given edit graph.
 emptyStateForGraph :: EditGraph a b -> MyersState a b
 emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
-  MyersState (Array.listArray (Diagonal (negate m), Diagonal n) (repeat (0, [])))
+  Array.listArray (Diagonal (negate m), Diagonal n) (repeat (0, []))
 
 -- | Evaluate some function for each value in a list until one returns a value or the list is exhausted.
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
@@ -167,11 +166,6 @@ liftShowsEndpoint sp1 sp2 d (Endpoint x y script) = showsTernaryWith showsPrec s
 
 
 -- Instances
-
-instance Show2 MyersState where
-  liftShowsPrec2 sp1 _ sp2 _ d (MyersState v) = showsUnaryWith showsStateVector "MyersState" d v
-    where showsStateVector = showsWith liftShowsVector (showsWith liftShowsPrec (liftShowsEditScript sp1 sp2))
-          showsWith g f = g f (showListWith (f 0))
 
 instance Show2 EditGraph where
   liftShowsPrec2 sp1 sl1 sp2 sl2 d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp1 sl1) (liftShowsVector sp2 sl2) "EditGraph" d as bs
