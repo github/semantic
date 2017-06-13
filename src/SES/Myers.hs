@@ -88,27 +88,27 @@ runSES eq (EditGraph as bs)
             return (Endpoint 0 0 [])
           else if k == negate d || k == negate m then
             -- The lower/left extent of the search region or edit graph, whichever is smaller.
-            getK (Diagonal (succ k)) >>= moveDownFrom
+            moveDownFrom <$> getK (Diagonal (succ k))
           else if k /= d && k /= n then do
             -- Somewhere in the interior of the search region and edit graph.
             prev <- getK (Diagonal (pred k))
             next <- getK (Diagonal (succ k))
-            if x prev < x next then
+            return $! if x prev < x next then
               moveDownFrom next
             else
               moveRightFrom prev
           else
             -- The upper/right extent of the search region or edit graph, whichever is smaller.
-            getK (Diagonal (pred k)) >>= moveRightFrom
+            moveRightFrom <$> getK (Diagonal (pred k))
           endpoint <- slideFrom from
           setK (Diagonal k) endpoint
           return endpoint
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
-        moveDownFrom (Endpoint x y script) = return (Endpoint x (succ y) (if y < length bs then That (bs ! y) : script else script))
+        moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < length bs then That (bs ! y) : script else script)
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-        moveRightFrom (Endpoint x y script) = return (Endpoint (succ x) y (if x < length as then This (as ! x) : script else script))
+        moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < length as then This (as ! x) : script else script)
 
         -- | Return the maximum extent reached and path taken along a given diagonal.
         getK k = do
