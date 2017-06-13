@@ -51,11 +51,11 @@ data UnmappedTerm f fields = UnmappedTerm {
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index Int | None
 
-rws :: (HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f)
+rws :: (HasField fields (Maybe FeatureVector), Functor f, Eq1 f)
     => (Diff f fields -> Int)
     -> ComparabilityRelation f fields
-    -> t (Term f (Record fields))
-    -> t (Term f (Record fields))
+    -> [Term f (Record fields)]
+    -> [Term f (Record fields)]
     -> RWSEditScript f fields
 rws editDistance canCompare as bs = Eff.run . RWS.run editDistance canCompare as bs $ do
   sesDiffs <- ses'
