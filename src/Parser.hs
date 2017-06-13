@@ -1,5 +1,14 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
-module Parser where
+module Parser
+( Parser
+, runParser
+-- Syntax parsers
+, parserForLanguage
+-- À la carte parsers
+, markdownParser
+, pythonParser
+, rubyParser
+) where
 
 import qualified CMark
 import Data.Record
