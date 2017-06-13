@@ -119,13 +119,12 @@ runSES eq (EditGraph as bs)
 
         -- | Return the maximum extent reached and path taken along a given diagonal.
         getK k = do
-          v <- checkK k
+          v <- gets unMyersState
           let (x, script) = v ! k in return (Endpoint x (x - unDiagonal k) script)
 
         -- | Update the maximum extent reached and path taken along a given diagonal.
-        setK k (Endpoint x _ script) = do
-          v <- checkK k
-          put (MyersState (v Array.// [(k, (x, script))]))
+        setK k (Endpoint x _ script) =
+          modify (MyersState . (Array.// [(k, (x, script))]) . unMyersState)
 
         -- | Slide down any diagonal edges from a given vertex.
         slideFrom (Endpoint x y script)
@@ -164,13 +163,6 @@ fail s = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStac
 v ! i | inRange (Array.bounds v) i = v Array.! i
       | otherwise = let ?callStack = fromCallSiteList (filter ((/= "M") . fst) (getCallStack callStack)) in
           throw (MyersException ("index " <> show i <> " out of bounds") callStack)
-
--- | Check that a given diagonal is in-bounds for the edit graph, returning the actual index to use and the state array.
-checkK :: Diagonal -> Myers a b (Array.Array Diagonal (Int, EditScript a b))
-checkK k = do
-  v <- gets unMyersState
-  unless (inRange (Array.bounds v) k) $ fail ("diagonal " <> show k <> " outside state bounds " <> show (Array.bounds v))
-  return v
 
 
 -- | Lifted showing of arrays.
