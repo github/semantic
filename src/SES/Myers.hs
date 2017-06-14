@@ -96,7 +96,7 @@ runSES eq (EditGraph as bs)
                   else
                     Nothing
                   where -- | Move downward from a given vertex, inserting the element for the corresponding row.
-                        moveDownFrom (Endpoint x script) = Endpoint x (if (x - k) < m then That (bs ! (x - k)) : script else script)
+                        moveDownFrom (Endpoint x script) = Endpoint x (if (x - pred k) < m then That (bs ! (x - pred k)) : script else script)
 
                         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
                         moveRightFrom (Endpoint x script) = Endpoint (succ x) (if x < n then This (as ! x) : script else script)
