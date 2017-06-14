@@ -64,9 +64,9 @@ runSES eq (EditGraph as bs)
     return (reverse script)
   where (n, m) = (length as, length bs)
 
-        -- | Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
+        -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD (Distance d) = for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK . Diagonal)
-          where -- | Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
+          where -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK (Diagonal k) = do
                   v <- get
                   let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
@@ -94,7 +94,7 @@ runSES eq (EditGraph as bs)
                     Just (script, d)
                   else
                     Nothing
-                  where -- | Slide down any diagonal edges from a given vertex.
+                  where -- Slide down any diagonal edges from a given vertex.
                         slideFrom (Endpoint x y script)
                           | x >= 0, x < n
                           , y >= 0, y < m
