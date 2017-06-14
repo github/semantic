@@ -72,7 +72,7 @@ runSES eq (EditGraph as bs)
           where -- | Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK (Diagonal k) = do
                   v <- get
-                  let getK k = let (x, script) = v ! Diagonal k in Endpoint x script
+                  let getK = uncurry Endpoint . (v !) . Diagonal
                   let Endpoint x' script = slideFrom $! if d == 0 || k < negate m || k > n then
                         -- The top-left corner, or otherwise out-of-bounds.
                         Endpoint 0 []
