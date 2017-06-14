@@ -72,11 +72,11 @@ safeToEnum n | (fromEnum (minBound :: n), fromEnum (maxBound :: n)) `inRange` n 
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
-documentToTerm language document source = do
+documentToTerm language document allSource = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
     peek rootPtr)
-  toTerm root source
+  toTerm root (slice (nodeRange root) allSource)
   where toTerm :: Node -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
         toTerm node source = do
           name <- peekCString (nodeType node)

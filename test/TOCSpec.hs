@@ -94,6 +94,11 @@ spec = parallel $ do
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
+    it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
+      sourceBlobs <- blobsForPaths (both "javascript/starts-with-newline.js" "javascript/starts-with-newline.js")
+      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      diffTOC diff `shouldBe` []
+
     prop "inserts of methods and functions are summarized" $
       \name body ->
         let diff = programWithInsert name (unListableF body)
