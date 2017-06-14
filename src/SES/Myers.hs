@@ -90,8 +90,8 @@ runSES eq (EditGraph as bs)
                         moveRightFrom prev
                   in (k, (x', script))
                   where getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
-                        prev = {-# SCC "runSES.searchUpToD.searchAlongK.prev" #-} getK (pred k)
-                        next = {-# SCC "runSES.searchUpToD.searchAlongK.next" #-} getK (succ k)
+                        prev = getK (pred k)
+                        next = getK (succ k)
 
                         -- | Move downward from a given vertex, inserting the element for the corresponding row.
                         moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
