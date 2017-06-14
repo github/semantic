@@ -68,49 +68,47 @@ runSES eq (EditGraph as bs)
   where (n, m) = (length as, length bs)
 
         -- | Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
-        searchUpToD (Distance d) =
-          for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK (Distance d) . Diagonal)
+        searchUpToD (Distance d) = for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK . Diagonal)
+          where -- | Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
+                searchAlongK (Diagonal k) = do
+                  v <- get
+                  let getK k = let (x, script) = v ! Diagonal k in Endpoint x script
+                  let Endpoint x' script = slideFrom $! if d == 0 || k < negate m || k > n then
+                        -- The top-left corner, or otherwise out-of-bounds.
+                        Endpoint 0 []
+                      else if k == negate d || k == negate m then
+                        -- The lower/left extent of the search region or edit graph, whichever is smaller.
+                        moveDownFrom (getK (succ k))
+                      else if k /= d && k /= n then do
+                        -- Somewhere in the interior of the search region and edit graph.
+                        let prev = getK (pred k)
+                        let next = getK (succ k)
+                        if x prev < x next then
+                          moveDownFrom next
+                        else
+                          moveRightFrom prev
+                      else
+                        -- The upper/right extent of the search region or edit graph, whichever is smaller.
+                        moveRightFrom (getK (pred k))
+                  put (v Array.// [(Diagonal k, (x', script))])
+                  return $! if x' >= n && (x' - k) >= m then
+                    Just (script, d)
+                  else
+                    Nothing
+                  where -- | Move downward from a given vertex, inserting the element for the corresponding row.
+                        moveDownFrom (Endpoint x script) = Endpoint x (if (x - k) < m then That (bs ! (x - k)) : script else script)
 
-        -- | Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
-        searchAlongK (Distance d) (Diagonal k) = do
-          v <- get
-          let getK k = let (x, script) = v ! Diagonal k in Endpoint x script
-          let Endpoint x' script = slideFrom $! if d == 0 || k < negate m || k > n then
-                -- The top-left corner, or otherwise out-of-bounds.
-                Endpoint 0 []
-              else if k == negate d || k == negate m then
-                -- The lower/left extent of the search region or edit graph, whichever is smaller.
-                moveDownFrom (getK (succ k))
-              else if k /= d && k /= n then do
-                -- Somewhere in the interior of the search region and edit graph.
-                let prev = getK (pred k)
-                let next = getK (succ k)
-                if x prev < x next then
-                  moveDownFrom next
-                else
-                  moveRightFrom prev
-              else
-                -- The upper/right extent of the search region or edit graph, whichever is smaller.
-                moveRightFrom (getK (pred k))
-          put (v Array.// [(Diagonal k, (x', script))])
-          return $! if x' >= n && (x' - k) >= m then
-            Just (script, d)
-          else
-            Nothing
-          where -- | Move downward from a given vertex, inserting the element for the corresponding row.
-                moveDownFrom (Endpoint x script) = Endpoint x (if (x - k) < m then That (bs ! (x - k)) : script else script)
+                        -- | Move rightward from a given vertex, deleting the element for the corresponding column.
+                        moveRightFrom (Endpoint x script) = Endpoint (succ x) (if x < n then This (as ! x) : script else script)
 
-                -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-                moveRightFrom (Endpoint x script) = Endpoint (succ x) (if x < n then This (as ! x) : script else script)
-
-                -- | Slide down any diagonal edges from a given vertex.
-                slideFrom (Endpoint x script)
-                  | x >= 0, x < n
-                  , (x - k) >= 0, (x - k) < m
-                  , a <- as ! x
-                  , b <- bs ! (x - k)
-                  , a `eq` b  = slideFrom (Endpoint (succ x) (These a b : script))
-                  | otherwise =            Endpoint       x               script
+                        -- | Slide down any diagonal edges from a given vertex.
+                        slideFrom (Endpoint x script)
+                          | x >= 0, x < n
+                          , (x - k) >= 0, (x - k) < m
+                          , a <- as ! x
+                          , b <- bs ! (x - k)
+                          , a `eq` b  = slideFrom (Endpoint (succ x) (These a b : script))
+                          | otherwise =            Endpoint       x               script
 
 
 -- Implementation details
