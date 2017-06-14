@@ -68,8 +68,10 @@ runSES eq (EditGraph as bs)
           v <- get
           let extents = (\ k -> (k, searchAlongK v (Diagonal k))) <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ]
           put (Map.fromList extents)
-          pure . fmap (snd . snd) $! find (\ (k, (x, _)) -> x >= n && (x - k) >= m) extents
-          where -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
+          pure . fmap (snd . snd) $! find isComplete extents
+          where isComplete (k, (x, _)) = x >= n && (x - k) >= m
+
+                -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK v (Diagonal k) =
                   let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
                       prev = {-# SCC "runSES.searchUpToD.searchAlongK.prev" #-} getK (pred k)
