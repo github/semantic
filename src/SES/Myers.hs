@@ -73,10 +73,7 @@ runSES eq (EditGraph as bs)
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK v (Diagonal k) =
-                  let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
-                      prev = {-# SCC "runSES.searchUpToD.searchAlongK.prev" #-} getK (pred k)
-                      next = {-# SCC "runSES.searchUpToD.searchAlongK.next" #-} getK (succ k)
-                      Endpoint x' _ script = slideFrom $! if d == 0 || k < negate m || k > n then
+                  let Endpoint x' _ script = slideFrom $! if d == 0 || k < negate m || k > n then
                         -- The top-left corner, or otherwise out-of-bounds.
                         Endpoint 0 0 []
                       else if k == negate d || k == negate m then
@@ -92,7 +89,11 @@ runSES eq (EditGraph as bs)
                         -- The upper/right extent of the search region or edit graph, whichever is smaller.
                         moveRightFrom prev
                   in (k, (x', script))
-                  where -- | Move downward from a given vertex, inserting the element for the corresponding row.
+                  where getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
+                        prev = {-# SCC "runSES.searchUpToD.searchAlongK.prev" #-} getK (pred k)
+                        next = {-# SCC "runSES.searchUpToD.searchAlongK.next" #-} getK (succ k)
+
+                        -- | Move downward from a given vertex, inserting the element for the corresponding row.
                         moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
 
                         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
