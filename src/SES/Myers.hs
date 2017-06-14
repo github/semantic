@@ -70,8 +70,8 @@ runSES eq (EditGraph as bs)
                 searchAlongK (Diagonal k) = do
                   v <- get
                   let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
-                      up   = {-# SCC "runSES.searchUpToD.searchAlongK.prev" #-} getK (pred k)
-                      left = {-# SCC "runSES.searchUpToD.searchAlongK.next" #-} getK (succ k)
+                      up   = {-# SCC "runSES.searchUpToD.searchAlongK.up" #-} getK (pred k)
+                      left = {-# SCC "runSES.searchUpToD.searchAlongK.left" #-} getK (succ k)
                       moveDown  = let Endpoint x y script = up   in Endpoint       x (succ y) (if y < m then That (bs ! y) : script else script)
                       moveRight = let Endpoint x y script = left in Endpoint (succ x)      y  (if x < n then This (as ! x) : script else script)
                       Endpoint x' _ script = slideFrom $! if d == 0 || k < negate m || k > n then
