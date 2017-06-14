@@ -119,7 +119,6 @@ library
                      , split
                      , template-haskell
                      , text >= 1.2.1.3
-                     , text-icu
                      , these
                      , haskell-tree-sitter
                      , vector
@@ -196,7 +195,6 @@ test-suite test
                      , regex-compat
                      , semantic-diff
                      , text >= 1.2.1.3
-                     , text-icu
                      , unordered-containers
                      , these
                      , vector

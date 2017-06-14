@@ -61,9 +61,8 @@ blobForPathInTree tree path language = do
     Just (BlobEntry entryOid entryKind) -> do
       blob <- reportGitmon "cat-file" $ lookupBlob entryOid
       contents <- blobToByteString blob
-      transcoded <- liftIO $ transcode contents
       let oid = renderObjOid $ blobOid blob
-      pure (SourceBlob transcoded (toS oid) path (Just (toSourceKind entryKind)) language)
+      pure (SourceBlob (Source contents) (toS oid) path (Just (toSourceKind entryKind)) language)
     _ -> pure (emptySourceBlob path)
   where
     toSourceKind :: Git.BlobKind -> SourceKind
