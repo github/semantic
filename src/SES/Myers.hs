@@ -86,7 +86,7 @@ runSES eq (EditGraph as bs)
                       else
                         -- The upper/right extent of the search region or edit graph, whichever is smaller.
                         moveRightFrom prev
-                  put ({-# SCC "runSES.searchUpToD.searchAlongK.update" #-} Map.insert k (x', script) v)
+                  put ({-# SCC "Data.IntMap.Lazy.insert" #-} Map.insert k (x', script) v)
                   return $! if x' >= n && (x' - k) >= m then
                     Just (script, d)
                   else
