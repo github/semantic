@@ -71,7 +71,6 @@ runSES eq (EditGraph as bs)
         -- | Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD (Distance d) =
           for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK (Distance d) . Diagonal)
-          where (n, m) = (length as, length bs)
 
         -- | Search an edit graph for the shortest edit script along a specific diagonal.
         searchAlongK d k = do
