@@ -59,15 +59,18 @@ runSES eq (EditGraph as bs)
   | null bs = return (This <$> toList as)
   | null as = return (That <$> toList bs)
   | otherwise = do
-    Just (script, _) <- asum <$> for [0..(n + m)] (searchUpToD . Distance)
+    Just script <- asum <$> for [0..(n + m)] (searchUpToD . Distance)
     return (reverse script)
   where (n, m) = (length as, length bs)
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
-        searchUpToD (Distance d) = asum <$> for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK . Diagonal)
+        searchUpToD (Distance d) = do
+          v <- get
+          let extents = (\ k -> (k, searchAlongK v (Diagonal k))) <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ]
+          put (Map.fromList extents)
+          pure . fmap (snd . snd) $! find (\ (k, (x, _)) -> x >= n && (x - k) >= m) extents
           where -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
-                searchAlongK (Diagonal k) = do
-                  v <- get
+                searchAlongK v (Diagonal k) =
                   let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
                       prev = {-# SCC "runSES.searchUpToD.searchAlongK.prev" #-} getK (pred k)
                       next = {-# SCC "runSES.searchUpToD.searchAlongK.next" #-} getK (succ k)
@@ -86,11 +89,7 @@ runSES eq (EditGraph as bs)
                       else
                         -- The upper/right extent of the search region or edit graph, whichever is smaller.
                         moveRightFrom prev
-                  put ({-# SCC "Data.IntMap.Lazy.insert" #-} Map.insert k (x', script) v)
-                  return $! if x' >= n && (x' - k) >= m then
-                    Just (script, d)
-                  else
-                    Nothing
+                  in (x', script)
                   where -- | Move downward from a given vertex, inserting the element for the corresponding row.
                         moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
 
