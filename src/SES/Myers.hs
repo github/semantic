@@ -70,8 +70,8 @@ runSES eq (EditGraph as bs)
                 searchAlongK (Diagonal k) = do
                   v <- get
                   let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
-                      prev = {-# SCC prev #-} getK (pred k)
-                      next = {-# SCC next #-} getK (succ k)
+                      prev = {-# SCC "runSES.searchUpToD.searchAlongK.prev" #-} getK (pred k)
+                      next = {-# SCC "runSES.searchUpToD.searchAlongK.next" #-} getK (succ k)
                       Endpoint x' _ script = slideFrom $! if d == 0 || k < negate m || k > n then
                         -- The top-left corner, or otherwise out-of-bounds.
                         Endpoint 0 0 []
@@ -87,7 +87,7 @@ runSES eq (EditGraph as bs)
                       else
                         -- The upper/right extent of the search region or edit graph, whichever is smaller.
                         moveRightFrom prev
-                  put ({-# SCC update #-} Map.insert k (x', script) v)
+                  put ({-# SCC "runSES.searchUpToD.searchAlongK.update" #-} Map.insert k (x', script) v)
                   return $! if x' >= n && (x' - k) >= m then
                     Just (script, d)
                   else
