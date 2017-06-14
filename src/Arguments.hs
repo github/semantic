@@ -3,7 +3,6 @@
 module Arguments where
 
 import Data.Maybe
-import Data.String
 import Language
 import Prologue
 import Renderer

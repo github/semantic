@@ -14,7 +14,6 @@ import Control.Monad.Free.Freer
 import Control.Monad.IO.Class
 import Data.Functor.Both
 import Data.Functor.Classes
-import Data.String
 import Prologue hiding (readFile)
 import Language
 import Source
