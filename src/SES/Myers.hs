@@ -17,7 +17,7 @@ import Data.Ix
 import Data.Functor.Classes
 import Data.These
 import GHC.Show hiding (show)
-import Prologue hiding (for, error)
+import Prologue hiding (error)
 
 -- | An edit script, i.e. a sequence of changes/copies of elements.
 type EditScript a b = [These a b]
@@ -59,12 +59,12 @@ runSES eq (EditGraph as bs)
   | null bs = return (This <$> toList as)
   | null as = return (That <$> toList bs)
   | otherwise = do
-    Just (script, _) <- for [0..(n + m)] (searchUpToD . Distance)
+    Just (script, _) <- asum <$> for [0..(n + m)] (searchUpToD . Distance)
     return (reverse script)
   where (n, m) = (length as, length bs)
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
-        searchUpToD (Distance d) = for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK . Diagonal)
+        searchUpToD (Distance d) = asum <$> for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK . Diagonal)
           where -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK (Diagonal k) = do
                   v <- get
@@ -116,11 +116,6 @@ type MyersState a b = Map.IntMap (Int, EditScript a b)
 emptyStateForGraph :: EditGraph a b -> MyersState a b
 emptyStateForGraph _ =
   Map.singleton 0 (0, [])
-
--- | Evaluate some function for each value in a list until one returns a value or the list is exhausted.
-for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
-for all run = fmap asum (traverse run all)
-{-# INLINE for #-}
 
 
 -- | Lifted showing of arrays.
