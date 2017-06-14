@@ -40,7 +40,7 @@ newtype Distance = Distance { unDistance :: Int }
 newtype Diagonal = Diagonal { unDiagonal :: Int }
   deriving (Eq, Ix, Ord, Show)
 
-data Endpoint a b = Endpoint { x :: !Int, y :: !Int, script :: !(EditScript a b) }
+data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, y :: {-# UNPACK #-} !Int, script :: !(EditScript a b) }
   deriving (Eq, Show)
 
 
