@@ -19,7 +19,6 @@ library
                      , Category
                      , Command
                      , Command.Files
-                     , Command.Git
                      , Data.Align.Generic
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
@@ -81,7 +80,6 @@ library
                      , FDoc.Term
                      , FDoc.RecursionSchemes
                      , FDoc.NatExample
-                     , GitmonClient
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , aeson-pretty
@@ -100,8 +98,6 @@ library
                      , filepath
                      , free
                      , freer-cofreer
-                     , gitlib
-                     , gitlib-libgit2
                      , gitrev
                      , hashable
                      , kdt
@@ -160,7 +156,6 @@ test-suite test
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
-                     , GitmonClientSpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , RangeSpec
@@ -178,8 +173,6 @@ test-suite test
                      , bytestring
                      , deepseq
                      , filepath
-                     , gitlib
-                     , gitlib-libgit2
                      , Glob
                      , haskell-tree-sitter
                      , hspec >= 2.4.1
