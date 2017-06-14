@@ -66,7 +66,7 @@ runSES eq (EditGraph as bs)
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD (Distance d) = do
           v <- get
-          let extents = (\ k -> (k, searchAlongK v (Diagonal k))) <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ]
+          let extents = searchAlongK v . Diagonal <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ]
           put (Map.fromList extents)
           pure . fmap (snd . snd) $! find isComplete extents
           where isComplete (k, (x, _)) = x >= n && (x - k) >= m
@@ -91,7 +91,7 @@ runSES eq (EditGraph as bs)
                       else
                         -- The upper/right extent of the search region or edit graph, whichever is smaller.
                         moveRightFrom prev
-                  in (x', script)
+                  in (k, (x', script))
                   where -- | Move downward from a given vertex, inserting the element for the corresponding row.
                         moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
 
