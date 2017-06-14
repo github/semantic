@@ -67,6 +67,3 @@ instance Show1 CommandF where
     ReadBlobPairsFromHandle h -> showsUnaryWith showsPrec "ReadBlobPairsFromHandle" d h
     ReadBlobsFromHandle h -> showsUnaryWith showsPrec "ReadBlobsFromHandle" d h
     LiftIO _ -> showsUnaryWith (const showChar) "LiftIO" d '_'
-    where
-      showsQuaternaryWith sp1 sp2 sp3 sp4 name d x y z w = showParen (d > 10) $
-        showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z . showChar ' ' . sp4 11 w
