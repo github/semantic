@@ -104,8 +104,8 @@ runSES eq (EditGraph as bs)
                   , y >= 0, y < m
                   , a <- as ! x
                   , b <- bs ! y
-                  , a `eq` b  = slideFrom (Endpoint (succ x)      y (These a b : script))
-                  | otherwise =           (Endpoint       x (succ y)             script)
+                  , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
+                  | otherwise =           (Endpoint       x        y               script)
 
 
 -- Implementation details
