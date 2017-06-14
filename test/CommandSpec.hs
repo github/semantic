@@ -80,48 +80,6 @@ spec = parallel $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode
       runCommand (readBlobsFromHandle h) `shouldThrow` (== ExitFailure 1)
 
-  describe "readFilesAtSHA" $ do
-    it "returns blobs for the specified paths" $ do
-      blobs <- runCommand (readFilesAtSHA repoPath [] [("methods.rb", Just Ruby)] (Both.snd (shas methodsFixture)))
-      blobs `shouldBe` [methodsBlob]
-
-    it "returns emptySourceBlob if path doesn't exist at sha" $ do
-      blobs <- runCommand (readFilesAtSHA repoPath [] [("methods.rb", Just Ruby)] (Both.fst (shas methodsFixture)))
-      blobExists <$> blobs `shouldBe` [False]
-
-  describe "readFilesAtSHAs" $ do
-    it "returns blobs for the specified paths" $ do
-      blobs <- runCommand (readFilesAtSHAs repoPath [] [("methods.rb", Just Ruby)] (shas methodsFixture))
-      blobs `shouldBe` expectedBlobs methodsFixture
-
-    it "returns blobs for all paths if none are specified" $ do
-      blobs <- runCommand (readFilesAtSHAs repoPath [] [] (shas methodsFixture))
-      blobs `shouldBe` expectedBlobs methodsFixture
-
-    it "returns entries for missing paths" $ do
-      blobs <- runCommand (readFilesAtSHAs repoPath [] [("this file should not exist", Nothing)] (shas methodsFixture))
-      let b = emptySourceBlob "this file should not exist"
-      blobs `shouldBe` [both b b]
-
-  describe "fetchDiffs" $ do
-    it "generates toc summaries for two shas" $ do
-      Summaries summaries errors <- fetchDiffsOutput "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)]
-      errors `shouldBe` fromList []
-      summaries `shouldBe` fromList [("methods.rb", [methodsObject])]
-
-    it "generates toc summaries for two shas inferring paths" $ do
-      Summaries summaries errors <- fetchDiffsOutput "test/fixtures/git/examples/all-languages.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" []
-      errors `shouldBe` fromList []
-      summaries `shouldBe` fromList [("methods.rb", [methodsObject])]
-
-    it "errors with bad shas" $
-      fetchDiffsOutput "test/fixtures/git/examples/all-languages.git" "dead" "beef" [("methods.rb", Just Ruby)]
-        `shouldThrow` (== Git.BackendError "Could not lookup dead: Object not found - no match for prefix (dead000000000000000000000000000000000000)")
-
-    it "errors with bad repo path" $
-      fetchDiffsOutput "test/fixtures/git/examples/not-a-repo.git" "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)]
-        `shouldThrow` errorCall "Could not open repository \"test/fixtures/git/examples/not-a-repo.git\""
-
   where repoPath = "test/fixtures/git/examples/all-languages.git"
         methodsFixture = Fixture
           (both "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe")
@@ -134,8 +92,3 @@ spec = parallel $ do
           pure blobs
 
 data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
-
-fetchDiffsOutput :: FilePath -> String -> String -> [(FilePath, Maybe Language)] -> IO Summaries
-fetchDiffsOutput gitDir sha1 sha2 filePaths = do
-  blobPairs <- runCommand $ readFilesAtSHAs gitDir [] filePaths (both sha1 sha2)
-  runTask (distributeFoldMap (Semantic.diffBlobPair Renderer.ToCDiffRenderer) blobPairs)
