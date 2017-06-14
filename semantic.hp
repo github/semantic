@@ -1,0 +1,8 @@
+JOB "semantic diff --sexpression /Users/rob/Desktop/crypto.pb.new.go /Users/rob/Desktop/crypto.pb.old.go +RTS -N -A4m -n2m -sstderr -N4 -A8m -n2m -p -s -h -i0.1"
+DATE "Wed Jun 14 09:24 2017"
+SAMPLE_UNIT "seconds"
+VALUE_UNIT "bytes"
+BEGIN_SAMPLE 0.000000
+END_SAMPLE 0.000000
+BEGIN_SAMPLE 0.137783
+END_SAMPLE 0.137783
