@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
 module SES.Myers
 ( EditScript
-, Step
 , Myers
 , EditGraph(..)
 , Distance(..)
@@ -23,9 +22,7 @@ import Prologue hiding (for, error)
 -- | An edit script, i.e. a sequence of changes/copies of elements.
 type EditScript a b = [These a b]
 
-type Step a b = State (MyersState a b)
-
-type Myers a b = (Step a b)
+type Myers a b = State (MyersState a b)
 
 -- | Notionally the cartesian product of two sequences, represented as a simple wrapper around those arrays holding those sequences’ elements for O(1) lookups.
 data EditGraph a b = EditGraph { as :: !(Array.Array Int a), bs :: !(Array.Array Int b) }
