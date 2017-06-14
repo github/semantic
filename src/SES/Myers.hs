@@ -15,7 +15,6 @@ import Data.Array ((!))
 import qualified Data.Array as Array
 import Data.Ix
 import Data.Functor.Classes
-import Data.String
 import Data.These
 import GHC.Show hiding (show)
 import Prologue hiding (for, error)
@@ -45,7 +44,7 @@ newtype Diagonal = Diagonal { unDiagonal :: Int }
   deriving (Eq, Ix, Ord, Show)
 
 -- | The endpoint of a path through the edit graph, represented as the x/y indices and the script of edits made to get to that point.
-data Endpoint a b = Endpoint { x :: !Int, y :: !Int, script :: !(EditScript a b) }
+data Endpoint a b = Endpoint { x :: !Int, script :: !(EditScript a b) }
   deriving (Eq, Show)
 
 
@@ -74,8 +73,8 @@ runSES eq (EditGraph as bs)
 
         -- | Search an edit graph for the shortest edit script along a specific diagonal.
         searchAlongK d k = do
-          Endpoint x y script <- moveFromAdjacent d k
-          return $! if x >= n && y >= m then
+          Endpoint x script <- moveFromAdjacent d k
+          return $! if x >= n && (x - unDiagonal k) >= m then
             Just (script, d)
           else
             Nothing
@@ -83,10 +82,10 @@ runSES eq (EditGraph as bs)
         -- | Move onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and slide down any diagonal edges eagerly.
         moveFromAdjacent (Distance d) (Diagonal k) = do
           v <- get
-          let getK k = let (x, script) = v ! Diagonal k in Endpoint x (x - k) script
-          let endpoint@(Endpoint x' _ script) = slideFrom $! if d == 0 || k < negate m || k > n then
+          let getK k = let (x, script) = v ! Diagonal k in Endpoint x script
+          let endpoint@(Endpoint x' script) = slideFrom $! if d == 0 || k < negate m || k > n then
                 -- The top-left corner, or otherwise out-of-bounds.
-                Endpoint 0 0 []
+                Endpoint 0 []
               else if k == negate d || k == negate m then
                 -- The lower/left extent of the search region or edit graph, whichever is smaller.
                 moveDownFrom (getK (succ k))
@@ -103,21 +102,20 @@ runSES eq (EditGraph as bs)
                 moveRightFrom (getK (pred k))
           put (v Array.// [(Diagonal k, (x', script))])
           return endpoint
+          where -- | Move downward from a given vertex, inserting the element for the corresponding row.
+                moveDownFrom (Endpoint x script) = Endpoint x (if (x - k) < m then That (bs ! (x - k)) : script else script)
 
-        -- | Move downward from a given vertex, inserting the element for the corresponding row.
-        moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
+                -- | Move rightward from a given vertex, deleting the element for the corresponding column.
+                moveRightFrom (Endpoint x script) = Endpoint (succ x) (if x < n then This (as ! x) : script else script)
 
-        -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-        moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < n then This (as ! x) : script else script)
-
-        -- | Slide down any diagonal edges from a given vertex.
-        slideFrom (Endpoint x y script)
-          | x >= 0, x < n
-          , y >= 0, y < m
-          , a <- as ! x
-          , b <- bs ! y
-          , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
-          | otherwise =            Endpoint       x        y               script
+                -- | Slide down any diagonal edges from a given vertex.
+                slideFrom (Endpoint x script)
+                  | x >= 0, x < n
+                  , (x - k) >= 0, (x - k) < m
+                  , a <- as ! x
+                  , b <- bs ! (x - k)
+                  , a `eq` b  = slideFrom (Endpoint (succ x) (These a b : script))
+                  | otherwise =            Endpoint       x               script
 
 
 -- Implementation details
@@ -140,12 +138,6 @@ for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
 liftShowsVector :: Show i => (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array.Array i a -> ShowS
 liftShowsVector sp sl d = liftShowsPrec sp sl d . toList
 
--- | Lifted showing of ternary constructors.
-showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
-showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $
-  showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
-
-
 -- | Lifted showing of These.
 liftShowsThese :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> These a b -> ShowS
 liftShowsThese sa sb d t = case t of
@@ -159,7 +151,7 @@ liftShowsEditScript sa sb _ = showListWith (liftShowsThese sa sb 0)
 
 -- | Lifted showing of edit graph endpoints.
 liftShowsEndpoint :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> Int -> Endpoint a b -> ShowS
-liftShowsEndpoint sp1 sp2 d (Endpoint x y script) = showsTernaryWith showsPrec showsPrec (liftShowsEditScript sp1 sp2) "Endpoint" d x y script
+liftShowsEndpoint sp1 sp2 d (Endpoint x script) = showsBinaryWith showsPrec (liftShowsEditScript sp1 sp2) "Endpoint" d x script
 
 
 -- Instances
