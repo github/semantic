@@ -13,6 +13,7 @@ module SES.Myers
 
 import Data.Array ((!))
 import qualified Data.Array as Array
+import qualified Data.IntMap.Lazy as Map
 import Data.Ix
 import Data.Functor.Classes
 import Data.These
@@ -68,7 +69,7 @@ runSES eq (EditGraph as bs)
           where -- | Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK (Diagonal k) = do
                   v <- get
-                  let getK k = let (x, script) = v ! Diagonal k in Endpoint x (x - k) script
+                  let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
                       prev = {-# SCC prev #-} getK (pred k)
                       next = {-# SCC next #-} getK (succ k)
                       Endpoint x' _ script = slideFrom $! if d == 0 || k < negate m || k > n then
@@ -86,7 +87,7 @@ runSES eq (EditGraph as bs)
                       else
                         -- The upper/right extent of the search region or edit graph, whichever is smaller.
                         moveRightFrom prev
-                  put ({-# SCC update #-} v Array.// [(Diagonal k, (x', script))])
+                  put ({-# SCC update #-} Map.insert k (x', script) v)
                   return $! if x' >= n && (x' - k) >= m then
                     Just (script, d)
                   else
@@ -110,12 +111,12 @@ runSES eq (EditGraph as bs)
 -- Implementation details
 
 -- | The state stored by Myers’ algorithm; an array of m + n + 1 values indicating the maximum x-index reached and path taken along each diagonal.
-type MyersState a b = Array.Array Diagonal (Int, EditScript a b)
+type MyersState a b = Map.IntMap (Int, EditScript a b)
 
 -- | Compute the empty state of length m + n + 1 for a given edit graph.
 emptyStateForGraph :: EditGraph a b -> MyersState a b
-emptyStateForGraph (EditGraph as bs) = let (n, m) = (length as, length bs) in
-  Array.listArray (Diagonal (negate m), Diagonal n) (repeat (0, []))
+emptyStateForGraph _ =
+  Map.singleton 0 (0, [])
 
 -- | Evaluate some function for each value in a list until one returns a value or the list is exhausted.
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
