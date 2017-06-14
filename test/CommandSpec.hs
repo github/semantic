@@ -8,7 +8,6 @@ import Data.Maybe
 import Data.String
 import Language
 import Prologue hiding (readFile, toList)
-import qualified Git.Types as Git
 import Renderer hiding (errors)
 import Source
 import Semantic

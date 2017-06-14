@@ -32,20 +32,15 @@ data ParseFixture = ParseFixture
   } deriving (Show)
 
 instance Listable ParseFixture where
-  tiers = cons0 (ParseFixture (sExpressionParseTree pathMode "" []) sExpressionParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree pathMode "" []) jsonParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree pathMode' "" []) jsonParseTreeOutput')
-       \/ cons0 (ParseFixture (sExpressionParseTree commitMode repo []) "(Program\n  (Method\n    (Identifier)))\n")
-       \/ cons0 (ParseFixture (jsonParseTree commitMode repo []) jsonParseTreeOutput'')
-       \/ cons0 (ParseFixture (jsonParseTree (ParseCommit "2e4144eb8c44f007463ec34cb66353f0041161fe" []) repo []) emptyJsonParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree (ParsePaths []) repo []) emptyJsonParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree (ParseCommit "2e4144eb8c44f007463ec34cb66353f0041161fe" [("not-a-file.rb", Just Ruby)]) repo []) emptyJsonParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree (ParsePaths [("not-a-file.rb", Just Ruby)]) repo []) emptyJsonParseTreeOutput)
+  tiers = cons0 (ParseFixture (sExpressionParseTree pathMode) sExpressionParseTreeOutput)
+       \/ cons0 (ParseFixture (jsonParseTree pathMode) jsonParseTreeOutput)
+       \/ cons0 (ParseFixture (jsonParseTree pathMode') jsonParseTreeOutput')
+       \/ cons0 (ParseFixture (jsonParseTree (ParsePaths [])) emptyJsonParseTreeOutput)
+       \/ cons0 (ParseFixture (jsonParseTree (ParsePaths [("not-a-file.rb", Just Ruby)])) emptyJsonParseTreeOutput)
 
     where
       pathMode = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
       pathMode' = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
-      commitMode = ParseCommit "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)]
 
       sExpressionParseTreeOutput = "(Program\n  (Binary\n    (Identifier)\n    (Other \"and\")\n    (Identifier)))\n"
       jsonParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"}]\n"
@@ -60,18 +55,13 @@ data DiffFixture = DiffFixture
   } deriving (Show)
 
 instance Listable DiffFixture where
-  tiers = cons0 (DiffFixture (patchDiff pathMode "" []) patchOutput)
-       \/ cons0 (DiffFixture (jsonDiff pathMode "" []) jsonOutput)
-       \/ cons0 (DiffFixture (sExpressionDiff pathMode "" []) sExpressionOutput)
-       \/ cons0 (DiffFixture (tocDiff pathMode "" []) tocOutput)
-       \/ cons0 (DiffFixture (patchDiff commitMode repo []) patchOutput')
-       \/ cons0 (DiffFixture (jsonDiff commitMode repo []) jsonOutput')
-       \/ cons0 (DiffFixture (sExpressionDiff commitMode repo []) sExpressionOutput')
-       \/ cons0 (DiffFixture (tocDiff commitMode repo []) tocOutput')
+  tiers = cons0 (DiffFixture (patchDiff pathMode) patchOutput)
+       \/ cons0 (DiffFixture (jsonDiff pathMode) jsonOutput)
+       \/ cons0 (DiffFixture (sExpressionDiff pathMode) sExpressionOutput)
+       \/ cons0 (DiffFixture (tocDiff pathMode) tocOutput)
 
     where
       pathMode = DiffPaths ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)
-      commitMode = DiffCommits "dfac8fd681b0749af137aebf3203e77a06fbafc2" "2e4144eb8c44f007463ec34cb66353f0041161fe" [("methods.rb", Just Ruby)]
 
       patchOutput = "diff --git a/test/fixtures/ruby/method-declaration.A.rb b/test/fixtures/ruby/method-declaration.B.rb\nindex 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644\n--- a/test/fixtures/ruby/method-declaration.A.rb\n+++ b/test/fixtures/ruby/method-declaration.B.rb\n@@ -1,3 +1,4 @@\n-def foo\n+def bar(a)\n+  baz\n end\n\n"
       patchOutput' = "diff --git a/methods.rb b/methods.rb\nnew file mode 100644\nindex 0000000000000000000000000000000000000000..ff7bbbe9495f61d9e1e58c597502d152bab1761e\n--- /dev/null\n+++ b/methods.rb\n+def foo\n+end\n\n"

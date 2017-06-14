@@ -10,8 +10,6 @@ module SpecHelpers
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Listable
-import qualified Data.Text.ICU.Convert as Convert
-import qualified Data.Text.ICU.Detect as Detect
 import Diff
 import Language
 import Patch
@@ -47,13 +45,7 @@ readFile path = do
   where
     -- | Read a file, convert it's contents unicode and return it wrapped in Source.
     readFileToUnicode :: FilePath -> IO Source
-    readFileToUnicode path = B.readFile path >>= transcode
-      where
-        transcode :: B.ByteString -> IO Source
-        transcode text = fromText <$> do
-          match <- Detect.detectCharset text
-          converter <- Convert.open match Nothing
-          pure $ Convert.toUnicode converter text
+    readFileToUnicode path = Source <$> B.readFile path
 
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language
