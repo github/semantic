@@ -79,10 +79,10 @@ runSES eq (EditGraph as bs)
                       else if k == negate d || k == negate m then
                         -- The lower/left extent of the search region or edit graph, whichever is smaller.
                         moveDownFrom (getK (succ k))
-                      else if k /= d && k /= n then do
+                      else if k /= d && k /= n then
                         -- Somewhere in the interior of the search region and edit graph.
                         let prev = getK (pred k)
-                        let next = getK (succ k)
+                            next = getK (succ k) in
                         if x prev < x next then
                           moveDownFrom next
                         else
