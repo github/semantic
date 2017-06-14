@@ -72,23 +72,22 @@ runSES eq (EditGraph as bs)
           where isComplete (k, (x, _)) = x >= n && (x - k) >= m
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
-                searchAlongK v (Diagonal k) =
-                  let Endpoint x' _ script = slideFrom $! if d == 0 || k < negate m || k > n then
-                        -- The top-left corner, or otherwise out-of-bounds.
-                        Endpoint 0 0 []
-                      else if k == negate d || k == negate m then
-                        -- The lower/left extent of the search region or edit graph, whichever is smaller.
-                        moveDownFrom next
-                      else if k /= d && k /= n then
-                        -- Somewhere in the interior of the search region and edit graph.
-                        if x prev < x next then
-                          moveDownFrom next
-                        else
-                          moveRightFrom prev
-                      else
-                        -- The upper/right extent of the search region or edit graph, whichever is smaller.
-                        moveRightFrom prev
-                  in (k, (x', script))
+                searchAlongK v (Diagonal k) = (,) k . (x &&& script) . slideFrom $!
+                  if d == 0 || k < negate m || k > n then
+                    -- The top-left corner, or otherwise out-of-bounds.
+                    Endpoint 0 0 []
+                  else if k == negate d || k == negate m then
+                    -- The lower/left extent of the search region or edit graph, whichever is smaller.
+                    moveDownFrom next
+                  else if k /= d && k /= n then
+                    -- Somewhere in the interior of the search region and edit graph.
+                    if x prev < x next then
+                      moveDownFrom next
+                    else
+                      moveRightFrom prev
+                  else
+                    -- The upper/right extent of the search region or edit graph, whichever is smaller.
+                    moveRightFrom prev
                   where getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
                         prev = getK (pred k)
                         next = getK (succ k)
