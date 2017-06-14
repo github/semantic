@@ -29,3 +29,6 @@ vendor/icu/common/
 vendor/icu/bin/
 vendor/icu/Makefile
 bin/
+
+semantic.hp
+semantic.prof
