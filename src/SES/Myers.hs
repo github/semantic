@@ -3,6 +3,8 @@ module SES.Myers
 ( EditScript
 , Myers
 , EditGraph(..)
+, Distance(..)
+, Diagonal(..)
 , Endpoint(..)
 , ses
 , MyersState
@@ -30,6 +32,14 @@ data EditGraph a b = EditGraph { as :: !(Array.Array Int a), bs :: !(Array.Array
 makeEditGraph :: (Foldable t, Foldable u) => t a -> u b -> EditGraph a b
 makeEditGraph as bs = EditGraph (Array.listArray (0, pred (length as)) (toList as)) (Array.listArray (0, pred (length bs)) (toList bs))
 
+-- | An edit distance, i.e. a cardinal number of changes.
+newtype Distance = Distance { unDistance :: Int }
+  deriving (Eq, Show)
+
+-- | A diagonal in the edit graph of lists of lengths n and m, numbered from -m to n.
+newtype Diagonal = Diagonal { unDiagonal :: Int }
+  deriving (Eq, Ix, Ord, Show)
+
 data Endpoint a b = Endpoint { x :: !Int, y :: !Int, script :: !(EditScript a b) }
   deriving (Eq, Show)
 
@@ -49,14 +59,14 @@ runSES eq (EditGraph as bs)
   | null bs = return (This <$> toList as)
   | null as = return (That <$> toList bs)
   | otherwise = do
-    Just (script, _) <- for [0..(n + m)] searchUpToD
+    Just (script, _) <- for [0..(n + m)] (searchUpToD . Distance)
     return (reverse script)
   where (n, m) = (length as, length bs)
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
-        searchUpToD d = for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] searchAlongK
+        searchUpToD (Distance d) = for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK . Diagonal)
           where -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
-                searchAlongK k = do
+                searchAlongK (Diagonal k) = do
                   v <- get
                   let getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
                       up   = {-# SCC "runSES.searchUpToD.searchAlongK.up" #-} getK (pred k)
