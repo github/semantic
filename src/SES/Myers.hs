@@ -92,20 +92,20 @@ runSES eq (EditGraph as bs)
                         prev = getK (pred k)
                         next = getK (succ k)
 
-                        -- | Move downward from a given vertex, inserting the element for the corresponding row.
-                        moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
+                -- | Move downward from a given vertex, inserting the element for the corresponding row.
+                moveDownFrom (Endpoint x y script) = Endpoint x (succ y) (if y < m then That (bs ! y) : script else script)
 
-                        -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-                        moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < n then This (as ! x) : script else script)
+                -- | Move rightward from a given vertex, deleting the element for the corresponding column.
+                moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < n then This (as ! x) : script else script)
 
-                        -- | Slide down any diagonal edges from a given vertex.
-                        slideFrom (Endpoint x y script)
-                          | x >= 0, x < n
-                          , y >= 0, y < m
-                          , a <- as ! x
-                          , b <- bs ! y
-                          , a `eq` b  = slideFrom (Endpoint (succ x)      y (These a b : script))
-                          | otherwise =           (Endpoint       x (succ y)             script)
+                -- | Slide down any diagonal edges from a given vertex.
+                slideFrom (Endpoint x y script)
+                  | x >= 0, x < n
+                  , y >= 0, y < m
+                  , a <- as ! x
+                  , b <- bs ! y
+                  , a `eq` b  = slideFrom (Endpoint (succ x)      y (These a b : script))
+                  | otherwise =           (Endpoint       x (succ y)             script)
 
 
 -- Implementation details
