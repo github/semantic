@@ -73,23 +73,23 @@ runSES eq (EditGraph as bs)
                 searchAlongK (Diagonal k) = do
                   v <- get
                   let getK = uncurry Endpoint . (v !) . Diagonal
-                  let Endpoint x' script = slideFrom $! if d == 0 || k < negate m || k > n then
+                      prev = getK (pred k)
+                      next = getK (succ k)
+                      Endpoint x' script = slideFrom $! if d == 0 || k < negate m || k > n then
                         -- The top-left corner, or otherwise out-of-bounds.
                         Endpoint 0 []
                       else if k == negate d || k == negate m then
                         -- The lower/left extent of the search region or edit graph, whichever is smaller.
-                        moveDownFrom (getK (succ k))
+                        moveDownFrom next
                       else if k /= d && k /= n then
                         -- Somewhere in the interior of the search region and edit graph.
-                        let prev = getK (pred k)
-                            next = getK (succ k) in
                         if x prev < x next then
                           moveDownFrom next
                         else
                           moveRightFrom prev
                       else
                         -- The upper/right extent of the search region or edit graph, whichever is smaller.
-                        moveRightFrom (getK (pred k))
+                        moveRightFrom prev
                   put (v Array.// [(Diagonal k, (x', script))])
                   return $! if x' >= n && (x' - k) >= m then
                     Just (script, d)
