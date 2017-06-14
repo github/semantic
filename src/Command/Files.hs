@@ -15,6 +15,7 @@ import Data.String
 import Language
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Prelude (fail)
@@ -55,8 +56,8 @@ readBlobsFromHandle = fmap toSourceBlobs . readFromHandle
 
 readFromHandle :: FromJSON a => Handle -> IO a
 readFromHandle h = do
-  input <- B.hGetContents h
-  case decode (toS input) of
+  input <- BL.hGetContents h
+  case decode input of
     Just d -> pure d
     Nothing -> die ("invalid input on " <> show h <> ", expecting JSON")
 
