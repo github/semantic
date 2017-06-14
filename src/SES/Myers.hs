@@ -119,7 +119,7 @@ emptyStateForGraph _ =
 
 -- | Evaluate some function for each value in a list until one returns a value or the list is exhausted.
 for :: [a] -> (a -> Myers c d (Maybe b)) -> Myers c d (Maybe b)
-for all run = foldr (\ a b -> (<|>) <$> run a <*> b) (return Nothing) all
+for all run = fmap asum (traverse run all)
 {-# INLINE for #-}
 
 
