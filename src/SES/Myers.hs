@@ -71,19 +71,11 @@ runSES eq (EditGraph as bs)
         searchUpToD (Distance d) =
           for [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] (searchAlongK (Distance d) . Diagonal)
 
-        -- | Search an edit graph for the shortest edit script along a specific diagonal.
-        searchAlongK d k = do
-          Endpoint x script <- moveFromAdjacent d k
-          return $! if x >= n && (x - unDiagonal k) >= m then
-            Just (script, d)
-          else
-            Nothing
-
-        -- | Move onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and slide down any diagonal edges eagerly.
-        moveFromAdjacent (Distance d) (Diagonal k) = do
+        -- | Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
+        searchAlongK (Distance d) (Diagonal k) = do
           v <- get
           let getK k = let (x, script) = v ! Diagonal k in Endpoint x script
-          let endpoint@(Endpoint x' script) = slideFrom $! if d == 0 || k < negate m || k > n then
+          let Endpoint x' script = slideFrom $! if d == 0 || k < negate m || k > n then
                 -- The top-left corner, or otherwise out-of-bounds.
                 Endpoint 0 []
               else if k == negate d || k == negate m then
@@ -101,7 +93,10 @@ runSES eq (EditGraph as bs)
                 -- The upper/right extent of the search region or edit graph, whichever is smaller.
                 moveRightFrom (getK (pred k))
           put (v Array.// [(Diagonal k, (x', script))])
-          return endpoint
+          return $! if x' >= n && (x' - k) >= m then
+            Just (script, d)
+          else
+            Nothing
           where -- | Move downward from a given vertex, inserting the element for the corresponding row.
                 moveDownFrom (Endpoint x script) = Endpoint x (if (x - k) < m then That (bs ! (x - k)) : script else script)
 
