@@ -35,14 +35,14 @@ main = do
 
 runDiff :: DiffArguments -> IO ByteString
 runDiff DiffArguments{..} = do
-  blobs <- runCommand $ case diffMode of
+  blobs <- case diffMode of
     DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
     DiffStdin -> readBlobPairsFromHandle stdin
   Task.runTask (Semantic.diffBlobPairs diffRenderer blobs)
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do
-  blobs <- runCommand $ case parseMode of
+  blobs <- case parseMode of
     ParsePaths paths -> traverse (uncurry readFile) paths
     ParseStdin -> readBlobsFromHandle stdin
   Task.runTask (Semantic.parseBlobs parseTreeRenderer blobs)
