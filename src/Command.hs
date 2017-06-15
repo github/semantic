@@ -1,7 +1,5 @@
 module Command
-( Files.readFile
-, Files.readBlobPairsFromHandle
-, Files.readBlobsFromHandle
+( module Files
 ) where
 
-import qualified Command.Files as Files
+import Command.Files as Files
