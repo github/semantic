@@ -12,10 +12,8 @@
           (Other "composite_literal"
             (SliceTy
               (Identifier))
-          { (Literal
-              (Element
-                (StringLiteral)))
-          ->(Literal) }))))
+          (Literal
+            {-(StringLiteral)-})))))
     (Other "const_declaration"
       (VarAssignment
         (Other "identifier_list"
@@ -25,9 +23,8 @@
             (SliceTy
               (Identifier))
             (Literal
-              (Element
-              { (StringLiteral)
-              ->(StringLiteral) }))))))
+            { (StringLiteral)
+            ->(StringLiteral) })))))
     (Other "const_declaration"
       (VarAssignment
         (Other "identifier_list"
@@ -37,9 +34,7 @@
             (SliceTy
               (Identifier))
             (Literal
-              (Element
-              { (StringLiteral)
-              ->(StringLiteral) })
-              (Element
-              { (StringLiteral)
-              ->(StringLiteral) }))))))))
+            { (StringLiteral)
+            ->(StringLiteral) }
+            { (StringLiteral)
+            ->(StringLiteral) })))))))

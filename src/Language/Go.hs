@@ -31,6 +31,7 @@ termAssignment source category children = case (category, children) of
   (SubscriptAccess, [a, b]) -> Just $ S.SubscriptAccess a b
   (IndexExpression, [a, b]) -> Just $ S.SubscriptAccess a b
   (Slice, [a, rest]) -> Just $ S.SubscriptAccess a rest
+  (Literal, children) -> Just . S.Indexed $ unpackElement <$> children
   (Other "composite_literal", [ty, values])
     | ArrayTy <- Info.category (extract ty)
     -> Just $ S.Array (Just ty) (toList (unwrap values))
@@ -64,6 +65,10 @@ termAssignment source category children = case (category, children) of
   (Method, [receiverParams, name, params, ty, body])
     -> Just (S.Method [] name (Just receiverParams) [params, ty] (toList (unwrap body)))
   _ -> Nothing
+  where unpackElement element
+          | Element <- Info.category (extract element)
+          , S.Indexed [ child ] <- unwrap element = child
+          | otherwise                             = element
 
 categoryForGoName :: Text -> Category
 categoryForGoName name = case name of

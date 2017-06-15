@@ -12,14 +12,13 @@ module RWS (
   , defaultD
   ) where
 
-import Prologue
-import Control.Monad.Effect as Eff
-import Control.Monad.Effect.Internal as I
+import Prologue hiding (State, evalState, runState)
+import Control.Monad.State.Strict
 import Data.Record
 import Data.These
 import Patch
 import Term
-import Data.Array
+import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES
 import qualified Data.Functor.Both as Both
@@ -39,50 +38,34 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation f fields = forall a b. TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
 
-type FeatureVector = Array Int Double
+type FeatureVector = UArray Int Double
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
-    termIndex :: Int -- ^ The index of the term within its root term.
-  , feature   :: FeatureVector -- ^ Feature vector
+    termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
+  , feature   :: {-# UNPACK #-} !FeatureVector -- ^ Feature vector
   , term      :: Term f (Record fields) -- ^ The unmapped term
 }
 
 -- | Either a `term`, an index of a matched term, or nil.
-data TermOrIndexOrNone term = Term term | Index Int | None
+data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
-rws :: (HasField fields (Maybe FeatureVector), Foldable t, Functor f, Eq1 f)
+rws :: (HasField fields FeatureVector, Functor f, Eq1 f)
     => (Diff f fields -> Int)
     -> ComparabilityRelation f fields
-    -> t (Term f (Record fields))
-    -> t (Term f (Record fields))
+    -> [Term f (Record fields)]
+    -> [Term f (Record fields)]
     -> RWSEditScript f fields
-rws editDistance canCompare as bs = Eff.run . RWS.run editDistance canCompare as bs $ do
-  sesDiffs <- ses'
-  (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs' sesDiffs
-  (diffs, remaining) <- findNearestNeighoursToDiff' allDiffs featureAs featureBs
-  diffs' <- deleteRemaining' diffs remaining
-  rwsDiffs <- insertMapped' mappedDiffs diffs'
-  pure (fmap snd rwsDiffs)
-
-data RWS f fields result where
-  SES :: RWS f fields (RWSEditScript f fields)
-
-  GenFeaturizedTermsAndDiffs :: HasField fields (Maybe FeatureVector)
-                             => RWSEditScript f fields
-                             -> RWS f fields
-                                ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-
-  FindNearestNeighoursToDiff :: [TermOrIndexOrNone (UnmappedTerm f fields)]
-                             -> [UnmappedTerm f fields]
-                             -> [UnmappedTerm f fields]
-                             -> RWS f fields ([MappedDiff f fields], UnmappedTerms f fields)
-
-  DeleteRemaining :: [MappedDiff f fields]
-                  -> UnmappedTerms f fields
-                  -> RWS f fields [MappedDiff f fields]
-
-  InsertMapped :: [MappedDiff f fields] -> [MappedDiff f fields] -> RWS f fields [MappedDiff f fields]
+rws _            _          as [] = This <$> as
+rws _            _          [] bs = That <$> bs
+rws _            canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
+rws editDistance canCompare as bs =
+  let sesDiffs = ses (equalTerms canCompare) as bs
+      (featureAs, featureBs, mappedDiffs, allDiffs) = genFeaturizedTermsAndDiffs sesDiffs
+      (diffs, remaining) = findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
+      diffs' = deleteRemaining diffs remaining
+      rwsDiffs = insertMapped mappedDiffs diffs'
+  in fmap snd rwsDiffs
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
@@ -93,24 +76,6 @@ type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 type MappedDiff f fields = (These Int Int, Diff f fields)
 
 type RWSEditScript f fields = [Diff f fields]
-
-run :: (Eq1 f, Functor f, HasField fields (Maybe FeatureVector), Foldable t)
-    => (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-    -> ComparabilityRelation f fields -- ^ A relation determining whether two terms can be compared.
-    -> t (Term f (Record fields))
-    -> t (Term f (Record fields))
-    -> Eff (RWS f fields ': e) (RWSEditScript f fields)
-    -> Eff e (RWSEditScript f fields)
-run editDistance canCompare as bs = relay pure (\m q -> q $ case m of
-  SES -> ses (equalTerms canCompare) as bs
-  (GenFeaturizedTermsAndDiffs sesDiffs) ->
-    evalState (genFeaturizedTermsAndDiffs sesDiffs) (0, 0)
-  (FindNearestNeighoursToDiff allDiffs featureAs featureBs) ->
-    findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
-  (DeleteRemaining allDiffs remainingDiffs) ->
-    deleteRemaining allDiffs remainingDiffs
-  (InsertMapped allDiffs mappedDiffs) ->
-    insertMapped allDiffs mappedDiffs)
 
 insertMapped :: Foldable t => t (MappedDiff f fields) -> [MappedDiff f fields] -> [MappedDiff f fields]
 insertMapped diffs into = foldl' (flip insertDiff) into diffs
@@ -170,10 +135,7 @@ findNearestNeighbourToDiff' :: (Diff f fields -> Int) -- ^ A function computes a
 findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
   None -> pure Nothing
   Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
-  Index i -> do
-    (_, unA, unB) <- get
-    put (i, unA, unB)
-    pure Nothing
+  Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
@@ -239,37 +201,28 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
-genFeaturizedTermsAndDiffs :: (Functor f, HasField fields (Maybe FeatureVector))
+genFeaturizedTermsAndDiffs :: (Functor f, HasField fields FeatureVector)
                            => RWSEditScript f fields
-                           -> State
-                                (Int, Int)
-                                ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-genFeaturizedTermsAndDiffs sesDiffs = case sesDiffs of
-  [] -> pure ([], [], [], [])
-  (diff : diffs) -> do
-    (counterA, counterB) <- get
-    case diff of
-      This term -> do
-        put (succ counterA, counterB)
-        (as, bs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs diffs
-        pure (featurize counterA term : as, bs, mappedDiffs, None : allDiffs )
-      That term -> do
-        put (counterA, succ counterB)
-        (as, bs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs diffs
-        pure (as, featurize counterB term : bs, mappedDiffs, Term (featurize counterB term) : allDiffs)
-      These a b -> do
-        put (succ counterA, succ counterB)
-        (as, bs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs diffs
-        pure (as, bs, (These counterA counterB, These a b) : mappedDiffs, Index counterA : allDiffs)
+                           -> ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
+genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
+  where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
+          This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
+          That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (Term (featurize counterB term) : allDiffs)
+          These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
 
-featurize :: (HasField fields (Maybe FeatureVector), Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
-featurize index term = UnmappedTerm index (let Just v = getField (extract term) in v) (eraseFeatureVector term)
+data Mapping f fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm f fields] ![UnmappedTerm f fields] ![MappedDiff f fields] ![TermOrIndexOrNone (UnmappedTerm f fields)]
 
-eraseFeatureVector :: (Functor f, HasField fields (Maybe FeatureVector)) => Term f (Record fields) -> Term f (Record fields)
+featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
+featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
+
+eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
 eraseFeatureVector term = let record :< functor = runCofree term in
-  cofree (setFeatureVector record Nothing :< functor)
+  cofree (setFeatureVector record nullFeatureVector :< functor)
 
-setFeatureVector :: HasField fields (Maybe FeatureVector) => Record fields -> Maybe FeatureVector -> Record fields
+nullFeatureVector :: FeatureVector
+nullFeatureVector = listArray (0, 0) [0]
+
+setFeatureVector :: HasField fields FeatureVector => Record fields -> FeatureVector -> Record fields
 setFeatureVector = setField
 
 minimumTermIndex :: [RWS.UnmappedTerm f fields] -> Int
@@ -281,35 +234,6 @@ toMap = IntMap.fromList . fmap (termIndex &&& identity)
 toKdTree :: [UnmappedTerm f fields] -> KdTree Double (UnmappedTerm f fields)
 toKdTree = build (elems . feature)
 
--- Effect constructors
-
-ses' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e (RWSEditScript f fields)
-ses' = send SES
-
-genFeaturizedTermsAndDiffs' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e)
-                            => RWSEditScript f fields
-                            -> Eff e ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-genFeaturizedTermsAndDiffs' = send . GenFeaturizedTermsAndDiffs
-
-findNearestNeighoursToDiff' :: (RWS f fields :< e)
-                            => [TermOrIndexOrNone (UnmappedTerm f fields)]
-                            -> [UnmappedTerm f fields]
-                            -> [UnmappedTerm f fields]
-                            -> Eff e ([MappedDiff f fields], UnmappedTerms f fields)
-findNearestNeighoursToDiff' diffs as bs = send (FindNearestNeighoursToDiff diffs as bs)
-
-deleteRemaining' :: (RWS f fields :< e)
-                 => [MappedDiff f fields]
-                 -> UnmappedTerms f fields
-                 -> Eff e [MappedDiff f fields]
-deleteRemaining' diffs remaining = send (DeleteRemaining diffs remaining)
-
-insertMapped' :: (RWS f fields :< e)
-              => [MappedDiff f fields]
-              -> [MappedDiff f fields]
-              -> Eff e [MappedDiff f fields]
-insertMapped' diffs mappedDiffs = send (InsertMapped diffs mappedDiffs)
-
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
  deriving (Eq, Show)
@@ -319,19 +243,19 @@ defaultFeatureVectorDecorator
  :: (Hashable label, Traversable f)
  => Label f fields label
  -> Term f (Record fields)
- -> Term f (Record (Maybe FeatureVector ': fields))
+ -> Term f (Record (FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Maybe FeatureVector ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
 featureVectorDecorator getLabel p q d
  = cata collect
  . pqGramDecorator getLabel p q
- where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (Just (unitVector d (hash gram))) functor :. rest) :< functor)
-       addSubtermVector :: Functor f => Maybe FeatureVector -> Term f (Record (Maybe FeatureVector ': fields)) -> Maybe FeatureVector
-       addSubtermVector v term = addVectors <$> v <*> rhead (extract term)
+ where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
+       addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
+       addSubtermVector v term = addVectors v (rhead (extract term))
 
-       addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
+       addVectors :: UArray Int Double -> UArray Int Double -> UArray Int Double
        addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
@@ -364,11 +288,10 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = fmap (* invMagnitude) uniform
+unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
   where
-    uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
-    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) uniform))
-    components = sequenceA (replicate d (liftRand randomDouble))
+    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) components))
+    components = evalRand (sequenceA (replicate d (liftRand randomDouble))) (pureMT (fromIntegral hash))
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
