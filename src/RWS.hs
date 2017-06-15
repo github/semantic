@@ -13,8 +13,6 @@ module RWS (
   ) where
 
 import Prologue
-import Control.Monad.Effect as Eff
-import Control.Monad.Effect.Internal as I
 import Data.Record
 import Data.These
 import Patch
@@ -60,32 +58,13 @@ rws :: (HasField fields (Maybe FeatureVector), Functor f, Eq1 f)
 rws _            _          as [] = This <$> as
 rws _            _          [] bs = That <$> bs
 rws _            canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
-rws editDistance canCompare as bs = Eff.run . RWS.run editDistance canCompare as bs $ do
-  sesDiffs <- ses'
-  (featureAs, featureBs, mappedDiffs, allDiffs) <- genFeaturizedTermsAndDiffs' sesDiffs
-  (diffs, remaining) <- findNearestNeighoursToDiff' allDiffs featureAs featureBs
-  diffs' <- deleteRemaining' diffs remaining
-  rwsDiffs <- insertMapped' mappedDiffs diffs'
-  pure (fmap snd rwsDiffs)
-
-data RWS f fields result where
-  SES :: RWS f fields (RWSEditScript f fields)
-
-  GenFeaturizedTermsAndDiffs :: HasField fields (Maybe FeatureVector)
-                             => RWSEditScript f fields
-                             -> RWS f fields
-                                ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-
-  FindNearestNeighoursToDiff :: [TermOrIndexOrNone (UnmappedTerm f fields)]
-                             -> [UnmappedTerm f fields]
-                             -> [UnmappedTerm f fields]
-                             -> RWS f fields ([MappedDiff f fields], UnmappedTerms f fields)
-
-  DeleteRemaining :: [MappedDiff f fields]
-                  -> UnmappedTerms f fields
-                  -> RWS f fields [MappedDiff f fields]
-
-  InsertMapped :: [MappedDiff f fields] -> [MappedDiff f fields] -> RWS f fields [MappedDiff f fields]
+rws editDistance canCompare as bs =
+  let sesDiffs = ses (equalTerms canCompare) as bs
+      (featureAs, featureBs, mappedDiffs, allDiffs) = evalState (genFeaturizedTermsAndDiffs sesDiffs) (0, 0)
+      (diffs, remaining) = findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
+      diffs' = deleteRemaining diffs remaining
+      rwsDiffs = insertMapped mappedDiffs diffs'
+  in fmap snd rwsDiffs
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
@@ -96,24 +75,6 @@ type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 type MappedDiff f fields = (These Int Int, Diff f fields)
 
 type RWSEditScript f fields = [Diff f fields]
-
-run :: (Eq1 f, Functor f, HasField fields (Maybe FeatureVector), Foldable t)
-    => (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-    -> ComparabilityRelation f fields -- ^ A relation determining whether two terms can be compared.
-    -> t (Term f (Record fields))
-    -> t (Term f (Record fields))
-    -> Eff (RWS f fields ': e) (RWSEditScript f fields)
-    -> Eff e (RWSEditScript f fields)
-run editDistance canCompare as bs = relay pure (\m q -> q $ case m of
-  SES -> ses (equalTerms canCompare) as bs
-  (GenFeaturizedTermsAndDiffs sesDiffs) ->
-    evalState (genFeaturizedTermsAndDiffs sesDiffs) (0, 0)
-  (FindNearestNeighoursToDiff allDiffs featureAs featureBs) ->
-    findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
-  (DeleteRemaining allDiffs remainingDiffs) ->
-    deleteRemaining allDiffs remainingDiffs
-  (InsertMapped allDiffs mappedDiffs) ->
-    insertMapped allDiffs mappedDiffs)
 
 insertMapped :: Foldable t => t (MappedDiff f fields) -> [MappedDiff f fields] -> [MappedDiff f fields]
 insertMapped diffs into = foldl' (flip insertDiff) into diffs
@@ -283,35 +244,6 @@ toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
 toKdTree :: [UnmappedTerm f fields] -> KdTree Double (UnmappedTerm f fields)
 toKdTree = build (elems . feature)
-
--- Effect constructors
-
-ses' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e) => Eff e (RWSEditScript f fields)
-ses' = send SES
-
-genFeaturizedTermsAndDiffs' :: (HasField fields (Maybe FeatureVector), RWS f fields :< e)
-                            => RWSEditScript f fields
-                            -> Eff e ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-genFeaturizedTermsAndDiffs' = send . GenFeaturizedTermsAndDiffs
-
-findNearestNeighoursToDiff' :: (RWS f fields :< e)
-                            => [TermOrIndexOrNone (UnmappedTerm f fields)]
-                            -> [UnmappedTerm f fields]
-                            -> [UnmappedTerm f fields]
-                            -> Eff e ([MappedDiff f fields], UnmappedTerms f fields)
-findNearestNeighoursToDiff' diffs as bs = send (FindNearestNeighoursToDiff diffs as bs)
-
-deleteRemaining' :: (RWS f fields :< e)
-                 => [MappedDiff f fields]
-                 -> UnmappedTerms f fields
-                 -> Eff e [MappedDiff f fields]
-deleteRemaining' diffs remaining = send (DeleteRemaining diffs remaining)
-
-insertMapped' :: (RWS f fields :< e)
-              => [MappedDiff f fields]
-              -> [MappedDiff f fields]
-              -> Eff e [MappedDiff f fields]
-insertMapped' diffs mappedDiffs = send (InsertMapped diffs mappedDiffs)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
