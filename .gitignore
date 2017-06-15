@@ -30,5 +30,5 @@ vendor/icu/bin/
 vendor/icu/Makefile
 bin/
 
-semantic.hp
-semantic.prof
+*.hp
+*.prof
