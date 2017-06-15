@@ -57,6 +57,7 @@ parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
   where syntaxParser = parserForLanguage blobLanguage
 
 
+
 diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both SourceBlob] -> Task ByteString
 diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
 
