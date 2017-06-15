@@ -42,13 +42,13 @@ type FeatureVector = UArray Int Double
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
-    termIndex :: Int -- ^ The index of the term within its root term.
-  , feature   :: FeatureVector -- ^ Feature vector
+    termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
+  , feature   :: {-# UNPACK #-} !FeatureVector -- ^ Feature vector
   , term      :: Term f (Record fields) -- ^ The unmapped term
 }
 
 -- | Either a `term`, an index of a matched term, or nil.
-data TermOrIndexOrNone term = Term term | Index Int | None
+data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
 rws :: (HasField fields (Maybe FeatureVector), Functor f, Eq1 f)
     => (Diff f fields -> Int)
