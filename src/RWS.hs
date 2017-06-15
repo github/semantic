@@ -12,7 +12,8 @@ module RWS (
   , defaultD
   ) where
 
-import Prologue
+import Prologue hiding (State, evalState, runState)
+import Control.Monad.State.Strict
 import Data.Record
 import Data.These
 import Patch
@@ -134,10 +135,7 @@ findNearestNeighbourToDiff' :: (Diff f fields -> Int) -- ^ A function computes a
 findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
   None -> pure Nothing
   Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
-  Index i -> do
-    (_, unA, unB) <- get
-    put (i, unA, unB)
-    pure Nothing
+  Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Diff f fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
