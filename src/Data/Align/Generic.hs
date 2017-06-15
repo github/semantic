@@ -10,38 +10,30 @@ import Prologue
 
 -- | Functors which can be aligned (structure-unioning-ly zipped). The default implementation will operate generically over the constructors in the aligning type.
 class GAlign f where
-  galign :: f a -> f b -> Maybe (f (These a b))
-  galign = galignWith identity
-
   -- | Perform generic alignment of values of some functor, applying the given function to alignments of elements.
   galignWith :: (These a b -> c) -> f a -> f b -> Maybe (f c)
   default galignWith :: (Generic1 f, GAlign (Rep1 f)) => (These a b -> c) -> f a -> f b -> Maybe (f c)
   galignWith f a b = to1 <$> galignWith f (from1 a) (from1 b)
 
+galign :: GAlign f => f a -> f b -> Maybe (f (These a b))
+galign = galignWith identity
 
 -- 'Data.Align.Align' instances
 
 instance GAlign [] where
-  galign = galignAlign
   galignWith = galignWithAlign
 instance GAlign Maybe where
-  galign = galignAlign
   galignWith = galignWithAlign
 instance GAlign Identity where
   galignWith f (Identity a) (Identity b) = Just (Identity (f (These a b)))
 
 instance (GAlign f, GAlign (Union fs)) => GAlign (Union (f ': fs)) where
-  galign u1 u2 = case (decompose u1, decompose u2) of
-    (Left u1', Left u2') -> weaken <$> galign u1' u2'
-    (Right r1, Right r2) -> inj <$> galign r1 r2
-    _ -> Nothing
   galignWith f u1 u2 = case (decompose u1, decompose u2) of
     (Left u1', Left u2') -> weaken <$> galignWith f u1' u2'
     (Right r1, Right r2) -> inj <$> galignWith f r1 r2
     _ -> Nothing
 
 instance GAlign (Union '[]) where
-  galign _ _ = Nothing
   galignWith _ _ _ = Nothing
 
 -- | Implements a function suitable for use as the definition of 'galign' for 'Align'able functors.
