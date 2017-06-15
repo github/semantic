@@ -40,12 +40,8 @@ parseFilePath path = do
 -- the filesystem or Git. The tests, however, will still leverage reading files.
 readFile :: FilePath -> IO SourceBlob
 readFile path = do
-  source <- (Just <$> readFileToUnicode path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
+  source <- (Just . Source <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
   pure $ fromMaybe (emptySourceBlob path) (sourceBlob path (languageForFilePath path) <$> source)
-  where
-    -- | Read a file, convert it's contents unicode and return it wrapped in Source.
-    readFileToUnicode :: FilePath -> IO Source
-    readFileToUnicode path = Source <$> B.readFile path
 
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language
