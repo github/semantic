@@ -204,11 +204,13 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
 genFeaturizedTermsAndDiffs :: (Functor f, HasField fields FeatureVector)
                            => RWSEditScript f fields
                            -> ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-genFeaturizedTermsAndDiffs sesDiffs = let (_, (a, b, c, d)) = foldl' combine ((0, 0), ([], [], [], [])) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
-  where combine ((counterA, counterB), (as, bs, mappedDiffs, allDiffs)) diff = case diff of
-          This term -> ((succ counterA, counterB), (featurize counterA term : as, bs, mappedDiffs, None : allDiffs))
-          That term -> ((counterA, succ counterB), (as, featurize counterB term : bs, mappedDiffs, Term (featurize counterB term) : allDiffs))
-          These a b -> ((succ counterA, succ counterB), (as, bs, (These counterA counterB, These a b) : mappedDiffs, Index counterA : allDiffs))
+genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
+  where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
+          This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
+          That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (Term (featurize counterB term) : allDiffs)
+          These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
+
+data Mapping f fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm f fields] ![UnmappedTerm f fields] ![MappedDiff f fields] ![TermOrIndexOrNone (UnmappedTerm f fields)]
 
 featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
