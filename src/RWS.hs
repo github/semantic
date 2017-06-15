@@ -18,7 +18,7 @@ import Data.Record
 import Data.These
 import Patch
 import Term
-import Data.Array
+import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES
 import qualified Data.Functor.Both as Both
@@ -38,7 +38,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation f fields = forall a b. TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
 
-type FeatureVector = Array Int Double
+type FeatureVector = UArray Int Double
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
@@ -250,7 +250,7 @@ featureVectorDecorator getLabel p q d
        addSubtermVector :: Functor f => Maybe FeatureVector -> Term f (Record (Maybe FeatureVector ': fields)) -> Maybe FeatureVector
        addSubtermVector v term = addVectors <$> v <*> rhead (extract term)
 
-       addVectors :: Num a => Array Int a -> Array Int a -> Array Int a
+       addVectors :: UArray Int Double -> UArray Int Double -> UArray Int Double
        addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
@@ -283,11 +283,10 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = fmap (* invMagnitude) uniform
+unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
   where
-    uniform = listArray (0, d - 1) (evalRand components (pureMT (fromIntegral hash)))
-    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) uniform))
-    components = sequenceA (replicate d (liftRand randomDouble))
+    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) components))
+    components = evalRand (sequenceA (replicate d (liftRand randomDouble))) (pureMT (fromIntegral hash))
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
