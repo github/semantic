@@ -14,11 +14,11 @@ spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      blob <- runCommand (readFile "semantic-diff.cabal" Nothing)
+      blob <- readFile "semantic-diff.cabal" Nothing
       path blob `shouldBe` "semantic-diff.cabal"
 
     it "returns a nullBlob for absent files" $ do
-      blob <- runCommand (readFile "this file should not exist" Nothing)
+      blob <- readFile "this file should not exist" Nothing
       nullBlob blob `shouldBe` True
 
   describe "readBlobPairsFromHandle" $ do
@@ -47,7 +47,7 @@ spec = parallel $ do
 
     it "returns blobs for unsupported language" $ do
       h <- openFile "test/fixtures/input/diff-unsupported-language.json" ReadMode
-      blobs <- runCommand (readBlobPairsFromHandle h)
+      blobs <- readBlobPairsFromHandle h
       let b' = sourceBlob "test.kt" Nothing "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
       blobs `shouldBe` [both (emptySourceBlob "test.kt") b']
 
@@ -57,26 +57,26 @@ spec = parallel $ do
 
     it "throws on blank input" $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode
-      runCommand (readBlobPairsFromHandle h) `shouldThrow` (== ExitFailure 1)
+      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
 
     it "throws if language field not given" $ do
       h <- openFile "test/fixtures/input/diff-no-language.json" ReadMode
-      runCommand (readBlobsFromHandle h) `shouldThrow` (== ExitFailure 1)
+      readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
       h <- openFile "test/fixtures/input/parse.json" ReadMode
-      blobs <- runCommand (readBlobsFromHandle h)
+      blobs <- readBlobsFromHandle h
       let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
       blobs `shouldBe` [a]
 
     it "throws on blank input" $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode
-      runCommand (readBlobsFromHandle h) `shouldThrow` (== ExitFailure 1)
+      readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
 
   where blobsFromFilePath path = do
           h <- openFile path ReadMode
-          blobs <- runCommand (readBlobPairsFromHandle h)
+          blobs <- readBlobPairsFromHandle h
           pure blobs
 
 data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
