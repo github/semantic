@@ -69,4 +69,3 @@ data Import a = Import { importContent :: ![a] }
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
-

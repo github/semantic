@@ -23,8 +23,8 @@ import Prologue hiding (for, get, Location, state, unless)
 import qualified Term
 
 -- | The type of Ruby syntax.
-type Syntax =
-  '[Comment.Comment
+type Syntax = '[
+    Comment.Comment
   , Declaration.Class
   , Declaration.Method
   , Expression.Arithmetic
@@ -37,13 +37,14 @@ type Syntax =
   , Literal.Range
   , Literal.String
   , Literal.Symbol
+  , Statement.Alias
   , Statement.Assignment
+  , Statement.BeginBlock
   , Statement.Break
   , Statement.Continue
+  , Statement.EndBlock
   , Statement.ForEach
   , Statement.If
-  -- TODO: redo
-  -- TODO: retry
   , Statement.Return
   , Statement.While
   , Statement.Yield
@@ -63,7 +64,13 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ comment <|> class' <|> method
+declaration = handleError $ comment <|> beginBlock <|> endBlock <|> statement
+
+beginBlock :: Assignment
+beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.BeginBlock <$> many declaration)
+
+endBlock :: Assignment
+endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.EndBlock <$> many declaration)
 
 class' :: Assignment
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
@@ -95,6 +102,9 @@ statement  = handleError
           <|> for
           <|> literal
           <|> assignment'
+          <|> class'
+          <|> method
+          <|> alias
   where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment
@@ -105,6 +115,9 @@ expression = identifier <|> statement
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+
+alias :: Assignment
+alias = makeTerm <$> symbol Alias <*> children (Statement.Alias <$> identifier <*> identifier)
 
 if' :: Assignment
 if' =  ifElsif If

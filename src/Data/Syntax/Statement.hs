@@ -127,3 +127,27 @@ newtype Finally a = Finally a
 
 instance Eq1 Finally where liftEq = genericLiftEq
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | BEGIN block statement.
+newtype BeginBlock a = BeginBlock [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 BeginBlock where liftEq = genericLiftEq
+instance Show1 BeginBlock where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | END block statement.
+newtype EndBlock a = EndBlock [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 EndBlock where liftEq = genericLiftEq
+instance Show1 EndBlock where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | Alias statement
+data Alias a = Alias { aliasFrom :: !a, aliasTo :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Alias where liftEq = genericLiftEq
+instance Show1 Alias where liftShowsPrec = genericLiftShowsPrec
