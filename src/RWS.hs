@@ -50,7 +50,7 @@ data UnmappedTerm f fields = UnmappedTerm {
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
-rws :: (HasField fields (Maybe FeatureVector), Functor f, Eq1 f)
+rws :: (HasField fields FeatureVector, Functor f, Eq1 f)
     => (Diff f fields -> Int)
     -> ComparabilityRelation f fields
     -> [Term f (Record fields)]
@@ -201,7 +201,7 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
-genFeaturizedTermsAndDiffs :: (Functor f, HasField fields (Maybe FeatureVector))
+genFeaturizedTermsAndDiffs :: (Functor f, HasField fields FeatureVector)
                            => RWSEditScript f fields
                            -> ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
 genFeaturizedTermsAndDiffs = snd . foldl' combine ((0, 0), ([], [], [], []))
@@ -210,14 +210,17 @@ genFeaturizedTermsAndDiffs = snd . foldl' combine ((0, 0), ([], [], [], []))
           That term -> ((counterA, succ counterB), (as, featurize counterB term : bs, mappedDiffs, Term (featurize counterB term) : allDiffs))
           These a b -> ((succ counterA, succ counterB), (as, bs, (These counterA counterB, These a b) : mappedDiffs, Index counterA : allDiffs))
 
-featurize :: (HasField fields (Maybe FeatureVector), Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
-featurize index term = UnmappedTerm index (let Just v = getField (extract term) in v) (eraseFeatureVector term)
+featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
+featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
 
-eraseFeatureVector :: (Functor f, HasField fields (Maybe FeatureVector)) => Term f (Record fields) -> Term f (Record fields)
+eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
 eraseFeatureVector term = let record :< functor = runCofree term in
-  cofree (setFeatureVector record Nothing :< functor)
+  cofree (setFeatureVector record nullFeatureVector :< functor)
 
-setFeatureVector :: HasField fields (Maybe FeatureVector) => Record fields -> Maybe FeatureVector -> Record fields
+nullFeatureVector :: FeatureVector
+nullFeatureVector = listArray (0, 0) [0]
+
+setFeatureVector :: HasField fields FeatureVector => Record fields -> FeatureVector -> Record fields
 setFeatureVector = setField
 
 minimumTermIndex :: [RWS.UnmappedTerm f fields] -> Int
@@ -238,17 +241,17 @@ defaultFeatureVectorDecorator
  :: (Hashable label, Traversable f)
  => Label f fields label
  -> Term f (Record fields)
- -> Term f (Record (Maybe FeatureVector ': fields))
+ -> Term f (Record (FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Maybe FeatureVector ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
 featureVectorDecorator getLabel p q d
  = cata collect
  . pqGramDecorator getLabel p q
- where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (Just (unitVector d (hash gram))) functor :. rest) :< functor)
-       addSubtermVector :: Functor f => Maybe FeatureVector -> Term f (Record (Maybe FeatureVector ': fields)) -> Maybe FeatureVector
-       addSubtermVector v term = addVectors <$> v <*> rhead (extract term)
+ where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
+       addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
+       addSubtermVector v term = addVectors v (rhead (extract term))
 
        addVectors :: UArray Int Double -> UArray Int Double -> UArray Int Double
        addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
