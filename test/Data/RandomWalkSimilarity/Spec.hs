@@ -45,7 +45,7 @@ spec = parallel $ do
 
   where canCompare a b = headF a == headF b
 
-        decorate :: SyntaxTerm leaf '[Category] -> SyntaxTerm leaf '[Maybe FeatureVector, Category]
+        decorate :: SyntaxTerm leaf '[Category] -> SyntaxTerm leaf '[FeatureVector, Category]
         decorate = defaultFeatureVectorDecorator (category . headF)
 
         diffThese = these deleting inserting replacing
