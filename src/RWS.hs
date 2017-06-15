@@ -204,7 +204,7 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
 genFeaturizedTermsAndDiffs :: (Functor f, HasField fields FeatureVector)
                            => RWSEditScript f fields
                            -> ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
-genFeaturizedTermsAndDiffs = snd . foldl' combine ((0, 0), ([], [], [], []))
+genFeaturizedTermsAndDiffs sesDiffs = let (_, (a, b, c, d)) = foldl' combine ((0, 0), ([], [], [], [])) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
   where combine ((counterA, counterB), (as, bs, mappedDiffs, allDiffs)) diff = case diff of
           This term -> ((succ counterA, counterB), (featurize counterA term : as, bs, mappedDiffs, None : allDiffs))
           That term -> ((counterA, succ counterB), (as, featurize counterB term : bs, mappedDiffs, Term (featurize counterB term) : allDiffs))
