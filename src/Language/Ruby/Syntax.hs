@@ -77,7 +77,7 @@ statement  = handleError
   <|> alias
   -- <|> if'
   -- <|> unless
-  -- <|> Language.Ruby.Syntax.while
+  <|> while'
   -- <|> until
   <|> emptyStatement
   <|> exit Return Statement.Return
@@ -92,6 +92,9 @@ statement  = handleError
   <|> identifier
   <|> literal
   where exit sym construct = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
+
+statements :: Assignment
+statements = makeTerm <$> location <*> many statement
 
 
 beginBlock :: Assignment
@@ -131,9 +134,6 @@ methodName = identifier <|> literal
 -- method :: Assignment
 -- method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
 
--- statements :: Assignment
--- statements = makeTerm <$> location <*> many statement
-
 -- lvalue :: Assignment
 -- lvalue = identifier
 
@@ -158,9 +158,10 @@ undef = makeTerm <$> symbol Undef <*> children (Statement.Undef <$> some methodN
 -- unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
 --       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
 --
--- while :: Assignment
--- while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
---      <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
+while' :: Assignment
+while' =
+      makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
+  <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
 --
 -- until :: Assignment
 -- until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
