@@ -45,6 +45,7 @@ parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter
 -- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> SourceBlob -> Task output
 parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
+  (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
   (ToCTermRenderer, _) -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source) >>= render (renderToCTerm blob)
   (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= render (renderJSONTerm blob)
