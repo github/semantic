@@ -39,16 +39,16 @@ type Syntax = '[
   , Literal.Symbol
   , Statement.Alias
   , Statement.Assignment
-  , Statement.BeginBlock
   , Statement.Break
   , Statement.Continue
-  , Statement.EndBlock
   , Statement.ForEach
   , Statement.If
   , Statement.Return
+  , Statement.ScopeEntry
+  , Statement.ScopeExit
+  , Statement.Undef
   , Statement.While
   , Statement.Yield
-  , Statement.Undef
   , Syntax.Empty
   , Syntax.Error Error
   , Syntax.Identifier
@@ -93,10 +93,10 @@ statement  = handleError
 
 
 beginBlock :: Assignment
-beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.BeginBlock <$> many topLevelStatement)
+beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many topLevelStatement)
 
 endBlock :: Assignment
-endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.EndBlock <$> many topLevelStatement)
+endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many topLevelStatement)
 
 
 -- class' :: Assignment

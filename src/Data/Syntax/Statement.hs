@@ -129,29 +129,31 @@ instance Eq1 Finally where liftEq = genericLiftEq
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
 
 
--- | BEGIN block statement.
-newtype BeginBlock a = BeginBlock [a]
+-- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
+newtype ScopeEntry a = ScopeEntry [a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
-instance Eq1 BeginBlock where liftEq = genericLiftEq
-instance Show1 BeginBlock where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 ScopeEntry where liftEq = genericLiftEq
+instance Show1 ScopeEntry where liftShowsPrec = genericLiftShowsPrec
 
 
--- | END block statement.
-newtype EndBlock a = EndBlock [a]
+-- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
+newtype ScopeExit a = ScopeExit [a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
-instance Eq1 EndBlock where liftEq = genericLiftEq
-instance Show1 EndBlock where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 ScopeExit where liftEq = genericLiftEq
+instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
 
 
--- | Alias statement
+-- | Alias statement.
 data Alias a = Alias { aliasFrom :: !a, aliasTo :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Alias where liftEq = genericLiftEq
 instance Show1 Alias where liftShowsPrec = genericLiftShowsPrec
 
+
+-- | Undef statement.
 newtype Undef a = Undef [a]
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
