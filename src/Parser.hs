@@ -26,6 +26,7 @@ import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
+import System.IO (hPutStrLn)
 import System.Console.ANSI
 import Term
 import qualified Text.Parser.TreeSitter as TS
@@ -81,20 +82,18 @@ runParser parser = case parser of
   AssignmentParser parser by assignment -> \ source -> do
     ast <- runParser parser source
     let Result err term = assignBy by assignment source ast
-    traverse_ (putStrLn . showError source) (toList err)
+    traverse_ (printError source) (toList err)
     case term of
       Just term -> do
         let errors = termErrors term `asTypeOf` toList err
-        traverse_ (putStrLn . showError source) errors
-        unless (Prologue.null errors) $
-          putStrLn (withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ "")
+        traverse_ (printError source) errors
+        unless (Prologue.null errors) $ do
+          withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] . hPutStrLn stderr . (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ ""
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> pure . cmarkParser
   LineByLineParser -> lineByLineParser
-  where showSGRCode = showString . setSGRCode
-        withSGRCode code s = showSGRCode code . s . showSGRCode []
 
 errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
