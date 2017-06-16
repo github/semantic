@@ -62,63 +62,96 @@ type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Te
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Program <*> children (many declaration)
+assignment = makeTerm <$> symbol Program <*> children (many topLevelStatement)
 
-declaration :: Assignment
-declaration = handleError $ comment <|> beginBlock <|> endBlock <|> statement
+topLevelStatement :: Assignment
+topLevelStatement = handleError
+   $  comment
+  <|> beginBlock
+  <|> endBlock
+  <|> statement
+
+statement :: Assignment
+statement  = handleError
+   $  alias
+  <|> undef
+  <|> if'
+  <|> unless
+  --  $  exit Statement.Return Return
+  -- <|> exit Statement.Yield Yield
+  -- <|> exit Statement.Break Break
+  -- <|> exit Statement.Continue Next
+  -- <|> Language.Ruby.Syntax.while
+  -- <|> until
+  -- <|> for
+  -- <|> literal
+  -- <|> assignment'
+  -- <|> class'
+  -- <|> method
+  -- where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
+
 
 beginBlock :: Assignment
-beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.BeginBlock <$> many declaration)
+beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.BeginBlock <$> many topLevelStatement)
 
 endBlock :: Assignment
-endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.EndBlock <$> many declaration)
+endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.EndBlock <$> many topLevelStatement)
 
-class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
-  where superclass = pure <$ symbol Superclass <*> children constant
-        scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
-constant :: Assignment
-constant = makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
+-- class' :: Assignment
+-- class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many topLevelStatement)
+--   where superclass = pure <$ symbol Superclass <*> children constant
+--         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
 identifier :: Assignment
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
-method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
+constant :: Assignment
+constant = makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
+
+variable :: Assignment
+variable =  makeTerm <$> symbol InstanceVariable <*> (Syntax.Identifier <$> source)
+        <|> makeTerm <$> symbol ClassVariable <*> (Syntax.Identifier <$> source)
+        <|> makeTerm <$> symbol GlobalVariable <*> (Syntax.Identifier <$> source)
+
+operator :: Assignment
+operator = makeTerm <$> symbol Operator <*> (Syntax.Identifier <$> source)
+
+symbol' :: Assignment
+symbol' = makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+
+setter :: Assignment
+setter = makeTerm <$> symbol Setter <*> (Syntax.Identifier <$> source)
+
+methodName :: Assignment
+methodName =  identifier
+          <|> constant
+          <|> variable
+          <|> operator
+          <|> symbol'
+          <|> setter
+
+
+-- method :: Assignment
+-- method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
 
 statements :: Assignment
 statements = makeTerm <$> location <*> many statement
 
-statement :: Assignment
-statement  = handleError
-           $  exit Statement.Return Return
-          <|> exit Statement.Yield Yield
-          <|> exit Statement.Break Break
-          <|> exit Statement.Continue Next
-          <|> if'
-          <|> unless
-          <|> Language.Ruby.Syntax.while
-          <|> until
-          <|> for
-          <|> literal
-          <|> assignment'
-          <|> class'
-          <|> method
-          <|> alias
-  where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
+-- lvalue :: Assignment
+-- lvalue = identifier
 
-lvalue :: Assignment
-lvalue = identifier
-
-expression :: Assignment
-expression = identifier <|> statement
+-- expression :: Assignment
+-- expression = identifier <|> statement
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
-alias = makeTerm <$> symbol Alias <*> children (Statement.Alias <$> identifier <*> identifier)
+alias = makeTerm <$> symbol Alias <*> children (Statement.Alias <$> methodName <*> methodName)
+
+undef :: Assignment
+undef = makeTerm <$> symbol Undef <*> children (Statement.Undef <$> some methodName)
 
 if' :: Assignment
 if' =  ifElsif If
@@ -129,50 +162,54 @@ unless :: Assignment
 unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
 
-while :: Assignment
-while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
-     <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
+-- while :: Assignment
+-- while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
+--      <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
+--
+-- until :: Assignment
+-- until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
+--      <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
+--
+-- for :: Assignment
+-- for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
 
-until :: Assignment
-until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
-     <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
+-- assignment' :: Assignment
+-- assignment'
+--    =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lvalue <*> expression)
+--   <|> makeTerm <$> symbol OperatorAssignment <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
+--          (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
+--       <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
+--       <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
+--       <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> expression)
+--       <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
+--       <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
+--       <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
+--       <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> expression)
+--       <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> expression)
+--       <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> expression)
+--       <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
+--       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
+--       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
-for :: Assignment
-for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
+-- literal :: Assignment
+-- literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
+--         <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+--         <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
+--         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+--         <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
-assignment' :: Assignment
-assignment'
-   =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lvalue <*> expression)
-  <|> makeTerm <$> symbol OperatorAssignment <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
-         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
-      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
-      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
-      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> expression)
-      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
-      <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
-      <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> expression)
-      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> expression)
-      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
-      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
-      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
-literal :: Assignment
-literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
-        <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
-        <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
-        <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
-        <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
+--
 
-invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
-invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
 
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+
+invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
+invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 handleError :: Assignment -> Assignment
 handleError = flip catchError $ \ error -> case errorCause error of
