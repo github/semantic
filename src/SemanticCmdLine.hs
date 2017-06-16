@@ -10,6 +10,7 @@ import Data.Version (showVersion)
 import Development.GitRev
 import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
+import Renderer
 import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
@@ -61,10 +62,10 @@ arguments = info (version <*> helper <*> argumentsParser) description
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
-      <$> ( (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-           <|> flag' jsonDiff (long "json" <> help "Output a json diff")
-           <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
-           <|> flag' tocDiff (long "toc" <> help "Output a table of contents for a diff") )
+      <$> ( (  flag (DiffArguments PatchDiffRenderer) (DiffArguments PatchDiffRenderer) (long "patch" <> help "Output a patch(1)-compatible diff (default)")
+           <|> flag' (DiffArguments JSONDiffRenderer) (long "json" <> help "Output a json diff")
+           <|> flag' (DiffArguments SExpressionDiffRenderer) (long "sexpression" <> help "Output an s-expression diff tree")
+           <|> flag' (DiffArguments ToCDiffRenderer) (long "toc" <> help "Output a table of contents for a diff") )
          <*> (  DiffPaths
                <$> argument filePathReader (metavar "FILE_A")
                <*> argument filePathReader (metavar "FILE_B")

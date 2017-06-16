@@ -18,20 +18,6 @@ data DiffArguments where
 
 deriving instance Show DiffArguments
 
-type DiffArguments' = DiffMode -> DiffArguments
-
-patchDiff :: DiffArguments'
-patchDiff = DiffArguments PatchDiffRenderer
-
-jsonDiff :: DiffArguments'
-jsonDiff = DiffArguments JSONDiffRenderer
-
-sExpressionDiff :: DiffArguments'
-sExpressionDiff = DiffArguments SExpressionDiffRenderer
-
-tocDiff :: DiffArguments'
-tocDiff = DiffArguments ToCDiffRenderer
-
 
 data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
