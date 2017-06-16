@@ -21,6 +21,7 @@ import Data.Align (crosswalk)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
+import Data.List.NonEmpty (nonEmpty)
 import Data.Proxy
 import Data.Record
 import Data.Text (toLower)
@@ -114,12 +115,12 @@ declarationAlgebra proxy source r
   where getSource = toText . flip Source.slice source . byteRange . extract
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error error :< fs, HasField fields Range, Show error, Functor (Union fs))
+markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error error :< fs, HasField fields Range, Show error, Functor (Union fs), Foldable (Union fs))
                      => Proxy error
                      -> Source
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 markupSectionAlgebra proxy source r
-  | Just (Markup.Section (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (getSource heading)
+  | Just (Markup.Section (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource heading) (toText . flip Source.slice source . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading))))
   | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
   | otherwise = Nothing
   where getSource = toText . flip Source.slice source . byteRange . extract
