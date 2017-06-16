@@ -153,9 +153,9 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
 termTableOfContentsBy :: Traversable f
                       => (forall b. TermF f annotation b -> Maybe a)
                       -> Term f annotation
-                      -> [Entry a]
+                      -> [a]
 termTableOfContentsBy selector = cata termAlgebra
-  where termAlgebra r | Just a <- selector r = [Unchanged a]
+  where termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
 dedupe :: HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
