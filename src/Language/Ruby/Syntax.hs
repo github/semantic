@@ -48,6 +48,7 @@ type Syntax = '[
   , Statement.Return
   , Statement.While
   , Statement.Yield
+  , Statement.Undef
   , Syntax.Empty
   , Syntax.Error Error
   , Syntax.Identifier
