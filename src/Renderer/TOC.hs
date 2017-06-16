@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
 module Renderer.TOC
 ( renderToCDiff
+, renderToCTerm
 , diffTOC
 , Summaries(..)
 , JSONSummary(..)
@@ -194,8 +195,21 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => SourceBlob -> Term f (Record fields) -> Summaries
+renderToCTerm blob = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
+  where toMap [] = mempty
+        toMap as = Map.singleton (toS (path blob)) (toJSON <$> as)
+
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
+
+termToC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Term f (Record fields) -> [JSONSummary]
+termToC = mapMaybe recordSummary . termTableOfContentsBy declaration
+  where recordSummary :: (HasField fields (Maybe Declaration), HasField fields SourceSpan) => Record fields -> Maybe JSONSummary
+        recordSummary record = case getDeclaration record of
+          Just (ErrorDeclaration text) -> Just (ErrorSummary text (sourceSpan record))
+          Just declaration -> Just (JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record) "unchanged")
+          Nothing -> Nothing
 
 -- The user-facing category name
 toCategoryName :: Declaration -> Text
