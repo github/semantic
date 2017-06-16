@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
 module Renderer.TOC
-( renderToC
+( renderToCDiff
+, renderToCTerm
 , diffTOC
 , Summaries(..)
 , JSONSummary(..)
@@ -141,14 +142,20 @@ tableOfContentsBy :: Traversable f
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap patchEntry . crosswalk (cata termAlgebra))
+tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap patchEntry . crosswalk (termTableOfContentsBy selector))
   where diffAlgebra r = case (selector (first Both.snd r), fold r) of
           (Just a, Nothing) -> Just [Unchanged a]
           (Just a, Just []) -> Just [Changed a]
           (_     , entries) -> entries
-        termAlgebra r | Just a <- selector r = [a]
-                      | otherwise = fold r
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
+
+termTableOfContentsBy :: Traversable f
+                      => (forall b. TermF f annotation b -> Maybe a)
+                      -> Term f annotation
+                      -> [a]
+termTableOfContentsBy selector = cata termAlgebra
+  where termAlgebra r | Just a <- selector r = [a]
+                      | otherwise = fold r
 
 dedupe :: HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = foldl' go []
@@ -171,13 +178,16 @@ entrySummary entry = case entry of
   Deleted a   -> recordSummary a "removed"
   Inserted a  -> recordSummary a "added"
   Replaced a  -> recordSummary a "modified"
-  where recordSummary record = case getDeclaration record of
-          Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
-          Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
-          Nothing -> const Nothing
 
-renderToC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
-renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
+-- | Construct a 'JSONSummary' from a node annotation and a change type label.
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields SourceSpan) => Record fields -> Text -> Maybe JSONSummary
+recordSummary record = case getDeclaration record of
+  Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
+  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
+  Nothing -> const Nothing
+
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
+renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = toS $ case runJoin (path <$> blobs) of
@@ -186,8 +196,16 @@ renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValid
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => SourceBlob -> Term f (Record fields) -> Summaries
+renderToCTerm blob = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
+  where toMap [] = mempty
+        toMap as = Map.singleton (toS (path blob)) (toJSON <$> as)
+
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
+
+termToC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Term f (Record fields) -> [JSONSummary]
+termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> Text
