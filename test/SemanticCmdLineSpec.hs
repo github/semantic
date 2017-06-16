@@ -17,8 +17,10 @@ spec = parallel $ do
     \ DiffFixture{..} -> do
         output <- runDiff arguments
         output `shouldBe'` expected
-  prop "runParse for all modes and formats" $
-    \ ParseFixture{..} -> do
+
+  describe "runParse" $
+    for_ parseFixtures $ \ (arguments@ParseArguments{..}, expected) ->
+      it ("renders to " <> show parseTreeRenderer <> " in mode " <> show parseMode) $ do
         output <- runParse arguments
         output `shouldBe'` expected
   where
@@ -26,27 +28,21 @@ spec = parallel $ do
       when (actual /= expected) $ print actual
       actual `shouldBe` expected
 
+parseFixtures :: [(ParseArguments, ByteString)]
+parseFixtures =
+  [ (ParseArguments SExpressionTermRenderer pathMode, sExpressionParseTreeOutput)
+  , (ParseArguments JSONTermRenderer pathMode, jsonParseTreeOutput)
+  , (ParseArguments JSONTermRenderer pathMode', jsonParseTreeOutput')
+  , (ParseArguments JSONTermRenderer (ParsePaths []), emptyJsonParseTreeOutput)
+  , (ParseArguments JSONTermRenderer (ParsePaths [("not-a-file.rb", Just Ruby)]), emptyJsonParseTreeOutput)
+  ]
+  where pathMode = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
+        pathMode' = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
 
-data ParseFixture = ParseFixture
-  { arguments :: ParseArguments
-  , expected :: ByteString
-  } deriving (Show)
-
-instance Listable ParseFixture where
-  tiers = cons0 (ParseFixture (ParseArguments SExpressionTermRenderer pathMode) sExpressionParseTreeOutput)
-       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer pathMode) jsonParseTreeOutput)
-       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer pathMode') jsonParseTreeOutput')
-       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer (ParsePaths [])) emptyJsonParseTreeOutput)
-       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer (ParsePaths [("not-a-file.rb", Just Ruby)])) emptyJsonParseTreeOutput)
-
-    where
-      pathMode = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
-      pathMode' = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
-
-      sExpressionParseTreeOutput = "(Program\n  (Binary\n    (Identifier)\n    (Other \"and\")\n    (Identifier)))\n"
-      jsonParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"}]\n"
-      jsonParseTreeOutput' = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"},{\"filePath\":\"test/fixtures/ruby/and-or.B.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"or\",\"children\":[],\"sourceRange\":[4,6],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,7]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[7,10],\"sourceSpan\":{\"start\":[1,8],\"end\":[1,11]}}],\"sourceRange\":[0,10],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,11]}},{\"category\":\"Binary\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[11,12],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,2]}},{\"category\":\"or\",\"children\":[],\"sourceRange\":[13,15],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,5]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[16,17],\"sourceSpan\":{\"start\":[2,6],\"end\":[2,7]}}],\"sourceRange\":[11,17],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,7]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[18,21],\"sourceSpan\":{\"start\":[2,8],\"end\":[2,11]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[22,23],\"sourceSpan\":{\"start\":[2,12],\"end\":[2,13]}}],\"sourceRange\":[11,23],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,13]}}],\"sourceRange\":[0,24],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}},\"language\":\"Ruby\"}]\n"
-      emptyJsonParseTreeOutput = "[]\n"
+        sExpressionParseTreeOutput = "(Program\n  (Binary\n    (Identifier)\n    (Other \"and\")\n    (Identifier)))\n"
+        jsonParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"}]\n"
+        jsonParseTreeOutput' = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"},{\"filePath\":\"test/fixtures/ruby/and-or.B.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"or\",\"children\":[],\"sourceRange\":[4,6],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,7]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[7,10],\"sourceSpan\":{\"start\":[1,8],\"end\":[1,11]}}],\"sourceRange\":[0,10],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,11]}},{\"category\":\"Binary\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[11,12],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,2]}},{\"category\":\"or\",\"children\":[],\"sourceRange\":[13,15],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,5]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[16,17],\"sourceSpan\":{\"start\":[2,6],\"end\":[2,7]}}],\"sourceRange\":[11,17],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,7]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[18,21],\"sourceSpan\":{\"start\":[2,8],\"end\":[2,11]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[22,23],\"sourceSpan\":{\"start\":[2,12],\"end\":[2,13]}}],\"sourceRange\":[11,23],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,13]}}],\"sourceRange\":[0,24],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}},\"language\":\"Ruby\"}]\n"
+        emptyJsonParseTreeOutput = "[]\n"
 
 
 data DiffFixture = DiffFixture
