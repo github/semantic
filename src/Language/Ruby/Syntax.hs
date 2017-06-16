@@ -75,6 +75,7 @@ statement :: Assignment
 statement  = handleError
    $  alias
   <|> undef
+  <|> emptyStatement
   -- <|> if'
   -- <|> unless
   --  $  exit Statement.Return Return
@@ -198,6 +199,8 @@ undef = makeTerm <$> symbol Undef <*> children (Statement.Undef <$> some methodN
 --         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
 --         <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
+emptyStatement :: Assignment
+emptyStatement = makeTerm <$> symbol EmptyStatement <*> children (Syntax.Identifier <$> source)
 
 --
 
