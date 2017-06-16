@@ -182,14 +182,16 @@ data ErrorCause grammar
 -- | Pretty-print an Error with reference to the source where it occurred.
 showError :: Show grammar => Source.Source -> Error grammar -> String
 showError source error@Error{..}
-  = (showSourcePos Nothing errorPos) . showString ": " . (showString "error") . showString ": " . showExpectation error . showChar '\n'
+  = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n'
   . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
-  . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . (showChar '^') . showChar '\n'
+  . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . withSGRCode [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
   . showString (prettyCallStack callStack)
   $ ""
   where context = maybe "\n" (Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
+        showSGRCode = showString . setSGRCode
+        withSGRCode code s = showSGRCode code . s . showSGRCode []
 
 showExpectation :: Show grammar => Error grammar -> ShowS
 showExpectation Error{..} = case errorCause of
