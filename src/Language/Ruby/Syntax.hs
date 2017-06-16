@@ -73,23 +73,25 @@ topLevelStatement = handleError
 
 statement :: Assignment
 statement  = handleError
-   $  alias
-  <|> undef
-  <|> emptyStatement
+   $  undef
+  <|> alias
   -- <|> if'
   -- <|> unless
-  --  $  exit Statement.Return Return
-  -- <|> exit Statement.Yield Yield
-  -- <|> exit Statement.Break Break
-  -- <|> exit Statement.Continue Next
   -- <|> Language.Ruby.Syntax.while
   -- <|> until
+  <|> emptyStatement
+  <|> exit Return Statement.Return
+  <|> exit Yield Statement.Yield
+  <|> exit Break Statement.Break
+  -- <|> exit Next Statement.Continue
   -- <|> for
   -- <|> literal
   -- <|> assignment'
   -- <|> class'
   -- <|> method
-  -- where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
+  <|> identifier
+  <|> literal
+  where exit sym construct = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 
 beginBlock :: Assignment
@@ -105,32 +107,25 @@ endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> ma
 --         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
 
 identifier :: Assignment
-identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
+identifier =
+      makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
+  <|> makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
+  <|> makeTerm <$> symbol InstanceVariable <*> (Syntax.Identifier <$> source)
+  <|> makeTerm <$> symbol ClassVariable <*> (Syntax.Identifier <$> source)
+  <|> makeTerm <$> symbol GlobalVariable <*> (Syntax.Identifier <$> source)
+  <|> makeTerm <$> symbol Operator <*> (Syntax.Identifier <$> source)
+  <|> makeTerm <$> symbol Setter <*> (Syntax.Identifier <$> source)
 
-constant :: Assignment
-constant = makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
-
-variable :: Assignment
-variable =  makeTerm <$> symbol InstanceVariable <*> (Syntax.Identifier <$> source)
-        <|> makeTerm <$> symbol ClassVariable <*> (Syntax.Identifier <$> source)
-        <|> makeTerm <$> symbol GlobalVariable <*> (Syntax.Identifier <$> source)
-
-operator :: Assignment
-operator = makeTerm <$> symbol Operator <*> (Syntax.Identifier <$> source)
-
-symbol' :: Assignment
-symbol' = makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
-
-setter :: Assignment
-setter = makeTerm <$> symbol Setter <*> (Syntax.Identifier <$> source)
+literal :: Assignment
+literal =
+      makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
+  <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+  <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
+  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+  -- <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
 methodName :: Assignment
-methodName =  identifier
-          <|> constant
-          <|> variable
-          <|> operator
-          <|> symbol'
-          <|> setter
+methodName = identifier <|> literal
 
 
 -- method :: Assignment
@@ -191,13 +186,6 @@ undef = makeTerm <$> symbol Undef <*> children (Statement.Undef <$> some methodN
 --       <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
 --       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
 --       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
-
--- literal :: Assignment
--- literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
---         <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
---         <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
---         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
---         <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
 emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> children (Syntax.Identifier <$> source)
