@@ -73,8 +73,8 @@ arguments = info (version <*> helper <*> argumentsParser) description
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for path(s)"))
     parseArgumentsParser = Parse
-      <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
-           <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees") )
+      <$> ( (  flag (ParseArguments SExpressionTermRenderer) (ParseArguments SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
+           <|> flag' (ParseArguments JSONTermRenderer) (long "json" <> help "Output JSON parse trees") )
          <*> (  ParsePaths
                <$> some (argument filePathReader (metavar "FILES..."))
             <|> pure ParseStdin ))

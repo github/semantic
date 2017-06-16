@@ -30,13 +30,6 @@ data ParseArguments where
 
 deriving instance Show ParseArguments
 
-type ParseArguments' = ParseMode -> ParseArguments
-
-sExpressionParseTree :: ParseArguments'
-sExpressionParseTree = ParseArguments SExpressionTermRenderer
-
-jsonParseTree :: ParseArguments'
-jsonParseTree = ParseArguments JSONTermRenderer
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
