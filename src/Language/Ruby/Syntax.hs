@@ -34,6 +34,7 @@ type Syntax = '[
   , Literal.Boolean
   , Literal.Hash
   , Literal.Integer
+  , Literal.Null
   , Literal.Range
   , Literal.String
   , Literal.Symbol
@@ -65,33 +66,33 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (many topLevelStatement)
 
 topLevelStatement :: Assignment
-topLevelStatement = handleError
-   $  comment
+topLevelStatement = handleError $
+      comment
   <|> beginBlock
   <|> endBlock
   <|> statement
 
 statement :: Assignment
-statement  = handleError
-   $  undef
+statement  = -- handleError $
+      undef
   <|> alias
-  -- <|> if'
-  -- <|> unless
+  <|> if'
+  <|> unless
   <|> while'
-  -- <|> until
+  <|> until'
   <|> emptyStatement
-  <|> exit Return Statement.Return
-  <|> exit Yield Statement.Yield
-  <|> exit Break Statement.Break
-  -- <|> exit Next Statement.Continue
-  -- <|> for
-  -- <|> literal
+  <|> mk Return Statement.Return
+  <|> mk Yield Statement.Yield
+  <|> mk Break Statement.Break
+  <|> mk Next Statement.Continue
+  <|> for
   -- <|> assignment'
-  -- <|> class'
-  -- <|> method
+  <|> class'
+  <|> method
   <|> identifier
   <|> literal
-  where exit sym construct = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
+  <|> scopeResolution
+  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
 statements = makeTerm <$> location <*> many statement
@@ -103,36 +104,40 @@ beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <
 endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many topLevelStatement)
 
-
--- class' :: Assignment
--- class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many topLevelStatement)
---   where superclass = pure <$ symbol Superclass <*> children constant
---         scopeResolution = symbol ScopeResolution *> children (constant <|> identifier)
-
 identifier :: Assignment
 identifier =
-      makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
-  <|> makeTerm <$> symbol Constant <*> (Syntax.Identifier <$> source)
-  <|> makeTerm <$> symbol InstanceVariable <*> (Syntax.Identifier <$> source)
-  <|> makeTerm <$> symbol ClassVariable <*> (Syntax.Identifier <$> source)
-  <|> makeTerm <$> symbol GlobalVariable <*> (Syntax.Identifier <$> source)
-  <|> makeTerm <$> symbol Operator <*> (Syntax.Identifier <$> source)
-  <|> makeTerm <$> symbol Setter <*> (Syntax.Identifier <$> source)
+      mk Identifier
+  <|> mk Constant
+  <|> mk InstanceVariable
+  <|> mk ClassVariable
+  <|> mk GlobalVariable
+  <|> mk Operator
+  <|> mk Self
+  <|> mk Super
+  <|> mk Setter
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 literal :: Assignment
 literal =
       makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
   <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
   <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
+  <|> makeTerm <$> symbol Grammar.Nil <*> (Literal.Null <$ source)
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
   -- <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
 
 methodName :: Assignment
 methodName = identifier <|> literal
 
+class' :: Assignment
+class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (identifier <|> scopeResolution) <*> (superclass <|> pure []) <*> many topLevelStatement)
+  where superclass = pure <$ symbol Superclass <*> children identifier
 
--- method :: Assignment
--- method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
+scopeResolution :: Assignment
+scopeResolution = symbol ScopeResolution *> children identifier
+
+method :: Assignment
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> methodName <*> pure [] <*> statements)
 
 -- lvalue :: Assignment
 -- lvalue = identifier
@@ -149,26 +154,31 @@ alias = makeTerm <$> symbol Alias <*> children (Statement.Alias <$> methodName <
 undef :: Assignment
 undef = makeTerm <$> symbol Undef <*> children (Statement.Undef <$> some methodName)
 
--- if' :: Assignment
--- if' =  ifElsif If
---    <|> makeTerm <$> symbol IfModifier     <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
---   where ifElsif s = makeTerm <$> symbol s <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$> symbol Else <*> children (many statement))))
---
--- unless :: Assignment
--- unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
---       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
---
+if' :: Assignment
+if' =
+      ifElsif If
+  <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> statement <*> statement <*> emptyTerm)
+  where ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
+        else' = makeTerm <$> symbol Else <*> children (many statement)
+
+unless :: Assignment
+unless =
+      makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional else'))
+  <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> emptyTerm)
+  where else' = makeTerm <$> symbol Else <*> children (many statement)
+
 while' :: Assignment
 while' =
       makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
   <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
---
--- until :: Assignment
--- until =  makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
---      <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
---
--- for :: Assignment
--- for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
+
+until' :: Assignment
+until' =
+      makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert statement <*> statements)
+  <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
+
+for :: Assignment
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
 
 -- assignment' :: Assignment
 -- assignment'
