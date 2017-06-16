@@ -150,6 +150,14 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
                       | otherwise = fold r
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
+termTableOfContentsBy :: Traversable f
+                      => (forall b. TermF f annotation b -> Maybe a)
+                      -> Term f annotation
+                      -> [Entry a]
+termTableOfContentsBy selector = cata termAlgebra
+  where termAlgebra r | Just a <- selector r = [Unchanged a]
+                      | otherwise = fold r
+
 dedupe :: HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = foldl' go []
   where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
