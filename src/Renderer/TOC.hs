@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
 module Renderer.TOC
-( renderToC
+( renderToCDiff
 , diffTOC
 , Summaries(..)
 , JSONSummary(..)
@@ -176,8 +176,8 @@ entrySummary entry = case entry of
           Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
           Nothing -> const Nothing
 
-renderToC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
-renderToC blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
+renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = toS $ case runJoin (path <$> blobs) of

@@ -64,9 +64,9 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . 
 -- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
-  (ToCDiffRenderer, Just Language.Markdown) -> run (\ source -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source)) diffLinearly (renderToC blobs)
-  (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToC blobs)
-  (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms (renderToC blobs)
+  (ToCDiffRenderer, Just Language.Markdown) -> run (\ source -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source)) diffLinearly (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToCDiff blobs)
+  (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms (renderToCDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderJSONDiff blobs)
   (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
