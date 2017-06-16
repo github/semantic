@@ -76,7 +76,7 @@ module Data.Syntax.Assignment
 , Error(..)
 , ErrorCause(..)
 , printError
-, showExpectation
+, withSGRCode
 -- Running
 , assign
 , assignBy
@@ -184,24 +184,28 @@ data ErrorCause grammar
 printError :: Show grammar => Source.Source -> Error grammar -> IO ()
 printError source error@Error{..}
   =  do
+    withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . (showSourcePos Nothing errorPos) . showString ": " $ ""
+    withSGRCode [SetColor Foreground Vivid Red] . putStrErr . (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') $ ""
 
-    _ <- withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " $ ""
-    _ <- withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') $ ""
-
-    _ <- withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " $ ""
-    _ <- withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') $ ""
-    withSGRCode [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n' . showString (prettyCallStack callStack) $ ""
+    withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . (showSourcePos Nothing errorPos) . showString ": " $ ""
+    withSGRCode [SetColor Foreground Vivid Red] . putStrErr . (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') $ ""
+    withSGRCode [SetColor Foreground Vivid Green] . putStrErr . (showChar '^') . showChar '\n' . showString (prettyCallStack callStack) $ ""
 
   where context = maybe "\n" (Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
-        showSGRCode = showString . setSGRCode
-        withSGRCode code showS s = do
-          isTerm <- hIsTerminalDevice stderr
-          hPutStr stderr $ if isTerm then
-            (showSGRCode code . showS . showSGRCode []) s
-          else
-            showS s
+        putStrErr = hPutStr stderr
+
+withSGRCode :: [SGR] -> IO a -> IO ()
+withSGRCode code action = do
+  isTerm <- hIsTerminalDevice stderr
+  if isTerm then do
+    _ <- hSetSGR stderr code
+    _ <- action
+    hSetSGR stderr []
+  else do
+    _ <- action
+    pure ()
 
 showExpectation :: Show grammar => Error grammar -> ShowS
 showExpectation Error{..} = case errorCause of

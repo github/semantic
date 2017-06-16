@@ -26,7 +26,7 @@ import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
-import System.IO (hPutStrLn, hIsTerminalDevice)
+import System.IO (hPutStrLn)
 import System.Console.ANSI
 import Term
 import qualified Text.Parser.TreeSitter as TS
@@ -88,19 +88,12 @@ runParser parser = case parser of
         let errors = termErrors term `asTypeOf` toList err
         traverse_ (printError source) errors
         unless (Prologue.null errors) $ do
-          printErrors [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ ""
+          withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] . hPutStrLn stderr . (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ ""
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> pure . cmarkParser
   LineByLineParser -> lineByLineParser
-  where showSGRCode = showString . setSGRCode
-        printErrors code showS s = do
-          isTerm <- hIsTerminalDevice stderr
-          hPutStrLn stderr $ if isTerm then
-            (showSGRCode code . showS . showSGRCode []) s
-          else
-            showS s
 
 errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
