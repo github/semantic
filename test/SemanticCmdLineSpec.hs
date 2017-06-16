@@ -6,10 +6,8 @@ import Arguments
 import Language
 import Renderer
 import SemanticCmdLine
-import Data.Functor.Listable
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
-import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
