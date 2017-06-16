@@ -75,8 +75,8 @@ statement :: Assignment
 statement  = handleError
    $  alias
   <|> undef
-  <|> if'
-  <|> unless
+  -- <|> if'
+  -- <|> unless
   --  $  exit Statement.Return Return
   -- <|> exit Statement.Yield Yield
   -- <|> exit Statement.Break Break
@@ -135,8 +135,8 @@ methodName =  identifier
 -- method :: Assignment
 -- method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> identifier <*> pure [] <*> statements)
 
-statements :: Assignment
-statements = makeTerm <$> location <*> many statement
+-- statements :: Assignment
+-- statements = makeTerm <$> location <*> many statement
 
 -- lvalue :: Assignment
 -- lvalue = identifier
@@ -153,15 +153,15 @@ alias = makeTerm <$> symbol Alias <*> children (Statement.Alias <$> methodName <
 undef :: Assignment
 undef = makeTerm <$> symbol Undef <*> children (Statement.Undef <$> some methodName)
 
-if' :: Assignment
-if' =  ifElsif If
-   <|> makeTerm <$> symbol IfModifier     <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
-  where ifElsif s = makeTerm <$> symbol s <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$> symbol Else <*> children (many statement))))
-
-unless :: Assignment
-unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
-      <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
-
+-- if' :: Assignment
+-- if' =  ifElsif If
+--    <|> makeTerm <$> symbol IfModifier     <*> children (flip Statement.If <$> statement <*> statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
+--   where ifElsif s = makeTerm <$> symbol s <*> children      (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> makeTerm <$> symbol Else <*> children (many statement))))
+--
+-- unless :: Assignment
+-- unless =  makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (makeTerm <$> symbol Else <*> children (many statement))))
+--       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> (makeTerm <$> location <*> pure Syntax.Empty))
+--
 -- while :: Assignment
 -- while =  makeTerm <$> symbol While         <*> children      (Statement.While <$> statement <*> statements)
 --      <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> statement <*> statement)
