@@ -178,10 +178,13 @@ entrySummary entry = case entry of
   Deleted a   -> recordSummary a "removed"
   Inserted a  -> recordSummary a "added"
   Replaced a  -> recordSummary a "modified"
-  where recordSummary record = case getDeclaration record of
-          Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
-          Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
-          Nothing -> const Nothing
+
+-- | Construct a 'JSONSummary' from a node annotation and a change type label.
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields SourceSpan) => Record fields -> Text -> Maybe JSONSummary
+recordSummary record = case getDeclaration record of
+  Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
+  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
+  Nothing -> const Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
@@ -202,12 +205,7 @@ diffTOC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Tra
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 termToC :: (HasField fields (Maybe Declaration), HasField fields SourceSpan, Traversable f) => Term f (Record fields) -> [JSONSummary]
-termToC = mapMaybe recordSummary . termTableOfContentsBy declaration
-  where recordSummary :: (HasField fields (Maybe Declaration), HasField fields SourceSpan) => Record fields -> Maybe JSONSummary
-        recordSummary record = case getDeclaration record of
-          Just (ErrorDeclaration text) -> Just (ErrorSummary text (sourceSpan record))
-          Just declaration -> Just (JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record) "unchanged")
-          Nothing -> Nothing
+termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> Text
