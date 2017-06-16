@@ -4,6 +4,7 @@ module SemanticCmdLineSpec where
 import Prologue
 import Arguments
 import Language
+import Renderer
 import SemanticCmdLine
 import Data.Functor.Listable
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
@@ -32,11 +33,11 @@ data ParseFixture = ParseFixture
   } deriving (Show)
 
 instance Listable ParseFixture where
-  tiers = cons0 (ParseFixture (sExpressionParseTree pathMode) sExpressionParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree pathMode) jsonParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree pathMode') jsonParseTreeOutput')
-       \/ cons0 (ParseFixture (jsonParseTree (ParsePaths [])) emptyJsonParseTreeOutput)
-       \/ cons0 (ParseFixture (jsonParseTree (ParsePaths [("not-a-file.rb", Just Ruby)])) emptyJsonParseTreeOutput)
+  tiers = cons0 (ParseFixture (ParseArguments SExpressionTermRenderer pathMode) sExpressionParseTreeOutput)
+       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer pathMode) jsonParseTreeOutput)
+       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer pathMode') jsonParseTreeOutput')
+       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer (ParsePaths [])) emptyJsonParseTreeOutput)
+       \/ cons0 (ParseFixture (ParseArguments JSONTermRenderer (ParsePaths [("not-a-file.rb", Just Ruby)])) emptyJsonParseTreeOutput)
 
     where
       pathMode = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
@@ -54,10 +55,10 @@ data DiffFixture = DiffFixture
   } deriving (Show)
 
 instance Listable DiffFixture where
-  tiers = cons0 (DiffFixture (patchDiff pathMode) patchOutput)
-       \/ cons0 (DiffFixture (jsonDiff pathMode) jsonOutput)
-       \/ cons0 (DiffFixture (sExpressionDiff pathMode) sExpressionOutput)
-       \/ cons0 (DiffFixture (tocDiff pathMode) tocOutput)
+  tiers = cons0 (DiffFixture (DiffArguments PatchDiffRenderer pathMode) patchOutput)
+       \/ cons0 (DiffFixture (DiffArguments JSONDiffRenderer pathMode) jsonOutput)
+       \/ cons0 (DiffFixture (DiffArguments SExpressionDiffRenderer pathMode) sExpressionOutput)
+       \/ cons0 (DiffFixture (DiffArguments ToCDiffRenderer pathMode) tocOutput)
 
     where
       pathMode = DiffPaths ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)
