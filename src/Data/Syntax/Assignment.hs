@@ -185,9 +185,6 @@ printError :: Show grammar => Source.Source -> Error grammar -> IO ()
 printError source error@Error{..}
   =  do
     withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . (showSourcePos Nothing errorPos) . showString ": " $ ""
-    withSGRCode [SetColor Foreground Vivid Red] . putStrErr . (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') $ ""
-
-    withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . (showSourcePos Nothing errorPos) . showString ": " $ ""
     withSGRCode [SetColor Foreground Vivid Red] . putStrErr . (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') $ ""
     withSGRCode [SetColor Foreground Vivid Green] . putStrErr . (showChar '^') . showChar '\n' . showString (prettyCallStack callStack) $ ""
 
