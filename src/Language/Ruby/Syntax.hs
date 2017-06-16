@@ -189,16 +189,15 @@ while' =
 --       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
 emptyStatement :: Assignment
-emptyStatement = makeTerm <$> symbol EmptyStatement <*> children (Syntax.Identifier <$> source)
+emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$> (Just <$> source))
+
 
 --
-
-
 makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
 
 emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+emptyTerm = makeTerm <$> location <*> pure (Syntax.Empty Nothing)
 
 invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term

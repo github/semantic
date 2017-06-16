@@ -358,7 +358,7 @@ makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.T
 makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
+emptyTerm = makeTerm <$> location <*> pure (Syntax.Empty Nothing)
 
 handleError :: Assignment -> Assignment
 handleError = flip catchError $ \ error -> case errorCause error of
