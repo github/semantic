@@ -26,6 +26,7 @@ import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Source
 import Syntax hiding (Go)
+import System.IO (hPutStrLn)
 import System.Console.ANSI
 import Term
 import qualified Text.Parser.TreeSitter as TS
@@ -87,7 +88,7 @@ runParser parser = case parser of
         let errors = termErrors term `asTypeOf` toList err
         traverse_ (putStrLn . showError source) errors
         unless (Prologue.null errors) $
-          putStrLn (withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ "")
+          hPutStrLn stderr (withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ "")
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
