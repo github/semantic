@@ -75,7 +75,7 @@ module Data.Syntax.Assignment
 , Result(..)
 , Error(..)
 , ErrorCause(..)
-, showError
+, printError
 , showExpectation
 -- Running
 , assign
@@ -94,14 +94,15 @@ import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Record
-import Data.String
 import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
 import Range (offsetRange)
 import qualified Source (Source(..), drop, slice, sourceText, actualLines)
+import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
+import System.IO (hIsTerminalDevice, hPutStr)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -180,18 +181,27 @@ data ErrorCause grammar
   deriving (Eq, Show)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
-showError :: Show grammar => Source.Source -> Error grammar -> String
-showError source error@Error{..}
-  = withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " . withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n'
-  . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
-  . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') . withSGRCode [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
-  . showString (prettyCallStack callStack)
-  $ ""
+printError :: Show grammar => Source.Source -> Error grammar -> IO ()
+printError source error@Error{..}
+  =  do
+
+    _ <- withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " $ ""
+    _ <- withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') $ ""
+
+    _ <- withSGRCode [SetConsoleIntensity BoldIntensity] (showSourcePos Nothing errorPos) . showString ": " $ ""
+    _ <- withSGRCode [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.column errorPos + lineNumberDigits)) ' ') $ ""
+    withSGRCode [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n' . showString (prettyCallStack callStack) $ ""
+
   where context = maybe "\n" (Source.sourceText . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.line errorPos - 2, Info.line errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.line errorPos) :: Double)))
         showSGRCode = showString . setSGRCode
-        withSGRCode code s = showSGRCode code . s . showSGRCode []
+        withSGRCode code showS s = do
+          isTerm <- hIsTerminalDevice stderr
+          hPutStr stderr $ if isTerm then
+            (showSGRCode code . showS . showSGRCode []) s
+          else
+            showS s
 
 showExpectation :: Show grammar => Error grammar -> ShowS
 showExpectation Error{..} = case errorCause of
