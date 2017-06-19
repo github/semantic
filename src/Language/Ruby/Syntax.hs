@@ -30,6 +30,7 @@ type Syntax = '[
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
+  , Expression.Comparison
   , Literal.Array
   , Literal.Boolean
   , Literal.Hash
@@ -93,6 +94,7 @@ statement  = -- handleError $
   <|> scopeResolution
   <|> conditional
   <|> unary
+  <|> binary
   -- <|> assignment'
   -- TODO: rescue
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
@@ -212,6 +214,38 @@ unary = symbol Unary >>= \ location ->
   -- FIXME: This also catches `defined? foo`, it shouldn't.
   <|> makeTerm location . Expression.Negate <$> children identifier -- Unary minus (e.g. `-a`). HiddenUnaryMinus nodes are hidden, so we can't match on the symbol.
 
+binary  :: Assignment
+binary = symbol Binary >>= \ loc -> children $ statement >>= \ lexpression -> go loc lexpression
+  where
+    go loc lexpression =
+          mk AnonAnd Expression.And
+      <|> mk AnonAmpersandAmpersand Expression.And
+      <|> mk AnonOr Expression.Or
+      <|> mk AnonPipePipe Expression.Or
+      <|> mk AnonLAngleLAngle Expression.LShift
+      <|> mk AnonRAngleRAngle Expression.RShift
+      <|> mk AnonEqualEqual Expression.Equal
+      <|> makeTerm loc <$ symbol AnonBangEqual <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> statement)))
+       -- TODO: Distinguish `===` from `==` ?
+      <|> mk AnonEqualEqualEqual Expression.Equal
+      <|> mk AnonLAngleEqualRAngle Expression.Comparison
+      -- TODO: Distinuish `=~` and `!~` ?
+      <|> mk AnonEqualTilde Expression.Equal
+      <|> makeTerm loc <$ symbol AnonBangTilde <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> statement)))
+      <|> mk AnonLAngle Expression.LessThan
+      <|> mk AnonLAngleEqual Expression.LessThanEqual
+      <|> mk AnonRAngle Expression.GreaterThan
+      <|> mk AnonRAngleEqual Expression.GreaterThanEqual
+      <|> mk AnonAmpersand Expression.BAnd
+      <|> mk AnonCaret Expression.BXOr
+      <|> mk AnonPipe Expression.BOr
+      -- TODO: binary minus (hidden node)
+      <|> mk AnonPlus Expression.Plus
+      -- TODO: binary star (hidden node)
+      <|> mk AnonSlash Expression.DividedBy
+      <|> mk AnonPercent Expression.Modulo
+      <|> mk AnonStarStar Expression.Power
+      where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> statement))
 
 conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> statement <*> statement <*> statement)

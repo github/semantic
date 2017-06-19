@@ -21,6 +21,7 @@ data Comparison a
   | GreaterThan !a !a
   | GreaterThanEqual !a !a
   | Equal !a !a
+  | Comparison !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Comparison where liftEq = genericLiftEq
