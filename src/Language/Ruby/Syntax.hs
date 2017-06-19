@@ -92,6 +92,7 @@ statement  = -- handleError $
   <|> literal
   <|> scopeResolution
   <|> conditional
+  <|> unary
   -- <|> assignment'
   -- TODO: rescue
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
@@ -199,6 +200,17 @@ for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*>
 --       <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
 --       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
 --       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
+
+unary :: Assignment
+unary = symbol Unary >>= \ location ->
+      -- TODO: Match a unary `defined?`
+      -- makeTerm location . Expression.Call <$> children ( symbol AnonDefinedQuestion *> statement )
+      makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> statement )
+  <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> statement )
+  <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> statement )
+  -- FIXME: Unable to match unary minus (e.g. -a)
+  <|> makeTerm location . Expression.Negate <$> children ( symbol HiddenUnaryMinus *> statement )
+  <|> children ( symbol AnonPlus *> statement )
 
 conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> statement <*> statement <*> statement)
