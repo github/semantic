@@ -86,12 +86,14 @@ statement  = -- handleError $
   <|> mk Break Statement.Break
   <|> mk Next Statement.Continue
   <|> for
-  -- <|> assignment'
   <|> class'
   <|> method
   <|> identifier
   <|> literal
   <|> scopeResolution
+  <|> conditional
+  -- <|> assignment'
+  -- TODO: rescue
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -197,6 +199,9 @@ for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*>
 --       <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
 --       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
 --       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
+
+conditional :: Assignment
+conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> statement <*> statement <*> statement)
 
 emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$> (Just <$> source))
