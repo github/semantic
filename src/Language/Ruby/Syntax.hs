@@ -126,7 +126,7 @@ literal =
   <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
   <|> makeTerm <$> symbol Grammar.Nil <*> (Literal.Null <$ source)
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
-  -- <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
+  <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- TODO: Do we want to represent the difference between .. and ...
 
 methodName :: Assignment
 methodName = identifier <|> literal

@@ -6,3 +6,6 @@ nil
 
 self
 super
+
+1..3
+1...5
