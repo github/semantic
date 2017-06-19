@@ -208,9 +208,10 @@ unary = symbol Unary >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> statement )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> statement )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> statement )
-  -- FIXME: Unable to match unary minus (e.g. -a)
-  <|> makeTerm location . Expression.Negate <$> children ( symbol HiddenUnaryMinus *> statement )
   <|> children ( symbol AnonPlus *> statement )
+  -- FIXME: This also catches `defined? foo`, it shouldn't.
+  <|> makeTerm location . Expression.Negate <$> children identifier -- Unary minus (e.g. `-a`). HiddenUnaryMinus nodes are hidden, so we can't match on the symbol.
+
 
 conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> statement <*> statement <*> statement)
