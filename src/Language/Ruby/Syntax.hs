@@ -144,12 +144,6 @@ scopeResolution = symbol ScopeResolution *> children identifier
 method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> methodName <*> pure [] <*> statements)
 
--- lvalue :: Assignment
--- lvalue = identifier
-
--- expression :: Assignment
--- expression = identifier <|> statement
-
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
@@ -184,6 +178,12 @@ until' =
 
 for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
+
+-- lvalue :: Assignment
+-- lvalue = identifier
+
+-- expression :: Assignment
+-- expression = identifier <|> statement
 
 -- assignment' :: Assignment
 -- assignment'
