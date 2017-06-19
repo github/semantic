@@ -217,21 +217,21 @@ unary = symbol Unary >>= \ location ->
 binary  :: Assignment
 binary = symbol Binary >>= \ loc -> children $ statement >>= \ lexpression -> go loc lexpression
   where
-    go loc lexpression =
-          mk AnonAnd Expression.And
+    go loc lexpression
+       =  mk AnonAnd Expression.And
       <|> mk AnonAmpersandAmpersand Expression.And
       <|> mk AnonOr Expression.Or
       <|> mk AnonPipePipe Expression.Or
       <|> mk AnonLAngleLAngle Expression.LShift
       <|> mk AnonRAngleRAngle Expression.RShift
       <|> mk AnonEqualEqual Expression.Equal
-      <|> makeTerm loc <$ symbol AnonBangEqual <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> statement)))
+      <|> mkNot AnonBangEqual Expression.Equal
        -- TODO: Distinguish `===` from `==` ?
       <|> mk AnonEqualEqualEqual Expression.Equal
       <|> mk AnonLAngleEqualRAngle Expression.Comparison
       -- TODO: Distinuish `=~` and `!~` ?
       <|> mk AnonEqualTilde Expression.Equal
-      <|> makeTerm loc <$ symbol AnonBangTilde <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> statement)))
+      <|> mkNot AnonBangTilde Expression.Equal
       <|> mk AnonLAngle Expression.LessThan
       <|> mk AnonLAngleEqual Expression.LessThanEqual
       <|> mk AnonRAngle Expression.GreaterThan
@@ -246,6 +246,7 @@ binary = symbol Binary >>= \ loc -> children $ statement >>= \ lexpression -> go
       <|> mk AnonPercent Expression.Modulo
       <|> mk AnonStarStar Expression.Power
       where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> statement))
+            mkNot s constr = makeTerm loc <$ symbol s <*> (Expression.Not <$> (makeTerm <$> location <*> (constr lexpression <$> statement)))
 
 conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> statement <*> statement <*> statement)
