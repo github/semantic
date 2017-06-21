@@ -65,9 +65,7 @@ ses eq as' bs'
 
                 -- | Slide down any diagonal edges from a given vertex.
                 slideFrom (Endpoint x y script)
-                  | x >= 0, x < n
-                  , y >= 0, y < m
-                  , a <- as ! x
-                  , b <- bs ! y
+                  | inRange (Array.bounds as) x, a <- as ! x
+                  , inRange (Array.bounds bs) y, b <- bs ! y
                   , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
                   | otherwise =            Endpoint       x        y               script
