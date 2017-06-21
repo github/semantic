@@ -28,7 +28,7 @@ ses eq as' bs'
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD !d !v =
-          let endpoints = slideFrom . searchAlongK <$> [ k | k <- [-d, -d + 2 .. d], inRange (-m, n) k ] in
+          let !endpoints = slideFrom . searchAlongK <$> [ k | k <- [-d, -d + 2 .. d], inRange (-m, n) k ] in
           case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
             _ -> searchUpToD (succ d) (Array.array (-d, d) ((\ e@(Endpoint x y _) -> (x - y, e)) <$> endpoints))
