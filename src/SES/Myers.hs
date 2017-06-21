@@ -37,8 +37,8 @@ ses eq as' bs'
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK k = slideFrom $!
-                  if d == 0 || k < -m || k > n then
-                    -- The top-left corner, or otherwise out-of-bounds.
+                  if d == 0 then
+                    -- The top-left corner.
                     Endpoint 0 0 []
                   else if k == -d || k == -m then
                     -- The lower/left extent of the search region or edit graph, whichever is smaller.
