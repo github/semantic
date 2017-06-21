@@ -25,7 +25,6 @@ ses eq as' bs'
   | null as = That <$> toList bs
   | otherwise = reverse (searchUpToD 0 (Array.array (1, 1) [(1, Endpoint 0 (-1) [])]))
   where (as, bs) = (Array.listArray (0, pred n) (toList as'), Array.listArray (0, pred m) (toList bs'))
-        (aBounds, bBounds) = (Array.bounds as, Array.bounds bs)
         (n, m) = (length as', length bs')
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
@@ -46,14 +45,14 @@ ses eq as' bs'
                         up   = v ! succ k
 
                 -- | Move downward from a given vertex, inserting the element for the corresponding row.
-                moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) (if inRange bBounds y then That (bs ! y) : script else script)
+                moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) (if inRange (Array.bounds bs) y then That (bs ! y) : script else script)
 
                 -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-                moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  (if inRange aBounds x then This (as ! x) : script else script)
+                moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  (if inRange (Array.bounds as) x then This (as ! x) : script else script)
 
                 -- | Slide down any diagonal edges from a given vertex.
                 slideFrom (Endpoint x y script)
-                  | inRange aBounds x, a <- as ! x
-                  , inRange bBounds y, b <- bs ! y
+                  | inRange (Array.bounds as) x, a <- as ! x
+                  , inRange (Array.bounds bs) y, b <- bs ! y
                   , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
                   | otherwise =            Endpoint       x        y               script
