@@ -52,9 +52,8 @@ ses eq as' bs'
                       moveDownFrom up
                     else
                       moveRightFrom left
-                  where getK k = v ! k
-                        left = getK (pred k)
-                        up   = getK (succ k)
+                  where left = v ! pred k
+                        up   = v ! succ k
 
                 -- | Move downward from a given vertex, inserting the element for the corresponding row.
                 moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) (if y < m then That (bs ! y) : script else script)
