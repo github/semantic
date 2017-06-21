@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
+{-# LANGUAGE BangPatterns, GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
 module SES.Myers
 ( EditScript
 , ses
@@ -23,12 +23,12 @@ ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript 
 ses eq as' bs'
   | null bs = This <$> toList as
   | null as = That <$> toList bs
-  | otherwise = n `seq` m `seq` reverse (searchUpToD 0 (Array.array (1, 1) [(1, Endpoint 0 (-1) [])]))
+  | otherwise = reverse (searchUpToD 0 (Array.array (1, 1) [(1, Endpoint 0 (-1) [])]))
   where (as, bs) = (Array.listArray (0, pred n) (toList as'), Array.listArray (0, pred m) (toList bs'))
-        (n, m) = (length as', length bs')
+        (!n, !m) = (length as', length bs')
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
-        searchUpToD d v = d `seq` v `seq`
+        searchUpToD !d !v =
           let endpoints = slideFrom . searchAlongK <$> [ k | k <- [-d, -d + 2 .. d], inRange (-m, n) k ] in
           case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
@@ -36,7 +36,7 @@ ses eq as' bs'
           where isComplete (Endpoint x y _) = x >= n && y >= m
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any).
-                searchAlongK k
+                searchAlongK !k
                   | k == -d       = moveDown
                   | k ==  d       = moveRight
                   | k == -m       = moveDown
