@@ -49,15 +49,11 @@ ses eq as' bs'
                       moveRightFrom left
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
-        moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) $ case bs ! y of
-          Just b -> That b : script
-          _ -> script
+        moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) $ maybe script ((: script) . That) (bs ! y)
         {-# INLINE moveDownFrom #-}
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-        moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  $ case as ! x of
-          Just a -> This a : script
-          _ -> script
+        moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  $ maybe script ((: script) . This) (as ! x)
         {-# INLINE moveRightFrom #-}
 
         -- | Slide down any diagonal edges from a given vertex.
