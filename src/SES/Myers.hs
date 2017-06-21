@@ -29,18 +29,18 @@ ses eq as' bs'
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD d v =
-          let endpoints = searchAlongK <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] in
+          let endpoints = searchAlongK <$> [ k | k <- [-d, -d + 2 .. d], inRange (negate m, n) k ] in
           case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
-            _ -> searchUpToD (succ d) (Array.array (negate d, d) ((\ e@(Endpoint x y _) -> (x - y, e)) <$> endpoints))
+            _ -> searchUpToD (succ d) (Array.array (-d, d) ((\ e@(Endpoint x y _) -> (x - y, e)) <$> endpoints))
           where isComplete (Endpoint x y _) = x >= n && y >= m
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
                 searchAlongK k = slideFrom $!
-                  if d == 0 || k < negate m || k > n then
+                  if d == 0 || k < -m || k > n then
                     -- The top-left corner, or otherwise out-of-bounds.
                     Endpoint 0 0 []
-                  else if k == negate d || k == negate m then
+                  else if k == -d || k == -m then
                     -- The lower/left extent of the search region or edit graph, whichever is smaller.
                     moveDownFrom up
                   else if k /= d && k /= n then
