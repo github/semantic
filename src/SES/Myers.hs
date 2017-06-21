@@ -24,7 +24,7 @@ ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript 
 ses eq as' bs'
   | null bs = This <$> toList as
   | null as = That <$> toList bs
-  | otherwise = reverse (searchUpToD 0 (Map.singleton 0 (0, [])))
+  | otherwise = reverse (searchUpToD 0 (Map.singleton 0 (Endpoint 0 0 [])))
   where (as, bs) = (Array.listArray (0, pred n) (toList as'), Array.listArray (0, pred m) (toList bs'))
         (n, m) = (length as', length bs')
 
@@ -33,7 +33,7 @@ ses eq as' bs'
           let endpoints = searchAlongK <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] in
           case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
-            _ -> searchUpToD (succ d) (Map.fromList ((\ (Endpoint x y script) -> (x - y, (x, script))) <$> endpoints))
+            _ -> searchUpToD (succ d) (Map.fromList ((\ e@(Endpoint x y _) -> (x - y, e)) <$> endpoints))
           where isComplete (Endpoint x y _) = x >= n && y >= m
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
@@ -53,7 +53,7 @@ ses eq as' bs'
                   else
                     -- The upper/right extent of the search region or edit graph, whichever is smaller.
                     moveRightFrom prev
-                  where getK k = let (x, script) = v Map.! k in Endpoint x (x - k) script
+                  where getK k = v Map.! k
                         prev = getK (pred k)
                         next = getK (succ k)
 
