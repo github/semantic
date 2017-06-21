@@ -35,18 +35,12 @@ data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, y :: {-# UNPACK #-} !In
 
 -- | Compute the shortest edit script using Myers’ algorithm.
 ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript a b
-ses eq as bs = let graph = makeEditGraph as bs in runSES eq graph
-
-
--- Evaluation
-
--- | Compute the shortest edit script (diff) of an edit graph.
-runSES :: (a -> b -> Bool) -> EditGraph a b -> EditScript a b
-runSES eq (EditGraph as bs)
+ses eq as' bs'
   | null bs = This <$> toList as
   | null as = That <$> toList bs
   | otherwise = reverse (searchUpToD 0 (Map.singleton 0 (0, [])))
-  where (n, m) = (length as, length bs)
+  where EditGraph as bs = makeEditGraph as' bs'
+        (n, m) = (length as, length bs)
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD d v =
