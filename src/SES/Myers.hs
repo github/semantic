@@ -58,12 +58,12 @@ runSES eq (EditGraph as bs)
         searchUpToD (d:ds) v =
           let extents = searchAlongK v . Diagonal <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] in
           case find isComplete extents of
-            Just (Extent _ _ script) -> script
-            _ -> searchUpToD ds (Map.fromList ((k' &&& (x' &&& script')) <$> extents))
-          where isComplete (Extent k x _) = x >= n && (x - k) >= m
+            Just (Endpoint _ _ script) -> script
+            _ -> searchUpToD ds (Map.fromList ((\ (Endpoint x y script) -> (x - y, (x, script))) <$> extents))
+          where isComplete (Endpoint x y _) = x >= n && y >= m
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
-                searchAlongK v (Diagonal k) = toExtent k . slideFrom $!
+                searchAlongK v (Diagonal k) = slideFrom $!
                   if d == 0 || k < negate m || k > n then
                     -- The top-left corner, or otherwise out-of-bounds.
                     Endpoint 0 0 []
@@ -89,8 +89,6 @@ runSES eq (EditGraph as bs)
                 -- | Move rightward from a given vertex, deleting the element for the corresponding column.
                 moveRightFrom (Endpoint x y script) = Endpoint (succ x) y (if x < n then This (as ! x) : script else script)
 
-                toExtent k (Endpoint x _ script) = Extent k x script
-
                 -- | Slide down any diagonal edges from a given vertex.
                 slideFrom (Endpoint x y script)
                   | x >= 0, x < n
@@ -100,8 +98,6 @@ runSES eq (EditGraph as bs)
                   , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
                   | otherwise =           (Endpoint       x        y               script)
 
-
-data Extent a b = Extent { k' :: {-# UNPACK #-} !Int, x' :: {-# UNPACK #-} !Int, script' :: !(EditScript a b) }
 
 -- Implementation details
 
