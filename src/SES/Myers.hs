@@ -43,15 +43,15 @@ ses eq as' bs'
                   else if k == -d || k == -m then
                     -- The lower/left extent of the search region or edit graph, whichever is smaller.
                     moveDownFrom up
-                  else if k /= d && k /= n then
+                  else if k == d || k == n then
+                    -- The upper/right extent of the search region or edit graph, whichever is smaller.
+                    moveRightFrom left
+                  else
                     -- Somewhere in the interior of the search region and edit graph.
                     if x left < x up then
                       moveDownFrom up
                     else
                       moveRightFrom left
-                  else
-                    -- The upper/right extent of the search region or edit graph, whichever is smaller.
-                    moveRightFrom left
                   where getK k = v ! k
                         left = getK (pred k)
                         up   = getK (succ k)
