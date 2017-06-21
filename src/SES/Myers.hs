@@ -71,3 +71,4 @@ ses eq as' bs'
 (!) :: Ix i => Array.Array i a -> i -> Maybe a
 (!) v i | inRange (Array.bounds v) i = Just $! v Array.! i
         | otherwise = Nothing
+{-# INLINE (!) #-}
