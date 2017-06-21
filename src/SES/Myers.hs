@@ -3,7 +3,6 @@ module SES.Myers
 ( EditScript
 , Endpoint(..)
 , ses
-, MyersState
 ) where
 
 import Data.Array ((!))
@@ -20,8 +19,6 @@ type EditScript a b = [These a b]
 data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, y :: {-# UNPACK #-} !Int, script :: !(EditScript a b) }
   deriving (Eq, Show)
 
-
--- API
 
 -- | Compute the shortest edit script using Myers’ algorithm.
 ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript a b
@@ -75,9 +72,3 @@ ses eq as' bs'
                   , b <- bs ! y
                   , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
                   | otherwise =           (Endpoint       x        y               script)
-
-
--- Implementation details
-
--- | The state stored by Myers’ algorithm; an array of m + n + 1 values indicating the maximum x-index reached and path taken along each diagonal.
-type MyersState a b = Map.IntMap (Int, EditScript a b)
