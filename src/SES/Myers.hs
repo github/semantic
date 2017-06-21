@@ -23,27 +23,26 @@ ses :: (Foldable t, Foldable u) => (a -> b -> Bool) -> t a -> u b -> EditScript 
 ses eq as' bs'
   | null bs = This <$> toList as
   | null as = That <$> toList bs
-  | otherwise = reverse (searchUpToD 0 (Array.array (1, 1) [(1, Endpoint 0 (-1) [])]))
+  | otherwise = n `seq` m `seq` reverse (searchUpToD 0 (Array.array (1, 1) [(1, Endpoint 0 (-1) [])]))
   where (as, bs) = (Array.listArray (0, pred n) (toList as'), Array.listArray (0, pred m) (toList bs'))
         (n, m) = (length as', length bs')
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
-        searchUpToD d v = v `seq`
-          let endpoints = searchAlongK <$> [ k | k <- [-d, -d + 2 .. d], inRange (lower, upper) k ] in
+        searchUpToD d v = d `seq` v `seq`
+          let endpoints = slideFrom . searchAlongK <$> [ k | k <- [-d, -d + 2 .. d], inRange (-m, n) k ] in
           case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
             _ -> searchUpToD (succ d) (Array.array (-d, d) ((\ e@(Endpoint x y _) -> (x - y, e)) <$> endpoints))
-          where (lower, upper) = (-(min m d), min n d)
-                isComplete (Endpoint x y _) = x >= n && y >= m
+          where isComplete (Endpoint x y _) = x >= n && y >= m
 
-                -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
-                searchAlongK k = slideFrom $!
-                  if k == lower || k /= upper && x left < x up then
-                    -- The lower/left extent of the search region or edit graph, whichever is smaller.
-                    moveDownFrom up
-                  else
-                    -- The upper/right extent of the search region or edit graph, whichever is smaller.
-                    moveRightFrom left
+                -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any).
+                searchAlongK k
+                  | k == -d       = moveDownFrom up
+                  | k ==  d       = moveRightFrom left
+                  | k == -m       = moveDownFrom up
+                  | k ==  n       = moveRightFrom left
+                  | x left < x up = moveDownFrom up
+                  | otherwise     = moveRightFrom left
                   where left = v ! pred k
                         up   = v ! succ k
 
