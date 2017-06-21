@@ -14,7 +14,7 @@ import Prologue hiding (error)
 -- | An edit script, i.e. a sequence of changes/copies of elements.
 type EditScript a b = [These a b]
 
-data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: !(EditScript a b) }
+data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, _y :: {-# UNPACK #-} !Int, _script :: EditScript a b }
   deriving (Eq, Show)
 
 
