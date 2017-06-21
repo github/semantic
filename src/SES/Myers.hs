@@ -4,6 +4,7 @@ module SES.Myers
 , ses
 ) where
 
+import Data.Array ((!))
 import qualified Data.Array as Array
 import Data.Ix
 import Data.These
@@ -36,13 +37,13 @@ ses eq as' bs'
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any).
                 searchAlongK !k
-                  | k == -d = moveDownFrom (v Array.! succ k)
-                  | k ==  d = moveRightFrom (v Array.! pred k)
-                  | k == -m = moveDownFrom (v Array.! succ k)
-                  | k ==  n = moveRightFrom (v Array.! pred k)
+                  | k == -d = moveDownFrom (v ! succ k)
+                  | k ==  d = moveRightFrom (v ! pred k)
+                  | k == -m = moveDownFrom (v ! succ k)
+                  | k ==  n = moveRightFrom (v ! pred k)
                   | otherwise =
-                    let left = v Array.! pred k
-                        up   = v Array.! succ k in
+                    let left = v ! pred k
+                        up   = v ! succ k in
                     if x left < x up then
                       moveDownFrom up
                     else
@@ -65,6 +66,6 @@ ses eq as' bs'
 
 
 (!?) :: Ix i => Array.Array i a -> i -> Maybe a
-(!?) v i | inRange (Array.bounds v) i, !a <- v Array.! i = Just a
+(!?) v i | inRange (Array.bounds v) i, !a <- v ! i = Just a
          | otherwise = Nothing
 {-# INLINE (!?) #-}
