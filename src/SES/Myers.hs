@@ -70,4 +70,4 @@ ses eq as' bs'
                   , a <- as ! x
                   , b <- bs ! y
                   , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
-                  | otherwise =           (Endpoint       x        y               script)
+                  | otherwise =            Endpoint       x        y               script
