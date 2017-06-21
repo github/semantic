@@ -42,19 +42,19 @@ ses eq as' bs'
                     Endpoint 0 0 []
                   else if k == negate d || k == negate m then
                     -- The lower/left extent of the search region or edit graph, whichever is smaller.
-                    moveDownFrom next
+                    moveDownFrom up
                   else if k /= d && k /= n then
                     -- Somewhere in the interior of the search region and edit graph.
-                    if x prev < x next then
-                      moveDownFrom next
+                    if x left < x up then
+                      moveDownFrom up
                     else
-                      moveRightFrom prev
+                      moveRightFrom left
                   else
                     -- The upper/right extent of the search region or edit graph, whichever is smaller.
-                    moveRightFrom prev
+                    moveRightFrom left
                   where getK k = v ! k
-                        prev = getK (pred k)
-                        next = getK (succ k)
+                        left = getK (pred k)
+                        up   = getK (succ k)
 
                 -- | Move downward from a given vertex, inserting the element for the corresponding row.
                 moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) (if y < m then That (bs ! y) : script else script)
