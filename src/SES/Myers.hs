@@ -52,11 +52,13 @@ ses eq as' bs'
         moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) $ case bs ! y of
           Just b -> That b : script
           _ -> script
+        {-# INLINE moveDownFrom #-}
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
         moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  $ case as ! x of
           Just a -> This a : script
           _ -> script
+        {-# INLINE moveRightFrom #-}
 
         -- | Slide down any diagonal edges from a given vertex.
         slideFrom (Endpoint x y script)
