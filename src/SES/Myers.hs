@@ -2,7 +2,6 @@
 module SES.Myers
 ( EditScript
 , EditGraph(..)
-, Diagonal(..)
 , Endpoint(..)
 , ses
 , MyersState
@@ -28,10 +27,6 @@ data EditGraph a b = EditGraph { as :: !(Array.Array Int a), bs :: !(Array.Array
 makeEditGraph :: (Foldable t, Foldable u) => t a -> u b -> EditGraph a b
 makeEditGraph as bs = EditGraph (Array.listArray (0, pred (length as)) (toList as)) (Array.listArray (0, pred (length bs)) (toList bs))
 
--- | A diagonal in the edit graph of lists of lengths n and m, numbered from -m to n.
-newtype Diagonal = Diagonal { unDiagonal :: Int }
-  deriving (Eq, Ix, Ord, Show)
-
 data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, y :: {-# UNPACK #-} !Int, script :: !(EditScript a b) }
   deriving (Eq, Show)
 
@@ -55,14 +50,14 @@ runSES eq (EditGraph as bs)
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD d v =
-          let endpoints = searchAlongK v . Diagonal <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] in
+          let endpoints = searchAlongK v <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] in
           case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
             _ -> searchUpToD (succ d) (Map.fromList ((\ (Endpoint x y script) -> (x - y, (x, script))) <$> endpoints))
           where isComplete (Endpoint x y _) = x >= n && y >= m
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
-                searchAlongK v (Diagonal k) = slideFrom $!
+                searchAlongK v k = slideFrom $!
                   if d == 0 || k < negate m || k > n then
                     -- The top-left corner, or otherwise out-of-bounds.
                     Endpoint 0 0 []
