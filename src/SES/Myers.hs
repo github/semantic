@@ -24,8 +24,8 @@ ses eq as' bs'
   | null bs = This <$> toList as
   | null as = That <$> toList bs
   | otherwise = reverse (searchUpToD 0 (Array.array (1, 1) [(1, Endpoint 0 (-1) [])]))
-  where (as, bs) = (Array.listArray (0, pred n) (toList as'), Array.listArray (0, pred m) (toList bs'))
-        (aBounds, bBounds) = (Array.bounds as, Array.bounds bs)
+  where (as, bs) = (Array.listArray aBounds (toList as'), Array.listArray bBounds (toList bs'))
+        (aBounds, bBounds) = ((0, pred n), (0, pred m))
         (n, m) = (length as', length bs')
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
