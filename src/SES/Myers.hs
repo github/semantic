@@ -37,16 +37,17 @@ ses eq as' bs'
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any).
                 searchAlongK !k
-                  | k == -d       = moveDown
-                  | k ==  d       = moveRight
-                  | k == -m       = moveDown
-                  | k ==  n       = moveRight
-                  | x left < x up = moveDown
-                  | otherwise     = moveRight
-                  where moveRight = moveRightFrom left
-                        moveDown  = moveDownFrom  up
-                        left = v ! pred k
-                        up   = v ! succ k
+                  | k == -d = moveDownFrom (v ! succ k)
+                  | k ==  d = moveRightFrom (v ! pred k)
+                  | k == -m = moveDownFrom (v ! succ k)
+                  | k ==  n = moveRightFrom (v ! pred k)
+                  | otherwise =
+                    let left = v ! pred k
+                        up   = v ! succ k in
+                    if x left < x up then
+                      moveDownFrom up
+                    else
+                      moveRightFrom left
 
                 -- | Move downward from a given vertex, inserting the element for the corresponding row.
                 moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) (if y >= 0 && y < m then That (bs ! y) : script else script)
