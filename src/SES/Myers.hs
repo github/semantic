@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
 module SES.Myers
 ( EditScript
-, EditGraph(..)
 , Endpoint(..)
 , ses
 , MyersState
@@ -11,21 +10,12 @@ import Data.Array ((!))
 import qualified Data.Array as Array
 import qualified Data.IntMap.Lazy as Map
 import Data.Ix
-import Data.Functor.Classes
 import Data.These
 import GHC.Show hiding (show)
 import Prologue hiding (error)
 
 -- | An edit script, i.e. a sequence of changes/copies of elements.
 type EditScript a b = [These a b]
-
--- | Notionally the cartesian product of two sequences, represented as a simple wrapper around those arrays holding those sequences’ elements for O(1) lookups.
-data EditGraph a b = EditGraph { as :: !(Array.Array Int a), bs :: !(Array.Array Int b) }
-  deriving (Eq, Show)
-
--- | Construct an edit graph from Foldable sequences.
-makeEditGraph :: (Foldable t, Foldable u) => t a -> u b -> EditGraph a b
-makeEditGraph as bs = EditGraph (Array.listArray (0, pred (length as)) (toList as)) (Array.listArray (0, pred (length bs)) (toList bs))
 
 data Endpoint a b = Endpoint { x :: {-# UNPACK #-} !Int, y :: {-# UNPACK #-} !Int, script :: !(EditScript a b) }
   deriving (Eq, Show)
@@ -39,8 +29,8 @@ ses eq as' bs'
   | null bs = This <$> toList as
   | null as = That <$> toList bs
   | otherwise = reverse (searchUpToD 0 (Map.singleton 0 (0, [])))
-  where EditGraph as bs = makeEditGraph as' bs'
-        (n, m) = (length as, length bs)
+  where (as, bs) = (Array.listArray (0, pred n) (toList as'), Array.listArray (0, pred m) (toList bs'))
+        (n, m) = (length as', length bs')
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD d v =
@@ -91,14 +81,3 @@ ses eq as' bs'
 
 -- | The state stored by Myers’ algorithm; an array of m + n + 1 values indicating the maximum x-index reached and path taken along each diagonal.
 type MyersState a b = Map.IntMap (Int, EditScript a b)
-
-
--- | Lifted showing of arrays.
-liftShowsVector :: Show i => (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Array.Array i a -> ShowS
-liftShowsVector sp sl d = liftShowsPrec sp sl d . toList
-
-
--- Instances
-
-instance Show2 EditGraph where
-  liftShowsPrec2 sp1 sl1 sp2 sl2 d (EditGraph as bs) = showsBinaryWith (liftShowsVector sp1 sl1) (liftShowsVector sp2 sl2) "EditGraph" d as bs
