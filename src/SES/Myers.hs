@@ -49,22 +49,22 @@ ses eq as' bs'
                       moveRightFrom left
 
         -- | Move downward from a given vertex, inserting the element for the corresponding row.
-        moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) $ maybe script ((: script) . That) (bs ! y)
+        moveDownFrom  (Endpoint x y script) = Endpoint       x (succ y) $ maybe script ((: script) . That) (bs !? y)
         {-# INLINE moveDownFrom #-}
 
         -- | Move rightward from a given vertex, deleting the element for the corresponding column.
-        moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  $ maybe script ((: script) . This) (as ! x)
+        moveRightFrom (Endpoint x y script) = Endpoint (succ x)      y  $ maybe script ((: script) . This) (as !? x)
         {-# INLINE moveRightFrom #-}
 
         -- | Slide down any diagonal edges from a given vertex.
         slideFrom (Endpoint x y script)
-          | Just a <- as ! x
-          , Just b <- bs ! y
+          | Just a <- as !? x
+          , Just b <- bs !? y
           , a `eq` b  = slideFrom (Endpoint (succ x) (succ y) (These a b : script))
           | otherwise =            Endpoint       x        y               script
 
 
-(!) :: Ix i => Array.Array i a -> i -> Maybe a
-(!) v i | inRange (Array.bounds v) i, !a <- v Array.! i = Just a
-        | otherwise = Nothing
-{-# INLINE (!) #-}
+(!?) :: Ix i => Array.Array i a -> i -> Maybe a
+(!?) v i | inRange (Array.bounds v) i, !a <- v Array.! i = Just a
+         | otherwise = Nothing
+{-# INLINE (!?) #-}
