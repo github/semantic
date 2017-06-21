@@ -1,5 +1,4 @@
 {-# LANGUAGE GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module SES.Myers
 ( EditScript
 , EditGraph(..)
