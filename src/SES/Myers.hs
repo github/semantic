@@ -56,10 +56,10 @@ runSES eq (EditGraph as bs)
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
         searchUpToD (d:ds) v =
-          let extents = searchAlongK v . Diagonal <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] in
-          case find isComplete extents of
+          let endpoints = searchAlongK v . Diagonal <$> [ k | k <- [negate d, negate d + 2 .. d], inRange (negate m, n) k ] in
+          case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
-            _ -> searchUpToD ds (Map.fromList ((\ (Endpoint x y script) -> (x - y, (x, script))) <$> extents))
+            _ -> searchUpToD ds (Map.fromList ((\ (Endpoint x y script) -> (x - y, (x, script))) <$> endpoints))
           where isComplete (Endpoint x y _) = x >= n && y >= m
 
                 -- Search an edit graph for the shortest edit script along a specific diagonal, moving onto a given diagonal from one of its in-bounds adjacent diagonals (if any), and sliding down any diagonal edges eagerly.
