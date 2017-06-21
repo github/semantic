@@ -28,7 +28,7 @@ ses eq as' bs'
         (n, m) = (length as', length bs')
 
         -- Search an edit graph for the shortest edit script up to a given proposed edit distance, building on the results of previous searches.
-        searchUpToD d v =
+        searchUpToD d v = v `seq`
           let endpoints = searchAlongK <$> [ k | k <- [-d, -d + 2 .. d], inRange (-m, n) k ] in
           case find isComplete endpoints of
             Just (Endpoint _ _ script) -> script
