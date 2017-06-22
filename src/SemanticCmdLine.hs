@@ -6,41 +6,28 @@ import Command
 import Command.Files (languageForFilePath)
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
-import Data.String
 import Data.Version (showVersion)
 import Development.GitRev
 import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
+import Renderer
 import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
 import System.Directory
-import System.Environment
 import System.FilePath.Posix (takeFileName, (-<.>))
-import System.IO.Error (IOError)
 import System.IO (stdin)
-import Text.Regex
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
 main :: IO ()
 main = do
-  gitDir <- findGitDir
-  alternates <- findAlternates
-  Arguments{..} <- customExecParser (prefs showHelpOnEmpty) (arguments gitDir alternates)
+  Arguments{..} <- customExecParser (prefs showHelpOnEmpty) arguments
   outputPath <- traverse getOutputPath outputFilePath
   text <- case programMode of
     Diff args -> runDiff args
     Parse args -> runParse args
   writeToOutput outputPath text
   where
-    findGitDir = do
-      pwd <- getCurrentDirectory
-      fromMaybe pwd <$> lookupEnv "GIT_DIR"
-    findAlternates = do
-      eitherObjectDirs <- try $ splitWhen (== ':') . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
-      pure $ case (eitherObjectDirs :: Either IOError [FilePath]) of
-              (Left _) -> []
-              (Right objectDirs) -> objectDirs
     getOutputPath path = do
       isDir <- doesDirectoryExist path
       pure $ if isDir then takeFileName path -<.> ".html" else path
@@ -49,28 +36,25 @@ main = do
 
 runDiff :: DiffArguments -> IO ByteString
 runDiff DiffArguments{..} = do
-  blobs <- runCommand $ case diffMode of
+  blobs <- case diffMode of
     DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
-    DiffCommits sha1 sha2 paths -> readFilesAtSHAs gitDir alternateObjectDirs paths (both sha1 sha2)
     DiffStdin -> readBlobPairsFromHandle stdin
   Task.runTask (Semantic.diffBlobPairs diffRenderer blobs)
 
 runParse :: ParseArguments -> IO ByteString
 runParse ParseArguments{..} = do
-  blobs <- runCommand $ case parseMode of
+  blobs <- case parseMode of
     ParsePaths paths -> traverse (uncurry readFile) paths
-    ParseCommit sha paths -> readFilesAtSHA gitDir alternateObjectDirs paths sha
     ParseStdin -> readBlobsFromHandle stdin
   Task.runTask (Semantic.parseBlobs parseTreeRenderer blobs)
 
 -- | A parser for the application's command-line arguments.
-arguments :: FilePath -> [FilePath] -> ParserInfo Arguments
-arguments gitDir alternates = info (version <*> helper <*> argumentsParser) description
+arguments :: ParserInfo Arguments
+arguments = info (version <*> helper <*> argumentsParser) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
-    description = fullDesc <> progDesc "Set the GIT_DIR environment variable to specify a different git repository. Set GIT_ALTERNATE_OBJECT_DIRECTORIES to specify location of alternates."
-                           <> header "semantic -- Parse and diff semantically"
+    description = fullDesc <> header "semantic -- Parse and diff semantically"
 
     argumentsParser = Arguments
       <$> hsubparser (diffCommand <> parseCommand)
@@ -78,39 +62,23 @@ arguments gitDir alternates = info (version <*> helper <*> argumentsParser) desc
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = Diff
-      <$> ( (  flag patchDiff patchDiff (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-           <|> flag' jsonDiff (long "json" <> help "Output a json diff")
-           <|> flag' sExpressionDiff (long "sexpression" <> help "Output an s-expression diff tree")
-           <|> flag' tocDiff (long "toc" <> help "Output a table of contents for a diff") )
+      <$> ( (  flag (DiffArguments PatchDiffRenderer) (DiffArguments PatchDiffRenderer) (long "patch" <> help "Output a patch(1)-compatible diff (default)")
+           <|> flag' (DiffArguments JSONDiffRenderer) (long "json" <> help "Output a json diff")
+           <|> flag' (DiffArguments SExpressionDiffRenderer) (long "sexpression" <> help "Output an s-expression diff tree")
+           <|> flag' (DiffArguments ToCDiffRenderer) (long "toc" <> help "Output a table of contents for a diff") )
          <*> (  DiffPaths
                <$> argument filePathReader (metavar "FILE_A")
                <*> argument filePathReader (metavar "FILE_B")
-            <|> DiffCommits
-               <$> option (eitherReader parseSha) (long "sha1" <> metavar "SHA" <> help "Starting commit SHA")
-               <*> option (eitherReader parseSha) (long "sha2" <> metavar "SHA" <> help "Ending commit SHA")
-               <*> many (argument filePathReader (metavar "FILES..."))
-            <|> pure DiffStdin )
-         <*> pure gitDir
-         <*> pure alternates )
+            <|> pure DiffStdin ))
 
-    parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for a commit or paths"))
+    parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for path(s)"))
     parseArgumentsParser = Parse
-      <$> ( (  flag sExpressionParseTree sExpressionParseTree (long "sexpression" <> help "Output s-expression parse trees (default)")
-           <|> flag' jsonParseTree (long "json" <> help "Output JSON parse trees") )
+      <$> ( (  flag (ParseArguments SExpressionTermRenderer) (ParseArguments SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
+           <|> flag' (ParseArguments JSONTermRenderer) (long "json" <> help "Output JSON parse trees")
+           <|> flag' (ParseArguments ToCTermRenderer) (long "toc" <> help "Output a table of contents for a file"))
          <*> (  ParsePaths
                <$> some (argument filePathReader (metavar "FILES..."))
-            <|> ParseCommit
-               <$> option (eitherReader parseSha) (long "sha" <> metavar "SHA" <> help "Commit SHA")
-               <*> some (argument filePathReader (metavar "FILES..."))
-            <|> pure ParseStdin )
-         <*> pure gitDir
-         <*> pure alternates )
-
-    parseSha :: String -> Either String String
-    parseSha s = case matchRegex regex s of
-      Just [sha] -> Right sha
-      _ -> Left $ s <> " is not a valid SHA-1"
-      where regex = mkRegexWithOpts "([0-9a-f]{40})" True False
+            <|> pure ParseStdin ))
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of

@@ -7,7 +7,6 @@ import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Data.Syntax.Assignment.Spec
 import qualified DiffSpec
-import qualified GitmonClientSpec
 import qualified InterpreterSpec
 import qualified PatchOutputSpec
 import qualified RangeSpec
@@ -39,6 +38,3 @@ main = hspec $ do
     describe "SemanticCmdLine" SemanticCmdLineSpec.spec
     describe "TOC" TOCSpec.spec
     describe "Integration" IntegrationSpec.spec
-
-
-  describe "GitmonClient" GitmonClientSpec.spec

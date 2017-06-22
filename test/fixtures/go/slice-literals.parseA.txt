@@ -22,8 +22,7 @@
             (SliceTy
               (Identifier))
             (Literal
-              (Element
-                (StringLiteral)))))))
+              (StringLiteral))))))
     (Other "const_declaration"
       (VarAssignment
         (Other "identifier_list"
@@ -33,7 +32,5 @@
             (SliceTy
               (Identifier))
             (Literal
-              (Element
-                (StringLiteral))
-              (Element
-                (StringLiteral)))))))))
+              (StringLiteral)
+              (StringLiteral))))))))

@@ -3,7 +3,6 @@ module Command.Files
 ( readFile
 , readBlobPairsFromHandle
 , readBlobsFromHandle
-, transcode
 , languageForFilePath
 ) where
 
@@ -15,8 +14,7 @@ import Data.String
 import Language
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
-import qualified Data.Text.ICU.Convert as Convert
-import qualified Data.Text.ICU.Detect as Detect
+import qualified Data.ByteString.Lazy as BL
 import Prelude (fail)
 import Source hiding (path)
 import System.FilePath
@@ -26,15 +24,7 @@ import System.FilePath
 readFile :: FilePath -> Maybe Language -> IO SourceBlob
 readFile path language = do
   raw <- (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
-  source <- traverse transcode raw
-  pure $ fromMaybe (emptySourceBlob path) (sourceBlob path language <$> source)
-
--- | Transcode a ByteString to a unicode Source.
-transcode :: B.ByteString -> IO Source
-transcode text = fromText <$> do
-  match <- Detect.detectCharset text
-  converter <- Convert.open match Nothing
-  pure $ Convert.toUnicode converter text
+  pure $ fromMaybe (emptySourceBlob path) (sourceBlob path language . Source <$> raw)
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Maybe Language
@@ -55,8 +45,8 @@ readBlobsFromHandle = fmap toSourceBlobs . readFromHandle
 
 readFromHandle :: FromJSON a => Handle -> IO a
 readFromHandle h = do
-  input <- B.hGetContents h
-  case decode (toS input) of
+  input <- BL.hGetContents h
+  case decode input of
     Just d -> pure d
     Nothing -> die ("invalid input on " <> show h <> ", expecting JSON")
 

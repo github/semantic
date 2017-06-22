@@ -3,6 +3,7 @@ import "hint" HLint.Dollar
 import "hint" HLint.Generalise
 
 ignore "Use mappend"
+ignore "Redundant do"
 error "generalize ++" = (++) ==> (<>)
 -- AMP fallout
 error "generalize mapM"  = mapM  ==> traverse

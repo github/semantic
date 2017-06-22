@@ -10,8 +10,6 @@ module SpecHelpers
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Listable
-import qualified Data.Text.ICU.Convert as Convert
-import qualified Data.Text.ICU.Detect as Detect
 import Diff
 import Language
 import Patch
@@ -42,18 +40,8 @@ parseFilePath path = do
 -- the filesystem or Git. The tests, however, will still leverage reading files.
 readFile :: FilePath -> IO SourceBlob
 readFile path = do
-  source <- (Just <$> readFileToUnicode path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
+  source <- (Just . Source <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
   pure $ fromMaybe (emptySourceBlob path) (sourceBlob path (languageForFilePath path) <$> source)
-  where
-    -- | Read a file, convert it's contents unicode and return it wrapped in Source.
-    readFileToUnicode :: FilePath -> IO Source
-    readFileToUnicode path = B.readFile path >>= transcode
-      where
-        transcode :: B.ByteString -> IO Source
-        transcode text = fromText <$> do
-          match <- Detect.detectCharset text
-          converter <- Convert.open match Nothing
-          pure $ Convert.toUnicode converter text
 
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language

@@ -36,8 +36,8 @@ data Grammar
   | Image
   deriving (Bounded, Enum, Eq, Ord, Show)
 
-cmarkParser :: Source -> IO (Cofree [] (Record (NodeType ': Location)))
-cmarkParser source = pure . toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+cmarkParser :: Source -> Cofree [] (Record (NodeType ': Location))
+cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
   where toTerm :: Range -> SourceSpan -> Node -> Cofree [] (Record (NodeType ': Location))
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (sourceSpanToRange source . toSpan) position

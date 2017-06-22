@@ -12,9 +12,6 @@
           (Other "composite_literal"
             (ArrayTy
               (Identifier))
-            (Element
-              (NumberLiteral))
-            (Element
-              (NumberLiteral))
-            (Element
-              (NumberLiteral))))))))+}
+            (NumberLiteral)
+            (NumberLiteral)
+            (NumberLiteral)))))))+}

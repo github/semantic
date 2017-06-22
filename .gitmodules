@@ -1,9 +1,3 @@
-[submodule "vendor/text-icu"]
-	path = vendor/text-icu
-	url = https://github.com/joshvera/text-icu
-[submodule "vendor/gitlib"]
-	path = vendor/gitlib
-	url = https://github.com/joshvera/gitlib
 [submodule "test/repos/jquery"]
 	path = test/repos/jquery
 	url = https://github.com/jquery/jquery

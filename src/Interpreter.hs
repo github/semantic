@@ -33,13 +33,13 @@ diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparable
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
 decoratingWith :: (Hashable label, Traversable f)
                => (forall a. TermF f (Record fields) a -> label)
-               -> (Both (Term f (Record (Maybe FeatureVector ': fields))) -> Diff f (Record (Maybe FeatureVector ': fields)))
+               -> (Both (Term f (Record (FeatureVector ': fields))) -> Diff f (Record (FeatureVector ': fields)))
                -> Both (Term f (Record fields))
                -> Diff f (Record fields)
 decoratingWith getLabel differ = stripDiff . differ . fmap (defaultFeatureVectorDecorator getLabel)
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
-diffTermsWith :: forall f fields . (Traversable f, GAlign f, Eq1 f, HasField fields (Maybe FeatureVector))
+diffTermsWith :: forall f fields . (Traversable f, GAlign f, Eq1 f, HasField fields FeatureVector)
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) (Diff f (Record fields))) -- ^ A function producing syntax-directed continuations of the algorithm.
               -> ComparabilityRelation f fields -- ^ A relation on terms used to determine comparability and equality.
               -> Both (Term f (Record fields)) -- ^ A pair of terms.
