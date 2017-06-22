@@ -17,6 +17,7 @@ library
   build-depends:       base >= 4.7 && < 5
                      , haskell-tree-sitter
   default-language:    Haskell2010
+  default-extensions:  FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
   c-sources:           vendor/tree-sitter-typescript/src/parser.c
                      , vendor/tree-sitter-typescript/src/scanner.c
   cc-options:          -std=c99 -Os
