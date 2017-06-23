@@ -34,5 +34,5 @@ bin/
 *.prof
 
 .bundle/
-.licenses/vendor/
+.licenses/vendor/gems
 .licenses/log/
