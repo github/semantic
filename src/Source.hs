@@ -112,10 +112,13 @@ actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start ran
 
 -- | Compute the byte 'Range' corresponding to a given 'SourceSpan' in a 'Source'.
 sourceSpanToRange :: Source -> SourceSpan -> Range
-sourceSpanToRange source SourceSpan{..} = Range start end
+sourceSpanToRange source = sourceSpanToRangeInLineRanges (actualLineRanges source)
+
+sourceSpanToRangeInLineRanges :: [Range] -> SourceSpan -> Range
+sourceSpanToRangeInLineRanges lineRanges SourceSpan{..} = Range start end
   where start = pred (sumLengths leadingRanges + column spanStart)
         end = start + sumLengths (Prologue.take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
-        (leadingRanges, remainingRanges) = splitAt (pred (line spanStart)) (actualLineRanges source)
+        (leadingRanges, remainingRanges) = splitAt (pred (line spanStart)) lineRanges
         sumLengths = sum . fmap rangeLength
 
 -- | Compute the 'SourceSpan' corresponding to a given byte 'Range' in a 'Source'.
