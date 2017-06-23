@@ -33,6 +33,7 @@ type Syntax = '[
   , Expression.Comparison
   , Literal.Array
   , Literal.Boolean
+  , Literal.Float
   , Literal.Hash
   , Literal.Integer
   , Literal.KeyValue
@@ -128,16 +129,20 @@ literal =
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many statement)
-  -- TODO: Handle interpolation
-  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
-  -- TODO: this isn't quite right `"a" "b"` ends up as TextElement {textElementContent = "\"a\"\"b\""}
-  <|> makeTerm <$> symbol ChainedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
   <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pairs)
   -- TODO: Give subshell it's own literal and allow interpolation
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   -- TODO: Handle interpolation
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
-  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
+  <|> makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+  <|> makeTerm <$> symbol Float <*> (Literal.Float <$> source)
+  -- TODO: Handle interpolation
+  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+  -- TODO: this isn't quite right `"a" "b"` ends up as TextElement {textElementContent = "\"a\"\"b\""}
+  <|> makeTerm <$> symbol ChainedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
+
+  where
+    pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
 
 beginBlock :: Assignment
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many topLevelStatement)
