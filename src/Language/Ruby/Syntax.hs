@@ -38,6 +38,7 @@ type Syntax = '[
   , Literal.Null
   , Literal.Range
   , Literal.String
+  , Literal.TextElement
   , Literal.Symbol
   , Statement.Alias
   , Statement.Assignment
@@ -81,7 +82,13 @@ statement  = -- handleError $
   <|> unless
   <|> while'
   <|> until'
+  -- TODO: rescue
   <|> emptyStatement
+  -- <|> assignment'
+  -- TODO: operator assignment
+  <|> unary
+  <|> binary
+  <|> literal
   <|> mk Return Statement.Return
   <|> mk Yield Statement.Yield
   <|> mk Break Statement.Break
@@ -90,13 +97,8 @@ statement  = -- handleError $
   <|> class'
   <|> method
   <|> identifier
-  <|> literal
   <|> scopeResolution
   <|> conditional
-  <|> unary
-  <|> binary
-  -- <|> assignment'
-  -- TODO: rescue
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -129,7 +131,13 @@ literal =
   <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
   <|> makeTerm <$> symbol Grammar.Nil <*> (Literal.Null <$ source)
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
-  <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- TODO: Do we want to represent the difference between .. and ...
+   -- TODO: Do we want to represent the difference between .. and ...
+  <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement)
+  <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many statement)
+  -- TODO: Handle interpolation
+  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+  -- TODO: this isn't quite right `"a" "b"` ends up as TextElement {textElementContent = "\"a\"\"b\""}
+  <|> makeTerm <$> symbol ChainedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
 
 methodName :: Assignment
 methodName = identifier <|> literal
