@@ -35,11 +35,12 @@ type Syntax = '[
   , Literal.Boolean
   , Literal.Hash
   , Literal.Integer
+  , Literal.KeyValue
   , Literal.Null
   , Literal.Range
   , Literal.String
-  , Literal.TextElement
   , Literal.Symbol
+  , Literal.TextElement
   , Statement.Alias
   , Statement.Assignment
   , Statement.Break
@@ -138,6 +139,8 @@ literal =
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
   -- TODO: this isn't quite right `"a" "b"` ends up as TextElement {textElementContent = "\"a\"\"b\""}
   <|> makeTerm <$> symbol ChainedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
+  <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pairs)
+  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
 
 methodName :: Assignment
 methodName = identifier <|> literal
