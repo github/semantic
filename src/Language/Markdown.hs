@@ -40,11 +40,13 @@ cmarkParser :: Source -> Cofree [] (Record (NodeType ': Location))
 cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
   where toTerm :: Range -> SourceSpan -> Node -> Cofree [] (Record (NodeType ': Location))
         toTerm within withinSpan (Node position t children) =
-          let range = maybe within (sourceSpanToRange source . toSpan) position
+          let range = maybe within (sourceSpanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
           in cofree $ (t :. range :. span :. Nil) :< (toTerm range span <$> children)
 
         toSpan PosInfo{..} = SourceSpan (SourcePos startLine startColumn) (SourcePos endLine (succ endColumn))
+
+        lineRanges = actualLineRanges source
 
 toGrammar :: NodeType -> Grammar
 toGrammar DOCUMENT{} = Document
