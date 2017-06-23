@@ -105,13 +105,6 @@ statement  = -- handleError $
 statements :: Assignment
 statements = makeTerm <$> location <*> many statement
 
-
-beginBlock :: Assignment
-beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many topLevelStatement)
-
-endBlock :: Assignment
-endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many topLevelStatement)
-
 identifier :: Assignment
 identifier =
       mk Identifier
@@ -140,7 +133,17 @@ literal =
   -- TODO: this isn't quite right `"a" "b"` ends up as TextElement {textElementContent = "\"a\"\"b\""}
   <|> makeTerm <$> symbol ChainedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
   <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pairs)
+  -- TODO: Give subshell it's own literal and allow interpolation
+  <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
+  -- TODO: Handle interpolation
+  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
   where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
+
+beginBlock :: Assignment
+beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many topLevelStatement)
+
+endBlock :: Assignment
+endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many topLevelStatement)
 
 methodName :: Assignment
 methodName = identifier <|> literal
@@ -266,7 +269,8 @@ emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$> (Just <$> source))
 
 
---
+-- Helper functions
+
 makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree $ a :< inj f
 
