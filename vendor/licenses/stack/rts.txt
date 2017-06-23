@@ -1,8 +1,0 @@
----
-type: stack
-name: rts
-version: '1.0'
-summary: 
-homepage: 
-license: other
----
