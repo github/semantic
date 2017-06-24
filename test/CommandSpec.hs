@@ -4,7 +4,6 @@ import Command
 import Data.Blob
 import Data.Functor.Both as Both
 import Data.Maybe
-import Data.Source
 import Data.String
 import Language
 import Prologue hiding (readFile, toList)
