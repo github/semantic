@@ -106,8 +106,7 @@ sourceLines source
 
 -- | Compute the 'Range's of each line in a 'Source'.
 sourceLineRanges :: Source -> [Range]
-sourceLineRanges = drop 1 . scanl toRange (Range 0 0) . sourceLines
-  where toRange previous source = Range (end previous) $ end previous + sourceLength source
+sourceLineRanges source = sourceLineRangesWithin (totalRange source) source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
 sourceLineRangesWithin :: Range -> Source -> [Range]
