@@ -191,7 +191,7 @@ renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Tra
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
-        summaryKey = toS $ case runJoin (path <$> blobs) of
+        summaryKey = toS $ case runJoin (blobPath <$> blobs) of
           (before, after) | null before -> after
                           | null after -> before
                           | before == after -> after
@@ -200,7 +200,7 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
 renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Blob -> Term f (Record fields) -> Summaries
 renderToCTerm blob = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where toMap [] = mempty
-        toMap as = Map.singleton (toS (path blob)) (toJSON <$> as)
+        toMap as = Map.singleton (toS (blobPath blob)) (toJSON <$> as)
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration

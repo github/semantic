@@ -28,8 +28,8 @@ import Syntax as S
 renderJSONDiff :: ToJSON a => Both Blob -> a -> Map.Map Text Value
 renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
-  , ("oids", toJSON (decodeUtf8 . oid <$> toList blobs))
-  , ("paths", toJSON (path <$> toList blobs))
+  , ("oids", toJSON (decodeUtf8 . blobOid <$> toList blobs))
+  , ("paths", toJSON (blobPath <$> toList blobs))
   ]
 
 instance StringConv (Map Text Value) ByteString where
@@ -121,4 +121,4 @@ instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
 
 renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
-renderJSONTerm Blob{..} = pure . toJSON . File path blobLanguage
+renderJSONTerm Blob{..} = pure . toJSON . File blobPath blobLanguage

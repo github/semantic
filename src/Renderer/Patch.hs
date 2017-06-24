@@ -70,7 +70,7 @@ showHunk :: Functor f => HasField fields Range => Both Blob -> Hunk (SplitDiff f
 showHunk blobs hunk = maybeOffsetHeader <>
   mconcat (showChange sources <$> changes hunk) <>
   showLines (snd sources) ' ' (maybeSnd . runJoin <$> trailingContext hunk)
-  where sources = source <$> blobs
+  where sources = blobSource <$> blobs
         maybeOffsetHeader = if lengthA > 0 && lengthB > 0
                             then offsetHeader
                             else mempty
@@ -116,12 +116,12 @@ header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> 
         maybeFilepaths = if (nullOid == oidA && Source.null (snd sources)) || (nullOid == oidB && Source.null (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
         beforeFilepath = "--- " <> modeHeader "a" modeA pathA
         afterFilepath = "+++ " <> modeHeader "b" modeB pathB
-        sources = source <$> blobs
-        (pathA, pathB) = case runJoin $ toS . path <$> blobs of
+        sources = blobSource <$> blobs
+        (pathA, pathB) = case runJoin $ toS . blobPath <$> blobs of
           ("", path) -> (path, path)
           (path, "") -> (path, path)
           paths -> paths
-        (oidA, oidB) = runJoin $ oid <$> blobs
+        (oidA, oidB) = runJoin $ blobOid <$> blobs
         (modeA, modeB) = runJoin $ blobKind <$> blobs
 
 -- | A hunk representing no changes.
@@ -130,12 +130,12 @@ emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
 hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) -> Both Blob -> [Hunk (SplitDiff [] (Record fields))]
-hunks _ blobs | sources <- source <$> blobs
+hunks _ blobs | sources <- blobSource <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (Source.null <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
-hunks diff blobs = hunksInRows (pure 1) $ alignDiff (source <$> blobs) diff
+hunks diff blobs = hunksInRows (pure 1) $ alignDiff (blobSource <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.

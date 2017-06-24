@@ -10,7 +10,7 @@ import Control.Exception (catch, IOException)
 import Data.Aeson
 import Data.These
 import Data.Functor.Both
-import qualified Data.Blob as Blob hiding (path)
+import qualified Data.Blob as Blob
 import Data.Source
 import Data.String
 import Language

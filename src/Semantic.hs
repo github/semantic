@@ -46,18 +46,18 @@ parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
-  (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source) >>= render (renderToCTerm blob)
-  (ToCTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
-  (ToCTermRenderer, _) -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source) >>= render (renderToCTerm blob)
-  (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, Just Language.Python) -> parse pythonParser source >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, _) -> parse syntaxParser source >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
-  (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
-  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
-  (SExpressionTermRenderer, _) -> parse syntaxParser source >>= render renderSExpressionTerm . fmap keepCategory
+  (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) blobSource) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, _) -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource) >>= render (renderToCTerm blob)
+  (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, _) -> parse syntaxParser blobSource >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
+  (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, _) -> parse syntaxParser blobSource >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
-  (IdentityTermRenderer, _) -> Just <$> parse syntaxParser source
+  (IdentityTermRenderer, _) -> Just <$> parse syntaxParser blobSource
   where syntaxParser = parserForLanguage blobLanguage
 
 
@@ -68,9 +68,9 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
-  (ToCDiffRenderer, Just Language.Markdown) -> run (\ source -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source)) diffLinearly (renderToCDiff blobs)
-  (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToCDiff blobs)
-  (ToCDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Markdown) -> run (\ blobSource -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) blobSource)) diffLinearly (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Python) -> run (\ blobSource -> parse pythonParser blobSource >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToCDiff blobs)
+  (ToCDiffRenderer, _) -> run (\ blobSource -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource)) diffTerms (renderToCDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderJSONDiff blobs)
   (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
@@ -80,12 +80,12 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate (ConstructorLabel . constructorLabel) <=< parse markdownParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (ConstructorLabel . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
-  (IdentityDiffRenderer, _) -> run (\ source -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source)) diffTerms Just
+  (IdentityDiffRenderer, _) -> run (\ blobSource -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         syntaxParser = parserForLanguage effectiveLanguage
 
         run :: Functor f => (Source -> Task (Term f a)) -> (Both (Term f a) -> Diff f a) -> (Diff f a -> output) -> Task output
-        run parse diff renderer = distributeFor blobs (parse . source) >>= diffTermPair blobs diff >>= render renderer
+        run parse diff renderer = distributeFor blobs (parse . blobSource) >>= diffTermPair blobs diff >>= render renderer
 
         diffLinearly :: (Eq1 f, GAlign f, Show1 f, Traversable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
         diffLinearly = decoratingWith constructorLabel (diffTermsWith linearly comparableByConstructor)

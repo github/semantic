@@ -7,9 +7,9 @@ import Prologue
 
 -- | The source, oid, path, and Maybe BlobKind of a blob.
 data Blob = Blob
-  { source :: Source -- ^ The UTF-8 encoded source text of the blob.
-  , oid :: ByteString -- ^ The Git object ID (SHA-1) of the blob.
-  , path :: FilePath -- ^ The file path to the blob.
+  { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
+  , blobOid :: ByteString -- ^ The Git object ID (SHA-1) of the blob.
+  , blobPath :: FilePath -- ^ The file path to the blob.
   , blobKind :: Maybe BlobKind -- ^ The kind of blob, Nothing denotes a blob that doesn't exist (e.g. on one side of a diff for adding a new file or deleting a file).
   , blobLanguage :: Maybe Language -- ^ The language of this blob. Nothing denotes a langauge we don't support yet.
   }
@@ -32,7 +32,7 @@ emptyBlob :: FilePath -> Blob
 emptyBlob filepath = Blob mempty nullOid filepath Nothing Nothing
 
 nullBlob :: Blob -> Bool
-nullBlob Blob{..} = oid == nullOid || Source.null source
+nullBlob Blob{..} = blobOid == nullOid || Source.null blobSource
 
 blobExists :: Blob -> Bool
 blobExists Blob{..} = isJust blobKind
@@ -43,7 +43,7 @@ sourceBlob filepath language source = Blob source nullOid filepath (Just default
 -- | Map blobs with Nothing blobKind to empty blobs.
 idOrEmptyBlob :: Blob -> Blob
 idOrEmptyBlob blob = if isNothing (blobKind blob)
-                           then blob { oid = nullOid, blobKind = Nothing }
+                           then blob { blobOid = nullOid, blobKind = Nothing }
                            else blob
 
 nullOid :: ByteString
