@@ -96,7 +96,7 @@ runParser parser = case parser of
   LineByLineParser -> lineByLineParser
 
 errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
-errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
+errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (Pos 0 0) (UnexpectedEndOfInput [])) err)))
 
 termErrors :: (Syntax.Error (Error grammar) :< fs, Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
 termErrors = cata $ \ (_ :< s) -> case s of
@@ -109,8 +109,8 @@ lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([],
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines source
-    root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
+    root children = (sourceRange :. Program :. rangeToSpan source sourceRange :. Nil) :< Indexed children
     sourceRange = Source.totalRange source
-    leaf byteIndex line = (Range byteIndex (byteIndex + T.length line) :. Program :. rangeToSourceSpan source (Range byteIndex (byteIndex + T.length line)) :. Nil) :< Leaf line
+    leaf byteIndex line = (Range byteIndex (byteIndex + T.length line) :. Program :. rangeToSpan source (Range byteIndex (byteIndex + T.length line)) :. Nil) :< Leaf line
     annotateLeaves (accum, byteIndex) line =
       (accum <> [ leaf byteIndex (Source.toText line) ] , byteIndex + Source.length line)

@@ -73,7 +73,7 @@ instance ToJSONFields Range where
 instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> toS c }]
 
-instance ToJSONFields SourceSpan where
+instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 instance ToJSONFields a => ToJSONFields (Maybe a) where

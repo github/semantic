@@ -8,11 +8,10 @@ module Info
 , Category(..)
 , category
 , setCategory
-, SourceSpan(..)
-, SourcePos(..)
-, SourceSpans(..)
+, Span(..)
+, Pos(..)
 , sourceSpan
-, setSourceSpan
+, setSpan
 ) where
 
 import Category
@@ -21,10 +20,10 @@ import Range
 import SourceSpan
 
 -- | The default set of fields produced by our parsers.
-type DefaultFields = '[ Range, Category, SourceSpan ]
+type DefaultFields = '[ Range, Category, Span ]
 
 -- | A type alias for HasField constraints commonly used throughout semantic-diff.
-type HasDefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields SourceSpan)
+type HasDefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields Span)
 
 byteRange :: HasField fields Range => Record fields -> Range
 byteRange = getField
@@ -38,8 +37,8 @@ category = getField
 setCategory :: HasField fields Category => Record fields -> Category -> Record fields
 setCategory = setField
 
-sourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan
+sourceSpan :: HasField fields Span => Record fields -> Span
 sourceSpan = getField
 
-setSourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan -> Record fields
-setSourceSpan = setField
+setSpan :: HasField fields Span => Record fields -> Span -> Record fields
+setSpan = setField

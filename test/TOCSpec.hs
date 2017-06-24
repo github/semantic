@@ -214,8 +214,8 @@ isMethodOrFunction a = case runCofree (unListableF a) of
 blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
 blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
 
-sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
-sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
+sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
+sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 
 blankDiff :: Diff'
 blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :< Leaf "\"a\"") ])

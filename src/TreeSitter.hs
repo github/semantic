@@ -102,16 +102,16 @@ isNonEmpty = (/= Empty) . category . extract
 nodeRange :: Node -> Range
 nodeRange Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
 
-nodeSpan :: Node -> SourceSpan
-nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` SourceSpan (pointPos nodeStartPoint) (pointPos nodeEndPoint)
-  where pointPos TSPoint{..} = pointRow `seq` pointColumn `seq` SourcePos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
+nodeSpan :: Node -> Span
+nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
+  where pointPos TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
 
-assignTerm :: Language -> Source -> Record DefaultFields -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
+assignTerm :: Language -> Source -> Record DefaultFields -> [ SyntaxTerm Text DefaultFields ] -> IO [ SyntaxTerm Text DefaultFields ] -> IO (SyntaxTerm Text DefaultFields)
 assignTerm language source annotation children allChildren =
   cofree . (annotation :<) <$> case assignTermByLanguage language source (category annotation) children of
     Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children allChildren
-  where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
+  where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text DefaultFields ] -> Maybe (S.Syntax Text (SyntaxTerm Text DefaultFields))
         assignTermByLanguage language = case language of
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
