@@ -16,7 +16,6 @@ import Data.Record
 import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
-import qualified Data.Text as T
 import Data.Union
 import Info hiding (Empty, Go)
 import Language
@@ -105,12 +104,5 @@ termErrors = cata $ \ (_ :< s) -> case s of
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> IO (SyntaxTerm Text DefaultFields)
-lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
-  (leaves, _) -> cofree <$> leaves
-  where
-    lines = sourceLines source
-    root children = (sourceRange :. Program :. rangeToSpan source sourceRange :. Nil) :< Indexed children
-    sourceRange = totalRange source
-    leaf byteIndex line = (Range byteIndex (byteIndex + T.length line) :. Program :. rangeToSpan source (Range byteIndex (byteIndex + T.length line)) :. Nil) :< Leaf line
-    annotateLeaves (accum, byteIndex) line =
-      (accum <> [ leaf byteIndex (toText line) ] , byteIndex + sourceLength line)
+lineByLineParser source = pure . cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
+  where toLine line range = cofree $ (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))
