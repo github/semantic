@@ -291,12 +291,12 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Empty `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
-  a <|> b = case (a, b) of
-    (Return a, _) -> pure a
-    (_, Empty `Then` _) -> a
-    (Empty `Then` _, _) -> b
-    (Choose choices1 `Then` continue1, Choose choices2 `Then` continue2) -> Choose (IntMap.union (fmap continue1 choices1) (fmap continue2 choices2)) `Then` identity
-    _ -> wrap $ Alt a b
+  Return a <|> _ = Return a
+  a        <|> b | Just c <- (liftA2 (<>) `on` choices) a b = Choose c `Then` identity
+                 | otherwise = wrap $ Alt a b
+    where choices (Choose choices `Then` continue) = Just (continue <$> choices)
+          choices (Empty `Then` _) = Just mempty
+          choices _ = Nothing
 
 instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
