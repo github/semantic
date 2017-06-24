@@ -115,6 +115,7 @@ data AssignmentF ast grammar a where
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF ast grammar a
+  Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
   Empty :: HasCallStack => AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
@@ -246,6 +247,8 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
             Result _ (Just (a, state')) -> yield a (advanceState (rtail . toRecord) state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
           (Choose choices, node : _) | Just symbol :. _ <- toRecord (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          (Many _, []) -> yield [] state
+          (Many rule, _) -> uncurry yield (runMany rule state)
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
@@ -261,6 +264,10 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
                   Choose choices -> choiceSymbols choices
                   _ -> []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
+                runMany :: Assignment ast grammar v -> AssignmentState ast -> ([v], AssignmentState ast)
+                runMany rule state = case runAssignment toRecord rule state of
+                  Result _ (Just (a, state')) -> first (a :) (runMany rule state')
+                  _ -> ([], state)
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Maybe grammar) -> AssignmentState ast -> AssignmentState ast
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . F.project) (stateNodes state) }
@@ -297,6 +304,8 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
     where choices (Choose choices `Then` continue) = Just (continue <$> choices)
           choices (Empty `Then` _) = Just mempty
           choices _ = Nothing
+  many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
+  many a = Many a `Then` return
 
 instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
@@ -305,6 +314,7 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
+    Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
     Throw e -> showsUnaryWith showsPrec "Throw" d e
