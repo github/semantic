@@ -120,13 +120,13 @@ spanToRangeInLineRanges lineRanges Span{..} = Range start end
 -- | Compute the 'Span' corresponding to a given byte 'Range' in a 'Source'.
 rangeToSpan :: Source -> Range -> Span
 rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
-  where startPos = Pos (firstLine + 1)                          (rangeStart - start firstRange + 1)
+  where startPos = Pos (firstLine + 1)                 (rangeStart - start firstRange + 1)
         endPos =   Pos (firstLine + length lineRanges) (rangeEnd   - start lastRange  + 1)
         firstLine = length before
         (before, rest) = span ((< rangeStart) . end) (sourceLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
         Just firstRange = getFirst (foldMap (First . Just) lineRanges)
-        Just lastRange = getLast (foldMap (Last . Just) lineRanges)
+        Just lastRange  = getLast  (foldMap (Last  . Just) lineRanges)
 
 
 -- Instances
