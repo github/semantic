@@ -40,11 +40,5 @@ blobExists Blob{..} = isJust blobKind
 sourceBlob :: FilePath -> Maybe Language -> Source -> Blob
 sourceBlob filepath language source = Blob source nullOid filepath (Just defaultPlainBlob) language
 
--- | Map blobs with Nothing blobKind to empty blobs.
-idOrEmptyBlob :: Blob -> Blob
-idOrEmptyBlob blob = if isNothing (blobKind blob)
-                           then blob { blobOid = nullOid, blobKind = Nothing }
-                           else blob
-
 nullOid :: ByteString
 nullOid = "0000000000000000000000000000000000000000"
