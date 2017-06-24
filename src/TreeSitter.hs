@@ -7,7 +7,7 @@ module TreeSitter
 
 import Prologue hiding (Constructor)
 import Category
-import Data.ByteString (useAsCStringLen)
+import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Functor.Foldable hiding (Nil)
 import Data.Ix
 import Data.Range
@@ -34,7 +34,7 @@ import Info
 treeSitterParser :: Language -> Ptr TS.Language -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
 treeSitterParser language grammar source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document grammar
-  useAsCStringLen (sourceBytes source) $ \ (sourceBytes, len) -> do
+  unsafeUseAsCStringLen (sourceBytes source) $ \ (sourceBytes, len) -> do
     ts_document_set_input_string_with_length document sourceBytes len
     ts_document_parse_halt_on_error document
     term <- documentToTerm language document source
@@ -45,7 +45,7 @@ treeSitterParser language grammar source = bracket ts_document_new ts_document_f
 parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (Cofree [] (Record (Maybe grammar ': A.Location)))
 parseToAST language source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document language
-  root <- useAsCStringLen (sourceBytes source) $ \ (source, len) -> do
+  root <- unsafeUseAsCStringLen (sourceBytes source) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
     ts_document_parse_halt_on_error document
     alloca (\ rootPtr -> do
