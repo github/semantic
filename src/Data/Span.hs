@@ -34,14 +34,11 @@ data Span = Span
   }
   deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
 
-unionSpan :: Span -> Span -> Span
-unionSpan (Span start1 end1) (Span start2 end2) = Span (min start1 start2) (max end1 end2)
-
 emptySpan :: Span
 emptySpan = Span (Pos 1 1) (Pos 1 1)
 
 instance Semigroup Span where
-  a <> b = unionSpan a b
+  Span start1 end1 <> Span start2 end2 = Span (min start1 start2) (max end1 end2)
 
 instance A.ToJSON Span where
   toJSON Span{..} =
