@@ -9,10 +9,10 @@ module Renderer.JSON
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
+import Data.Blob
 import Data.Functor.Both (Both)
 import qualified Data.Map as Map
 import Data.Record
-import Data.Source
 import Data.Union
 import Info
 import Language

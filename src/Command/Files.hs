@@ -10,7 +10,8 @@ import Control.Exception (catch, IOException)
 import Data.Aeson
 import Data.These
 import Data.Functor.Both
-import Data.Source hiding (path)
+import Data.Blob hiding (path)
+import Data.Source
 import Data.String
 import Language
 import Prologue hiding (readFile)

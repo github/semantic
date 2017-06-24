@@ -7,6 +7,7 @@ module SpecHelpers
 , unListableDiff
 ) where
 
+import Data.Blob
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Listable

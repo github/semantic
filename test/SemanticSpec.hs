@@ -1,7 +1,7 @@
 module SemanticSpec where
 
+import Data.Blob
 import Data.Functor.Both as Both
-import Data.Source
 import Language
 import Patch
 import Prologue
@@ -37,4 +37,4 @@ spec = parallel $ do
       (() <$) <$> result `shouldBe` pure (Delete ())
 
   where
-    methodsBlob = SourceBlob (Source "def foo\nend\n") "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)
+    methodsBlob = SourceBlob "def foo\nend\n" "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)

@@ -4,6 +4,7 @@ module TOCSpec where
 
 import Data.Aeson
 import Category as C
+import Data.Blob
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.Record

@@ -19,6 +19,7 @@ module Renderer.TOC
 
 import Data.Aeson
 import Data.Align (crosswalk)
+import Data.Blob
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable

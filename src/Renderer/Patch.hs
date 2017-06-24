@@ -9,6 +9,7 @@ module Renderer.Patch
 
 import Alignment
 import Data.Bifunctor.Join
+import Data.Blob
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Functor.Both as Both
 import Data.List (span, unzip)

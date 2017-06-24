@@ -9,6 +9,7 @@ module Semantic
 
 import Algorithm hiding (diff)
 import Data.Align.Generic (GAlign)
+import Data.Blob
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
 import Data.Proxy
