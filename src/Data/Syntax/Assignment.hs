@@ -284,7 +284,7 @@ data AssignmentState ast = AssignmentState
   deriving (Eq, Show)
 
 makeState :: Source.Source -> [ast] -> AssignmentState ast
-makeState source nodes = AssignmentState 0 (Info.Pos 1 1) source nodes
+makeState = AssignmentState 0 (Info.Pos 1 1)
 
 
 -- Instances
