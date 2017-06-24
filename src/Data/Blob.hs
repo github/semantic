@@ -16,7 +16,7 @@ data Blob = Blob
   deriving (Show, Eq)
 
 -- | The kind and file mode of a 'Blob'.
-data BlobKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
+data BlobKind = PlainBlob Word32 | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
 modeToDigits :: BlobKind -> ByteString
