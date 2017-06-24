@@ -14,9 +14,9 @@ module Data.Source
 , drop
 -- Splitting
 , break
-, actualLines
-, actualLineRanges
-, actualLineRangesWithin
+, sourceLines
+, sourceLineRanges
+, sourceLineRangesWithin
 -- Conversion
 , spanToRange
 , spanToRangeInLineRanges
@@ -54,7 +54,7 @@ totalRange = Range 0 . B.length . sourceBytes
 -- | Return a 'Span' that covers the entire text.
 totalSpan :: Source -> Span
 totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - start lastRange)))
-  where ranges = actualLineRanges source
+  where ranges = sourceLineRanges source
         Just lastRange = getLast (foldMap (Last . Just) ranges)
 
 
@@ -92,23 +92,23 @@ break predicate (Source text) = let (start, remainder) = B.break predicate text 
 
 
 -- | Split the contents of the source after newlines.
-actualLines :: Source -> [Source]
-actualLines = fmap Source . actualLines' . sourceBytes
-  where actualLines' text
+sourceLines :: Source -> [Source]
+sourceLines = fmap Source . sourceLines' . sourceBytes
+  where sourceLines' text
           | B.null text = [ text ]
           | otherwise = case B.break (== toEnum (fromEnum '\n')) text of
             (l, lines') -> case B.uncons lines' of
               Nothing -> [ l ]
-              Just (_, lines') -> (l <> B.singleton (toEnum (fromEnum '\n'))) : actualLines' lines'
+              Just (_, lines') -> (l <> B.singleton (toEnum (fromEnum '\n'))) : sourceLines' lines'
 
 -- | Compute the 'Range's of each line in a 'Source'.
-actualLineRanges :: Source -> [Range]
-actualLineRanges = Prologue.drop 1 . scanl toRange (Range 0 0) . actualLines
+sourceLineRanges :: Source -> [Range]
+sourceLineRanges = Prologue.drop 1 . scanl toRange (Range 0 0) . sourceLines
   where toRange previous source = Range (end previous) $ end previous + sourceLength source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
-actualLineRangesWithin :: Range -> Source -> [Range]
-actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
+sourceLineRangesWithin :: Range -> Source -> [Range]
+sourceLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . sourceLines . slice range
   where toRange previous source = Range (end previous) $ end previous + sourceLength source
 
 
@@ -116,7 +116,7 @@ actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start ran
 
 -- | Compute the byte 'Range' corresponding to a given 'Span' in a 'Source'.
 spanToRange :: Source -> Span -> Range
-spanToRange source = spanToRangeInLineRanges (actualLineRanges source)
+spanToRange source = spanToRangeInLineRanges (sourceLineRanges source)
 
 spanToRangeInLineRanges :: [Range] -> Span -> Range
 spanToRangeInLineRanges lineRanges Span{..} = Range start end
@@ -131,7 +131,7 @@ rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
   where startPos = Pos (firstLine + 1)                          (rangeStart - start firstRange + 1)
         endPos =   Pos (firstLine + length lineRanges) (rangeEnd   - start lastRange  + 1)
         firstLine = length before
-        (before, rest) = span ((< rangeStart) . end) (actualLineRanges source)
+        (before, rest) = span ((< rangeStart) . end) (sourceLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
         Just firstRange = getFirst (foldMap (First . Just) lineRanges)
         Just lastRange = getLast (foldMap (Last . Just) lineRanges)

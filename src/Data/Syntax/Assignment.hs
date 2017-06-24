@@ -95,7 +95,7 @@ import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Range (offsetRange)
 import Data.Record
-import qualified Data.Source as Source (Source(..), drop, slice, sourceBytes, actualLines)
+import qualified Data.Source as Source (Source(..), drop, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
@@ -188,7 +188,7 @@ printError source error@Error{..}
     withSGRCode [SetColor Foreground Vivid Red] . putStrErr . (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') $ ""
     withSGRCode [SetColor Foreground Vivid Green] . putStrErr . (showChar '^') . showChar '\n' . showString (prettyCallStack callStack) $ ""
 
-  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.actualLines source), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
+  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.Source (toS (showLineNumber i)) <> Source.Source ": " <> l | (i, l) <- zip [1..] (Source.sourceLines source), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
         putStrErr = hPutStr stderr

@@ -59,7 +59,7 @@ alignSyntax :: (Applicative f, HasField fields Range, Foldable g) => (forall a. 
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) =
   catMaybes $ wrapInBranch <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
-        lineRanges = toJoinThese $ actualLineRangesWithin . byteRange <$> infos <*> sources
+        lineRanges = toJoinThese $ sourceLineRangesWithin . byteRange <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
         makeNode info (range, children) = toNode (setByteRange info range :< children)
 

@@ -11,18 +11,18 @@ import Test.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "actualLineRanges" $ do
+  describe "sourceLineRanges" $ do
     prop "produces 1 more range than there are newlines" $
-      \ source -> length (actualLineRanges source) `shouldBe` succ (Text.count "\n" (toText source))
+      \ source -> length (sourceLineRanges source) `shouldBe` succ (Text.count "\n" (toText source))
 
     prop "produces exhaustive ranges" $
-      \ source -> foldMap (`slice` source) (actualLineRanges source) `shouldBe` source
+      \ source -> foldMap (`slice` source) (sourceLineRanges source) `shouldBe` source
 
   describe "spanToRange" $ do
     prop "computes single-line ranges" . forAll (unListableByteString `mapT` tiers) $
       \ s -> let source = Source s
                  spans = zipWith (\ i Range {..} -> Span (Pos i 1) (Pos i (succ (end - start)))) [1..] ranges
-                 ranges = actualLineRanges source in
+                 ranges = sourceLineRanges source in
         spanToRange source <$> spans `shouldBe` ranges
 
     prop "computes multi-line ranges" $

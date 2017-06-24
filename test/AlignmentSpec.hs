@@ -222,9 +222,9 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
         alignBranchElement element = case element of
           Child key contents -> Child key <$> joinCrosswalk lines contents
           Margin contents -> Margin <$> joinCrosswalk lines contents
-          where lines = fmap Source.toText . Source.actualLines . Source.fromText
+          where lines = fmap Source.toText . Source.sourceLines . Source.fromText
         sources = foldMap Source.fromText <$> bothContents elements
-        ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRangesWithin <$> (Source.totalRange <$> sources) <*> sources
+        ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.sourceLineRangesWithin <$> (Source.totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
         branchElementContents (Child _ contents) = contents
         branchElementContents (Margin contents) = contents

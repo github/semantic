@@ -108,7 +108,7 @@ lineByLineParser :: Source -> IO (SyntaxTerm Text DefaultFields)
 lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
-    lines = actualLines source
+    lines = sourceLines source
     root children = (sourceRange :. Program :. rangeToSpan source sourceRange :. Nil) :< Indexed children
     sourceRange = totalRange source
     leaf byteIndex line = (Range byteIndex (byteIndex + T.length line) :. Program :. rangeToSpan source (Range byteIndex (byteIndex + T.length line)) :. Nil) :< Leaf line
