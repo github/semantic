@@ -40,12 +40,12 @@ import Text.Show
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
-parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [SourceBlob] -> Task ByteString
+parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [Blob] -> Task ByteString
 parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter blobExists
 
--- | A task to parse a 'SourceBlob' and render the resulting 'Term'.
-parseBlob :: TermRenderer output -> SourceBlob -> Task output
-parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
+-- | A task to parse a 'Blob' and render the resulting 'Term'.
+parseBlob :: TermRenderer output -> Blob -> Task output
+parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.Python) -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
   (ToCTermRenderer, _) -> parse syntaxParser source >>= decorate (syntaxDeclarationAlgebra source) >>= render (renderToCTerm blob)
@@ -62,11 +62,11 @@ parseBlob renderer blob@SourceBlob{..} = case (renderer, blobLanguage) of
 
 
 
-diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both SourceBlob] -> Task ByteString
+diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both Blob] -> Task ByteString
 diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
 
--- | A task to parse a pair of 'SourceBlob's, diff them, and render the 'Diff'.
-diffBlobPair :: DiffRenderer output -> Both SourceBlob -> Task output
+-- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
+diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, Just Language.Markdown) -> run (\ source -> parse markdownParser source >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) source)) diffLinearly (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Python) -> run (\ source -> parse pythonParser source >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) source) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToCDiff blobs)
@@ -90,8 +90,8 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         diffLinearly :: (Eq1 f, GAlign f, Show1 f, Traversable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
         diffLinearly = decoratingWith constructorLabel (diffTermsWith linearly comparableByConstructor)
 
--- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'SourceBlob's.
-diffTermPair :: Functor f => Both SourceBlob -> Differ f a -> Both (Term f a) -> Task (Diff f a)
+-- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
+diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task (Diff f a)
 diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting (Both.fst terms))
   (False, True) -> pure (inserting (Both.snd terms))

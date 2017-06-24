@@ -25,7 +25,7 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-renderJSONDiff :: ToJSON a => Both SourceBlob -> a -> Map.Map Text Value
+renderJSONDiff :: ToJSON a => Both Blob -> a -> Map.Map Text Value
 renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
   , ("oids", toJSON (decodeUtf8 . oid <$> toList blobs))
@@ -120,5 +120,5 @@ instance ToJSON a => ToJSON (File a) where
 instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-renderJSONTerm :: ToJSON a => SourceBlob -> a -> [Value]
-renderJSONTerm SourceBlob{..} = pure . toJSON . File path blobLanguage
+renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
+renderJSONTerm Blob{..} = pure . toJSON . File path blobLanguage

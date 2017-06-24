@@ -34,15 +34,15 @@ parseFilePath path = do
   blob <- readFile path
   runTask (parseBlob SExpressionTermRenderer blob)
 
--- | Read a file to a SourceBlob.
+-- | Read a file to a Blob.
 --
 -- NB: This is intentionally duplicated from Command.Files because eventually
 -- we want to be able to test a core Semantic library that has no knowledge of
 -- the filesystem or Git. The tests, however, will still leverage reading files.
-readFile :: FilePath -> IO SourceBlob
+readFile :: FilePath -> IO Blob
 readFile path = do
   source <- (Just . Source <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
-  pure $ fromMaybe (emptySourceBlob path) (sourceBlob path (languageForFilePath path) <$> source)
+  pure $ fromMaybe (emptyBlob path) (sourceBlob path (languageForFilePath path) <$> source)
 
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language

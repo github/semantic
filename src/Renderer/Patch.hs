@@ -24,11 +24,11 @@ import Prologue hiding (fst, snd)
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
-truncatePatch :: Both SourceBlob -> ByteString
+truncatePatch :: Both Blob -> ByteString
 truncatePatch blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-renderPatch :: (HasField fields Range, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> File
+renderPatch :: (HasField fields Range, Traversable f) => Both Blob -> Diff f (Record fields) -> File
 renderPatch blobs diff = File $ if not (ByteString.null text) && ByteString.last text /= '\n'
   then text <> "\n\\ No newline at end of file\n"
   else text
@@ -66,7 +66,7 @@ rowIncrement :: Join These a -> Both (Sum Int)
 rowIncrement = Join . fromThese (Sum 0) (Sum 0) . runJoin . (Sum 1 <$)
 
 -- | Given the before and after sources, render a hunk to a string.
-showHunk :: Functor f => HasField fields Range => Both SourceBlob -> Hunk (SplitDiff f (Record fields)) -> ByteString
+showHunk :: Functor f => HasField fields Range => Both Blob -> Hunk (SplitDiff f (Record fields)) -> ByteString
 showHunk blobs hunk = maybeOffsetHeader <>
   mconcat (showChange sources <$> changes hunk) <>
   showLines (snd sources) ' ' (maybeSnd . runJoin <$> trailingContext hunk)
@@ -95,7 +95,7 @@ showLine source line | Just line <- line = Just . sourceText . (`slice` source) 
                      | otherwise = Nothing
 
 -- | Returns the header given two source blobs and a hunk.
-header :: Both SourceBlob -> ByteString
+header :: Both Blob -> ByteString
 header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> maybeFilepaths) <> "\n"
   where filepathHeader = "diff --git a/" <> pathA <> " b/" <> pathB
         fileModeHeader = case (modeA, modeB) of
@@ -109,7 +109,7 @@ header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> 
             ]
           (Nothing, Nothing) -> ""
         blobOidHeader = "index " <> oidA <> ".." <> oidB
-        modeHeader :: ByteString -> Maybe SourceKind -> ByteString -> ByteString
+        modeHeader :: ByteString -> Maybe BlobKind -> ByteString -> ByteString
         modeHeader ty maybeMode path = case maybeMode of
            Just _ -> ty <> "/" <> path
            Nothing -> "/dev/null"
@@ -129,7 +129,7 @@ emptyHunk :: Hunk (SplitDiff a annotation)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
-hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) -> Both SourceBlob -> [Hunk (SplitDiff [] (Record fields))]
+hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) -> Both Blob -> [Hunk (SplitDiff [] (Record fields))]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (Source.null <$> sources)

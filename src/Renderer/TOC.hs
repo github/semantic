@@ -187,7 +187,7 @@ recordSummary record = case getDeclaration record of
   Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
   Nothing -> const Nothing
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Both Blob -> Diff f (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -197,7 +197,7 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => SourceBlob -> Term f (Record fields) -> Summaries
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Blob -> Term f (Record fields) -> Summaries
 renderToCTerm blob = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where toMap [] = mempty
         toMap as = Map.singleton (toS (path blob)) (toJSON <$> as)

@@ -212,7 +212,7 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   (a :< _) | getField a == C.SingletonMethod -> True
   _ -> False
 
-blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
+blobsForPaths :: Both FilePath -> IO (Both Blob)
 blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
@@ -224,8 +224,8 @@ blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :<
     arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
-blankDiffBlobs :: Both SourceBlob
-blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
+blankDiffBlobs :: Both Blob
+blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
 
 instance Listable Text where
   tiers = unListableText `mapT` tiers

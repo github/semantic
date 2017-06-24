@@ -31,26 +31,26 @@ spec = parallel $ do
 
     it "returns blobs when there's no before" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-no-before.json"
-      blobs `shouldBe` [both (emptySourceBlob "method.rb") b]
+      blobs `shouldBe` [both (emptyBlob "method.rb") b]
 
     it "returns blobs when there's null before" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-null-before.json"
-      blobs `shouldBe` [both (emptySourceBlob "method.rb") b]
+      blobs `shouldBe` [both (emptyBlob "method.rb") b]
 
     it "returns blobs when there's no after" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-no-after.json"
-      blobs `shouldBe` [both a (emptySourceBlob "method.rb")]
+      blobs `shouldBe` [both a (emptyBlob "method.rb")]
 
     it "returns blobs when there's null after" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-null-after.json"
-      blobs `shouldBe` [both a (emptySourceBlob "method.rb")]
+      blobs `shouldBe` [both a (emptyBlob "method.rb")]
 
 
     it "returns blobs for unsupported language" $ do
       h <- openFile "test/fixtures/input/diff-unsupported-language.json" ReadMode
       blobs <- readBlobPairsFromHandle h
       let b' = sourceBlob "test.kt" Nothing "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
-      blobs `shouldBe` [both (emptySourceBlob "test.kt") b']
+      blobs `shouldBe` [both (emptyBlob "test.kt") b']
 
     it "detects language based on filepath for empty language" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-empty-language.json"
@@ -80,4 +80,4 @@ spec = parallel $ do
           blobs <- readBlobPairsFromHandle h
           pure blobs
 
-data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both SourceBlob] }
+data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both Blob] }
