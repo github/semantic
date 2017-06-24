@@ -15,7 +15,7 @@ import Data.Functor.Both
 import Data.List (partition)
 import Data.Maybe (fromJust)
 import Data.Range
-import Data.Source hiding (drop)
+import Data.Source
 import Data.Record
 import Data.These
 import Diff

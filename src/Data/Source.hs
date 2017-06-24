@@ -11,7 +11,7 @@ module Data.Source
 , toText
 -- Slicing
 , slice
-, drop
+, dropSource
 -- Splitting
 , sourceLines
 , sourceLineRanges
@@ -30,8 +30,7 @@ import Data.Range
 import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
-import Prologue hiding (break, drop, take)
-import qualified Prologue
+import Prologue
 import Test.LeanCheck
 
 -- | The contents of a source file, represented as a ByteString.
@@ -72,42 +71,42 @@ toText = decodeUtf8 . sourceBytes
 -- | Return a 'Source' that contains a slice of the given 'Source'.
 slice :: Range -> Source -> Source
 slice range = take . drop
-  where drop = Data.Source.drop (start range)
-        take = Data.Source.take (rangeLength range)
+  where drop = dropSource (start range)
+        take = takeSource (rangeLength range)
 
-drop :: Int -> Source -> Source
-drop i = Source . drop . sourceBytes
+dropSource :: Int -> Source -> Source
+dropSource i = Source . drop . sourceBytes
   where drop = B.drop i
 
-take :: Int -> Source -> Source
-take i = Source . take . sourceBytes
+takeSource :: Int -> Source -> Source
+takeSource i = Source . take . sourceBytes
   where take = B.take i
 
 
 -- Splitting
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-break :: (Word8 -> Bool) -> Source -> (Source, Source)
-break predicate (Source text) = let (start, remainder) = B.break predicate text in (Source start, Source remainder)
+breakSource :: (Word8 -> Bool) -> Source -> (Source, Source)
+breakSource predicate (Source text) = let (start, remainder) = B.break predicate text in (Source start, Source remainder)
 
 
 -- | Split the contents of the source after newlines.
 sourceLines :: Source -> [Source]
 sourceLines source
   | nullSource source = [ source ]
-  | otherwise = case break (== toEnum (fromEnum '\n')) source of
+  | otherwise = case breakSource (== toEnum (fromEnum '\n')) source of
     (line, rest)
       | nullSource rest -> [ line ]
-      | otherwise -> (line <> "\n") : sourceLines (drop 1 rest)
+      | otherwise -> (line <> "\n") : sourceLines (dropSource 1 rest)
 
 -- | Compute the 'Range's of each line in a 'Source'.
 sourceLineRanges :: Source -> [Range]
-sourceLineRanges = Prologue.drop 1 . scanl toRange (Range 0 0) . sourceLines
+sourceLineRanges = drop 1 . scanl toRange (Range 0 0) . sourceLines
   where toRange previous source = Range (end previous) $ end previous + sourceLength source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
 sourceLineRangesWithin :: Range -> Source -> [Range]
-sourceLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . sourceLines . slice range
+sourceLineRangesWithin range = drop 1 . scanl toRange (Range (start range) (start range)) . sourceLines . slice range
   where toRange previous source = Range (end previous) $ end previous + sourceLength source
 
 
@@ -120,7 +119,7 @@ spanToRange source = spanToRangeInLineRanges (sourceLineRanges source)
 spanToRangeInLineRanges :: [Range] -> Span -> Range
 spanToRangeInLineRanges lineRanges Span{..} = Range start end
   where start = pred (sumLengths leadingRanges + posColumn spanStart)
-        end = start + sumLengths (Prologue.take (posLine spanEnd - posLine spanStart) remainingRanges) + (posColumn spanEnd - posColumn spanStart)
+        end = start + sumLengths (take (posLine spanEnd - posLine spanStart) remainingRanges) + (posColumn spanEnd - posColumn spanStart)
         (leadingRanges, remainingRanges) = splitAt (pred (posLine spanStart)) lineRanges
         sumLengths = sum . fmap rangeLength
 

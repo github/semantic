@@ -95,7 +95,7 @@ import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Range (offsetRange)
 import Data.Record
-import qualified Data.Source as Source (Source(..), drop, slice, sourceBytes, sourceLines)
+import qualified Data.Source as Source (Source(..), dropSource, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
@@ -271,7 +271,7 @@ dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just 
 advanceState :: Recursive ast => (forall x. Base ast x -> Record Location) -> AssignmentState ast -> AssignmentState ast
 advanceState toLocation state@AssignmentState{..}
   | node : rest <- stateNodes
-  , range :. span :. Nil <- toLocation (F.project node) = AssignmentState (Info.end range) (Info.spanEnd span) (Source.drop (Info.end range - stateOffset) stateSource) rest
+  , range :. span :. Nil <- toLocation (F.project node) = AssignmentState (Info.end range) (Info.spanEnd span) (Source.dropSource (Info.end range - stateOffset) stateSource) rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
