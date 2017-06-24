@@ -1,5 +1,10 @@
 {-# LANGUAGE DeriveAnyClass #-}
-module Data.Range where
+module Data.Range
+( Range(..)
+, rangeLength
+, offsetRange
+, intersectsRange
+) where
 
 import Data.Semigroup
 import Prologue
