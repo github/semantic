@@ -16,9 +16,6 @@ newtype Source = Source { sourceText :: B.ByteString }
   deriving (Eq, IsString, Show)
 
 
-empty :: Source
-empty = Source B.empty
-
 -- | Return a 'Source' from a 'ByteString'.
 fromText :: T.Text -> Source
 fromText = Source . encodeUtf8
@@ -107,7 +104,7 @@ instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
 
 instance Monoid Source where
-  mempty = Data.Source.empty
+  mempty = Source B.empty
   mappend = (<>)
 
 instance Listable Source where
