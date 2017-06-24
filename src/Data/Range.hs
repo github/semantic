@@ -22,10 +22,6 @@ offsetRange a b = Range (start a + b) (end a + b)
 intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = start range1 < end range2 && start range2 < end range1
 
--- Return the (possibly empty, possibly ill-formed) intersection of two ranges.
-intersectionRange :: Range -> Range -> Range
-intersectionRange range1 range2 = Range (max (start range1) (start range2)) (min (end range1) (end range2))
-
 -- | Return a range that contains both the given ranges.
 unionRange :: Range -> Range -> Range
 unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
