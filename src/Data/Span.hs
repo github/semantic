@@ -7,7 +7,6 @@ module Data.Span where
 
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
-import Data.List.NonEmpty (nonEmpty)
 import Data.Semigroup
 import Data.These
 import Prologue
@@ -34,9 +33,6 @@ data Span = Span
   , spanEnd :: Pos
   }
   deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
-
-unionSpansFrom :: Foldable f => Span -> f Span -> Span
-unionSpansFrom sourceSpan = maybe sourceSpan sconcat . nonEmpty . toList
 
 unionSpan :: Span -> Span -> Span
 unionSpan (Span start1 end1) (Span start2 end2) = Span (min start1 start2) (max end1 end2)
