@@ -32,7 +32,7 @@ emptyBlob :: FilePath -> Blob
 emptyBlob filepath = Blob mempty nullOid filepath Nothing Nothing
 
 nullBlob :: Blob -> Bool
-nullBlob Blob{..} = blobOid == nullOid || Source.null blobSource
+nullBlob Blob{..} = blobOid == nullOid || nullSource blobSource
 
 blobExists :: Blob -> Bool
 blobExists Blob{..} = isJust blobKind

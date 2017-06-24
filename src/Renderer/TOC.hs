@@ -26,7 +26,7 @@ import Data.Functor.Listable
 import Data.List.NonEmpty (nonEmpty)
 import Data.Proxy
 import Data.Record
-import Data.Source as Source hiding (null)
+import Data.Source as Source
 import Data.Text (toLower)
 import Data.Text.Listable
 import Data.These

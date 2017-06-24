@@ -2,7 +2,7 @@
 module Language.Ruby where
 
 import Data.List (partition)
-import Data.Source hiding (null)
+import Data.Source
 import Info
 import Prologue
 import Language

@@ -15,8 +15,7 @@ import Data.Functor.Both as Both
 import Data.List (span, unzip)
 import Data.Range
 import Data.Record
-import Data.Source as Source hiding (break, drop, length, null, take)
-import qualified Data.Source as Source
+import Data.Source as Source hiding (break, drop, length, take)
 import Data.These
 import Diff
 import Patch
@@ -113,7 +112,7 @@ header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> 
         modeHeader ty maybeMode path = case maybeMode of
            Just _ -> ty <> "/" <> path
            Nothing -> "/dev/null"
-        maybeFilepaths = if (nullOid == oidA && Source.null (snd sources)) || (nullOid == oidB && Source.null (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
+        maybeFilepaths = if (nullOid == oidA && nullSource (snd sources)) || (nullOid == oidB && nullSource (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
         beforeFilepath = "--- " <> modeHeader "a" modeA pathA
         afterFilepath = "+++ " <> modeHeader "b" modeB pathB
         sources = blobSource <$> blobs
@@ -132,7 +131,7 @@ emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) -> Both Blob -> [Hunk (SplitDiff [] (Record fields))]
 hunks _ blobs | sources <- blobSource <$> blobs
               , sourcesEqual <- runBothWith (==) sources
-              , sourcesNull <- runBothWith (&&) (Source.null <$> sources)
+              , sourcesNull <- runBothWith (&&) (nullSource <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
 hunks diff blobs = hunksInRows (pure 1) $ alignDiff (blobSource <$> blobs) diff

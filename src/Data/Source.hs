@@ -97,8 +97,8 @@ totalSpan source = Span (Pos 1 1) (Pos (Prologue.length ranges) (succ (end lastR
 length :: Source -> Int
 length = B.length . sourceText
 
-null :: Source -> Bool
-null = B.null . sourceText
+nullSource :: Source -> Bool
+nullSource = B.null . sourceText
 
 instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
