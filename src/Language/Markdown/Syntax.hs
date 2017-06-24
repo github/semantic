@@ -71,7 +71,7 @@ item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 section :: Assignment
 section = makeTerm <$> symbol Heading <*> (heading >>= \ headingTerm -> Markup.Section headingTerm <$> while (((<) `on` level) headingTerm) blockElement)
-  where heading = makeTerm <$> symbol Heading <*> (Markup.Heading <$> project (\ ((CMark.HEADING level :. _) :< _) -> level) <*> children (many inlineElement))
+  where heading = makeTerm <$> symbol Heading <*> (project (\ ((CMark.HEADING level :. _) :< _) -> Markup.Heading level) <*> children (many inlineElement))
         level term = case term of
           _ | Just section <- prj (unwrap term) -> level (Markup.sectionHeading section)
           _ | Just heading <- prj (unwrap term) -> Markup.headingLevel heading
@@ -81,7 +81,7 @@ blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code <$> project (\ ((CMark.CODE_BLOCK language _ :. _) :< _) -> nullText language) <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> (project (\ ((CMark.CODE_BLOCK language _ :. _) :< _) -> Markup.Code (nullText language)) <*> source)
 
 thematicBreak :: Assignment
 thematicBreak = makeTerm <$> symbol ThematicBreak <*> pure Markup.ThematicBreak <* source
