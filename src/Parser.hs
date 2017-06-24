@@ -92,7 +92,7 @@ runParser parser = case parser of
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> pure . cmarkParser
-  LineByLineParser -> lineByLineParser
+  LineByLineParser -> pure . lineByLineParser
 
 errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
 errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (Pos 0 0) (UnexpectedEndOfInput [])) err)))
@@ -103,6 +103,6 @@ termErrors = cata $ \ (_ :< s) -> case s of
   _ -> fold s
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Source -> IO (SyntaxTerm Text DefaultFields)
-lineByLineParser source = pure . cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
+lineByLineParser :: Source -> SyntaxTerm Text DefaultFields
+lineByLineParser source = cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
   where toLine line range = cofree $ (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))
