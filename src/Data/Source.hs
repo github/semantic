@@ -91,11 +91,6 @@ takeSource i = Source . take . sourceBytes
 
 -- Splitting
 
--- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-breakSource :: (Word8 -> Bool) -> Source -> (Source, Source)
-breakSource predicate (Source text) = let (start, remainder) = B.break predicate text in (Source start, Source remainder)
-
-
 -- | Split the contents of the source after newlines.
 sourceLines :: Source -> [Source]
 sourceLines source = (`slice` source) <$> sourceLineRanges source
