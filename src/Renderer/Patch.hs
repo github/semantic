@@ -90,7 +90,7 @@ showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine
 
 -- | Given a source, render a line to a string.
 showLine :: Functor f => HasField fields Range => Source -> Maybe (SplitDiff f (Record fields)) -> Maybe ByteString
-showLine source line | Just line <- line = Just . sourceText . (`slice` source) $ getRange line
+showLine source line | Just line <- line = Just . sourceBytes . (`slice` source) $ getRange line
                      | otherwise = Nothing
 
 -- | Returns the header given two source blobs and a hunk.

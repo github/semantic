@@ -11,7 +11,7 @@ import Prologue
 import Test.LeanCheck
 
 -- | The contents of a source file, represented as a ByteString.
-newtype Source = Source { sourceText :: B.ByteString }
+newtype Source = Source { sourceBytes :: B.ByteString }
   deriving (Eq, IsString, Show)
 
 
@@ -26,16 +26,16 @@ slice range = take . drop
         take = Data.Source.take (rangeLength range)
 
 drop :: Int -> Source -> Source
-drop i = Source . drop . sourceText
+drop i = Source . drop . sourceBytes
   where drop = B.drop i
 
 take :: Int -> Source -> Source
-take i = Source . take . sourceText
+take i = Source . take . sourceBytes
   where take = B.take i
 
 -- | Return the ByteString contained in the 'Source'.
 toText :: Source -> Text
-toText = decodeUtf8 . sourceText
+toText = decodeUtf8 . sourceBytes
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
 break :: (Word8 -> Bool) -> Source -> (Source, Source)
@@ -43,7 +43,7 @@ break predicate (Source text) = let (start, remainder) = B.break predicate text 
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source -> [Source]
-actualLines = fmap Source . actualLines' . sourceText
+actualLines = fmap Source . actualLines' . sourceBytes
   where actualLines' text
           | B.null text = [ text ]
           | otherwise = case B.break (== toEnum (fromEnum '\n')) text of
@@ -54,12 +54,12 @@ actualLines = fmap Source . actualLines' . sourceText
 -- | Compute the 'Range's of each line in a 'Source'.
 actualLineRanges :: Source -> [Range]
 actualLineRanges = Prologue.drop 1 . scanl toRange (Range 0 0) . actualLines
-  where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
+  where toRange previous source = Range (end previous) $ end previous + sourceLength source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
 actualLineRangesWithin :: Range -> Source -> [Range]
 actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + B.length (sourceText string)
+  where toRange previous source = Range (end previous) $ end previous + sourceLength source
 
 -- | Compute the byte 'Range' corresponding to a given 'Span' in a 'Source'.
 spanToRange :: Source -> Span -> Range
@@ -85,7 +85,7 @@ rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
 
 -- | Return a 'Range' that covers the entire text.
 totalRange :: Source -> Range
-totalRange = Range 0 . B.length . sourceText
+totalRange = Range 0 . B.length . sourceBytes
 
 -- | Return a 'Span' that covers the entire text.
 totalSpan :: Source -> Span
@@ -94,10 +94,10 @@ totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - st
         Just lastRange = getLast (foldMap (Last . Just) ranges)
 
 sourceLength :: Source -> Int
-sourceLength = B.length . sourceText
+sourceLength = B.length . sourceBytes
 
 nullSource :: Source -> Bool
-nullSource = B.null . sourceText
+nullSource = B.null . sourceBytes
 
 instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
@@ -120,4 +120,4 @@ instance Listable ListableByteString where
             , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.
 
 instance StringConv Source ByteString where
-  strConv _ = sourceText
+  strConv _ = sourceBytes
