@@ -27,6 +27,7 @@ module Data.Source
 ) where
 
 import qualified Data.ByteString as B
+import Data.Char (ord)
 import Data.List (span)
 import Data.Range
 import Data.Span
@@ -99,7 +100,7 @@ breakSource predicate (Source text) = let (start, remainder) = B.break predicate
 sourceLines :: Source -> [Source]
 sourceLines source
   | nullSource source = [ source ]
-  | otherwise = case breakSource (== toEnum (fromEnum '\n')) source of
+  | otherwise = case breakSource (== toEnum (ord '\n')) source of
     (line, rest)
       | nullSource rest -> [ line ]
       | otherwise -> (line <> "\n") : sourceLines (dropSource 1 rest)
