@@ -39,6 +39,7 @@ import Test.LeanCheck
 newtype Source = Source { sourceBytes :: B.ByteString }
   deriving (Eq, IsString, Show)
 
+
 -- Measurement
 
 sourceLength :: Source -> Int
