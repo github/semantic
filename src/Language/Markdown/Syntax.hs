@@ -105,10 +105,10 @@ text :: Assignment
 text = makeTerm <$> symbol Text <*> (Markup.Text <$> source)
 
 link :: Assignment
-link = makeTerm <$> symbol Link <*> (uncurry Markup.Link <$> project (\ ((CMark.LINK url title :. _) :< _) -> (toS url, nullText title))) <* source
+link = makeTerm <$> symbol Link <*> project (\ ((CMark.LINK url title :. _) :< _) -> Markup.Link (toS url) (nullText title)) <* source
 
 image :: Assignment
-image = makeTerm <$> symbol Image <*> (uncurry Markup.Image <$> project (\ ((CMark.IMAGE url title :. _) :< _) -> (toS url, nullText title))) <* source
+image = makeTerm <$> symbol Image <*> project (\ ((CMark.IMAGE url title :. _) :< _) -> Markup.Image (toS url) (nullText title)) <* source
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
