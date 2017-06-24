@@ -1,5 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
-{-# OPTIONS_GHC -funbox-strict-fields #-}
 module Data.Source where
 
 import qualified Data.ByteString as B
