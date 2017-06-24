@@ -13,7 +13,6 @@ module Data.Source
 , slice
 , drop
 -- Splitting
-, break
 , sourceLines
 , sourceLineRanges
 , sourceLineRangesWithin

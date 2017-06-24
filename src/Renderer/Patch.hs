@@ -15,7 +15,7 @@ import Data.Functor.Both as Both
 import Data.List (span, unzip)
 import Data.Range
 import Data.Record
-import Data.Source as Source hiding (break, drop)
+import Data.Source as Source hiding (drop)
 import Data.These
 import Diff
 import Patch
