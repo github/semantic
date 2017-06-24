@@ -25,11 +25,6 @@ divideRange :: Range -> Int -> (Range, Range)
 divideRange Range{..} at = (Range start divider, Range divider end)
   where divider = max (min end at) start
 
--- | Return Just the last index from a non-empty range, or if the range is empty, Nothing.
-maybeLastIndex :: Range -> Maybe Int
-maybeLastIndex (Range start end) | start == end = Nothing
-maybeLastIndex (Range _ end) = Just $ end - 1
-
 -- | Test two ranges for intersection.
 intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = start range1 < end range2 && start range2 < end range1
