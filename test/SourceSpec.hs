@@ -20,7 +20,7 @@ spec = parallel $ do
 
   describe "spanToRange" $ do
     prop "computes single-line ranges" . forAll (unListableByteString `mapT` tiers) $
-      \ s -> let source = Source s
+      \ s -> let source = fromBytes s
                  spans = zipWith (\ i Range {..} -> Span (Pos i 1) (Pos i (succ (end - start)))) [1..] ranges
                  ranges = sourceLineRanges source in
         spanToRange source <$> spans `shouldBe` ranges

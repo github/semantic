@@ -1,6 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
 module Data.Source
-( Source(..)
+( Source
+, sourceBytes
+, fromBytes
 -- Measurement
 , sourceLength
 , nullSource
@@ -36,6 +38,9 @@ import Test.LeanCheck
 -- | The contents of a source file, represented as a ByteString.
 newtype Source = Source { sourceBytes :: B.ByteString }
   deriving (Eq, IsString, Show)
+
+fromBytes :: ByteString -> Source
+fromBytes = Source
 
 
 -- Measurement

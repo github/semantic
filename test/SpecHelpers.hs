@@ -41,7 +41,7 @@ parseFilePath path = do
 -- the filesystem or Git. The tests, however, will still leverage reading files.
 readFile :: FilePath -> IO Blob
 readFile path = do
-  source <- (Just . Source <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
+  source <- (Just . fromBytes <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
   pure $ fromMaybe (emptyBlob path) (sourceBlob path (languageForFilePath path) <$> source)
 
 -- | Returns a Maybe Language based on the FilePath's extension.

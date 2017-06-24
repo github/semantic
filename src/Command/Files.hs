@@ -25,7 +25,7 @@ import System.FilePath
 readFile :: FilePath -> Maybe Language -> IO Blob.Blob
 readFile path language = do
   raw <- (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
-  pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . Source <$> raw)
+  pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Maybe Language

@@ -24,7 +24,7 @@ spec = do
       let s = "colourless green ideas sleep furiously"
           w = words s
           (_, nodes) = foldl (\ (i, prev) word -> (i + B.length word + 1, prev <> [node Red i (i + B.length word) []])) (0, []) w in
-      resultValue (runAssignment headF (many red) (makeState (Source s) nodes)) `shouldBe` Just (Out <$> w, AssignmentState (B.length s) (Info.Pos 1 (succ (B.length s))) "" [])
+      resultValue (runAssignment headF (many red) (makeState (fromBytes s) nodes)) `shouldBe` Just (Out <$> w, AssignmentState (B.length s) (Info.Pos 1 (succ (B.length s))) "" [])
 
     it "matches one-or-more repetitions against one or more input nodes" $
       resultValue (runAssignment headF (some red) (makeState "hello" [node Red 0 5 []])) `shouldBe` Just ([Out "hello"], AssignmentState 5 (Info.Pos 1 6) "" [])
