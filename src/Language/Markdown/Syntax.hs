@@ -84,7 +84,7 @@ codeBlock :: Assignment
 codeBlock = makeTerm <$> symbol CodeBlock <*> (Markup.Code <$> project (\ ((CMark.CODE_BLOCK language _ :. _) :< _) -> nullText language) <*> source)
 
 thematicBreak :: Assignment
-thematicBreak = makeTerm <$> symbol ThematicBreak <*> (Markup.ThematicBreak <$ source)
+thematicBreak = makeTerm <$> symbol ThematicBreak <*> pure Markup.ThematicBreak <* source
 
 htmlBlock :: Assignment
 htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
@@ -114,10 +114,10 @@ code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
 
 lineBreak :: Assignment
-lineBreak = makeTerm <$> symbol LineBreak <*> (Markup.LineBreak <$ source)
+lineBreak = makeTerm <$> symbol LineBreak <*> pure Markup.LineBreak <* source
 
 softBreak :: Assignment
-softBreak = makeTerm <$> symbol SoftBreak <*> (Markup.LineBreak <$ source)
+softBreak = makeTerm <$> symbol SoftBreak <*> pure Markup.LineBreak <* source
 
 
 -- Implementation details
