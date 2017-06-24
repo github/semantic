@@ -12,7 +12,6 @@ module Data.Source
 -- Slicing
 , slice
 , drop
-, take
 -- Splitting
 , break
 , actualLines
