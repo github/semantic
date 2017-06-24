@@ -20,6 +20,7 @@ library
                      , Command
                      , Command.Files
                      , Data.Align.Generic
+                     , Data.Blob
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
