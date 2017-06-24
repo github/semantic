@@ -148,7 +148,6 @@ test-suite test
                      , SemanticCmdLineSpec
                      , InterpreterSpec
                      , PatchOutputSpec
-                     , RangeSpec
                      , SES.Myers.Spec
                      , SourceSpec
                      , SpecHelpers
