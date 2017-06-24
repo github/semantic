@@ -28,9 +28,9 @@ divideRange :: Range -> Int -> (Range, Range)
 divideRange Range{..} at = (Range start divider, Range divider end)
   where divider = max (min end at) start
 
--- | Break a string down into words and sequences of punctuation. Return a list
--- | strings with ranges, assuming that the first character in the string is
--- | at the given index.
+-- | Break a string down into words and sequences of punctuation.
+--
+--   Returns a list strings with ranges, assuming that the first character in the string is at the given index.
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPunctuation <|> skip Char.isSpace
@@ -42,9 +42,9 @@ rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPun
     parse transform predicate = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just . maybe identity (:) (transform parsed) $ rangesAndWordsFrom (endFor parsed) rest
-    -- | Is this a word character?
-    -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e:.
-    -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
+    -- Is this a word character?
+    -- Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e:.
+    -- > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
     isWord c = Char.isLetter c || Char.isNumber c || Char.isMark c || Char.generalCategory c == Char.ConnectorPunctuation
     isPunctuation c = not (Char.isSpace c || isWord c)
 
