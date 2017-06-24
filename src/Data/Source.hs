@@ -77,8 +77,8 @@ spanToRangeInLineRanges lineRanges Span{..} = Range start end
 rangeToSpan :: Source -> Range -> Span
 rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
   where startPos = Pos (firstLine + 1)                          (rangeStart - start firstRange + 1)
-        endPos =   Pos (firstLine + Prologue.length lineRanges) (rangeEnd   - start lastRange  + 1)
-        firstLine = Prologue.length before
+        endPos =   Pos (firstLine + length lineRanges) (rangeEnd   - start lastRange  + 1)
+        firstLine = length before
         (before, rest) = span ((< rangeStart) . end) (actualLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
         Just firstRange = getFirst (foldMap (First . Just) lineRanges)
@@ -90,12 +90,12 @@ totalRange = Range 0 . B.length . sourceText
 
 -- | Return a 'Span' that covers the entire text.
 totalSpan :: Source -> Span
-totalSpan source = Span (Pos 1 1) (Pos (Prologue.length ranges) (succ (end lastRange - start lastRange)))
+totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - start lastRange)))
   where ranges = actualLineRanges source
         Just lastRange = getLast (foldMap (Last . Just) ranges)
 
-length :: Source -> Int
-length = B.length . sourceText
+sourceLength :: Source -> Int
+sourceLength = B.length . sourceText
 
 nullSource :: Source -> Bool
 nullSource = B.null . sourceText

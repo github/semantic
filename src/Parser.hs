@@ -88,7 +88,7 @@ runParser parser = case parser of
         let errors = termErrors term `asTypeOf` toList err
         traverse_ (printError source) errors
         unless (Prologue.null errors) $ do
-          withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] . hPutStrLn stderr . (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ ""
+          withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] . hPutStrLn stderr . (shows (length errors) . showChar ' ' . showString (if length errors == 1 then "error" else "errors")) $ ""
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
@@ -110,7 +110,7 @@ lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([],
   where
     lines = actualLines source
     root children = (sourceRange :. Program :. rangeToSpan source sourceRange :. Nil) :< Indexed children
-    sourceRange = Source.totalRange source
+    sourceRange = totalRange source
     leaf byteIndex line = (Range byteIndex (byteIndex + T.length line) :. Program :. rangeToSpan source (Range byteIndex (byteIndex + T.length line)) :. Nil) :< Leaf line
     annotateLeaves (accum, byteIndex) line =
-      (accum <> [ leaf byteIndex (Source.toText line) ] , byteIndex + Source.length line)
+      (accum <> [ leaf byteIndex (toText line) ] , byteIndex + sourceLength line)

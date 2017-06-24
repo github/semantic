@@ -51,7 +51,7 @@ spec = parallel $ do
       \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff (Syntax ()) Int])) in
         tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
         if Prologue.null diff' then [Unchanged 0]
-                               else replicate (Prologue.length diff') (Changed 0)
+                               else replicate (length diff') (Changed 0)
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -153,7 +153,7 @@ type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
 type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)
 
 numTocSummaries :: Diff' -> Int
-numTocSummaries diff = Prologue.length $ filter isValidSummary (diffTOC diff)
+numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'

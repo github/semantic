@@ -13,7 +13,7 @@ spec :: Spec
 spec = parallel $ do
   describe "actualLineRanges" $ do
     prop "produces 1 more range than there are newlines" $
-      \ source -> Prologue.length (actualLineRanges source) `shouldBe` succ (Text.count "\n" (toText source))
+      \ source -> length (actualLineRanges source) `shouldBe` succ (Text.count "\n" (toText source))
 
     prop "produces exhaustive ranges" $
       \ source -> foldMap (`slice` source) (actualLineRanges source) `shouldBe` source
