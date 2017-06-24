@@ -110,7 +110,7 @@ sourceLineRangesWithin range = uncurry (zipWith Range) . ((start range:) &&& (<>
 
 -- | Compute the byte 'Range' corresponding to a given 'Span' in a 'Source'.
 spanToRange :: Source -> Span -> Range
-spanToRange source = spanToRangeInLineRanges (sourceLineRangesByLineNumber source)
+spanToRange = spanToRangeInLineRanges . sourceLineRangesByLineNumber
 
 spanToRangeInLineRanges :: Array Int Range -> Span -> Range
 spanToRangeInLineRanges lineRanges Span{..} = Range
