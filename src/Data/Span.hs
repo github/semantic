@@ -8,7 +8,6 @@ module Data.Span where
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Data.Semigroup
-import Data.These
 import Prologue
 import Test.LeanCheck
 
@@ -51,20 +50,6 @@ instance A.FromJSON Span where
     Span <$>
       o .: "start" <*>
       o .: "end"
-
-
-newtype Spans = Spans { unSpans :: These Span Span }
-  deriving (Eq, Show)
-
-instance A.ToJSON Spans where
-  toJSON (Spans spans) = case spans of
-    (This span) -> A.object ["delete" .= span]
-    (That span) -> A.object ["insert" .= span]
-    (These span1 span2) -> A.object ["replace" .= (span1, span2)]
-  toEncoding (Spans spans) = case spans of
-    (This span) -> A.pairs $ "delete" .= span
-    (That span) -> A.pairs $ "insert" .= span
-    (These span1 span2) -> A.pairs $ "replace" .= (span1, span2)
 
 instance Listable Pos where
   tiers = cons2 Pos
