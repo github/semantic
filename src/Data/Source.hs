@@ -111,8 +111,7 @@ sourceLineRanges source = sourceLineRangesWithin (totalRange source) source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
 sourceLineRangesWithin :: Range -> Source -> [Range]
-sourceLineRangesWithin range = drop 1 . scanl toRange (Range (start range) (start range)) . sourceLines . slice range
-  where toRange previous source = Range (end previous) $ end previous + sourceLength source
+sourceLineRangesWithin range = uncurry (zipWith Range) . ((start range:) &&& (<> [ end range ])) . fmap (+ succ (start range)) . B.elemIndices (toEnum (ord '\n')) . sourceBytes . slice range
 
 
 -- Conversion
