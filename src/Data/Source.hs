@@ -14,10 +14,35 @@ import Test.LeanCheck
 newtype Source = Source { sourceBytes :: B.ByteString }
   deriving (Eq, IsString, Show)
 
+-- Measurement
+
+sourceLength :: Source -> Int
+sourceLength = B.length . sourceBytes
+
+nullSource :: Source -> Bool
+nullSource = B.null . sourceBytes
+
+-- | Return a 'Range' that covers the entire text.
+totalRange :: Source -> Range
+totalRange = Range 0 . B.length . sourceBytes
+
+-- | Return a 'Span' that covers the entire text.
+totalSpan :: Source -> Span
+totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - start lastRange)))
+  where ranges = actualLineRanges source
+        Just lastRange = getLast (foldMap (Last . Just) ranges)
+
+
+-- En/decoding
 
 -- | Return a 'Source' from a 'ByteString'.
 fromText :: T.Text -> Source
 fromText = Source . encodeUtf8
+
+-- | Return the ByteString contained in the 'Source'.
+toText :: Source -> Text
+toText = decodeUtf8 . sourceBytes
+
 
 -- | Return a 'Source' that contains a slice of the given 'Source'.
 slice :: Range -> Source -> Source
@@ -33,13 +58,13 @@ take :: Int -> Source -> Source
 take i = Source . take . sourceBytes
   where take = B.take i
 
--- | Return the ByteString contained in the 'Source'.
-toText :: Source -> Text
-toText = decodeUtf8 . sourceBytes
+
+-- Splitting
 
 -- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
 break :: (Word8 -> Bool) -> Source -> (Source, Source)
 break predicate (Source text) = let (start, remainder) = B.break predicate text in (Source start, Source remainder)
+
 
 -- | Split the contents of the source after newlines.
 actualLines :: Source -> [Source]
@@ -60,6 +85,9 @@ actualLineRanges = Prologue.drop 1 . scanl toRange (Range 0 0) . actualLines
 actualLineRangesWithin :: Range -> Source -> [Range]
 actualLineRangesWithin range = Prologue.drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous source = Range (end previous) $ end previous + sourceLength source
+
+
+-- Conversion
 
 -- | Compute the byte 'Range' corresponding to a given 'Span' in a 'Source'.
 spanToRange :: Source -> Span -> Range
@@ -83,21 +111,8 @@ rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
         Just firstRange = getFirst (foldMap (First . Just) lineRanges)
         Just lastRange = getLast (foldMap (Last . Just) lineRanges)
 
--- | Return a 'Range' that covers the entire text.
-totalRange :: Source -> Range
-totalRange = Range 0 . B.length . sourceBytes
 
--- | Return a 'Span' that covers the entire text.
-totalSpan :: Source -> Span
-totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - start lastRange)))
-  where ranges = actualLineRanges source
-        Just lastRange = getLast (foldMap (Last . Just) ranges)
-
-sourceLength :: Source -> Int
-sourceLength = B.length . sourceBytes
-
-nullSource :: Source -> Bool
-nullSource = B.null . sourceBytes
+-- Instances
 
 instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
