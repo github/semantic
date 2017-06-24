@@ -98,12 +98,7 @@ breakSource predicate (Source text) = let (start, remainder) = B.break predicate
 
 -- | Split the contents of the source after newlines.
 sourceLines :: Source -> [Source]
-sourceLines source
-  | nullSource source = [ source ]
-  | otherwise = case breakSource (== toEnum (ord '\n')) source of
-    (line, rest)
-      | nullSource rest -> [ line ]
-      | otherwise -> (line <> "\n") : sourceLines (dropSource 1 rest)
+sourceLines source = (`slice` source) <$> sourceLineRanges source
 
 -- | Compute the 'Range's of each line in a 'Source'.
 sourceLineRanges :: Source -> [Range]
