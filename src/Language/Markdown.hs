@@ -44,7 +44,7 @@ cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkT
               span = maybe withinSpan toSpan position
           in cofree $ (t :. range :. span :. Nil) :< (toTerm range span <$> children)
 
-        toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos endLine (succ endColumn))
+        toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ endColumn))
 
         lineRanges = sourceLineRangesByLineNumber source
 
