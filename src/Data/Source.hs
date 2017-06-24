@@ -1,5 +1,30 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
-module Data.Source where
+module Data.Source
+( Source(..)
+-- Measurement
+, sourceLength
+, nullSource
+, totalRange
+, totalSpan
+-- En/decoding
+, fromText
+, toText
+-- Slicing
+, slice
+, drop
+, take
+-- Splitting
+, break
+, actualLines
+, actualLineRanges
+, actualLineRangesWithin
+-- Conversion
+, spanToRange
+, spanToRangeInLineRanges
+, rangeToSpan
+-- Listable
+, ListableByteString(..)
+) where
 
 import qualified Data.ByteString as B
 import Data.List (span)
@@ -7,7 +32,8 @@ import Data.Range
 import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
-import Prologue
+import Prologue hiding (break, drop, take)
+import qualified Prologue
 import Test.LeanCheck
 
 -- | The contents of a source file, represented as a ByteString.
