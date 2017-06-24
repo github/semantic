@@ -2,8 +2,8 @@ module PatchOutputSpec where
 
 import Prologue
 import Data.Functor.Both
+import Data.Range
 import Data.Record
-import Range
 import Renderer.Patch
 import Source
 import Syntax

@@ -14,12 +14,12 @@ import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.List (partition)
 import Data.Maybe (fromJust)
+import Data.Range
 import Data.Record
 import Data.These
 import Diff
 import Info
 import Patch
-import Range
 import Source hiding (break, drop, take)
 import SplitDiff
 import Term

@@ -10,13 +10,13 @@ import Data.Functor.Both as Both
 import Data.Functor.Listable
 import Data.List (nub)
 import Data.Monoid hiding ((<>))
+import Data.Range
 import Data.Record
 import qualified Data.Text as Text
 import Data.These
 import Patch
 import Prologue hiding (fst, snd)
 import qualified Prologue
-import Range
 import qualified Source
 import SplitDiff
 import Syntax

@@ -4,12 +4,12 @@ module Source where
 
 import qualified Data.ByteString as B
 import Data.List (span)
+import Data.Range
 import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
 import Language
 import Numeric
-import Range
 import Prologue
 import System.IO (FilePath)
 import Test.LeanCheck

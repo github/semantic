@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
-module Range where
+module Data.Range where
 
 import qualified Data.Char as Char
 import Data.List (span)

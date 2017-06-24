@@ -1,10 +1,10 @@
 module SourceSpec where
 
+import Data.Range
+import Data.Span
 import qualified Data.Text as Text
 import Prologue hiding (list)
-import Range
 import Source
-import Data.Span
 import Test.Hspec
 import Test.Hspec.LeanCheck
 import Test.LeanCheck

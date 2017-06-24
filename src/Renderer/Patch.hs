@@ -12,12 +12,12 @@ import Data.Bifunctor.Join
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Functor.Both as Both
 import Data.List (span, unzip)
+import Data.Range
 import Data.Record
 import Data.These
 import Diff
 import Patch
 import Prologue hiding (fst, snd)
-import Range
 import qualified Source
 import Source hiding (break, drop, length, null, take)
 import SplitDiff

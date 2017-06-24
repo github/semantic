@@ -9,6 +9,7 @@ import Prologue hiding (Constructor)
 import Category
 import Data.Functor.Foldable hiding (Nil)
 import Data.Ix
+import Data.Range
 import Data.Record
 import Data.Span
 import qualified Data.Syntax.Assignment as A
@@ -17,7 +18,6 @@ import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
-import Range
 import Source
 import qualified Syntax
 import Foreign

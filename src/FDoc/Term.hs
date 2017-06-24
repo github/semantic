@@ -1,8 +1,8 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module FDoc.Term where
 
+import Data.Range
 import Data.Record
-import Range
 import Category
 import Term
 import Syntax

@@ -15,9 +15,9 @@ module Info
 ) where
 
 import Category
+import Data.Range
 import Data.Record
 import Data.Span
-import Range
 
 -- | The default set of fields produced by our parsers.
 type DefaultFields = '[ Range, Category, Span ]

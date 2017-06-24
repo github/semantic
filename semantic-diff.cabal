@@ -26,6 +26,7 @@ library
                      , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
+                     , Data.Range
                      , Data.Record
                      , Data.Span
                      , Data.Syntax
@@ -60,7 +61,6 @@ library
                      , Patch
                      , Paths_semantic_diff
                      , Prologue
-                     , Range
                      , Renderer
                      , Renderer.JSON
                      , Renderer.Patch
