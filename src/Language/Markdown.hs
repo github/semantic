@@ -46,7 +46,7 @@ cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkT
 
         toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos endLine (succ endColumn))
 
-        lineRanges = sourceLineRanges source
+        lineRanges = sourceLineRangesByLineNumber source
 
 toGrammar :: NodeType -> Grammar
 toGrammar DOCUMENT{} = Document

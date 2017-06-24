@@ -21,11 +21,13 @@ module Data.Source
 -- Conversion
 , spanToRange
 , spanToRangeInLineRanges
+, sourceLineRangesByLineNumber
 , rangeToSpan
 -- Listable
 , ListableByteString(..)
 ) where
 
+import Data.Array
 import qualified Data.ByteString as B
 import Data.Char (ord)
 import Data.List (span)
@@ -108,14 +110,16 @@ sourceLineRangesWithin range = uncurry (zipWith Range) . ((start range:) &&& (<>
 
 -- | Compute the byte 'Range' corresponding to a given 'Span' in a 'Source'.
 spanToRange :: Source -> Span -> Range
-spanToRange source = spanToRangeInLineRanges (sourceLineRanges source)
+spanToRange source = spanToRangeInLineRanges (sourceLineRangesByLineNumber source)
 
-spanToRangeInLineRanges :: [Range] -> Span -> Range
-spanToRangeInLineRanges lineRanges Span{..} = Range start end
-  where start = pred (sumLengths leadingRanges + posColumn spanStart)
-        end = start + sumLengths (take (posLine spanEnd - posLine spanStart) remainingRanges) + (posColumn spanEnd - posColumn spanStart)
-        (leadingRanges, remainingRanges) = splitAt (pred (posLine spanStart)) lineRanges
-        sumLengths = sum . fmap rangeLength
+spanToRangeInLineRanges :: Array Int Range -> Span -> Range
+spanToRangeInLineRanges lineRanges Span{..} = Range
+  (start (lineRanges ! posLine spanStart) + pred (posColumn spanStart))
+  (start (lineRanges ! posLine spanEnd)   + pred (posColumn spanEnd))
+
+sourceLineRangesByLineNumber :: Source -> Array Int Range
+sourceLineRangesByLineNumber source = listArray (1, length lineRanges) lineRanges
+  where lineRanges = sourceLineRanges source
 
 -- | Compute the 'Span' corresponding to a given byte 'Range' in a 'Source'.
 rangeToSpan :: Source -> Range -> Span
