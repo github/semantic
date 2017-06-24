@@ -1,4 +1,14 @@
-module Data.Blob where
+module Data.Blob
+( Blob(..)
+, BlobKind(..)
+, modeToDigits
+, defaultPlainBlob
+, emptyBlob
+, nullBlob
+, blobExists
+, sourceBlob
+, nullOid
+) where
 
 import Data.Source as Source
 import Language
