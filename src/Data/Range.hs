@@ -18,13 +18,6 @@ rangeLength range = end range - start range
 offsetRange :: Range -> Int -> Range
 offsetRange a b = Range (start a + b) (end a + b)
 
--- | Divide a range in two at the given coordinate.
---
---   Passing a coordinate that does not lie between start and end will result in one of the ranges being empty.
-divideRange :: Range -> Int -> (Range, Range)
-divideRange Range{..} at = (Range start divider, Range divider end)
-  where divider = max (min end at) start
-
 -- | Test two ranges for intersection.
 intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = start range1 < end range2 && start range2 < end range1
