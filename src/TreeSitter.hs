@@ -10,6 +10,7 @@ import Category
 import Data.Functor.Foldable hiding (Nil)
 import Data.Ix
 import Data.Record
+import Data.Span
 import qualified Data.Syntax.Assignment as A
 import Language
 import qualified Language.C as C
@@ -27,7 +28,6 @@ import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
-import SourceSpan
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.

@@ -3,7 +3,7 @@
 -- | Source position and span information
 --
 --   Mostly taken from purescript's SourcePos definition.
-module SourceSpan where
+module Data.Span where
 
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A

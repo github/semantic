@@ -16,8 +16,8 @@ module Info
 
 import Category
 import Data.Record
+import Data.Span
 import Range
-import SourceSpan
 
 -- | The default set of fields produced by our parsers.
 type DefaultFields = '[ Range, Category, Span ]
