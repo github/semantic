@@ -2,9 +2,9 @@
 module Language.Ruby where
 
 import Data.List (partition)
+import Data.Source hiding (null)
 import Info
 import Prologue
-import Source hiding (null)
 import Language
 import qualified Syntax as S
 import Term

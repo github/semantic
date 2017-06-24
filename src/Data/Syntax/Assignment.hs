@@ -95,10 +95,10 @@ import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Range (offsetRange)
 import Data.Record
+import qualified Data.Source as Source (Source(..), drop, slice, sourceText, actualLines)
 import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
-import qualified Source (Source(..), drop, slice, sourceText, actualLines)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)

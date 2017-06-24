@@ -7,10 +7,10 @@ module Language.Markdown
 
 import CMark
 import Data.Record
+import Data.Source
 import Data.Syntax.Assignment (Location)
 import Info
 import Prologue hiding (Location)
-import Source
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar

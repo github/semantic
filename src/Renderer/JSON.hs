@@ -12,12 +12,12 @@ import Data.Bifunctor.Join
 import Data.Functor.Both (Both)
 import qualified Data.Map as Map
 import Data.Record
+import Data.Source
 import Data.Union
 import Info
 import Language
 import Patch
 import Prologue hiding ((++))
-import Source
 import Syntax as S
 
 --

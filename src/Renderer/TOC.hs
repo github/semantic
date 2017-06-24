@@ -25,6 +25,7 @@ import Data.Functor.Listable
 import Data.List.NonEmpty (nonEmpty)
 import Data.Proxy
 import Data.Record
+import Data.Source as Source hiding (null)
 import Data.Text (toLower)
 import Data.Text.Listable
 import Data.These
@@ -35,7 +36,6 @@ import Patch
 import Prologue
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
-import Source hiding (null)
 import Syntax as S
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax

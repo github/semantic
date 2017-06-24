@@ -11,6 +11,7 @@ import Data.Functor.Foldable hiding (Nil)
 import Data.Ix
 import Data.Range
 import Data.Record
+import Data.Source
 import Data.Span
 import qualified Data.Syntax.Assignment as A
 import Language
@@ -18,7 +19,6 @@ import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
-import Source
 import qualified Syntax
 import Foreign
 import Foreign.C.String (peekCString)

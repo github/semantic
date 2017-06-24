@@ -10,6 +10,7 @@ module SpecHelpers
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Listable
+import Data.Source
 import Diff
 import Language
 import Patch
@@ -17,7 +18,6 @@ import Prologue hiding (readFile)
 import Renderer
 import Semantic
 import Semantic.Task
-import Source
 import System.FilePath
 import Term
 

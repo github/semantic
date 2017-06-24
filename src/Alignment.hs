@@ -15,12 +15,12 @@ import Data.Functor.Both
 import Data.List (partition)
 import Data.Maybe (fromJust)
 import Data.Range
+import Data.Source hiding (break, drop, take)
 import Data.Record
 import Data.These
 import Diff
 import Info
 import Patch
-import Source hiding (break, drop, take)
 import SplitDiff
 import Term
 

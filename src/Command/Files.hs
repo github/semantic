@@ -10,13 +10,13 @@ import Control.Exception (catch, IOException)
 import Data.Aeson
 import Data.These
 import Data.Functor.Both
+import Data.Source hiding (path)
 import Data.String
 import Language
 import Prologue hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Prelude (fail)
-import Source hiding (path)
 import System.FilePath
 
 

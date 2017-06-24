@@ -13,6 +13,7 @@ import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
 import Data.Proxy
 import Data.Record
+import Data.Source
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Union
 import Diff
@@ -26,7 +27,6 @@ import Parser
 import Prologue
 import Renderer
 import Semantic.Task as Task
-import Source
 import Term
 import Text.Show
 

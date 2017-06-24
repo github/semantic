@@ -14,12 +14,12 @@ import Data.Functor.Both as Both
 import Data.List (span, unzip)
 import Data.Range
 import Data.Record
+import Data.Source as Source hiding (break, drop, length, null, take)
+import qualified Data.Source as Source
 import Data.These
 import Diff
 import Patch
 import Prologue hiding (fst, snd)
-import qualified Source
-import Source hiding (break, drop, length, null, take)
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.

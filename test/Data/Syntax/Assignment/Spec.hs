@@ -3,10 +3,10 @@ module Data.Syntax.Assignment.Spec where
 
 import Data.ByteString.Char8 as B (words, length)
 import Data.Record
+import Data.Source hiding (source, length)
 import Data.Syntax.Assignment
 import Info
 import Prologue
-import Source hiding (source, length)
 import Test.Hspec
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 

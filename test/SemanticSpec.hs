@@ -1,13 +1,13 @@
 module SemanticSpec where
 
 import Data.Functor.Both as Both
+import Data.Source
 import Language
 import Patch
 import Prologue
 import Renderer
 import Semantic
 import Semantic.Task
-import Source
 import Syntax
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty

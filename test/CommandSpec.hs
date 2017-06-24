@@ -3,10 +3,10 @@ module CommandSpec where
 import Command
 import Data.Functor.Both as Both
 import Data.Maybe
+import Data.Source
 import Data.String
 import Language
 import Prologue hiding (readFile, toList)
-import Source
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 

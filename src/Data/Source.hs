@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Source where
+module Data.Source where
 
 import qualified Data.ByteString as B
 import Data.List (span)
@@ -41,16 +41,16 @@ defaultPlainBlob :: SourceKind
 defaultPlainBlob = PlainBlob 0o100644
 
 emptySourceBlob :: FilePath -> SourceBlob
-emptySourceBlob filepath = SourceBlob Source.empty Source.nullOid filepath Nothing Nothing
+emptySourceBlob filepath = SourceBlob Data.Source.empty Data.Source.nullOid filepath Nothing Nothing
 
 nullBlob :: SourceBlob -> Bool
-nullBlob SourceBlob{..} = oid == nullOid || Source.null source
+nullBlob SourceBlob{..} = oid == nullOid || Data.Source.null source
 
 blobExists :: SourceBlob -> Bool
 blobExists SourceBlob{..} = isJust blobKind
 
 sourceBlob :: FilePath -> Maybe Language -> Source -> SourceBlob
-sourceBlob filepath language source = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob) language
+sourceBlob filepath language source = SourceBlob source Data.Source.nullOid filepath (Just defaultPlainBlob) language
 
 -- | Map blobs with Nothing blobKind to empty blobs.
 idOrEmptySourceBlob :: SourceBlob -> SourceBlob
@@ -64,15 +64,15 @@ nullOid = "0000000000000000000000000000000000000000"
 empty :: Source
 empty = Source B.empty
 
--- | Return a Source from a ByteString.
+-- | Return a 'Source' from a 'ByteString'.
 fromText :: T.Text -> Source
 fromText = Source . encodeUtf8
 
--- | Return a Source that contains a slice of the given Source.
+-- | Return a 'Source' that contains a slice of the given 'Source'.
 slice :: Range -> Source -> Source
 slice range = take . drop
-  where drop = Source.drop (start range)
-        take = Source.take (rangeLength range)
+  where drop = Data.Source.drop (start range)
+        take = Data.Source.take (rangeLength range)
 
 drop :: Int -> Source -> Source
 drop i = Source . drop . sourceText
@@ -82,7 +82,7 @@ take :: Int -> Source -> Source
 take i = Source . take . sourceText
   where take = B.take i
 
--- | Return the ByteString contained in the Source.
+-- | Return the ByteString contained in the 'Source'.
 toText :: Source -> Text
 toText = decodeUtf8 . sourceText
 
@@ -152,7 +152,7 @@ instance Semigroup Source where
   Source a <> Source b = Source (a <> b)
 
 instance Monoid Source where
-  mempty = Source.empty
+  mempty = Data.Source.empty
   mappend = (<>)
 
 instance Listable Source where

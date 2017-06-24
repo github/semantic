@@ -7,6 +7,7 @@ import Category as C
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.Record
+import Data.Source
 import Data.Text.Listable
 import Data.These
 import Diff
@@ -20,7 +21,6 @@ import Renderer.TOC
 import RWS
 import Semantic
 import Semantic.Task
-import Source
 import SpecHelpers
 import Syntax as S
 import Term

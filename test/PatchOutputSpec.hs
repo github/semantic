@@ -4,8 +4,8 @@ import Prologue
 import Data.Functor.Both
 import Data.Range
 import Data.Record
+import Data.Source as Source
 import Renderer.Patch
-import Source
 import Syntax
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty

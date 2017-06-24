@@ -28,6 +28,7 @@ library
                      , Data.Mergeable.Generic
                      , Data.Range
                      , Data.Record
+                     , Data.Source
                      , Data.Span
                      , Data.Syntax
                      , Data.Syntax.Algebra
@@ -72,7 +73,6 @@ library
                      , SemanticCmdLine
                      , SES
                      , SES.Myers
-                     , Source
                      , SplitDiff
                      , Syntax
                      , Term
