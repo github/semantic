@@ -93,13 +93,12 @@ break predicate (Source text) = let (start, remainder) = B.break predicate text 
 
 -- | Split the contents of the source after newlines.
 sourceLines :: Source -> [Source]
-sourceLines = fmap Source . sourceLines' . sourceBytes
-  where sourceLines' text
-          | B.null text = [ text ]
-          | otherwise = case B.break (== toEnum (fromEnum '\n')) text of
-            (l, lines') -> case B.uncons lines' of
-              Nothing -> [ l ]
-              Just (_, lines') -> (l <> B.singleton (toEnum (fromEnum '\n'))) : sourceLines' lines'
+sourceLines source
+  | nullSource source = [ source ]
+  | otherwise = case break (== toEnum (fromEnum '\n')) source of
+    (line, rest)
+      | nullSource rest -> [ line ]
+      | otherwise -> (line <> "\n") : sourceLines (drop 1 rest)
 
 -- | Compute the 'Range's of each line in a 'Source'.
 sourceLineRanges :: Source -> [Range]
