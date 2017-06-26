@@ -117,7 +117,6 @@ data AssignmentF ast grammar a where
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
-  Empty :: HasCallStack => AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
   Catch :: HasCallStack => a -> (Error grammar -> a) -> AssignmentF ast grammar a
 
@@ -296,14 +295,13 @@ makeState = AssignmentState 0 (Info.Pos 1 1)
 
 instance Enum grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Empty `Then` return
+  empty = Choose mempty `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   a        <|> b | Just c <- (liftA2 (<>) `on` choices) a b = Choose c `Then` identity
                  | otherwise = wrap $ Alt a b
     where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
           choices (Choose choices `Then` continue) = Just (continue <$> choices)
-          choices (Empty `Then` _) = Just mempty
           choices (Many rule `Then` continue) = fmap (const (Many rule `Then` continue)) <$> choices rule
           choices _ = Nothing
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
@@ -318,7 +316,6 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
-    Empty -> showString "Empty"
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
 
