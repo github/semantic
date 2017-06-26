@@ -1,10 +1,10 @@
 {-# LANGUAGE DataKinds #-}
 module Language.TypeScript where
 
+import Data.Source
 import Info
-import Prologue
-import Source
 import Language
+import Prologue
 import qualified Syntax as S
 import Term
 

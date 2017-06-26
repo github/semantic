@@ -1,11 +1,11 @@
 {-# LANGUAGE DataKinds #-}
 module Language.Go where
 
-import Prologue
+import Data.Source
 import Info
-import Source
-import Term
+import Prologue
 import qualified Syntax as S
+import Term
 
 termAssignment
   :: Source -- ^ The source of the term.

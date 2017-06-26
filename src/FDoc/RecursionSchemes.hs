@@ -1,8 +1,8 @@
 {-# LANGUAGE DataKinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module FDoc.RecursionSchemes where
 
+import Data.Range
 import Data.Record
-import Range
 import Category
 import Term
 import Syntax
