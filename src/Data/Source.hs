@@ -21,12 +21,15 @@ module Data.Source
 -- Conversion
 , spanToRange
 , spanToRangeInLineRanges
+, sourceLineRangesByLineNumber
 , rangeToSpan
 -- Listable
 , ListableByteString(..)
 ) where
 
+import Data.Array
 import qualified Data.ByteString as B
+import Data.Char (ord)
 import Data.List (span)
 import Data.Range
 import Data.Span
@@ -35,7 +38,7 @@ import qualified Data.Text as T
 import Prologue
 import Test.LeanCheck
 
--- | The contents of a source file, represented as a ByteString.
+-- | The contents of a source file, represented as a 'ByteString'.
 newtype Source = Source { sourceBytes :: B.ByteString }
   deriving (Eq, IsString, Show)
 
@@ -90,54 +93,44 @@ takeSource i = Source . take . sourceBytes
 
 -- Splitting
 
--- | Split the source into the longest prefix of elements that do not satisfy the predicate and the rest without copying.
-breakSource :: (Word8 -> Bool) -> Source -> (Source, Source)
-breakSource predicate (Source text) = let (start, remainder) = B.break predicate text in (Source start, Source remainder)
-
-
 -- | Split the contents of the source after newlines.
 sourceLines :: Source -> [Source]
-sourceLines source
-  | nullSource source = [ source ]
-  | otherwise = case breakSource (== toEnum (fromEnum '\n')) source of
-    (line, rest)
-      | nullSource rest -> [ line ]
-      | otherwise -> (line <> "\n") : sourceLines (dropSource 1 rest)
+sourceLines source = (`slice` source) <$> sourceLineRanges source
 
 -- | Compute the 'Range's of each line in a 'Source'.
 sourceLineRanges :: Source -> [Range]
-sourceLineRanges = drop 1 . scanl toRange (Range 0 0) . sourceLines
-  where toRange previous source = Range (end previous) $ end previous + sourceLength source
+sourceLineRanges source = sourceLineRangesWithin (totalRange source) source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
 sourceLineRangesWithin :: Range -> Source -> [Range]
-sourceLineRangesWithin range = drop 1 . scanl toRange (Range (start range) (start range)) . sourceLines . slice range
-  where toRange previous source = Range (end previous) $ end previous + sourceLength source
+sourceLineRangesWithin range = uncurry (zipWith Range) . ((start range:) &&& (<> [ end range ])) . fmap (+ succ (start range)) . B.elemIndices (toEnum (ord '\n')) . sourceBytes . slice range
 
 
 -- Conversion
 
 -- | Compute the byte 'Range' corresponding to a given 'Span' in a 'Source'.
 spanToRange :: Source -> Span -> Range
-spanToRange source = spanToRangeInLineRanges (sourceLineRanges source)
+spanToRange = spanToRangeInLineRanges . sourceLineRangesByLineNumber
 
-spanToRangeInLineRanges :: [Range] -> Span -> Range
-spanToRangeInLineRanges lineRanges Span{..} = Range start end
-  where start = pred (sumLengths leadingRanges + posColumn spanStart)
-        end = start + sumLengths (take (posLine spanEnd - posLine spanStart) remainingRanges) + (posColumn spanEnd - posColumn spanStart)
-        (leadingRanges, remainingRanges) = splitAt (pred (posLine spanStart)) lineRanges
-        sumLengths = sum . fmap rangeLength
+spanToRangeInLineRanges :: Array Int Range -> Span -> Range
+spanToRangeInLineRanges lineRanges Span{..} = Range
+  (start (lineRanges ! posLine spanStart) + pred (posColumn spanStart))
+  (start (lineRanges ! posLine spanEnd)   + pred (posColumn spanEnd))
+
+sourceLineRangesByLineNumber :: Source -> Array Int Range
+sourceLineRangesByLineNumber source = listArray (1, length lineRanges) lineRanges
+  where lineRanges = sourceLineRanges source
 
 -- | Compute the 'Span' corresponding to a given byte 'Range' in a 'Source'.
 rangeToSpan :: Source -> Range -> Span
 rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
-  where startPos = Pos (firstLine + 1)                          (rangeStart - start firstRange + 1)
+  where startPos = Pos (firstLine + 1)                 (rangeStart - start firstRange + 1)
         endPos =   Pos (firstLine + length lineRanges) (rangeEnd   - start lastRange  + 1)
         firstLine = length before
         (before, rest) = span ((< rangeStart) . end) (sourceLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
         Just firstRange = getFirst (foldMap (First . Just) lineRanges)
-        Just lastRange = getLast (foldMap (Last . Just) lineRanges)
+        Just lastRange  = getLast  (foldMap (Last  . Just) lineRanges)
 
 
 -- Instances

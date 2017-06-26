@@ -115,6 +115,7 @@ data AssignmentF ast grammar a where
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF ast grammar a
+  Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
   Empty :: HasCallStack => AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
@@ -128,13 +129,13 @@ location = Location `Then` return
 
 -- | Zero-width projection of the current node.
 --
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (project f *> b)' is fine, but 'many (project f)' is not.
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (project f *> b)@ is fine, but @many (project f)@ is not.
 project :: HasCallStack => (forall x. Base ast x -> a) -> Assignment ast grammar a
 project projection = Project projection `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. 'many (symbol A *> b)' is fine, but 'many (symbol A)' is not.
+--   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (symbol A *> b)@ is fine, but @many (symbol A)@ is not.
 symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) `Then` (const location)
 
@@ -182,12 +183,10 @@ data ErrorCause grammar
 
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Source.Source -> Error grammar -> IO ()
-printError source error@Error{..}
-  =  do
-    withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . (showPos Nothing errorPos) . showString ": " $ ""
-    withSGRCode [SetColor Foreground Vivid Red] . putStrErr . (showString "error") . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') $ ""
-    withSGRCode [SetColor Foreground Vivid Green] . putStrErr . (showChar '^') . showChar '\n' . showString (prettyCallStack callStack) $ ""
-
+printError source error@Error{..} = do
+  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . showPos Nothing errorPos . showString ": " $ ""
+  withSGRCode [SetColor Foreground Vivid Red] . putStrErr . showString "error" . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') $ ""
+  withSGRCode [SetColor Foreground Vivid Green] . putStrErr . showChar '^' . showChar '\n' . showString (prettyCallStack callStack) $ ""
   where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines source), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
@@ -248,7 +247,9 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
             Result _ (Just (a, state')) -> yield a (advanceState (rtail . toRecord) state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
           (Choose choices, node : _) | Just symbol :. _ <- toRecord (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
-          -- Nullability: some rules, e.g. 'pure a' and 'many a', should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
+          (Many _, []) -> yield [] state
+          (Many rule, _) -> uncurry yield (runMany rule state)
+          -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
           (Catch during handler, _) -> case yield during state of
@@ -263,6 +264,10 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
                   Choose choices -> choiceSymbols choices
                   _ -> []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
+                runMany :: Assignment ast grammar v -> AssignmentState ast -> ([v], AssignmentState ast)
+                runMany rule state = case runAssignment toRecord rule state of
+                  Result _ (Just (a, state')) -> first (a :) (runMany rule state')
+                  _ -> ([], state)
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Maybe grammar) -> AssignmentState ast -> AssignmentState ast
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . F.project) (stateNodes state) }
@@ -284,7 +289,7 @@ data AssignmentState ast = AssignmentState
   deriving (Eq, Show)
 
 makeState :: Source.Source -> [ast] -> AssignmentState ast
-makeState source nodes = AssignmentState 0 (Info.Pos 1 1) source nodes
+makeState = AssignmentState 0 (Info.Pos 1 1)
 
 
 -- Instances
@@ -293,11 +298,16 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Empty `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
-  a <|> b = case (a, b) of
-    (_, Empty `Then` _) -> a
-    (Empty `Then` _, _) -> b
-    (Choose choices1 `Then` continue1, Choose choices2 `Then` continue2) -> Choose (IntMap.union (fmap continue1 choices1) (fmap continue2 choices2)) `Then` identity
-    _ -> wrap $ Alt a b
+  Return a <|> _ = Return a
+  a        <|> b | Just c <- (liftA2 (<>) `on` choices) a b = Choose c `Then` identity
+                 | otherwise = wrap $ Alt a b
+    where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
+          choices (Choose choices `Then` continue) = Just (continue <$> choices)
+          choices (Empty `Then` _) = Just mempty
+          choices (Many rule `Then` continue) = fmap (const (Many rule `Then` continue)) <$> choices rule
+          choices _ = Nothing
+  many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
+  many a = Many a `Then` return
 
 instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
@@ -306,6 +316,7 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
+    Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Empty -> showString "Empty"
     Throw e -> showsUnaryWith showsPrec "Throw" d e
