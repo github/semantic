@@ -2,8 +2,8 @@
   (ExpressionStatements
     (Constructor
       (FunctionCall
-        (Identifier)
-        (Identifier)
+        (MemberAccess
+          (Identifier))
         (NumberLiteral)
       { (StringLiteral)
       ->(StringLiteral) }))))
