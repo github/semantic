@@ -93,9 +93,8 @@ import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
-import Data.Range (offsetRange)
 import Data.Record
-import qualified Data.Source as Source (Source, dropSource, fromBytes, slice, sourceBytes, sourceLines)
+import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
@@ -241,7 +240,7 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
           (Location, node : _) -> yield (rtail (toRecord (F.project node))) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
           (Project projection, node : _) -> yield (projection (F.project node)) state
-          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (offsetRange (Info.byteRange (toRecord (F.project node))) (negate stateOffset)) stateSource)) (advanceState (rtail . toRecord) state)
+          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (Info.byteRange (toRecord (F.project node))) stateSource)) (advanceState (rtail . toRecord) state)
           (Children childAssignment, node : _) -> case assignAllFrom toRecord childAssignment state { stateNodes = toList (F.project node) } of
             Result _ (Just (a, state')) -> yield a (advanceState (rtail . toRecord) state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
@@ -275,7 +274,7 @@ dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just 
 advanceState :: Recursive ast => (forall x. Base ast x -> Record Location) -> AssignmentState ast -> AssignmentState ast
 advanceState toLocation state@AssignmentState{..}
   | node : rest <- stateNodes
-  , range :. span :. Nil <- toLocation (F.project node) = AssignmentState (Info.end range) (Info.spanEnd span) (Source.dropSource (Info.end range - stateOffset) stateSource) rest
+  , range :. span :. Nil <- toLocation (F.project node) = AssignmentState (Info.end range) (Info.spanEnd span) stateSource rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
