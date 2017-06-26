@@ -266,6 +266,7 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
                 runMany rule state = case runAssignment toRecord rule state of
                   Result _ (Just (a, state')) -> let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
                   _ -> ([], state)
+        {-# INLINE run #-}
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Maybe grammar) -> AssignmentState ast -> AssignmentState ast
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . F.project) (stateNodes state) }
