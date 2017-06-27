@@ -93,9 +93,8 @@ import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
-import Data.Range (offsetRange)
 import Data.Record
-import qualified Data.Source as Source (Source, dropSource, fromBytes, slice, sourceBytes, sourceLines)
+import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
@@ -117,7 +116,6 @@ data AssignmentF ast grammar a where
   Choose :: HasCallStack => IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
-  Empty :: HasCallStack => AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
   Catch :: HasCallStack => a -> (Error grammar -> a) -> AssignmentF ast grammar a
 
@@ -242,7 +240,7 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
           (Location, node : _) -> yield (rtail (toRecord (F.project node))) state
           (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
           (Project projection, node : _) -> yield (projection (F.project node)) state
-          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (offsetRange (Info.byteRange (toRecord (F.project node))) (negate stateOffset)) stateSource)) (advanceState (rtail . toRecord) state)
+          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (Info.byteRange (toRecord (F.project node))) stateSource)) (advanceState (rtail . toRecord) state)
           (Children childAssignment, node : _) -> case assignAllFrom toRecord childAssignment state { stateNodes = toList (F.project node) } of
             Result _ (Just (a, state')) -> yield a (advanceState (rtail . toRecord) state' { stateNodes = stateNodes })
             Result err Nothing -> Result err Nothing
@@ -266,8 +264,9 @@ runAssignment toRecord = iterFreer run . fmap ((pure .) . (,))
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                 runMany :: Assignment ast grammar v -> AssignmentState ast -> ([v], AssignmentState ast)
                 runMany rule state = case runAssignment toRecord rule state of
-                  Result _ (Just (a, state')) -> first (a :) (runMany rule state')
+                  Result _ (Just (a, state')) -> let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
                   _ -> ([], state)
+        {-# INLINE run #-}
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Maybe grammar) -> AssignmentState ast -> AssignmentState ast
 dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just Regular, Nothing]) . fmap symbolType . toSymbol . F.project) (stateNodes state) }
@@ -276,7 +275,7 @@ dropAnonymous toSymbol state = state { stateNodes = dropWhile ((`notElem` [Just 
 advanceState :: Recursive ast => (forall x. Base ast x -> Record Location) -> AssignmentState ast -> AssignmentState ast
 advanceState toLocation state@AssignmentState{..}
   | node : rest <- stateNodes
-  , range :. span :. Nil <- toLocation (F.project node) = AssignmentState (Info.end range) (Info.spanEnd span) (Source.dropSource (Info.end range - stateOffset) stateSource) rest
+  , range :. span :. Nil <- toLocation (F.project node) = AssignmentState (Info.end range) (Info.spanEnd span) stateSource rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -296,14 +295,13 @@ makeState = AssignmentState 0 (Info.Pos 1 1)
 
 instance Enum grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Empty `Then` return
+  empty = Choose mempty `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   a        <|> b | Just c <- (liftA2 (<>) `on` choices) a b = Choose c `Then` identity
                  | otherwise = wrap $ Alt a b
     where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
           choices (Choose choices `Then` continue) = Just (continue <$> choices)
-          choices (Empty `Then` _) = Just mempty
           choices (Many rule `Then` continue) = fmap (const (Many rule `Then` continue)) <$> choices rule
           choices _ = Nothing
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
@@ -318,7 +316,6 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Choose choices -> showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Choose" d (IntMap.toList choices)
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
-    Empty -> showString "Empty"
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
 
