@@ -1,9 +1,14 @@
 (Program
   (If
-    { (MemberAccess (Identifier) (Identifier)) -> (Identifier) }
+  { (MemberAccess
+      (Identifier)
+      (Identifier))
+  ->(Identifier) }
     (ExpressionStatements
       (ExpressionStatements
         (FunctionCall
           (Identifier)
-          { (Identifier) -> (Identifier) }))
-      { -(ExpressionStatements (Identifier))- })))
+        { (Identifier)
+        ->(Identifier) }))
+    {-(ExpressionStatements
+        (Identifier))-})))

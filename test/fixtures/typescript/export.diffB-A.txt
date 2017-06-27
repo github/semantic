@@ -64,16 +64,16 @@
     (Function
       (Params)))
   (Export
-      {+(Function
-        (Identifier)
-        (Params))+}
-      {-(Other "export_specifier"
-        (Identifier)
-        (Identifier))-})
-  {+(Export
+  {+(Function
+      (Identifier)
+      (Params))+}
+  {-(Other "export_specifier"
+      (Identifier)
+      (Identifier))-})
+{+(Export
     (Other "export_specifier"
-    (Identifier)
-    (Identifier)))+}
+      (Identifier)
+      (Identifier)))+}
   (Export
   { (StringLiteral)
   ->(StringLiteral) })
