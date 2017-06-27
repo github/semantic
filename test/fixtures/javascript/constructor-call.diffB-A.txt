@@ -2,8 +2,8 @@
   (ExpressionStatements
     (Constructor
       (FunctionCall
-        (MemberAccess
-          (Identifier))
+        (Other "reserved_identifier")
+        (Identifier)
         (NumberLiteral)
       { (StringLiteral)
       ->(StringLiteral) }))))
