@@ -14,13 +14,13 @@ import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.List (partition)
 import Data.Maybe (fromJust)
+import Data.Range
+import Data.Source
 import Data.Record
 import Data.These
 import Diff
 import Info
 import Patch
-import Range
-import Source hiding (break, drop, take)
 import SplitDiff
 import Term
 
@@ -59,7 +59,7 @@ alignSyntax :: (Applicative f, HasField fields Range, Foldable g) => (forall a. 
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) =
   catMaybes $ wrapInBranch <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
-        lineRanges = toJoinThese $ actualLineRangesWithin . byteRange <$> infos <*> sources
+        lineRanges = toJoinThese $ sourceLineRangesWithin . byteRange <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
         makeNode info (range, children) = toNode (setByteRange info range :< children)
 

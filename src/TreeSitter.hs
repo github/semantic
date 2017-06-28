@@ -7,35 +7,35 @@ module TreeSitter
 
 import Prologue hiding (Constructor)
 import Category
+import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Functor.Foldable hiding (Nil)
 import Data.Ix
+import Data.Range
 import Data.Record
+import Data.Source
+import Data.Span
 import qualified Data.Syntax.Assignment as A
 import Language
 import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
-import Range
-import Source
 import qualified Syntax
 import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
-import Data.Text.Foreign (withCStringLen)
 import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
-import SourceSpan
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
 treeSitterParser :: Language -> Ptr TS.Language -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
 treeSitterParser language grammar source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document grammar
-  withCStringLen (toText source) $ \ (sourceText, len) -> do
-    ts_document_set_input_string_with_length document sourceText len
+  unsafeUseAsCStringLen (sourceBytes source) $ \ (sourceBytes, len) -> do
+    ts_document_set_input_string_with_length document sourceBytes len
     ts_document_parse_halt_on_error document
     term <- documentToTerm language document source
     pure term
@@ -45,7 +45,7 @@ treeSitterParser language grammar source = bracket ts_document_new ts_document_f
 parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (Cofree [] (Record (Maybe grammar ': A.Location)))
 parseToAST language source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document language
-  root <- withCStringLen (toText source) $ \ (source, len) -> do
+  root <- unsafeUseAsCStringLen (sourceBytes source) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
     ts_document_parse_halt_on_error document
     alloca (\ rootPtr -> do
@@ -102,16 +102,16 @@ isNonEmpty = (/= Empty) . category . extract
 nodeRange :: Node -> Range
 nodeRange Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
 
-nodeSpan :: Node -> SourceSpan
-nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` SourceSpan (pointPos nodeStartPoint) (pointPos nodeEndPoint)
-  where pointPos TSPoint{..} = pointRow `seq` pointColumn `seq` SourcePos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
+nodeSpan :: Node -> Span
+nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
+  where pointPos TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
 
-assignTerm :: Language -> Source -> Record DefaultFields -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
+assignTerm :: Language -> Source -> Record DefaultFields -> [ SyntaxTerm Text DefaultFields ] -> IO [ SyntaxTerm Text DefaultFields ] -> IO (SyntaxTerm Text DefaultFields)
 assignTerm language source annotation children allChildren =
   cofree . (annotation :<) <$> case assignTermByLanguage language source (category annotation) children of
     Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children allChildren
-  where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
+  where assignTermByLanguage :: Language -> Source -> Category -> [ SyntaxTerm Text DefaultFields ] -> Maybe (S.Syntax Text (SyntaxTerm Text DefaultFields))
         assignTermByLanguage language = case language of
           C -> C.termAssignment
           Language.Go -> Go.termAssignment
