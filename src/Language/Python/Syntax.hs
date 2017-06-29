@@ -403,10 +403,11 @@ none :: Assignment
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
 lambda :: Assignment
-lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function Nothing <$> lambdaIdentifier <*> lambdaParameters <*> lambdaBody)
-  where lambdaIdentifier = makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
-        lambdaParameters = many identifier
-        lambdaBody = expression
+lambda = symbol Lambda >>= \ location -> children $ do
+  lambdaIdentifier <- makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
+  lambdaParameters <- many identifier
+  lambdaBody <- expression
+  pure $ makeTerm location $ Type.Annotation (makeTerm location (Declaration.Function lambdaIdentifier lambdaParameters lambdaBody)) (makeTerm location Syntax.Empty)
 
 comprehension :: Assignment
 comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehensionDeclaration expression)
