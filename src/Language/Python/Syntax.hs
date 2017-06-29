@@ -19,6 +19,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Syntax.Type as Type
 import Data.Union
 import GHC.Generics
 import GHC.Stack
@@ -70,7 +71,7 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error Error
    , Syntax.Identifier
-   , Syntax.TypedIdentifier
+   , Type.Annotation
    , []
    ]
 
@@ -180,7 +181,7 @@ classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.
                     <|> pure []
 
 typedParameter :: Assignment
-typedParameter = makeTerm <$> symbol TypedParameter <*> children (flip Syntax.TypedIdentifier <$> identifier <*> type')
+typedParameter = makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
 
 type' :: Assignment
 type' = symbol Type *> children expression
