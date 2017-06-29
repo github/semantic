@@ -169,7 +169,7 @@ functionDefinition =  symbol FunctionDefinition >>= \ location -> children $ do
   functionParameters <- symbol Parameters *> children (many expression)
   functionType <- optional type'
   functionBody <- statements
-  return $ case functionType of
+  pure $ case functionType of
     Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)
     Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a
 
@@ -180,7 +180,7 @@ asyncFunctionDefinition = symbol AsyncFunctionDefinition >>= \ location -> child
   functionParameters <- symbol Parameters *> children (many expression)
   functionType <- optional type'
   functionBody <- statements
-  return $ case functionType of
+  pure $ case functionType of
     Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)) async'
     Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a) async'
 
