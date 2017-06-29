@@ -10,6 +10,9 @@ import Prologue hiding (Product)
 data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
+instance Eq1 Annotation where liftEq = genericLiftEq
+instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
+
 newtype Product a = Product { productElements :: [a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
