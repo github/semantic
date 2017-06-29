@@ -98,7 +98,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ classDefinition <|> comment <|> functionDefinition <|> expression <|> statement
+declaration = handleError $ classDefinition <|> comment <|> functionDefinition <|> asyncFunctionDefinition <|> expression <|> statement
 
 statement :: Assignment
 statement = assertStatement
@@ -163,17 +163,26 @@ whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.Whil
 tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many expression))
 
--- TODO: Assign the 'async' portion
 functionDefinition :: Assignment
-functionDefinition =  makeTerm <$> symbol FunctionDefinition      <*> children functionDefinition'
-                  <|> makeTerm <$> symbol AsyncFunctionDefinition <*> children functionDefinition'
-  where
-    functionDefinition' = do
-      functionName' <- identifier
-      functionParameters <- symbol Parameters *> children (many expression)
-      functionType <- optional type'
-      functionBody <- statements
-      return $ Declaration.Function functionType functionName' functionParameters functionBody
+functionDefinition =  symbol FunctionDefinition >>= \ location -> children $ do
+  functionName' <- identifier
+  functionParameters <- symbol Parameters *> children (many expression)
+  functionType <- optional type'
+  functionBody <- statements
+  return $ case functionType of
+    Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)
+    Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a
+
+asyncFunctionDefinition :: Assignment
+asyncFunctionDefinition = symbol AsyncFunctionDefinition >>= \ location -> children $ do
+  async' <- makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
+  functionName' <- identifier
+  functionParameters <- symbol Parameters *> children (many expression)
+  functionType <- optional type'
+  functionBody <- statements
+  return $ case functionType of
+    Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)) async'
+    Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a) async'
 
 classDefinition :: Assignment
 classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> (many declaration))
