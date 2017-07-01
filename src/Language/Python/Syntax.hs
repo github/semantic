@@ -164,25 +164,21 @@ tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many expression))
 
 functionDefinition :: Assignment
-functionDefinition =  symbol FunctionDefinition >>= \ location -> children $ do
-  functionName' <- identifier
-  functionParameters <- symbol Parameters *> children (many expression)
-  functionType <- optional type'
-  functionBody <- statements
-  pure $ case functionType of
-    Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)
-    Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a
+functionDefinition =  symbol FunctionDefinition >>= \ loc -> children (make loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration))
+  where
+    make location functionName' functionParameters ty functionBody = case ty of
+      Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)
+      Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a
 
 asyncFunctionDefinition :: Assignment
-asyncFunctionDefinition = symbol AsyncFunctionDefinition >>= \ location -> children $ do
-  async' <- makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
-  functionName' <- identifier
-  functionParameters <- symbol Parameters *> children (many expression)
-  functionType <- optional type'
-  functionBody <- statements
-  pure $ case functionType of
-    Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)) async'
-    Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a) async'
+asyncFunctionDefinition = symbol AsyncFunctionDefinition >>= \ loc -> children (make loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration))
+  where
+    make location async' functionName' functionParameters ty functionBody = case ty of
+      Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)) async'
+      Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a) async'
+
+async' :: Assignment
+async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
 
 classDefinition :: Assignment
 classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> (many declaration))
