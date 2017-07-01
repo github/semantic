@@ -155,9 +155,9 @@ expression = await
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
   where
-    make loc variables expressionList expressions elseClause = case elseClause of
-      Nothing -> makeTerm loc $ (Statement.ForEach variables expressionList expressions)
-      Just a -> makeTerm loc $ (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList expressions) a)
+    make loc variables expressionList forBody forElseClause = case forElseClause of
+      Nothing -> makeTerm loc $ (Statement.ForEach variables expressionList forBody)
+      Just a -> makeTerm loc $ (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList forBody) a)
 
 whileStatement :: Assignment
 whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
