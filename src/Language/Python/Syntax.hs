@@ -58,6 +58,7 @@ type Syntax =
    , Statement.Break
    , Statement.Catch
    , Statement.Continue
+   , Statement.Else
    , Statement.Finally
    , Statement.ForEach
    , Statement.If
@@ -151,9 +152,12 @@ expression = await
           <|> typedParameter
           <|> unaryOperator
 
--- TODO: Assign for else clauses
 forStatement :: Assignment
-forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.ForEach <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression))
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
+  where
+    make loc variables expressionList expressions elseClause = case elseClause of
+      Nothing -> makeTerm loc $ (Statement.ForEach variables expressionList expressions)
+      Just a -> makeTerm loc $ (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList expressions) a)
 
 -- TODO: Assign while else clauses
 whileStatement :: Assignment
