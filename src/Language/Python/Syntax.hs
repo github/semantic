@@ -159,9 +159,12 @@ forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm
       Nothing -> makeTerm loc $ (Statement.ForEach variables expressionList expressions)
       Just a -> makeTerm loc $ (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList expressions) a)
 
--- TODO: Assign while else clauses
 whileStatement :: Assignment
-whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (makeTerm <$> location <*> many expression))
+whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
+  where
+    make loc whileCondition whileBody whileElseClause = case whileElseClause of
+      Nothing -> makeTerm loc $ (Statement.While whileCondition whileBody)
+      Just a -> makeTerm loc $ (Statement.Else (makeTerm loc $ Statement.While whileCondition whileBody) a)
 
 -- TODO: Assign try else clauses
 tryStatement :: Assignment
