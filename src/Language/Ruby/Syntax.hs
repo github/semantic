@@ -91,7 +91,7 @@ statement  = -- handleError $
   <|> unary
   <|> binary
   <|> literal
-  <|> keywords
+  <|> keyword
   <|> mk Return Statement.Return
   <|> mk Yield Statement.Yield
   <|> mk Break Statement.Break
@@ -147,8 +147,8 @@ literal =
   where
     pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
 
-keywords :: Assignment
-keywords =
+keyword :: Assignment
+keyword =
       mk KeywordFILE
   <|> mk KeywordLINE
   <|> mk KeywordENCODING
