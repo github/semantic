@@ -20,13 +20,17 @@ library
                      , Command
                      , Command.Files
                      , Data.Align.Generic
+                     , Data.Blob
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
+                     , Data.Range
                      , Data.Record
+                     , Data.Source
+                     , Data.Span
                      , Data.Syntax
                      , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
@@ -59,7 +63,6 @@ library
                      , Patch
                      , Paths_semantic_diff
                      , Prologue
-                     , Range
                      , Renderer
                      , Renderer.JSON
                      , Renderer.Patch
@@ -71,8 +74,6 @@ library
                      , SemanticCmdLine
                      , SES
                      , SES.Myers
-                     , Source
-                     , SourceSpan
                      , SplitDiff
                      , Syntax
                      , Term
@@ -147,7 +148,6 @@ test-suite test
                      , SemanticCmdLineSpec
                      , InterpreterSpec
                      , PatchOutputSpec
-                     , RangeSpec
                      , SES.Myers.Spec
                      , SourceSpec
                      , SpecHelpers

@@ -2,5 +2,6 @@
   (ExpressionStatements
     (BooleanOperator
       (Identifier)
-      { (Other "&&") -> (Other "||") }
+    { (Other "&&")
+    ->(Other "||") }
       (Identifier))))

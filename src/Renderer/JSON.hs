@@ -9,6 +9,7 @@ module Renderer.JSON
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
+import Data.Blob
 import Data.Functor.Both (Both)
 import qualified Data.Map as Map
 import Data.Record
@@ -17,7 +18,6 @@ import Info
 import Language
 import Patch
 import Prologue hiding ((++))
-import Source
 import Syntax as S
 
 --
@@ -25,11 +25,11 @@ import Syntax as S
 --
 
 -- | Render a diff to a string representing its JSON.
-renderJSONDiff :: ToJSON a => Both SourceBlob -> a -> Map.Map Text Value
+renderJSONDiff :: ToJSON a => Both Blob -> a -> Map.Map Text Value
 renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
-  , ("oids", toJSON (decodeUtf8 . oid <$> toList blobs))
-  , ("paths", toJSON (path <$> toList blobs))
+  , ("oids", toJSON (decodeUtf8 . blobOid <$> toList blobs))
+  , ("paths", toJSON (blobPath <$> toList blobs))
   ]
 
 instance StringConv (Map Text Value) ByteString where
@@ -73,7 +73,7 @@ instance ToJSONFields Range where
 instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> toS c }]
 
-instance ToJSONFields SourceSpan where
+instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 instance ToJSONFields a => ToJSONFields (Maybe a) where
@@ -120,5 +120,5 @@ instance ToJSON a => ToJSON (File a) where
 instance StringConv [Value] ByteString where
   strConv _ = toS . (<> "\n") . encode
 
-renderJSONTerm :: ToJSON a => SourceBlob -> a -> [Value]
-renderJSONTerm SourceBlob{..} = pure . toJSON . File path blobLanguage
+renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
+renderJSONTerm Blob{..} = pure . toJSON . File blobPath blobLanguage
