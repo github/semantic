@@ -37,6 +37,13 @@ data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classSc
 instance Eq1 Class where liftEq = genericLiftEq
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
+
+data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Module where liftEq = genericLiftEq
+instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Generics, constraints.
 
 

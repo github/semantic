@@ -28,10 +28,12 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
+  , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
   , Expression.Comparison
+  , Expression.ScopeResolution
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -99,8 +101,11 @@ statement  = -- handleError $
   <|> mk Next Statement.Continue
   <|> for
   <|> class'
+  -- TODO: Singleton class
   <|> method
+  -- TODO: Singleton method
   <|> lambda
+  <|> module'
   <|> identifier
   <|> scopeResolution
   <|> conditional
@@ -170,8 +175,11 @@ class' :: Assignment
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (identifier <|> scopeResolution) <*> (superclass <|> pure []) <*> many topLevelStatement)
   where superclass = pure <$ symbol Superclass <*> children identifier
 
+module' :: Assignment
+module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> (identifier <|> scopeResolution) <*> many topLevelStatement)
+
 scopeResolution :: Assignment
-scopeResolution = symbol ScopeResolution *> children identifier
+scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many statement)
 
 parameter :: Assignment
 parameter =

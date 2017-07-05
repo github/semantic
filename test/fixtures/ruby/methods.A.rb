@@ -15,3 +15,6 @@ end
 
 def foo(&block)
 end
+
+def self.foo(a)
+end
