@@ -1,3 +1,31 @@
 {+(Program
   (Method
-    (Identifier)))+}
+    (Identifier))
+  (Method
+    (Other "setter"
+      (Identifier)))
+  (Method
+    (Other "operator")
+    (Params
+      (Identifier)))
+  (Method
+    (Identifier)
+    (Params
+      (Identifier)
+      (KeywordParameter
+        (Identifier)
+        (Boolean))
+      (KeywordParameter
+        (Identifier)
+        (Identifier))
+      (HashSplatParameter)))
+  (Method
+    (Identifier)
+    (Params
+      (SplatParameter
+        (Identifier))))
+  (Method
+    (Identifier)
+    (Params
+      (BlockParameter
+        (Identifier)))))+}

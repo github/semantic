@@ -26,6 +26,7 @@ import qualified Term
 type Syntax = '[
     Comment.Comment
   , Declaration.Class
+  , Declaration.Function
   , Declaration.Method
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -99,6 +100,7 @@ statement  = -- handleError $
   <|> for
   <|> class'
   <|> method
+  <|> lambda
   <|> identifier
   <|> scopeResolution
   <|> conditional
@@ -171,8 +173,27 @@ class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (identifi
 scopeResolution :: Assignment
 scopeResolution = symbol ScopeResolution *> children identifier
 
+parameter :: Assignment
+parameter =
+      identifier
+  <|> mk SplatParameter
+  <|> mk HashSplatParameter
+  <|> mk BlockParameter
+  <|> mk KeywordParameter
+  <|> mk OptionalParameter
+  <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> methodName <*> pure [] <*> statements)
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> methodName <*> params <*> statements)
+  where params = optional (symbol BlockParameters <|> symbol LambdaParameters) >>= \ _ -> children (many parameter)
+
+lambda :: Assignment
+lambda = symbol Lambda >>= \ location -> children $ do
+  iden <- makeTerm location <$> (Syntax.Identifier <$> source)
+  params <- optional (symbol BlockParameters <|> symbol LambdaParameters) >>= \ _ -> children (many parameter)
+  body <- statements
+  pure $ makeTerm location (Declaration.Function iden params body)
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
