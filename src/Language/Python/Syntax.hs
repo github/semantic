@@ -168,7 +168,8 @@ whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expre
 
 -- TODO: Assign try else clauses
 tryStatement :: Assignment
-tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many expression))
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many (expression <|> elseClause)))
+  where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> (many expression)))
 
 functionDefinition :: Assignment
 functionDefinition =  symbol FunctionDefinition >>= \ loc -> children (make loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration))
@@ -198,8 +199,9 @@ typedParameter = makeTerm <$> symbol TypedParameter <*> children (Type.Annotatio
 type' :: Assignment
 type' = symbol Type *> children expression
 
+-- TODO: support As expressions
 exceptClause :: Assignment
-exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> optional (makeTerm <$> location <*> many expression <* symbol AnonColon) <*> expression)
+exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> (expression <|> emptyTerm) <*> expression)
 
 finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
