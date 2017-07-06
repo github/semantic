@@ -308,7 +308,7 @@ assignment'
     rhs = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
     expr =
           makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
-      <|> makeTerm <$> symbol DestructuredLeftAssigment <*> children (many expr)
+      <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
       <|> argument
 
 
