@@ -149,6 +149,7 @@ literal =
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
   -- TODO: Handle interpolation
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+  <|> makeTerm <$> symbol Hash <*> (Literal.Hash <$> many pair)
 
   where
     pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
@@ -237,6 +238,8 @@ until' =
 for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> some identifier <*> statement <*> statements)
 
+pair :: Assignment
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
 -- lvalue :: Assignment
 -- lvalue = identifier
 
