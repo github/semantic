@@ -130,7 +130,7 @@ data Try a = Try !a ![a]
 instance Eq1 Try where liftEq = genericLiftEq
 instance Show1 Try where liftShowsPrec = genericLiftShowsPrec
 
-data Catch a = Catch !(Maybe a) !a
+data Catch a = Catch !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Catch where liftEq = genericLiftEq
