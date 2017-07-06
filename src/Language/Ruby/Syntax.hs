@@ -92,7 +92,7 @@ statement  = handleError $
   <|> until'
   -- TODO: rescue
   <|> emptyStatement
-  -- <|> assignment'
+  <|> assignment'
   -- TODO: operator assignment
   <|> unary
   <|> binary
@@ -271,29 +271,31 @@ call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> statem
 -- begin :: Assignment
 -- begin = makeTerm <$> symbol Begin <*> children (Statement.Try)
 
--- lvalue :: Assignment
--- lvalue = identifier
+assignment' :: Assignment
+assignment'
+   =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lhs <*> rhs)
+  <|> makeTerm <$> symbol OperatorAssignment <*> children (lhs >>= \ var -> Statement.Assignment var <$>
+         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> statement)
+      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> statement)
+      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> statement)
+      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> statement)
+      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> statement)
+      <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> statement)
+      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> statement)
+      <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> statement)
+      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> statement)
+      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> statement)
+      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> statement)
+      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> statement)
+      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> statement)))
+  where
+    lhs = makeTerm <$> symbol LeftAssignmentList <*> children (many expr) <|> expr
+    rhs = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
+    expr =
+          makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
+      <|> makeTerm <$> symbol DestructuredLeftAssigment <*> children (many expr)
+      <|> argument
 
--- expression :: Assignment
--- expression = identifier <|> statement
-
--- assignment' :: Assignment
--- assignment'
---    =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lvalue <*> expression)
---   <|> makeTerm <$> symbol OperatorAssignment <*> children (lvalue >>= \ var -> Statement.Assignment var <$>
---          (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
---       <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
---       <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
---       <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> expression)
---       <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
---       <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
---       <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
---       <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> expression)
---       <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> expression)
---       <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> expression)
---       <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
---       <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
---       <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->
