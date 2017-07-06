@@ -73,6 +73,12 @@ newtype Continue a = Continue a
 instance Eq1 Continue where liftEq = genericLiftEq
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
+newtype Retry a = Retry a
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Retry where liftEq = genericLiftEq
+instance Show1 Retry where liftShowsPrec = genericLiftShowsPrec
+
 newtype NoOp a = NoOp a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 

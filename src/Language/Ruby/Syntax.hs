@@ -57,6 +57,7 @@ type Syntax = '[
   , Statement.Finally
   , Statement.ForEach
   , Statement.If
+  , Statement.Retry
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
@@ -106,6 +107,8 @@ statement = -- handleError $
   <|> mk Yield Statement.Yield
   <|> mk Break Statement.Break
   <|> mk Next Statement.Continue
+  <|> mk Redo Statement.Retry
+  <|> mk Retry Statement.Retry
   <|> for
   <|> class'
   -- TODO: Singleton class
