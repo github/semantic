@@ -32,7 +32,9 @@ type Syntax = '[
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
+  , Expression.Call
   , Expression.Comparison
+  , Expression.MemberAccess
   , Expression.ScopeResolution
   , Literal.Array
   , Literal.Boolean
@@ -109,6 +111,8 @@ statement  = handleError $
   <|> identifier
   <|> scopeResolution
   <|> conditional
+  <|> methodCall
+  <|> call
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -240,6 +244,28 @@ for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> some identifie
 
 pair :: Assignment
 pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
+
+argument :: Assignment
+argument =
+      mk SplatArgument
+  <|> mk HashSplatArgument
+  <|> mk BlockArgument
+  <|> pair
+  <|> statement
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+
+methodCall :: Assignment
+methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> name <*> args)
+  where
+    name = identifier <|> scopeResolution <|> call
+    args = optional (symbol ArgumentList <|> symbol ArgumentListWithParens) >>= \ _ -> children (many argument)
+
+call :: Assignment
+call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> statement <*> statement)
+
+-- begin :: Assignment
+-- begin = makeTerm <$> symbol Begin <*> children (Statement.Try)
+
 -- lvalue :: Assignment
 -- lvalue = identifier
 
