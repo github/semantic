@@ -31,6 +31,7 @@ type Syntax =
   '[ Comment.Comment
    , Declaration.Class
    , Declaration.Comprehension
+   , Declaration.Decorator
    , Declaration.Function
    , Declaration.Import
    , Declaration.Variable
@@ -100,7 +101,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ classDefinition <|> comment <|> functionDefinition <|> asyncFunctionDefinition <|> expression <|> statement
+declaration = handleError $ classDefinition <|> comment <|> decoratedDefinition <|> functionDefinition <|> asyncFunctionDefinition <|> expression <|> statement
 
 statement :: Assignment
 statement = assertStatement
@@ -153,6 +154,12 @@ expression = await
           <|> type'
           <|> typedParameter
           <|> unaryOperator
+
+decoratedDefinition :: Assignment
+decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
+  (a, b) <- (symbol Decorator *> (children ((,) <$> expression <*> (symbol ArgumentList *> children ((many expression) <|> (many emptyTerm))))))
+  dec <- declaration
+  pure (Declaration.Decorator a b dec))
 
 withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
