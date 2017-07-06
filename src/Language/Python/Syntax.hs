@@ -201,7 +201,7 @@ type' = symbol Type *> children expression
 
 -- TODO: support As expressions
 exceptClause :: Assignment
-exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> (expression <|> emptyTerm) <*> expression)
+exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> (makeTerm <$> location <*> (many identifier)) <*> (makeTerm <$> location <*> (many expression)))
 
 finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
