@@ -14,6 +14,13 @@ data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
 instance Eq1 If where liftEq = genericLiftEq
 instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 
+-- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
+data Else a = Else { elseCondition :: !a, elseBody :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Else where liftEq = genericLiftEq
+instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
@@ -108,15 +115,13 @@ newtype Throw a = Throw a
 instance Eq1 Throw where liftEq = genericLiftEq
 instance Show1 Throw where liftShowsPrec = genericLiftShowsPrec
 
-data Try with a = Try !a ![with a]
+data Try a = Try { tryBody :: ![a], tryCatch :: ![a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
--- deriving instance (Eq a, Eq (with a)) => Eq (Try with a)
--- deriving instance (Show a, Show (with a)) => Show (Try with a)
 
-instance Eq1 with => Eq1 (Try with) where liftEq = genericLiftEq
-instance Show1 with => Show1 (Try with) where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Try where liftEq = genericLiftEq
+instance Show1 Try where liftShowsPrec = genericLiftShowsPrec
 
-data Catch a = Catch !(Maybe a) !a
+data Catch a = Catch !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Catch where liftEq = genericLiftEq
