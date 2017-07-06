@@ -62,6 +62,7 @@ type Syntax =
    , Statement.Finally
    , Statement.ForEach
    , Statement.If
+   , Statement.Let
    , Statement.NoOp
    , Statement.Return
    , Statement.Throw
@@ -125,6 +126,7 @@ statement = assertStatement
           <|> returnStatement
           <|> tryStatement
           <|> whileStatement
+          <|> withStatement
 
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children expression
@@ -151,6 +153,12 @@ expression = await
           <|> type'
           <|> typedParameter
           <|> unaryOperator
+
+withStatement :: Assignment
+withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
+  (value, variable) <- (symbol WithItem *> (children $ (,) <$> identifier <*> identifier))
+  body <- expression
+  pure (Statement.Let variable value body))
 
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
