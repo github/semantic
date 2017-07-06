@@ -133,15 +133,12 @@ literal =
   <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
   <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
   <|> makeTerm <$> symbol Grammar.Nil <*> (Literal.Null <$ source)
-  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many statement)
   <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pairs)
   -- TODO: Give subshell it's own literal and allow interpolation
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
-  -- TODO: Handle interpolation
-  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
   <|> makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
   <|> makeTerm <$> symbol Float <*> (Literal.Float <$> source)
   -- TODO: Handle interpolation
@@ -150,6 +147,8 @@ literal =
   <|> makeTerm <$> symbol ChainedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
   -- TODO: Handle interpolation, dedicated literal?
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
+  -- TODO: Handle interpolation
+  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
 
   where
     pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
