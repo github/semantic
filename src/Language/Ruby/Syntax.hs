@@ -91,10 +91,8 @@ statement = -- handleError $
   <|> unless
   <|> while'
   <|> until'
-  -- TODO: rescue
   <|> emptyStatement
   <|> assignment'
-  -- TODO: operator assignment
   <|> unary
   <|> binary
   <|> literal
@@ -107,7 +105,7 @@ statement = -- handleError $
   <|> mk Retry Statement.Retry
   <|> for
   <|> class'
-  -- TODO: Singleton class
+  <|> singletonClass
   <|> method
   -- TODO: Singleton method
   <|> lambda
@@ -184,6 +182,9 @@ methodName = identifier <|> literal
 class' :: Assignment
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (identifier <|> scopeResolution) <*> (superclass <|> pure []) <*> many statement)
   where superclass = pure <$ symbol Superclass <*> children identifier
+
+singletonClass :: Assignment
+singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> statement <*> pure [] <*> many statement)
 
 module' :: Assignment
 module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> (identifier <|> scopeResolution) <*> many statement)
