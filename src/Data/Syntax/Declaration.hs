@@ -37,6 +37,12 @@ data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classBo
 instance Eq1 Class where liftEq = genericLiftEq
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
+data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Class where liftEq = genericLiftEq
+instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Generics, constraints.
 
 
