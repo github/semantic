@@ -81,7 +81,7 @@ data For a = For { forBefore :: !a, forCondition :: !a, forStep :: !a, forBody :
 instance Eq1 For where liftEq = genericLiftEq
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
-data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
+data ForEach a = ForEach { forEachBinding :: ![a], forEachSubject :: !a, forEachBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ForEach where liftEq = genericLiftEq
