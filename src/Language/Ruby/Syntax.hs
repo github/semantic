@@ -78,17 +78,13 @@ type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Te
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Program <*> children (many topLevelStatement)
-
-topLevelStatement :: Assignment
-topLevelStatement = handleError $
-      beginBlock
-  <|> endBlock
-  <|> statement
+assignment = makeTerm <$> symbol Program <*> children (many (handleError statement))
 
 statement :: Assignment
 statement = -- handleError $
-      comment
+      beginBlock
+  <|> endBlock
+  <|> comment
   <|> undef
   <|> alias
   <|> if'
@@ -177,20 +173,20 @@ keyword =
   where mk s = makeTerm <$> symbol s <*> (Literal.TextElement <$> source)
 
 beginBlock :: Assignment
-beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many topLevelStatement)
+beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many statement)
 
 endBlock :: Assignment
-endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many topLevelStatement)
+endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many statement)
 
 methodName :: Assignment
 methodName = identifier <|> literal
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (identifier <|> scopeResolution) <*> (superclass <|> pure []) <*> many topLevelStatement)
+class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (identifier <|> scopeResolution) <*> (superclass <|> pure []) <*> many statement)
   where superclass = pure <$ symbol Superclass <*> children identifier
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> (identifier <|> scopeResolution) <*> many topLevelStatement)
+module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> (identifier <|> scopeResolution) <*> many statement)
 
 scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many statement)
