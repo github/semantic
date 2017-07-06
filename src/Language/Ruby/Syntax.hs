@@ -74,14 +74,14 @@ assignment = makeTerm <$> symbol Program <*> children (many topLevelStatement)
 
 topLevelStatement :: Assignment
 topLevelStatement = handleError $
-      comment
-  <|> beginBlock
+      beginBlock
   <|> endBlock
   <|> statement
 
 statement :: Assignment
-statement  = -- handleError $
-      undef
+statement  = handleError $
+      comment
+  <|> undef
   <|> alias
   <|> if'
   <|> unless
@@ -236,7 +236,7 @@ until' =
   <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
 
 for :: Assignment
-for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> identifier <*> statement <*> statements)
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> some identifier <*> statement <*> statements)
 
 -- lvalue :: Assignment
 -- lvalue = identifier
