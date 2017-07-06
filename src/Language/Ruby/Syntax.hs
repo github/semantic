@@ -36,6 +36,7 @@ type Syntax = '[
   , Expression.Comparison
   , Expression.MemberAccess
   , Expression.ScopeResolution
+  , Expression.Subscript
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -113,6 +114,7 @@ statement  = handleError $
   <|> conditional
   <|> methodCall
   <|> call
+  <|> subscript
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -241,6 +243,9 @@ until' =
 
 for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> some identifier <*> statement <*> statements)
+
+subscript :: Assignment
+subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscript <$> statement <*> many argument)
 
 pair :: Assignment
 pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
