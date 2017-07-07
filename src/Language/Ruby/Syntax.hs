@@ -205,18 +205,18 @@ parameter =
 
 method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> methodName <*> params <*> statements)
-  where params = optional (symbol BlockParameters <|> symbol LambdaParameters) >>= \ _ -> children (many parameter)
+  where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 singletonMethod :: Assignment
 singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> statement <*> methodName <*> params <*> statements)
-  where params = optional (symbol BlockParameters <|> symbol LambdaParameters) >>= \ _ -> children (many parameter)
+  where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
-lambda = symbol Lambda >>= \ location -> children $ do
-  iden <- makeTerm location <$> (Syntax.Identifier <$> source)
-  params <- optional (symbol BlockParameters <|> symbol LambdaParameters) >>= \ _ -> children (many parameter)
+lambda = symbol Lambda >>= \ loc -> children $ do
+  name <- makeTerm loc <$> (Syntax.Identifier <$> source)
+  params <- (symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure []
   body <- statements
-  pure $ makeTerm location (Declaration.Function iden params body)
+  pure $ makeTerm loc (Declaration.Function name params body)
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -272,7 +272,7 @@ methodCall :: Assignment
 methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> name <*> args)
   where
     name = identifier <|> scopeResolution <|> call
-    args = optional (symbol ArgumentList <|> symbol ArgumentListWithParens) >>= \ _ -> children (many argument)
+    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many argument) <|> pure []
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> statement <*> statement)

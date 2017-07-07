@@ -16,5 +16,8 @@ end
 def foo(&block)
 end
 
-def self.foo(a)
+def self.foo
+end
+
+def self.foo(a, b)
 end
