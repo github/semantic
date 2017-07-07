@@ -191,16 +191,12 @@ tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> 
 functionDefinition :: Assignment
 functionDefinition =  symbol FunctionDefinition >>= \ loc -> children (make loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration))
   where
-    make location functionName' functionParameters ty functionBody = case ty of
-      Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)
-      Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a
+    make loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
 
 asyncFunctionDefinition :: Assignment
 asyncFunctionDefinition = symbol AsyncFunctionDefinition >>= \ loc -> children (make loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration))
   where
-    make location async' functionName' functionParameters ty functionBody = case ty of
-      Nothing -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) (makeTerm location Syntax.Empty)) async'
-      Just a -> makeTerm location $ Type.Annotation (makeTerm location $ Type.Annotation (makeTerm location $ Declaration.Function functionName' functionParameters functionBody) a) async'
+    make loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
 
 async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
