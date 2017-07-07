@@ -56,6 +56,8 @@ type Syntax = '[
   , Statement.Finally
   , Statement.ForEach
   , Statement.If
+  , Statement.Match
+  , Statement.Pattern
   , Statement.Retry
   , Statement.Return
   , Statement.ScopeEntry
@@ -89,6 +91,7 @@ statement = -- handleError $
   <|> unless
   <|> while'
   <|> until'
+  <|> case'
   <|> emptyStatement
   <|> assignment'
   <|> unary
@@ -254,6 +257,13 @@ until' =
 
 for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> some identifier <*> statement <*> statements)
+
+case' :: Assignment
+case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> statement <*> when)
+  where
+    when =  makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> (when <|> else' <|> statements))
+    else' = makeTerm <$> symbol Else <*> children (many statement)
+    pattern = symbol Pattern *> children ((symbol SplatArgument *> children statement) <|> statement)
 
 subscript :: Assignment
 subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscript <$> statement <*> many argument)
