@@ -255,7 +255,8 @@ until' =
   <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> statement <*> invert statement)
 
 for :: Assignment
-for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> some identifier <*> statement <*> statements)
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> vars <*> statement <*> statements)
+  where vars = makeTerm <$> location <*> some identifier
 
 case' :: Assignment
 case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> statement <*> when)
