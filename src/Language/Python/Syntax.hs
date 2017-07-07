@@ -144,6 +144,7 @@ expression = await
           <|> ellipsis
           <|> expressionList
           <|> lambda
+          <|> keywordArgument
           <|> keywordIdentifier
           <|> literal
           <|> memberAccess
@@ -160,6 +161,8 @@ decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
   (a, b) <- (symbol Decorator *> (children ((,) <$> expression <*> (symbol ArgumentList *> children ((many expression) <|> (many emptyTerm))))))
   dec <- declaration
   pure (Declaration.Decorator a b dec))
+keywordArgument :: Assignment
+keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Declaration.Variable <$> expression <*> emptyTerm <*> expression)
 
 withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
