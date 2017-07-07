@@ -37,6 +37,14 @@ data Pattern a = Pattern { pattern :: !a, patternBody :: !a }
 instance Eq1 Pattern where liftEq = genericLiftEq
 instance Show1 Pattern where liftShowsPrec = genericLiftShowsPrec
 
+
+data Let a  = Let { letVariable :: !a, letValue :: !a, letBody :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Let where liftEq = genericLiftEq
+instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
+
+
 -- Assignment
 
 -- | Assignment to a variable or other lvalue.
