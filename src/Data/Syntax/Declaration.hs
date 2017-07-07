@@ -31,11 +31,18 @@ instance Eq1 Variable where liftEq = genericLiftEq
 instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 
-data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classScope :: ![a] }
+data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classBody :: ![a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Class where liftEq = genericLiftEq
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
+
+-- | A decorator in Python
+data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Decorator where liftEq = genericLiftEq
+instance Show1 Decorator where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Generics, constraints.
 
