@@ -117,6 +117,7 @@ statement = -- handleError $
   <|> call
   <|> subscript
   <|> begin
+  <|> rescue
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -277,18 +278,18 @@ methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> na
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> statement <*> statement)
 
--- TODO: Multiple rescue clauses not quite working
-begin :: Assignment
-begin = makeTerm <$> symbol Begin <*> children (Statement.Try <$> many statement <*> many elseRescueEnsure)
-  where
-    elseRescueEnsure =
-          makeTerm <$> symbol Else <*> children (Statement.Else <$> emptyTerm <*> statements)
+rescue :: Assignment
+rescue =  rescue'
       <|> makeTerm <$> symbol Ensure <*> children (Statement.Finally <$> statements)
-      <|> makeTerm <$> symbol Rescue <*> children (Statement.Catch <$> (makeTerm <$> location <*> many exception) <*> statements)
-    exception =
-          makeTerm <$> symbol Exceptions <*> children (many identifier)
+      <|> makeTerm <$> symbol Else <*> children (Statement.Else <$> emptyTerm <*> statements)
+  where
+    rescue' = makeTerm <$> symbol Rescue <*> children (Statement.Catch <$> exceptions <*> (rescue' <|> statements))
+    exceptions = makeTerm <$> location <*> many ex
+    ex =  makeTerm <$> symbol Exceptions <*> children (many identifier)
       <|> makeTerm <$> symbol ExceptionVariable <*> children (many identifier)
 
+begin :: Assignment
+begin = makeTerm <$> symbol Begin <*> children (Statement.Try <$> statements <*> many rescue)
 
 assignment' :: Assignment
 assignment'

@@ -121,7 +121,7 @@ newtype Throw a = Throw a
 instance Eq1 Throw where liftEq = genericLiftEq
 instance Show1 Throw where liftShowsPrec = genericLiftShowsPrec
 
-data Try a = Try { tryBody :: ![a], tryCatch :: ![a] }
+data Try a = Try { tryBody :: !a, tryCatch :: ![a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Try where liftEq = genericLiftEq

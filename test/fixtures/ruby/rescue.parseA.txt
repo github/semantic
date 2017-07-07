@@ -2,4 +2,25 @@
   (Begin
     (Identifier)
     (Rescue
-      (Identifier))))
+      (Constant)
+      (Rescue
+        (Constant)
+        (Constant)
+        (RescuedException
+          (Identifier))
+        (Identifier)))
+    (Else
+      (Identifier))
+    (Ensure
+      (Identifier)))
+  (Method
+    (Identifier)
+    (Rescue
+      (Constant)
+      (Rescue
+        (Constant)
+        (Constant)
+        (RescuedException
+          (Identifier))))
+    (Else)
+    (Ensure)))
