@@ -119,6 +119,7 @@ statement = -- handleError $
   <|> subscript
   <|> begin
   <|> rescue
+  <|> block
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -216,15 +217,20 @@ lambda = symbol Lambda >>= \ loc -> children $ do
   body <- statements
   pure $ makeTerm loc (Declaration.Function name params body)
 
+block :: Assignment
+block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> emptyTerm <*> params <*> statements)
+     <|> makeTerm <$> symbol Block <*> children (Declaration.Function <$> emptyTerm <*> params <*> statements)
+  where params = (symbol BlockParameters) *> children (many parameter) <|> pure []
+
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
-alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> name <*> some methodName)
+alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> name <*> some methodName <*> emptyTerm)
   where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 undef :: Assignment
-undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> name <*> some methodName)
+undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> name <*> some methodName <*> emptyTerm)
   where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 if' :: Assignment
@@ -232,13 +238,14 @@ if' =
       ifElsif If
   <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> statement <*> statement <*> emptyTerm)
   where ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
-        else' = makeTerm <$> symbol Else <*> children (many statement)
+
+else' :: Assignment
+else' = makeTerm <$> symbol Else <*> children (many statement)
 
 unless :: Assignment
 unless =
       makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert statement <*> statements <*> (fromMaybe <$> emptyTerm <*> optional else'))
   <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> statement <*> invert statement <*> emptyTerm)
-  where else' = makeTerm <$> symbol Else <*> children (many statement)
 
 while' :: Assignment
 while' =
@@ -258,7 +265,6 @@ case' :: Assignment
 case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> statement <*> when)
   where
     when =  makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> (when <|> else' <|> statements))
-    else' = makeTerm <$> symbol Else <*> children (many statement)
     pattern = symbol Pattern *> children ((symbol SplatArgument *> children statement) <|> statement)
 
 subscript :: Assignment
@@ -277,7 +283,7 @@ argument =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 methodCall :: Assignment
-methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> name <*> args)
+methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> name <*> args <*> (block <|> emptyTerm))
   where
     name = identifier <|> scopeResolution <|> call
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many argument) <|> pure []
