@@ -147,7 +147,7 @@ literal =
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many statement)
-  <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pairs)
+  <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pair)
   -- TODO: Give subshell it's own literal and allow interpolation
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
@@ -160,10 +160,6 @@ literal =
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
   -- TODO: Handle interpolation
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
-  <|> makeTerm <$> symbol Hash <*> (Literal.Hash <$> many pair)
-
-  where
-    pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> statement <*> statement)
 
 keyword :: Assignment
 keyword =
