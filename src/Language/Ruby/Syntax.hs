@@ -280,6 +280,7 @@ call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> statem
 
 rescue :: Assignment
 rescue =  rescue'
+      <|> makeTerm <$> symbol RescueModifier <*> children (Statement.Try <$> statement <*> many (makeTerm <$> location <*> (Statement.Catch <$> statement <*> emptyTerm)))
       <|> makeTerm <$> symbol Ensure <*> children (Statement.Finally <$> statements)
       <|> makeTerm <$> symbol Else <*> children (Statement.Else <$> emptyTerm <*> statements)
   where

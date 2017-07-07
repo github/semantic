@@ -15,3 +15,5 @@ rescue StandardError, TimeoutError => x
 else
 ensure
 end
+
+bar rescue nil
