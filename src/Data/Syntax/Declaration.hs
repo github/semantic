@@ -37,6 +37,7 @@ data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classBo
 instance Eq1 Class where liftEq = genericLiftEq
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
+-- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
