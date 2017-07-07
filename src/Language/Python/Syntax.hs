@@ -101,7 +101,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ classDefinition <|> comment <|> decoratedDefinition <|> functionDefinition <|> asyncFunctionDefinition <|> expression <|> statement
+declaration = handleError $ classDefinition <|> comment <|> decoratedDefinition <|> functionDefinition <|> expression <|> statement
 
 statement :: Assignment
 statement = assertStatement
@@ -130,7 +130,7 @@ statement = assertStatement
           <|> withStatement
 
 expressionStatement :: Assignment
-expressionStatement = symbol ExpressionStatement *> children expression
+expressionStatement = symbol ExpressionStatement *> children declaration
 
 expression :: Assignment
 expression = await
@@ -143,7 +143,6 @@ expression = await
           <|> dottedName
           <|> ellipsis
           <|> expressionList
-          <|> lambda
           <|> keywordArgument
           <|> keywordIdentifier
           <|> literal
@@ -189,14 +188,12 @@ tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> 
   where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> (many expression)))
 
 functionDefinition :: Assignment
-functionDefinition =  symbol FunctionDefinition >>= \ loc -> children (make loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration))
+functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
+                  <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
+                  <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> (pure [])) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
   where
-    make loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
-
-asyncFunctionDefinition :: Assignment
-asyncFunctionDefinition = symbol AsyncFunctionDefinition >>= \ loc -> children (make loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration))
-  where
-    make loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
+    makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
+    makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
 
 async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
@@ -416,13 +413,6 @@ boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
 
 none :: Assignment
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
-
-lambda :: Assignment
-lambda = symbol Lambda >>= \ location -> children $ do
-  lambdaIdentifier <- makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
-  lambdaParameters <- many identifier
-  lambdaBody <- expression
-  pure $ makeTerm location $ Type.Annotation (makeTerm location (Declaration.Function lambdaIdentifier lambdaParameters lambdaBody)) (makeTerm location Syntax.Empty)
 
 comprehension :: Assignment
 comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehensionDeclaration expression)
