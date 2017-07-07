@@ -53,7 +53,7 @@ instance Show1 Range where liftShowsPrec = genericLiftShowsPrec
 
 -- Strings, symbols
 
-newtype String a = String { stringElements :: [Union '[InterpolationElement, TextElement] a] }
+newtype String a = String { stringElements :: [a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 String where liftEq = genericLiftEq
