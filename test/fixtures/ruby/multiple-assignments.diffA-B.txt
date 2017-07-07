@@ -55,7 +55,7 @@
         (Identifier))))-}
 {-(Assignment
     (Args
-      (Other "destructured_left_assigment"
+      (Other "destructured_left_assignment"
         (Identifier)
         (Identifier)))
     (Identifier))-})
