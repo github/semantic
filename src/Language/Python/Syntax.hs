@@ -184,7 +184,6 @@ whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expre
       Nothing -> makeTerm loc $ (Statement.While whileCondition whileBody)
       Just a -> makeTerm loc $ (Statement.Else (makeTerm loc $ Statement.While whileCondition whileBody) a)
 
--- TODO: Assign try else clauses
 tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many (expression <|> elseClause)))
   where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> (many expression)))
