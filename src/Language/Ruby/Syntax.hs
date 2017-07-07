@@ -107,7 +107,7 @@ statement = -- handleError $
   <|> class'
   <|> singletonClass
   <|> method
-  -- TODO: Singleton method
+  <|> singletonMethod
   <|> lambda
   <|> module'
   <|> identifier
@@ -204,7 +204,11 @@ parameter =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> methodName <*> params <*> statements)
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> methodName <*> params <*> statements)
+  where params = optional (symbol BlockParameters <|> symbol LambdaParameters) >>= \ _ -> children (many parameter)
+
+singletonMethod :: Assignment
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> statement <*> methodName <*> params <*> statements)
   where params = optional (symbol BlockParameters <|> symbol LambdaParameters) >>= \ _ -> children (many parameter)
 
 lambda :: Assignment

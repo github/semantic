@@ -15,7 +15,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: How should we represent function types, where applicable?
 
-data Method a = Method { methodName :: !a, methodParameters :: ![a], methodBody :: !a }
+data Method a = Method { methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Method where liftEq = genericLiftEq
