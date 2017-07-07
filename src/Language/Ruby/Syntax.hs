@@ -48,7 +48,6 @@ type Syntax = '[
   , Literal.String
   , Literal.Symbol
   , Literal.TextElement
-  , Statement.Alias
   , Statement.Assignment
   , Statement.Break
   , Statement.Catch
@@ -62,7 +61,6 @@ type Syntax = '[
   , Statement.ScopeEntry
   , Statement.ScopeExit
   , Statement.Try
-  , Statement.Undef
   , Statement.While
   , Statement.Yield
   , Syntax.Empty
@@ -223,10 +221,12 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
-alias = makeTerm <$> symbol Alias <*> children (Statement.Alias <$> methodName <*> methodName)
+alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> name <*> some methodName)
+  where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 undef :: Assignment
-undef = makeTerm <$> symbol Undef <*> children (Statement.Undef <$> some methodName)
+undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> name <*> some methodName)
+  where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 if' :: Assignment
 if' =

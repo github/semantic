@@ -154,19 +154,3 @@ newtype ScopeExit a = ScopeExit [a]
 
 instance Eq1 ScopeExit where liftEq = genericLiftEq
 instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
-
-
--- | Alias statement.
-data Alias a = Alias { aliasFrom :: !a, aliasTo :: !a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Alias where liftEq = genericLiftEq
-instance Show1 Alias where liftShowsPrec = genericLiftShowsPrec
-
-
--- | Undef statement.
-newtype Undef a = Undef [a]
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Undef where liftEq = genericLiftEq
-instance Show1 Undef where liftShowsPrec = genericLiftShowsPrec
