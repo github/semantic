@@ -132,6 +132,7 @@ identifier =
   <|> mk Self
   <|> mk Super
   <|> mk Setter
+  <|> mk Uninterpreted
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 literal :: Assignment
