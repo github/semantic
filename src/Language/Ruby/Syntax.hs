@@ -170,8 +170,7 @@ keyword =
       mk KeywordFILE
   <|> mk KeywordLINE
   <|> mk KeywordENCODING
-  -- TODO: Give keywords their own Expression?
-  where mk s = makeTerm <$> symbol s <*> (Literal.TextElement <$> source)
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 beginBlock :: Assignment
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many statement)
