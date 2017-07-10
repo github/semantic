@@ -23,4 +23,7 @@
         (RescuedException
           (Identifier))))
     (Else)
-    (Ensure)))
+    (Ensure))
+  (Modifier Rescue
+    (Identifier)
+    (Identifier)))

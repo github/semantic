@@ -1,20 +1,23 @@
 (Program
-  (Begin
+{+(Begin
     (Identifier)
     (Rescue
-    { (Constant)
-    ->(Identifier) }
-    { (Rescue
+      (Identifier)
+      (Identifier)))+}
+{-(Begin
+    (Identifier)
+    (Rescue
+      (Constant)
+      (Rescue
         (Constant)
         (Constant)
         (RescuedException
           (Identifier))
-        (Identifier))
-    ->(Identifier) })
-  {-(Else
-      (Identifier))-}
-  {-(Ensure
-      (Identifier))-})
+        (Identifier)))
+    (Else
+      (Identifier))
+    (Ensure
+      (Identifier)))-}
 {-(Method
     (Identifier)
     (Rescue
@@ -25,4 +28,7 @@
         (RescuedException
           (Identifier))))
     (Else)
-    (Ensure))-})
+    (Ensure))-}
+{-(Modifier Rescue
+    (Identifier)
+    (Identifier))-})
