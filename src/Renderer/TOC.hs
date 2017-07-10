@@ -28,6 +28,7 @@ import Data.Proxy
 import Data.Record
 import Data.Source as Source
 import Data.Text (toLower)
+import qualified Data.Text as T
 import Data.Text.Listable
 import Data.These
 import Data.Union
@@ -213,7 +214,7 @@ toCategoryName :: Declaration -> Text
 toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
   MethodDeclaration _ -> "Method"
-  SectionDeclaration _ -> "Section"
+  SectionDeclaration x -> "Heading " <> show (T.length (T.takeWhile (== '#') x))
   ErrorDeclaration _ -> "ParseError"
 
 instance Listable Declaration where

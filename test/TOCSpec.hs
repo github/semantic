@@ -149,6 +149,12 @@ spec = parallel $ do
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
       toS output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n" :: ByteString)
 
+    it "summarizes Markdown headings" $ do
+      blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
+      toS output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[5,7]},\"category\":\"Heading 2\",\"term\":\"## Two\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+
+
 type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
 type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)
 
