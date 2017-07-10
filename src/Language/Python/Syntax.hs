@@ -133,6 +133,7 @@ statement = assertStatement
           <|> returnStatement
           <|> tryStatement
           <|> whileStatement
+          <|> wildcardImport
           <|> withStatement
 
 expressionStatement :: Assignment
@@ -357,6 +358,9 @@ importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.I
 
 importAlias :: Assignment
 importAlias = makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
+
+wildcardImport :: Assignment
+wildcardImport = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
