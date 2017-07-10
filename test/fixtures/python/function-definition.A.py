@@ -6,3 +6,6 @@ def c(d):
 
 def g(g, h,):
   i
+
+def h(i=j):
+  i
