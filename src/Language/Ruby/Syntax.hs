@@ -120,6 +120,7 @@ statement = -- handleError $
   <|> begin
   <|> rescue
   <|> block
+  -- TODO: Heredocs
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -136,6 +137,7 @@ identifier =
   <|> mk Self
   <|> mk Super
   <|> mk Setter
+  <|> mk ReservedIdentifier
   <|> mk Uninterpreted
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
@@ -144,6 +146,7 @@ literal =
       makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
   <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
   <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
+  <|> makeTerm <$> symbol Grammar.Float <*> (Literal.Float <$> source)
   <|> makeTerm <$> symbol Grammar.Nil <*> (Literal.Null <$ source)
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement)
@@ -151,8 +154,6 @@ literal =
   <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pair)
   -- TODO: Give subshell it's own literal and allow interpolation
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
-  <|> makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
-  <|> makeTerm <$> symbol Float <*> (Literal.Float <$> source)
   -- TODO: Handle interpolation
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
   -- TODO: this isn't quite right `"a" "b"` ends up as TextElement {textElementContent = "\"a\"\"b\""}
