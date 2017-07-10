@@ -101,7 +101,12 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ classDefinition <|> comment <|> decoratedDefinition <|> functionDefinition <|> expression <|> statement
+declaration = handleError $ classDefinition
+           <|> comment
+           <|> decoratedDefinition
+           <|> expression
+           <|> functionDefinition
+           <|> statement
 
 statement :: Assignment
 statement = assertStatement
