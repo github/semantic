@@ -145,6 +145,7 @@ expression = await
           <|> comparisonOperator
           <|> comprehension
           <|> conditionalExpression
+          <|> defaultParameter
           <|> dottedName
           <|> ellipsis
           <|> expressionList
@@ -159,6 +160,9 @@ expression = await
           <|> type'
           <|> typedParameter
           <|> unaryOperator
+
+defaultParameter :: Assignment
+defaultParameter = makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
