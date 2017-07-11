@@ -144,43 +144,34 @@ expression =  argument
           <|> comparisonOperator
           <|> comprehension
           <|> conditionalExpression
-          <|> defaultParameter
-          <|> dictionarySplat
           <|> dottedName
           <|> ellipsis
           <|> expressionList
           <|> keyword
-          <|> listSplat
           <|> literal
           <|> memberAccess
           <|> notOperator
+          <|> parameter
           <|> subscript
           <|> statement
           <|> tuple
           <|> type'
-          <|> typedDefaultParameter
-          <|> typedParameter
           <|> unaryOperator
 
-defaultParameter :: Assignment
-defaultParameter = makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
-
-typedDefaultParameter :: Assignment
-typedDefaultParameter = symbol TypedDefaultParameter >>= \ loc -> children (makeAnnotation loc <$> expression <*> expression <*> expression)
 argument :: Assignment
 argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
         <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
         <|> makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
 
+parameter :: Assignment
+parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
+         <|> makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
+         <|> makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
+         <|> makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
+         <|> (symbol TypedDefaultParameter >>= \ loc -> children (makeAnnotation loc <$> expression <*> expression <*> expression))
   where
     makeAnnotation loc identifier' type' value' = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
     makeAssignment loc identifier' value'       = makeTerm loc (Statement.Assignment identifier' value')
-
-listSplat :: Assignment
-listSplat = makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
-
-dictionarySplat :: Assignment
-dictionarySplat = makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
@@ -227,9 +218,6 @@ classDefinition :: Assignment
 classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> (many declaration))
   where argumentList = symbol ArgumentList *> children (many expression)
                     <|> pure []
-
-typedParameter :: Assignment
-typedParameter = makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
 
 type' :: Assignment
 type' = symbol Type *> children expression
