@@ -328,7 +328,15 @@ identifier :: Assignment
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: Assignment
-literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString <|> list' <|> dictionary <|> set
+literal =  boolean
+       <|> concatenatedString
+       <|> dictionary
+       <|> float
+       <|> integer
+       <|> list'
+       <|> none
+       <|> set
+       <|> string
 
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
