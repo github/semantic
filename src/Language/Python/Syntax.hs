@@ -360,7 +360,6 @@ integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
--- TODO Possibly match against children for dotted name and identifiers
 import' :: Assignment
 import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
