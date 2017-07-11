@@ -7,5 +7,5 @@ def c():
 def d(e):
   a
 
-def i(j:int=1):
+def i(j:int=1, **d):
   j
