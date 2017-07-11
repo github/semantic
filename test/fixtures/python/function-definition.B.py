@@ -1,4 +1,4 @@
-def g(i, j,):
+def g(i, *j,):
   j
 
 def c():

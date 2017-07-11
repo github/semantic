@@ -153,6 +153,7 @@ expression = await
           <|> expressionList
           <|> keywordArgument
           <|> keywordIdentifier
+          <|> listSplatParameter
           <|> literal
           <|> memberAccess
           <|> notOperator
@@ -172,6 +173,9 @@ typedDefaultParameter = symbol TypedDefaultParameter >>= \ loc -> children (make
   where
     makeAnnotation loc identifier' type' value' = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
     makeAssignment loc identifier' value'       = makeTerm loc (Statement.Assignment identifier' value')
+
+listSplatParameter :: Assignment
+listSplatParameter = makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do

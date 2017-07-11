@@ -4,7 +4,7 @@ def a():
 def c(d):
   e
 
-def g(g, h,):
+def g(g, *h,):
   i
 
 def h(i=j):
