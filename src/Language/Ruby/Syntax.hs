@@ -372,7 +372,8 @@ binary = symbol Binary >>= \ loc -> children $ statement >>= \ lexpression -> go
       <|> mk AnonAmpersand Expression.BAnd
       <|> mk AnonCaret Expression.BXOr
       <|> mk AnonPipe Expression.BOr
-      -- TODO: binary minus (hidden node)
+      -- TODO: binary minus (hidden node). Doesn't work b/c we can't match hidden nodes (they aren't in the tree).
+      -- <|> mk HiddenBinaryMinus Expression.Minus
       <|> mk AnonPlus Expression.Plus
       -- TODO: binary star (hidden node)
       <|> mk AnonSlash Expression.DividedBy
