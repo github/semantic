@@ -136,7 +136,8 @@ expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children declaration
 
 expression :: Assignment
-expression = await
+expression =  argument
+          <|> await
           <|> binaryOperator
           <|> booleanOperator
           <|> call
@@ -166,17 +167,20 @@ defaultParameter = makeTerm <$> symbol DefaultParameter <*> children (Statement.
 
 typedDefaultParameter :: Assignment
 typedDefaultParameter = symbol TypedDefaultParameter >>= \ loc -> children (makeAnnotation loc <$> expression <*> expression <*> expression)
+argument :: Assignment
+argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
+        <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
+        <|> makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
+
   where
     makeAnnotation loc identifier' type' value' = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
     makeAssignment loc identifier' value'       = makeTerm loc (Statement.Assignment identifier' value')
 
 listSplat :: Assignment
 listSplat = makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
-         <|> makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
 
 dictionarySplat :: Assignment
 dictionarySplat = makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
-               <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
@@ -263,7 +267,6 @@ notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> e
 
 keyword :: Assignment
 keyword =  makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
-       <|> makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
 
 tuple :: Assignment
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
