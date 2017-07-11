@@ -1,9 +1,9 @@
 {-# LANGUAGE DataKinds #-}
 module Language.C where
 
+import Data.Source
 import Info
 import Prologue
-import Source
 import qualified Syntax as S
 import Term
 

@@ -9,25 +9,25 @@ module Renderer.Patch
 
 import Alignment
 import Data.Bifunctor.Join
+import Data.Blob
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Functor.Both as Both
 import Data.List (span, unzip)
+import Data.Range
 import Data.Record
+import Data.Source
 import Data.These
 import Diff
 import Patch
 import Prologue hiding (fst, snd)
-import Range
-import qualified Source
-import Source hiding (break, drop, length, null, take)
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
-truncatePatch :: Both SourceBlob -> ByteString
+truncatePatch :: Both Blob -> ByteString
 truncatePatch blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-renderPatch :: (HasField fields Range, Traversable f) => Both SourceBlob -> Diff f (Record fields) -> File
+renderPatch :: (HasField fields Range, Traversable f) => Both Blob -> Diff f (Record fields) -> File
 renderPatch blobs diff = File $ if not (ByteString.null text) && ByteString.last text /= '\n'
   then text <> "\n\\ No newline at end of file\n"
   else text
@@ -65,11 +65,11 @@ rowIncrement :: Join These a -> Both (Sum Int)
 rowIncrement = Join . fromThese (Sum 0) (Sum 0) . runJoin . (Sum 1 <$)
 
 -- | Given the before and after sources, render a hunk to a string.
-showHunk :: Functor f => HasField fields Range => Both SourceBlob -> Hunk (SplitDiff f (Record fields)) -> ByteString
+showHunk :: Functor f => HasField fields Range => Both Blob -> Hunk (SplitDiff f (Record fields)) -> ByteString
 showHunk blobs hunk = maybeOffsetHeader <>
   mconcat (showChange sources <$> changes hunk) <>
   showLines (snd sources) ' ' (maybeSnd . runJoin <$> trailingContext hunk)
-  where sources = source <$> blobs
+  where sources = blobSource <$> blobs
         maybeOffsetHeader = if lengthA > 0 && lengthB > 0
                             then offsetHeader
                             else mempty
@@ -90,11 +90,11 @@ showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine
 
 -- | Given a source, render a line to a string.
 showLine :: Functor f => HasField fields Range => Source -> Maybe (SplitDiff f (Record fields)) -> Maybe ByteString
-showLine source line | Just line <- line = Just . sourceText . (`slice` source) $ getRange line
+showLine source line | Just line <- line = Just . sourceBytes . (`slice` source) $ getRange line
                      | otherwise = Nothing
 
 -- | Returns the header given two source blobs and a hunk.
-header :: Both SourceBlob -> ByteString
+header :: Both Blob -> ByteString
 header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> maybeFilepaths) <> "\n"
   where filepathHeader = "diff --git a/" <> pathA <> " b/" <> pathB
         fileModeHeader = case (modeA, modeB) of
@@ -108,19 +108,19 @@ header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> 
             ]
           (Nothing, Nothing) -> ""
         blobOidHeader = "index " <> oidA <> ".." <> oidB
-        modeHeader :: ByteString -> Maybe SourceKind -> ByteString -> ByteString
+        modeHeader :: ByteString -> Maybe BlobKind -> ByteString -> ByteString
         modeHeader ty maybeMode path = case maybeMode of
            Just _ -> ty <> "/" <> path
            Nothing -> "/dev/null"
-        maybeFilepaths = if (nullOid == oidA && Source.null (snd sources)) || (nullOid == oidB && Source.null (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
+        maybeFilepaths = if (nullOid == oidA && nullSource (snd sources)) || (nullOid == oidB && nullSource (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
         beforeFilepath = "--- " <> modeHeader "a" modeA pathA
         afterFilepath = "+++ " <> modeHeader "b" modeB pathB
-        sources = source <$> blobs
-        (pathA, pathB) = case runJoin $ toS . path <$> blobs of
+        sources = blobSource <$> blobs
+        (pathA, pathB) = case runJoin $ toS . blobPath <$> blobs of
           ("", path) -> (path, path)
           (path, "") -> (path, path)
           paths -> paths
-        (oidA, oidB) = runJoin $ oid <$> blobs
+        (oidA, oidB) = runJoin $ blobOid <$> blobs
         (modeA, modeB) = runJoin $ blobKind <$> blobs
 
 -- | A hunk representing no changes.
@@ -128,13 +128,13 @@ emptyHunk :: Hunk (SplitDiff a annotation)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
-hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) -> Both SourceBlob -> [Hunk (SplitDiff [] (Record fields))]
-hunks _ blobs | sources <- source <$> blobs
+hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) -> Both Blob -> [Hunk (SplitDiff [] (Record fields))]
+hunks _ blobs | sources <- blobSource <$> blobs
               , sourcesEqual <- runBothWith (==) sources
-              , sourcesNull <- runBothWith (&&) (Source.null <$> sources)
+              , sourcesNull <- runBothWith (&&) (nullSource <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
-hunks diff blobs = hunksInRows (pure 1) $ alignDiff (source <$> blobs) diff
+hunks diff blobs = hunksInRows (pure 1) $ alignDiff (blobSource <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.

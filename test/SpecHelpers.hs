@@ -7,9 +7,11 @@ module SpecHelpers
 , unListableDiff
 ) where
 
+import Data.Blob
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Functor.Listable
+import Data.Source
 import Diff
 import Language
 import Patch
@@ -17,7 +19,6 @@ import Prologue hiding (readFile)
 import Renderer
 import Semantic
 import Semantic.Task
-import Source
 import System.FilePath
 import Term
 
@@ -33,15 +34,15 @@ parseFilePath path = do
   blob <- readFile path
   runTask (parseBlob SExpressionTermRenderer blob)
 
--- | Read a file to a SourceBlob.
+-- | Read a file to a Blob.
 --
 -- NB: This is intentionally duplicated from Command.Files because eventually
 -- we want to be able to test a core Semantic library that has no knowledge of
 -- the filesystem or Git. The tests, however, will still leverage reading files.
-readFile :: FilePath -> IO SourceBlob
+readFile :: FilePath -> IO Blob
 readFile path = do
-  source <- (Just . Source <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
-  pure $ fromMaybe (emptySourceBlob path) (sourceBlob path (languageForFilePath path) <$> source)
+  source <- (Just . fromBytes <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe Source))
+  pure $ fromMaybe (emptyBlob path) (sourceBlob path (languageForFilePath path) <$> source)
 
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language

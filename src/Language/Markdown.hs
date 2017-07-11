@@ -7,10 +7,10 @@ module Language.Markdown
 
 import CMark
 import Data.Record
+import Data.Source
 import Data.Syntax.Assignment (Location)
 import Info
 import Prologue hiding (Location)
-import Source
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
@@ -38,13 +38,15 @@ data Grammar
 
 cmarkParser :: Source -> Cofree [] (Record (NodeType ': Location))
 cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
-  where toTerm :: Range -> SourceSpan -> Node -> Cofree [] (Record (NodeType ': Location))
+  where toTerm :: Range -> Span -> Node -> Cofree [] (Record (NodeType ': Location))
         toTerm within withinSpan (Node position t children) =
-          let range = maybe within (sourceSpanToRange source . toSpan) position
+          let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
           in cofree $ (t :. range :. span :. Nil) :< (toTerm range span <$> children)
 
-        toSpan PosInfo{..} = SourceSpan (SourcePos startLine startColumn) (SourcePos endLine (succ endColumn))
+        toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ (if endLine <= startLine then max startColumn endColumn else endColumn)))
+
+        lineRanges = sourceLineRangesByLineNumber source
 
 toGrammar :: NodeType -> Grammar
 toGrammar DOCUMENT{} = Document

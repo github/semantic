@@ -1,2 +1,2 @@
-import a, b
-import b.c as d
+import a, b as c
+import b.c as d, e

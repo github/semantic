@@ -11,7 +11,7 @@
   (Other "ambient_declaration"
     (Class
       (Identifier)
-      (Other "ambient_method_declaration"
+      (Method
         (Identifier)
         (Other "call_signature"
           (Params
@@ -23,7 +23,7 @@
         (Identifier)
         (Ty
           (Other "predefined_type")))
-      (Other "ambient_method_declaration"
+      (Method
         (Identifier)
         (Other "call_signature"
           (Params)

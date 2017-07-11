@@ -11,11 +11,11 @@ module Parser
 ) where
 
 import qualified CMark
+import Data.Functor.Foldable hiding (fold, Nil)
 import Data.Record
+import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
-import Data.Functor.Foldable hiding (fold, Nil)
-import qualified Data.Text as T
 import Data.Union
 import Info hiding (Empty, Go)
 import Language
@@ -24,7 +24,6 @@ import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
-import Source
 import Syntax hiding (Go)
 import System.IO (hPutStrLn)
 import System.Console.ANSI
@@ -88,15 +87,15 @@ runParser parser = case parser of
         let errors = termErrors term `asTypeOf` toList err
         traverse_ (printError source) errors
         unless (Prologue.null errors) $ do
-          withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] . hPutStrLn stderr . (shows (Prologue.length errors) . showChar ' ' . showString (if Prologue.length errors == 1 then "error" else "errors")) $ ""
+          withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] . hPutStrLn stderr . (shows (length errors) . showChar ' ' . showString (if length errors == 1 then "error" else "errors")) $ ""
         pure term
       Nothing -> pure (errorTerm source err)
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> pure . cmarkParser
-  LineByLineParser -> lineByLineParser
+  LineByLineParser -> pure . lineByLineParser
 
 errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
-errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (SourcePos 0 0) (UnexpectedEndOfInput [])) err)))
+errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (Pos 0 0) (UnexpectedEndOfInput [])) err)))
 
 termErrors :: (Syntax.Error (Error grammar) :< fs, Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
 termErrors = cata $ \ (_ :< s) -> case s of
@@ -104,13 +103,6 @@ termErrors = cata $ \ (_ :< s) -> case s of
   _ -> fold s
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Source -> IO (SyntaxTerm Text DefaultFields)
-lineByLineParser source = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
-  (leaves, _) -> cofree <$> leaves
-  where
-    lines = actualLines source
-    root children = (sourceRange :. Program :. rangeToSourceSpan source sourceRange :. Nil) :< Indexed children
-    sourceRange = Source.totalRange source
-    leaf byteIndex line = (Range byteIndex (byteIndex + T.length line) :. Program :. rangeToSourceSpan source (Range byteIndex (byteIndex + T.length line)) :. Nil) :< Leaf line
-    annotateLeaves (accum, byteIndex) line =
-      (accum <> [ leaf byteIndex (Source.toText line) ] , byteIndex + Source.length line)
+lineByLineParser :: Source -> SyntaxTerm Text DefaultFields
+lineByLineParser source = cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
+  where toLine line range = cofree $ (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))

@@ -18,11 +18,11 @@ import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Functor.Both as Both
 import Data.Record
+import Data.Source
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
 import Parser
 import Prologue
-import Source
 import Term
 
 data TaskF output where

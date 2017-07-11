@@ -2,11 +2,9 @@
   (ExpressionStatements
     (Operator
       (Other "delete")
-      {
-      (SubscriptAccess
+    { (SubscriptAccess
         (Identifier)
         (StringLiteral))
-      ->
-      (MemberAccess
+    ->(MemberAccess
         (Identifier)
         (Identifier)) })))

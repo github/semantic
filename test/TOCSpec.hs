@@ -4,9 +4,11 @@ module TOCSpec where
 
 import Data.Aeson
 import Category as C
+import Data.Blob
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.Record
+import Data.Source
 import Data.Text.Listable
 import Data.These
 import Diff
@@ -20,7 +22,6 @@ import Renderer.TOC
 import RWS
 import Semantic
 import Semantic.Task
-import Source
 import SpecHelpers
 import Syntax as S
 import Term
@@ -50,7 +51,7 @@ spec = parallel $ do
       \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff (Syntax ()) Int])) in
         tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
         if Prologue.null diff' then [Unchanged 0]
-                               else replicate (Prologue.length diff') (Changed 0)
+                               else replicate (length diff') (Changed 0)
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -148,11 +149,17 @@ spec = parallel $ do
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
       toS output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\"}]}}\n" :: ByteString)
 
+    it "summarizes Markdown headings" $ do
+      blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
+      toS output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[5,7]},\"category\":\"Heading 2\",\"term\":\"## Two\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+
+
 type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
 type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)
 
 numTocSummaries :: Diff' -> Int
-numTocSummaries diff = Prologue.length $ filter isValidSummary (diffTOC diff)
+numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
@@ -211,11 +218,11 @@ isMethodOrFunction a = case runCofree (unListableF a) of
   (a :< _) | getField a == C.SingletonMethod -> True
   _ -> False
 
-blobsForPaths :: Both FilePath -> IO (Both SourceBlob)
+blobsForPaths :: Both FilePath -> IO (Both Blob)
 blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
 
-sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
-sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
+sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
+sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 
 blankDiff :: Diff'
 blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :< Leaf "\"a\"") ])
@@ -223,8 +230,8 @@ blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :<
     arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
-blankDiffBlobs :: Both SourceBlob
-blankDiffBlobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
+blankDiffBlobs :: Both Blob
+blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
 
 instance Listable Text where
   tiers = unListableText `mapT` tiers

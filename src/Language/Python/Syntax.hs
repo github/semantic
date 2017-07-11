@@ -19,6 +19,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Syntax.Type as Type
 import Data.Union
 import GHC.Generics
 import GHC.Stack
@@ -28,7 +29,9 @@ import qualified Term
 
 type Syntax =
   '[ Comment.Comment
+   , Declaration.Class
    , Declaration.Comprehension
+   , Declaration.Decorator
    , Declaration.Function
    , Declaration.Import
    , Declaration.Variable
@@ -54,16 +57,24 @@ type Syntax =
    , Redirect
    , Statement.Assignment
    , Statement.Break
+   , Statement.Catch
    , Statement.Continue
+   , Statement.Else
+   , Statement.Finally
+   , Statement.ForEach
    , Statement.If
+   , Statement.Let
    , Statement.NoOp
    , Statement.Return
    , Statement.Throw
+   , Statement.Try
+   , Statement.While
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
    , Syntax.Error Error
    , Syntax.Identifier
+   , Type.Annotation
    , []
    ]
 
@@ -90,7 +101,12 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ comment <|> statement <|> expression
+declaration = handleError $ classDefinition
+           <|> comment
+           <|> decoratedDefinition
+           <|> expression
+           <|> functionDefinition
+           <|> statement
 
 statement :: Assignment
 statement = assertStatement
@@ -99,21 +115,29 @@ statement = assertStatement
           <|> breakStatement
           <|> continueStatement
           <|> deleteStatement
+          <|> exceptClause
           <|> execStatement
           <|> expressionStatement
+          <|> finallyClause
+          <|> forStatement
           <|> globalStatement
           <|> ifStatement
           <|> identifier
           <|> import'
+          <|> importAlias
           <|> importFrom
           <|> nonlocalStatement
           <|> passStatement
           <|> printStatement
           <|> raiseStatement
           <|> returnStatement
+          <|> tryStatement
+          <|> whileStatement
+          <|> wildcardImport
+          <|> withStatement
 
 expressionStatement :: Assignment
-expressionStatement = symbol ExpressionStatement *> children expression
+expressionStatement = symbol ExpressionStatement *> children declaration
 
 expression :: Assignment
 expression = await
@@ -123,10 +147,11 @@ expression = await
           <|> comparisonOperator
           <|> comprehension
           <|> conditionalExpression
+          <|> defaultParameter
           <|> dottedName
           <|> ellipsis
           <|> expressionList
-          <|> lambda
+          <|> keywordArgument
           <|> keywordIdentifier
           <|> literal
           <|> memberAccess
@@ -134,7 +159,73 @@ expression = await
           <|> subscript
           <|> statement
           <|> tuple
+          <|> type'
+          <|> typedParameter
           <|> unaryOperator
+
+defaultParameter :: Assignment
+defaultParameter = makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
+
+decoratedDefinition :: Assignment
+decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
+  (a, b) <- (symbol Decorator *> (children ((,) <$> expression <*> (symbol ArgumentList *> children ((many expression) <|> (many emptyTerm))))))
+  dec <- declaration
+  pure (Declaration.Decorator a b dec))
+keywordArgument :: Assignment
+keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Declaration.Variable <$> expression <*> emptyTerm <*> expression)
+
+withStatement :: Assignment
+withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
+  (value, variable) <- (symbol WithItem *> (children $ (,) <$> identifier <*> identifier))
+  body <- expression
+  pure (Statement.Let variable value body))
+
+forStatement :: Assignment
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
+  where
+    make loc variables expressionList forBody forElseClause = case forElseClause of
+      Nothing -> makeTerm loc (Statement.ForEach variables expressionList forBody)
+      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList forBody) a)
+
+whileStatement :: Assignment
+whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
+  where
+    make loc whileCondition whileBody whileElseClause = case whileElseClause of
+      Nothing -> makeTerm loc (Statement.While whileCondition whileBody)
+      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.While whileCondition whileBody) a)
+
+tryStatement :: Assignment
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many (expression <|> elseClause)))
+  where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> (many expression)))
+
+functionDefinition :: Assignment
+functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
+                  <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
+                  <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> (pure [])) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
+  where
+    makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
+    makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
+
+async' :: Assignment
+async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
+
+classDefinition :: Assignment
+classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> (many declaration))
+  where argumentList = symbol ArgumentList *> children (many expression)
+                    <|> pure []
+
+typedParameter :: Assignment
+typedParameter = makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
+
+type' :: Assignment
+type' = symbol Type *> children expression
+
+-- TODO: support As expressions
+exceptClause :: Assignment
+exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> (makeTerm <$> location <*> (many identifier)) <*> (makeTerm <$> location <*> (many expression)))
+
+finallyClause :: Assignment
+finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
 
 dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
@@ -265,6 +356,12 @@ import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <
 importFrom :: Assignment
 importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
 
+importAlias :: Assignment
+importAlias = makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
+
+wildcardImport :: Assignment
+wildcardImport = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
 
@@ -289,7 +386,7 @@ await :: Assignment
 await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier <$> source)) <*> many expression)
 
 returnStatement :: Assignment
-returnStatement = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expressionList)
+returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expressionList <|> emptyTerm))
 
 deleteStatement :: Assignment
 deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> deleteIdentifier <* symbol ExpressionList <*> children (many expression))
@@ -333,12 +430,6 @@ boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
 
 none :: Assignment
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
-
-lambda :: Assignment
-lambda = makeTerm <$> symbol Lambda <*> children (Declaration.Function <$> lambdaIdentifier <*> lambdaParameters <*> lambdaBody)
-  where lambdaIdentifier = makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)
-        lambdaParameters = many identifier
-        lambdaBody = expression
 
 comprehension :: Assignment
 comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehensionDeclaration expression)
