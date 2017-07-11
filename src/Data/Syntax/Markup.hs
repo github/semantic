@@ -23,7 +23,7 @@ newtype Paragraph a = Paragraph [a]
 instance Eq1 Paragraph where liftEq = genericLiftEq
 instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
 
-data Section a = Section { sectionHeading :: a, sectionContent :: [a] }
+data Section a = Section { sectionLevel :: Int, sectionHeading :: a, sectionContent :: [a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Section where liftEq = genericLiftEq
