@@ -132,6 +132,17 @@ statement = assertStatement
           <|> whileStatement
           <|> withStatement
 
+literal :: Assignment
+literal =  boolean
+       <|> concatenatedString
+       <|> dictionary
+       <|> float
+       <|> integer
+       <|> list'
+       <|> none
+       <|> set
+       <|> string
+
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children declaration
 
@@ -317,17 +328,6 @@ rvalue  = expressionList <|> assignment' <|> yield
 
 identifier :: Assignment
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
-
-literal :: Assignment
-literal =  boolean
-       <|> concatenatedString
-       <|> dictionary
-       <|> float
-       <|> integer
-       <|> list'
-       <|> none
-       <|> set
-       <|> string
 
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
