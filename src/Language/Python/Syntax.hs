@@ -124,8 +124,6 @@ statement = assertStatement
           <|> ifStatement
           <|> identifier
           <|> import'
-          <|> importAlias
-          <|> importFrom
           <|> nonlocalStatement
           <|> passStatement
           <|> printStatement
@@ -133,7 +131,6 @@ statement = assertStatement
           <|> returnStatement
           <|> tryStatement
           <|> whileStatement
-          <|> wildcardImport
           <|> withStatement
 
 expressionStatement :: Assignment
@@ -365,17 +362,10 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 -- TODO Possibly match against children for dotted name and identifiers
 import' :: Assignment
-import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
-
--- TODO Possibly match against children nodes
-importFrom :: Assignment
-importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
-
-importAlias :: Assignment
-importAlias = makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
-
-wildcardImport :: Assignment
-wildcardImport = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
+       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
+       <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
+       <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
