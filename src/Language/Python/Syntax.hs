@@ -148,7 +148,7 @@ expression = await
           <|> comprehension
           <|> conditionalExpression
           <|> defaultParameter
-          <|> dictionarySplatParameter
+          <|> dictionarySplat
           <|> dottedName
           <|> ellipsis
           <|> expressionList
@@ -178,8 +178,9 @@ typedDefaultParameter = symbol TypedDefaultParameter >>= \ loc -> children (make
 listSplatParameter :: Assignment
 listSplatParameter = makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
 
-dictionarySplatParameter :: Assignment
-dictionarySplatParameter = makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
+dictionarySplat :: Assignment
+dictionarySplat = makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
+               <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
