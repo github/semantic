@@ -152,8 +152,7 @@ expression = await
           <|> dottedName
           <|> ellipsis
           <|> expressionList
-          <|> keywordArgument
-          <|> keywordIdentifier
+          <|> keyword
           <|> listSplat
           <|> literal
           <|> memberAccess
@@ -188,8 +187,6 @@ decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
   (a, b) <- (symbol Decorator *> (children ((,) <$> expression <*> (symbol ArgumentList *> children ((many expression) <|> (many emptyTerm))))))
   dec <- declaration
   pure (Declaration.Decorator a b dec))
-keywordArgument :: Assignment
-keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Declaration.Variable <$> expression <*> emptyTerm <*> expression)
 
 withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
@@ -268,8 +265,9 @@ comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression
 notOperator :: Assignment
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
 
-keywordIdentifier :: Assignment
-keywordIdentifier = makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
+keyword :: Assignment
+keyword =  makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
+       <|> makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
 
 tuple :: Assignment
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
