@@ -120,7 +120,7 @@ statement = -- handleError $
   <|> begin
   <|> rescue
   <|> block
-  -- TODO: Heredocs
+  <|> heredoc
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -162,6 +162,10 @@ literal =
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
   -- TODO: Handle interpolation
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+
+heredoc :: Assignment
+heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
+       <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 keyword :: Assignment
 keyword =
