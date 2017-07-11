@@ -160,11 +160,18 @@ expression = await
           <|> statement
           <|> tuple
           <|> type'
+          <|> typedDefaultParameter
           <|> typedParameter
           <|> unaryOperator
 
 defaultParameter :: Assignment
 defaultParameter = makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
+
+typedDefaultParameter :: Assignment
+typedDefaultParameter = symbol TypedDefaultParameter >>= \ loc -> children (makeAnnotation loc <$> expression <*> expression <*> expression)
+  where
+    makeAnnotation loc identifier' type' value' = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
+    makeAssignment loc identifier' value'       = makeTerm loc (Statement.Assignment identifier' value')
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do

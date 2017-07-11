@@ -9,3 +9,6 @@ def g(g, h,):
 
 def h(i=j):
   i
+
+def i(j:str="default"):
+  j

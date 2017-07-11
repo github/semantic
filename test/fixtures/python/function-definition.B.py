@@ -6,3 +6,6 @@ def c():
 
 def d(e):
   a
+
+def i(j:int=1):
+  j
