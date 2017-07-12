@@ -92,6 +92,7 @@ statement  =  exit Statement.Return Return
           <|> for
           <|> literal
           <|> assignment'
+          <|> parseError
   where exit construct sym = makeTerm <$> symbol sym <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 lvalue :: Assignment
@@ -157,3 +158,5 @@ makeTerm a f = cofree $ a :< inj f
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
+parseError :: Assignment
+parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
