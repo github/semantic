@@ -176,7 +176,6 @@ deriving instance Show grammar => Show (Error grammar)
 data ErrorCause grammar
   = UnexpectedSymbol [grammar] grammar
   | UnexpectedEndOfInput [grammar]
-  | ParseError [grammar]
   deriving (Eq, Show)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
@@ -206,7 +205,6 @@ showExpectation Error{..} = case errorCause of
   UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
   UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
   UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
-  ParseError symbols -> showString "expected " . showSymbols symbols . showString ", but got parse error"
 
 showSymbols :: Show grammar => [grammar] -> ShowS
 showSymbols [] = showString "end of input nodes"
@@ -332,7 +330,6 @@ instance Show1 ErrorCause where
   liftShowsPrec sp sl d e = case e of
     UnexpectedSymbol expected actual -> showsBinaryWith (liftShowsPrec sp sl) sp "UnexpectedSymbol" d expected actual
     UnexpectedEndOfInput expected -> showsUnaryWith (liftShowsPrec sp sl) "UnexpectedEndOfInput" d expected
-    ParseError expected -> showsUnaryWith (liftShowsPrec sp sl) "ParseError" d expected
 
 instance Applicative (Result grammar) where
   pure = Result Nothing . Just
