@@ -111,7 +111,6 @@ declaration = handleError $ classDefinition
 statement :: Assignment
 statement = assertStatement
           <|> assignment'
-          <|> augmentedAssignment
           <|> breakStatement
           <|> continueStatement
           <|> deleteStatement
@@ -124,8 +123,6 @@ statement = assertStatement
           <|> ifStatement
           <|> identifier
           <|> import'
-          <|> importAlias
-          <|> importFrom
           <|> nonlocalStatement
           <|> passStatement
           <|> printStatement
@@ -133,46 +130,65 @@ statement = assertStatement
           <|> returnStatement
           <|> tryStatement
           <|> whileStatement
-          <|> wildcardImport
           <|> withStatement
+
+literal :: Assignment
+literal =  boolean
+       <|> concatenatedString
+       <|> dictionary
+       <|> float
+       <|> integer
+       <|> list'
+       <|> none
+       <|> set
+       <|> string
 
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children declaration
 
 expression :: Assignment
-expression = await
+expression =  argument
+          <|> await
           <|> binaryOperator
           <|> booleanOperator
           <|> call
           <|> comparisonOperator
           <|> comprehension
           <|> conditionalExpression
-          <|> defaultParameter
           <|> dottedName
           <|> ellipsis
           <|> expressionList
-          <|> keywordArgument
-          <|> keywordIdentifier
+          <|> keyword
           <|> literal
           <|> memberAccess
           <|> notOperator
+          <|> parameter
           <|> subscript
           <|> statement
           <|> tuple
           <|> type'
-          <|> typedParameter
           <|> unaryOperator
 
-defaultParameter :: Assignment
-defaultParameter = makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
+argument :: Assignment
+argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
+        <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
+        <|> makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
+
+parameter :: Assignment
+parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
+         <|> makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
+         <|> makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
+         <|> makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
+         <|> makeAnnotation <$> symbol TypedDefaultParameter <*> children ((,,) <$> expression <*> expression <*> expression)
+  where
+    makeAnnotation loc (identifier', type', value') = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
+    makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment identifier' value')
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
   (a, b) <- (symbol Decorator *> (children ((,) <$> expression <*> (symbol ArgumentList *> children ((many expression) <|> (many emptyTerm))))))
   dec <- declaration
   pure (Declaration.Decorator a b dec))
-keywordArgument :: Assignment
-keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Declaration.Variable <$> expression <*> emptyTerm <*> expression)
 
 withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
@@ -214,9 +230,6 @@ classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.
   where argumentList = symbol ArgumentList *> children (many expression)
                     <|> pure []
 
-typedParameter :: Assignment
-typedParameter = makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
-
 type' :: Assignment
 type' = symbol Type *> children expression
 
@@ -251,8 +264,8 @@ comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression
 notOperator :: Assignment
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
 
-keywordIdentifier :: Assignment
-keywordIdentifier = makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
+keyword :: Assignment
+keyword =  makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
 
 tuple :: Assignment
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
@@ -292,35 +305,29 @@ booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression 
                                 <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
 
 assignment' :: Assignment
-assignment' =
-  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
-
-augmentedAssignment :: Assignment
-augmentedAssignment = makeTerm <$> symbol AugmentedAssignment <*> children (expressionList >>= \ lvalue -> Statement.Assignment lvalue <$>
-         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus lvalue      <$> rvalue)
-      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus lvalue     <$> rvalue)
-      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times lvalue     <$> rvalue)
-      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power lvalue     <$> rvalue)
-      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy lvalue <$> rvalue)
-      <|> makeTerm <$> symbol AnonSlashSlashEqual         <*> (Expression.DividedBy lvalue <$> rvalue)
-      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr lvalue       <$> rvalue)
-      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd lvalue      <$> rvalue)
-      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo lvalue    <$> rvalue)
-      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift lvalue    <$> rvalue)
-      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift lvalue    <$> rvalue)
-      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr lvalue      <$> rvalue)))
+assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
+           <|> makeTerm <$> symbol AugmentedAssignment <*> children (expressionList >>= \ lvalue -> Statement.Assignment lvalue <$>
+                 (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus lvalue      <$> rvalue)
+              <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus lvalue     <$> rvalue)
+              <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times lvalue     <$> rvalue)
+              <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power lvalue     <$> rvalue)
+              <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy lvalue <$> rvalue)
+              <|> makeTerm <$> symbol AnonSlashSlashEqual         <*> (Expression.DividedBy lvalue <$> rvalue)
+              <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr lvalue       <$> rvalue)
+              <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd lvalue      <$> rvalue)
+              <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo lvalue    <$> rvalue)
+              <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift lvalue    <$> rvalue)
+              <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift lvalue    <$> rvalue)
+              <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr lvalue      <$> rvalue)))
 
 yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> expressionList <|> emptyTerm ))
 
 rvalue :: Assignment
-rvalue  = expressionList <|> assignment' <|> augmentedAssignment <|> yield
+rvalue  = expressionList <|> assignment' <|> yield
 
 identifier :: Assignment
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
-
-literal :: Assignment
-literal = string <|> integer <|> float <|> boolean <|> none <|> concatenatedString <|> list' <|> dictionary <|> set
 
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
@@ -348,19 +355,11 @@ integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
--- TODO Possibly match against children for dotted name and identifiers
 import' :: Assignment
-import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
-
--- TODO Possibly match against children nodes
-importFrom :: Assignment
-importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
-
-importAlias :: Assignment
-importAlias = makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
-
-wildcardImport :: Assignment
-wildcardImport = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
+       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
+       <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
+       <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
