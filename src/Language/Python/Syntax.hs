@@ -105,6 +105,7 @@ declaration = classDefinition
            <|> expression
            <|> functionDefinition
            <|> statement
+           <|> parseError
 
 statement :: Assignment
 statement = assertStatement
@@ -129,6 +130,7 @@ statement = assertStatement
           <|> tryStatement
           <|> whileStatement
           <|> withStatement
+          <|> parseError
 
 literal :: Assignment
 literal =  boolean
@@ -140,6 +142,7 @@ literal =  boolean
        <|> none
        <|> set
        <|> string
+       <|> parseError
 
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children declaration
@@ -166,6 +169,7 @@ expression =  argument
           <|> tuple
           <|> type'
           <|> unaryOperator
+          <|> parseError
 
 argument :: Assignment
 argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
@@ -358,6 +362,7 @@ import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import 
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+       <|> parseError
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
@@ -448,3 +453,5 @@ makeTerm a f = cofree (a :< inj f)
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
+parseError :: Assignment
+parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
