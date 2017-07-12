@@ -203,8 +203,8 @@ functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunc
                   <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
                   <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> (pure [])) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
   where
-    makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc (Syntax.Empty Nothing)) identity ty)
-    makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc (Syntax.Empty Nothing)) identity ty)) async'
+    makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
+    makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
 
 async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
@@ -449,7 +449,7 @@ makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.T
 makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure (Syntax.Empty Nothing)
+emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
 handleError :: Assignment -> Assignment
 handleError = flip catchError $ \ error -> case errorCause error of

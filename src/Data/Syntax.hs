@@ -36,7 +36,7 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 -- | Empty syntax, with essentially no-op semantics.
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
-data Empty a = Empty (Maybe ByteString)
+data Empty a = Empty
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Empty where liftEq _ _ _ = True

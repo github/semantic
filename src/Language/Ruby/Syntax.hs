@@ -386,7 +386,7 @@ conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> statement <*> statement <*> statement)
 
 emptyStatement :: Assignment
-emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$> (Just <$> source))
+emptyStatement = makeTerm <$> symbol EmptyStatement <*> pure Syntax.Empty
 
 
 -- Helper functions
@@ -395,7 +395,7 @@ makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.T
 makeTerm a f = cofree $ a :< inj f
 
 emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure (Syntax.Empty Nothing)
+emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
 invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
