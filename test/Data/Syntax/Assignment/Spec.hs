@@ -2,7 +2,6 @@
 module Data.Syntax.Assignment.Spec where
 
 import Data.ByteString.Char8 as B (words, length)
-import Data.Record
 import Data.Source
 import Data.Syntax.Assignment
 import Info
