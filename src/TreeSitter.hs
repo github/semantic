@@ -41,7 +41,7 @@ treeSitterParser language grammar source = bracket ts_document_new ts_document_f
 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
-parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (Cofree [] (Record (grammar ': A.Location)))
+parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (A.AST grammar)
 parseToAST language source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document language
   root <- unsafeUseAsCStringLen (sourceBytes source) $ \ (source, len) -> do
@@ -53,7 +53,7 @@ parseToAST language source = bracket ts_document_new ts_document_free $ \ docume
 
   anaM toAST root
 
-toAST :: (Bounded grammar, Enum grammar) => Node -> IO (CofreeF [] (Record (grammar ': A.Location)) Node)
+toAST :: (Bounded grammar, Enum grammar) => Node -> IO (Base (A.AST grammar) Node)
 toAST node@Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
