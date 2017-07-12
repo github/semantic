@@ -38,7 +38,7 @@ newtype Pattern a = Pattern a
 instance Eq1 Pattern where liftEq = genericLiftEq
 instance Show1 Pattern where liftShowsPrec = genericLiftShowsPrec
 
-
+-- | A let statement or local binding, like 'a as b' or 'let a = b'.
 data Let a  = Let { letVariable :: !a, letValue :: !a, letBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 

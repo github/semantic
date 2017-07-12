@@ -124,6 +124,7 @@ statement = assertStatement
           <|> ifStatement
           <|> identifier
           <|> import'
+          <|> importAlias
           <|> importFrom
           <|> nonlocalStatement
           <|> passStatement
@@ -132,6 +133,7 @@ statement = assertStatement
           <|> returnStatement
           <|> tryStatement
           <|> whileStatement
+          <|> wildcardImport
           <|> withStatement
 
 expressionStatement :: Assignment
@@ -353,6 +355,12 @@ import' = makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <
 -- TODO Possibly match against children nodes
 importFrom :: Assignment
 importFrom = makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
+
+importAlias :: Assignment
+importAlias = makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
+
+wildcardImport :: Assignment
+wildcardImport = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression)
