@@ -179,10 +179,10 @@ parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assign
          <|> makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
          <|> makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
          <|> makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
-         <|> (symbol TypedDefaultParameter >>= \ loc -> children (makeAnnotation loc <$> expression <*> expression <*> expression))
+         <|> makeAnnotation <$> symbol TypedDefaultParameter <*> children ((,,) <$> expression <*> expression <*> expression)
   where
-    makeAnnotation loc identifier' type' value' = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
-    makeAssignment loc identifier' value'       = makeTerm loc (Statement.Assignment identifier' value')
+    makeAnnotation loc (identifier', type', value') = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
+    makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment identifier' value')
 
 decoratedDefinition :: Assignment
 decoratedDefinition = makeTerm <$> symbol DecoratedDefinition <*> (children $ do
