@@ -59,7 +59,7 @@ toAST node@Node{..} = do
   children <- allocaArray count $ \ childNodesPtr -> do
     _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
     peekArray count childNodesPtr
-  pure $ (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) :< children
+  pure $! A.Node (toEnum (fromIntegral nodeSymbol)) (nodeRange node) (nodeSpan node) :< children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g

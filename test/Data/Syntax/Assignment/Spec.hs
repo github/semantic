@@ -89,7 +89,7 @@ spec = do
       runAssignment headF ((,) <$> magenta <*> red) (makeState "magenta red" [node Magenta 0 7 [], node Red 8 11 []]) `shouldBe` Result Nothing (Just ((Out "magenta", Out "red"), AssignmentState 11 (Info.Pos 1 12) "magenta red" []))
 
 node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
-node symbol start end children = cofree $ (symbol :. Range start end :. Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end)) :. Nil) :< children
+node symbol start end children = cofree $ (Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end)))) :< children
 
 data Grammar = Red | Green | Blue | Magenta
   deriving (Enum, Eq, Show)
