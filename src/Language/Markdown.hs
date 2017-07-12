@@ -6,9 +6,8 @@ module Language.Markdown
 ) where
 
 import CMark
-import Data.Record
 import Data.Source
-import Data.Syntax.Assignment (Location)
+import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
 import Prologue hiding (Location)
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
@@ -36,13 +35,13 @@ data Grammar
   | Image
   deriving (Bounded, Enum, Eq, Ord, Show)
 
-cmarkParser :: Source -> Cofree [] (Record (NodeType ': Location))
+cmarkParser :: Source -> A.AST NodeType
 cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
-  where toTerm :: Range -> Span -> Node -> Cofree [] (Record (NodeType ': Location))
+  where toTerm :: Range -> Span -> Node -> A.AST NodeType
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
-          in cofree $ (t :. range :. span :. Nil) :< (toTerm range span <$> children)
+          in cofree $ (A.Node t range span) :< (toTerm range span <$> children)
 
         toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ (if endLine <= startLine then max startColumn endColumn else endColumn)))
 

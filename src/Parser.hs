@@ -48,7 +48,7 @@ data Parser term where
   -- | A tree-sitter parser.
   TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (Cofree [] (Record (CMark.NodeType ': Location)))
+  MarkdownParser :: Parser (AST CMark.NodeType)
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
 
@@ -70,7 +70,7 @@ pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) headF Python.assignment
 
 markdownParser :: Parser Markdown.Term
-markdownParser = AssignmentParser MarkdownParser (\ ((nodeType :. range :. span :. Nil) :< _) -> Node (toGrammar nodeType) range span) Markdown.assignment
+markdownParser = AssignmentParser MarkdownParser (\ (node@Node{..} :< _) -> node { nodeSymbol = toGrammar nodeSymbol }) Markdown.assignment
 
 runParser :: Parser term -> Source -> IO term
 runParser parser = case parser of
