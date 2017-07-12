@@ -30,11 +30,11 @@ type Syntax =
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
+  , Expression.Enumeration
   , Literal.Array
   , Literal.Boolean
   , Literal.Hash
   , Literal.Integer
-  , Literal.Range
   , Literal.String
   , Literal.Symbol
   , Statement.Assignment
@@ -149,7 +149,7 @@ literal  =  makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
         <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
         <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
         <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
-        <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement) -- FIXME: represent the difference between .. and ...
+        <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> statement <*> statement <*> emptyTerm) -- FIXME: represent the difference between .. and ...
 
 invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
