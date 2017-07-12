@@ -25,8 +25,6 @@ import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import Prologue hiding (Location)
 import Syntax hiding (Go)
-import System.IO (hPutStrLn)
-import System.Console.ANSI
 import Term
 import qualified Text.Parser.TreeSitter as TS
 import Text.Parser.TreeSitter.Language (Symbol)
@@ -35,7 +33,6 @@ import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
-import Text.Show
 import TreeSitter
 
 -- | A parser from 'Source' onto some term type.
@@ -43,7 +40,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Enum grammar, Eq grammar, Show grammar, Symbol grammar, Syntax.Error (Error grammar) :< fs, Foldable (Union fs), Functor (Union fs), Recursive ast, Foldable (Base ast))
+  AssignmentParser :: (Enum grammar, Eq grammar, Show grammar, Symbol grammar, Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs), Recursive ast, Foldable (Base ast))
                    => Parser ast                                                   -- ^ A parser producing AST.
                    -> (forall x. Base ast x -> Node grammar) -- ^ A function extracting the symbol and location.
                    -> Assignment ast grammar (Term (Union fs) (Record Location))   -- ^ An assignment from AST onto 'Term's.
@@ -82,25 +79,13 @@ runParser parser = case parser of
     ast <- runParser parser source
     let Result err term = assignBy by assignment source ast
     traverse_ (printError source) (toList err)
-    case term of
-      Just term -> do
-        let errors = termErrors term `asTypeOf` toList err
-        traverse_ (printError source) errors
-        unless (Prologue.null errors) $ do
-          withSGRCode [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Red] . hPutStrLn stderr . (shows (length errors) . showChar ' ' . showString (if length errors == 1 then "error" else "errors")) $ ""
-        pure term
-      Nothing -> pure (errorTerm source err)
+    pure $! fromMaybe (errorTerm source) term
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> pure . cmarkParser
   LineByLineParser -> pure . lineByLineParser
 
-errorTerm :: Syntax.Error (Error grammar) :< fs => Source -> Maybe (Error grammar) -> Term (Union fs) (Record Location)
-errorTerm source err = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error (fromMaybe (Error (Pos 0 0) (UnexpectedEndOfInput [])) err)))
-
-termErrors :: (Syntax.Error (Error grammar) :< fs, Functor (Union fs), Foldable (Union fs)) => Term (Union fs) a -> [Error grammar]
-termErrors = cata $ \ (_ :< s) -> case s of
-  _ | Just (Syntax.Error err) <- prj s -> [err]
-  _ -> fold s
+errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Location)
+errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> SyntaxTerm Text DefaultFields

@@ -3,7 +3,6 @@ module Language.Markdown.Syntax
 ( assignment
 , Syntax
 , Grammar
-, Error
 , Term
 ) where
 
@@ -40,11 +39,10 @@ type Syntax =
    , Markup.Strong
    , Markup.Text
    -- Assignment errors; cmark does not provide parse errors.
-   , Syntax.Error Error
+   , Syntax.Error
    , []
    ]
 
-type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (Cofree [] (Record (CMark.NodeType ': Location))) Grammar Term
 

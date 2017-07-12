@@ -3,7 +3,6 @@ module Language.Ruby.Syntax
 ( assignment
 , Syntax
 , Grammar
-, Error
 , Term
 ) where
 
@@ -48,12 +47,11 @@ type Syntax =
   , Statement.While
   , Statement.Yield
   , Syntax.Empty
-  , Syntax.Error Error
+  , Syntax.Error
   , Syntax.Identifier
   , []
   ]
 
-type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
@@ -63,7 +61,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (many declaration)
 
 declaration :: Assignment
-declaration = handleError $ comment <|> class' <|> method
+declaration = comment <|> class' <|> method
 
 class' :: Assignment
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> (constant <|> scopeResolution) <*> (superclass <|> pure []) <*> many declaration)
@@ -83,8 +81,7 @@ statements :: Assignment
 statements = makeTerm <$> location <*> many statement
 
 statement :: Assignment
-statement  = handleError
-           $  exit Statement.Return Return
+statement  =  exit Statement.Return Return
           <|> exit Statement.Yield Yield
           <|> exit Statement.Break Break
           <|> exit Statement.Continue Next
@@ -160,7 +157,3 @@ makeTerm a f = cofree $ a :< inj f
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
-handleError :: Assignment -> Assignment
-handleError = flip catchError $ \ error -> case errorCause error of
-  UnexpectedEndOfInput _ -> throwError error
-  _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)

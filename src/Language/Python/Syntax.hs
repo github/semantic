@@ -3,7 +3,6 @@ module Language.Python.Syntax
 ( assignment
 , Syntax
 , Grammar
-, Error
 , Term
 ) where
 
@@ -72,13 +71,12 @@ type Syntax =
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
-   , Syntax.Error Error
+   , Syntax.Error
    , Syntax.Identifier
    , Type.Annotation
    , []
    ]
 
-type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
@@ -98,10 +96,10 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Module <*> children (many declaration)
+assignment = makeTerm <$> symbol Module <*> children (many declaration) <|> parseError
 
 declaration :: Assignment
-declaration = handleError $ classDefinition
+declaration = classDefinition
            <|> comment
            <|> decoratedDefinition
            <|> expression
@@ -450,7 +448,3 @@ makeTerm a f = cofree (a :< inj f)
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
-handleError :: Assignment -> Assignment
-handleError = flip catchError $ \ error -> case errorCause error of
-  UnexpectedEndOfInput _ -> throwError error
-  _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
