@@ -1,4 +1,4 @@
-def g(i, j,):
+def g(i, *j,):
   j
 
 def c():
@@ -6,3 +6,6 @@ def c():
 
 def d(e):
   a
+
+def i(j:int=1, **d):
+  j

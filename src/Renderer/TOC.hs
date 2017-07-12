@@ -80,7 +80,7 @@ isValidSummary _ = True
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: Text }
   | FunctionDeclaration { declarationIdentifier :: Text }
-  | SectionDeclaration  { declarationIdentifier :: Text }
+  | SectionDeclaration  { declarationIdentifier :: Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: Text }
   deriving (Eq, Generic, NFData, Show)
 
@@ -123,10 +123,11 @@ markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error error :< fs, HasFiel
                      -> Source
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 markupSectionAlgebra proxy source r
-  | Just (Markup.Section (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource heading) (toText . flip Source.slice source . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading))))
+  | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource heading) (firstLine . toText . flip Source.slice source . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
   | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
   | otherwise = Nothing
-  where getSource = toText . flip Source.slice source . byteRange . extract
+  where getSource = firstLine . toText . flip Source.slice source . byteRange . extract
+        firstLine = T.takeWhile (/= '\n')
 
 
 -- | An entry in a table of contents.
@@ -214,7 +215,7 @@ toCategoryName :: Declaration -> Text
 toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
   MethodDeclaration _ -> "Method"
-  SectionDeclaration x -> "Heading " <> show (T.length (T.takeWhile (== '#') x))
+  SectionDeclaration _ l -> "Heading " <> show l
   ErrorDeclaration _ -> "ParseError"
 
 instance Listable Declaration where
