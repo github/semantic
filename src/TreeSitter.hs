@@ -9,7 +9,6 @@ import Prologue hiding (Constructor)
 import Category
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Functor.Foldable hiding (Nil)
-import Data.Ix
 import Data.Range
 import Data.Record
 import Data.Source
@@ -42,7 +41,7 @@ treeSitterParser language grammar source = bracket ts_document_new ts_document_f
 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
-parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (Cofree [] (Record (Maybe grammar ': A.Location)))
+parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (Cofree [] (Record (grammar ': A.Location)))
 parseToAST language source = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document language
   root <- unsafeUseAsCStringLen (sourceBytes source) $ \ (source, len) -> do
@@ -54,20 +53,16 @@ parseToAST language source = bracket ts_document_new ts_document_free $ \ docume
 
   anaM toAST root
 
-toAST :: (Bounded grammar, Enum grammar) => Node -> IO (CofreeF [] (Record (Maybe grammar ': A.Location)) Node)
+toAST :: (Bounded grammar, Enum grammar) => Node -> IO (CofreeF [] (Record (grammar ': A.Location)) Node)
 toAST node@Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
     _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
     peekArray count childNodesPtr
-  pure $ (safeToEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) :< children
+  pure $ (toEnum (fromIntegral nodeSymbol) :. nodeRange node :. nodeSpan node :. Nil) :< children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g
-
-safeToEnum :: forall n. (Bounded n, Enum n) => Int -> Maybe n
-safeToEnum n | (fromEnum (minBound :: n), fromEnum (maxBound :: n)) `inRange` n = Just (toEnum n)
-             | otherwise = Nothing
 
 
 -- | Return a parser for a tree sitter language & document.
