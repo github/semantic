@@ -338,13 +338,11 @@ assignment'
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->
-      -- TODO: Match a unary `defined?`
-      -- makeTerm location . Expression.Call <$> children ( symbol AnonDefinedQuestion *> statement )
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> statement )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> statement )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> statement )
+  <|> makeTerm location <$> children (Expression.Call <$> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier <$> source)) <*> some statement <*> emptyTerm)
   <|> children ( symbol AnonPlus *> statement )
-  -- FIXME: This also catches `defined? foo`, it shouldn't.
   <|> makeTerm location . Expression.Negate <$> children identifier -- Unary minus (e.g. `-a`). HiddenUnaryMinus nodes are hidden, so we can't match on the symbol.
 
 binary  :: Assignment
