@@ -110,7 +110,7 @@ declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syn
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 declarationAlgebra source r
   | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource (extract identifier))
-  | Just (Declaration.Method (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource (extract identifier))
+  | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource (extract identifier))
   | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r))
   | otherwise = Nothing
   where getSource = toText . flip Source.slice source . byteRange

@@ -1,0 +1,3 @@
+(Program
+  (Other "heredoc_beginning")
+  (Other "heredoc_end"))

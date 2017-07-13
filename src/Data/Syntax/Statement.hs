@@ -21,18 +21,17 @@ data Else a = Else { elseCondition :: !a, elseBody :: !a }
 instance Eq1 Else where liftEq = genericLiftEq
 instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
 
-
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
-data Match with a = Match { matchSubject :: !a, matchPatterns :: ![with a] }
+data Match a = Match { matchSubject :: !a, matchPatterns :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
-instance Eq1 with => Eq1 (Match with) where liftEq = genericLiftEq
-instance Show1 with => Show1 (Match with) where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Match where liftEq = genericLiftEq
+instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
-newtype Pattern a = Pattern a
+data Pattern a = Pattern { pattern :: !a, patternBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Pattern where liftEq = genericLiftEq
@@ -82,6 +81,12 @@ newtype Continue a = Continue a
 instance Eq1 Continue where liftEq = genericLiftEq
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
+newtype Retry a = Retry a
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Retry where liftEq = genericLiftEq
+instance Show1 Retry where liftShowsPrec = genericLiftShowsPrec
+
 newtype NoOp a = NoOp a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -124,7 +129,7 @@ newtype Throw a = Throw a
 instance Eq1 Throw where liftEq = genericLiftEq
 instance Show1 Throw where liftShowsPrec = genericLiftShowsPrec
 
-data Try a = Try !a ![a]
+data Try a = Try { tryBody :: !a, tryCatch :: ![a] }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Try where liftEq = genericLiftEq
@@ -141,3 +146,19 @@ newtype Finally a = Finally a
 
 instance Eq1 Finally where liftEq = genericLiftEq
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
+newtype ScopeEntry a = ScopeEntry [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ScopeEntry where liftEq = genericLiftEq
+instance Show1 ScopeEntry where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
+newtype ScopeExit a = ScopeExit [a]
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ScopeExit where liftEq = genericLiftEq
+instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec

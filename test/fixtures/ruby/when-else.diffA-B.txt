@@ -3,8 +3,16 @@
     (Identifier)
     (When
       (Args
-        (Identifier))
-      (Identifier)
-    { (Else)
-    ->(Else
-        (Identifier)) })))
+      { (Identifier)
+      ->(Identifier) })
+    { (When
+        (Args
+          (Identifier))
+        (Args
+          (Other "splat_argument"
+            (Identifier)))
+        (Identifier)
+        (Else))
+    ->(Identifier) }
+    {+(Else
+        (Identifier))+})))
