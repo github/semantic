@@ -82,6 +82,13 @@ data Subscript a
 instance Eq1 Subscript where liftEq = genericLiftEq
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 
+-- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
+data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a, enumerationStep :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Enumeration where liftEq = genericLiftEq
+instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
+
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
 data ScopeResolution a
   = ScopeResolution ![a]

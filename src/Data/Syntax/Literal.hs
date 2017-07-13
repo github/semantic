@@ -42,14 +42,6 @@ newtype Float a = Float { floatContent :: ByteString }
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
-
-data Range a = Range { rangeStart :: !a, rangeEnd :: !a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Range where liftEq = genericLiftEq
-instance Show1 Range where liftShowsPrec = genericLiftShowsPrec
-
-
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [a] }

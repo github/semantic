@@ -33,6 +33,7 @@ type Syntax = '[
   , Expression.Boolean
   , Expression.Call
   , Expression.Comparison
+  , Expression.Enumeration
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
@@ -43,7 +44,6 @@ type Syntax = '[
   , Literal.Integer
   , Literal.KeyValue
   , Literal.Null
-  , Literal.Range
   , Literal.String
   , Literal.Symbol
   , Literal.TextElement
@@ -148,7 +148,7 @@ literal =
   <|> makeTerm <$> symbol Grammar.Float <*> (Literal.Float <$> source)
   <|> makeTerm <$> symbol Grammar.Nil <*> (Literal.Null <$ source)
    -- TODO: Do we want to represent the difference between .. and ...
-  <|> makeTerm <$> symbol Range <*> children (Literal.Range <$> statement <*> statement)
+  <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> statement <*> statement <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many statement)
   <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pair)
   -- TODO: Give subshell it's own literal and allow interpolation
@@ -333,7 +333,6 @@ assignment'
           makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
       <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
       <|> argument
-
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->

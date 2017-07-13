@@ -39,6 +39,7 @@ type Syntax =
    , Expression.Bitwise
    , Expression.Call
    , Expression.Comparison
+   , Expression.Enumeration
    , Expression.ScopeResolution
    , Expression.MemberAccess
    , Expression.Subscript
@@ -164,6 +165,7 @@ expression =  argument
           <|> memberAccess
           <|> notOperator
           <|> parameter
+          <|> slice
           <|> subscript
           <|> statement
           <|> tuple
@@ -422,6 +424,12 @@ memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAcce
 
 subscript :: Assignment
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> expression <*> many expression)
+
+slice :: Assignment
+slice = makeTerm <$> symbol Slice <*> children
+  (Expression.Enumeration <$> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source))
+                          <*> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source) <|> (expression <|> emptyTerm))
+                          <*> (expression <|> emptyTerm))
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <*> (symbol ArgumentList *> children (many expression)
