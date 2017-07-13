@@ -1,8 +1,33 @@
 (Program
-  (AnonymousFunction
-  {+(Identifier)+}
-  { (Identifier)
-  ->(Binary
+{+(AnonymousFunction
+    (Identifier)
+    (Binary
       (Identifier)
       (Other "+")
-      (IntegerLiteral)) }))
+      (IntegerLiteral)))+}
+{-(AnonymousFunction)-}
+{-(AnonymousFunction
+    (Identifier))-}
+{-(AnonymousFunction
+    (Identifier)
+    (KeywordParameter
+      (Identifier)
+      (Boolean))
+    (OptionalParameter
+      (Identifier)
+      (Identifier))
+    (IntegerLiteral))-}
+{-(AnonymousFunction)-}
+{-(AnonymousFunction
+    (Identifier))-}
+{-(AnonymousFunction
+    (Identifier)
+    (IntegerLiteral))-}
+{-(AnonymousFunction
+    (Params
+      (Identifier)
+      (SplatParameter
+        (Identifier))
+      (Other "destructured_parameter"
+        (Identifier)
+        (Identifier))))-})

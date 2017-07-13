@@ -8,7 +8,7 @@ import GHC.Generics
 import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
-data Call a = Call { callFunction :: !a, callParams :: ![a] }
+data Call a = Call { callFunction :: !a, callParams :: ![a], callBlock :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Call where liftEq = genericLiftEq
@@ -21,6 +21,7 @@ data Comparison a
   | GreaterThan !a !a
   | GreaterThanEqual !a !a
   | Equal !a !a
+  | Comparison !a !a
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Comparison where liftEq = genericLiftEq
