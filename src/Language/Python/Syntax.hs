@@ -423,10 +423,9 @@ subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$>
 
 slice :: Assignment
 slice = makeTerm <$> symbol Slice <*> children
-  (toEnumeration <$> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source))
-                 <*> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source) <|> (expression <|> emptyTerm))
-                 <*> (expression <|> emptyTerm))
-  where toEnumeration start stop step = Expression.Enumeration start stop step
+  (Expression.Enumeration <$> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source))
+                          <*> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source) <|> (expression <|> emptyTerm))
+                          <*> (expression <|> emptyTerm))
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <*> (symbol ArgumentList *> children (many expression)
