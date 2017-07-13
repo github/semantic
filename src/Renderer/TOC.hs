@@ -112,7 +112,7 @@ declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syn
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 declarationAlgebra proxy source r
   | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource identifier)
-  | Just (Declaration.Method (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource identifier)
+  | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource identifier)
   | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
   | otherwise = Nothing
   where getSource = toText . flip Source.slice source . byteRange . extract

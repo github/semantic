@@ -1,5 +1,6 @@
 case foo
-when bar
+when qux
+when bar, *a
   baz
 else
 end

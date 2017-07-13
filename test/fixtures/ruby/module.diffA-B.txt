@@ -2,4 +2,8 @@
   (Module
     (Constant)
   {+(Method
-      (Identifier))+}))
+      (Identifier))+})
+{-(Module
+    (ScopeOperator
+      (Constant)
+      (Constant)))-})
