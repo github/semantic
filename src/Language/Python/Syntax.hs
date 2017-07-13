@@ -216,6 +216,12 @@ tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many (expression <|> elseClause)))
   where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> (many expression)))
 
+exceptClause :: Assignment
+exceptClause = makeTerm <$> symbol ExceptClause <*> children
+  (Statement.Catch <$> ((makeTerm <$> location <*> (uncurry Statement.Let . swap <$> ((,) <$> identifier <* symbol AnonAs <*> identifier) <*> emptyTerm))
+                      <|> (makeTerm <$> location <*> (many identifier)))
+                   <*> (makeTerm <$> location <*> (many expression)))
+
 functionDefinition :: Assignment
 functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
                   <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
@@ -234,10 +240,6 @@ classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.
 
 type' :: Assignment
 type' = symbol Type *> children expression
-
--- TODO: support As expressions
-exceptClause :: Assignment
-exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> (makeTerm <$> location <*> (many identifier)) <*> (makeTerm <$> location <*> (many expression)))
 
 finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
