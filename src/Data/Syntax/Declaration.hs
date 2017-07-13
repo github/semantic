@@ -15,7 +15,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: How should we represent function types, where applicable?
 
-data Method a = Method { methodName :: !a, methodParameters :: ![a], methodBody :: !a }
+data Method a = Method { methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Method where liftEq = genericLiftEq
@@ -36,6 +36,14 @@ data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classBo
 
 instance Eq1 Class where liftEq = genericLiftEq
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
+
+
+data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Module where liftEq = genericLiftEq
+instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
+
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -76,4 +84,3 @@ data Import a = Import { importContent :: ![a] }
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
-

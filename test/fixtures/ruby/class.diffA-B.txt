@@ -4,4 +4,8 @@
   {-(Superclass
       (Constant))-}
     (Method
-      (Identifier))))
+      (Identifier)))
+{-(Class
+    (ScopeOperator
+      (Constant)
+      (Constant)))-})

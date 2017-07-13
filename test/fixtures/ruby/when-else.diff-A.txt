@@ -4,5 +4,11 @@
     (When
       (Args
         (Identifier))
-      (Identifier)
-      (Else))))-}
+      (When
+        (Args
+          (Identifier))
+        (Args
+          (Other "splat_argument"
+            (Identifier)))
+        (Identifier)
+        (Else)))))-}
