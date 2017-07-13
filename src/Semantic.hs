@@ -12,7 +12,6 @@ import Data.Align.Generic (GAlign)
 import Data.Blob
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
-import Data.Proxy
 import Data.Record
 import Data.Source
 import qualified Data.Syntax.Declaration as Declaration
@@ -21,8 +20,6 @@ import Diff
 import Info
 import Interpreter
 import qualified Language
-import qualified Language.Markdown.Syntax as Markdown
-import qualified Language.Python.Syntax as Python
 import Patch
 import Parser
 import Prologue
@@ -46,8 +43,8 @@ parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
-  (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) blobSource) >>= render (renderToCTerm blob)
-  (ToCTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra blobSource) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (declarationAlgebra blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
   (ToCTermRenderer, _) -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource) >>= render (renderToCTerm blob)
   (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= render (renderJSONTerm blob)
@@ -68,8 +65,8 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
-  (ToCDiffRenderer, Just Language.Markdown) -> run (\ blobSource -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra (Proxy :: Proxy Markdown.Error) blobSource)) diffLinearly (renderToCDiff blobs)
-  (ToCDiffRenderer, Just Language.Python) -> run (\ blobSource -> parse pythonParser blobSource >>= decorate (declarationAlgebra (Proxy :: Proxy Python.Error) blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Markdown) -> run (\ blobSource -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra blobSource)) diffLinearly (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Python) -> run (\ blobSource -> parse pythonParser blobSource >>= decorate (declarationAlgebra blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToCDiff blobs)
   (ToCDiffRenderer, _) -> run (\ blobSource -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource)) diffTerms (renderToCDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderJSONDiff blobs)

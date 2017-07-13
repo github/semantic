@@ -24,7 +24,6 @@ import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
 import Data.List.NonEmpty (nonEmpty)
-import Data.Proxy
 import Data.Record
 import Data.Source as Source
 import Data.Text (toLower)
@@ -106,27 +105,25 @@ syntaxDeclarationAlgebra source r = case tailF r of
   where getSource = toText . flip Source.slice source . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error error :< fs, Show error, Functor (Union fs), HasField fields Range)
-                   => Proxy error
-                   -> Source
+declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Functor (Union fs), HasField fields Range)
+                   => Source
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra proxy source r
-  | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource identifier)
-  | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource identifier)
-  | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
+declarationAlgebra source r
+  | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource (extract identifier))
+  | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource (extract identifier))
+  | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r))
   | otherwise = Nothing
-  where getSource = toText . flip Source.slice source . byteRange . extract
+  where getSource = toText . flip Source.slice source . byteRange
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error error :< fs, HasField fields Range, Show error, Functor (Union fs), Foldable (Union fs))
-                     => Proxy error
-                     -> Source
+markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, Functor (Union fs), Foldable (Union fs))
+                     => Source
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra proxy source r
-  | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource heading) (firstLine . toText . flip Source.slice source . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just (Syntax.Error err) <- prj (tailF r) = Just $ ErrorDeclaration (show (err `asProxyTypeOf` proxy))
+markupSectionAlgebra source r
+  | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice source . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
+  | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r))
   | otherwise = Nothing
-  where getSource = firstLine . toText . flip Source.slice source . byteRange . extract
+  where getSource = firstLine . toText . flip Source.slice source . byteRange
         firstLine = T.takeWhile (/= '\n')
 
 
