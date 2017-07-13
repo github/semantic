@@ -135,7 +135,7 @@ data Try a = Try { tryBody :: !a, tryCatch :: ![a] }
 instance Eq1 Try where liftEq = genericLiftEq
 instance Show1 Try where liftShowsPrec = genericLiftShowsPrec
 
-data Catch a = Catch !a !a
+data Catch a = Catch { catchException :: !a, catchBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Catch where liftEq = genericLiftEq
