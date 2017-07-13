@@ -3,7 +3,6 @@ module Language.Python.Syntax
 ( assignment
 , Syntax
 , Grammar
-, Error
 , Term
 ) where
 
@@ -73,13 +72,12 @@ type Syntax =
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
    , Syntax.Empty
-   , Syntax.Error Error
+   , Syntax.Error
    , Syntax.Identifier
    , Type.Annotation
    , []
    ]
 
-type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
@@ -99,15 +97,16 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Module <*> children (many declaration)
+assignment = makeTerm <$> symbol Module <*> children (many declaration) <|> parseError
 
 declaration :: Assignment
-declaration = handleError $ classDefinition
+declaration = classDefinition
            <|> comment
            <|> decoratedDefinition
            <|> expression
            <|> functionDefinition
            <|> statement
+           <|> parseError
 
 statement :: Assignment
 statement = assertStatement
@@ -132,6 +131,7 @@ statement = assertStatement
           <|> tryStatement
           <|> whileStatement
           <|> withStatement
+          <|> parseError
 
 literal :: Assignment
 literal =  boolean
@@ -143,6 +143,7 @@ literal =  boolean
        <|> none
        <|> set
        <|> string
+       <|> parseError
 
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children declaration
@@ -170,6 +171,7 @@ expression =  argument
           <|> tuple
           <|> type'
           <|> unaryOperator
+          <|> parseError
 
 argument :: Assignment
 argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
@@ -363,6 +365,7 @@ import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import 
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+       <|> parseError
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
@@ -459,7 +462,5 @@ makeTerm a f = cofree (a :< inj f)
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
-handleError :: Assignment -> Assignment
-handleError = flip catchError $ \ error -> case errorCause error of
-  UnexpectedEndOfInput _ -> throwError error
-  _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
+parseError :: Assignment
+parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)

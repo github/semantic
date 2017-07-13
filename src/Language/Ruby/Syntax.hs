@@ -3,7 +3,6 @@ module Language.Ruby.Syntax
 ( assignment
 , Syntax
 , Grammar
-, Error
 , Term
 ) where
 
@@ -66,22 +65,21 @@ type Syntax = '[
   , Statement.While
   , Statement.Yield
   , Syntax.Empty
-  , Syntax.Error Error
+  , Syntax.Error
   , Syntax.Identifier
   , []
   ]
 
-type Error = Assignment.Error Grammar
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Program <*> children (many (handleError statement))
+assignment = makeTerm <$> symbol Program <*> children (many statement) <|> parseError
 
 statement :: Assignment
-statement = -- handleError $
+statement =
       beginBlock
   <|> endBlock
   <|> comment
@@ -121,6 +119,7 @@ statement = -- handleError $
   <|> rescue
   <|> block
   <|> heredoc
+  <|> parseError
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children statement))
 
 statements :: Assignment
@@ -397,7 +396,5 @@ emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
 
-handleError :: Assignment -> Assignment
-handleError = flip catchError $ \ error -> case errorCause error of
-  UnexpectedEndOfInput _ -> throwError error
-  _ -> makeTerm <$> location <*> (Syntax.Error error <$ source)
+parseError :: Assignment
+parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
