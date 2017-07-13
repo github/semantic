@@ -344,7 +344,6 @@ dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
 
--- TODO: Wrap `Literal.TextElement` with a `Literal.String`
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
