@@ -193,7 +193,7 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
     partialDecorator = (,) <$> symbol Decorator <*> children decorator'
-    decorator' = Declaration.Decorator <$> expression <* symbol ArgumentList <*> children (many expression <|> many emptyTerm)
+    decorator' = Declaration.Decorator <$> expression <*> ((symbol ArgumentList *> children (many expression <|> many emptyTerm)) <|> many emptyTerm)
 
 withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> (symbol WithItem *> children ((,) <$> identifier <*> identifier)) <*> expression)
