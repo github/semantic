@@ -196,10 +196,7 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
     decorator' = Declaration.Decorator <$> expression <* symbol ArgumentList <*> children (many expression <|> many emptyTerm)
 
 withStatement :: Assignment
-withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
-  (value, variable) <- (symbol WithItem *> (children $ (,) <$> identifier <*> identifier))
-  body <- expression
-  pure (Statement.Let variable value body))
+withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> (symbol WithItem *> children ((,) <$> identifier <*> identifier)) <*> expression)
 
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
