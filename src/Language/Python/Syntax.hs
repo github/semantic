@@ -193,13 +193,10 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
     partialDecorator = (,) <$> symbol Decorator <*> children decorator'
-    decorator' = Declaration.Decorator <$> expression <* symbol ArgumentList <*> children (many expression <|> many emptyTerm)
+    decorator' = Declaration.Decorator <$> expression <*> ((symbol ArgumentList *> children (many expression <|> many emptyTerm)) <|> many emptyTerm)
 
 withStatement :: Assignment
-withStatement = makeTerm <$> symbol WithStatement <*> (children $ do
-  (value, variable) <- (symbol WithItem *> (children $ (,) <$> identifier <*> identifier))
-  body <- expression
-  pure (Statement.Let variable value body))
+withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> (symbol WithItem *> children ((,) <$> identifier <*> identifier)) <*> expression)
 
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
@@ -219,6 +216,12 @@ tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many (expression <|> elseClause)))
   where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> (many expression)))
 
+exceptClause :: Assignment
+exceptClause = makeTerm <$> symbol ExceptClause <*> children
+  (Statement.Catch <$> ((makeTerm <$> location <*> (uncurry Statement.Let . swap <$> ((,) <$> identifier <* symbol AnonAs <*> identifier) <*> emptyTerm))
+                      <|> (makeTerm <$> location <*> (many identifier)))
+                   <*> (makeTerm <$> location <*> (many expression)))
+
 functionDefinition :: Assignment
 functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
                   <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
@@ -237,10 +240,6 @@ classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.
 
 type' :: Assignment
 type' = symbol Type *> children expression
-
--- TODO: support As expressions
-exceptClause :: Assignment
-exceptClause = makeTerm <$> symbol ExceptClause <*> children (Statement.Catch <$> (makeTerm <$> location <*> (many identifier)) <*> (makeTerm <$> location <*> (many expression)))
 
 finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
@@ -344,7 +343,6 @@ dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
 
--- TODO: Wrap `Literal.TextElement` with a `Literal.String`
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
