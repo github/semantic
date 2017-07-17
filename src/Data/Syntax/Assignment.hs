@@ -194,14 +194,14 @@ data ErrorCause grammar
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Source.Source -> Error grammar -> IO ()
 printError source error@Error{..} = do
-  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . showPos Nothing errorPos . showString ": " $ ""
-  withSGRCode [SetColor Foreground Vivid Red] . putStrErr . showString "error" . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') $ ""
-  withSGRCode [SetColor Foreground Vivid Green] . putStrErr . showChar '^' . showChar '\n' $ ""
-  putStrErr . showString (prettyCallStack callStack) . showChar '\n' $ ""
+  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos Nothing errorPos . showString ": "
+  withSGRCode [SetColor Foreground Vivid Red] . putStrErr $ showString "error" . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ')
+  withSGRCode [SetColor Foreground Vivid Green] . putStrErr $ showChar '^' . showChar '\n'
+  putStrErr $ showString (prettyCallStack callStack) . showChar '\n'
   where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines source), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
-        putStrErr = hPutStr stderr
+        putStrErr = hPutStr stderr . ($ "")
 
 withSGRCode :: [SGR] -> IO a -> IO ()
 withSGRCode code action = do
