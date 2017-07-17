@@ -19,7 +19,6 @@ library
   default-language:    Haskell2010
   default-extensions:  FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
   c-sources:           vendor/tree-sitter-json/src/parser.c
-                     , vendor/tree-sitter-json/src/scanner.c
   cc-options:          -std=c99 -Os
 
 

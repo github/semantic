@@ -51,6 +51,7 @@ library
                      , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Syntax
+                     , Language.JSON.Grammar
                      , Language.Ruby
                      , Language.Ruby.Grammar
                      , Language.Ruby.Syntax

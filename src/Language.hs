@@ -14,6 +14,7 @@ data Language =
       C
     | Go
     | JavaScript
+    | JSON
     | Markdown
     | Python
     | Ruby
@@ -25,6 +26,7 @@ languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> Just C
     ".c" -> Just C
+    ".json" -> Just JSON
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
     ".go" -> Just Language.Go

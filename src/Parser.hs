@@ -33,6 +33,7 @@ import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
+import Text.Parser.TreeSitter.JSON
 import TreeSitter
 
 -- | A parser from 'Source' onto some term type.
@@ -58,6 +59,7 @@ parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
   C -> TreeSitterParser C tree_sitter_c
   Go -> TreeSitterParser Go tree_sitter_go
+  JSON -> TreeSitterParser JSON tree_sitter_json
   JavaScript -> TreeSitterParser TypeScript tree_sitter_typescript
   Ruby -> TreeSitterParser Ruby tree_sitter_ruby
   TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
