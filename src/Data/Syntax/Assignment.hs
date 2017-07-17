@@ -194,13 +194,15 @@ data ErrorCause grammar
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Source.Source -> Error grammar -> IO ()
 printError source error@Error{..} = do
-  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr . showPos Nothing errorPos . showString ": " $ ""
-  withSGRCode [SetColor Foreground Vivid Red] . putStrErr . showString "error" . showString ": " . showExpectation error . showChar '\n' . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') $ ""
-  withSGRCode [SetColor Foreground Vivid Green] . putStrErr . showChar '^' . showChar '\n' . showString (prettyCallStack callStack) $ ""
+  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos Nothing errorPos . showString ": "
+  withSGRCode [SetColor Foreground Vivid Red] . putStrErr $ showString "error" . showString ": " . showExpectation error . showChar '\n'
+  putStrErr $ showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ')
+  withSGRCode [SetColor Foreground Vivid Green] . putStrErr $ showChar '^' . showChar '\n'
+  putStrErr $ showString (prettyCallStack callStack) . showChar '\n'
   where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines source), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
-        putStrErr = hPutStr stderr
+        putStrErr = hPutStr stderr . ($ "")
 
 withSGRCode :: [SGR] -> IO a -> IO ()
 withSGRCode code action = do
@@ -240,7 +242,8 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Folda
 assignAllFrom toNode assignment state = case runAssignment toNode assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous toNode state) of
     [] -> pure (a, state)
-    node : _ -> Result (err <|> Just (Error (statePos state) (UnexpectedSymbol [] (nodeSymbol (toNode (F.project node)))))) Nothing
+    node : _ -> let Node nodeSymbol _ (Info.Span spanStart _) = toNode (F.project node) in
+      Result (err <|> Just (Error spanStart (UnexpectedSymbol [] nodeSymbol))) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
@@ -257,7 +260,8 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
             Result err Nothing -> Result err Nothing
           (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           (Many _, []) -> yield [] state
-          (Many rule, _) -> uncurry yield (runMany rule state)
+          (Many rule, _) -> let (e1, values, state') = runMany rule state
+                                Result e2 v = yield values state' in Result (e2 <|> e1) v
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
@@ -273,10 +277,10 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
                   Choose choices -> choiceSymbols choices
                   _ -> []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                runMany :: Assignment ast grammar v -> AssignmentState ast -> ([v], AssignmentState ast)
+                runMany :: Assignment ast grammar v -> AssignmentState ast -> (Maybe (Error grammar), [v], AssignmentState ast)
                 runMany rule state = case runAssignment toNode rule state of
-                  Result _ (Just (a, state')) -> let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
-                  _ -> ([], state)
+                  Result e1 (Just (a, state')) -> let (e2, as, state'') = runMany rule state' in as `seq` (e2 <|> e1, a : as, state'')
+                  Result err Nothing -> (err, [], state)
         {-# INLINE run #-}
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast -> AssignmentState ast
@@ -350,7 +354,7 @@ instance Applicative (Result grammar) where
 
 instance Alternative (Result grammar) where
   empty = Result Nothing Nothing
-  Result e (Just a) <|> _ = Result e (Just a)
+  Result e1 (Just a) <|> Result e2 _ = Result (e1 <|> e2) (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <|> e2) b
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
