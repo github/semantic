@@ -258,7 +258,8 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
             Result err Nothing -> Result err Nothing
           (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           (Many _, []) -> yield [] state
-          (Many rule, _) -> uncurry yield (runMany rule state)
+          (Many rule, _) -> let (e1, values, state') = runMany rule state
+                                Result e2 v = yield values state' in Result (e1 <|> e2) v
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> yield a state <|> yield b state
           (Throw e, _) -> Result (Just e) Nothing
@@ -274,10 +275,10 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
                   Choose choices -> choiceSymbols choices
                   _ -> []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                runMany :: Assignment ast grammar v -> AssignmentState ast -> ([v], AssignmentState ast)
+                runMany :: Assignment ast grammar v -> AssignmentState ast -> (Maybe (Error grammar), [v], AssignmentState ast)
                 runMany rule state = case runAssignment toNode rule state of
-                  Result _ (Just (a, state')) -> let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
-                  _ -> ([], state)
+                  Result e1 (Just (a, state')) -> let (e2, as, state'') = runMany rule state' in as `seq` (e1 <|> e2, a : as, state'')
+                  Result err Nothing -> (err, [], state)
         {-# INLINE run #-}
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast -> AssignmentState ast
