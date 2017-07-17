@@ -77,9 +77,11 @@ runParser parser = case parser of
   ASTParser language -> parseToAST language
   AssignmentParser parser by assignment -> \ source -> do
     ast <- runParser parser source
-    let Result err term = assignBy by assignment source ast
-    traverse_ (printError source) err
-    pure $! fromMaybe (errorTerm source) term
+    case assignBy by assignment source ast of
+      Left err -> do
+        printError source err
+        pure (errorTerm source)
+      Right term -> pure term
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
   MarkdownParser -> pure . cmarkParser
   LineByLineParser -> pure . lineByLineParser
