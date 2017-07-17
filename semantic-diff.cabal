@@ -118,6 +118,7 @@ library
                      , ruby
                      , typescript
                      , python
+                     , json
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
