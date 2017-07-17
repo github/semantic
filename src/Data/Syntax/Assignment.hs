@@ -351,7 +351,7 @@ instance Applicative (Result grammar) where
 
 instance Alternative (Result grammar) where
   empty = Result Nothing Nothing
-  Result e (Just a) <|> _ = Result e (Just a)
+  Result e1 (Just a) <|> Result e2 _ = Result (e1 <|> e2) (Just a)
   Result e1 Nothing <|> Result e2 b = Result (e1 <|> e2) b
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
