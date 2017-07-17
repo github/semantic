@@ -240,7 +240,8 @@ assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Folda
 assignAllFrom toNode assignment state = case runAssignment toNode assignment state of
   Result err (Just (a, state)) -> case stateNodes (dropAnonymous toNode state) of
     [] -> pure (a, state)
-    node : _ -> Result (err <|> Just (Error (statePos state) (UnexpectedSymbol [] (nodeSymbol (toNode (F.project node)))))) Nothing
+    node : _ -> let Node nodeSymbol _ (Info.Span spanStart _) = toNode (F.project node) in
+      Result (err <|> Just (Error spanStart (UnexpectedSymbol [] nodeSymbol))) Nothing
   r -> r
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
