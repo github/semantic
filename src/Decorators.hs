@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds, TypeOperators #-}
 module Decorators
 ( ConstructorLabel(..)
 , constructorLabelWithSource
