@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module Decorators
 ( ConstructorLabel(..)
-, constructorLabelWithSource
+, constructorNameAndConstantFields
 , constructorLabel
 ) where
 
@@ -20,8 +20,8 @@ import Text.Show
 --
 --   This uses 'liftShowsPrec' to produce the 'ByteString', with the effect that
 --   constant fields will be included and parametric fields will not be.
-constructorLabelWithSource :: Show1 f => TermF f a b -> ByteString
-constructorLabelWithSource (_ :< f) = toS (liftShowsPrec (const (const identity)) (const identity) 0 f "")
+constructorNameAndConstantFields :: Show1 f => TermF f a b -> ByteString
+constructorNameAndConstantFields (_ :< f) = toS (liftShowsPrec (const (const identity)) (const identity) 0 f "")
 
 -- | Compute a 'ConstructorLabel' label for a 'Union' of syntax 'Term's.
 constructorLabel :: ConstructorName f => TermF f a b -> ConstructorLabel
