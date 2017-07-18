@@ -45,32 +45,31 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
 import Term
 
-data Summaries = Summaries { changes, errors :: !(Map Text [Value]), language :: Language }
+data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
   deriving (Eq, Show)
 
 instance Monoid Summaries where
-  mempty = Summaries mempty mempty Undetected
-  mappend (Summaries c1 e1 l1) (Summaries c2 e2 l2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2) l1
+  mempty = Summaries mempty mempty
+  mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
 
 instance StringConv Summaries ByteString where
   strConv _ = toS . (<> "\n") . encode
 
 instance ToJSON Summaries where
-  toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors, "language" .= language ]
+  toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
 data JSONSummary
   = JSONSummary
     { summaryCategoryName :: Text
     , summaryTermName :: Text
     , summarySpan :: Span
-    , summaryLanguage :: Language
     , summaryChangeType :: Text
     }
   | ErrorSummary { error :: Text, errorSpan :: Span, errorLanguage :: Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
-  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan, "language" .= summaryLanguage ]
+  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
 
 isValidSummary :: JSONSummary -> Bool
@@ -185,11 +184,11 @@ entrySummary language entry = case entry of
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Language -> Record fields -> Text -> Maybe JSONSummary
 recordSummary language record = case getDeclaration record of
   Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record) language)
-  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record) language
+  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
   Nothing -> const Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Both Blob -> Diff f (Record fields) -> Summaries
-renderToCDiff blobs diff = Summaries (toMap changes) (toMap errors) languages
+renderToCDiff blobs diff = Summaries (toMap changes) (toMap errors)
   where (changes, errors) = List.partition isValidSummary $ diffTOC languages diff
         toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -205,7 +204,7 @@ renderToCDiff blobs diff = Summaries (toMap changes) (toMap errors) languages
                           | otherwise -> before <> " -> " <> after
 
 renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Blob -> Term f (Record fields) -> Summaries
-renderToCTerm Blob{..} term = Summaries (toMap changes) (toMap errors) language
+renderToCTerm Blob{..} term = Summaries (toMap changes) (toMap errors)
   where (changes, errors) = List.partition isValidSummary $ termToC language term
         language = fromMaybe Undetected blobLanguage
         toMap [] = mempty
