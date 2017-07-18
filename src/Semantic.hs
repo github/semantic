@@ -46,11 +46,11 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra blobSource) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (declarationAlgebra blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
   (ToCTermRenderer, _) -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource) >>= render (renderToCTerm blob)
-  (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate constructorLabel >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser blobSource >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
-  (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
-  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) -> parse syntaxParser blobSource >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
@@ -74,8 +74,8 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
-  (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate (ConstructorLabel . constructorLabel) <=< parse markdownParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate (ConstructorLabel . constructorLabel) <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
   (IdentityDiffRenderer, _) -> run (\ blobSource -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)

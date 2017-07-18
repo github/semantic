@@ -23,9 +23,9 @@ import Text.Show
 constructorLabelWithSource :: Show1 f => TermF f a b -> ByteString
 constructorLabelWithSource (_ :< f) = toS (liftShowsPrec (const (const identity)) (const identity) 0 f "")
 
--- | Compute a 'ByteString' label for a 'Union' of syntax 'Term's.
-constructorLabel :: ConstructorName f => TermF f a b -> ByteString
-constructorLabel (_ :< f) = toS (constructorName f)
+-- | Compute a 'ConstructorLabel' label for a 'Union' of syntax 'Term's.
+constructorLabel :: ConstructorName f => TermF f a b -> ConstructorLabel
+constructorLabel (_ :< f) = ConstructorLabel $ toS (constructorName f)
 
 
 newtype ConstructorLabel = ConstructorLabel ByteString
