@@ -45,18 +45,18 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
 import Term
 
-data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
+data Summaries = Summaries { changes, errors :: !(Map Text [Value]), language :: Language }
   deriving (Eq, Show)
 
 instance Monoid Summaries where
-  mempty = Summaries mempty mempty
-  mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+  mempty = Summaries mempty mempty Undetected
+  mappend (Summaries c1 e1 l1) (Summaries c2 e2 l2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2) l1
 
 instance StringConv Summaries ByteString where
   strConv _ = toS . (<> "\n") . encode
 
 instance ToJSON Summaries where
-  toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
+  toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors, "language" .= language ]
 
 data JSONSummary
   = JSONSummary
@@ -189,9 +189,15 @@ recordSummary language record = case getDeclaration record of
   Nothing -> const Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Both Blob -> Diff f (Record fields) -> Summaries
-renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
-  where toMap [] = mempty
+renderToCDiff blobs diff = Summaries (toMap changes) (toMap errors) languages
+  where (changes, errors) = List.partition isValidSummary $ diffTOC languages diff
+        toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
+        languages = case runJoin (blobLanguage <$> blobs) of
+          (Nothing, Just after) -> after
+          (Just before, Nothing) -> before
+          (Nothing, Nothing) -> Undetected
+          (Just before, Just _) -> before
         summaryKey = toS $ case runJoin (blobPath <$> blobs) of
           (before, after) | null before -> after
                           | null after -> before
@@ -199,9 +205,11 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | otherwise -> before <> " -> " <> after
 
 renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Blob -> Term f (Record fields) -> Summaries
-renderToCTerm blob = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
-  where toMap [] = mempty
-        toMap as = Map.singleton (toS (blobPath blob)) (toJSON <$> as)
+renderToCTerm Blob{..} term = Summaries (toMap changes) (toMap errors) language
+  where (changes, errors) = List.partition isValidSummary $ termToC language term
+        language = fromMaybe Undetected blobLanguage
+        toMap [] = mempty
+        toMap as = Map.singleton (toS blobPath) (toJSON <$> as)
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Language -> Diff f (Record fields) -> [JSONSummary]
 diffTOC language = mapMaybe (entrySummary language) . dedupe . tableOfContentsBy declaration
