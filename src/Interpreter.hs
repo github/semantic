@@ -4,7 +4,6 @@ module Interpreter
 , decoratingWith
 , diffTermsWith
 , comparableByConstructor
-, constructorLabel
 , runAlgorithm
 , runAlgorithmSteps
 ) where
@@ -13,7 +12,7 @@ import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
-import Data.Functor.Classes (Eq1, Show1 (liftShowsPrec))
+import Data.Functor.Classes (Eq1)
 import RWS
 import Data.Record
 import Data.These
@@ -23,6 +22,7 @@ import Patch (inserting, deleting, replacing, patchSum)
 import Prologue hiding (lookup)
 import Syntax as S hiding (Return)
 import Term
+
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
 diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
@@ -61,12 +61,6 @@ getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a ->
 getLabel (h :< t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
-
--- | Compute a 'ByteString' label for a 'Show1'able 'Term'.
---
---   This uses 'liftShowsPrec' to produce the 'ByteString', with the effect that constant fields will be included and parametric fields will not be.
-constructorLabel :: Show1 f => TermF f a b -> ByteString
-constructorLabel (_ :< f) = toS (liftShowsPrec (const (const identity)) (const identity) 0 f "")
 
 -- | Run an Algorithm to completion by repeated application of a stepping operation and return its result.
 runAlgorithm :: forall f result

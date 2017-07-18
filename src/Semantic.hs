@@ -16,6 +16,7 @@ import Data.Record
 import Data.Source
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Union
+import Decorators
 import Diff
 import Info
 import Interpreter
@@ -26,7 +27,6 @@ import Prologue
 import Renderer
 import Semantic.Task as Task
 import Term
-import Text.Show
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -46,8 +46,8 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (markupSectionAlgebra blobSource) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (declarationAlgebra blobSource) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
   (ToCTermRenderer, _) -> parse syntaxParser blobSource >>= decorate (syntaxDeclarationAlgebra blobSource) >>= render (renderToCTerm blob)
-  (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser blobSource >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blobSource >>= decorate (ConstructorLabel . constructorLabel) >>= render renderSExpressionTerm . fmap keepConstructorLabel
@@ -85,7 +85,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run parse diff renderer = distributeFor blobs (parse . blobSource) >>= diffTermPair blobs diff >>= render renderer
 
         diffLinearly :: (Eq1 f, GAlign f, Show1 f, Traversable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
-        diffLinearly = decoratingWith constructorLabel (diffTermsWith linearly comparableByConstructor)
+        diffLinearly = decoratingWith constructorLabelWithSource (diffTermsWith linearly comparableByConstructor)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task (Diff f a)
@@ -100,9 +100,3 @@ keepCategory = (:. Nil) . category
 
 keepConstructorLabel :: Record (ConstructorLabel ': fields) -> Record '[ConstructorLabel]
 keepConstructorLabel = (:. Nil) . rhead
-
-
-newtype ConstructorLabel = ConstructorLabel ByteString
-
-instance Show ConstructorLabel where
-  showsPrec _ (ConstructorLabel s) = showString (toS s)
