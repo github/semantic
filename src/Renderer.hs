@@ -2,6 +2,7 @@
 module Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
+, SomeRenderer(..)
 , renderPatch
 , renderSExpressionDiff
 , renderSExpressionTerm
