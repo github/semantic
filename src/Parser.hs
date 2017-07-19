@@ -5,6 +5,7 @@ module Parser
 -- Syntax parsers
 , parserForLanguage
 -- À la carte parsers
+, jsonParser
 , markdownParser
 , pythonParser
 , rubyParser
@@ -20,6 +21,7 @@ import Data.Union
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
+import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
@@ -70,6 +72,9 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) headF Ruby.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) headF Python.assignment
+
+jsonParser :: Parser JSON.Term
+jsonParser = AssignmentParser (ASTParser tree_sitter_json) headF JSON.assignment
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser (\ (node@Node{..} :< _) -> node { nodeSymbol = toGrammar nodeSymbol }) Markdown.assignment

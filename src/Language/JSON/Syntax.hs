@@ -19,7 +19,15 @@ import Prologue hiding (Location)
 
 type Syntax =
   '[ Literal.Hash
+   , Literal.KeyValue
+   , Literal.Null
+   , Literal.String
+   , Literal.TextElement
    , Syntax.Error
+   , Literal.Array
+   , Literal.Boolean
+   , Literal.Float
+   , []
    ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
@@ -35,12 +43,26 @@ parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
 assignment :: Assignment
 assignment = object <|> array <|> parseError
 
+value :: Assignment
+value = object <|> array <|> number <|> string <|> boolean <|> none
+
 object :: Assignment
 object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
-  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> (number <|> string) <*> value)
 
 array :: Assignment
-array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
+array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many value)
 
+number :: Assignment
+number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
 
+string :: Assignment
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+
+boolean :: Assignment
+boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
+       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+
+none :: Assignment
+none = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
 
