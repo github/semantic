@@ -6,7 +6,7 @@ module SemanticCmdLine
 , runParse
 ) where
 
-import Command.Files (languageForFilePath)
+import Files (languageForFilePath)
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.Version (showVersion)

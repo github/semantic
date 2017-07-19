@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields #-}
-module Command.Files
+module Files
 ( readBlobs
 , readBlobPairs
 , readFile

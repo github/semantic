@@ -16,7 +16,7 @@ module Semantic.Task
 , runTask
 ) where
 
-import qualified Command.Files as Files
+import qualified Files
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
