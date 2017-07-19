@@ -46,11 +46,6 @@ parseFixtures =
         tocOutput = "{\"changes\":{\"test/fixtures/ruby/method-declaration.A.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"unchanged\"}]},\"errors\":{}}\n"
 
 
-data DiffFixture = DiffFixture
-  { arguments :: DiffArguments
-  , expected :: ByteString
-  } deriving (Show)
-
 diffFixtures :: [(SomeRenderer DiffRenderer, DiffMode, ByteString)]
 diffFixtures =
   [ (SomeRenderer PatchDiffRenderer, pathMode, patchOutput)
