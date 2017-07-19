@@ -6,6 +6,3 @@ import Data.Maybe
 import Language
 import Prologue
 import Renderer
-
-data DiffMode = DiffStdin | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
-  deriving Show

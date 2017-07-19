@@ -2,12 +2,12 @@
 module SemanticCmdLine
 ( main
 -- Testing
+, DiffMode
 , runDiff
 , ParseMode
 , runParse
 ) where
 
-import Arguments
 import Command
 import Command.Files (languageForFilePath)
 import Data.Functor.Both
@@ -38,6 +38,9 @@ main = do
       pure $ if isDir then takeFileName path -<.> ".html" else path
     writeToOutput :: Maybe FilePath -> ByteString -> IO ()
     writeToOutput = maybe B.putStr B.writeFile
+
+data DiffMode = DiffStdin | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
+  deriving Show
 
 runDiff :: SomeRenderer DiffRenderer -> DiffMode -> IO ByteString
 runDiff (SomeRenderer diffRenderer) diffMode = do
