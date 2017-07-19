@@ -3,6 +3,8 @@ module Semantic.Task
 ( Task
 , RAlgebra
 , Differ
+, readBlobs
+, readBlobPairs
 , parse
 , decorate
 , diff
@@ -13,6 +15,7 @@ module Semantic.Task
 , runTask
 ) where
 
+import qualified Command.Files as Files
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
@@ -21,11 +24,14 @@ import Data.Functor.Both as Both
 import Data.Record
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
+import Language
 import Parser
 import Prologue
 import Term
 
 data TaskF output where
+  ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
+  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
@@ -40,6 +46,14 @@ type Differ f a = Both (Term f a) -> Diff f a
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
+
+-- | A 'Task' which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
+readBlobs :: Either Handle [(FilePath, Maybe Language)] -> Task [Blob]
+readBlobs from = ReadBlobs from `Then` return
+
+-- | A 'Task' which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
+readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
+readBlobPairs from = ReadBlobPairs from `Then` return
 
 
 -- | A 'Task' which parses 'Source' with the given 'Parser'.
@@ -80,6 +94,8 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 -- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
+  ReadBlobs source -> Files.readBlobs source >>= yield
+  ReadBlobPairs source -> Files.readBlobPairs source >>= yield
   Parse parser blob -> runParser parser blob >>= yield
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
