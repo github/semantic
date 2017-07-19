@@ -11,6 +11,7 @@ module Parser
 ) where
 
 import qualified CMark
+import Data.Blob
 import Data.Functor.Foldable hiding (fold, Nil)
 import Data.Record
 import Data.Source as Source
@@ -72,19 +73,19 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) headF Python.assi
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser (\ (node@Node{..} :< _) -> node { nodeSymbol = toGrammar nodeSymbol }) Markdown.assignment
 
-runParser :: Parser term -> Source -> IO term
+runParser :: Parser term -> Blob -> IO term
 runParser parser = case parser of
-  ASTParser language -> parseToAST language
-  AssignmentParser parser by assignment -> \ source -> do
-    ast <- runParser parser source
-    case assignBy by assignment source ast of
+  ASTParser language -> parseToAST language . blobSource
+  AssignmentParser parser by assignment -> \ blob -> do
+    ast <- runParser parser blob
+    case assignBy by assignment (blobSource blob) ast of
       Left err -> do
-        printError source err
-        pure (errorTerm source)
+        printError (blobSource blob) err
+        pure (errorTerm (blobSource blob))
       Right term -> pure term
-  TreeSitterParser language tslanguage -> treeSitterParser language tslanguage
-  MarkdownParser -> pure . cmarkParser
-  LineByLineParser -> pure . lineByLineParser
+  TreeSitterParser language tslanguage -> treeSitterParser language tslanguage . blobSource
+  MarkdownParser -> pure . cmarkParser . blobSource
+  LineByLineParser -> pure . lineByLineParser . blobSource
 
 errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Location)
 errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))

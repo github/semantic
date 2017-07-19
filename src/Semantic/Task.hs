@@ -80,7 +80,7 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 -- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
-  Parse parser blob -> runParser parser (blobSource blob) >>= yield
+  Parse parser blob -> runParser parser blob >>= yield
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
   Render renderer input -> yield (renderer input)
