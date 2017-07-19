@@ -18,7 +18,7 @@ data Language =
     | Python
     | Ruby
     | TypeScript
-    deriving (Show, Eq, Read, Generic, ToJSON)
+    deriving (Show, Eq, Read, Generic, NFData, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
