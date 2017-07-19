@@ -52,6 +52,7 @@ library
                      , Language.Go
                      , Language.Go.Syntax
                      , Language.JSON.Grammar
+                     , Language.JSON.Syntax
                      , Language.Ruby
                      , Language.Ruby.Grammar
                      , Language.Ruby.Syntax
