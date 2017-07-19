@@ -29,7 +29,3 @@ data ParseArguments where
     } -> ParseArguments
 
 deriving instance Show ParseArguments
-
-
-data ProgramMode = Parse ParseArguments | Diff DiffArguments
-  deriving Show
