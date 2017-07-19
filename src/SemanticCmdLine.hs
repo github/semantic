@@ -37,9 +37,7 @@ main = do
     writeToOutput = maybe B.putStr B.writeFile
 
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> IO ByteString
-runDiff (SomeRenderer diffRenderer) from = do
-  blobs <- readBlobPairs from
-  Task.runTask (Semantic.diffBlobPairs diffRenderer blobs)
+runDiff (SomeRenderer diffRenderer) = Task.runTask . Semantic.diffBlobPairs diffRenderer <=< readBlobPairs
 
 data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
