@@ -27,8 +27,8 @@ readBlobs :: Either Handle [(FilePath, Maybe Language)] -> IO [Blob.Blob]
 readBlobs = either readBlobsFromHandle (traverse (uncurry readFile))
 
 -- | Read a pair of 'Blob.Blob's from either a 'Handle' or a pair of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Either Handle (Both (FilePath, Maybe Language)) -> IO [Both Blob.Blob]
-readBlobPairs = either readBlobPairsFromHandle (fmap pure . traverse (uncurry readFile))
+readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> IO [Both Blob.Blob]
+readBlobPairs = either readBlobPairsFromHandle (traverse (traverse (uncurry readFile)))
 
 
 -- | Read a utf8-encoded file to a 'Blob'.
