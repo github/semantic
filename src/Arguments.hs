@@ -33,8 +33,3 @@ deriving instance Show ParseArguments
 
 data ProgramMode = Parse ParseArguments | Diff DiffArguments
   deriving Show
-
-data Arguments = Arguments
-  { programMode :: ProgramMode
-  , outputFilePath :: Maybe FilePath
-  } deriving Show
