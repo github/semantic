@@ -39,9 +39,6 @@ main = do
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> IO ByteString
 runDiff (SomeRenderer diffRenderer) = Task.runTask . Semantic.diffBlobPairs diffRenderer <=< readBlobPairs
 
-data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
-  deriving Show
-
 runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> IO ByteString
 runParse (SomeRenderer parseTreeRenderer) = Task.runTask . Semantic.parseBlobs parseTreeRenderer <=< readBlobs
 
