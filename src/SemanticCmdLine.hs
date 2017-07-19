@@ -19,20 +19,15 @@ import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
 import System.Directory
-import System.FilePath.Posix (takeFileName, (-<.>))
 import System.IO (stdin)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
 main :: IO ()
 main = do
-  (task, outputFilePath) <- customExecParser (prefs showHelpOnEmpty) arguments
-  outputPath <- traverse getOutputPath outputFilePath
+  (task, outputPath) <- customExecParser (prefs showHelpOnEmpty) arguments
   text <- Task.runTask task
   writeToOutput outputPath text
   where
-    getOutputPath path = do
-      isDir <- doesDirectoryExist path
-      pure $ if isDir then takeFileName path -<.> ".html" else path
     writeToOutput :: Maybe FilePath -> ByteString -> IO ()
     writeToOutput = maybe B.putStr B.writeFile
 
