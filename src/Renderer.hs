@@ -2,6 +2,7 @@
 module Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
+, SomeRenderer(..)
 , renderPatch
 , renderSExpressionDiff
 , renderSExpressionTerm
@@ -60,6 +61,14 @@ data TermRenderer output where
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
 
+
+-- | Abstraction of some renderer to some 'Monoid'al output which can be serialized to a 'ByteString'.
+--
+--   This type abstracts the type indices of 'DiffRenderer' and 'TermRenderer' s.t. multiple renderers can be present in a single list, alternation, etc., while retaining the ability to render and serialize. (Without 'SomeRenderer', the different output types of individual term/diff renderers prevent them from being used in a homogeneously typed setting.)
+data SomeRenderer f where
+  SomeRenderer :: (Monoid output, StringConv output ByteString, Show (f output)) => f output -> SomeRenderer f
+
+deriving instance Show (SomeRenderer f)
 
 identifierAlgebra :: RAlgebra (CofreeF (Syntax Text) a) (Cofree (Syntax Text) a) (Maybe Identifier)
 identifierAlgebra (_ :< syntax) = case syntax of
