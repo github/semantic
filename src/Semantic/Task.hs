@@ -34,7 +34,7 @@ import Term
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
-  WriteToOutput :: Maybe FilePath -> ByteString -> TaskF ()
+  WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
@@ -58,7 +58,7 @@ readBlobs from = ReadBlobs from `Then` return
 readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
 readBlobPairs from = ReadBlobPairs from `Then` return
 
-writeToOutput :: Maybe FilePath -> ByteString -> Task ()
+writeToOutput :: Either Handle FilePath -> ByteString -> Task ()
 writeToOutput path contents = WriteToOutput path contents `Then` return
 
 
@@ -102,7 +102,7 @@ runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
   ReadBlobs source -> Files.readBlobs source >>= yield
   ReadBlobPairs source -> Files.readBlobPairs source >>= yield
-  WriteToOutput path contents -> maybe B.putStr B.writeFile path contents >>= yield
+  WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
   Parse parser blob -> runParser parser blob >>= yield
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
