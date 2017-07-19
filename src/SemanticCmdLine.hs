@@ -2,13 +2,11 @@
 module SemanticCmdLine
 ( main
 -- Testing
-, DiffMode(..)
 , runDiff
-, ParseMode(..)
 , runParse
 ) where
 
-import Command.Files (languageForFilePath, readBlobsFromHandle, readBlobPairsFromHandle, readFile)
+import Command.Files (languageForFilePath, readBlobs, readBlobPairs)
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.Version (showVersion)
@@ -38,24 +36,17 @@ main = do
     writeToOutput :: Maybe FilePath -> ByteString -> IO ()
     writeToOutput = maybe B.putStr B.writeFile
 
-data DiffMode = DiffStdin | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
-  deriving Show
-
-runDiff :: SomeRenderer DiffRenderer -> DiffMode -> IO ByteString
-runDiff (SomeRenderer diffRenderer) diffMode = do
-  blobs <- case diffMode of
-    DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
-    DiffStdin -> readBlobPairsFromHandle stdin
+runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> IO ByteString
+runDiff (SomeRenderer diffRenderer) from = do
+  blobs <- readBlobPairs from
   Task.runTask (Semantic.diffBlobPairs diffRenderer blobs)
 
 data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
 
-runParse :: SomeRenderer TermRenderer -> ParseMode -> IO ByteString
-runParse (SomeRenderer parseTreeRenderer) parseMode = do
-  blobs <- case parseMode of
-    ParsePaths paths -> traverse (uncurry readFile) paths
-    ParseStdin -> readBlobsFromHandle stdin
+runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> IO ByteString
+runParse (SomeRenderer parseTreeRenderer) from = do
+  blobs <- readBlobs from
   Task.runTask (Semantic.parseBlobs parseTreeRenderer blobs)
 
 -- | A parser for the application's command-line arguments.
@@ -78,19 +69,18 @@ arguments = info (version <*> helper <*> argumentsParser) description
           <|> flag' (SomeRenderer JSONDiffRenderer)                                   (long "json" <> help "Output a json diff")
           <|> flag' (SomeRenderer SExpressionDiffRenderer)                            (long "sexpression" <> help "Output an s-expression diff tree")
           <|> flag' (SomeRenderer ToCDiffRenderer)                                    (long "toc" <> help "Output a table of contents for a diff") )
-      <*> (   DiffPaths
+      <*> (   ((Right . pure) .) . both
           <$> argument filePathReader (metavar "FILE_A")
           <*> argument filePathReader (metavar "FILE_B")
-          <|> pure DiffStdin )
+          <|> pure (Left stdin) )
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for path(s)"))
     parseArgumentsParser = runParse
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag' (SomeRenderer JSONTermRenderer)                                               (long "json" <> help "Output JSON parse trees")
           <|> flag' (SomeRenderer ToCTermRenderer)                                                (long "toc" <> help "Output a table of contents for a file"))
-      <*> (   ParsePaths
-          <$> some (argument filePathReader (metavar "FILES..."))
-          <|> pure ParseStdin )
+      <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
+          <|> pure (Left stdin) )
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of

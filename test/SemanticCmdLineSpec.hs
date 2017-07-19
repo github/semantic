@@ -26,17 +26,17 @@ spec = parallel $ do
       when (actual /= expected) $ print actual
       actual `shouldBe` expected
 
-parseFixtures :: [(SomeRenderer TermRenderer, ParseMode, ByteString)]
+parseFixtures :: [(SomeRenderer TermRenderer, Either Handle [(FilePath, Maybe Language)], ByteString)]
 parseFixtures =
   [ (SomeRenderer SExpressionTermRenderer, pathMode, sExpressionParseTreeOutput)
   , (SomeRenderer JSONTermRenderer, pathMode, jsonParseTreeOutput)
   , (SomeRenderer JSONTermRenderer, pathMode', jsonParseTreeOutput')
-  , (SomeRenderer JSONTermRenderer, ParsePaths [], emptyJsonParseTreeOutput)
-  , (SomeRenderer JSONTermRenderer, ParsePaths [("not-a-file.rb", Just Ruby)], emptyJsonParseTreeOutput)
-  , (SomeRenderer ToCTermRenderer, ParsePaths [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby)], tocOutput)
+  , (SomeRenderer JSONTermRenderer, Right [], emptyJsonParseTreeOutput)
+  , (SomeRenderer JSONTermRenderer, Right [("not-a-file.rb", Just Ruby)], emptyJsonParseTreeOutput)
+  , (SomeRenderer ToCTermRenderer, Right [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby)], tocOutput)
   ]
-  where pathMode = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
-        pathMode' = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
+  where pathMode = Right [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
+        pathMode' = Right [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
 
         sExpressionParseTreeOutput = "(Program\n  (Binary\n    (Identifier)\n    (Other \"and\")\n    (Identifier)))\n"
         jsonParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"}]\n"
@@ -45,14 +45,14 @@ parseFixtures =
         tocOutput = "{\"changes\":{\"test/fixtures/ruby/method-declaration.A.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"unchanged\"}]},\"errors\":{}}\n"
 
 
-diffFixtures :: [(SomeRenderer DiffRenderer, DiffMode, ByteString)]
+diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both (FilePath, Maybe Language)], ByteString)]
 diffFixtures =
   [ (SomeRenderer PatchDiffRenderer, pathMode, patchOutput)
   , (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
   , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
   , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
   ]
-  where pathMode = DiffPaths ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)
+  where pathMode = Right [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)]
 
         patchOutput = "diff --git a/test/fixtures/ruby/method-declaration.A.rb b/test/fixtures/ruby/method-declaration.B.rb\nindex 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644\n--- a/test/fixtures/ruby/method-declaration.A.rb\n+++ b/test/fixtures/ruby/method-declaration.B.rb\n@@ -1,3 +1,4 @@\n-def foo\n+def bar(a)\n+  baz\n end\n\n"
 
