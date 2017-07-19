@@ -16,9 +16,9 @@ module Semantic.Task
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
+import Data.Blob
 import Data.Functor.Both as Both
 import Data.Record
-import Data.Source
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
 import Parser
@@ -26,7 +26,7 @@ import Prologue
 import Term
 
 data TaskF output where
-  Parse :: Parser term -> Source -> TaskF term
+  Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
   Render :: Renderer input output -> input -> TaskF output
@@ -43,8 +43,8 @@ type Renderer i o = i -> o
 
 
 -- | A 'Task' which parses 'Source' with the given 'Parser'.
-parse :: Parser term -> Source -> Task term
-parse parser source = Parse parser source `Then` return
+parse :: Parser term -> Blob -> Task term
+parse parser blob = Parse parser blob `Then` return
 
 -- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
@@ -80,7 +80,7 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 -- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
-  Parse parser source -> runParser parser source >>= yield
+  Parse parser blob -> runParser parser (blobSource blob) >>= yield
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
   Render renderer input -> yield (renderer input)
