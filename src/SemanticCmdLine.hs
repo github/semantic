@@ -43,9 +43,7 @@ data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
 
 runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> IO ByteString
-runParse (SomeRenderer parseTreeRenderer) from = do
-  blobs <- readBlobs from
-  Task.runTask (Semantic.parseBlobs parseTreeRenderer blobs)
+runParse (SomeRenderer parseTreeRenderer) = Task.runTask . Semantic.parseBlobs parseTreeRenderer <=< readBlobs
 
 -- | A parser for the application's command-line arguments.
 --
