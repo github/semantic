@@ -9,7 +9,3 @@ import Renderer
 
 data DiffMode = DiffStdin | DiffPaths (FilePath, Maybe Language) (FilePath, Maybe Language)
   deriving Show
-
-
-data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
-  deriving Show

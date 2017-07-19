@@ -3,6 +3,7 @@ module SemanticCmdLine
 ( main
 -- Testing
 , runDiff
+, ParseMode
 , runParse
 ) where
 
@@ -13,6 +14,7 @@ import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.Version (showVersion)
 import Development.GitRev
+import Language
 import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import Renderer
@@ -43,6 +45,9 @@ runDiff (SomeRenderer diffRenderer) diffMode = do
     DiffPaths a b -> pure <$> traverse (uncurry readFile) (both a b)
     DiffStdin -> readBlobPairsFromHandle stdin
   Task.runTask (Semantic.diffBlobPairs diffRenderer blobs)
+
+data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
+  deriving Show
 
 runParse :: SomeRenderer TermRenderer -> ParseMode -> IO ByteString
 runParse (SomeRenderer parseTreeRenderer) parseMode = do
