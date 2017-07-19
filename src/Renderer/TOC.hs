@@ -93,38 +93,38 @@ declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Decl
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
-syntaxDeclarationAlgebra :: HasField fields Range => Source -> RAlgebra (SyntaxTermF Text fields) (SyntaxTerm Text fields) (Maybe Declaration)
-syntaxDeclarationAlgebra source r = case tailF r of
+syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (SyntaxTermF Text fields) (SyntaxTerm Text fields) (Maybe Declaration)
+syntaxDeclarationAlgebra Blob{..} r = case tailF r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
     | S.Indexed [receiverParams] <- unwrap receiver
     , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
     | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange (headF r)) source))
+  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange (headF r)) blobSource))
   _ -> Nothing
-  where getSource = toText . flip Source.slice source . byteRange . extract
+  where getSource = toText . flip Source.slice blobSource . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
 declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Functor (Union fs), HasField fields Range)
-                   => Source
+                   => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra source r
+declarationAlgebra Blob{..} r
   | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource (extract identifier))
   | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource (extract identifier))
   | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r))
   | otherwise = Nothing
-  where getSource = toText . flip Source.slice source . byteRange
+  where getSource = toText . flip Source.slice blobSource . byteRange
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
 markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, Functor (Union fs), Foldable (Union fs))
-                     => Source
+                     => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra source r
-  | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice source . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
+markupSectionAlgebra Blob{..} r
+  | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
   | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r))
   | otherwise = Nothing
-  where getSource = firstLine . toText . flip Source.slice source . byteRange
+  where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
         firstLine = T.takeWhile (/= '\n')
 
 
