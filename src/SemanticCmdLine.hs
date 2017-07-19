@@ -15,21 +15,15 @@ import Language
 import Options.Applicative hiding (action)
 import Prologue hiding (concurrently, fst, snd, readFile)
 import Renderer
-import qualified Data.ByteString as B
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
-import System.Directory
 import System.IO (stdin)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
 main :: IO ()
 main = do
-  (task, outputPath) <- customExecParser (prefs showHelpOnEmpty) arguments
-  text <- Task.runTask task
-  writeToOutput outputPath text
-  where
-    writeToOutput :: Maybe FilePath -> ByteString -> IO ()
-    writeToOutput = maybe B.putStr B.writeFile
+  task <- customExecParser (prefs showHelpOnEmpty) arguments
+  Task.runTask task
 
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.Task ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
@@ -39,17 +33,17 @@ runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRendere
 
 -- | A parser for the application's command-line arguments.
 --
---   Returns a 'Task' producing 'ByteString' output, and a 'Maybe FilePath' to write the output to.
-arguments :: ParserInfo (Task.Task ByteString, Maybe FilePath)
+--   Returns a 'Task' to read the input, run the requested operation, and write the output to the specified output path or stdout.
+arguments :: ParserInfo (Task.Task ())
 arguments = info (version <*> helper <*> argumentsParser) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
-    argumentsParser = (,)
+    argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
-      <*> optional (strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout"))
+      <*> (maybe (Left stdout) Right <$> optional (strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")))
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = runDiff
