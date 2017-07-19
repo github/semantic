@@ -134,6 +134,14 @@ spec = do
           `shouldBe`
             Right (([], Out "G"), AssignmentState 1 (Info.Pos 1 2) err "PG" [])
 
+  describe "many" $ do
+    it "should not infinite loop if nothing matches" $
+      runAssignment headF
+        (symbol Palatte *> children ( many (pure (Out "always")) ))
+        (makeState "A" [node Palatte 0 1 [node Green 1 2 []]])
+        `shouldBe`
+          Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Red] Green))
+
   describe "source" $ do
     it "produces the node’s source" $
       assignBy headF source "hi" (node Red 0 2 []) `shouldBe` Right "hi"
