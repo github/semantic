@@ -2,9 +2,9 @@
 module SemanticCmdLine
 ( main
 -- Testing
-, DiffMode
+, DiffMode(..)
 , runDiff
-, ParseMode
+, ParseMode(..)
 , runParse
 ) where
 
