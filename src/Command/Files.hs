@@ -21,7 +21,7 @@ import Prelude (fail)
 import System.FilePath
 
 
--- | Read a file to a Blob, transcoding to UTF-8 along the way.
+-- | Read a utf8-encoded file to a 'Blob'.
 readFile :: FilePath -> Maybe Language -> IO Blob.Blob
 readFile path language = do
   raw <- (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
