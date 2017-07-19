@@ -18,7 +18,6 @@ data Language =
     | Python
     | Ruby
     | TypeScript
-    | Undetected
     deriving (Show, Eq, Read, Generic, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
