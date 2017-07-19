@@ -2,7 +2,6 @@
 module SemanticCmdLineSpec where
 
 import Prologue
-import Arguments
 import Language
 import Renderer
 import SemanticCmdLine
