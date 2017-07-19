@@ -33,6 +33,7 @@ import Data.These
 import Data.Union
 import Diff
 import Info
+import Language
 import Patch
 import Prologue
 import qualified Data.List as List
@@ -64,12 +65,12 @@ data JSONSummary
     , summarySpan :: Span
     , summaryChangeType :: Text
     }
-  | ErrorSummary { error :: Text, errorSpan :: Span }
+  | ErrorSummary { error :: Text, errorSpan :: Span, errorLanguage :: Maybe Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
   toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
-  toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
+  toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
 
 isValidSummary :: JSONSummary -> Bool
 isValidSummary ErrorSummary{} = False
@@ -171,25 +172,30 @@ dedupe = foldl' go []
         similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
-entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe JSONSummary
-entrySummary entry = case entry of
+entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Maybe Language -> Entry (Record fields) -> Maybe JSONSummary
+entrySummary language entry = case entry of
   Unchanged _ -> Nothing
-  Changed a   -> recordSummary a "modified"
-  Deleted a   -> recordSummary a "removed"
-  Inserted a  -> recordSummary a "added"
-  Replaced a  -> recordSummary a "modified"
+  Changed a   -> recordSummary language a "modified"
+  Deleted a   -> recordSummary language a "removed"
+  Inserted a  -> recordSummary language a "added"
+  Replaced a  -> recordSummary language a "modified"
 
 -- | Construct a 'JSONSummary' from a node annotation and a change type label.
-recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Text -> Maybe JSONSummary
-recordSummary record = case getDeclaration record of
-  Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record))
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Maybe Language -> Record fields -> Text -> Maybe JSONSummary
+recordSummary language record = case getDeclaration record of
+  Just (ErrorDeclaration text) -> Just . const (ErrorSummary text (sourceSpan record) language)
   Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
   Nothing -> const Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Both Blob -> Diff f (Record fields) -> Summaries
-renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
+renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC language
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
+        language = case runJoin (blobLanguage <$> blobs) of
+          (Nothing, Just after) -> Just after
+          (Just before, Nothing) -> Just before
+          (Nothing, Nothing) -> Nothing
+          (Just before, Just _) -> Just before
         summaryKey = toS $ case runJoin (blobPath <$> blobs) of
           (before, after) | null before -> after
                           | null after -> before
@@ -197,15 +203,15 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | otherwise -> before <> " -> " <> after
 
 renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Blob -> Term f (Record fields) -> Summaries
-renderToCTerm blob = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
+renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC blobLanguage
   where toMap [] = mempty
-        toMap as = Map.singleton (toS (blobPath blob)) (toJSON <$> as)
+        toMap as = Map.singleton (toS blobPath) (toJSON <$> as)
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Diff f (Record fields) -> [JSONSummary]
-diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Maybe Language -> Diff f (Record fields) -> [JSONSummary]
+diffTOC language = mapMaybe (entrySummary language) . dedupe . tableOfContentsBy declaration
 
-termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Term f (Record fields) -> [JSONSummary]
-termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
+termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Maybe Language -> Term f (Record fields) -> [JSONSummary]
+termToC language = mapMaybe (flip (recordSummary language) "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> Text

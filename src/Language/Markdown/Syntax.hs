@@ -91,7 +91,7 @@ htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = strong <|> emphasis <|> text <|> link <|> image <|> code <|> lineBreak <|> softBreak
+inlineElement = strong <|> emphasis <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
 
 strong :: Assignment
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
@@ -101,6 +101,9 @@ emphasis = makeTerm <$> symbol Emphasis <*> children (Markup.Emphasis <$> many i
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Markup.Text <$> source)
+
+htmlInline :: Assignment
+htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
 
 link :: Assignment
 link = makeTerm <$> symbol Link <*> project (\ (Node (CMark.LINK url title) _ _ :< _) -> Markup.Link (toS url) (nullText title)) <* source
