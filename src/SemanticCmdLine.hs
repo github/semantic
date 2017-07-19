@@ -6,7 +6,7 @@ module SemanticCmdLine
 , runParse
 ) where
 
-import Command.Files (languageForFilePath, readBlobs, readBlobPairs)
+import Command.Files (languageForFilePath)
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.Version (showVersion)
@@ -25,9 +25,9 @@ import qualified Semantic (parseBlobs, diffBlobPairs)
 
 main :: IO ()
 main = do
-  (command, outputFilePath) <- customExecParser (prefs showHelpOnEmpty) arguments
+  (task, outputFilePath) <- customExecParser (prefs showHelpOnEmpty) arguments
   outputPath <- traverse getOutputPath outputFilePath
-  text <- command
+  text <- Task.runTask task
   writeToOutput outputPath text
   where
     getOutputPath path = do
@@ -36,16 +36,16 @@ main = do
     writeToOutput :: Maybe FilePath -> ByteString -> IO ()
     writeToOutput = maybe B.putStr B.writeFile
 
-runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> IO ByteString
-runDiff (SomeRenderer diffRenderer) = Task.runTask . Semantic.diffBlobPairs diffRenderer <=< readBlobPairs
+runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.Task ByteString
+runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> IO ByteString
-runParse (SomeRenderer parseTreeRenderer) = Task.runTask . Semantic.parseBlobs parseTreeRenderer <=< readBlobs
+runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
+runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
 -- | A parser for the application's command-line arguments.
 --
 --   Returns an 'IO' action producing 'ByteString' output, and a 'Maybe FilePath' to write the output to.
-arguments :: ParserInfo (IO ByteString, Maybe FilePath)
+arguments :: ParserInfo (Task.Task ByteString, Maybe FilePath)
 arguments = info (version <*> helper <*> argumentsParser) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
