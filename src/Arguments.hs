@@ -21,11 +21,3 @@ deriving instance Show DiffArguments
 
 data ParseMode = ParseStdin | ParsePaths [(FilePath, Maybe Language)]
   deriving Show
-
-data ParseArguments where
-  ParseArguments :: (Monoid output, StringConv output ByteString) =>
-    { parseTreeRenderer :: TermRenderer output
-    , parseMode :: ParseMode
-    } -> ParseArguments
-
-deriving instance Show ParseArguments
