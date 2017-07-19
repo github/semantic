@@ -16,7 +16,6 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
-                     , Command
                      , Command.Files
                      , Data.Align.Generic
                      , Data.Blob
