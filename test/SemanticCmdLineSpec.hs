@@ -4,6 +4,7 @@ module SemanticCmdLineSpec where
 import Prologue
 import Language
 import Renderer
+import Semantic.Task
 import SemanticCmdLine
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
@@ -13,13 +14,13 @@ spec = parallel $ do
   describe "runDiff" $
     for_ diffFixtures $ \ (diffRenderer, diffMode, expected) ->
       it ("renders to " <> show diffRenderer <> " in mode " <> show diffMode) $ do
-        output <- runDiff diffRenderer diffMode
+        output <- runTask $ runDiff diffRenderer diffMode
         output `shouldBe'` expected
 
   describe "runParse" $
     for_ parseFixtures $ \ (parseTreeRenderer, parseMode, expected) ->
       it ("renders to " <> show parseTreeRenderer <> " in mode " <> show parseMode) $ do
-        output <- runParse parseTreeRenderer parseMode
+        output <- runTask $ runParse parseTreeRenderer parseMode
         output `shouldBe'` expected
   where
     shouldBe' actual expected = do
