@@ -44,7 +44,7 @@ runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRendere
 
 -- | A parser for the application's command-line arguments.
 --
---   Returns an 'IO' action producing 'ByteString' output, and a 'Maybe FilePath' to write the output to.
+--   Returns a 'Task' producing 'ByteString' output, and a 'Maybe FilePath' to write the output to.
 arguments :: ParserInfo (Task.Task ByteString, Maybe FilePath)
 arguments = info (version <*> helper <*> argumentsParser) description
   where
