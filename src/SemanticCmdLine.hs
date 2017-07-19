@@ -8,8 +8,7 @@ module SemanticCmdLine
 , runParse
 ) where
 
-import Command
-import Command.Files (languageForFilePath)
+import Command.Files (languageForFilePath, readBlobsFromHandle, readBlobPairsFromHandle, readFile)
 import Data.Functor.Both
 import Data.List.Split (splitWhen)
 import Data.Version (showVersion)
