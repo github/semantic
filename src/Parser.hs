@@ -80,7 +80,7 @@ runParser parser = case parser of
     ast <- runParser parser blob
     case assignBy by assignment (blobSource blob) ast of
       Left err -> do
-        printError (blobSource blob) err
+        printError blob err
         pure (errorTerm (blobSource blob))
       Right term -> pure term
   TreeSitterParser language tslanguage -> treeSitterParser language tslanguage . blobSource
