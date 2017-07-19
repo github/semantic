@@ -52,6 +52,88 @@ spec = do
       let initialState = makeState "hi" [ node Red 0 2 [] ] in
       snd <$> runAssignment headF (symbol Red) initialState `shouldBe` Right initialState
 
+  describe "without catchError" $ do
+    it "assignment returns UnexpectedSymbol" $
+      runAssignment headF
+        red
+        (makeState "A" [node Green 0 1 []])
+        `shouldBe`
+          Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Red] Green))
+
+    it "assignment returns UnexpectedEndOfInput" $
+      runAssignment headF
+        (symbol Green *> children (some red))
+        (makeState "A" [node Green 0 1 []])
+        `shouldBe`
+          Left (Error (Info.Pos 1 1) (UnexpectedEndOfInput [Red]))
+
+  describe "catchError" $ do
+    it "handler that always matches" $
+      runAssignment headF
+        (red `catchError` (\ _ -> OutError <$ location <*> source))
+        (makeState "A" [node Green 0 1 []])
+        `shouldBe`
+          Right (OutError "A", AssignmentState 1 (Info.Pos 1 2) Nothing "A" [])
+
+    it "handler that matches" $
+      runAssignment headF
+        (red `catchError` const green)
+        (makeState "A" [node Green 0 1 []])
+        `shouldBe`
+          Right (Out "A", AssignmentState 1 (Info.Pos 1 2) Nothing "A" [])
+
+    it "handler that doesn't match produces error" $
+      runAssignment headF
+        (red `catchError` const blue)
+        (makeState "A" [node Green 0 1 []])
+        `shouldBe`
+          Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Blue] Green))
+
+    describe "in many" $ do
+      let err = Just (Error (Info.Pos 1 3) (UnexpectedEndOfInput []))
+      it "handler that always matches" $
+        runAssignment headF
+          (symbol Palatte *> children (
+            many (red `catchError` (\ _ -> OutError <$ location <*> source))
+          ))
+          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          `shouldBe`
+            Right ([OutError "G"], AssignmentState 1 (Info.Pos 1 2) err "PG" [])
+
+      let err = Just (Error (Info.Pos 1 3) (UnexpectedEndOfInput [Green]))
+      it "handler that matches" $
+        runAssignment headF
+          (symbol Palatte *> children ( many (red `catchError` const green) ))
+          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          `shouldBe`
+            Right ([Out "G"], AssignmentState 1 (Info.Pos 1 2) err "PG" [])
+
+      it "handler that doesn't match produces error" $
+        runAssignment headF
+          (symbol Palatte *> children ( many (red `catchError` const blue) ))
+          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          `shouldBe`
+            Left (Error (Info.Pos 1 2) (UnexpectedSymbol [Blue] Green))
+
+      it "handler that always matches with apply consumes and then errors" $
+        runAssignment headF
+          (symbol Palatte *> children (
+            (,) <$> many (red `catchError` (\ _ -> OutError <$ location <*> source)) <*> green
+          ))
+          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          `shouldBe`
+            Left (Error (Info.Pos 1 3) (UnexpectedEndOfInput [Green]))
+
+      let err = Just (Error (Info.Pos 1 2) (UnexpectedSymbol [Blue] Green))
+      it "handler that doesn't match with apply" $
+        runAssignment headF
+          (symbol Palatte *> children (
+            (,) <$> many (red `catchError` (\ _ -> blue)) <*> green
+          ))
+          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          `shouldBe`
+            Right (([], Out "G"), AssignmentState 1 (Info.Pos 1 2) err "PG" [])
+
   describe "source" $ do
     it "produces the node’s source" $
       assignBy headF source "hi" (node Red 0 2 []) `shouldBe` Right "hi"
@@ -106,14 +188,14 @@ spec = do
 node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = cofree $ Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
 
-data Grammar = Red | Green | Blue | Magenta
+data Grammar = Palatte | Red | Green | Blue | Magenta
   deriving (Enum, Eq, Show)
 
 instance Symbol Grammar where
   symbolType Magenta = Anonymous
   symbolType _ = Regular
 
-data Out = Out ByteString
+data Out = Out ByteString | OutError ByteString
   deriving (Eq, Show)
 
 red :: Assignment (AST Grammar) Grammar Out

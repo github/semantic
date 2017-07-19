@@ -276,7 +276,7 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                 runMany :: Assignment ast grammar v -> AssignmentState ast grammar -> ([v], AssignmentState ast grammar)
                 runMany rule state = case runAssignment toNode rule state of
-                  Left e -> ([], state { stateError = Just e })
+                  Left err -> ([], state { stateError = Just err })
                   Right (a, state') -> let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
         {-# INLINE run #-}
 
