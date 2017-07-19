@@ -190,7 +190,7 @@ data ErrorCause grammar
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Blob -> Error grammar -> IO ()
 printError Blob{..} error@Error{..} = do
-  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos Nothing errorPos . showString ": "
+  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": "
   withSGRCode [SetColor Foreground Vivid Red] . putStrErr $ showString "error" . showString ": " . showExpectation error . showChar '\n'
   putStrErr $ showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ')
   withSGRCode [SetColor Foreground Vivid Green] . putStrErr $ showChar '^' . showChar '\n'
