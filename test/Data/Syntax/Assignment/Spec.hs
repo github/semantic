@@ -128,7 +128,7 @@ spec = do
       it "handler that doesn't match with apply" $
         runAssignment headF
           (symbol Palatte *> children (
-            (,) <$> many (red `catchError` (\ _ -> blue)) <*> green
+            (,) <$> many (red `catchError` const blue) <*> green
           ))
           (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
           `shouldBe`
