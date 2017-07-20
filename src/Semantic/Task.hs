@@ -58,6 +58,7 @@ readBlobs from = ReadBlobs from `Then` return
 readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
 readBlobPairs from = ReadBlobPairs from `Then` return
 
+-- | A 'Task' which writes a 'ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Either Handle FilePath -> ByteString -> Task ()
 writeToOutput path contents = WriteToOutput path contents `Then` return
 
