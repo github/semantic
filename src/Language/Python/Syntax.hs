@@ -146,7 +146,7 @@ literal =  boolean
        <|> parseError
 
 expressionStatement :: Assignment
-expressionStatement = symbol ExpressionStatement *> children declaration
+expressionStatement = makeTerm <$> symbol ExpressionStatement <*> children (some declaration)
 
 expression :: Assignment
 expression =  argument
