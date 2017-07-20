@@ -74,18 +74,18 @@ markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser (\ (node@Node{..} :< _) -> node { nodeSymbol = toGrammar nodeSymbol }) Markdown.assignment
 
 runParser :: Parser term -> Blob -> IO term
-runParser parser = case parser of
-  ASTParser language -> parseToAST language . blobSource
-  AssignmentParser parser by assignment -> \ blob -> do
+runParser parser blob@Blob{..} = case parser of
+  ASTParser language -> parseToAST language blobSource
+  AssignmentParser parser by assignment -> do
     ast <- runParser parser blob
-    case assignBy by assignment (blobSource blob) ast of
+    case assignBy by assignment blobSource ast of
       Left err -> do
         printError blob err
-        pure (errorTerm (blobSource blob))
+        pure (errorTerm blobSource)
       Right term -> pure term
-  TreeSitterParser language tslanguage -> treeSitterParser language tslanguage . blobSource
-  MarkdownParser -> pure . cmarkParser . blobSource
-  LineByLineParser -> pure . lineByLineParser . blobSource
+  TreeSitterParser language tslanguage -> treeSitterParser language tslanguage blobSource
+  MarkdownParser -> pure (cmarkParser blobSource)
+  LineByLineParser -> pure (lineByLineParser blobSource)
 
 errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Location)
 errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
