@@ -64,17 +64,17 @@ diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
-  (ToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob)) diffLinearly (renderToCDiff blobs)
-  (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffLinearly (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob)) diffRecursively (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffRecursively (renderToCDiff blobs)
   (ToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms (renderToCDiff blobs)
-  (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderJSONDiff blobs)
-  (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderJSONDiff blobs)
+  (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderJSONDiff blobs)
+  (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
-  (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffLinearly (renderPatch blobs)
-  (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffLinearly (renderPatch blobs)
+  (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderPatch blobs)
+  (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
-  (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffLinearly (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
   (IdentityDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
@@ -83,8 +83,8 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run :: Functor f => (Blob -> Task (Term f a)) -> (Both (Term f a) -> Diff f a) -> (Diff f a -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= diffTermPair blobs diff >>= render renderer
 
-        diffLinearly :: (Eq1 f, GAlign f, Show1 f, Traversable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
-        diffLinearly = decoratingWith constructorNameAndConstantFields (diffTermsWith linearly comparableByConstructor)
+        diffRecursively :: (Eq1 f, GAlign f, Show1 f, Traversable f, Diffable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
+        diffRecursively = decoratingWith constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task (Diff f a)
