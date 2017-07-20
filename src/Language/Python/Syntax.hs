@@ -133,6 +133,9 @@ statement = assertStatement
           <|> withStatement
           <|> parseError
 
+statements :: Assignment
+statements = makeTerm <$> location <*> many statement
+
 literal :: Assignment
 literal =  boolean
        <|> concatenatedString
@@ -400,7 +403,7 @@ raiseStatement :: Assignment
 raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> (makeTerm <$> location <*> many expression))
 
 ifStatement :: Assignment
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statement <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statements <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
   where elseClause = symbol ElseClause *> children statement
         elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
