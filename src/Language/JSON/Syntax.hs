@@ -44,7 +44,7 @@ assignment :: Assignment
 assignment = object <|> array <|> parseError
 
 value :: Assignment
-value = object <|> array <|> number <|> string <|> boolean <|> none
+value = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
 
 object :: Assignment
 object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
