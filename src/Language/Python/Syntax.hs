@@ -404,8 +404,8 @@ raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Thro
 
 ifStatement :: Assignment
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statements <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
-  where elseClause = symbol ElseClause *> children statement
-        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statement)
+  where elseClause = symbol ElseClause *> children statements
+        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statements)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
