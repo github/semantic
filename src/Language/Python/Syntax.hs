@@ -108,6 +108,9 @@ declaration = classDefinition
            <|> statement
            <|> parseError
 
+declarations :: Assignment
+declarations = makeTerm <$> location <*> many declaration
+
 statement :: Assignment
 statement = assertStatement
           <|> assignment'
@@ -176,6 +179,9 @@ expression =  argument
           <|> unaryOperator
           <|> parseError
 
+expressions :: Assignment
+expressions = makeTerm <$> location <*> many expression
+
 argument :: Assignment
 argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
         <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
@@ -202,33 +208,33 @@ withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> (symbol WithItem *> children ((,) <$> identifier <*> identifier)) <*> expression)
 
 forStatement :: Assignment
-forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many declaration)))
   where
     make loc variables expressionList forBody forElseClause = case forElseClause of
       Nothing -> makeTerm loc (Statement.ForEach variables expressionList forBody)
       Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList forBody) a)
 
 whileStatement :: Assignment
-whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> (makeTerm <$> location <*> many expression) <*> (optional (makeTerm <$> symbol ElseClause <*> children (many declaration))))
+whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many declaration)))
   where
     make loc whileCondition whileBody whileElseClause = case whileElseClause of
       Nothing -> makeTerm loc (Statement.While whileCondition whileBody)
       Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.While whileCondition whileBody) a)
 
 tryStatement :: Assignment
-tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> (many (expression <|> elseClause)))
-  where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> (many expression)))
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expression <*> many (expression <|> elseClause))
+  where elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> many expression))
 
 exceptClause :: Assignment
 exceptClause = makeTerm <$> symbol ExceptClause <*> children
   (Statement.Catch <$> ((makeTerm <$> location <*> (uncurry Statement.Let . swap <$> ((,) <$> identifier <* symbol AnonAs <*> identifier) <*> emptyTerm))
-                      <|> (makeTerm <$> location <*> (many identifier)))
-                   <*> (makeTerm <$> location <*> (many expression)))
+                      <|> makeTerm <$> location <*> many identifier)
+                   <*> expressions)
 
 functionDefinition :: Assignment
-functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
-                  <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
-                  <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> (pure [])) <*> (optional (symbol Type *> children expression)) <*> (makeTerm <$> location <*> many declaration)))
+functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> optional (symbol Type *> children expression) <*> declarations))
+                  <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> optional (symbol Type *> children expression) <*> declarations))
+                  <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> pure []) <*> optional (symbol Type *> children expression) <*> declarations))
   where
     makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
     makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
@@ -237,7 +243,7 @@ async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
 
 classDefinition :: Assignment
-classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> (many declaration))
+classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> many declaration)
   where argumentList = symbol ArgumentList *> children (many expression)
                     <|> pure []
 
@@ -276,7 +282,7 @@ keyword :: Assignment
 keyword =  makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
 
 tuple :: Assignment
-tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> (many expression))
+tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> many expression)
 
 -- TODO: Consider flattening single element lists
 expressionList :: Assignment
@@ -400,7 +406,7 @@ deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.C
   where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier <$> source)
 
 raiseStatement :: Assignment
-raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> (makeTerm <$> location <*> many expression))
+raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> expressions)
 
 ifStatement :: Assignment
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statements <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
