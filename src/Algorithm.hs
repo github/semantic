@@ -1,10 +1,15 @@
-{-# LANGUAGE GADTs, RankNTypes #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators #-}
 module Algorithm where
 
 import Control.Monad.Free.Freer
+import Data.Functor.Both
 import Data.Functor.Classes
 import Data.These
+import Data.Union
+import Diff
+import GHC.Generics
 import Prologue hiding (liftF)
+import Term
 import Text.Show
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
@@ -73,3 +78,52 @@ instance Show term => Show1 (AlgorithmF term diff) where
     Delete t1 -> showsUnaryWith showsPrec "Delete" d t1
     Insert t2 -> showsUnaryWith showsPrec "Insert" d t2
     Replace t1 t2 -> showsBinaryWith showsPrec showsPrec "Replace" d t1 t2
+
+
+algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f a) (Diff f a) (Diff f a)
+algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (fmap (wrap . (both ann1 ann2 :<)) <$> algorithmFor f1 f2)
+  where ann1 :< f1 = runCofree t1
+        ann2 :< f2 = runCofree t2
+
+class Diffable f where
+  algorithmFor :: f term -> f term -> Maybe (Algorithm term diff (f diff))
+  default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
+  algorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+
+instance Diffable [] where
+  algorithmFor a b = Just (byRWS a b)
+
+instance (Diffable f, Diffable (Union fs)) => Diffable (Union (f ': fs)) where
+  algorithmFor u1 u2 = case (decompose u1, decompose u2) of
+    (Left l1, Left l2) -> fmap weaken <$> algorithmFor l1 l2
+    (Right r1, Right r2) -> fmap inj <$> algorithmFor r1 r2
+    _ -> Nothing
+
+instance Diffable (Union '[]) where
+  algorithmFor _ _ = Nothing
+
+class Diffable' f where
+  algorithmFor' :: f term -> f term -> Maybe (Algorithm term diff (f diff))
+
+instance Diffable' f => Diffable' (M1 i c f) where
+  algorithmFor' (M1 a) (M1 b) = fmap M1 <$> algorithmFor' a b
+
+instance (Diffable' f, Diffable' g) => Diffable' (f :*: g) where
+  algorithmFor' (a1 :*: b1) (a2 :*: b2) = liftA2 (:*:) <$> algorithmFor' a1 a2 <*> algorithmFor' b1 b2
+
+instance (Diffable' f, Diffable' g) => Diffable' (f :+: g) where
+  algorithmFor' (L1 a) (L1 b) = fmap L1 <$> algorithmFor' a b
+  algorithmFor' (R1 a) (R1 b) = fmap R1 <$> algorithmFor' a b
+  algorithmFor' _ _ = Nothing
+
+instance Diffable' Par1 where
+  algorithmFor' (Par1 a) (Par1 b) = Just (Par1 <$> linearly a b)
+
+instance Eq c => Diffable' (K1 i c) where
+  algorithmFor' (K1 a) (K1 b) = guard (a == b) *> Just (pure (K1 a))
+
+instance Diffable' U1 where
+  algorithmFor' _ _ = Just (pure U1)
+
+instance Diffable' (Rec1 []) where
+  algorithmFor' a b = fmap Rec1 <$> Just ((byRWS `on` unRec1) a b)
