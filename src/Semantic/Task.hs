@@ -63,7 +63,7 @@ writeToOutput :: Either Handle FilePath -> ByteString -> Task ()
 writeToOutput path contents = WriteToOutput path contents `Then` return
 
 
--- | A 'Task' which parses 'Source' with the given 'Parser'.
+-- | A 'Task' which parses a 'Blob' with the given 'Parser'.
 parse :: Parser term -> Blob -> Task term
 parse parser blob = Parse parser blob `Then` return
 
