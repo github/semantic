@@ -82,7 +82,6 @@ spec = do
           Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Blue] Green))
 
     describe "in many" $ do
-      let err = Just (Error (Info.Pos 1 3) (UnexpectedEndOfInput []))
       it "handler that always matches" $
         fst <$> runAssignment headF
           (symbol Palatte *> children (
@@ -92,7 +91,6 @@ spec = do
           `shouldBe`
             Right [OutError "G"]
 
-      let err = Just (Error (Info.Pos 1 3) (UnexpectedEndOfInput [Green]))
       it "handler that matches" $
         fst <$> runAssignment headF
           (symbol Palatte *> children ( many (red `catchError` const green) ))
@@ -116,7 +114,6 @@ spec = do
           `shouldBe`
             Left (Error (Info.Pos 1 3) (UnexpectedEndOfInput [Green]))
 
-      let err = Just (Error (Info.Pos 1 2) (UnexpectedSymbol [Blue] Green))
       it "handler that doesn't match with apply" $
         fst <$> runAssignment headF
           (symbol Palatte *> children (
@@ -127,7 +124,6 @@ spec = do
             Right ([], Out "G")
 
   describe "many" $ do
-    let err = Just (Error (Info.Pos 1 2) (UnexpectedEndOfInput [Green]))
     it "takes ones and only one zero width repetition" $
       fst <$> runAssignment headF
         (symbol Palatte *> children ( many (green <|> pure (Out "always")) ))
