@@ -1,10 +1,11 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module SemanticCmdLineSpec where
 
-import Prologue
-import Arguments
+import Data.Functor.Both
 import Language
+import Prologue
 import Renderer
+import Semantic.Task
 import SemanticCmdLine
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
@@ -12,32 +13,32 @@ import Test.Hspec.Expectations.Pretty
 spec :: Spec
 spec = parallel $ do
   describe "runDiff" $
-    for_ diffFixtures $ \ (arguments@DiffArguments{..}, expected) ->
+    for_ diffFixtures $ \ (diffRenderer, diffMode, expected) ->
       it ("renders to " <> show diffRenderer <> " in mode " <> show diffMode) $ do
-        output <- runDiff arguments
+        output <- runTask $ runDiff diffRenderer diffMode
         output `shouldBe'` expected
 
   describe "runParse" $
-    for_ parseFixtures $ \ (arguments@ParseArguments{..}, expected) ->
+    for_ parseFixtures $ \ (parseTreeRenderer, parseMode, expected) ->
       it ("renders to " <> show parseTreeRenderer <> " in mode " <> show parseMode) $ do
-        output <- runParse arguments
+        output <- runTask $ runParse parseTreeRenderer parseMode
         output `shouldBe'` expected
   where
     shouldBe' actual expected = do
       when (actual /= expected) $ print actual
       actual `shouldBe` expected
 
-parseFixtures :: [(ParseArguments, ByteString)]
+parseFixtures :: [(SomeRenderer TermRenderer, Either Handle [(FilePath, Maybe Language)], ByteString)]
 parseFixtures =
-  [ (ParseArguments SExpressionTermRenderer pathMode, sExpressionParseTreeOutput)
-  , (ParseArguments JSONTermRenderer pathMode, jsonParseTreeOutput)
-  , (ParseArguments JSONTermRenderer pathMode', jsonParseTreeOutput')
-  , (ParseArguments JSONTermRenderer (ParsePaths []), emptyJsonParseTreeOutput)
-  , (ParseArguments JSONTermRenderer (ParsePaths [("not-a-file.rb", Just Ruby)]), emptyJsonParseTreeOutput)
-  , (ParseArguments ToCTermRenderer (ParsePaths [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby)]), tocOutput)
+  [ (SomeRenderer SExpressionTermRenderer, pathMode, sExpressionParseTreeOutput)
+  , (SomeRenderer JSONTermRenderer, pathMode, jsonParseTreeOutput)
+  , (SomeRenderer JSONTermRenderer, pathMode', jsonParseTreeOutput')
+  , (SomeRenderer JSONTermRenderer, Right [], emptyJsonParseTreeOutput)
+  , (SomeRenderer JSONTermRenderer, Right [("not-a-file.rb", Just Ruby)], emptyJsonParseTreeOutput)
+  , (SomeRenderer ToCTermRenderer, Right [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby)], tocOutput)
   ]
-  where pathMode = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
-        pathMode' = ParsePaths [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
+  where pathMode = Right [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
+        pathMode' = Right [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
 
         sExpressionParseTreeOutput = "(Program\n  (Binary\n    (Identifier)\n    (Other \"and\")\n    (Identifier)))\n"
         jsonParseTreeOutput = "[{\"filePath\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Binary\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"and\",\"children\":[],\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"}]\n"
@@ -46,19 +47,14 @@ parseFixtures =
         tocOutput = "{\"changes\":{\"test/fixtures/ruby/method-declaration.A.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"unchanged\"}]},\"errors\":{}}\n"
 
 
-data DiffFixture = DiffFixture
-  { arguments :: DiffArguments
-  , expected :: ByteString
-  } deriving (Show)
-
-diffFixtures :: [(DiffArguments, ByteString)]
+diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both (FilePath, Maybe Language)], ByteString)]
 diffFixtures =
-  [ (DiffArguments PatchDiffRenderer pathMode, patchOutput)
-  , (DiffArguments JSONDiffRenderer pathMode, jsonOutput)
-  , (DiffArguments SExpressionDiffRenderer pathMode, sExpressionOutput)
-  , (DiffArguments ToCDiffRenderer pathMode, tocOutput)
+  [ (SomeRenderer PatchDiffRenderer, pathMode, patchOutput)
+  , (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
+  , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
+  , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
   ]
-  where pathMode = DiffPaths ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)
+  where pathMode = Right [both ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)]
 
         patchOutput = "diff --git a/test/fixtures/ruby/method-declaration.A.rb b/test/fixtures/ruby/method-declaration.B.rb\nindex 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644\n--- a/test/fixtures/ruby/method-declaration.A.rb\n+++ b/test/fixtures/ruby/method-declaration.B.rb\n@@ -1,3 +1,4 @@\n-def foo\n+def bar(a)\n+  baz\n end\n\n"
 

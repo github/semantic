@@ -15,10 +15,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
                      , Alignment
-                     , Arguments
                      , Category
-                     , Command
-                     , Command.Files
                      , Data.Align.Generic
                      , Data.Blob
                      , Data.Functor.Both
@@ -44,6 +41,7 @@ library
                      , Data.Text.Listable
                      , Decorators
                      , Diff
+                     , Files
                      , Info
                      , Interpreter
                      , Language

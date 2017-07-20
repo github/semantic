@@ -1,6 +1,6 @@
 module CommandSpec where
 
-import Command
+import Files
 import Data.Blob
 import Data.Functor.Both as Both
 import Data.Maybe
