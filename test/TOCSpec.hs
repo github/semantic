@@ -55,12 +55,12 @@ spec = parallel $ do
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
-      diffTOC Nothing blankDiff `shouldBe` [ ]
+      diffTOC blankDiff `shouldBe` [ ]
 
     it "summarizes changed methods" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
-      diffTOC (Just Ruby) diff `shouldBe`
+      diffTOC diff `shouldBe`
         [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
         , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
         , JSONSummary "Method" "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
@@ -68,37 +68,37 @@ spec = parallel $ do
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
-      diffTOC Nothing diff `shouldBe`
+      diffTOC diff `shouldBe`
         [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
-      diffTOC (Just JavaScript) diff `shouldBe`
+      diffTOC diff `shouldBe`
         [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
-      diffTOC (Just Language.Go) diff `shouldBe`
+      diffTOC diff `shouldBe`
         [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
-      diffTOC (Just Ruby) diff `shouldBe`
+      diffTOC diff `shouldBe`
         [ JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
-      diffTOC (Just Ruby) diff `shouldBe`
+      diffTOC diff `shouldBe`
         [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (both "javascript/starts-with-newline.js" "javascript/starts-with-newline.js")
       Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
-      diffTOC (Just JavaScript) diff `shouldBe` []
+      diffTOC diff `shouldBe` []
 
     prop "inserts of methods and functions are summarized" $
       \name body ->
@@ -127,7 +127,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
-        diffTOC Nothing (diffTerms (pure term)) `shouldBe` []
+        diffTOC (diffTerms (pure term)) `shouldBe` []
 
   describe "JSONSummary" $ do
     it "encodes modified summaries to JSON" $ do
@@ -159,7 +159,7 @@ type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
 type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)
 
 numTocSummaries :: Diff' -> Int
-numTocSummaries diff = length $ filter isValidSummary (diffTOC Nothing diff)
+numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'

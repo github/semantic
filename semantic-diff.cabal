@@ -16,7 +16,6 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
-                     , Command.Files
                      , Data.Align.Generic
                      , Data.Blob
                      , Data.Functor.Both
@@ -42,6 +41,7 @@ library
                      , Data.Text.Listable
                      , Decorators
                      , Diff
+                     , Files
                      , Info
                      , Interpreter
                      , Language

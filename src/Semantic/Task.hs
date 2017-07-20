@@ -3,6 +3,9 @@ module Semantic.Task
 ( Task
 , RAlgebra
 , Differ
+, readBlobs
+, readBlobPairs
+, writeToOutput
 , parse
 , decorate
 , diff
@@ -13,20 +16,26 @@ module Semantic.Task
 , runTask
 ) where
 
+import qualified Files
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
+import Data.Blob
+import qualified Data.ByteString as B
 import Data.Functor.Both as Both
 import Data.Record
-import Data.Source
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
+import Language
 import Parser
 import Prologue
 import Term
 
 data TaskF output where
-  Parse :: Parser term -> Source -> TaskF term
+  ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
+  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
+  WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
+  Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
   Render :: Renderer input output -> input -> TaskF output
@@ -41,10 +50,22 @@ type Differ f a = Both (Term f a) -> Diff f a
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
 
+-- | A 'Task' which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
+readBlobs :: Either Handle [(FilePath, Maybe Language)] -> Task [Blob]
+readBlobs from = ReadBlobs from `Then` return
 
--- | A 'Task' which parses 'Source' with the given 'Parser'.
-parse :: Parser term -> Source -> Task term
-parse parser source = Parse parser source `Then` return
+-- | A 'Task' which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
+readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
+readBlobPairs from = ReadBlobPairs from `Then` return
+
+-- | A 'Task' which writes a 'ByteString' to a 'Handle' or a 'FilePath'.
+writeToOutput :: Either Handle FilePath -> ByteString -> Task ()
+writeToOutput path contents = WriteToOutput path contents `Then` return
+
+
+-- | A 'Task' which parses a 'Blob' with the given 'Parser'.
+parse :: Parser term -> Blob -> Task term
+parse parser blob = Parse parser blob `Then` return
 
 -- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
@@ -80,7 +101,10 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 -- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
-  Parse parser source -> runParser parser source >>= yield
+  ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield
+  ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield
+  WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
+  Parse parser blob -> runParser parser blob >>= yield
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
   Render renderer input -> yield (renderer input)
