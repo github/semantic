@@ -41,7 +41,8 @@ arguments = info (version <*> helper <*> argumentsParser) description
 
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
-      <*> (maybe (Left stdout) Right <$> optional (strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")))
+      <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
+          <|> pure (Left stdout) )
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = runDiff
