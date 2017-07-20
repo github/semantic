@@ -246,16 +246,15 @@ assignAllFrom toNode assignment state = runAssignment toNode assignment state >>
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack) => (forall x. Base ast x -> Node grammar) -> Assignment ast grammar a -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)
 runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
   where run :: AssignmentF ast grammar x -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)) -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)
-        run assignment yield initialState = case (assignment, stateNodes) of
+        run assignment yield initialState = case (assignment, stateNodes state) of
           (Location, node : _) -> yield (nodeLocation (toNode (F.project node))) state
-          (Location, []) -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
+          (Location, []) -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
           (Project projection, node : _) -> yield (projection (F.project node)) state
-          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) stateSource)) (advanceState toNode state)
+          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) (stateSource state))) (advanceState toNode state)
           (Children childAssignment, node : _) -> do
             (a, state') <- assignAllFrom toNode childAssignment state { stateNodes = toList (F.project node) }
-            yield a (advanceState toNode state' { stateNodes = stateNodes })
+            yield a (advanceState toNode state' { stateNodes = stateNodes state })
           (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
-          (Many _, []) -> yield [] state
           (Many rule, _) -> uncurry yield (runMany rule state)
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           (Alt a b, _) -> case yield a state of
@@ -265,9 +264,9 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
           (Catch during handler, _) -> case yield during state of
             Left err -> yield (handler err) state
             Right (a, state') -> Right (a, state')
-          (_, []) -> Left (Error statePos (UnexpectedEndOfInput expectedSymbols))
+          (_, []) -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           (_, ast:_) -> let Node symbol _ (Info.Span spanStart _) = toNode (F.project ast) in Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
-          where state@AssignmentState{..} = case assignment of
+          where state = case assignment of
                   Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous toNode initialState
                   _ -> initialState
                 expectedSymbols = case assignment of
@@ -277,7 +276,9 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
                 runMany :: Assignment ast grammar v -> AssignmentState ast grammar -> ([v], AssignmentState ast grammar)
                 runMany rule state = case runAssignment toNode rule state of
                   Left err -> ([], state { stateError = Just err })
-                  Right (a, state') -> let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
+                  Right (a, state') -> if ((/=) `on` stateCounter) state state'
+                                       then let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
+                                       else ([a], state')
         {-# INLINE run #-}
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
@@ -287,7 +288,7 @@ dropAnonymous toNode state = state { stateNodes = dropWhile ((/= Regular) . symb
 advanceState :: Recursive ast => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
 advanceState toNode state@AssignmentState{..}
   | node : rest <- stateNodes
-  , Node{..} <- toNode (F.project node) = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError stateSource rest
+  , Node{..} <- toNode (F.project node) = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) stateSource rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -295,13 +296,14 @@ data AssignmentState ast grammar = AssignmentState
   { stateOffset :: Int -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateError :: Maybe (Error grammar)
+  , stateCounter :: Int -- ^ Always incrementing counter that tracks how many nodes have been visited.
   , stateSource :: Source.Source -- ^ The remaining Source. Equal to dropping 'stateOffset' bytes off the original input Source.
   , stateNodes :: [ast] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
 makeState :: Source.Source -> [ast] -> AssignmentState ast grammar
-makeState = AssignmentState 0 (Info.Pos 1 1) Nothing
+makeState = AssignmentState 0 (Info.Pos 1 1) Nothing 0
 
 
 -- Instances
