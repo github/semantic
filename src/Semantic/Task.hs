@@ -101,8 +101,8 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 -- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
 runTask = iterFreerA $ \ task yield -> case task of
-  ReadBlobs source -> Files.readBlobs source >>= yield
-  ReadBlobPairs source -> Files.readBlobPairs source >>= yield
+  ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield
+  ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield
   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
   Parse parser blob -> runParser parser blob >>= yield
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)

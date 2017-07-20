@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields #-}
 module Files
-( readBlobs
-, readBlobPairs
-, readFile
+( readFile
 , readBlobPairsFromHandle
 , readBlobsFromHandle
 , languageForFilePath
@@ -21,15 +19,6 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Prelude (fail)
 import System.FilePath
-
--- | Read a list of 'Blob.Blob's from either a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: Either Handle [(FilePath, Maybe Language)] -> IO [Blob.Blob]
-readBlobs = either readBlobsFromHandle (traverse (uncurry readFile))
-
--- | Read a pair of 'Blob.Blob's from either a 'Handle' or a pair of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> IO [Both Blob.Blob]
-readBlobPairs = either readBlobPairsFromHandle (traverse (traverse (uncurry readFile)))
-
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readFile :: FilePath -> Maybe Language -> IO Blob.Blob
