@@ -1,8 +1,9 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module SemanticCmdLineSpec where
 
-import Prologue
+import Data.Functor.Both
 import Language
+import Prologue
 import Renderer
 import Semantic.Task
 import SemanticCmdLine
@@ -53,7 +54,7 @@ diffFixtures =
   , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
   , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
   ]
-  where pathMode = Right [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)]
+  where pathMode = Right [both ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)]
 
         patchOutput = "diff --git a/test/fixtures/ruby/method-declaration.A.rb b/test/fixtures/ruby/method-declaration.B.rb\nindex 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644\n--- a/test/fixtures/ruby/method-declaration.A.rb\n+++ b/test/fixtures/ruby/method-declaration.B.rb\n@@ -1,3 +1,4 @@\n-def foo\n+def bar(a)\n+  baz\n end\n\n"
 
