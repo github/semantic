@@ -18,17 +18,17 @@ import GHC.Stack
 import Prologue hiding (Location)
 
 type Syntax =
-  '[ Literal.Hash
-   , Literal.KeyValue
-   , Literal.Null
-   , Literal.String
-   , Literal.TextElement
-   , Syntax.Error
-   , Literal.Array
-   , Literal.Boolean
-   , Literal.Float
-   , []
-   ]
+  [ Literal.Array
+  , Literal.Boolean
+  , Literal.Hash
+  , Literal.Float
+  , Literal.KeyValue
+  , Literal.Null
+  , Literal.String
+  , Literal.TextElement
+  , Syntax.Error
+  , []
+  ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
