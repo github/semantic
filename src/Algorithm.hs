@@ -95,8 +95,8 @@ class Diffable f where
   algorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
 
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
--- Right is the "head" of the Union. `weaken` relaxes the Union to allow the possible
--- diff terms from the "rest" of the Union, and `inj` adds the diff terms into the Union.
+-- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
+-- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
 instance (Diffable f, Diffable (Union fs)) => Diffable (Union (f ': fs)) where
   algorithmFor u1 u2 = case (decompose u1, decompose u2) of
@@ -104,12 +104,12 @@ instance (Diffable f, Diffable (Union fs)) => Diffable (Union (f ': fs)) where
     (Right r1, Right r2) -> fmap inj <$> algorithmFor r1 r2
     _ -> Nothing
 
--- | Diffing an empty Union is technically impossible because Union is a strictly
--- non-empty Set-like value. This instance is included for completeness.
 -- | Diff two list parameters using RWS.
 instance Diffable [] where
   algorithmFor a b = Just (byRWS a b)
 
+-- | Diffing an empty Union is technically impossible because Union '[] uninhabited.
+-- This instance is included because GHC cannot prove that.
 instance Diffable (Union '[]) where
   algorithmFor _ _ = Nothing
 
@@ -117,29 +117,29 @@ instance Diffable (Union '[]) where
 class Diffable' f where
   algorithmFor' :: f term -> f term -> Maybe (Algorithm term diff (f diff))
 
--- | Diff two data constructors (M1 is the Generic1 newtype for meta-information containing constructor names).
+-- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
 instance Diffable' f => Diffable' (M1 i c f) where
   algorithmFor' (M1 a) (M1 b) = fmap M1 <$> algorithmFor' a b
 
--- | Diff two terms whose parameters are a product type.
--- i.e. data Foo a b = Foo a b (the `Foo a b` is captured by `a :*: b`).
+-- | Diff the fields of a product type.
+-- i.e. data Foo a b = Foo a b (the 'Foo a b' is captured by 'a :*: b').
 instance (Diffable' f, Diffable' g) => Diffable' (f :*: g) where
   algorithmFor' (a1 :*: b1) (a2 :*: b2) = liftA2 (:*:) <$> algorithmFor' a1 a2 <*> algorithmFor' b1 b2
 
--- | Diff two terms whose data constructors are sum types.
--- i.e. data Foo a = Foo a | Bar a (the `Foo a` is captured by L1 and `Bar a` is R1).
+-- | Diff the constructors of a sum type.
+-- i.e. data Foo a = Foo a | Bar a (the 'Foo a' is captured by L1 and 'Bar a' is R1).
 instance (Diffable' f, Diffable' g) => Diffable' (f :+: g) where
   algorithmFor' (L1 a) (L1 b) = fmap L1 <$> algorithmFor' a b
   algorithmFor' (R1 a) (R1 b) = fmap R1 <$> algorithmFor' a b
   algorithmFor' _ _ = Nothing
 
 -- | Diff two parameters (Par1 is the Generic1 newtype representing a type parameter).
--- i.e. data Foo a = Foo a (the `a` is captured by Par1).
+-- i.e. data Foo a = Foo a (the 'a' is captured by Par1).
 instance Diffable' Par1 where
   algorithmFor' (Par1 a) (Par1 b) = Just (Par1 <$> linearly a b)
 
 -- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
--- i.e. data Foo = Foo Int (the `Int` is a constant parameter).
+-- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).
 instance Eq c => Diffable' (K1 i c) where
   algorithmFor' (K1 a) (K1 b) = guard (a == b) *> Just (pure (K1 a))
 
@@ -149,6 +149,6 @@ instance Diffable' U1 where
   algorithmFor' _ _ = Just (pure U1)
 
 -- | Diff two recursively defined parameters (Rec1 is the Generic1 newtype representing recursive type parameters).
--- i.e. data Tree a = Leaf a | Node (Tree a) (Tree a) (the two `Tree a` in `Node (Tree a) (Tree a)` are Rec1 type parameters).
+-- i.e. data Tree a = Leaf a | Node (Tree a) (Tree a) (the two 'Tree a' in 'Node (Tree a) (Tree a)' are Rec1 type parameters).
 instance Diffable' (Rec1 []) where
   algorithmFor' a b = fmap Rec1 <$> Just ((byRWS `on` unRec1) a b)
