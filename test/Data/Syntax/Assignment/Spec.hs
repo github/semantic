@@ -13,13 +13,13 @@ spec :: Spec
 spec = do
   describe "Applicative" $
     it "matches in sequence" $
-      fst <$> runAssignment headF ((,) <$> red <*> red) (makeState "helloworld" [node Red 0 5 [], node Red 5 10 []])
+      fst <$> runAssignment "helloworld" headF ((,) <$> red <*> red) (makeState [node Red 0 5 [], node Red 5 10 []])
       `shouldBe`
         Right (Out "hello", Out "world")
 
   describe "Alternative" $ do
     it "attempts multiple alternatives" $
-      fst <$> runAssignment headF (green <|> red) (makeState "hello" [node Red 0 5 []])
+      fst <$> runAssignment "hello" headF (green <|> red) (makeState [node Red 0 5 []])
       `shouldBe`
         Right (Out "hello")
 
@@ -27,107 +27,107 @@ spec = do
       let s = "colourless green ideas sleep furiously"
           w = words s
           (_, nodes) = foldl (\ (i, prev) word -> (i + B.length word + 1, prev <> [node Red i (i + B.length word) []])) (0, []) w in
-      fst <$> runAssignment headF (many red) (makeState (fromBytes s) nodes)
+      fst <$> runAssignment (fromBytes s) headF (many red) (makeState nodes)
       `shouldBe`
         Right (Out <$> w)
 
     it "matches one-or-more repetitions against one or more input nodes" $
-      fst <$> runAssignment headF (some red) (makeState "hello" [node Red 0 5 []])
+      fst <$> runAssignment "hello" headF (some red) (makeState [node Red 0 5 []])
       `shouldBe`
         Right [Out "hello"]
 
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
-      fst <$> runAssignment headF red (makeState "hello" [node Red 0 5 []]) `shouldBe` Right (Out "hello")
+      fst <$> runAssignment "hello" headF red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
 
     it "does not advance past the current node" $
-      let initialState = makeState "hi" [ node Red 0 2 [] ] in
-      snd <$> runAssignment headF (symbol Red) initialState `shouldBe` Right initialState
+      let initialState = makeState [ node Red 0 2 [] ] in
+      snd <$> runAssignment "hi" headF (symbol Red) initialState `shouldBe` Right initialState
 
   describe "without catchError" $ do
     it "assignment returns UnexpectedSymbol" $
-      runAssignment headF
+      runAssignment "A" headF
         red
-        (makeState "A" [node Green 0 1 []])
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Red] Green))
 
     it "assignment returns UnexpectedEndOfInput" $
-      runAssignment headF
+      runAssignment "A" headF
         (symbol Green *> children (some red))
-        (makeState "A" [node Green 0 1 []])
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Left (Error (Info.Pos 1 1) (UnexpectedEndOfInput [Red]))
 
   describe "catchError" $ do
     it "handler that always matches" $
-      fst <$> runAssignment headF
+      fst <$> runAssignment "A" headF
         (red `catchError` (\ _ -> OutError <$ location <*> source))
-        (makeState "A" [node Green 0 1 []])
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Right (OutError "A")
 
     it "handler that matches" $
-      fst <$> runAssignment headF
+      fst <$> runAssignment "A" headF
         (red `catchError` const green)
-        (makeState "A" [node Green 0 1 []])
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Right (Out "A")
 
     it "handler that doesn't match produces error" $
-      runAssignment headF
+      runAssignment "A" headF
         (red `catchError` const blue)
-        (makeState "A" [node Green 0 1 []])
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Blue] Green))
 
     describe "in many" $ do
       it "handler that always matches" $
-        fst <$> runAssignment headF
+        fst <$> runAssignment "PG" headF
           (symbol Palette *> children (
             many (red `catchError` (\ _ -> OutError <$ location <*> source))
           ))
-          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
+          (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Right [OutError "G"]
 
       it "handler that matches" $
-        fst <$> runAssignment headF
+        fst <$> runAssignment "PG" headF
           (symbol Palette *> children ( many (red `catchError` const green) ))
-          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
+          (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Right [Out "G"]
 
       it "handler that doesn't match produces error" $
-        runAssignment headF
+        runAssignment "PG" headF
           (symbol Palette *> children ( many (red `catchError` const blue) ))
-          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
+          (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Left (Error (Info.Pos 1 2) (UnexpectedSymbol [Blue] Green))
 
       it "handler that always matches with apply consumes and then errors" $
-        runAssignment headF
+        runAssignment "PG" headF
           (symbol Palette *> children (
             (,) <$> many (red `catchError` (\ _ -> OutError <$ location <*> source)) <*> green
           ))
-          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
+          (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Left (Error (Info.Pos 1 3) (UnexpectedEndOfInput [Green]))
 
       it "handler that doesn't match with apply" $
-        fst <$> runAssignment headF
+        fst <$> runAssignment "PG" headF
           (symbol Palette *> children (
             (,) <$> many (red `catchError` const blue) <*> green
           ))
-          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
+          (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Right ([], Out "G")
 
   describe "many" $ do
     it "takes ones and only one zero width repetition" $
-      fst <$> runAssignment headF
+      fst <$> runAssignment "PGG" headF
         (symbol Palette *> children ( many (green <|> pure (Out "always")) ))
-        (makeState "PGG" [node Palette 0 1 [node Green 1 2 [], node Green 2 3 []]])
+        (makeState [node Palette 0 1 [node Green 1 2 [], node Green 2 3 []]])
         `shouldBe`
           Right [Out "G", Out "G", Out "always"]
 
@@ -136,55 +136,63 @@ spec = do
       assignBy headF source "hi" (node Red 0 2 []) `shouldBe` Right "hi"
 
     it "advances past the current node" $
-      snd <$> runAssignment headF source (makeState "hi" [ node Red 0 2 [] ]) `shouldBe` Right (AssignmentState 2 (Info.Pos 1 3) Nothing 1 "hi" [])
+      snd <$> runAssignment "hi" headF source (makeState [ node Red 0 2 [] ])
+      `shouldBe`
+        Right (AssignmentState 2 (Info.Pos 1 3) Nothing 1 [])
 
   describe "children" $ do
     it "advances past the current node" $
-      snd <$> runAssignment headF (children (pure (Out ""))) (makeState "a" [node Red 0 1 []]) `shouldBe` Right (AssignmentState 1 (Info.Pos 1 2) Nothing 1 "a" [])
+      snd <$> runAssignment "a" headF (children (pure (Out ""))) (makeState [node Red 0 1 []])
+      `shouldBe`
+        Right (AssignmentState 1 (Info.Pos 1 2) Nothing 1 [])
 
     it "matches if its subrule matches" $
-      () <$ runAssignment headF (children red) (makeState "a" [node Blue 0 1 [node Red 0 1 []]]) `shouldBe` Right ()
+      () <$ runAssignment "a" headF (children red) (makeState [node Blue 0 1 [node Red 0 1 []]])
+      `shouldBe`
+        Right ()
 
     it "does not match if its subrule does not match" $
-      runAssignment headF (children red) (makeState "a" [node Blue 0 1 [node Green 0 1 []]]) `shouldBe` Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Red] Green))
+      runAssignment "a" headF (children red) (makeState [node Blue 0 1 [node Green 0 1 []]])
+      `shouldBe`
+        Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Red] Green))
 
     it "matches nested children" $
-      fst <$> runAssignment headF
+      fst <$> runAssignment "1" headF
         (symbol Red *> children (symbol Green *> children (symbol Blue *> source)))
-        (makeState "1" [ node Red 0 1 [ node Green 0 1 [ node Blue 0 1 [] ] ] ])
+        (makeState [ node Red 0 1 [ node Green 0 1 [ node Blue 0 1 [] ] ] ])
       `shouldBe`
         Right "1"
 
     it "continues after children" $
-      fst <$> runAssignment headF
+      fst <$> runAssignment "BC" headF
         (many (symbol Red *> children (symbol Green *> source)
            <|> symbol Blue *> source))
-        (makeState "BC" [ node Red 0 1 [ node Green 0 1 [] ]
-                        , node Blue 1 2 [] ])
+        (makeState [ node Red 0 1 [ node Green 0 1 [] ]
+                   , node Blue 1 2 [] ])
       `shouldBe`
         Right ["B", "C"]
 
     it "matches multiple nested children" $
-      fst <$> runAssignment headF
+      fst <$> runAssignment "12" headF
         (symbol Red *> children (many (symbol Green *> children (symbol Blue *> source))))
-        (makeState "12" [ node Red 0 2 [ node Green 0 1 [ node Blue 0 1 [] ]
-                                       , node Green 1 2 [ node Blue 1 2 [] ] ] ])
+        (makeState [ node Red 0 2 [ node Green 0 1 [ node Blue 0 1 [] ]
+                                  , node Green 1 2 [ node Blue 1 2 [] ] ] ])
       `shouldBe`
         Right ["1", "2"]
 
   describe "runAssignment" $ do
     it "drops anonymous nodes before matching symbols" $
-      fst <$> runAssignment headF red (makeState "magenta red" [node Magenta 0 7 [], node Red 8 11 []])
+      fst <$> runAssignment "magenta red" headF red (makeState [node Magenta 0 7 [], node Red 8 11 []])
       `shouldBe`
         Right (Out "red")
 
     it "does not drop anonymous nodes after matching" $
-      stateNodes . snd <$> runAssignment headF red (makeState "red magenta" [node Red 0 3 [], node Magenta 4 11 []])
+      stateNodes . snd <$> runAssignment "red magenta" headF red (makeState [node Red 0 3 [], node Magenta 4 11 []])
       `shouldBe`
         Right [node Magenta 4 11 []]
 
     it "does not drop anonymous nodes when requested" $
-      fst <$> runAssignment headF ((,) <$> magenta <*> red) (makeState "magenta red" [node Magenta 0 7 [], node Red 8 11 []])
+      fst <$> runAssignment "magenta red" headF ((,) <$> magenta <*> red) (makeState [node Magenta 0 7 [], node Red 8 11 []])
       `shouldBe`
         Right (Out "magenta", Out "red")
 
