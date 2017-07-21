@@ -7,6 +7,7 @@ module Semantic.Task
 , readBlobs
 , readBlobPairs
 , writeToOutput
+, writeLog
 , parse
 , decorate
 , diff
@@ -36,6 +37,7 @@ data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
   WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
+  WriteLog :: Message -> TaskF ()
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
@@ -74,6 +76,11 @@ readBlobPairs from = ReadBlobPairs from `Then` return
 -- | A 'Task' which writes a 'ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Either Handle FilePath -> ByteString -> Task ()
 writeToOutput path contents = WriteToOutput path contents `Then` return
+
+
+-- | A 'Task' which logs a message at a specific log level to stderr.
+writeLog :: Message -> Task ()
+writeLog message = WriteLog message `Then` return
 
 
 -- | A 'Task' which parses a 'Blob' with the given 'Parser'.
@@ -117,6 +124,7 @@ runTask = iterFreerA $ \ task yield -> case task of
   ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield
   ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield
   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
+  WriteLog message -> B.hPutStr stderr (formatMessage message) >>= yield
   Parse parser blob -> runParser parser blob >>= yield
   Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
   Diff differ terms -> yield (differ terms)
