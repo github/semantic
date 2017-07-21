@@ -98,7 +98,7 @@ class Diffable f where
 instance Diffable [] where
   algorithmFor a b = Just (byRWS a b)
 
--- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms,
+-- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
 -- Right is the "head" of the Union. `weaken` relaxes the Union to allow the possible
 -- diff terms from the "rest" of the Union, and `inj` adds the diff terms into the Union.
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
