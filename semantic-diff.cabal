@@ -110,6 +110,7 @@ library
                      , recursion-schemes
                      , semigroups
                      , split
+                     , stm-chans
                      , template-haskell
                      , text >= 1.2.1.3
                      , these

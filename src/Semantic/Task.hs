@@ -18,6 +18,7 @@ module Semantic.Task
 , runTask
 ) where
 
+import Control.Concurrent.STM.TMQueue
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
@@ -122,13 +123,28 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
-runTask = foldFreer $ \ task -> case task of
-  ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
-  ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
-  WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents
-  WriteLog message -> B.hPutStr stderr (formatMessage message)
-  Parse parser blob -> runParser parser blob
-  Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
-  Diff differ terms -> pure (differ terms)
-  Render renderer input -> pure (renderer input)
-  Distribute tasks -> Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq)
+runTask task = do
+  logQueue <- newTMQueueIO
+  logging <- async (writeThread logQueue)
+
+  result <- foldFreer (\ task -> case task of
+    ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
+    ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
+    WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents
+    WriteLog message -> atomically (writeTMQueue logQueue message)
+    Parse parser blob -> runParser parser blob
+    Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
+    Diff differ terms -> pure (differ terms)
+    Render renderer input -> pure (renderer input)
+    Distribute tasks -> Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
+    task
+  atomically (closeTMQueue logQueue)
+  wait logging
+  pure result
+  where writeThread queue = do
+          message <- atomically (readTMQueue queue)
+          case message of
+            Just message -> do
+              B.hPutStr stderr (formatMessage message)
+              writeThread queue
+            _ -> pure ()
