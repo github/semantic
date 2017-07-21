@@ -42,7 +42,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     optionsParser = Task.Options
       <$> options [("yes", Just True), ("no", Just False), ("auto", Nothing)]
             (long "colour" <> long "color" <> value Nothing <> help "Enable, disable, or decide automatically iff stderr is a terminal device, whether to use colour.")
-      <*> pure (Just Task.Warning)
+      <*> options [("error", Just Task.Error), ("warning", Just Task.Warning), ("info", Just Task.Info), ("debug", Just Task.Debug), ("none", Nothing)]
+            (long "log-level" <> value (Just Task.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
