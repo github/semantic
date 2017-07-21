@@ -32,6 +32,7 @@ import qualified Data.ByteString as B
 import Data.Functor.Both as Both
 import Data.Record
 import Data.Source
+import Data.String
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
@@ -42,7 +43,7 @@ import Language
 import Language.Markdown
 import Parser
 import Prologue hiding (Location)
-import System.IO (hIsTerminalDevice)
+import System.IO (hIsTerminalDevice, hPutStr)
 import Term
 import TreeSitter
 
@@ -63,13 +64,14 @@ type Task = Freer TaskF
 
 -- | A log message at a specific level.
 data Message
-  = Error { messageContent :: ByteString }
-  | Warning { messageContent :: ByteString }
-  | Info { messageContent :: ByteString }
-  | Debug { messageContent :: ByteString }
+  = Error { messageContent :: String }
+  | Warning { messageContent :: String }
+  | Info { messageContent :: String }
+  | Debug { messageContent :: String }
   deriving (Eq, Show)
 
-formatMessage :: Message -> ByteString
+-- | Format a 'Message'.
+formatMessage :: Message -> String
 formatMessage (Error s) = "error: " <> s <> "\n"
 formatMessage (Warning s) = "warning: " <> s <> "\n"
 formatMessage (Info s) = "info: " <> s <> "\n"
@@ -182,7 +184,7 @@ runTaskWithOptions options task = do
           message <- atomically (readTMQueue queue)
           case message of
             Just message -> do
-              B.hPutStr stderr (formatMessage message)
+              hPutStr stderr (formatMessage message)
               logSink options queue
             _ -> pure ()
 

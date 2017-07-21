@@ -94,7 +94,7 @@ module Data.Syntax.Assignment
 
 import Control.Monad.Free.Freer
 import Data.Blob
-import Data.ByteString (isSuffixOf, hPutStr)
+import Data.ByteString (isSuffixOf)
 import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
@@ -102,13 +102,14 @@ import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Record
 import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
+import Data.String
 import GHC.Stack
 import qualified Info
 import Prologue hiding (Alt, get, Location, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
-import System.IO (hIsTerminalDevice)
+import System.IO (hIsTerminalDevice, hPutStr)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -220,13 +221,13 @@ printError blob error = do
 -- | Format an 'Error', optionally with reference to the source where it occurred.
 --
 -- > formatError = formatErrorWithOptions defaultOptions
-formatError :: Show grammar => Blob -> Error grammar -> ByteString
+formatError :: Show grammar => Blob -> Error grammar -> String
 formatError = formatErrorWithOptions defaultOptions
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
-formatErrorWithOptions :: Show grammar => Options -> Blob -> Error grammar -> ByteString
+formatErrorWithOptions :: Show grammar => Options -> Blob -> Error grammar -> String
 formatErrorWithOptions Options{..} Blob{..} error@Error{..}
-  = toS . ($ "")
+  = ($ "")
   $ withSGRCode optionsColour [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
   . withSGRCode optionsColour [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation error . showChar '\n')
   . (if optionsIncludeSource
