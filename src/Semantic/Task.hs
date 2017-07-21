@@ -49,10 +49,10 @@ type Task = Freer TaskF
 
 -- | A log message at a specific level.
 data Message
-  = Error ByteString
-  | Warning ByteString
-  | Info ByteString
-  | Debug ByteString
+  = Error { messageContent :: ByteString }
+  | Warning { messageContent :: ByteString }
+  | Info { messageContent :: ByteString }
+  | Debug { messageContent :: ByteString }
   deriving (Eq, Show)
 
 formatMessage :: Message -> ByteString
