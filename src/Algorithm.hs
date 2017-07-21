@@ -1,10 +1,15 @@
-{-# LANGUAGE GADTs, RankNTypes #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators #-}
 module Algorithm where
 
 import Control.Monad.Free.Freer
+import Data.Functor.Both
 import Data.Functor.Classes
 import Data.These
+import Data.Union
+import Diff
+import GHC.Generics
 import Prologue hiding (liftF)
+import Term
 import Text.Show
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
@@ -73,3 +78,77 @@ instance Show term => Show1 (AlgorithmF term diff) where
     Delete t1 -> showsUnaryWith showsPrec "Delete" d t1
     Insert t2 -> showsUnaryWith showsPrec "Insert" d t2
     Replace t1 t2 -> showsBinaryWith showsPrec showsPrec "Replace" d t1 t2
+
+
+-- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
+-- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
+algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f a) (Diff f a) (Diff f a)
+algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (fmap (wrap . (both ann1 ann2 :<)) <$> algorithmFor f1 f2)
+  where ann1 :< f1 = runCofree t1
+        ann2 :< f2 = runCofree t2
+
+
+-- | A type class for determining what algorithm to use for diffing two terms.
+class Diffable f where
+  algorithmFor :: f term -> f term -> Maybe (Algorithm term diff (f diff))
+  default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
+  algorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+
+-- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
+-- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
+-- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
+-- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
+instance (Diffable f, Diffable (Union fs)) => Diffable (Union (f ': fs)) where
+  algorithmFor u1 u2 = case (decompose u1, decompose u2) of
+    (Left l1, Left l2) -> fmap weaken <$> algorithmFor l1 l2
+    (Right r1, Right r2) -> fmap inj <$> algorithmFor r1 r2
+    _ -> Nothing
+
+-- | Diff two list parameters using RWS.
+instance Diffable [] where
+  algorithmFor a b = Just (byRWS a b)
+
+-- | Diffing an empty Union is technically impossible because Union '[] uninhabited.
+-- This instance is included because GHC cannot prove that.
+instance Diffable (Union '[]) where
+  algorithmFor _ _ = Nothing
+
+-- | A generic type class for diffing two terms defined by the Generic1 interface.
+class Diffable' f where
+  algorithmFor' :: f term -> f term -> Maybe (Algorithm term diff (f diff))
+
+-- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
+instance Diffable' f => Diffable' (M1 i c f) where
+  algorithmFor' (M1 a) (M1 b) = fmap M1 <$> algorithmFor' a b
+
+-- | Diff the fields of a product type.
+-- i.e. data Foo a b = Foo a b (the 'Foo a b' is captured by 'a :*: b').
+instance (Diffable' f, Diffable' g) => Diffable' (f :*: g) where
+  algorithmFor' (a1 :*: b1) (a2 :*: b2) = liftA2 (:*:) <$> algorithmFor' a1 a2 <*> algorithmFor' b1 b2
+
+-- | Diff the constructors of a sum type.
+-- i.e. data Foo a = Foo a | Bar a (the 'Foo a' is captured by L1 and 'Bar a' is R1).
+instance (Diffable' f, Diffable' g) => Diffable' (f :+: g) where
+  algorithmFor' (L1 a) (L1 b) = fmap L1 <$> algorithmFor' a b
+  algorithmFor' (R1 a) (R1 b) = fmap R1 <$> algorithmFor' a b
+  algorithmFor' _ _ = Nothing
+
+-- | Diff two parameters (Par1 is the Generic1 newtype representing a type parameter).
+-- i.e. data Foo a = Foo a (the 'a' is captured by Par1).
+instance Diffable' Par1 where
+  algorithmFor' (Par1 a) (Par1 b) = Just (Par1 <$> linearly a b)
+
+-- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
+-- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).
+instance Eq c => Diffable' (K1 i c) where
+  algorithmFor' (K1 a) (K1 b) = guard (a == b) *> Just (pure (K1 a))
+
+-- | Diff two terms whose constructors contain 0 type parameters.
+-- i.e. data Foo = Foo.
+instance Diffable' U1 where
+  algorithmFor' _ _ = Just (pure U1)
+
+-- | Diff two recursively defined parameters (Rec1 is the Generic1 newtype representing recursive type parameters).
+-- i.e. data Tree a = Leaf a | Node (Tree a) (Tree a) (the two 'Tree a' in 'Node (Tree a) (Tree a)' are Rec1 type parameters).
+instance Diffable' (Rec1 []) where
+  algorithmFor' a b = fmap Rec1 <$> Just ((byRWS `on` unRec1) a b)
