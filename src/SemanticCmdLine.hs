@@ -21,7 +21,7 @@ import System.IO (stdin)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
 main :: IO ()
-main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskOptions
+main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.Task ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs

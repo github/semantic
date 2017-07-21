@@ -19,7 +19,7 @@ module Semantic.Task
 , defaultOptions
 , configureOptionsForHandle
 , runTask
-, runTaskOptions
+, runTaskWithOptions
 ) where
 
 import Control.Concurrent.STM.TMQueue
@@ -152,13 +152,13 @@ configureOptionsForHandle handle options = do
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
--- > runTask = runTaskOptions defaultOptions
+-- > runTask = runTaskWithOptions defaultOptions
 runTask :: Task a -> IO a
-runTask = runTaskOptions defaultOptions
+runTask = runTaskWithOptions defaultOptions
 
 -- | Execute a 'Task' with the passed 'Options', yielding its result value in 'IO'.
-runTaskOptions :: Options -> Task a -> IO a
-runTaskOptions options task = do
+runTaskWithOptions :: Options -> Task a -> IO a
+runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
   logQueue <- newTMQueueIO
   logging <- async (sink logQueue)
