@@ -155,7 +155,9 @@ literal =  boolean
        <|> parseError
 
 expressionStatement :: Assignment
-expressionStatement = makeTerm <$> symbol ExpressionStatement <*> children (some declaration)
+expressionStatement = mk <$> symbol ExpressionStatement <*> children (some declaration)
+  where mk _ [child] = child
+        mk location children = makeTerm location children
 
 expression :: Assignment
 expression =  argument
