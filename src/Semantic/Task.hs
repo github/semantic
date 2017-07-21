@@ -52,6 +52,11 @@ data Message
   | Debug ByteString
   deriving (Eq, Show)
 
+formatMessage :: Message -> ByteString
+formatMessage (Error s) = "error: " <> s <> "\n"
+formatMessage (Warning s) = "warning: " <> s <> "\n"
+formatMessage (Debug s) = "debug: " <> s <> "\n"
+
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ f a = Both (Term f a) -> Diff f a
 
