@@ -276,9 +276,10 @@ runAssignment toNode = iterFreer run . fmap ((pure .) . (,))
                 runMany :: Assignment ast grammar v -> AssignmentState ast grammar -> ([v], AssignmentState ast grammar)
                 runMany rule state = case runAssignment toNode rule state of
                   Left err -> ([], state { stateError = Just err })
-                  Right (a, state') -> if ((/=) `on` stateCounter) state state'
-                                       then let (as, state'') = runMany rule state' in as `seq` (a : as, state'')
-                                       else ([a], state')
+                  Right (a, state') | ((/=) `on` stateCounter) state state' ->
+                                        let (as, state'') = runMany rule state'
+                                        in as `seq` (a : as, state'')
+                                    | otherwise -> ([a], state')
         {-# INLINE run #-}
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
