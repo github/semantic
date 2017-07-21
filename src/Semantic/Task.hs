@@ -127,16 +127,16 @@ runTask task = do
   logQueue <- newTMQueueIO
   logging <- async (writeThread logQueue)
 
-  result <- foldFreer (\ task -> case task of
-    ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
-    ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
-    WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents
-    WriteLog message -> atomically (writeTMQueue logQueue message)
-    Parse parser blob -> runParser parser blob
-    Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
-    Diff differ terms -> pure (differ terms)
-    Render renderer input -> pure (renderer input)
-    Distribute tasks -> Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
+  result <- runFreerM (\ task -> case task of
+    ReadBlobs source -> writeLog (Info "ReadBlobs") *> pure (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source)
+    ReadBlobPairs source -> writeLog (Info "ReadBlobPairs") *> pure (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source)
+    WriteToOutput destination contents -> writeLog (Info "WriteToOutput") *> pure (either B.hPutStr B.writeFile destination contents)
+    WriteLog message -> pure (atomically (writeTMQueue logQueue message))
+    Parse parser blob -> writeLog (Info "Parse") *> pure (runParser parser blob)
+    Decorate algebra term -> writeLog (Info "Decorate") *> pure (pure (decoratorWithAlgebra algebra term))
+    Diff differ terms -> writeLog (Info "Diff") *> pure (pure (differ terms))
+    Render renderer input -> writeLog (Info "Render") *> pure (pure (renderer input))
+    Distribute tasks -> writeLog (Info "Distribute") *> pure (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq)))
     task
   atomically (closeTMQueue logQueue)
   wait logging
