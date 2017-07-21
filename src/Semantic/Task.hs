@@ -120,13 +120,13 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Execute a 'Task', yielding its result value in 'IO'.
 runTask :: Task a -> IO a
-runTask = iterFreerA $ \ task yield -> case task of
-  ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield
-  ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield
-  WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-  WriteLog message -> B.hPutStr stderr (formatMessage message) >>= yield
-  Parse parser blob -> runParser parser blob >>= yield
-  Decorate algebra term -> yield (decoratorWithAlgebra algebra term)
-  Diff differ terms -> yield (differ terms)
-  Render renderer input -> yield (renderer input)
-  Distribute tasks -> Async.mapConcurrently runTask tasks >>= yield . withStrategy (parTraversable rseq)
+runTask = foldFreer $ \ task -> case task of
+  ReadBlobs source -> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
+  ReadBlobPairs source -> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
+  WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents
+  WriteLog message -> B.hPutStr stderr (formatMessage message)
+  Parse parser blob -> runParser parser blob
+  Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
+  Diff differ terms -> pure (differ terms)
+  Render renderer input -> pure (renderer input)
+  Distribute tasks -> Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq)
