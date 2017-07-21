@@ -138,7 +138,7 @@ runTask task = do
     Decorate algebra term -> pure <$ writeLog (Info "Decorate") <*> pure (decoratorWithAlgebra algebra term)
     Diff differ terms -> pure <$ writeLog (Info "Diff") <*> pure (differ terms)
     Render renderer input -> pure <$ writeLog (Info "Render") <*> pure (renderer input)
-    Distribute tasks -> pure <$ writeLog (Info "Distribute") <*> (liftIO (Async.mapConcurrently runTask tasks) >>= pure . withStrategy (parTraversable rseq))
+    Distribute tasks -> pure <$ writeLog (Info "Distribute") <*> liftIO (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
     LiftIO action -> pure action)
     task
   atomically (closeTMQueue logQueue)
