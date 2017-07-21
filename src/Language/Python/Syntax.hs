@@ -129,7 +129,6 @@ expression =
   <|> tuple
   <|> type'
   <|> unaryOperator
-  <|> parseError
   <|> functionDefinition
   <|> assertStatement
   <|> assignment'
