@@ -254,7 +254,7 @@ type' :: Assignment
 type' = symbol Type *> children expression
 
 finallyClause :: Assignment
-finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
+finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expressions)
 
 dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
