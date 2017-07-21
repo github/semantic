@@ -139,7 +139,7 @@ runTask task = do
     Decorate algebra term -> logMessage (Info "Decorate") *> pure (decoratorWithAlgebra algebra term)
     Diff differ terms -> logMessage (Info "Diff") *> pure (differ terms)
     Render renderer input -> logMessage (Info "Render") *> pure (renderer input)
-    Distribute tasks -> logMessage (Info "Distribute") *> (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
+    Distribute tasks -> logMessage (Info "Distribute") *> Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq)
     LiftIO action -> action)
     task
   atomically (closeTMQueue logQueue)
