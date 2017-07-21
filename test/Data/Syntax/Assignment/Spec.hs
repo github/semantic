@@ -176,7 +176,7 @@ spec = do
       fst <$> runAssignment "12" headF
         (symbol Red *> children (many (symbol Green *> children (symbol Blue *> source))))
         (makeState [ node Red 0 2 [ node Green 0 1 [ node Blue 0 1 [] ]
-                   , node Green 1 2 [ node Blue 1 2 [] ] ] ])
+                                  , node Green 1 2 [ node Blue 1 2 [] ] ] ])
       `shouldBe`
         Right ["1", "2"]
 
