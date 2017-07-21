@@ -161,7 +161,7 @@ runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
   logQueue <- newTMQueueIO
-  logging <- async (sink options logQueue)
+  logging <- async (logSink options logQueue)
 
   result <- runFreerM (\ task -> case task of
     ReadBlobs source -> pure <$ writeLog (Info "ReadBlobs") <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
@@ -178,12 +178,12 @@ runTaskWithOptions options task = do
   atomically (closeTMQueue logQueue)
   wait logging
   pure result
-  where sink options queue = do
+  where logSink options queue = do
           message <- atomically (readTMQueue queue)
           case message of
             Just message -> do
               B.hPutStr stderr (formatMessage message)
-              sink options queue
+              logSink options queue
             _ -> pure ()
 
 runParser :: Options -> Parser term -> Blob -> Task term
