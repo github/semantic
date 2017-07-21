@@ -74,6 +74,7 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
+   , Syntax.Program
    , Type.Annotation
    , []
    ]
@@ -97,7 +98,9 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Module <*> children (many declaration) <|> parseError
+assignment =
+      makeTerm <$> symbol Module <*> children (Syntax.Program <$> many declaration)
+  <|> parseError
 
 declaration :: Assignment
 declaration = classDefinition
