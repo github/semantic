@@ -1,3 +1,6 @@
 {b: 2}
 {}
-{bar: d, foo: e}
+a = {
+# a comment can go here
+bar: d, foo: e
+}
