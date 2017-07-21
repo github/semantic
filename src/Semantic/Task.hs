@@ -127,7 +127,7 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 runTask :: Task a -> IO a
 runTask task = do
   logQueue <- newTMQueueIO
-  logging <- async (writeThread logQueue)
+  logging <- async (sink logQueue)
 
   result <- runFreerM (\ task -> case task of
     ReadBlobs source -> pure <$ writeLog (Info "ReadBlobs") <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
@@ -144,12 +144,12 @@ runTask task = do
   atomically (closeTMQueue logQueue)
   wait logging
   pure result
-  where writeThread queue = do
+  where sink queue = do
           message <- atomically (readTMQueue queue)
           case message of
             Just message -> do
               B.hPutStr stderr (formatMessage message)
-              writeThread queue
+              sink queue
             _ -> pure ()
 
 
