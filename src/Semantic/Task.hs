@@ -70,12 +70,12 @@ data Message
   | Debug { messageContent :: String }
   deriving (Eq, Show)
 
--- | Format a 'Message'.
-formatMessage :: Message -> String
-formatMessage (Error s) = "error: " <> s <> "\n"
-formatMessage (Warning s) = "warning: " <> s <> "\n"
-formatMessage (Info s) = "info: " <> s <> "\n"
-formatMessage (Debug s) = "debug: " <> s <> "\n"
+-- | Format a 'Message', optionally colourized.
+formatMessage :: Bool -> Message -> String
+formatMessage _ (Error s) = "error: " <> s <> "\n"
+formatMessage _ (Warning s) = "warning: " <> s <> "\n"
+formatMessage _ (Info s) = "info: " <> s <> "\n"
+formatMessage _ (Debug s) = "debug: " <> s <> "\n"
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ f a = Both (Term f a) -> Diff f a
@@ -184,7 +184,7 @@ runTaskWithOptions options task = do
           message <- atomically (readTMQueue queue)
           case message of
             Just message -> do
-              hPutStr stderr (formatMessage message)
+              hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) message)
               logSink options queue
             _ -> pure ()
 
