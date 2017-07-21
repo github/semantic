@@ -76,8 +76,12 @@ module Data.Syntax.Assignment
 -- Results
 , Error(..)
 , ErrorCause(..)
+, Options(..)
+, defaultOptions
+, optionsForHandle
 , printError
-, withSGRCode
+, formatError
+, formatErrorWithOptions
 -- Running
 , assign
 , assignBy
@@ -89,7 +93,7 @@ module Data.Syntax.Assignment
 
 import Control.Monad.Free.Freer
 import Data.Blob
-import Data.ByteString (isSuffixOf)
+import Data.ByteString (isSuffixOf, hPutStr)
 import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
@@ -103,7 +107,7 @@ import Prologue hiding (Alt, get, Location, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
-import System.IO (hIsTerminalDevice, hPutStr)
+import System.IO (hIsTerminalDevice)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -187,29 +191,56 @@ data ErrorCause grammar
   | UnexpectedEndOfInput [grammar]
   deriving (Eq, Show)
 
--- | Pretty-print an Error with reference to the source where it occurred.
+-- | Options for printing errors.
+data Options = Options
+  { optionsColour :: Bool -- ^ Whether to use colour formatting.
+  }
+
+defaultOptions :: Options
+defaultOptions = Options
+  { optionsColour = True
+  }
+
+optionsForHandle :: Handle -> IO Options
+optionsForHandle handle = do
+  isTerminal <- hIsTerminalDevice handle
+  pure $ Options
+    { optionsColour = isTerminal
+    }
+
+-- | Pretty-print an 'Error' to stdout with reference to the source where it occurred.
 printError :: Show grammar => Blob -> Error grammar -> IO ()
-printError Blob{..} error@Error{..} = do
-  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": "
-  withSGRCode [SetColor Foreground Vivid Red] . putStrErr $ showString "error" . showString ": " . showExpectation error . showChar '\n'
-  putStrErr $ showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ')
-  withSGRCode [SetColor Foreground Vivid Green] . putStrErr $ showChar '^' . showChar '\n'
-  putStrErr $ showString (prettyCallStack callStack) . showChar '\n'
+printError blob error = do
+  options <- optionsForHandle stderr
+  hPutStr stderr $ formatErrorWithOptions options blob error
+
+-- | Format an 'Error' with reference to the source where it occurred.
+--
+-- > formatError = formatErrorWithOptions defaultOptions
+formatError :: Show grammar => Blob -> Error grammar -> ByteString
+formatError = formatErrorWithOptions defaultOptions
+
+-- | Format an 'Error' with reference
+formatErrorWithOptions :: Show grammar => Options -> Blob -> Error grammar -> ByteString
+formatErrorWithOptions options Blob{..} error@Error{..}
+  = toS . ($ "")
+  $ withSGRCode options [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
+  . withSGRCode options [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation error . showChar '\n')
+  . showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ')
+  . withSGRCode options [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
+  . showString (prettyCallStack callStack) . showChar '\n'
   where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
-        putStrErr = hPutStr stderr . ($ "")
 
-withSGRCode :: [SGR] -> IO a -> IO ()
-withSGRCode code action = do
-  isTerm <- hIsTerminalDevice stderr
-  if isTerm then do
-    _ <- hSetSGR stderr code
-    _ <- action
-    hSetSGR stderr []
-  else do
-    _ <- action
-    pure ()
+withSGRCode :: Options -> [SGR] -> ShowS -> ShowS
+withSGRCode Options{..} code content =
+  if optionsColour then
+    showString (setSGRCode code)
+    . content
+    . showString (setSGRCode [])
+  else
+    content
 
 showExpectation :: Show grammar => Error grammar -> ShowS
 showExpectation Error{..} = case errorCause of
