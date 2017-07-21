@@ -224,22 +224,22 @@ formatError = formatErrorWithOptions defaultOptions
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
 formatErrorWithOptions :: Show grammar => Options -> Blob -> Error grammar -> ByteString
-formatErrorWithOptions options Blob{..} error@Error{..}
+formatErrorWithOptions Options{..} Blob{..} error@Error{..}
   = toS . ($ "")
-  $ withSGRCode options [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
-  . withSGRCode options [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation error . showChar '\n')
-  . (if optionsIncludeSource options
+  $ withSGRCode optionsColour [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
+  . withSGRCode optionsColour [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation error . showChar '\n')
+  . (if optionsIncludeSource
     then showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
-       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode options [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
+       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode optionsColour [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else identity)
   . showString (prettyCallStack callStack) . showChar '\n'
   where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
 
-withSGRCode :: Options -> [SGR] -> ShowS -> ShowS
-withSGRCode Options{..} code content =
-  if optionsColour then
+withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
+withSGRCode useColour code content =
+  if useColour then
     showString (setSGRCode code)
     . content
     . showString (setSGRCode [])
