@@ -347,7 +347,9 @@ rvalue :: Assignment
 rvalue  = expressionList <|> assignment' <|> yield
 
 identifier :: Assignment
-identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
+identifier =
+      makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
+  <|> makeTerm <$> symbol KeywordIdentifier <*> (Syntax.Identifier <$> source)
 
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
