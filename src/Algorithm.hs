@@ -94,10 +94,6 @@ class Diffable f where
   default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
   algorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
 
--- | Diff two list parameters using RWS.
-instance Diffable [] where
-  algorithmFor a b = Just (byRWS a b)
-
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
 -- Right is the "head" of the Union. `weaken` relaxes the Union to allow the possible
 -- diff terms from the "rest" of the Union, and `inj` adds the diff terms into the Union.
@@ -110,6 +106,10 @@ instance (Diffable f, Diffable (Union fs)) => Diffable (Union (f ': fs)) where
 
 -- | Diffing an empty Union is technically impossible because Union is a strictly
 -- non-empty Set-like value. This instance is included for completeness.
+-- | Diff two list parameters using RWS.
+instance Diffable [] where
+  algorithmFor a b = Just (byRWS a b)
+
 instance Diffable (Union '[]) where
   algorithmFor _ _ = Nothing
 
