@@ -128,6 +128,7 @@ expression =
   <|> subscript
   <|> tuple
   <|> type'
+  <|> yield
   <|> unaryOperator
   <|> functionDefinition
   <|> assertStatement
@@ -325,12 +326,11 @@ assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment
               <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift lvalue    <$> rvalue)
               <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift lvalue    <$> rvalue)
               <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr lvalue      <$> rvalue)))
+  where
+    rvalue = expressionList <|> assignment' <|> yield
 
 yield :: Assignment
-yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> expressionList <|> emptyTerm ))
-
-rvalue :: Assignment
-rvalue  = expressionList <|> assignment' <|> yield
+yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> emptyTerm ))
 
 identifier :: Assignment
 identifier =
@@ -457,6 +457,7 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
+
 
 makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree (a :< inj f)
