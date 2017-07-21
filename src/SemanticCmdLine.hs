@@ -74,5 +74,5 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
         _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
 
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
-    options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options))
+    options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
     findOption options value = maybe "" fst (find ((== value) . snd) options)
