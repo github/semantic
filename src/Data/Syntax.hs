@@ -33,6 +33,12 @@ newtype Identifier a = Identifier ByteString
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
+newtype Program a = Program [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Program where liftEq = genericLiftEq
+instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+
 
 -- | Empty syntax, with essentially no-op semantics.
 --

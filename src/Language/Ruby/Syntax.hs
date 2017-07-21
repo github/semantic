@@ -67,6 +67,7 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
+  , Syntax.Program
   , []
   ]
 
@@ -76,7 +77,9 @@ type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Te
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Program <*> children (many expression) <|> parseError
+assignment =
+      makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
+  <|> parseError
 
 expression :: Assignment
 expression =
