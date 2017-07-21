@@ -82,6 +82,7 @@ module Data.Syntax.Assignment
 , printError
 , formatError
 , formatErrorWithOptions
+, withSGRCode
 -- Running
 , assign
 , assignBy
