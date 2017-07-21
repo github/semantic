@@ -203,9 +203,12 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
     decorator' = Declaration.Decorator <$> expression <*> ((symbol ArgumentList *> children (many expression <|> many emptyTerm)) <|> many emptyTerm)
 
 withStatement :: Assignment
-withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> withItem <*> expressions)
+withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with)
   where
-    withItem = symbol WithItem *> children ((,) <$> expression <*> expression)
+    mk _ [child] = child
+    mk l children = makeTerm l children
+    with = makeTerm <$> location <*> (uncurry Statement.Let . swap <$> withItem <*> expressions)
+    withItem = symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm))
 
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
