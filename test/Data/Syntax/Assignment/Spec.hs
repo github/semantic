@@ -84,50 +84,50 @@ spec = do
     describe "in many" $ do
       it "handler that always matches" $
         fst <$> runAssignment headF
-          (symbol Palatte *> children (
+          (symbol Palette *> children (
             many (red `catchError` (\ _ -> OutError <$ location <*> source))
           ))
-          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Right [OutError "G"]
 
       it "handler that matches" $
         fst <$> runAssignment headF
-          (symbol Palatte *> children ( many (red `catchError` const green) ))
-          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          (symbol Palette *> children ( many (red `catchError` const green) ))
+          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Right [Out "G"]
 
       it "handler that doesn't match produces error" $
         runAssignment headF
-          (symbol Palatte *> children ( many (red `catchError` const blue) ))
-          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          (symbol Palette *> children ( many (red `catchError` const blue) ))
+          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Left (Error (Info.Pos 1 2) (UnexpectedSymbol [Blue] Green))
 
       it "handler that always matches with apply consumes and then errors" $
         runAssignment headF
-          (symbol Palatte *> children (
+          (symbol Palette *> children (
             (,) <$> many (red `catchError` (\ _ -> OutError <$ location <*> source)) <*> green
           ))
-          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Left (Error (Info.Pos 1 3) (UnexpectedEndOfInput [Green]))
 
       it "handler that doesn't match with apply" $
         fst <$> runAssignment headF
-          (symbol Palatte *> children (
+          (symbol Palette *> children (
             (,) <$> many (red `catchError` const blue) <*> green
           ))
-          (makeState "PG" [node Palatte 0 1 [node Green 1 2 []]])
+          (makeState "PG" [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Right ([], Out "G")
 
   describe "many" $ do
     it "takes ones and only one zero width repetition" $
       fst <$> runAssignment headF
-        (symbol Palatte *> children ( many (green <|> pure (Out "always")) ))
-        (makeState "PGG" [node Palatte 0 1 [node Green 1 2 [], node Green 2 3 []]])
+        (symbol Palette *> children ( many (green <|> pure (Out "always")) ))
+        (makeState "PGG" [node Palette 0 1 [node Green 1 2 [], node Green 2 3 []]])
         `shouldBe`
           Right [Out "G", Out "G", Out "always"]
 
@@ -191,7 +191,7 @@ spec = do
 node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = cofree $ Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
 
-data Grammar = Palatte | Red | Green | Blue | Magenta
+data Grammar = Palette | Red | Green | Blue | Magenta
   deriving (Enum, Eq, Show)
 
 instance Symbol Grammar where
