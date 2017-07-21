@@ -50,6 +50,8 @@ library
                      , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Syntax
+                     , Language.JSON.Grammar
+                     , Language.JSON.Syntax
                      , Language.Ruby
                      , Language.Ruby.Grammar
                      , Language.Ruby.Syntax
@@ -117,6 +119,7 @@ library
                      , ruby
                      , typescript
                      , python
+                     , json
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
