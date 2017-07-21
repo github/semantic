@@ -1,8 +1,8 @@
 {-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
 module Semantic.Task
 ( Task
+, Level(..)
 , RAlgebra
-, Message(..)
 , Differ
 , readBlobs
 , readBlobPairs
@@ -53,7 +53,7 @@ data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
   WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
-  WriteLog :: Message -> TaskF ()
+  WriteLog :: Level -> String -> TaskF ()
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
@@ -65,20 +65,20 @@ data TaskF output where
 type Task = Freer TaskF
 
 -- | A log message at a specific level.
-data Message
-  = Error { messageContent :: String }
-  | Warning { messageContent :: String }
-  | Info { messageContent :: String }
-  | Debug { messageContent :: String }
-  deriving (Eq, Show)
+data Level
+  = Error
+  | Warning
+  | Info
+  | Debug
+  deriving (Eq, Ord, Show)
 
 -- | Format a 'Message', optionally colourized.
-formatMessage :: Bool -> Message -> String
-formatMessage colourize m = showLabel m . showString ": " . showString (messageContent m) . showChar '\n' $ ""
-  where showLabel Error{} = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
-        showLabel Warning{} = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
-        showLabel Info{} = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
-        showLabel Debug{} = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
+formatMessage :: Bool -> Level -> String -> String
+formatMessage colourize level message = showLabel level . showString ": " . showString message . showChar '\n' $ ""
+  where showLabel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
+        showLabel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
+        showLabel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
+        showLabel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
 
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
@@ -101,8 +101,8 @@ writeToOutput path contents = WriteToOutput path contents `Then` return
 
 
 -- | A 'Task' which logs a message at a specific log level to stderr.
-writeLog :: Message -> Task ()
-writeLog message = WriteLog message `Then` return
+writeLog :: Level -> String -> Task ()
+writeLog level message = WriteLog level message `Then` return
 
 
 -- | A 'Task' which parses a 'Blob' with the given 'Parser'.
@@ -170,15 +170,15 @@ runTaskWithOptions options task = do
   logging <- async (logSink options logQueue)
 
   result <- runFreerM (\ task -> case task of
-    ReadBlobs source -> pure <$ writeLog (Info "ReadBlobs") <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
-    ReadBlobPairs source -> pure <$ writeLog (Info "ReadBlobPairs") <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
-    WriteToOutput destination contents -> pure <$ writeLog (Info "WriteToOutput") <*> liftIO (either B.hPutStr B.writeFile destination contents)
-    WriteLog message -> pure <$> liftIO (atomically (writeTMQueue logQueue message))
-    Parse parser blob -> pure <$ writeLog (Info "Parse") <*> runParser options parser blob
-    Decorate algebra term -> pure <$ writeLog (Info "Decorate") <*> pure (decoratorWithAlgebra algebra term)
-    Diff differ terms -> pure <$ writeLog (Info "Diff") <*> pure (differ terms)
-    Render renderer input -> pure <$ writeLog (Info "Render") <*> pure (renderer input)
-    Distribute tasks -> pure <$ writeLog (Info "Distribute") <*> liftIO (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
+    ReadBlobs source -> pure <$ writeLog Info "ReadBlobs" <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
+    ReadBlobPairs source -> pure <$ writeLog Info "ReadBlobPairs" <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
+    WriteToOutput destination contents -> pure <$ writeLog Info "WriteToOutput" <*> liftIO (either B.hPutStr B.writeFile destination contents)
+    WriteLog level message -> pure <$> liftIO (atomically (writeTMQueue logQueue (level, message)))
+    Parse parser blob -> pure <$ writeLog Info "Parse" <*> runParser options parser blob
+    Decorate algebra term -> pure <$ writeLog Info "Decorate" <*> pure (decoratorWithAlgebra algebra term)
+    Diff differ terms -> pure <$ writeLog Info "Diff" <*> pure (differ terms)
+    Render renderer input -> pure <$ writeLog Info "Render" <*> pure (renderer input)
+    Distribute tasks -> pure <$ writeLog Info "Distribute" <*> liftIO (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
     LiftIO action -> pure action)
     task
   atomically (closeTMQueue logQueue)
@@ -187,8 +187,8 @@ runTaskWithOptions options task = do
   where logSink options queue = do
           message <- atomically (readTMQueue queue)
           case message of
-            Just message -> do
-              hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) message)
+            Just (level, message) -> do
+              hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) level message)
               logSink options queue
             _ -> pure ()
 
@@ -202,7 +202,7 @@ runParser options parser blob@Blob{..} = case parser of
         let formatOptions = Assignment.defaultOptions
               { Assignment.optionsColour = fromMaybe True (optionsColour options)
               }
-        writeLog (Warning (Assignment.formatErrorWithOptions formatOptions blob err))
+        writeLog Warning (Assignment.formatErrorWithOptions formatOptions blob err)
         pure (errorTerm blobSource)
       Right term -> pure term
   TreeSitterParser language tslanguage -> liftIO $ treeSitterParser language tslanguage blobSource
