@@ -132,7 +132,7 @@ runTask task = do
   result <- runFreerM (\ task -> case task of
     ReadBlobs source -> pure <$ writeLog (Info "ReadBlobs") <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
     ReadBlobPairs source -> pure <$ writeLog (Info "ReadBlobPairs") <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
-    WriteToOutput destination contents -> writeLog (Info "WriteToOutput") *> (pure <$> liftIO (either B.hPutStr B.writeFile destination contents))
+    WriteToOutput destination contents -> pure <$ writeLog (Info "WriteToOutput") <*> liftIO (either B.hPutStr B.writeFile destination contents)
     WriteLog message -> pure <$> liftIO (atomically (writeTMQueue logQueue message))
     Parse parser blob -> pure <$ writeLog (Info "Parse") <*> liftIO (runParser parser blob)
     Decorate algebra term -> pure <$ writeLog (Info "Decorate") <*> pure (decoratorWithAlgebra algebra term)
