@@ -175,6 +175,11 @@ expressionStatement = mk <$> symbol ExpressionStatement <*> children (some expre
   where mk _ [child] = child
         mk location children = makeTerm location children
 
+expressionList :: Assignment
+expressionList = mk <$> symbol ExpressionList <*> children (some expression)
+  where mk _ [child] = child
+        mk location children = makeTerm location children
+
 argument :: Assignment
 argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
         <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
@@ -276,10 +281,6 @@ keyword =  makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier
 
 tuple :: Assignment
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> many expression)
-
--- TODO: Consider flattening single element lists
-expressionList :: Assignment
-expressionList = makeTerm <$> symbol ExpressionList <*> children (many expression)
 
 unaryOperator :: Assignment
 unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> bitwise location <|> children ( symbol AnonPlus *> expression )
