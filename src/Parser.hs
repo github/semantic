@@ -1,9 +1,9 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Parser
-( Parser
-, runParser
+( Parser(..)
 -- Syntax parsers
 , parserForLanguage
+, lineByLineParser
 -- À la carte parsers
 , jsonParser
 , markdownParser
@@ -12,7 +12,6 @@ module Parser
 ) where
 
 import qualified CMark
-import Data.Blob
 import Data.Functor.Foldable hiding (fold, Nil)
 import Data.Record
 import Data.Source as Source
@@ -37,7 +36,6 @@ import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Ruby
 import Text.Parser.TreeSitter.TypeScript
 import Text.Parser.TreeSitter.JSON
-import TreeSitter
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
@@ -80,22 +78,6 @@ jsonParser = AssignmentParser (ASTParser tree_sitter_json) headF JSON.assignment
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser (\ (node@Node{..} :< _) -> node { nodeSymbol = toGrammar nodeSymbol }) Markdown.assignment
 
-runParser :: Parser term -> Blob -> IO term
-runParser parser blob@Blob{..} = case parser of
-  ASTParser language -> parseToAST language blobSource
-  AssignmentParser parser by assignment -> do
-    ast <- runParser parser blob
-    case assignBy by assignment blobSource ast of
-      Left err -> do
-        printError blob err
-        pure (errorTerm blobSource)
-      Right term -> pure term
-  TreeSitterParser language tslanguage -> treeSitterParser language tslanguage blobSource
-  MarkdownParser -> pure (cmarkParser blobSource)
-  LineByLineParser -> pure (lineByLineParser blobSource)
-
-errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Location)
-errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> SyntaxTerm Text DefaultFields

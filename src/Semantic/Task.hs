@@ -27,13 +27,19 @@ import Data.Blob
 import qualified Data.ByteString as B
 import Data.Functor.Both as Both
 import Data.Record
+import Data.Source
+import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
+import Data.Syntax.Assignment hiding (Error)
+import Data.Union
 import Diff
 import qualified Files
 import Language
+import Language.Markdown
 import Parser
-import Prologue
+import Prologue hiding (Location)
 import Term
+import TreeSitter
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
@@ -134,7 +140,7 @@ runTask task = do
     ReadBlobPairs source -> pure <$ writeLog (Info "ReadBlobPairs") <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
     WriteToOutput destination contents -> pure <$ writeLog (Info "WriteToOutput") <*> liftIO (either B.hPutStr B.writeFile destination contents)
     WriteLog message -> pure <$> liftIO (atomically (writeTMQueue logQueue message))
-    Parse parser blob -> pure <$ writeLog (Info "Parse") <*> liftIO (runParser parser blob)
+    Parse parser blob -> pure <$ writeLog (Info "Parse") <*> runParser parser blob
     Decorate algebra term -> pure <$ writeLog (Info "Decorate") <*> pure (decoratorWithAlgebra algebra term)
     Diff differ terms -> pure <$ writeLog (Info "Diff") <*> pure (differ terms)
     Render renderer input -> pure <$ writeLog (Info "Render") <*> pure (renderer input)
@@ -151,6 +157,24 @@ runTask task = do
               B.hPutStr stderr (formatMessage message)
               sink queue
             _ -> pure ()
+
+runParser :: Parser term -> Blob -> Task term
+runParser parser blob@Blob{..} = case parser of
+  ASTParser language -> liftIO $ parseToAST language blobSource
+  AssignmentParser parser by assignment -> do
+    ast <- runParser parser blob
+    case assignBy by assignment blobSource ast of
+      Left err -> do
+        options <- liftIO $ optionsForHandle stderr
+        writeLog (Warning (formatErrorWithOptions options blob err))
+        pure (errorTerm blobSource)
+      Right term -> pure term
+  TreeSitterParser language tslanguage -> liftIO $ treeSitterParser language tslanguage blobSource
+  MarkdownParser -> pure (cmarkParser blobSource)
+  LineByLineParser -> pure (lineByLineParser blobSource)
+
+errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Location)
+errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
 
 
 instance MonadIO Task where
