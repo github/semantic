@@ -19,6 +19,7 @@ module Semantic.Task
 ) where
 
 import Control.Concurrent.STM.TMQueue
+import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
@@ -44,6 +45,7 @@ data TaskF output where
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
+  LiftIO :: IO a -> TaskF a
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Freer TaskF
@@ -136,7 +138,8 @@ runTask task = do
     Decorate algebra term -> writeLog (Info "Decorate") *> pure (pure (decoratorWithAlgebra algebra term))
     Diff differ terms -> writeLog (Info "Diff") *> pure (pure (differ terms))
     Render renderer input -> writeLog (Info "Render") *> pure (pure (renderer input))
-    Distribute tasks -> writeLog (Info "Distribute") *> pure (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq)))
+    Distribute tasks -> writeLog (Info "Distribute") *> pure (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
+    LiftIO action -> pure action)
     task
   atomically (closeTMQueue logQueue)
   wait logging
@@ -148,3 +151,7 @@ runTask task = do
               B.hPutStr stderr (formatMessage message)
               writeThread queue
             _ -> pure ()
+
+
+instance MonadIO Task where
+  liftIO action = LiftIO action `Then` return
