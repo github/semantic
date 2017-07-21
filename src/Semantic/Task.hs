@@ -152,7 +152,7 @@ defaultOptions = Options
 configureOptionsForHandle :: Handle -> Options -> IO Options
 configureOptionsForHandle handle options = do
   isTerminal <- hIsTerminalDevice handle
-  pure $ Options
+  pure $ options
     { optionsColour = optionsColour options <|> Just isTerminal
     }
 
