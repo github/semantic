@@ -43,8 +43,10 @@ import Language
 import Language.Markdown
 import Parser
 import Prologue hiding (Location)
+import System.Console.ANSI
 import System.IO (hIsTerminalDevice, hPutStr)
 import Term
+import Text.Show
 import TreeSitter
 
 data TaskF output where
@@ -72,10 +74,12 @@ data Message
 
 -- | Format a 'Message', optionally colourized.
 formatMessage :: Bool -> Message -> String
-formatMessage _ (Error s) = "error: " <> s <> "\n"
-formatMessage _ (Warning s) = "warning: " <> s <> "\n"
-formatMessage _ (Info s) = "info: " <> s <> "\n"
-formatMessage _ (Debug s) = "debug: " <> s <> "\n"
+formatMessage colourize m = showLabel m . showString ": " . showString (messageContent m) . showChar '\n' $ ""
+  where showLabel Error{} = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
+        showLabel Warning{} = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
+        showLabel Info{} = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
+        showLabel Debug{} = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
+
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ f a = Both (Term f a) -> Diff f a
