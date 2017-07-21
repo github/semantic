@@ -15,7 +15,11 @@ module Semantic.Task
 , distribute
 , distributeFor
 , distributeFoldMap
+, Options(..)
+, defaultOptions
+, configureOptionsForHandle
 , runTask
+, runTaskOptions
 ) where
 
 import Control.Concurrent.STM.TMQueue
@@ -30,7 +34,7 @@ import Data.Record
 import Data.Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
-import Data.Syntax.Assignment hiding (Error)
+import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
 import Diff
 import qualified Files
@@ -38,6 +42,7 @@ import Language
 import Language.Markdown
 import Parser
 import Prologue hiding (Location)
+import System.IO (hIsTerminalDevice)
 import Term
 import TreeSitter
 
@@ -128,10 +133,33 @@ distributeFor inputs toTask = distribute (fmap toTask inputs)
 distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
+-- | Options controlling 'Task' logging, error handling, &c.
+data Options = Options
+  { optionsColour :: Maybe Bool -- ^ Whether to use colour formatting for errors. 'Nothing' implies automatic selection for the stderr handle, using colour for terminal handles but not for regular files.
+  }
 
--- | Execute a 'Task', yielding its result value in 'IO'.
+defaultOptions :: Options
+defaultOptions = Options
+  { optionsColour = Nothing
+  }
+
+configureOptionsForHandle :: Handle -> Options -> IO Options
+configureOptionsForHandle handle options = do
+  isTerminal <- hIsTerminalDevice handle
+  pure $ Options
+    { optionsColour = optionsColour options <|> Just isTerminal
+    }
+
+-- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
+--
+-- > runTask = runTaskOptions defaultOptions
 runTask :: Task a -> IO a
-runTask task = do
+runTask = runTaskOptions defaultOptions
+
+-- | Execute a 'Task' with the passed 'Options', yielding its result value in 'IO'.
+runTaskOptions :: Options -> Task a -> IO a
+runTaskOptions options task = do
+  options <- configureOptionsForHandle stderr options
   logQueue <- newTMQueueIO
   logging <- async (sink logQueue)
 
@@ -140,7 +168,7 @@ runTask task = do
     ReadBlobPairs source -> pure <$ writeLog (Info "ReadBlobPairs") <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
     WriteToOutput destination contents -> pure <$ writeLog (Info "WriteToOutput") <*> liftIO (either B.hPutStr B.writeFile destination contents)
     WriteLog message -> pure <$> liftIO (atomically (writeTMQueue logQueue message))
-    Parse parser blob -> pure <$ writeLog (Info "Parse") <*> runParser parser blob
+    Parse parser blob -> pure <$ writeLog (Info "Parse") <*> runParser options parser blob
     Decorate algebra term -> pure <$ writeLog (Info "Decorate") <*> pure (decoratorWithAlgebra algebra term)
     Diff differ terms -> pure <$ writeLog (Info "Diff") <*> pure (differ terms)
     Render renderer input -> pure <$ writeLog (Info "Render") <*> pure (renderer input)
@@ -158,22 +186,24 @@ runTask task = do
               sink queue
             _ -> pure ()
 
-runParser :: Parser term -> Blob -> Task term
-runParser parser blob@Blob{..} = case parser of
+runParser :: Options -> Parser term -> Blob -> Task term
+runParser options parser blob@Blob{..} = case parser of
   ASTParser language -> liftIO $ parseToAST language blobSource
   AssignmentParser parser by assignment -> do
-    ast <- runParser parser blob
-    case assignBy by assignment blobSource ast of
+    ast <- runParser options parser blob
+    case Assignment.assignBy by assignment blobSource ast of
       Left err -> do
-        options <- liftIO $ optionsForHandle stderr
-        writeLog (Warning (formatErrorWithOptions options blob err))
+        let formatOptions = Assignment.defaultOptions
+              { Assignment.optionsColour = fromMaybe True (optionsColour options)
+              }
+        writeLog (Warning (Assignment.formatErrorWithOptions formatOptions blob err))
         pure (errorTerm blobSource)
       Right term -> pure term
   TreeSitterParser language tslanguage -> liftIO $ treeSitterParser language tslanguage blobSource
   MarkdownParser -> pure (cmarkParser blobSource)
   LineByLineParser -> pure (lineByLineParser blobSource)
 
-errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Location)
+errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Assignment.Location)
 errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
 
 
