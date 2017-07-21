@@ -193,7 +193,7 @@ data ErrorCause grammar
 
 -- | Options for printing errors.
 data Options = Options
-  { optionsColour :: Bool -- ^ Whether to use colour formatting.
+  { optionsColour :: Bool -- ^ Whether to use colour formatting codes suitable for a terminal device.
   }
 
 defaultOptions :: Options
