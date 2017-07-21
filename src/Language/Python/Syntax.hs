@@ -203,14 +203,16 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
     decorator' = Declaration.Decorator <$> expression <*> ((symbol ArgumentList *> children (many expression <|> many emptyTerm)) <|> many emptyTerm)
 
 withStatement :: Assignment
-withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> (symbol WithItem *> children ((,) <$> expression <*> expression)) <*> expression)
+withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> withItem <*> expressions)
+  where
+    withItem = symbol WithItem *> children ((,) <$> expression <*> expression)
 
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
   where
-    make loc variables expressionList forBody forElseClause = case forElseClause of
-      Nothing -> makeTerm loc (Statement.ForEach variables expressionList forBody)
-      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList forBody) a)
+    make loc binding subject body forElseClause = case forElseClause of
+      Nothing -> makeTerm loc (Statement.ForEach binding subject body)
+      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach binding subject body) a)
 
 whileStatement :: Assignment
 whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
