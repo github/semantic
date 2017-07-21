@@ -2,6 +2,7 @@
 module Semantic.Task
 ( Task
 , RAlgebra
+, Message(..)
 , Differ
 , readBlobs
 , readBlobPairs
@@ -43,6 +44,13 @@ data TaskF output where
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Freer TaskF
+
+-- | A log message at a specific level.
+data Message
+  = Error ByteString
+  | Warning ByteString
+  | Debug ByteString
+  deriving (Eq, Show)
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ f a = Both (Term f a) -> Diff f a
