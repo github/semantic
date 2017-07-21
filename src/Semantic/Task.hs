@@ -130,15 +130,15 @@ runTask task = do
   logging <- async (writeThread logQueue)
 
   result <- runFreerM (\ task -> case task of
-    ReadBlobs source -> writeLog (Info "ReadBlobs") *> pure (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source)
-    ReadBlobPairs source -> writeLog (Info "ReadBlobPairs") *> pure (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source)
-    WriteToOutput destination contents -> writeLog (Info "WriteToOutput") *> pure (either B.hPutStr B.writeFile destination contents)
-    WriteLog message -> pure (atomically (writeTMQueue logQueue message))
-    Parse parser blob -> writeLog (Info "Parse") *> pure (runParser parser blob)
-    Decorate algebra term -> writeLog (Info "Decorate") *> pure (pure (decoratorWithAlgebra algebra term))
-    Diff differ terms -> writeLog (Info "Diff") *> pure (pure (differ terms))
-    Render renderer input -> writeLog (Info "Render") *> pure (pure (renderer input))
-    Distribute tasks -> writeLog (Info "Distribute") *> pure (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
+    ReadBlobs source -> pure <$ writeLog (Info "ReadBlobs") <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
+    ReadBlobPairs source -> pure <$ writeLog (Info "ReadBlobPairs") <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
+    WriteToOutput destination contents -> writeLog (Info "WriteToOutput") *> (pure <$> liftIO (either B.hPutStr B.writeFile destination contents))
+    WriteLog message -> pure <$> liftIO (atomically (writeTMQueue logQueue message))
+    Parse parser blob -> pure <$ writeLog (Info "Parse") <*> liftIO (runParser parser blob)
+    Decorate algebra term -> pure <$ writeLog (Info "Decorate") <*> pure (decoratorWithAlgebra algebra term)
+    Diff differ terms -> pure <$ writeLog (Info "Diff") <*> pure (differ terms)
+    Render renderer input -> pure <$ writeLog (Info "Render") <*> pure (renderer input)
+    Distribute tasks -> pure <$ writeLog (Info "Distribute") <*> (liftIO (Async.mapConcurrently runTask tasks) >>= pure . withStrategy (parTraversable rseq))
     LiftIO action -> pure action)
     task
   atomically (closeTMQueue logQueue)
