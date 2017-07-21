@@ -333,9 +333,7 @@ yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> emptyTerm ))
 
 identifier :: Assignment
-identifier =
-      makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
-  <|> makeTerm <$> symbol KeywordIdentifier <*> (Syntax.Identifier <$> source)
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
