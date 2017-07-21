@@ -41,6 +41,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     optionsParser = Task.Options
       <$> options [("yes", Just True), ("no", Just False), ("auto", Nothing)] (long "colour" <> long "color" <> value Nothing <> help "Enable (yes)/disable (no) colour output, or enable automatically iff stderr is a terminal device.")
+      <*> pure (Just Task.Warning)
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")

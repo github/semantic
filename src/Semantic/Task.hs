@@ -142,11 +142,13 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 -- | Options controlling 'Task' logging, error handling, &c.
 data Options = Options
   { optionsColour :: Maybe Bool -- ^ Whether to use colour formatting for errors. 'Nothing' implies automatic selection for the stderr handle, using colour for terminal handles but not for regular files.
+  , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
   }
 
 defaultOptions :: Options
 defaultOptions = Options
   { optionsColour = Nothing
+  , optionsLevel = Just Warning
   }
 
 configureOptionsForHandle :: Handle -> Options -> IO Options
@@ -173,7 +175,9 @@ runTaskWithOptions options task = do
     ReadBlobs source -> pure <$ writeLog Info "ReadBlobs" <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
     ReadBlobPairs source -> pure <$ writeLog Info "ReadBlobPairs" <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
     WriteToOutput destination contents -> pure <$ writeLog Info "WriteToOutput" <*> liftIO (either B.hPutStr B.writeFile destination contents)
-    WriteLog level message -> pure <$> liftIO (atomically (writeTMQueue logQueue (level, message)))
+    WriteLog level message
+      | Just logLevel <- optionsLevel options, level <= logLevel -> pure <$> liftIO (atomically (writeTMQueue logQueue (level, message)))
+      | otherwise -> pure (pure ())
     Parse parser blob -> pure <$ writeLog Info "Parse" <*> runParser options parser blob
     Decorate algebra term -> pure <$ writeLog Info "Decorate" <*> pure (decoratorWithAlgebra algebra term)
     Diff differ terms -> pure <$ writeLog Info "Diff" <*> pure (differ terms)
