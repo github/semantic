@@ -127,19 +127,20 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 runTask :: Task a -> IO a
 runTask task = do
   logQueue <- newTMQueueIO
+  let logMessage message = atomically (writeTMQueue logQueue message)
   logging <- async (sink logQueue)
 
-  result <- runFreerM (\ task -> case task of
-    ReadBlobs source -> pure <$ writeLog (Info "ReadBlobs") <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
-    ReadBlobPairs source -> pure <$ writeLog (Info "ReadBlobPairs") <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
-    WriteToOutput destination contents -> writeLog (Info "WriteToOutput") *> (pure <$> liftIO (either B.hPutStr B.writeFile destination contents))
-    WriteLog message -> pure <$> liftIO (atomically (writeTMQueue logQueue message))
-    Parse parser blob -> pure <$ writeLog (Info "Parse") <*> liftIO (runParser parser blob)
-    Decorate algebra term -> pure <$ writeLog (Info "Decorate") <*> pure (decoratorWithAlgebra algebra term)
-    Diff differ terms -> pure <$ writeLog (Info "Diff") <*> pure (differ terms)
-    Render renderer input -> pure <$ writeLog (Info "Render") <*> pure (renderer input)
-    Distribute tasks -> pure <$ writeLog (Info "Distribute") <*> (liftIO (Async.mapConcurrently runTask tasks) >>= pure . withStrategy (parTraversable rseq))
-    LiftIO action -> pure action)
+  result <- foldFreer (\ task -> case task of
+    ReadBlobs source -> logMessage (Info "ReadBlobs") *> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
+    ReadBlobPairs source -> logMessage (Info "ReadBlobPairs") *> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
+    WriteToOutput destination contents -> logMessage (Info "WriteToOutput") *> either B.hPutStr B.writeFile destination contents
+    WriteLog message -> logMessage message
+    Parse parser blob -> logMessage (Info "Parse") *> runParser parser blob
+    Decorate algebra term -> logMessage (Info "Decorate") *> pure (decoratorWithAlgebra algebra term)
+    Diff differ terms -> logMessage (Info "Diff") *> pure (differ terms)
+    Render renderer input -> logMessage (Info "Render") *> pure (renderer input)
+    Distribute tasks -> logMessage (Info "Distribute") *> (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
+    LiftIO action -> action)
     task
   atomically (closeTMQueue logQueue)
   wait logging
