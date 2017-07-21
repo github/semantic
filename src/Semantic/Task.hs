@@ -18,7 +18,6 @@ module Semantic.Task
 , runTask
 ) where
 
-import qualified Files
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
@@ -28,6 +27,7 @@ import Data.Functor.Both as Both
 import Data.Record
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
+import qualified Files
 import Language
 import Parser
 import Prologue
