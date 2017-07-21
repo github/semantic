@@ -40,7 +40,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
     optionsParser = Task.Options
-      <$> options [("yes", Just True), ("no", Just False), ("auto", Nothing)] (long "colour" <> long "color" <> value Nothing <> help "Enable, disable, or decide automatically iff stderr is a terminal device, whether to use colour.")
+      <$> options [("yes", Just True), ("no", Just False), ("auto", Nothing)]
+            (long "colour" <> long "color" <> value Nothing <> help "Enable, disable, or decide automatically iff stderr is a terminal device, whether to use colour.")
       <*> pure (Just Task.Warning)
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
