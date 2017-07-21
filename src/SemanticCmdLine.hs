@@ -7,13 +7,13 @@ module SemanticCmdLine
 ) where
 
 import Files (languageForFilePath)
-import Data.Functor.Both
+import Data.Functor.Both hiding (fst, snd)
 import Data.List.Split (splitWhen)
 import Data.Version (showVersion)
 import Development.GitRev
 import Language
 import Options.Applicative hiding (action)
-import Prologue hiding (concurrently, fst, snd, readFile)
+import Prologue hiding (concurrently, readFile)
 import Renderer
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
@@ -21,7 +21,7 @@ import System.IO (stdin)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
 main :: IO ()
-main = customExecParser (prefs showHelpOnEmpty) arguments >>= Task.runTask
+main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskOptions
 
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.Task ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
@@ -32,13 +32,15 @@ runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRendere
 -- | A parser for the application's command-line arguments.
 --
 --   Returns a 'Task' to read the input, run the requested operation, and write the output to the specified output path or stdout.
-arguments :: ParserInfo (Task.Task ())
-arguments = info (version <*> helper <*> argumentsParser) description
+arguments :: ParserInfo (Task.Options, Task.Task ())
+arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsParser)) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
+    optionsParser = Task.Options
+      <$> (   options [("yes", Just True), ("no", Just False), ("auto", Nothing)] (long "colour" <> long "color" <> value Nothing <> help "Enable/disable colour output, or enable automatically when stderr is a terminal but not for regular files."))
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
@@ -69,3 +71,7 @@ arguments = info (version <*> helper <*> argumentsParser) description
                | Just lang <- readMaybe b -> Right (a, Just lang)
         [path] -> Right (path, languageForFilePath path)
         _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
+
+    optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
+    options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options))
+    findOption options value = maybe "" fst (find ((== value) . snd) options)
