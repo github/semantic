@@ -9,7 +9,7 @@ module Interpreter
 ) where
 
 import Algorithm
-import Control.Monad.Free.Freer
+import Control.Monad.Free.Freer hiding (cutoff)
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.Functor.Classes (Eq1)
