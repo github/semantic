@@ -228,9 +228,9 @@ assignBy toNode source assignment = fmap fst . runAssignment toNode source assig
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
-              => (forall x. Base ast x -> Node grammar)                  -- ^ A function to project a 'Node' from the ast.
-              -> Source.Source                                           -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                                -- ^ The 'Assignment' to run.
+              => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
+              -> Source.Source                                 -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
               -> State ast grammar                             -- ^ The current state.
               -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
 runAssignment toNode source = (requireExhaustive <=<) . go
