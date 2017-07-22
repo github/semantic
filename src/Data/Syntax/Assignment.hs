@@ -254,7 +254,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Throw e -> Left e
           Catch during handler -> either (flip yield state . handler) Right (yield during state)
           _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . projectNode) headNode)
-          where state | all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
+          where state | not (null expectedSymbols), all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
                                 | otherwise = []
