@@ -261,7 +261,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Children childAssignment | node : _ <- stateNodes state -> do
             (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive
             yield a (advanceState state' { stateNodes = stateNodes state })
-          Choose choices | Node symbol _ _ : _ <- toNode . F.project <$> stateNodes state, Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . toNode . F.project =<< listToMaybe (stateNodes state) -> yield choice state
           Many rule -> uncurry yield (runMany rule state)
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
