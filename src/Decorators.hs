@@ -52,7 +52,9 @@ instance ConstructorName f => ConstructorName (M1 D c f) where
   constructorName = constructorName . unM1
 
 instance Constructor c => ConstructorName (M1 C c f) where
-  constructorName = conName
+  constructorName x = case conName x of
+                        ":" -> ""
+                        n -> n
 
 instance (ConstructorName f, ConstructorName g) => ConstructorName (f :+: g) where
   constructorName (L1 l) = constructorName l

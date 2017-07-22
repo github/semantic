@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric #-}
 module Data.Syntax.Literal where
 
+import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
@@ -10,7 +11,7 @@ import Prologue hiding (Set)
 -- Boolean
 
 newtype Boolean a = Boolean Bool
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 true :: Boolean a
 true = Boolean True
@@ -26,7 +27,7 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | A literal integer of unspecified width. No particular base is implied.
 newtype Integer a = Integer { integerContent :: ByteString }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
@@ -37,7 +38,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 
 -- | A literal float of unspecified width.
 newtype Float a = Float { floatContent :: ByteString }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
@@ -45,7 +46,7 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [a] }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 String where liftEq = genericLiftEq
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
@@ -54,7 +55,7 @@ instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 InterpolationElement where liftEq = genericLiftEq
 instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
@@ -62,19 +63,19 @@ instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: ByteString }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 data Null a = Null
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Null where liftEq = genericLiftEq
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
@@ -87,35 +88,35 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 -- Collections
 
 newtype Array a = Array { arrayElements :: [a] }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Array where liftEq = genericLiftEq
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 
 newtype Hash a = Hash { hashElements :: [a] }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Hash where liftEq = genericLiftEq
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 
 newtype Tuple a = Tuple { tupleContents :: [a]}
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 
 newtype Set a = Set { setElements :: [a] }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Set where liftEq = genericLiftEq
 instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
