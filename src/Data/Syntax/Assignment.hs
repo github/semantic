@@ -258,10 +258,10 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           (Location, node : _) -> yield (nodeLocation (toNode (F.project node))) state
           (Location, []) -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
           (Project projection, node : _) -> yield (projection (F.project node)) state
-          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState toNode state)
+          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState state)
           (Children childAssignment, node : _) -> do
             (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive
-            yield a (advanceState toNode state' { stateNodes = stateNodes state })
+            yield a (advanceState state' { stateNodes = stateNodes state })
           (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           (Many rule, _) -> uncurry yield (runMany rule state)
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
@@ -292,15 +292,11 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
 
--- | Advances the state past the current (head) node (if any), dropping it off
--- stateNodes & its corresponding bytes off of source, and updating stateOffset &
--- statePos to its end. Exhausted 'AssignmentState's (those without any
--- remaining nodes) are returned unchanged.
-advanceState :: Recursive ast => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
-advanceState toNode state@AssignmentState{..}
-  | node : rest <- stateNodes
-  , Node{..} <- toNode (F.project node) = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
-  | otherwise = state
+        -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
+        advanceState state@AssignmentState{..}
+          | node : rest <- stateNodes
+          , Node{..} <- toNode (F.project node) = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
+          | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data AssignmentState ast grammar = AssignmentState
