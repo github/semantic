@@ -270,7 +270,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           (Catch during handler, _) -> either (flip yield state . handler) Right (yield during state)
           (_, []) -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           (_, ast:_) -> let Node symbol _ (Info.Span spanStart _) = toNode (F.project ast) in Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
-          where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous toNode initialState
+          where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
                                 | otherwise = []
@@ -285,14 +285,12 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                             | otherwise -> ([a], state')
         {-# INLINE runMany #-}
         requireExhaustive :: forall a. (a, AssignmentState ast grammar) -> Either (Error grammar) (a, AssignmentState ast grammar)
-        requireExhaustive (a, state) = case stateNodes (dropAnonymous toNode state) of
+        requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
           node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- toNode (F.project node) ->
             Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
 
-
-dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
-dropAnonymous toNode state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
+        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off
 -- stateNodes & its corresponding bytes off of source, and updating stateOffset &
