@@ -298,14 +298,14 @@ runAssignment source toNode = go
                   Choose choices -> choiceSymbols choices
                   _ -> []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
-                runMany rule state = case go rule state of
-                  Left err -> ([], state { stateError = Just err })
-                  Right (a, state') | ((/=) `on` stateCounter) state state' ->
-                                        let (as, state'') = runMany rule state'
-                                        in as `seq` (a : as, state'')
-                                    | otherwise -> ([a], state')
         {-# INLINE run #-}
+        runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
+        runMany rule state = case go rule state of
+          Left err -> ([], state { stateError = Just err })
+          Right (a, state') | ((/=) `on` stateCounter) state state' ->
+                                let (as, state'') = runMany rule state'
+                                in as `seq` (a : as, state'')
+                            | otherwise -> ([a], state')
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
 dropAnonymous toNode state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
