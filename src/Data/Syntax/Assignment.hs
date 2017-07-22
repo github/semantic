@@ -242,7 +242,7 @@ runAssignment toNode source = (requireExhaustive <=<) . go
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
-        run assignment yield initialState = maybe (atNodeOrEnd Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
+        run assignment yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state
@@ -251,9 +251,9 @@ runAssignment toNode source = (requireExhaustive <=<) . go
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes state })
                   Choose choices | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
-                  _ -> atNodeOrEnd (Just node)
+                  _ -> anywhere (Just node)
 
-                atNodeOrEnd node = case assignment of
+                anywhere node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Many rule -> uncurry yield (runMany rule state)
                   Alt a b -> yield a state `catchError` (yield b . setStateError state . Just)
