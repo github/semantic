@@ -75,7 +75,6 @@ module Data.Syntax.Assignment
 , while
 -- Results
 , Error(..)
-, ErrorCause(..)
 , printError
 , withSGRCode
 -- Running
@@ -171,32 +170,24 @@ nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 
-data Error grammar where
-  Error
-    :: HasCallStack
-    => { errorPos :: Info.Pos
-       , errorCause :: ErrorCause grammar
-       } -> Error grammar
+data Error grammar
+  = HasCallStack => UnexpectedSymbol { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: grammar }
+  | HasCallStack => UnexpectedEndOfInput { errorPos :: Info.Pos, errorExpected :: [grammar] }
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
 
-data ErrorCause grammar
-  = UnexpectedSymbol [grammar] grammar
-  | UnexpectedEndOfInput [grammar]
-  deriving (Eq, Show)
-
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Blob -> Error grammar -> IO ()
-printError Blob{..} error@Error{..} = do
-  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": "
+printError Blob{..} error = do
+  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos (maybe Nothing (const (Just blobPath)) blobKind) (errorPos error) . showString ": "
   withSGRCode [SetColor Foreground Vivid Red] . putStrErr $ showString "error" . showString ": " . showExpectation error . showChar '\n'
-  putStrErr $ showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ')
+  putStrErr $ showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn (errorPos error) + lineNumberDigits)) ' ')
   withSGRCode [SetColor Foreground Vivid Green] . putStrErr $ showChar '^' . showChar '\n'
   putStrErr $ showString (prettyCallStack callStack) . showChar '\n'
-  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
+  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine (errorPos error) - 2, Info.posLine (errorPos error)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine (errorPos error)) :: Double)))
         putStrErr = hPutStr stderr . ($ "")
 
 withSGRCode :: [SGR] -> IO a -> IO ()
@@ -211,10 +202,9 @@ withSGRCode code action = do
     pure ()
 
 showExpectation :: Show grammar => Error grammar -> ShowS
-showExpectation Error{..} = case errorCause of
-  UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
-  UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
-  UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+showExpectation (UnexpectedEndOfInput _ []) = showString "no rule to match at end of input nodes"
+showExpectation (UnexpectedEndOfInput _ symbols) = showString "expected " . showSymbols symbols . showString " at end of input nodes"
+showExpectation (UnexpectedSymbol _ symbols a) = showString "expected " . showSymbols symbols . showString ", but got " . shows a
 
 showSymbols :: Show grammar => [grammar] -> ShowS
 showSymbols [] = showString "end of input nodes"
@@ -263,8 +253,8 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
           Throw e -> Left e
           Catch during handler -> either (flip yield state . handler) Right (yield during state)
-          _ -> Left (Error (maybe (statePos state) (Info.spanStart . nodeSpan . projectNode) headNode)
-                           (maybe (UnexpectedEndOfInput expectedSymbols) (UnexpectedSymbol expectedSymbols . nodeSymbol . projectNode) headNode))
+          _ -> let pos = maybe (statePos state) (Info.spanStart . nodeSpan . projectNode) headNode in
+              Left (maybe (UnexpectedEndOfInput pos expectedSymbols) (UnexpectedSymbol pos expectedSymbols . nodeSymbol . projectNode) headNode)
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
@@ -287,7 +277,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
           node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- projectNode node ->
-            Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
+            Left $ fromMaybe (UnexpectedSymbol spanStart [] nodeSymbol) (stateError state)
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . projectNode) (stateNodes state) }
 
@@ -345,12 +335,8 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
 
 instance Show1 Error where
-  liftShowsPrec sp sl d (Error p c) = showsBinaryWith showsPrec (liftShowsPrec sp sl) "Error" d p c
-
-instance Show1 ErrorCause where
-  liftShowsPrec sp sl d e = case e of
-    UnexpectedSymbol expected actual -> showsBinaryWith (liftShowsPrec sp sl) sp "UnexpectedSymbol" d expected actual
-    UnexpectedEndOfInput expected -> showsUnaryWith (liftShowsPrec sp sl) "UnexpectedEndOfInput" d expected
+  liftShowsPrec sp sl d UnexpectedSymbol{..} = showParen (d > 10) $ showString "UnexpectedSymbol" . showChar ' ' . showsPrec 11 errorPos . showChar ' ' . liftShowsPrec sp sl 11 errorExpected . showChar ' ' . sp 11 errorActual
+  liftShowsPrec sp sl d UnexpectedEndOfInput{..} = showsBinaryWith showsPrec (liftShowsPrec sp sl) "UnexpectedEndOfInput" d errorPos errorExpected
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a

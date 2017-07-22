@@ -41,7 +41,7 @@ spec = do
       fst <$> runAssignment headF "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
 
     it "does not advance past the current node" $
-      runAssignment headF "hi" (symbol Red) (makeState [ node Red 0 2 [] ]) `shouldBe` Left (Error (Info.Pos 1 1) (UnexpectedSymbol [] Red))
+      runAssignment headF "hi" (symbol Red) (makeState [ node Red 0 2 [] ]) `shouldBe` Left (UnexpectedSymbol (Info.Pos 1 1) [] Red)
 
   describe "without catchError" $ do
     it "assignment returns UnexpectedSymbol" $
@@ -49,14 +49,14 @@ spec = do
         red
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Red] Green))
+          Left (UnexpectedSymbol (Info.Pos 1 1) [Red] Green)
 
     it "assignment returns UnexpectedEndOfInput" $
       runAssignment headF "A"
         (symbol Green *> children (some red))
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Info.Pos 1 1) (UnexpectedEndOfInput [Red]))
+          Left (UnexpectedEndOfInput (Info.Pos 1 1) [Red])
 
   describe "catchError" $ do
     it "handler that always matches" $
@@ -78,7 +78,7 @@ spec = do
         (red `catchError` const blue)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Blue] Green))
+          Left (UnexpectedSymbol (Info.Pos 1 1) [Blue] Green)
 
     describe "in many" $ do
       it "handler that always matches" $
@@ -102,7 +102,7 @@ spec = do
           (symbol Palette *> children ( many (red `catchError` const blue) ))
           (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
-            Left (Error (Info.Pos 1 2) (UnexpectedSymbol [Blue] Green))
+            Left (UnexpectedSymbol (Info.Pos 1 2) [Blue] Green)
 
       it "handler that always matches with apply consumes and then errors" $
         runAssignment headF "PG"
@@ -111,7 +111,7 @@ spec = do
           ))
           (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
-            Left (Error (Info.Pos 1 3) (UnexpectedEndOfInput [Green]))
+            Left (UnexpectedEndOfInput (Info.Pos 1 3) [Green])
 
       it "handler that doesn't match with apply" $
         fst <$> runAssignment headF "PG"
@@ -153,7 +153,7 @@ spec = do
     it "does not match if its subrule does not match" $
       runAssignment headF "a" (children red) (makeState [node Blue 0 1 [node Green 0 1 []]])
       `shouldBe`
-        Left (Error (Info.Pos 1 1) (UnexpectedSymbol [Red] Green))
+        Left (UnexpectedSymbol (Info.Pos 1 1) [Red] Green)
 
     it "matches nested children" $
       fst <$> runAssignment headF "1"
