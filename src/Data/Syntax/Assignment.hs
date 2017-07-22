@@ -242,7 +242,7 @@ runAssignment toNode source = (requireExhaustive <=<) . go
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
-        run assignment yield initialState = maybe (atEnd Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
+        run assignment yield initialState = maybe (atNodeOrEnd Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state
@@ -251,15 +251,15 @@ runAssignment toNode source = (requireExhaustive <=<) . go
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes state })
                   Choose choices | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
-                  _ -> atEnd (Just (nodeError expectedSymbols (toNode node)))
+                  _ -> atNodeOrEnd (Just node)
 
-                atEnd nodeError = case assignment of
+                atNodeOrEnd node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Many rule -> uncurry yield (runMany rule state)
                   Alt a b -> yield a state `catchError` (yield b . setStateError state . Just)
                   Throw e -> Left e
                   Catch during handler -> yield during state `catchError` (flip yield state . handler)
-                  _ -> Left (fromMaybe (Error (statePos state) expectedSymbols Nothing) nodeError)
+                  _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
 
                 state | _:_ <- expectedSymbols, all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
