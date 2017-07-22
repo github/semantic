@@ -253,24 +253,25 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
             -> Either (Error grammar) (result, AssignmentState ast grammar)
         run assignment yield initialState = case assignment of
           Location -> yield location state
-          Project projection | node : _ <- stateNodes state -> yield (projection (F.project node)) state
-          Source | node : _ <- stateNodes state -> yield (Source.sourceBytes (Source.slice (nodeByteRange (projectNode node)) source)) (advanceState state)
-          Children childAssignment | node : _ <- stateNodes state -> do
+          Project projection | Just node <- headNode -> yield (projection (F.project node)) state
+          Source | Just node <- headNode -> yield (Source.sourceBytes (Source.slice (nodeByteRange (projectNode node)) source)) (advanceState state)
+          Children childAssignment | Just node <- headNode -> do
             (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive
             yield a (advanceState state' { stateNodes = stateNodes state })
-          Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . projectNode =<< listToMaybe (stateNodes state) -> yield choice state
+          Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . projectNode =<< headNode -> yield choice state
           Many rule -> uncurry yield (runMany rule state)
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
           Throw e -> Left e
           Catch during handler -> either (flip yield state . handler) Right (yield during state)
-          _ | Node symbol _ (Info.Span spanStart _) : _ <- projectNode <$> stateNodes state -> Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
+          _ | Just (Node symbol _ (Info.Span spanStart _)) <- projectNode <$> headNode -> Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
             | otherwise -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
                                 | otherwise = []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . projectNode) (listToMaybe (stateNodes state))
+                headNode = listToMaybe (stateNodes state)
+                location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . projectNode) headNode
         {-# INLINE run #-}
 
         runMany :: Assignment ast grammar result -> AssignmentState ast grammar -> ([result], AssignmentState ast grammar)
