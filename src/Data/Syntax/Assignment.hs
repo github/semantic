@@ -243,19 +243,6 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (
   -> Either (Error grammar) a
 assignBy toNode assignment source = fmap fst . (>>= requireExhaustive toNode) . runAssignment source toNode assignment . makeState . pure
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
-  => Source.Source
-  -> (forall x. Base ast x -> Node grammar)
-  -> Assignment ast grammar a
-  -> AssignmentState ast grammar
-  -> Either (Error grammar) (a, AssignmentState ast grammar)
-assignAllFrom source toNode assignment state = do
-  (a, state) <- runAssignment source toNode assignment state
-  case stateNodes (dropAnonymous toNode state) of
-    [] -> Right (a, state)
-    node : _ -> let Node nodeSymbol _ (Info.Span spanStart _) = toNode (F.project node) in
-      Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
-
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
   => Source.Source                                           -- ^ The source for the parse tree.
