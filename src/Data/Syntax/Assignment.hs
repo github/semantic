@@ -336,10 +336,6 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
 
-instance Show1 Error where
-  liftShowsPrec sp sl d UnexpectedSymbol{..} = showParen (d > 10) $ showString "UnexpectedSymbol" . showChar ' ' . showsPrec 11 errorPos . showChar ' ' . liftShowsPrec sp sl 11 errorExpected . showChar ' ' . sp 11 errorActual
-  liftShowsPrec sp sl d UnexpectedEndOfInput{..} = showsBinaryWith showsPrec (liftShowsPrec sp sl) "UnexpectedEndOfInput" d errorPos errorExpected
-
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
   throwError error = withFrozenCallStack $ Throw error `Then` return
