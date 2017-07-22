@@ -265,7 +265,8 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
   -> Either (Error grammar) (a, AssignmentState ast grammar)
 runAssignment source toNode = go
   where go = iterFreer run . fmap ((pure .) . (,))
-        run :: AssignmentF ast grammar x
+        run :: forall a x
+            .  AssignmentF ast grammar x
             -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar))
             -> AssignmentState ast grammar
             -> Either (Error grammar) (a, AssignmentState ast grammar)
