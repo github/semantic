@@ -259,7 +259,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
                                 | otherwise = []
-                choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
+                choiceSymbols = fmap (toEnum :: Int -> grammar) . IntMap.keys
                 headNode = listToMaybe (stateNodes state)
                 location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . projectNode) headNode
         {-# INLINE run #-}
