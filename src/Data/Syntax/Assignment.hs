@@ -267,7 +267,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           (Alt a b, _) -> either (yield b . setStateError state . Just) Right (yield a state)
           (Throw e, _) -> Left e
           (Catch during handler, _) -> either (flip yield state . handler) Right (yield during state)
-          _ | node : _ <- stateNodes state, Node symbol _ (Info.Span spanStart _) <- toNode (F.project node) -> Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
+          _ | Node symbol _ (Info.Span spanStart _) : _ <- toNode . F.project <$> stateNodes state -> Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
             | otherwise -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
