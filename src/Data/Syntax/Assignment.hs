@@ -265,7 +265,6 @@ runAssignment toNode source = (requireExhaustive <=<) . go
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                                 | otherwise = []
-        {-# INLINE run #-}
 
         runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
         runMany rule = loop
