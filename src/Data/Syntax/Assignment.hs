@@ -279,7 +279,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (result, State ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
-          node : _-> Left (fromMaybe (nodeError [] (toNode (F.project node))) (stateError state))
+          node : _ -> Left (fromMaybe (nodeError [] (toNode (F.project node))) (stateError state))
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
 
