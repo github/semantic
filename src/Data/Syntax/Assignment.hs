@@ -242,26 +242,30 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
-        run assignment yield initialState = case assignment of
-          Location -> yield location state
-          Project projection | Just node <- headNode -> yield (projection node) state
-          Source | Just node <- headNode -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
-          Children child | Just node <- headNode -> do
-            (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
-            yield a (advance state' { stateNodes = stateNodes state })
-          Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . toNode =<< headNode -> yield choice state
-          Many rule -> uncurry yield (runMany rule state)
-          Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
-          Throw e -> Left e
-          Catch during handler -> either (flip yield state . handler) Right (yield during state)
-          _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) headNode)
-          where state | not (null expectedSymbols), all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
+        run assignment yield initialState = maybe atEnd atNode (F.project <$> listToMaybe (stateNodes state))
+          where atNode node = case assignment of
+                  Location -> yield (nodeLocation (toNode node)) state
+                  Project projection -> yield (projection node) state
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
+                  Children child -> do
+                    (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
+                    yield a (advance state' { stateNodes = stateNodes state })
+                  Choose choices | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
+                  _ -> atEnd
+
+                atEnd = case assignment of
+                  Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
+                  Many rule -> uncurry yield (runMany rule state)
+                  Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
+                  Throw e -> Left e
+                  Catch during handler -> either (flip yield state . handler) Right (yield during state)
+                  _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) (F.project <$> listToMaybe (stateNodes state)))
+
+                state | not (null expectedSymbols), all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
                                 | otherwise = []
                 choiceSymbols = fmap (toEnum :: Int -> grammar) . IntMap.keys
-                headNode = F.project <$> listToMaybe (stateNodes state)
-                location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . toNode) headNode
         {-# INLINE run #-}
 
         runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
