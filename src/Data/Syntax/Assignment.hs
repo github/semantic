@@ -297,7 +297,7 @@ runAssignment source toNode = go
                   Choose choices -> choiceSymbols choices
                   _ -> []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                runMany :: Assignment ast grammar v -> AssignmentState ast grammar -> ([v], AssignmentState ast grammar)
+                runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
                 runMany rule state = case runAssignment source toNode rule state of
                   Left err -> ([], state { stateError = Just err })
                   Right (a, state') | ((/=) `on` stateCounter) state state' ->
