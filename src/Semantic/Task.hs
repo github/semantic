@@ -201,7 +201,7 @@ runParser options parser blob@Blob{..} = case parser of
   ASTParser language -> liftIO $ parseToAST language blobSource
   AssignmentParser parser by assignment -> do
     ast <- runParser options parser blob
-    case Assignment.assignBy by assignment blobSource ast of
+    case Assignment.assignBy by blobSource assignment ast of
       Left err -> do
         let formatOptions = Assignment.defaultOptions
               { Assignment.optionsColour = fromMaybe True (optionsColour options)
