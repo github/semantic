@@ -264,7 +264,10 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
   -> AssignmentState ast grammar
   -> Either (Error grammar) (a, AssignmentState ast grammar)
 runAssignment source toNode = iterFreer run . fmap ((pure .) . (,))
-  where run :: AssignmentF ast grammar x -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)) -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)
+  where run :: AssignmentF ast grammar x
+            -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar))
+            -> AssignmentState ast grammar
+            -> Either (Error grammar) (a, AssignmentState ast grammar)
         run assignment yield initialState = case (assignment, stateNodes state) of
           (Location, node : _) -> yield (nodeLocation (toNode (F.project node))) state
           (Location, []) -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
