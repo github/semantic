@@ -272,9 +272,8 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           (_, ast:_) -> let Node symbol _ (Info.Span spanStart _) = toNode (F.project ast) in Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous toNode initialState
                       | otherwise = initialState
-                expectedSymbols = case assignment of
-                  Choose choices -> choiceSymbols choices
-                  _ -> []
+                expectedSymbols | Choose choices <- assignment = choiceSymbols choices
+                                | otherwise = []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
         {-# INLINE run #-}
         runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
