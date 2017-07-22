@@ -258,11 +258,11 @@ assignAllFrom source toNode assignment state = runAssignment source toNode assig
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
-  => Source.Source
-  -> (forall x. Base ast x -> Node grammar)
-  -> Assignment ast grammar a
-  -> AssignmentState ast grammar
-  -> Either (Error grammar) (a, AssignmentState ast grammar)
+  => Source.Source                                           -- ^ The source for the parse tree.
+  -> (forall x. Base ast x -> Node grammar)                  -- ^ A function to project a 'Node' from the ast.
+  -> Assignment ast grammar a                                -- ^ The 'Assignment' to run.
+  -> AssignmentState ast grammar                             -- ^ The current state.
+  -> Either (Error grammar) (a, AssignmentState ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
 runAssignment source toNode = go
   where go :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)
         go = iterFreer run . fmap ((pure .) . (,))
