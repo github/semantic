@@ -81,7 +81,7 @@ module Data.Syntax.Assignment
 , assignBy
 , runAssignment
 -- Implementation details (for testing)
-, AssignmentState(..)
+, State(..)
 , makeState
 ) where
 
@@ -97,7 +97,7 @@ import Data.Record
 import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
-import Prologue hiding (Alt, get, Location, state)
+import Prologue hiding (Alt, get, Location, State, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
@@ -231,17 +231,17 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
               => (forall x. Base ast x -> Node grammar)                  -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                           -- ^ The source for the parse tree.
               -> Assignment ast grammar a                                -- ^ The 'Assignment' to run.
-              -> AssignmentState ast grammar                             -- ^ The current state.
-              -> Either (Error grammar) (a, AssignmentState ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
+              -> State ast grammar                             -- ^ The current state.
+              -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
 runAssignment toNode source assignment state = go assignment state >>= requireExhaustive
-  where go :: Assignment ast grammar result -> AssignmentState ast grammar -> Either (Error grammar) (result, AssignmentState ast grammar)
+  where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
         go = iterFreer run . fmap ((pure .) . (,))
         {-# INLINE go #-}
 
         run :: AssignmentF ast grammar x
-            -> (x -> AssignmentState ast grammar -> Either (Error grammar) (result, AssignmentState ast grammar))
-            -> AssignmentState ast grammar
-            -> Either (Error grammar) (result, AssignmentState ast grammar)
+            -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
+            -> State ast grammar
+            -> Either (Error grammar) (result, State ast grammar)
         run assignment yield initialState = case assignment of
           Location -> yield location state
           Project projection | Just node <- headNode -> yield (projection (F.project node)) state
@@ -263,7 +263,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                 location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . projectNode) headNode
         {-# INLINE run #-}
 
-        runMany :: Assignment ast grammar result -> AssignmentState ast grammar -> ([result], AssignmentState ast grammar)
+        runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
         runMany rule state = case go rule state of
           Left err -> ([], state { stateError = Just err })
           Right (a, state') | ((/=) `on` stateCounter) state state' ->
@@ -272,7 +272,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                             | otherwise -> ([a], state')
         {-# INLINE runMany #-}
 
-        requireExhaustive :: (result, AssignmentState ast grammar) -> Either (Error grammar) (result, AssignmentState ast grammar)
+        requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (result, State ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
           node : _-> Left (fromMaybe (nodeError [] (projectNode node)) (stateError state))
@@ -280,15 +280,15 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . projectNode) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
-        advanceState state@AssignmentState{..}
+        advanceState state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- projectNode node = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
+          , Node{..} <- projectNode node = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
           | otherwise = state
 
         projectNode = toNode . F.project
 
 -- | State kept while running 'Assignment's.
-data AssignmentState ast grammar = AssignmentState
+data State ast grammar = State
   { stateOffset :: Int                  -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: Info.Pos                -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateError :: Maybe (Error grammar) -- ^ The most recently encountered error. Preserved for improved error messages in the presence of backtracking.
@@ -297,13 +297,13 @@ data AssignmentState ast grammar = AssignmentState
   }
   deriving (Eq, Show)
 
-makeState :: [ast] -> AssignmentState ast grammar
-makeState = AssignmentState 0 (Info.Pos 1 1) Nothing 0
+makeState :: [ast] -> State ast grammar
+makeState = State 0 (Info.Pos 1 1) Nothing 0
 
-setStateError :: AssignmentState ast grammar -> Maybe (Error grammar) -> AssignmentState ast grammar
+setStateError :: State ast grammar -> Maybe (Error grammar) -> State ast grammar
 setStateError state error = state { stateError = error }
 
-setStateNodes :: AssignmentState ast grammar -> [ast] -> AssignmentState ast grammar
+setStateNodes :: State ast grammar -> [ast] -> State ast grammar
 setStateNodes state nodes = state { stateNodes = nodes }
 
 
