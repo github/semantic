@@ -175,8 +175,8 @@ data Error grammar = HasCallStack => Error { errorPos :: Info.Pos, errorExpected
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
 
-nodeError :: Node grammar -> [grammar] -> Error grammar
-nodeError (Node actual _ (Info.Span spanStart _)) expected = Error spanStart expected (Just actual)
+nodeError :: [grammar] -> Node grammar -> Error grammar
+nodeError expected (Node actual _ (Info.Span spanStart _)) = Error spanStart expected (Just actual)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Blob -> Error grammar -> IO ()
@@ -275,7 +275,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         requireExhaustive :: (result, AssignmentState ast grammar) -> Either (Error grammar) (result, AssignmentState ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
-          node : _-> Left (fromMaybe (nodeError (projectNode node) []) (stateError state))
+          node : _-> Left (fromMaybe (nodeError [] (projectNode node)) (stateError state))
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . projectNode) (stateNodes state) }
 
