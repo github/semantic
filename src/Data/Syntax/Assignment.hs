@@ -261,7 +261,7 @@ runAssignment toNode source = (requireExhaustive <=<) . go
                   Catch during handler -> yield during state `catchError` (flip yield state . handler)
                   _ -> Left (fromMaybe (Error (statePos state) expectedSymbols Nothing) nodeError)
 
-                state | not (null expectedSymbols), all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
+                state | _:_ <- expectedSymbols, all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                                 | otherwise = []
