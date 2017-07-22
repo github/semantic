@@ -254,19 +254,19 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
             -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar))
             -> AssignmentState ast grammar
             -> Either (Error grammar) (a, AssignmentState ast grammar)
-        run assignment yield initialState = case (assignment, stateNodes state) of
-          (Location, _) -> yield location state
-          (Project projection, node : _) -> yield (projection (F.project node)) state
-          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState state)
-          (Children childAssignment, node : _) -> do
+        run assignment yield initialState = case assignment of
+          Location -> yield location state
+          Project projection | node : _ <- stateNodes state -> yield (projection (F.project node)) state
+          Source | node : _ <- stateNodes state -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState state)
+          Children childAssignment | node : _ <- stateNodes state -> do
             (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive
             yield a (advanceState state' { stateNodes = stateNodes state })
-          (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
-          (Many rule, _) -> uncurry yield (runMany rule state)
+          Choose choices | Node symbol _ _ : _ <- toNode . F.project <$> stateNodes state, Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
+          Many rule -> uncurry yield (runMany rule state)
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-          (Alt a b, _) -> either (yield b . setStateError state . Just) Right (yield a state)
-          (Throw e, _) -> Left e
-          (Catch during handler, _) -> either (flip yield state . handler) Right (yield during state)
+          Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
+          Throw e -> Left e
+          Catch during handler -> either (flip yield state . handler) Right (yield during state)
           _ | Node symbol _ (Info.Span spanStart _) : _ <- toNode . F.project <$> stateNodes state -> Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
             | otherwise -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
