@@ -270,9 +270,8 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           (Catch during handler, _) -> either (flip yield state . handler) Right (yield during state)
           (_, []) -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           (_, ast:_) -> let Node symbol _ (Info.Span spanStart _) = toNode (F.project ast) in Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
-          where state = case assignment of
-                  Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous toNode initialState
-                  _ -> initialState
+          where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous toNode initialState
+                      | otherwise = initialState
                 expectedSymbols = case assignment of
                   Choose choices -> choiceSymbols choices
                   _ -> []
