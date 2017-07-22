@@ -241,7 +241,7 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (
   -> Source.Source
   -> ast
   -> Either (Error grammar) a
-assignBy toNode assignment source = fmap fst . assignAllFrom source toNode assignment . makeState . pure
+assignBy toNode assignment source = fmap fst . (>>= requireExhaustive toNode) . runAssignment source toNode assignment . makeState . pure
 
 assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
   => Source.Source
