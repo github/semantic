@@ -279,17 +279,15 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (result, State ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
-          node : _-> Left (fromMaybe (nodeError [] (projectNode node)) (stateError state))
+          node : _-> Left (fromMaybe (nodeError [] (toNode (F.project node))) (stateError state))
 
-        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . projectNode) (stateNodes state) }
+        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- projectNode node = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
+          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
           | otherwise = state
-
-        projectNode = toNode . F.project
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
