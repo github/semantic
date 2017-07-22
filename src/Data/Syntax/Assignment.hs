@@ -268,12 +268,10 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         {-# INLINE run #-}
 
         runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
-        runMany rule state = case go rule state of
-          Left err -> ([], state { stateError = Just err })
-          Right (a, state') | ((/=) `on` stateCounter) state state' ->
-                                let (as, state'') = runMany rule state'
-                                in as `seq` (a : as, state'')
-                            | otherwise -> ([a], state')
+        runMany rule = goMany
+          where goMany state = either ((,) [] . setStateError state . Just) loop (go rule state)
+                loop (a, state') | ((/=) `on` stateCounter) state state', (as, state'') <- goMany state' = as `seq` (a : as, state'')
+                                 | otherwise                                                             =          (   [a], state')
         {-# INLINE runMany #-}
 
         requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (result, State ast grammar)
