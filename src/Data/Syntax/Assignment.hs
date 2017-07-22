@@ -269,9 +269,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
             Left err -> yield b state { stateError = Just err }
             r -> r
           (Throw e, _) -> Left e
-          (Catch during handler, _) -> case yield during state of
-            Left err -> yield (handler err) state
-            Right (a, state') -> Right (a, state')
+          (Catch during handler, _) -> either (flip yield state . handler) Right (yield during state)
           (_, []) -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           (_, ast:_) -> let Node symbol _ (Info.Span spanStart _) = toNode (F.project ast) in Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
           where state = case assignment of
