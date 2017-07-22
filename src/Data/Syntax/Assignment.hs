@@ -177,6 +177,9 @@ data Error grammar
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
 
+makeError :: HasCallStack => Info.Pos -> [grammar] -> Maybe grammar -> Error grammar
+makeError pos expected = maybe (UnexpectedEndOfInput pos expected) (UnexpectedSymbol pos expected)
+
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Blob -> Error grammar -> IO ()
 printError Blob{..} error = do
@@ -253,8 +256,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
           Throw e -> Left e
           Catch during handler -> either (flip yield state . handler) Right (yield during state)
-          _ -> let pos = maybe (statePos state) (Info.spanStart . nodeSpan . projectNode) headNode in
-              Left (maybe (UnexpectedEndOfInput pos expectedSymbols) (UnexpectedSymbol pos expectedSymbols . nodeSymbol . projectNode) headNode)
+          _ -> Left (makeError (maybe (statePos state) (Info.spanStart . nodeSpan . projectNode) headNode) expectedSymbols (nodeSymbol . projectNode <$> headNode))
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
