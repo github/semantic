@@ -248,6 +248,7 @@ runAssignment source toNode = go
            -> AssignmentState ast grammar
            -> Either (Error grammar) (a, AssignmentState ast grammar)
         go = iterFreer run . fmap ((pure .) . (,))
+        {-# INLINE go #-}
         run :: forall a x
             .  AssignmentF ast grammar x
             -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar))
