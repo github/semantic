@@ -256,9 +256,9 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                 atEnd nodeError = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Many rule -> uncurry yield (runMany rule state)
-                  Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
+                  Alt a b -> yield a state `catchError` (yield b . setStateError state . Just)
                   Throw e -> Left e
-                  Catch during handler -> either (flip yield state . handler) Right (yield during state)
+                  Catch during handler -> yield during state `catchError` (flip yield state . handler)
                   _ -> Left (fromMaybe (Error (statePos state) expectedSymbols Nothing) nodeError)
 
                 state | not (null expectedSymbols), all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
