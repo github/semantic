@@ -308,6 +308,13 @@ runAssignment source toNode = go
                             | otherwise -> ([a], state')
         {-# INLINE runMany #-}
 
+requireExhaustive :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> (a, AssignmentState ast grammar) -> Either (Error grammar) (a, AssignmentState ast grammar)
+requireExhaustive toNode (a, state) = case stateNodes (dropAnonymous toNode state) of
+  [] -> Right (a, state)
+  node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- toNode (F.project node) ->
+    Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
+
+
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
 dropAnonymous toNode state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
 
