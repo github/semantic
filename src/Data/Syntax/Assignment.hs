@@ -233,16 +233,16 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (
   -> Source.Source
   -> ast
   -> Either (Error grammar) a
-assignBy toNode assignment source = fmap fst . runAssignment source toNode assignment . makeState . pure
+assignBy toNode assignment source = fmap fst . runAssignment toNode source assignment . makeState . pure
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
-  => Source.Source                                           -- ^ The source for the parse tree.
-  -> (forall x. Base ast x -> Node grammar)                  -- ^ A function to project a 'Node' from the ast.
+  => (forall x. Base ast x -> Node grammar)                  -- ^ A function to project a 'Node' from the ast.
+  -> Source.Source                                           -- ^ The source for the parse tree.
   -> Assignment ast grammar a                                -- ^ The 'Assignment' to run.
   -> AssignmentState ast grammar                             -- ^ The current state.
   -> Either (Error grammar) (a, AssignmentState ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
-runAssignment source toNode assignment state = go assignment state >>= requireExhaustive
+runAssignment toNode source assignment state = go assignment state >>= requireExhaustive
   where go :: forall a
            .  Assignment ast grammar a
            -> AssignmentState ast grammar
