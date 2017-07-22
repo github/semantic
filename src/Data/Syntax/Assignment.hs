@@ -79,7 +79,6 @@ module Data.Syntax.Assignment
 , printError
 , withSGRCode
 -- Running
-, assign
 , assignBy
 , runAssignment
 -- Implementation details (for testing)
@@ -228,13 +227,6 @@ showPos :: Maybe FilePath -> Info.Pos -> ShowS
 showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (HasField fields Info.Range, HasField fields Info.Span, HasField fields grammar, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack)
-  => Assignment (Cofree f (Record fields)) grammar a
-  -> Source.Source
-  -> Cofree f (Record fields)
-  -> Either (Error grammar) a
-assign = assignBy (\ (r :< _) -> Node (getField r) (getField r) (getField r))
-
 assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
   => (forall x. Base ast x -> Node grammar)
   -> Assignment ast grammar a
