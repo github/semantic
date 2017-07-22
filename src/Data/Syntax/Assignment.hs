@@ -171,14 +171,10 @@ nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 
 data Error grammar
-  = HasCallStack => UnexpectedSymbol { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: grammar }
-  | HasCallStack => UnexpectedEndOfInput { errorPos :: Info.Pos, errorExpected :: [grammar] }
+  = HasCallStack => Error { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: Maybe grammar }
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
-
-makeError :: HasCallStack => Info.Pos -> [grammar] -> Maybe grammar -> Error grammar
-makeError pos expected = maybe (UnexpectedEndOfInput pos expected) (UnexpectedSymbol pos expected)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Blob -> Error grammar -> IO ()
@@ -205,9 +201,9 @@ withSGRCode code action = do
     pure ()
 
 showExpectation :: Show grammar => Error grammar -> ShowS
-showExpectation (UnexpectedEndOfInput _ []) = showString "no rule to match at end of input nodes"
-showExpectation (UnexpectedEndOfInput _ symbols) = showString "expected " . showSymbols symbols . showString " at end of input nodes"
-showExpectation (UnexpectedSymbol _ symbols a) = showString "expected " . showSymbols symbols . showString ", but got " . shows a
+showExpectation (Error _ [] Nothing) = showString "no rule to match at end of input nodes"
+showExpectation (Error _ expected Nothing) = showString "expected " . showSymbols expected . showString " at end of input nodes"
+showExpectation (Error _ expected (Just actual)) = showString "expected " . showSymbols expected . showString ", but got " . shows actual
 
 showSymbols :: Show grammar => [grammar] -> ShowS
 showSymbols [] = showString "end of input nodes"
@@ -256,7 +252,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
           Throw e -> Left e
           Catch during handler -> either (flip yield state . handler) Right (yield during state)
-          _ -> Left (makeError (maybe (statePos state) (Info.spanStart . nodeSpan . projectNode) headNode) expectedSymbols (nodeSymbol . projectNode <$> headNode))
+          _ -> Left (Error (maybe (statePos state) (Info.spanStart . nodeSpan . projectNode) headNode) expectedSymbols (nodeSymbol . projectNode <$> headNode))
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
@@ -279,7 +275,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
           node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- projectNode node ->
-            Left $ fromMaybe (UnexpectedSymbol spanStart [] nodeSymbol) (stateError state)
+            Left $ fromMaybe (Error spanStart [] (Just nodeSymbol)) (stateError state)
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . projectNode) (stateNodes state) }
 
