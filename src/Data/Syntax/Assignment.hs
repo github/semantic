@@ -229,11 +229,11 @@ showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) sh
 -- | Run an assignment over an AST exhaustively.
 assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
   => (forall x. Base ast x -> Node grammar)
-  -> Assignment ast grammar a
   -> Source.Source
+  -> Assignment ast grammar a
   -> ast
   -> Either (Error grammar) a
-assignBy toNode assignment source = fmap fst . runAssignment toNode source assignment . makeState . pure
+assignBy toNode source assignment = fmap fst . runAssignment toNode source assignment . makeState . pure
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)

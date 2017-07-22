@@ -132,7 +132,7 @@ spec = do
 
   describe "source" $ do
     it "produces the node’s source" $
-      assignBy headF source "hi" (node Red 0 2 []) `shouldBe` Right "hi"
+      assignBy headF "hi" source (node Red 0 2 []) `shouldBe` Right "hi"
 
     it "advances past the current node" $
       snd <$> runAssignment headF "hi" source (makeState [ node Red 0 2 [] ])
