@@ -257,24 +257,24 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         run assignment yield initialState = case assignment of
           Location -> yield location state
           Project projection | node : _ <- stateNodes state -> yield (projection (F.project node)) state
-          Source | node : _ <- stateNodes state -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState state)
+          Source | node : _ <- stateNodes state -> yield (Source.sourceBytes (Source.slice (nodeByteRange (projectNode node)) source)) (advanceState state)
           Children childAssignment | node : _ <- stateNodes state -> do
             (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive
             yield a (advanceState state' { stateNodes = stateNodes state })
-          Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . toNode . F.project =<< listToMaybe (stateNodes state) -> yield choice state
+          Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . projectNode =<< listToMaybe (stateNodes state) -> yield choice state
           Many rule -> uncurry yield (runMany rule state)
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
           Throw e -> Left e
           Catch during handler -> either (flip yield state . handler) Right (yield during state)
-          _ | Node symbol _ (Info.Span spanStart _) : _ <- toNode . F.project <$> stateNodes state -> Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
+          _ | Node symbol _ (Info.Span spanStart _) : _ <- projectNode <$> stateNodes state -> Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
             | otherwise -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
                                 | otherwise = []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . toNode . F.project) (listToMaybe (stateNodes state))
+                location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . projectNode) (listToMaybe (stateNodes state))
         {-# INLINE run #-}
         runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
         runMany rule state = case go rule state of
@@ -287,16 +287,18 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         requireExhaustive :: forall a. (a, AssignmentState ast grammar) -> Either (Error grammar) (a, AssignmentState ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
-          node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- toNode (F.project node) ->
+          node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- projectNode node ->
             Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
 
-        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
+        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . projectNode) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advanceState state@AssignmentState{..}
           | node : rest <- stateNodes
-          , Node{..} <- toNode (F.project node) = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
+          , Node{..} <- projectNode node = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
           | otherwise = state
+
+        projectNode = toNode . F.project
 
 -- | State kept while running 'Assignment's.
 data AssignmentState ast grammar = AssignmentState
