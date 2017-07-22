@@ -243,18 +243,14 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
               -> AssignmentState ast grammar                             -- ^ The current state.
               -> Either (Error grammar) (a, AssignmentState ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
 runAssignment toNode source assignment state = go assignment state >>= requireExhaustive
-  where go :: forall a
-           .  Assignment ast grammar a
-           -> AssignmentState ast grammar
-           -> Either (Error grammar) (a, AssignmentState ast grammar)
+  where go :: Assignment ast grammar result -> AssignmentState ast grammar -> Either (Error grammar) (result, AssignmentState ast grammar)
         go = iterFreer run . fmap ((pure .) . (,))
         {-# INLINE go #-}
-        
-        run :: forall a x
-            .  AssignmentF ast grammar x
-            -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar))
+
+        run :: AssignmentF ast grammar x
+            -> (x -> AssignmentState ast grammar -> Either (Error grammar) (result, AssignmentState ast grammar))
             -> AssignmentState ast grammar
-            -> Either (Error grammar) (a, AssignmentState ast grammar)
+            -> Either (Error grammar) (result, AssignmentState ast grammar)
         run assignment yield initialState = case assignment of
           Location -> yield location state
           Project projection | node : _ <- stateNodes state -> yield (projection (F.project node)) state
@@ -278,7 +274,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                 location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . projectNode) (listToMaybe (stateNodes state))
         {-# INLINE run #-}
 
-        runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
+        runMany :: Assignment ast grammar result -> AssignmentState ast grammar -> ([result], AssignmentState ast grammar)
         runMany rule state = case go rule state of
           Left err -> ([], state { stateError = Just err })
           Right (a, state') | ((/=) `on` stateCounter) state state' ->
@@ -287,7 +283,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                             | otherwise -> ([a], state')
         {-# INLINE runMany #-}
 
-        requireExhaustive :: forall a. (a, AssignmentState ast grammar) -> Either (Error grammar) (a, AssignmentState ast grammar)
+        requireExhaustive :: (result, AssignmentState ast grammar) -> Either (Error grammar) (result, AssignmentState ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
           node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- projectNode node ->
