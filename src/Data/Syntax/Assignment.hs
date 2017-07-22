@@ -245,9 +245,9 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         run assignment yield initialState = case assignment of
           Location -> yield location state
           Project projection | Just node <- headNode -> yield (projection (F.project node)) state
-          Source | Just node <- headNode -> yield (Source.sourceBytes (Source.slice (nodeByteRange (projectNode node)) source)) (advanceState state)
+          Source | Just node <- headNode -> yield (Source.sourceBytes (Source.slice (nodeByteRange (projectNode node)) source)) (advance state)
           Children child | Just node <- headNode ->
-            uncurry yield . second (advanceState . flip setStateNodes (stateNodes state)) <=< requireExhaustive <=< go child . setStateNodes state . toList . F.project $ node
+            uncurry yield . second (advance . flip setStateNodes (stateNodes state)) <=< requireExhaustive <=< go child . setStateNodes state . toList . F.project $ node
           Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . projectNode =<< headNode -> yield choice state
           Many rule -> uncurry yield (runMany rule state)
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
@@ -280,7 +280,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . projectNode) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
-        advanceState state@State{..}
+        advance state@State{..}
           | node : rest <- stateNodes
           , Node{..} <- projectNode node = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
           | otherwise = state
