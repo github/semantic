@@ -249,6 +249,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
            -> Either (Error grammar) (a, AssignmentState ast grammar)
         go = iterFreer run . fmap ((pure .) . (,))
         {-# INLINE go #-}
+        
         run :: forall a x
             .  AssignmentF ast grammar x
             -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar))
@@ -276,6 +277,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                 location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . projectNode) (listToMaybe (stateNodes state))
         {-# INLINE run #-}
+
         runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
         runMany rule state = case go rule state of
           Left err -> ([], state { stateError = Just err })
@@ -284,6 +286,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                                 in as `seq` (a : as, state'')
                             | otherwise -> ([a], state')
         {-# INLINE runMany #-}
+
         requireExhaustive :: forall a. (a, AssignmentState ast grammar) -> Either (Error grammar) (a, AssignmentState ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Right (a, state)
