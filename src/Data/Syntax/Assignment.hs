@@ -233,7 +233,7 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
               -> Assignment ast grammar a                                -- ^ The 'Assignment' to run.
               -> State ast grammar                             -- ^ The current state.
               -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
-runAssignment toNode source assignment = requireExhaustive <=< go assignment
+runAssignment toNode source = (requireExhaustive <=<) . go
   where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
         go = iterFreer run . fmap ((pure .) . (,))
         {-# INLINE go #-}
