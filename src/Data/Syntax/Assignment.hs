@@ -306,6 +306,7 @@ runAssignment source toNode = go
                                 let (as, state'') = runMany rule state'
                                 in as `seq` (a : as, state'')
                             | otherwise -> ([a], state')
+        {-# INLINE runMany #-}
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
 dropAnonymous toNode state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
