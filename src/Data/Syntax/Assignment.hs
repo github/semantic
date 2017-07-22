@@ -170,8 +170,7 @@ nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 
-data Error grammar
-  = HasCallStack => Error { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: Maybe grammar }
+data Error grammar = HasCallStack => Error { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: Maybe grammar }
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
