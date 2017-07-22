@@ -271,7 +271,7 @@ runAssignment toNode source = (requireExhaustive <=<) . go
           where loop state = case go rule state of
                   Left err -> ([], state { stateError = Just err })
                   Right (a, state') | ((/=) `on` stateCounter) state state', (as, state'') <- loop state' -> as `seq` (a : as, state'')
-                                    | otherwise -> ([], state')
+                                    | otherwise -> ([a], state')
         {-# INLINE runMany #-}
 
         requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (result, State ast grammar)
