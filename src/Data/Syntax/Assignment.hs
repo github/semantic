@@ -246,8 +246,10 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Location -> yield location state
           Project projection | Just node <- headNode -> yield (projection (F.project node)) state
           Source | Just node <- headNode -> yield (Source.sourceBytes (Source.slice (nodeByteRange (projectNode node)) source)) (advance state)
-          Children child | Just node <- headNode ->
-            uncurry yield . second (advance . flip setStateNodes (stateNodes state)) <=< requireExhaustive <=< go child . setStateNodes state . toList . F.project $ node
+          Children child | Just node <- headNode -> do
+            childResult <- go child state { stateNodes = toList (F.project node) }
+            (a, state') <- requireExhaustive childResult
+            yield a (advance state' { stateNodes = stateNodes state })
           Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . projectNode =<< headNode -> yield choice state
           Many rule -> uncurry yield (runMany rule state)
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
@@ -302,9 +304,6 @@ makeState = State 0 (Info.Pos 1 1) Nothing 0
 
 setStateError :: State ast grammar -> Maybe (Error grammar) -> State ast grammar
 setStateError state error = state { stateError = error }
-
-setStateNodes :: State ast grammar -> [ast] -> State ast grammar
-setStateNodes state nodes = state { stateNodes = nodes }
 
 
 -- Instances
