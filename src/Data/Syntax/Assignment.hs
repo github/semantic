@@ -265,9 +265,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           (Many rule, _) -> uncurry yield (runMany rule state)
           -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-          (Alt a b, _) -> case yield a state of
-            Left err -> yield b state { stateError = Just err }
-            r -> r
+          (Alt a b, _) -> either (\ err -> yield b state { stateError = Just err }) Right (yield a state)
           (Throw e, _) -> Left e
           (Catch during handler, _) -> either (flip yield state . handler) Right (yield during state)
           (_, []) -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
