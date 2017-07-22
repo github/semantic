@@ -263,9 +263,8 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
 
                 state | not (null expectedSymbols), all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
-                expectedSymbols | Choose choices <- assignment = choiceSymbols choices
+                expectedSymbols | Choose choices <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                                 | otherwise = []
-                choiceSymbols = fmap (toEnum :: Int -> grammar) . IntMap.keys
         {-# INLINE run #-}
 
         runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
