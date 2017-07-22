@@ -277,7 +277,7 @@ runAssignment source toNode = go
           (Project projection, node : _) -> yield (projection (F.project node)) state
           (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState toNode state)
           (Children childAssignment, node : _) -> do
-            (a, state') <- assignAllFrom source toNode childAssignment state { stateNodes = toList (F.project node) }
+            (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive toNode
             yield a (advanceState toNode state' { stateNodes = stateNodes state })
           (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           (Many rule, _) -> uncurry yield (runMany rule state)
