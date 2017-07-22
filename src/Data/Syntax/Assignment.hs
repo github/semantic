@@ -242,7 +242,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
-        run assignment yield initialState = maybe (atEnd Nothing) atNode (F.project <$> listToMaybe (stateNodes state))
+        run assignment yield initialState = maybe (atEnd Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state
