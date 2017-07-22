@@ -233,16 +233,16 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (
   -> Source.Source
   -> ast
   -> Either (Error grammar) a
-assignBy toNode assignment source = fmap fst . (>>= requireExhaustive toNode) . runAssignment source toNode assignment . makeState . pure
+assignBy toNode assignment source = fmap fst . runAssignment source toNode assignment . makeState . pure
 
--- | Run an assignment of nodes in a grammar onto terms in a syntax.
+-- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
   => Source.Source                                           -- ^ The source for the parse tree.
   -> (forall x. Base ast x -> Node grammar)                  -- ^ A function to project a 'Node' from the ast.
   -> Assignment ast grammar a                                -- ^ The 'Assignment' to run.
   -> AssignmentState ast grammar                             -- ^ The current state.
   -> Either (Error grammar) (a, AssignmentState ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
-runAssignment source toNode = go
+runAssignment source toNode assignment state = go assignment state >>= requireExhaustive
   where go :: forall a
            .  Assignment ast grammar a
            -> AssignmentState ast grammar
@@ -260,7 +260,7 @@ runAssignment source toNode = go
           (Project projection, node : _) -> yield (projection (F.project node)) state
           (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState toNode state)
           (Children childAssignment, node : _) -> do
-            (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive toNode
+            (a, state') <- go childAssignment state { stateNodes = toList (F.project node) } >>= requireExhaustive
             yield a (advanceState toNode state' { stateNodes = stateNodes state })
           (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
           (Many rule, _) -> uncurry yield (runMany rule state)
@@ -290,12 +290,11 @@ runAssignment source toNode = go
                                 in as `seq` (a : as, state'')
                             | otherwise -> ([a], state')
         {-# INLINE runMany #-}
-
-requireExhaustive :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> (a, AssignmentState ast grammar) -> Either (Error grammar) (a, AssignmentState ast grammar)
-requireExhaustive toNode (a, state) = case stateNodes (dropAnonymous toNode state) of
-  [] -> Right (a, state)
-  node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- toNode (F.project node) ->
-    Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
+        requireExhaustive :: forall a. (a, AssignmentState ast grammar) -> Either (Error grammar) (a, AssignmentState ast grammar)
+        requireExhaustive (a, state) = case stateNodes (dropAnonymous toNode state) of
+          [] -> Right (a, state)
+          node : _ | Node nodeSymbol _ (Info.Span spanStart _) <- toNode (F.project node) ->
+            Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
 
 
 dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar

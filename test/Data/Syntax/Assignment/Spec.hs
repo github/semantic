@@ -41,8 +41,7 @@ spec = do
       fst <$> runAssignment "hello" headF red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
 
     it "does not advance past the current node" $
-      let initialState = makeState [ node Red 0 2 [] ] in
-      snd <$> runAssignment "hi" headF (symbol Red) initialState `shouldBe` Right initialState
+      runAssignment "hi" headF (symbol Red) (makeState [ node Red 0 2 [] ]) `shouldBe` Left (Error (Info.Pos 1 1) (UnexpectedSymbol [] Red))
 
   describe "without catchError" $ do
     it "assignment returns UnexpectedSymbol" $
