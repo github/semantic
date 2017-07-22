@@ -255,8 +255,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
             -> AssignmentState ast grammar
             -> Either (Error grammar) (a, AssignmentState ast grammar)
         run assignment yield initialState = case (assignment, stateNodes state) of
-          (Location, node : _) -> yield (nodeLocation (toNode (F.project node))) state
-          (Location, []) -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
+          (Location, _) -> yield location state
           (Project projection, node : _) -> yield (projection (F.project node)) state
           (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState state)
           (Children childAssignment, node : _) -> do
@@ -275,6 +274,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
                                 | otherwise = []
                 choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
+                location = maybe (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) (nodeLocation . toNode . F.project) (listToMaybe (stateNodes state))
         {-# INLINE run #-}
         runMany :: forall a. Assignment ast grammar a -> AssignmentState ast grammar -> ([a], AssignmentState ast grammar)
         runMany rule state = case go rule state of
