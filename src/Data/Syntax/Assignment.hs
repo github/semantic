@@ -253,7 +253,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
           Throw e -> Left e
           Catch during handler -> either (flip yield state . handler) Right (yield during state)
-          _ -> Left (Error (maybe (statePos state) (Info.spanStart . nodeSpan . projectNode) headNode) expectedSymbols (nodeSymbol . projectNode <$> headNode))
+          _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . projectNode) headNode)
           where state | any ((/= Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices <- assignment = choiceSymbols choices
