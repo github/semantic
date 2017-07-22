@@ -245,7 +245,7 @@ runAssignment toNode source assignment state = go assignment state >>= requireEx
           Project projection | Just node <- headNode -> yield (projection (F.project node)) state
           Source | Just node <- headNode -> yield (Source.sourceBytes (Source.slice (nodeByteRange (projectNode node)) source)) (advanceState state)
           Children child | Just node <- headNode ->
-            go child (setStateNodes state (toList (F.project node))) >>= requireExhaustive >>= uncurry yield . second (advanceState . flip setStateNodes (stateNodes state))
+            uncurry yield . second (advanceState . flip setStateNodes (stateNodes state)) <=< requireExhaustive <=< go child . setStateNodes state . toList . F.project $ node
           Choose choices | Just choice <- flip IntMap.lookup choices . fromEnum . nodeSymbol . projectNode =<< headNode -> yield choice state
           Many rule -> uncurry yield (runMany rule state)
           Alt a b -> either (yield b . setStateError state . Just) Right (yield a state)
