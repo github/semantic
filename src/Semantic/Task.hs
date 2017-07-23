@@ -68,7 +68,7 @@ data TaskF output where
 type Task = Freer TaskF
 
 -- | A log message at a specific level.
-data Message = Message Time.UTCTime Level String
+data Message = Message Level String Time.UTCTime
   deriving (Eq, Show)
 
 data Level
@@ -80,7 +80,7 @@ data Level
 
 -- | Format a 'Message', optionally colourized.
 formatMessage :: Bool -> Message -> String
-formatMessage colourize (Message time level message) = showTime time . showChar ' ' . showLevel level . showString ": " . showString message . showChar '\n' $ ""
+formatMessage colourize (Message level message time) = showTime time . showChar ' ' . showLevel level . showString ": " . showString message . showChar '\n' $ ""
   where showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
         showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
         showLevel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
@@ -186,9 +186,7 @@ runTaskWithOptions options task = do
     ReadBlobPairs source -> pure <$ writeLog Info "ReadBlobPairs" <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
     WriteToOutput destination contents -> pure <$ writeLog Info "WriteToOutput" <*> liftIO (either B.hPutStr B.writeFile destination contents)
     WriteLog level message
-      | Just logLevel <- optionsLevel options, level <= logLevel -> pure <$> liftIO (do
-        now <- Time.getCurrentTime
-        atomically (writeTMQueue logQueue (Message now level message)))
+      | Just logLevel <- optionsLevel options, level <= logLevel -> pure <$> liftIO (Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message)
       | otherwise -> pure (pure ())
     Parse parser blob -> pure <$ writeLog Info "Parse" <*> runParser options parser blob
     Decorate algebra term -> pure <$ writeLog Info "Decorate" <*> pure (decoratorWithAlgebra algebra term)
