@@ -207,6 +207,7 @@ runParser options parser blob@Blob{..} = case parser of
       Left err -> do
         let formatOptions = Assignment.defaultOptions
               { Assignment.optionsColour = fromMaybe True (optionsColour options)
+              , Assignment.optionsIncludeSource = optionsPrintSource options
               }
         writeLog Warning (Assignment.formatErrorWithOptions formatOptions blob err)
         pure (errorTerm blobSource)
