@@ -19,7 +19,7 @@ spec :: Spec
 spec = parallel $ do
   let decorate = defaultFeatureVectorDecorator (category . headF)
   prop "equality is reflexive" $
-    \ a -> let diff = unListableDiff a :: SyntaxDiff String '[Category] in
+    \ a -> let diff = unListableDiff a :: SyntaxDiff '[Category] in
       diff `shouldBe` diff
 
   prop "equal terms produce identity diffs" $

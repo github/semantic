@@ -155,7 +155,7 @@ spec = parallel $ do
       toS output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[5,7]},\"category\":\"Heading 2\",\"term\":\"## Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
-type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
+type Diff' = SyntaxDiff (Maybe Declaration ': DefaultFields)
 type Term' = SyntaxTerm (Maybe Declaration ': DefaultFields)
 
 numTocSummaries :: Diff' -> Int
