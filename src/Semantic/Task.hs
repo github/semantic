@@ -65,6 +65,9 @@ data TaskF output where
 type Task = Freer TaskF
 
 -- | A log message at a specific level.
+data Message = Message Time.UTCTime Level String
+  deriving (Eq, Show)
+
 data Level
   = Error
   | Warning
