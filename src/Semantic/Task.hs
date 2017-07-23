@@ -36,6 +36,8 @@ import Data.String
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
+import qualified Data.Time.Clock as Time
+import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import Data.Union
 import Diff
 import qualified Files
@@ -181,7 +183,9 @@ runTaskWithOptions options task = do
     ReadBlobPairs source -> pure <$ writeLog Info "ReadBlobPairs" <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
     WriteToOutput destination contents -> pure <$ writeLog Info "WriteToOutput" <*> liftIO (either B.hPutStr B.writeFile destination contents)
     WriteLog level message
-      | Just logLevel <- optionsLevel options, level <= logLevel -> pure <$> liftIO (atomically (writeTMQueue logQueue (level, message)))
+      | Just logLevel <- optionsLevel options, level <= logLevel -> pure <$> liftIO (do
+        now <- Time.getCurrentTime
+        atomically (writeTMQueue logQueue (Message now level message)))
       | otherwise -> pure (pure ())
     Parse parser blob -> pure <$ writeLog Info "Parse" <*> runParser options parser blob
     Decorate algebra term -> pure <$ writeLog Info "Decorate" <*> pure (decoratorWithAlgebra algebra term)
@@ -196,7 +200,7 @@ runTaskWithOptions options task = do
   where logSink options queue = do
           message <- atomically (readTMQueue queue)
           case message of
-            Just (level, message) -> do
+            Just (Message _ level message) -> do
               hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) level message)
               logSink options queue
             _ -> pure ()

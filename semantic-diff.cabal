@@ -114,6 +114,7 @@ library
                      , template-haskell
                      , text >= 1.2.1.3
                      , these
+                     , time
                      , haskell-tree-sitter
                      , c
                      , go
