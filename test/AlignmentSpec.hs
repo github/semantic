@@ -31,7 +31,7 @@ spec :: Spec
 spec = parallel $ do
   describe "alignBranch" $ do
     it "produces symmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff (Syntax Text) (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff Syntax (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 2, []))
         , Join (These (Range 2 4, [])
@@ -39,7 +39,7 @@ spec = parallel $ do
         ]
 
     it "produces asymmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff (Syntax Text) (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff Syntax (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 1, []))
         , Join (This  (Range 2 4, []))
@@ -256,7 +256,7 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
-align :: Both Source.Source -> ConstructibleFree (Syntax Text) (Patch (Term (Syntax Text) (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff [] (Record '[Range]))
+align :: Both Source.Source -> ConstructibleFree Syntax (Patch (SyntaxTerm '[Range])) (Both (Record '[Range])) -> PrettyDiff (SplitDiff [] (Record '[Range]))
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
@@ -281,14 +281,14 @@ newtype ConstructibleFree f patch annotation = ConstructibleFree { deconstruct :
 
 
 class PatchConstructible p where
-  insert :: Term (Syntax Text) (Record '[Range]) -> p
-  delete :: Term (Syntax Text) (Record '[Range]) -> p
+  insert :: SyntaxTerm '[Range] -> p
+  delete :: SyntaxTerm '[Range] -> p
 
-instance PatchConstructible (Patch (Term (Syntax Text) (Record '[Range]))) where
+instance PatchConstructible (Patch (SyntaxTerm '[Range])) where
   insert = Insert
   delete = Delete
 
-instance PatchConstructible (SplitPatch (Term (Syntax Text) (Record '[Range]))) where
+instance PatchConstructible (SplitPatch (SyntaxTerm '[Range])) where
   insert = SplitInsert
   delete = SplitDelete
 
@@ -304,7 +304,7 @@ class SyntaxConstructible s where
   leaf :: annotation -> Text -> s annotation
   branch :: annotation -> [s annotation] -> s annotation
 
-instance SyntaxConstructible (ConstructibleFree (Syntax Text) patch) where
+instance SyntaxConstructible (ConstructibleFree Syntax patch) where
   leaf info = ConstructibleFree . free . Free . (info :<) . Leaf
   branch info = ConstructibleFree . free . Free . (info :<) . Indexed . fmap deconstruct
 
@@ -312,7 +312,7 @@ instance SyntaxConstructible (ConstructibleFree [] patch) where
   leaf info = ConstructibleFree . free . Free . (info :<) . const []
   branch info = ConstructibleFree . free . Free . (info :<) . fmap deconstruct
 
-instance SyntaxConstructible (Cofree (Syntax Text)) where
+instance SyntaxConstructible (Cofree Syntax) where
   info `leaf` value = cofree $ info :< Leaf value
   info `branch` children = cofree $ info :< Indexed children
 

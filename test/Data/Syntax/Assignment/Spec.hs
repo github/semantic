@@ -5,7 +5,7 @@ import Data.ByteString.Char8 as B (words, length)
 import Data.Source
 import Data.Syntax.Assignment
 import Info
-import Prologue
+import Prologue hiding (Symbol)
 import Test.Hspec
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
