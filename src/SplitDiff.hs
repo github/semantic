@@ -24,4 +24,4 @@ getRange diff = byteRange $ case runFree diff of
 
 -- | A diff with only one side’s annotations.
 type SplitDiff f annotation = Free (TermF f annotation) (SplitPatch (Term f annotation))
-type SplitSyntaxDiff leaf fields = SplitDiff Syntax (Record fields)
+type SplitSyntaxDiff fields = SplitDiff Syntax (Record fields)
