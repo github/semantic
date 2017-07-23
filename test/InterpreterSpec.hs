@@ -26,15 +26,15 @@ spec = parallel $ do
           diffTerms (both termA termB) `shouldBe` replacing termA termB
 
     prop "produces correct diffs" $
-      \ a b -> let diff = diffTerms (unListableF <$> both a b :: Both (SyntaxTerm String '[Category])) in
+      \ a b -> let diff = diffTerms (unListableF <$> both a b :: Both (SyntaxTerm '[Category])) in
                    (beforeTerm diff, afterTerm diff) `shouldBe` (Just (unListableF a), Just (unListableF b))
 
     prop "constructs zero-cost diffs of equal terms" $
-      \ a -> let term = (unListableF a :: SyntaxTerm String '[Category])
+      \ a -> let term = (unListableF a :: SyntaxTerm '[Category])
                  diff = diffTerms (pure term) in
                  diffCost diff `shouldBe` 0
 
     it "produces unbiased insertions within branches" $
-      let term s = cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf s) ]) :: SyntaxTerm String '[Category]
+      let term s = cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf s) ]) :: SyntaxTerm '[Category]
           root = cofree . ((Program :. Nil) :<) . Indexed in
       diffTerms (both (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program :. Nil) :< Indexed [ inserting (term "a"), cata wrap (fmap pure (term "b")) ])

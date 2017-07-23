@@ -14,4 +14,4 @@ spec :: Spec
 spec = parallel $ do
   describe "Term" $ do
     prop "equality is reflexive" $
-      \ a -> unListableF a `shouldBe` (unListableF a :: SyntaxTerm String '[Category])
+      \ a -> unListableF a `shouldBe` (unListableF a :: SyntaxTerm '[Category])

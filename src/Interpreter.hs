@@ -24,7 +24,7 @@ import Term
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
 diffTerms :: HasField fields Category
-          => Both (SyntaxTerm leaf fields) -- ^ A pair of terms representing the old and new state, respectively.
+          => Both (SyntaxTerm fields) -- ^ A pair of terms representing the old and new state, respectively.
           -> SyntaxDiff leaf fields
 diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
@@ -62,9 +62,9 @@ getLabel (h :< t) = (Info.category h, case t of
 
 
 -- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: SyntaxTerm leaf fields
-                   -> SyntaxTerm leaf fields
-                   -> Algorithm (SyntaxTerm leaf fields) (SyntaxDiff leaf fields) (SyntaxDiff leaf fields)
+algorithmWithTerms :: SyntaxTerm fields
+                   -> SyntaxTerm fields
+                   -> Algorithm (SyntaxTerm fields) (SyntaxDiff leaf fields) (SyntaxDiff leaf fields)
 algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     annotate . Indexed <$> byRWS a b

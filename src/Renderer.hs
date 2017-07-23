@@ -56,7 +56,7 @@ data TermRenderer output where
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | “Render” by returning the computed 'SyntaxTerm'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for SemanticSpec.hs.
-  IdentityTermRenderer :: TermRenderer (Maybe (SyntaxTerm Text DefaultFields))
+  IdentityTermRenderer :: TermRenderer (Maybe (SyntaxTerm DefaultFields))
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)

@@ -156,7 +156,7 @@ spec = parallel $ do
 
 
 type Diff' = SyntaxDiff Text (Maybe Declaration ': DefaultFields)
-type Term' = SyntaxTerm Text (Maybe Declaration ': DefaultFields)
+type Term' = SyntaxTerm (Maybe Declaration ': DefaultFields)
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
