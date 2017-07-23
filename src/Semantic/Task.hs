@@ -38,6 +38,7 @@ import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
+import qualified Data.Time.Format as Time
 import Data.Union
 import Diff
 import qualified Files
@@ -79,11 +80,12 @@ data Level
 
 -- | Format a 'Message', optionally colourized.
 formatMessage :: Bool -> Message -> String
-formatMessage colourize (Message _ level message) = showLevel level . showString ": " . showString message . showChar '\n' $ ""
+formatMessage colourize (Message time level message) = showTime time . showChar ' ' . showLevel level . showString ": " . showString message . showChar '\n' $ ""
   where showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
         showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
         showLevel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
         showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
+        showTime = showString . Time.formatTime Time.defaultTimeLocale (Time.iso8601DateFormat (Just "%Q"))
 
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
@@ -200,8 +202,8 @@ runTaskWithOptions options task = do
   where logSink options queue = do
           message <- atomically (readTMQueue queue)
           case message of
-            Just (Message _ level message) -> do
-              hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) level message)
+            Just message -> do
+              hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) message)
               logSink options queue
             _ -> pure ()
 
