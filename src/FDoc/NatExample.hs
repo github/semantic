@@ -1,6 +1,6 @@
 module FDoc.NatExample where
 
-import Prologue
+import Prologue hiding (Nat)
 import Data.Functor.Foldable
 
 -- Our base Functor. The recursive bit is parameterized by r.
