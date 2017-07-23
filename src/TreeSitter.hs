@@ -45,10 +45,10 @@ treeSitterParser language blob = bracket ts_document_new ts_document_free $ \ do
 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
-parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Source -> IO (A.AST grammar)
-parseToAST language source = bracket ts_document_new ts_document_free $ \ document -> do
+parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Blob -> IO (A.AST grammar)
+parseToAST language Blob{..} = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document language
-  root <- unsafeUseAsCStringLen (sourceBytes source) $ \ (source, len) -> do
+  root <- unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
     ts_document_set_input_string_with_length document source len
     ts_document_parse_halt_on_error document
     alloca (\ rootPtr -> do
