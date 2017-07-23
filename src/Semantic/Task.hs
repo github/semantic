@@ -219,7 +219,9 @@ runParser options parser blob@Blob{..} = case parser of
               }
         writeLog Warning (Assignment.formatErrorWithOptions formatOptions blob err)
         pure (errorTerm blobSource)
-      Right term -> pure term
+      Right term -> do
+        when (hasErrors term) $ writeLog Warning ("parse errors present in " <> blobPath)
+        pure term
   TreeSitterParser language tslanguage -> liftIO $ treeSitterParser language tslanguage blobSource
   MarkdownParser -> pure (cmarkParser blobSource)
   LineByLineParser -> pure (lineByLineParser blobSource)
