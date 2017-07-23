@@ -143,12 +143,14 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 data Options = Options
   { optionsColour :: Maybe Bool -- ^ Whether to use colour formatting for errors. 'Nothing' implies automatic selection for the stderr handle, using colour for terminal handles but not for regular files.
   , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
+  , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
   }
 
 defaultOptions :: Options
 defaultOptions = Options
   { optionsColour = Nothing
   , optionsLevel = Just Warning
+  , optionsPrintSource = False
   }
 
 configureOptionsForHandle :: Handle -> Options -> IO Options
