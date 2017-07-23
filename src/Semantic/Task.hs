@@ -45,7 +45,7 @@ import qualified Files
 import Language
 import Language.Markdown
 import Parser
-import Prologue hiding (Location)
+import Prologue hiding (Location, show)
 import System.Console.ANSI
 import System.IO (hIsTerminalDevice, hPutStr)
 import Term
@@ -220,7 +220,7 @@ runParser options parser blob@Blob{..} = case parser of
         writeLog Warning (Assignment.formatErrorWithOptions formatOptions blob err)
         pure (errorTerm blobSource)
       Right term -> do
-        when (hasErrors term) $ writeLog Warning ("parse errors present in " <> blobPath)
+        when (hasErrors term) $ writeLog Warning (blobPath <> ":" <> show blobLanguage <> " has parse errors")
         pure term
   TreeSitterParser language tslanguage -> liftIO $ treeSitterParser language tslanguage blobSource
   MarkdownParser -> pure (cmarkParser blobSource)
