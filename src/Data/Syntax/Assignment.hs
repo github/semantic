@@ -217,18 +217,18 @@ formatError = formatErrorWithOptions defaultOptions
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
 formatErrorWithOptions :: Show grammar => Options -> Blob -> Error grammar -> String
-formatErrorWithOptions Options{..} Blob{..} error
+formatErrorWithOptions Options{..} Blob{..} Error{..}
   = ($ "")
-  $ withSGRCode optionsColour [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) (errorPos error) . showString ": ")
-  . withSGRCode optionsColour [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation error . showChar '\n')
+  $ withSGRCode optionsColour [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
+  . withSGRCode optionsColour [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
   . (if optionsIncludeSource
     then showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
-       . showString (replicate (succ (Info.posColumn (errorPos error) + lineNumberDigits)) ' ') . withSGRCode optionsColour [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
+       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode optionsColour [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else identity)
   . showString (prettyCallStack callStack) . showChar '\n'
-  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine (errorPos error) - 2, Info.posLine (errorPos error)) i ])
+  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine (errorPos error)) :: Double)))
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
 
 withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
 withSGRCode useColour code content =
@@ -239,10 +239,10 @@ withSGRCode useColour code content =
   else
     content
 
-showExpectation :: Show grammar => Error grammar -> ShowS
-showExpectation (Error _ [] Nothing) = showString "no rule to match at end of input nodes"
-showExpectation (Error _ expected Nothing) = showString "expected " . showSymbols expected . showString " at end of input nodes"
-showExpectation (Error _ expected (Just actual)) = showString "expected " . showSymbols expected . showString ", but got " . shows actual
+showExpectation :: Show grammar => [grammar] -> Maybe grammar -> ShowS
+showExpectation [] Nothing = showString "no rule to match at end of input nodes"
+showExpectation expected Nothing = showString "expected " . showSymbols expected . showString " at end of input nodes"
+showExpectation expected (Just actual) = showString "expected " . showSymbols expected . showString ", but got " . shows actual
 
 showSymbols :: Show grammar => [grammar] -> ShowS
 showSymbols [] = showString "end of input nodes"
