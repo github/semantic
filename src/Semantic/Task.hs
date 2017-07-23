@@ -222,7 +222,7 @@ runParser options parser blob@Blob{..} = case parser of
       Right term -> do
         when (hasErrors term) $ writeLog Warning (blobPath <> ":" <> show blobLanguage <> " has parse errors")
         pure term
-  TreeSitterParser language tslanguage -> liftIO $ treeSitterParser language tslanguage blobSource
+  TreeSitterParser tslanguage -> liftIO $ treeSitterParser tslanguage blob
   MarkdownParser -> pure (cmarkParser blobSource)
   LineByLineParser -> pure (lineByLineParser blobSource)
 

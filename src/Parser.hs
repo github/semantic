@@ -48,7 +48,7 @@ data Parser term where
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
-  TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
+  TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (AST CMark.NodeType)
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
@@ -58,12 +58,12 @@ data Parser term where
 parserForLanguage :: Maybe Language -> Parser (SyntaxTerm Text DefaultFields)
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
-  C -> TreeSitterParser C tree_sitter_c
-  Go -> TreeSitterParser Go tree_sitter_go
-  JSON -> TreeSitterParser JSON tree_sitter_json
-  JavaScript -> TreeSitterParser TypeScript tree_sitter_typescript
-  Ruby -> TreeSitterParser Ruby tree_sitter_ruby
-  TypeScript -> TreeSitterParser TypeScript tree_sitter_typescript
+  C -> TreeSitterParser tree_sitter_c
+  Go -> TreeSitterParser tree_sitter_go
+  JSON -> TreeSitterParser tree_sitter_json
+  JavaScript -> TreeSitterParser tree_sitter_typescript
+  Ruby -> TreeSitterParser tree_sitter_ruby
+  TypeScript -> TreeSitterParser tree_sitter_typescript
   _ -> LineByLineParser
 
 rubyParser :: Parser Ruby.Term
