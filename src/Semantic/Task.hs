@@ -78,12 +78,12 @@ data Level
   deriving (Eq, Ord, Show)
 
 -- | Format a 'Message', optionally colourized.
-formatMessage :: Bool -> Level -> String -> String
-formatMessage colourize level message = showLabel level . showString ": " . showString message . showChar '\n' $ ""
-  where showLabel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
-        showLabel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
-        showLabel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
-        showLabel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
+formatMessage :: Bool -> Message -> String
+formatMessage colourize (Message _ level message) = showLevel level . showString ": " . showString message . showChar '\n' $ ""
+  where showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
+        showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
+        showLevel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
+        showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
 
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
