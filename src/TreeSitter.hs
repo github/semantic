@@ -72,13 +72,14 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Ptr TS.Language -> Ptr Document -> Blob -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
-documentToTerm language document blob = do
+documentToTerm language document Blob{..} = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
     peek rootPtr)
-  toTerm root (slice (nodeRange root) (blobSource blob))
-  where toTerm :: Node -> Source -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
-        toTerm node source = do
+  toTerm root
+  where toTerm :: Node -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+        toTerm node = do
+          let source = slice (nodeRange node) blobSource
           name <- peekCString (nodeType node)
 
           children <- getChildren (fromIntegral (nodeNamedChildCount node)) copyNamed
@@ -89,9 +90,8 @@ documentToTerm language document blob = do
                   nodes <- allocaArray count $ \ childNodesPtr -> do
                     _ <- with (nodeTSNode node) (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
                     peekArray count childNodesPtr
-                  children <- traverse childNodeToTerm nodes
+                  children <- traverse toTerm nodes
                   return $! filter isNonEmpty children
-                childNodeToTerm childNode = toTerm childNode (slice (offsetRange (nodeRange childNode) (negate (start range))) source)
                 range = nodeRange node
         copyNamed = ts_node_copy_named_child_nodes document
         copyAll = ts_node_copy_child_nodes document
