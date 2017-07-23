@@ -24,36 +24,36 @@ data Syntax a f
   -- | A function call has an identifier where f is a (Leaf a) and a list of arguments.
   | FunctionCall f [f] [f]
   -- | A ternary has a condition, a true case and a false case
-  | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
+  | Ternary f [f]
   -- | An anonymous function has a list of expressions and params.
-  | AnonymousFunction { params :: [f], expressions :: [f] }
+  | AnonymousFunction  [f] [f]
   -- | A function has an identifier, possible type arguments, params, a possible type, and list of expressions.
-  | Function { id :: f, params :: [f], expressions :: [f] }
+  | Function f [f] [f]
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
-  | Assignment { assignmentId :: f, value :: f }
+  | Assignment f f
   -- | An operator assignment represents expressions with operators like math (e.g x += 1) or conditional (e.g. x ||= 1) assignment.
   | OperatorAssignment f f
   -- | A member access contains a syntax, and another syntax that identifies a property or value in the first syntax.
   -- | e.g. in Javascript x.y represents a member access syntax.
-  | MemberAccess { memberId :: f, property :: f }
+  | MemberAccess f f
   -- | A method call consisting of its target, the method name, and the parameters passed to the method.
   -- | e.g. in Javascript console.log('hello') represents a method call.
-  | MethodCall { targetId :: f, methodId :: f, typeArgs :: [f], methodParams :: [f] }
+  | MethodCall f f [f] [f]
   -- | An operator can be applied to a list of syntaxes.
   | Operator [f]
   -- | A variable declaration. e.g. var foo;
   | VarDecl [f]
   -- | A variable assignment in a variable declaration. var foo = bar;
-  | VarAssignment { varId :: [f], varValue :: f }
+  | VarAssignment [f] f
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
-  | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
-  | Switch { switchExpr :: [f], cases :: [f] }
-  | Case { caseExpr :: f, caseStatements :: [f] }
+  | SubscriptAccess f f
+  | Switch [f] [f]
+  | Case f [f]
   -- | A default case in a switch statement.
   | DefaultCase [f]
-  | Select { cases :: [f] }
-  | Object { objectTy :: Maybe f, keyValues :: [f] }
+  | Select [f]
+  | Object (Maybe f) [f]
   -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
   -- | A comment.
@@ -63,13 +63,13 @@ data Syntax a f
   | ParseError [f]
   -- | A for statement has a list of expressions to setup the iteration and then a list of expressions in the body.
   | For [f] [f]
-  | DoWhile { doWhileBody :: f, doWhileExpr :: f }
-  | While { whileExpr :: f, whileBody :: [f] }
+  | DoWhile f f
+  | While f [f]
   | Return [f]
   | Throw f
   | Constructor f
   -- | TODO: Is it a problem that in Ruby, this pattern can work for method def too?
-  | Try { tryBegin :: [f], catchRescue :: [f], beginElse :: Maybe f, finallyEnsure :: Maybe f }
+  | Try [f] [f] (Maybe f) (Maybe f)
   -- | An array literal with list of children.
   | Array (Maybe f) [f]
   -- | A class with an identifier, superclass, and a list of definitions.
@@ -79,10 +79,10 @@ data Syntax a f
   -- | An if statement with an expression and maybe more expression clauses.
   | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
-  | Module { moduleId:: f, moduleBody :: [f] }
+  | Module f [f]
   -- | An interface with an identifier, a list of clauses, and a list of declarations..
   | Interface f [f] [f]
-  | Namespace { namespaceId:: f, namespaceBody :: [f] }
+  | Namespace f [f]
   | Import f [f]
   | Export (Maybe f) [f]
   | Yield [f]
