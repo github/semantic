@@ -110,7 +110,7 @@ assignTerm language source annotation children allChildren =
   cofree . (annotation :<) <$> case assignTermByLanguage source (category annotation) children of
     Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children allChildren
-  where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm Text DefaultFields ] -> Maybe (S.Syntax Text (SyntaxTerm Text DefaultFields))
+  where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm Text DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm Text DefaultFields))
         assignTermByLanguage = case languageForTSLanguage language of
           Just C -> C.termAssignment
           Just Language.Go -> Go.termAssignment
@@ -118,7 +118,7 @@ assignTerm language source annotation children allChildren =
           Just TypeScript -> TS.termAssignment
           _ -> \ _ _ _ -> Nothing
 
-defaultTermAssignment :: Source -> Category -> [ SyntaxTerm Text DefaultFields ] -> IO [ SyntaxTerm Text DefaultFields ] -> IO (S.Syntax Text (SyntaxTerm Text DefaultFields))
+defaultTermAssignment :: Source -> Category -> [ SyntaxTerm Text DefaultFields ] -> IO [ SyntaxTerm Text DefaultFields ] -> IO (S.Syntax (SyntaxTerm Text DefaultFields))
 defaultTermAssignment source category children allChildren
   | category `elem` operatorCategories = S.Operator <$> allChildren
   | otherwise = pure $! case (category, children) of

@@ -34,21 +34,21 @@ spec :: Spec
 spec = parallel $ do
   describe "tableOfContentsBy" $ do
     prop "drops all nodes with the constant Nothing function" $
-      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (unListableDiff diff :: Diff (Syntax ()) ()) `shouldBe` []
+      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (unListableDiff diff :: Diff Syntax ()) `shouldBe` []
 
     let diffSize = max 1 . sum . fmap (const 1)
     let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
-      \ diff -> let diff' = (unListableDiff diff :: Diff (Syntax ()) ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
+      \ diff -> let diff' = (unListableDiff diff :: Diff Syntax ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
     prop "produces an unchanged entry for identity diffs" $
-      \ term -> let term' = (unListableF term :: Term (Syntax ()) (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
+      \ term -> let term' = (unListableF term :: Term Syntax (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term (Syntax ()) Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
+      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff (Syntax ()) Int])) in
+      \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff Syntax Int])) in
         tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
         if Prologue.null diff' then [Unchanged 0]
                                else replicate (length diff') (Changed 0)
@@ -200,7 +200,7 @@ functionInfo :: Record DefaultFields
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
-isMeaningfulTerm :: ListableF (Term (Syntax leaf)) a -> Bool
+isMeaningfulTerm :: ListableF (Term Syntax) a -> Bool
 isMeaningfulTerm a = case runCofree (unListableF a) of
   (_ :< S.Indexed _) -> False
   (_ :< S.Fixed _) -> False
@@ -209,7 +209,7 @@ isMeaningfulTerm a = case runCofree (unListableF a) of
   _ -> True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
-isMethodOrFunction :: HasField fields Category => ListableF (Term (Syntax leaf)) (Record fields) -> Bool
+isMethodOrFunction :: HasField fields Category => ListableF (Term Syntax) (Record fields) -> Bool
 isMethodOrFunction a = case runCofree (unListableF a) of
   (_ :< S.Method{}) -> True
   (_ :< S.Function{}) -> True

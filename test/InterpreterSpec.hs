@@ -21,7 +21,7 @@ spec :: Spec
 spec = parallel $ do
   describe "interpret" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
-      let termA = cofree $ (StringLiteral :. Nil) :< Leaf ("t\776" :: String)
+      let termA = cofree $ (StringLiteral :. Nil) :< Leaf "t\776"
           termB = cofree $ (StringLiteral :. Nil) :< Leaf "\7831" in
           diffTerms (both termA termB) `shouldBe` replacing termA termB
 

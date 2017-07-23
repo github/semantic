@@ -23,9 +23,9 @@ import Term
 
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: (Eq leaf, Hashable leaf, HasField fields Category)
-  => Both (SyntaxTerm leaf fields) -- ^ A pair of terms representing the old and new state, respectively.
-  -> SyntaxDiff leaf fields
+diffTerms :: HasField fields Category
+          => Both (SyntaxTerm leaf fields) -- ^ A pair of terms representing the old and new state, respectively.
+          -> SyntaxDiff leaf fields
 diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
@@ -55,7 +55,7 @@ diffTermsWith refine comparable (Join (a, b)) = runFreer decompose (diff a b)
           Replace a b -> pure (replacing a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
-getLabel :: HasField fields Category => TermF (Syntax leaf) (Record fields) a -> (Category, Maybe leaf)
+getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
 getLabel (h :< t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)

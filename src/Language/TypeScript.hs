@@ -12,7 +12,7 @@ termAssignment
   :: Source -- ^ The source of the term.
   -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text DefaultFields ] -- ^ The child nodes of the term.
-  -> Maybe (S.Syntax Text (SyntaxTerm Text DefaultFields)) -- ^ The resulting term, in Maybe.
+  -> Maybe (S.Syntax (SyntaxTerm Text DefaultFields)) -- ^ The resulting term, in Maybe.
 termAssignment _ category children =
   case (category, children) of
     (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value

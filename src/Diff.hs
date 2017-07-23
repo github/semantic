@@ -14,7 +14,7 @@ import Term
 type DiffF f annotation = FreeF (TermF f (Both annotation)) (Patch (Term f annotation))
 type Diff f annotation = Free (TermF f (Both annotation)) (Patch (Term f annotation))
 
-type SyntaxDiff leaf fields = Diff (Syntax leaf) (Record fields)
+type SyntaxDiff leaf fields = Diff Syntax (Record fields)
 
 diffSum :: (Foldable f, Functor f) => (Patch (Term f annotation) -> Int) -> Diff f annotation -> Int
 diffSum patchCost diff = sum $ fmap patchCost diff

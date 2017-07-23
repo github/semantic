@@ -14,8 +14,8 @@ type Term f = Cofree f
 type TermF = CofreeF
 
 -- | A Term with a Syntax leaf and a record of fields.
-type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
-type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
+type SyntaxTerm leaf fields = Term Syntax (Record fields)
+type SyntaxTermF leaf fields = TermF Syntax (Record fields)
 
 instance (NFData (f (Cofree f a)), NFData a, Functor f) => NFData (Cofree f a) where
   rnf = rnf . runCofree

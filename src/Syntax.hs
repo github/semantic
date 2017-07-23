@@ -7,6 +7,7 @@ import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
 import Data.Mergeable
+import Data.Text (pack)
 import GHC.Generics
 import Prologue
 
@@ -14,9 +15,9 @@ import Prologue
 --
 -- 'a' is the type of leaves in the syntax tree, typically 'Text', but possibly some datatype representing different leaves more precisely.
 -- 'f' is the type representing another level of the tree, e.g. the children of branches. Often 'Cofree', 'Free' or similar.
-data Syntax a f
+data Syntax f
   -- | A terminal syntax node, e.g. an identifier, or atomic literal.
-  = Leaf a
+  = Leaf Text
   -- | An ordered branch of child nodes, expected to be variadic in the grammar, e.g. a list of statements or uncurried function parameters.
   | Indexed [f]
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
@@ -57,7 +58,7 @@ data Syntax a f
   -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
   -- | A comment.
-  | Comment a
+  | Comment Text
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
   | ParseError [f]
@@ -113,16 +114,16 @@ data Syntax a f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
 
 
-extractLeafValue :: Syntax leaf b -> Maybe leaf
+extractLeafValue :: Syntax a -> Maybe Text
 extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
 
 -- Instances
 
-instance Listable2 Syntax where
-  liftTiers2 leaf recur
-    =  liftCons1 leaf Leaf
+instance Listable1 Syntax where
+  liftTiers recur
+    =  liftCons1 (pack `mapT` tiers) Leaf
     \/ liftCons1 (liftTiers recur) Indexed
     \/ liftCons1 (liftTiers recur) Fixed
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FunctionCall
@@ -142,7 +143,7 @@ instance Listable2 Syntax where
     \/ liftCons1 (liftTiers recur) Select
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
     \/ liftCons2 recur recur Pair
-    \/ liftCons1 leaf Comment
+    \/ liftCons1 (pack `mapT` tiers) Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
     \/ liftCons1 (liftTiers recur) Syntax.ParseError
     \/ liftCons2 (liftTiers recur) (liftTiers recur) For
@@ -177,13 +178,10 @@ instance Listable2 Syntax where
     \/ liftCons2 recur recur Send
     \/ liftCons1 (liftTiers recur) DefaultCase
 
-instance Listable leaf => Listable1 (Syntax leaf) where
-  liftTiers = liftTiers2 tiers
-
-instance (Listable leaf, Listable recur) => Listable (Syntax leaf recur) where
+instance Listable recur => Listable (Syntax recur) where
   tiers = tiers1
 
-instance Eq leaf => Eq1 (Syntax leaf) where
+instance Eq1 Syntax where
   liftEq = genericLiftEq
 
-instance Eq leaf => GAlign (Syntax leaf)
+instance GAlign Syntax

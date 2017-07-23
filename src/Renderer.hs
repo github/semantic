@@ -70,7 +70,7 @@ data SomeRenderer f where
 
 deriving instance Show (SomeRenderer f)
 
-identifierAlgebra :: RAlgebra (CofreeF (Syntax Text) a) (Cofree (Syntax Text) a) (Maybe Identifier)
+identifierAlgebra :: RAlgebra (CofreeF Syntax a) (Cofree Syntax a) (Maybe Identifier)
 identifierAlgebra (_ :< syntax) = case syntax of
   S.Assignment f _ -> identifier f
   S.Class f _ _ -> identifier f
