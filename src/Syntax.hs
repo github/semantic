@@ -7,6 +7,7 @@ import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
 import Data.Mergeable
+import Data.Text (pack)
 import GHC.Generics
 import Prologue
 
@@ -121,7 +122,7 @@ extractLeafValue syntax = case syntax of
 
 instance Listable1 Syntax where
   liftTiers recur
-    =  liftCons1 leaf Leaf
+    =  liftCons1 (pack `mapT` tiers) Leaf
     \/ liftCons1 (liftTiers recur) Indexed
     \/ liftCons1 (liftTiers recur) Fixed
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FunctionCall
@@ -141,7 +142,7 @@ instance Listable1 Syntax where
     \/ liftCons1 (liftTiers recur) Select
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
     \/ liftCons2 recur recur Pair
-    \/ liftCons1 leaf Comment
+    \/ liftCons1 (pack `mapT` tiers) Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
     \/ liftCons1 (liftTiers recur) Syntax.ParseError
     \/ liftCons2 (liftTiers recur) (liftTiers recur) For
