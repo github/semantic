@@ -6,7 +6,6 @@ import Data.Functor.Both
 import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
 import Data.Record
-import Data.String
 import Diff
 import Interpreter
 import Patch

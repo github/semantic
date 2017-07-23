@@ -7,7 +7,6 @@ import Data.Bifunctor
 import Data.Functor.Listable
 import RWS
 import Data.Record
-import Data.String
 import Data.These
 import Diff
 import Info
