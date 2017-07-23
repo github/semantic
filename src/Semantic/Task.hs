@@ -167,6 +167,7 @@ configureOptionsForHandle handle options = do
     { optionsColour = optionsColour options <|> Just isTerminal
     }
 
+
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
 -- > runTask = runTaskWithOptions defaultOptions
