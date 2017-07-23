@@ -1,0 +1,2 @@
+packages: semantic-diff.cabal languages/*/*.cabal vendor/effects/effects.cabal vendor/freer-cofreer/freer-cofreer.cabal vendor/haskell-tree-sitter/haskell-tree-sitter.cabal vendor/hspec-expectations-pretty-diff/hspec-expectations-pretty-diff.cabal
+jobs: $ncpus
