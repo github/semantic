@@ -20,7 +20,6 @@ import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
-import qualified Syntax
 import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
@@ -35,7 +34,7 @@ import qualified Text.Parser.TreeSitter.TypeScript as TS
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Ptr TS.Language -> Blob -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+treeSitterParser :: Ptr TS.Language -> Blob -> IO (SyntaxTerm Text DefaultFields)
 treeSitterParser language blob = bracket ts_document_new ts_document_free $ \ document -> do
   ts_document_set_language document language
   unsafeUseAsCStringLen (sourceBytes (blobSource blob)) $ \ (sourceBytes, len) -> do
@@ -71,13 +70,13 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Ptr TS.Language -> Ptr Document -> Blob -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+documentToTerm :: Ptr TS.Language -> Ptr Document -> Blob -> IO (SyntaxTerm Text DefaultFields)
 documentToTerm language document Blob{..} = do
   root <- alloca (\ rootPtr -> do
     ts_document_root_node_p document rootPtr
     peek rootPtr)
   toTerm root
-  where toTerm :: Node -> IO (Term (Syntax.Syntax Text) (Record DefaultFields))
+  where toTerm :: Node -> IO (SyntaxTerm Text DefaultFields)
         toTerm node = do
           let source = slice (nodeRange node) blobSource
           name <- peekCString (nodeType node)
