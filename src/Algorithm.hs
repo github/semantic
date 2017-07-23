@@ -8,7 +8,7 @@ import Data.These
 import Data.Union
 import Diff
 import GHC.Generics
-import Prologue hiding (liftF)
+import Prologue hiding (diff, liftF)
 import Term
 import Text.Show
 

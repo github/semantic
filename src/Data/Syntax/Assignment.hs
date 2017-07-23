@@ -99,7 +99,7 @@ import Data.Record
 import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
-import Prologue hiding (Alt, get, Location, state)
+import Prologue hiding (Alt, get, hPutStr, Location, Symbol, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)

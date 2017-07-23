@@ -290,7 +290,7 @@ pqGramDecorator getLabel p q = cata algebra
 unitVector :: Int -> Int -> FeatureVector
 unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
   where
-    invMagnitude = 1 / sqrtDouble (sum (fmap (** 2) components))
+    invMagnitude = 1 / sqrt (sum (fmap (** 2) components))
     components = evalRand (sequenceA (replicate d (liftRand randomDouble))) (pureMT (fromIntegral hash))
 
 -- | Test the comparability of two root 'Term's in O(1).

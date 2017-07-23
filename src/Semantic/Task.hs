@@ -28,7 +28,7 @@ import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import Diff
 import Language
 import Parser
-import Prologue
+import Prologue hiding (diff)
 import Term
 
 data TaskF output where

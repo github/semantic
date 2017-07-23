@@ -22,7 +22,7 @@ import Interpreter
 import qualified Language
 import Patch
 import Parser
-import Prologue
+import Prologue hiding (diff)
 import Renderer
 import Semantic.Task as Task
 import Term

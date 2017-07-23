@@ -19,7 +19,7 @@ import Data.These
 import Diff
 import Info hiding (Return)
 import Patch (inserting, deleting, replacing, patchSum)
-import Prologue hiding (lookup)
+import Prologue hiding (diff, lookup)
 import Syntax as S hiding (Return)
 import Term
 

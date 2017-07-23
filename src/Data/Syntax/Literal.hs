@@ -6,7 +6,7 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
-import Prologue hiding (Set)
+import Prologue hiding (Set, Symbol)
 
 -- Boolean
 

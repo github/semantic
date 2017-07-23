@@ -26,7 +26,7 @@ import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
-import Prologue hiding (Location)
+import Prologue hiding (Location, Symbol)
 import Syntax hiding (Go)
 import Term
 import qualified Text.Parser.TreeSitter as TS

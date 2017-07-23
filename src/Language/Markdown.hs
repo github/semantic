@@ -9,7 +9,7 @@ import CMark
 import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
-import Prologue hiding (Location)
+import Prologue hiding (Location, Symbol)
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
