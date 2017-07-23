@@ -4,6 +4,7 @@ module FDoc.Term where
 import Data.Range
 import Data.Record
 import Category
+import Syntax
 import Term
 import Prologue
 
@@ -31,7 +32,7 @@ Example (from GHCi):
 
 -}
 
-leafTermF :: leaf -> SyntaxTermF (Record '[Range, Category]) b
+leafTermF :: Text -> SyntaxTermF '[Range, Category] b
 leafTermF leaf = (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf leaf
 
 {-
@@ -56,11 +57,11 @@ Example (from GHCi):
 > Leaf "example"
 
 -}
-leafTerm :: leaf -> SyntaxTerm (Record '[Range, Category])
+leafTerm :: Text -> SyntaxTerm '[Range, Category]
 leafTerm = cofree . leafTermF
 
-indexedTermF :: [leaf] -> SyntaxTermF (Record '[Range, Category]) (Term Syntax (Record '[Range, Category]))
+indexedTermF :: [Text] -> SyntaxTermF '[Range, Category] (SyntaxTerm '[Range, Category])
 indexedTermF leaves = (Range 1 10 :. Category.MethodCall :. Nil) :< Indexed (leafTerm <$> leaves)
 
-indexedTerm :: [leaf] -> SyntaxTerm (Record '[Range, Category])
+indexedTerm :: [Text] -> SyntaxTerm '[Range, Category]
 indexedTerm leaves = cofree $ indexedTermF leaves

@@ -57,7 +57,7 @@ diffTermsWith refine comparable (Join (a, b)) = runAlgorithm decompose (diff a b
           Replace a b -> pure (replacing a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
-getLabel :: HasField fields Category => SyntaxTermF (Record fields) a -> (Category, Maybe Text)
+getLabel :: HasField fields Category => SyntaxTermF fields a -> (Category, Maybe Text)
 getLabel (h :< t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
