@@ -5,7 +5,6 @@ import Data.Range
 import Data.Record
 import Category
 import Term
-import Syntax
 import Prologue
 
 {-
@@ -32,7 +31,7 @@ Example (from GHCi):
 
 -}
 
-leafTermF :: leaf -> TermF (Syntax leaf) (Record '[Range, Category]) b
+leafTermF :: leaf -> SyntaxTermF (Record '[Range, Category]) b
 leafTermF leaf = (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf leaf
 
 {-
@@ -57,11 +56,11 @@ Example (from GHCi):
 > Leaf "example"
 
 -}
-leafTerm :: leaf -> Cofree (Syntax leaf) (Record '[Range, Category])
+leafTerm :: leaf -> SyntaxTerm (Record '[Range, Category])
 leafTerm = cofree . leafTermF
 
-indexedTermF :: [leaf] -> TermF (Syntax leaf) (Record '[Range, Category]) (Term (Syntax leaf) (Record '[Range, Category]))
+indexedTermF :: [leaf] -> SyntaxTermF (Record '[Range, Category]) (Term Syntax (Record '[Range, Category]))
 indexedTermF leaves = (Range 1 10 :. Category.MethodCall :. Nil) :< Indexed (leafTerm <$> leaves)
 
-indexedTerm :: [leaf] -> Term (Syntax leaf) (Record '[Range, Category])
+indexedTerm :: [leaf] -> SyntaxTerm (Record '[Range, Category])
 indexedTerm leaves = cofree $ indexedTermF leaves

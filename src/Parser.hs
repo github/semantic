@@ -50,14 +50,14 @@ data Parser term where
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
-  TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm Text DefaultFields)
+  TreeSitterParser :: Language -> Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (AST CMark.NodeType)
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
-  LineByLineParser :: Parser (SyntaxTerm Text DefaultFields)
+  LineByLineParser :: Parser (SyntaxTerm DefaultFields)
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Maybe Language -> Parser (SyntaxTerm Text DefaultFields)
+parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
   C -> TreeSitterParser C tree_sitter_c
@@ -98,6 +98,6 @@ errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Location)
 errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Source -> SyntaxTerm Text DefaultFields
+lineByLineParser :: Source -> SyntaxTerm DefaultFields
 lineByLineParser source = cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
   where toLine line range = cofree $ (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))

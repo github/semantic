@@ -12,11 +12,10 @@ import Prologue
 
 -- | A node in an abstract syntax tree.
 --
--- 'a' is the type of leaves in the syntax tree, typically 'Text', but possibly some datatype representing different leaves more precisely.
 -- 'f' is the type representing another level of the tree, e.g. the children of branches. Often 'Cofree', 'Free' or similar.
-data Syntax a f
+data Syntax f
   -- | A terminal syntax node, e.g. an identifier, or atomic literal.
-  = Leaf a
+  = Leaf Text
   -- | An ordered branch of child nodes, expected to be variadic in the grammar, e.g. a list of statements or uncurried function parameters.
   | Indexed [f]
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
@@ -57,7 +56,7 @@ data Syntax a f
   -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
   -- | A comment.
-  | Comment a
+  | Comment Text
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
   | ParseError [f]
@@ -110,18 +109,18 @@ data Syntax a f
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
   | Send f f
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
+  deriving (Eq, Foldable, Functor, GAlign, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
 
 
-extractLeafValue :: Syntax leaf b -> Maybe leaf
+extractLeafValue :: Syntax b -> Maybe Text
 extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
 
 -- Instances
 
-instance Listable2 Syntax where
-  liftTiers2 leaf recur
+instance Listable1 Syntax where
+  liftTiers recur
     =  liftCons1 leaf Leaf
     \/ liftCons1 (liftTiers recur) Indexed
     \/ liftCons1 (liftTiers recur) Fixed
@@ -177,13 +176,8 @@ instance Listable2 Syntax where
     \/ liftCons2 recur recur Send
     \/ liftCons1 (liftTiers recur) DefaultCase
 
-instance Listable leaf => Listable1 (Syntax leaf) where
-  liftTiers = liftTiers2 tiers
-
-instance (Listable leaf, Listable recur) => Listable (Syntax leaf recur) where
+instance Listable recur => Listable (Syntax recur) where
   tiers = tiers1
 
-instance Eq leaf => Eq1 (Syntax leaf) where
+instance Eq1 Syntax where
   liftEq = genericLiftEq
-
-instance Eq leaf => GAlign (Syntax leaf)

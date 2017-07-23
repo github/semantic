@@ -5,7 +5,6 @@ import Data.Range
 import Data.Record
 import Category
 import Term
-import Syntax
 import Prologue
 import Prelude
 import FDoc.Term
@@ -25,7 +24,7 @@ structure.
 
 The example below adds a new field to the `Record` fields.
 -}
-indexedTermAna :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
+indexedTermAna :: [leaf] -> SyntaxTerm (Record '[NewField, Range, Category])
 indexedTermAna childrenLeaves = ana coalgebra (indexedTerm childrenLeaves)
   where
     coalgebra term = (NewField :. (extract term)) :< unwrap term
@@ -43,7 +42,7 @@ structure to a new shape.
 
 The example below adds a new field to the `Record` fields.
 -}
-indexedTermCata :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
+indexedTermCata :: [leaf] -> SyntaxTerm (Record '[NewField, Range, Category])
 indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
   where
     algebra :: Functor f => CofreeF f (Record t) (Cofree f (Record (NewField : t))) -> Cofree f (Record (NewField : t))
@@ -82,7 +81,7 @@ stringToTermAna "indexed" =>
   the new cofree `Indexed` structure, resulting in a expansion of all possible
   string terms.
 -}
-stringToTermAna :: String -> Term (Syntax String) (Record '[Range, Category])
+stringToTermAna :: String -> SyntaxTerm (Record '[Range, Category])
 stringToTermAna = ana coalgebra
   where
     coalgebra representation = case representation of
@@ -95,7 +94,7 @@ Catamorphism -- construct a list of Strings from a recursive Term structure.
 The example below shows how to tear down a recursive Term structure into a list
 of String representation.
 -}
-termToStringCata :: Term (Syntax String) (Record '[Range, Category]) -> [String]
+termToStringCata :: SyntaxTerm (Record '[Range, Category]) -> [String]
 termToStringCata = cata algebra
   where
     algebra term = case term of
@@ -177,7 +176,7 @@ Final shape:
 ]
 
 -}
-termPara :: Term (Syntax String) (Record '[Range, Category]) -> [(Term (Syntax String) (Record '[Range, Category]), String)]
+termPara :: Syntaxterm (Record '[Range, Category]) -> [(SyntaxTerm (Record '[Range, Category]), String)]
 termPara = para algebra
   where
     algebra term = case term of

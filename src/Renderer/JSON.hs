@@ -100,7 +100,7 @@ instance ToJSON a => ToJSONFields (Patch a) where
 instance ToJSON a => ToJSONFields [a] where
   toJSONFields list = [ "children" .= list ]
 
-instance ToJSON recur => ToJSONFields (Syntax leaf recur) where
+instance ToJSON recur => ToJSONFields (Syntax recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
 
 instance (Foldable f, ToJSON a, ToJSONFields (Union fs a)) => ToJSONFields (Union (f ': fs) a) where
