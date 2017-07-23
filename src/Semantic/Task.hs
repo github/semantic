@@ -227,6 +227,11 @@ runParser options parser blob@Blob{..} = case parser of
 errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Assignment.Location)
 errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
 
+hasErrors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> Bool
+hasErrors = cata $ \ (_ :< syntax) -> case syntax of
+  _ | Just err <- prj syntax -> const True (err :: Syntax.Error Bool)
+  _ -> or syntax
+
 
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return
