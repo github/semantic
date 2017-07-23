@@ -8,8 +8,9 @@ module Prologue
 , module Data.Hashable
 ) where
 
-import Protolude as X
+import Protolude as X hiding ((<>))
 import Data.List (lookup)
+import Data.Semigroup as X (Semigroup(..))
 
 import Control.Comonad.Cofree as X hiding ((:<), unfold, unfoldM)
 import Control.Monad.Free as X (Free())
