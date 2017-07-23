@@ -167,3 +167,12 @@ categoryForLanguageProductionName = withDefaults . byLanguage
       Language.Go -> Go.categoryForGoName
       TypeScript -> TS.categoryForTypeScriptName
       _ -> Other
+
+
+languageForTSLanguage :: Ptr TS.Language -> Maybe Language
+languageForTSLanguage language
+  =    if language == TS.tree_sitter_c then Just C
+  else if language == TS.tree_sitter_go then Just Language.Go
+  else if language == TS.tree_sitter_ruby then Just Ruby
+  else if language == TS.tree_sitter_typescript then Just TypeScript
+  else Nothing
