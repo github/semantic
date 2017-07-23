@@ -78,12 +78,12 @@ documentToTerm language document Blob{..} = do
   toTerm root
   where toTerm :: Node -> IO (SyntaxTerm Text DefaultFields)
         toTerm node = do
-          let source = slice (nodeRange node) blobSource
           name <- peekCString (nodeType node)
 
           children <- getChildren (fromIntegral (nodeNamedChildCount node)) copyNamed
           let allChildren = getChildren (fromIntegral (nodeChildCount node)) copyAll
 
+          let source = slice (nodeRange node) blobSource
           assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
           where getChildren count copy = do
                   nodes <- allocaArray count $ \ childNodesPtr -> do
