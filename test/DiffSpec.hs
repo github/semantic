@@ -5,7 +5,6 @@ import Category
 import Data.Functor.Both
 import Data.Functor.Listable
 import RWS
-import Data.String
 import Diff
 import Info
 import Interpreter

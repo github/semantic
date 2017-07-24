@@ -25,7 +25,7 @@ structure.
 
 The example below adds a new field to the `Record` fields.
 -}
-indexedTermAna :: [Text] -> SyntaxTerm '[NewField, Range, Category]
+indexedTermAna :: [Text] -> Term Syntax (Record '[NewField, Range, Category])
 indexedTermAna childrenLeaves = ana coalgebra (indexedTerm childrenLeaves)
   where
     coalgebra term = (NewField :. (extract term)) :< unwrap term
@@ -43,7 +43,7 @@ structure to a new shape.
 
 The example below adds a new field to the `Record` fields.
 -}
-indexedTermCata :: [Text] -> SyntaxTerm '[NewField, Range, Category]
+indexedTermCata :: [Text] -> Term Syntax (Record '[NewField, Range, Category])
 indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
   where
     algebra :: Functor f => CofreeF f (Record t) (Cofree f (Record (NewField : t))) -> Cofree f (Record (NewField : t))
@@ -82,7 +82,7 @@ stringToTermAna "indexed" =>
   the new cofree `Indexed` structure, resulting in a expansion of all possible
   string terms.
 -}
-stringToTermAna :: Text -> SyntaxTerm '[Range, Category]
+stringToTermAna :: Text -> Term Syntax (Record '[Range, Category])
 stringToTermAna = ana coalgebra
   where
     coalgebra representation = case representation of
@@ -95,7 +95,7 @@ Catamorphism -- construct a list of Strings from a recursive Term structure.
 The example below shows how to tear down a recursive Term structure into a list
 of String representation.
 -}
-termToStringCata :: SyntaxTerm '[Range, Category] -> [Text]
+termToStringCata :: Term Syntax (Record '[Range, Category]) -> [Text]
 termToStringCata = cata algebra
   where
     algebra term = case term of
@@ -177,7 +177,7 @@ Final shape:
 ]
 
 -}
-termPara :: SyntaxTerm '[Range, Category] -> [(SyntaxTerm '[Range, Category], Text)]
+termPara :: Term Syntax (Record '[Range, Category]) -> [(Term Syntax (Record '[Range, Category]), Text)]
 termPara = para algebra
   where
     algebra term = case term of

@@ -256,7 +256,7 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
-align :: Both Source.Source -> ConstructibleFree Syntax (Patch (SyntaxTerm '[Range])) (Both (Record '[Range])) -> PrettyDiff (SplitDiff [] (Record '[Range]))
+align :: Both Source.Source -> ConstructibleFree Syntax (Patch (Term Syntax (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff [] (Record '[Range]))
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
@@ -281,14 +281,14 @@ newtype ConstructibleFree f patch annotation = ConstructibleFree { deconstruct :
 
 
 class PatchConstructible p where
-  insert :: SyntaxTerm '[Range] -> p
-  delete :: SyntaxTerm '[Range] -> p
+  insert :: Term Syntax (Record '[Range]) -> p
+  delete :: Term Syntax (Record '[Range]) -> p
 
-instance PatchConstructible (Patch (SyntaxTerm '[Range])) where
+instance PatchConstructible (Patch (Term Syntax (Record '[Range]))) where
   insert = Insert
   delete = Delete
 
-instance PatchConstructible (SplitPatch (SyntaxTerm '[Range])) where
+instance PatchConstructible (SplitPatch (Term Syntax (Record '[Range]))) where
   insert = SplitInsert
   delete = SplitDelete
 

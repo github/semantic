@@ -32,7 +32,7 @@ Example (from GHCi):
 
 -}
 
-leafTermF :: Text -> SyntaxTermF '[Range, Category] b
+leafTermF :: Text -> TermF Syntax (Record '[Range, Category]) b
 leafTermF leaf = (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf leaf
 
 {-
@@ -57,11 +57,11 @@ Example (from GHCi):
 > Leaf "example"
 
 -}
-leafTerm :: Text -> SyntaxTerm '[Range, Category]
+leafTerm :: Text -> Cofree Syntax (Record '[Range, Category])
 leafTerm = cofree . leafTermF
 
-indexedTermF :: [Text] -> SyntaxTermF '[Range, Category] (SyntaxTerm '[Range, Category])
+indexedTermF :: [Text] -> TermF Syntax (Record '[Range, Category]) (Term Syntax (Record '[Range, Category]))
 indexedTermF leaves = (Range 1 10 :. Category.MethodCall :. Nil) :< Indexed (leafTerm <$> leaves)
 
-indexedTerm :: [Text] -> SyntaxTerm '[Range, Category]
+indexedTerm :: [Text] -> Term Syntax (Record '[Range, Category])
 indexedTerm leaves = cofree $ indexedTermF leaves

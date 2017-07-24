@@ -3,7 +3,6 @@ module TermSpec where
 
 import Category
 import Data.Functor.Listable
-import Data.String (String)
 import Prologue
 import Term
 import Test.Hspec (Spec, describe, parallel)

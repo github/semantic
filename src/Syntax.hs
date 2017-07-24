@@ -26,7 +26,7 @@ data Syntax f
   -- | A ternary has a condition, a true case and a false case
   | Ternary f [f]
   -- | An anonymous function has a list of expressions and params.
-  | AnonymousFunction [f] [f]
+  | AnonymousFunction  [f] [f]
   -- | A function has an identifier, possible type arguments, params, a possible type, and list of expressions.
   | Function f [f] [f]
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
@@ -110,10 +110,10 @@ data Syntax f
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
   | Send f f
-  deriving (Eq, Foldable, Functor, GAlign, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
 
 
-extractLeafValue :: Syntax b -> Maybe Text
+extractLeafValue :: Syntax a -> Maybe Text
 extractLeafValue syntax = case syntax of
   Leaf a -> Just a
   _ -> Nothing
@@ -182,3 +182,5 @@ instance Listable recur => Listable (Syntax recur) where
 
 instance Eq1 Syntax where
   liftEq = genericLiftEq
+
+instance GAlign Syntax

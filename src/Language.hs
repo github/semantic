@@ -36,7 +36,7 @@ languageForType mediaType = case mediaType of
     ".py" -> Just Python
     _ -> Nothing
 
-toVarDeclOrAssignment :: HasField fields Category => SyntaxTerm fields -> SyntaxTerm fields
+toVarDeclOrAssignment :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
 toVarDeclOrAssignment child = case unwrap child of
   S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment [child'] assignment
   S.Indexed [child'] -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child']
@@ -44,10 +44,10 @@ toVarDeclOrAssignment child = case unwrap child of
   S.VarAssignment _ _ -> child
   _ -> toVarDecl child
 
-toVarDecl :: HasField fields Category => SyntaxTerm fields -> SyntaxTerm fields
+toVarDecl :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child]
 
-toTuple :: SyntaxTerm fields -> [SyntaxTerm fields]
+toTuple :: Term S.Syntax (Record fields) -> [Term S.Syntax (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
