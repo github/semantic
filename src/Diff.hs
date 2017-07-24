@@ -46,7 +46,7 @@ mapAnnotations :: (Functor f, Functor g)
 mapAnnotations f = hoistFree (first (fmap f)) . fmap (fmap (fmap f))
 
 
-instance (NFData (f (Diff f a)), NFData (Cofree f a), NFData a, Functor f) => NFData (Diff f a) where
+instance (NFData (f (Diff f a)), NFData (f (Cofree f a)), NFData a, Functor f) => NFData (Diff f a) where
   rnf fa = case runFree fa of
     Free f -> rnf f `seq` ()
     Pure a -> rnf a `seq` ()
