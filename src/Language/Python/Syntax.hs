@@ -100,48 +100,63 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
 assignment =
-      makeTerm <$> symbol Module <*> children (Syntax.Program <$> many declaration)
+      makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
   <|> parseError
 
-declaration :: Assignment
-declaration = classDefinition
-           <|> comment
-           <|> decoratedDefinition
-           <|> expression
-           <|> functionDefinition
-           <|> statement
-           <|> parseError
+expression :: Assignment
+expression =
+      argument
+  <|> assertStatement
+  <|> assignment'
+  <|> await
+  <|> binaryOperator
+  <|> booleanOperator
+  <|> breakStatement
+  <|> call
+  <|> classDefinition
+  <|> comment
+  <|> comparisonOperator
+  <|> comprehension
+  <|> conditionalExpression
+  <|> continueStatement
+  <|> decoratedDefinition
+  <|> deleteStatement
+  <|> dottedName
+  <|> ellipsis
+  <|> exceptClause
+  <|> execStatement
+  <|> expressionList
+  <|> expressionStatement
+  <|> finallyClause
+  <|> forStatement
+  <|> functionDefinition
+  <|> globalStatement
+  <|> identifier
+  <|> ifStatement
+  <|> import'
+  <|> keyword
+  <|> literal
+  <|> memberAccess
+  <|> nonlocalStatement
+  <|> notOperator
+  <|> parameter
+  <|> parseError
+  <|> passStatement
+  <|> printStatement
+  <|> raiseStatement
+  <|> returnStatement
+  <|> slice
+  <|> subscript
+  <|> tryStatement
+  <|> tuple
+  <|> type'
+  <|> unaryOperator
+  <|> whileStatement
+  <|> withStatement
+  <|> yield
 
-declarations :: Assignment
-declarations = makeTerm <$> location <*> many declaration
-
-statement :: Assignment
-statement = assertStatement
-          <|> assignment'
-          <|> breakStatement
-          <|> continueStatement
-          <|> deleteStatement
-          <|> exceptClause
-          <|> execStatement
-          <|> expressionStatement
-          <|> finallyClause
-          <|> forStatement
-          <|> globalStatement
-          <|> ifStatement
-          <|> identifier
-          <|> import'
-          <|> nonlocalStatement
-          <|> passStatement
-          <|> printStatement
-          <|> raiseStatement
-          <|> returnStatement
-          <|> tryStatement
-          <|> whileStatement
-          <|> withStatement
-          <|> parseError
-
-statements :: Assignment
-statements = makeTerm <$> location <*> many statement
+expressions :: Assignment
+expressions = makeTerm <$> location <*> many expression
 
 literal :: Assignment
 literal =  boolean
@@ -156,37 +171,14 @@ literal =  boolean
        <|> parseError
 
 expressionStatement :: Assignment
-expressionStatement = mk <$> symbol ExpressionStatement <*> children (some declaration)
+expressionStatement = mk <$> symbol ExpressionStatement <*> children (some expression)
   where mk _ [child] = child
         mk location children = makeTerm location children
 
-expression :: Assignment
-expression =  argument
-          <|> await
-          <|> binaryOperator
-          <|> booleanOperator
-          <|> call
-          <|> comparisonOperator
-          <|> comprehension
-          <|> conditionalExpression
-          <|> dottedName
-          <|> ellipsis
-          <|> expressionList
-          <|> keyword
-          <|> literal
-          <|> memberAccess
-          <|> notOperator
-          <|> parameter
-          <|> slice
-          <|> subscript
-          <|> statement
-          <|> tuple
-          <|> type'
-          <|> unaryOperator
-          <|> parseError
-
-expressions :: Assignment
-expressions = makeTerm <$> location <*> many expression
+expressionList :: Assignment
+expressionList = mk <$> symbol ExpressionList <*> children (some expression)
+  where mk _ [child] = child
+        mk location children = makeTerm location children
 
 argument :: Assignment
 argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
@@ -197,31 +189,36 @@ parameter :: Assignment
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
          <|> makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
          <|> makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
-         <|> makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> identifier <*> type')
+         <|> makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> expression <*> type')
          <|> makeAnnotation <$> symbol TypedDefaultParameter <*> children ((,,) <$> expression <*> expression <*> expression)
   where
     makeAnnotation loc (identifier', type', value') = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
     makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment identifier' value')
 
 decoratedDefinition :: Assignment
-decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> declaration))
+decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> expression))
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
     partialDecorator = (,) <$> symbol Decorator <*> children decorator'
     decorator' = Declaration.Decorator <$> expression <*> ((symbol ArgumentList *> children (many expression <|> many emptyTerm)) <|> many emptyTerm)
 
 withStatement :: Assignment
-withStatement = makeTerm <$> symbol WithStatement <*> children (uncurry Statement.Let . swap <$> (symbol WithItem *> children ((,) <$> identifier <*> identifier)) <*> expression)
+withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with)
+  where
+    mk _ [child] = child
+    mk l children = makeTerm l children
+    with = makeTerm <$> location <*> (uncurry Statement.Let . swap <$> withItem <*> expressions)
+    withItem = symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm))
 
 forStatement :: Assignment
-forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many declaration)))
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
   where
-    make loc variables expressionList forBody forElseClause = case forElseClause of
-      Nothing -> makeTerm loc (Statement.ForEach variables expressionList forBody)
-      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach variables expressionList forBody) a)
+    make loc binding subject body forElseClause = case forElseClause of
+      Nothing -> makeTerm loc (Statement.ForEach binding subject body)
+      Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach binding subject body) a)
 
 whileStatement :: Assignment
-whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many declaration)))
+whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
   where
     make loc whileCondition whileBody whileElseClause = case whileElseClause of
       Nothing -> makeTerm loc (Statement.While whileCondition whileBody)
@@ -233,14 +230,14 @@ tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> 
 
 exceptClause :: Assignment
 exceptClause = makeTerm <$> symbol ExceptClause <*> children
-  (Statement.Catch <$> ((makeTerm <$> location <*> (uncurry Statement.Let . swap <$> ((,) <$> identifier <* symbol AnonAs <*> identifier) <*> emptyTerm))
-                      <|> makeTerm <$> location <*> many identifier)
+  (Statement.Catch <$> ((makeTerm <$> location <*> (uncurry Statement.Let . swap <$> ((,) <$> expression <* symbol AnonAs <*> expression) <*> emptyTerm))
+                      <|> makeTerm <$> location <*> many expression)
                    <*> expressions)
 
 functionDefinition :: Assignment
-functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> identifier <*> (symbol Parameters *> children (many expression)) <*> optional (symbol Type *> children expression) <*> declarations))
-                  <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> identifier <*> (symbol Parameters *> children (many expression)) <*> optional (symbol Type *> children expression) <*> declarations))
-                  <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> pure []) <*> optional (symbol Type *> children expression) <*> declarations))
+functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunctionDeclaration loc <$> expression <*> (symbol Parameters *> children (many expression)) <*> optional (symbol Type *> children expression) <*> expressions))
+                  <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> expression <*> (symbol Parameters *> children (many expression)) <*> optional (symbol Type *> children expression) <*> expressions))
+                  <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> pure []) <*> optional (symbol Type *> children expression) <*> expressions))
   where
     makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
     makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
@@ -249,7 +246,7 @@ async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
 
 classDefinition :: Assignment
-classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> identifier <*> argumentList <*> many declaration)
+classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> expression <*> argumentList <*> many expression)
   where argumentList = symbol ArgumentList *> children (many expression)
                     <|> pure []
 
@@ -257,7 +254,7 @@ type' :: Assignment
 type' = symbol Type *> children expression
 
 finallyClause :: Assignment
-finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expression)
+finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expressions)
 
 dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
@@ -289,10 +286,6 @@ keyword =  makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier
 
 tuple :: Assignment
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> many expression)
-
--- TODO: Consider flattening single element lists
-expressionList :: Assignment
-expressionList = makeTerm <$> symbol ExpressionList <*> children (many expression)
 
 unaryOperator :: Assignment
 unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> bitwise location <|> children ( symbol AnonPlus *> expression )
@@ -339,12 +332,11 @@ assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment
               <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift lvalue    <$> rvalue)
               <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift lvalue    <$> rvalue)
               <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr lvalue      <$> rvalue)))
+  where
+    rvalue = expressionList <|> assignment' <|> yield
 
 yield :: Assignment
-yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> expressionList <|> emptyTerm ))
-
-rvalue :: Assignment
-rvalue  = expressionList <|> assignment' <|> yield
+yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> emptyTerm ))
 
 identifier :: Assignment
 identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
@@ -353,8 +345,8 @@ set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
 
 dictionary :: Assignment
-dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many pairs)
-  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many (pair <|> comment))
+  where pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
@@ -396,10 +388,10 @@ printStatement = do
     printCallTerm location keyword = makeTerm location <$> (Expression.Call keyword <$> many expression <*> emptyTerm)
 
 nonlocalStatement :: Assignment
-nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier <$> source)) <*> many identifier <*> emptyTerm)
+nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
 
 globalStatement :: Assignment
-globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many identifier <*> emptyTerm)
+globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
 
 await :: Assignment
 await = makeTerm <$> symbol Await <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
@@ -415,9 +407,9 @@ raiseStatement :: Assignment
 raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> expressions)
 
 ifStatement :: Assignment
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> statements <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
-  where elseClause = symbol ElseClause *> children statements
-        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> statements)
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> expressions <*> (flip (foldr makeElif) <$> many elifClause <*> optionalElse))
+  where elseClause = symbol ElseClause *> children expressions
+        elifClause = (,) <$ symbol ElifClause <*> location <*> children (Statement.If <$> expression <*> expressions)
         optionalElse = fromMaybe <$> emptyTerm <*> optional elseClause
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
@@ -446,7 +438,7 @@ slice = makeTerm <$> symbol Slice <*> children
                           <*> (expression <|> emptyTerm))
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.Call <$> identifier <*> (symbol ArgumentList *> children (many expression)
+call = makeTerm <$> symbol Call <*> children (Expression.Call <$> expression <*> (symbol ArgumentList *> children (many expression)
                                                                                 <|> some comprehension) <*> emptyTerm)
 
 boolean :: Assignment
@@ -469,6 +461,7 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
+
 
 makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree (a :< inj f)
