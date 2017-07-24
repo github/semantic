@@ -37,3 +37,6 @@
 [submodule "languages/json/vendor/tree-sitter-json"]
 	path = languages/json/vendor/tree-sitter-json
 	url = https://github.com/tree-sitter/tree-sitter-json
+[submodule "vendor/freer-cofreer"]
+	path = vendor/freer-cofreer
+	url = https://github.com/robrix/freer-cofreer.git
