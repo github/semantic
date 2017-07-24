@@ -24,8 +24,8 @@ spec = parallel $ do
     withAlternativeInstances sequenceAltLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
     withAlternativeInstances mergeLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
   describe "Syntax" $ do
-    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Syntax Char Char)])
-    withAlternativeInstances mergeLaws (tiers :: [Tier (Syntax Char Char)])
+    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Syntax Char)])
+    withAlternativeInstances mergeLaws (tiers :: [Tier (Syntax Char)])
 
   prop "subsumes catMaybes/Just" $
     \ a -> sequenceAlt a `shouldBe` pure (catMaybes (a :: [Maybe Char]))

@@ -42,7 +42,7 @@ data DiffRenderer output where
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
   -- | “Render” by returning the computed 'SyntaxDiff'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for TOCSpec.hs.
-  IdentityDiffRenderer :: DiffRenderer (Maybe (SyntaxDiff Text (Maybe Declaration ': DefaultFields)))
+  IdentityDiffRenderer :: DiffRenderer (Maybe (SyntaxDiff (Maybe Declaration ': DefaultFields)))
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
@@ -56,7 +56,7 @@ data TermRenderer output where
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | “Render” by returning the computed 'SyntaxTerm'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for SemanticSpec.hs.
-  IdentityTermRenderer :: TermRenderer (Maybe (SyntaxTerm Text DefaultFields))
+  IdentityTermRenderer :: TermRenderer (Maybe (SyntaxTerm DefaultFields))
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
@@ -70,7 +70,7 @@ data SomeRenderer f where
 
 deriving instance Show (SomeRenderer f)
 
-identifierAlgebra :: RAlgebra (CofreeF (Syntax Text) a) (Cofree (Syntax Text) a) (Maybe Identifier)
+identifierAlgebra :: RAlgebra (CofreeF Syntax a) (Cofree Syntax a) (Maybe Identifier)
 identifierAlgebra (_ :< syntax) = case syntax of
   S.Assignment f _ -> identifier f
   S.Class f _ _ -> identifier f
