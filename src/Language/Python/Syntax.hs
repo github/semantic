@@ -105,55 +105,55 @@ assignment =
 
 expression :: Assignment
 expression =
-      classDefinition
-  <|> comment
-  <|> decoratedDefinition
-  <|> argument
+      argument
+  <|> assertStatement
+  <|> assignment'
   <|> await
   <|> binaryOperator
   <|> booleanOperator
+  <|> breakStatement
   <|> call
+  <|> classDefinition
+  <|> comment
   <|> comparisonOperator
   <|> comprehension
   <|> conditionalExpression
+  <|> continueStatement
+  <|> decoratedDefinition
+  <|> deleteStatement
   <|> dottedName
   <|> ellipsis
-  <|> expressionList
-  <|> keyword
-  <|> literal
-  <|> memberAccess
-  <|> notOperator
-  <|> parameter
-  <|> slice
-  <|> subscript
-  <|> tuple
-  <|> type'
-  <|> yield
-  <|> unaryOperator
-  <|> functionDefinition
-  <|> assertStatement
-  <|> assignment'
-  <|> breakStatement
-  <|> continueStatement
-  <|> deleteStatement
   <|> exceptClause
   <|> execStatement
+  <|> expressionList
   <|> expressionStatement
   <|> finallyClause
   <|> forStatement
+  <|> functionDefinition
   <|> globalStatement
-  <|> ifStatement
   <|> identifier
+  <|> ifStatement
   <|> import'
+  <|> keyword
+  <|> literal
+  <|> memberAccess
   <|> nonlocalStatement
+  <|> notOperator
+  <|> parameter
+  <|> parseError
   <|> passStatement
   <|> printStatement
   <|> raiseStatement
   <|> returnStatement
+  <|> slice
+  <|> subscript
   <|> tryStatement
+  <|> tuple
+  <|> type'
+  <|> unaryOperator
   <|> whileStatement
   <|> withStatement
-  <|> parseError
+  <|> yield
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
