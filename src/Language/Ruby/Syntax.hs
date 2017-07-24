@@ -267,9 +267,10 @@ for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> vars <*> expre
   where vars = makeTerm <$> location <*> some expression
 
 case' :: Assignment
-case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> expression <*> when')
+case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> expression <*> whens)
   where
-    when' =  makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> (when' <|> else' <|> expressions))
+    whens = makeTerm <$> location <*> many (when' <|> else' <|> expressions)
+    when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
     pattern = symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression)
 
 subscript :: Assignment
