@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, MonoLocalBinds, RankNTypes, TypeOperators #-}
 module Language.Python.Syntax
 ( assignment
 , Syntax
