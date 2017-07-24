@@ -256,7 +256,7 @@ runAssignment toNode source = (requireExhaustive <=<) . go
                 anywhere node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Many rule -> uncurry yield (runMany rule state)
-                  Alt a b -> yield a state `catchError` (yield b . setStateError state . Just)
+                  Alt a b -> yield a state `catchError` (\ err -> yield b state { stateError = Just err })
                   Throw e -> Left e
                   Catch during handler -> yield during state `catchError` (flip yield state . handler)
                   _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
@@ -299,9 +299,6 @@ data State ast grammar = State
 
 makeState :: [ast] -> State ast grammar
 makeState = State 0 (Info.Pos 1 1) Nothing 0
-
-setStateError :: State ast grammar -> Maybe (Error grammar) -> State ast grammar
-setStateError state error = state { stateError = error }
 
 
 -- Instances
