@@ -13,7 +13,6 @@ import Prologue
 
 -- | A node in an abstract syntax tree.
 --
--- 'a' is the type of leaves in the syntax tree, typically 'Text', but possibly some datatype representing different leaves more precisely.
 -- 'f' is the type representing another level of the tree, e.g. the children of branches. Often 'Cofree', 'Free' or similar.
 data Syntax f
   -- | A terminal syntax node, e.g. an identifier, or atomic literal.
