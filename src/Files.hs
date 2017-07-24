@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables #-}
 module Files
 ( readFile
 , readBlobPairsFromHandle
@@ -7,6 +7,7 @@ module Files
 ) where
 
 import Control.Exception (catch, IOException)
+import Control.Monad.IO.Class
 import Data.Aeson
 import Data.These
 import Data.Functor.Both
@@ -21,9 +22,9 @@ import Prelude (fail)
 import System.FilePath
 
 -- | Read a utf8-encoded file to a 'Blob'.
-readFile :: FilePath -> Maybe Language -> IO Blob.Blob
+readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m Blob.Blob
 readFile path language = do
-  raw <- (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
+  raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
   pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
@@ -31,7 +32,7 @@ languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . toS . takeExtension
 
 -- | Read JSON encoded blob pairs from a handle.
-readBlobPairsFromHandle :: Handle -> IO [Both Blob.Blob]
+readBlobPairsFromHandle :: MonadIO m => Handle -> m [Both Blob.Blob]
 readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
   where
     toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
@@ -39,16 +40,16 @@ readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
       where empty = Blob.emptyBlob (mergeThese const (runJoin (path <$> blobs)))
 
 -- | Read JSON encoded blobs from a handle.
-readBlobsFromHandle :: Handle -> IO [Blob.Blob]
+readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
-readFromHandle :: FromJSON a => Handle -> IO a
+readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
 readFromHandle h = do
-  input <- BL.hGetContents h
+  input <- liftIO $ BL.hGetContents h
   case decode input of
     Just d -> pure d
-    Nothing -> die ("invalid input on " <> show h <> ", expecting JSON")
+    Nothing -> liftIO $ die ("invalid input on " <> show h <> ", expecting JSON")
 
 toBlob :: Blob -> Blob.Blob
 toBlob Blob{..} = Blob.sourceBlob path language' (fromText content)
