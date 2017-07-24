@@ -85,7 +85,7 @@ runParser parser blob@Blob{..} = case parser of
   ASTParser language -> parseToAST language blobSource
   AssignmentParser parser by assignment -> do
     ast <- runParser parser blob
-    case assignBy by assignment blobSource ast of
+    case assignBy by blobSource assignment ast of
       Left err -> do
         printError blob err
         pure (errorTerm blobSource)

@@ -75,15 +75,13 @@ module Data.Syntax.Assignment
 , while
 -- Results
 , Error(..)
-, ErrorCause(..)
 , printError
 , withSGRCode
 -- Running
-, assign
 , assignBy
 , runAssignment
 -- Implementation details (for testing)
-, AssignmentState(..)
+, State(..)
 , makeState
 ) where
 
@@ -99,7 +97,7 @@ import Data.Record
 import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
-import Prologue hiding (Alt, get, Location, state)
+import Prologue hiding (Alt, get, Location, State, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
@@ -172,32 +170,25 @@ nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 
-data Error grammar where
-  Error
-    :: HasCallStack
-    => { errorPos :: Info.Pos
-       , errorCause :: ErrorCause grammar
-       } -> Error grammar
+data Error grammar = HasCallStack => Error { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: Maybe grammar }
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
 
-data ErrorCause grammar
-  = UnexpectedSymbol [grammar] grammar
-  | UnexpectedEndOfInput [grammar]
-  deriving (Eq, Show)
+nodeError :: [grammar] -> Node grammar -> Error grammar
+nodeError expected (Node actual _ (Info.Span spanStart _)) = Error spanStart expected (Just actual)
 
 -- | Pretty-print an Error with reference to the source where it occurred.
 printError :: Show grammar => Blob -> Error grammar -> IO ()
-printError Blob{..} error@Error{..} = do
-  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": "
+printError Blob{..} error = do
+  withSGRCode [SetConsoleIntensity BoldIntensity] . putStrErr $ showPos (maybe Nothing (const (Just blobPath)) blobKind) (errorPos error) . showString ": "
   withSGRCode [SetColor Foreground Vivid Red] . putStrErr $ showString "error" . showString ": " . showExpectation error . showChar '\n'
-  putStrErr $ showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ')
+  putStrErr $ showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n') . showString (replicate (succ (Info.posColumn (errorPos error) + lineNumberDigits)) ' ')
   withSGRCode [SetColor Foreground Vivid Green] . putStrErr $ showChar '^' . showChar '\n'
   putStrErr $ showString (prettyCallStack callStack) . showChar '\n'
-  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
+  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine (errorPos error) - 2, Info.posLine (errorPos error)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine (errorPos error)) :: Double)))
         putStrErr = hPutStr stderr . ($ "")
 
 withSGRCode :: [SGR] -> IO a -> IO ()
@@ -212,10 +203,9 @@ withSGRCode code action = do
     pure ()
 
 showExpectation :: Show grammar => Error grammar -> ShowS
-showExpectation Error{..} = case errorCause of
-  UnexpectedEndOfInput [] -> showString "no rule to match at end of input nodes"
-  UnexpectedEndOfInput symbols -> showString "expected " . showSymbols symbols . showString " at end of input nodes"
-  UnexpectedSymbol symbols a -> showString "expected " . showSymbols symbols . showString ", but got " . shows a
+showExpectation (Error _ [] Nothing) = showString "no rule to match at end of input nodes"
+showExpectation (Error _ expected Nothing) = showString "expected " . showSymbols expected . showString " at end of input nodes"
+showExpectation (Error _ expected (Just actual)) = showString "expected " . showSymbols expected . showString ", but got " . shows actual
 
 showSymbols :: Show grammar => [grammar] -> ShowS
 showSymbols [] = showString "end of input nodes"
@@ -228,104 +218,88 @@ showPos :: Maybe FilePath -> Info.Pos -> ShowS
 showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (HasField fields Info.Range, HasField fields Info.Span, HasField fields grammar, Symbol grammar, Enum grammar, Eq grammar, Traversable f, HasCallStack)
-  => Assignment (Cofree f (Record fields)) grammar a
-  -> Source.Source
-  -> Cofree f (Record fields)
-  -> Either (Error grammar) a
-assign = assignBy (\ (r :< _) -> Node (getField r) (getField r) (getField r))
-
 assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
-  => (forall x. Base ast x -> Node grammar)
-  -> Assignment ast grammar a
-  -> Source.Source
-  -> ast
-  -> Either (Error grammar) a
-assignBy toNode assignment source = fmap fst . assignAllFrom source toNode assignment . makeState . pure
+         => (forall x. Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
+         -> Source.Source                          -- ^ The source for the parse tree.
+         -> Assignment ast grammar a               -- ^ The 'Assignment to run.
+         -> ast                                    -- ^ The root of the ast.
+         -> Either (Error grammar) a               -- ^ 'Either' an 'Error' or the assigned value.
+assignBy toNode source assignment = fmap fst . runAssignment toNode source assignment . makeState . pure
 
-assignAllFrom :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
-  => Source.Source
-  -> (forall x. Base ast x -> Node grammar)
-  -> Assignment ast grammar a
-  -> AssignmentState ast grammar
-  -> Either (Error grammar) (a, AssignmentState ast grammar)
-assignAllFrom source toNode assignment state = runAssignment source toNode assignment state >>= go
-  where
-    go (a, state) = case stateNodes (dropAnonymous toNode state) of
-      [] -> Right (a, state)
-      node : _ -> let Node nodeSymbol _ (Info.Span spanStart _) = toNode (F.project node) in
-        Left $ fromMaybe (Error spanStart (UnexpectedSymbol [] nodeSymbol)) (stateError state)
-
--- | Run an assignment of nodes in a grammar onto terms in a syntax.
+-- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
-  => Source.Source
-  -> (forall x. Base ast x -> Node grammar)
-  -> Assignment ast grammar a
-  -> AssignmentState ast grammar
-  -> Either (Error grammar) (a, AssignmentState ast grammar)
-runAssignment source toNode = iterFreer run . fmap ((pure .) . (,))
-  where run :: AssignmentF ast grammar x -> (x -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)) -> AssignmentState ast grammar -> Either (Error grammar) (a, AssignmentState ast grammar)
-        run assignment yield initialState = case (assignment, stateNodes state) of
-          (Location, node : _) -> yield (nodeLocation (toNode (F.project node))) state
-          (Location, []) -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
-          (Project projection, node : _) -> yield (projection (F.project node)) state
-          (Source, node : _) -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (F.project node))) source)) (advanceState toNode state)
-          (Children childAssignment, node : _) -> do
-            (a, state') <- assignAllFrom source toNode childAssignment state { stateNodes = toList (F.project node) }
-            yield a (advanceState toNode state' { stateNodes = stateNodes state })
-          (Choose choices, node : _) | Node symbol _ _ <- toNode (F.project node), Just a <- IntMap.lookup (fromEnum symbol) choices -> yield a state
-          (Many rule, _) -> uncurry yield (runMany rule state)
-          -- Nullability: some rules, e.g. @pure a@ and @many a@, should match at the end of input. Either side of an alternation may be nullable, ergo Alt can match at the end of input.
-          (Alt a b, _) -> case yield a state of
-            Left err -> yield b state { stateError = Just err }
-            r -> r
-          (Throw e, _) -> Left e
-          (Catch during handler, _) -> case yield during state of
-            Left err -> yield (handler err) state
-            Right (a, state') -> Right (a, state')
-          (_, []) -> Left (Error (statePos state) (UnexpectedEndOfInput expectedSymbols))
-          (_, ast:_) -> let Node symbol _ (Info.Span spanStart _) = toNode (F.project ast) in Left (Error spanStart (UnexpectedSymbol expectedSymbols symbol))
-          where state = case assignment of
-                  Choose choices | all ((== Regular) . symbolType) (choiceSymbols choices) -> dropAnonymous toNode initialState
-                  _ -> initialState
-                expectedSymbols = case assignment of
-                  Choose choices -> choiceSymbols choices
-                  _ -> []
-                choiceSymbols choices = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                runMany :: Assignment ast grammar v -> AssignmentState ast grammar -> ([v], AssignmentState ast grammar)
-                runMany rule state = case runAssignment source toNode rule state of
+              => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
+              -> Source.Source                                 -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
+              -> State ast grammar                             -- ^ The current state.
+              -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
+runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
+  -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
+  where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
+        go assignment = iterFreer run ((pure .) . (,) <$> assignment)
+        {-# INLINE go #-}
+
+        run :: AssignmentF ast grammar x
+            -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
+            -> State ast grammar
+            -> Either (Error grammar) (result, State ast grammar)
+        run assignment yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
+          where atNode node = case assignment of
+                  Location -> yield (nodeLocation (toNode node)) state
+                  Project projection -> yield (projection node) state
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
+                  Children child -> do
+                    (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
+                    yield a (advance state' { stateNodes = stateNodes state })
+                  Choose choices | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
+                  _ -> anywhere (Just node)
+
+                anywhere node = case assignment of
+                  Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
+                  Many rule -> uncurry yield (runMany rule state)
+                  Alt a b -> yield a state `catchError` (\ err -> yield b state { stateError = Just err })
+                  Throw e -> Left e
+                  Catch during handler -> yield during state `catchError` (flip yield state . handler)
+                  _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
+
+                state | _:_ <- expectedSymbols, all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
+                      | otherwise = initialState
+                expectedSymbols | Choose choices <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
+                                | otherwise = []
+
+        runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
+        runMany rule = loop
+          where loop state = case go rule state of
                   Left err -> ([], state { stateError = Just err })
-                  Right (a, state') | ((/=) `on` stateCounter) state state' ->
-                                        let (as, state'') = runMany rule state'
-                                        in as `seq` (a : as, state'')
+                  Right (a, state') | ((/=) `on` stateCounter) state state', (as, state'') <- loop state' -> as `seq` (a : as, state'')
                                     | otherwise -> ([a], state')
-        {-# INLINE run #-}
+        {-# INLINE runMany #-}
 
-dropAnonymous :: (Symbol grammar, Recursive ast) => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
-dropAnonymous toNode state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
+        requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (result, State ast grammar)
+        requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
+          [] -> Right (a, state)
+          node : _ -> Left (fromMaybe (nodeError [] (toNode (F.project node))) (stateError state))
 
--- | Advances the state past the current (head) node (if any), dropping it off
--- stateNodes & its corresponding bytes off of source, and updating stateOffset &
--- statePos to its end. Exhausted 'AssignmentState's (those without any
--- remaining nodes) are returned unchanged.
-advanceState :: Recursive ast => (forall x. Base ast x -> Node grammar) -> AssignmentState ast grammar -> AssignmentState ast grammar
-advanceState toNode state@AssignmentState{..}
-  | node : rest <- stateNodes
-  , Node{..} <- toNode (F.project node) = AssignmentState (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
-  | otherwise = state
+        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
+
+        -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
+        advance state@State{..}
+          | node : rest <- stateNodes
+          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
+          | otherwise = state
 
 -- | State kept while running 'Assignment's.
-data AssignmentState ast grammar = AssignmentState
-  { stateOffset :: Int -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateError :: Maybe (Error grammar)
-  , stateCounter :: Int -- ^ Always incrementing counter that tracks how many nodes have been visited.
-  , stateNodes :: [ast] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+data State ast grammar = State
+  { stateOffset :: Int                  -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: Info.Pos                -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateError :: Maybe (Error grammar) -- ^ The most recently encountered error. Preserved for improved error messages in the presence of backtracking.
+  , stateCounter :: Int                 -- ^ Always incrementing counter that tracks how many nodes have been visited.
+  , stateNodes :: [ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
-makeState :: [ast] -> AssignmentState ast grammar
-makeState = AssignmentState 0 (Info.Pos 1 1) Nothing 0
+makeState :: [ast] -> State ast grammar
+makeState = State 0 (Info.Pos 1 1) Nothing 0
 
 
 -- Instances
@@ -355,14 +329,6 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
-
-instance Show1 Error where
-  liftShowsPrec sp sl d (Error p c) = showsBinaryWith showsPrec (liftShowsPrec sp sl) "Error" d p c
-
-instance Show1 ErrorCause where
-  liftShowsPrec sp sl d e = case e of
-    UnexpectedSymbol expected actual -> showsBinaryWith (liftShowsPrec sp sl) sp "UnexpectedSymbol" d expected actual
-    UnexpectedEndOfInput expected -> showsUnaryWith (liftShowsPrec sp sl) "UnexpectedEndOfInput" d expected
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
