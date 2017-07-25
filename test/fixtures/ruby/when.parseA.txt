@@ -1,6 +1,10 @@
 (Program
-  (Case
+  (Match
     (Identifier)
-    (When
-      (Args
-        (Identifier)))))
+    (
+      (Pattern
+        (
+          (Identifier))
+        (
+          ([])))
+      ([]))))
