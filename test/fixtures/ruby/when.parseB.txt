@@ -1,20 +1,14 @@
 (Program
-  (Match
+  (Case
     (Identifier)
-    (
-      (Pattern
-        (
+    (When
+      (Args
+        (Identifier))
+      (Identifier)
+      (When
+        (Args
           (Identifier))
-        (
-          (
-            (Identifier))
-          (Pattern
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (
-                (Identifier))
-              ([])))
-          ([])))
-      ([]))))
+        (Args
+          (Identifier))
+        (Else
+          (Identifier))))))
