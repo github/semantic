@@ -347,6 +347,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   empty = Choose mempty Nothing `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
+  (Throw err `Then` continue) <|> _ = Throw err `Then` continue
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
