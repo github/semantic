@@ -46,7 +46,12 @@ spec = do
       `shouldBe`
       Right (Out "(blue)")
 
-    it "alternates repetitions" $
+    it "alternates repetitions, matching the left alternative" $
+      fst <$> runAssignment headF "green green" (many green <|> many blue) (makeState [node Green 0 5 [], node Green 6 11 []])
+      `shouldBe`
+      Right [Out "green", Out "green"]
+
+    it "alternates repetitions, matching the right alternative" $
       fst <$> runAssignment headF "blue blue" (many green <|> many blue) (makeState [node Blue 0 4 [], node Blue 5 9 []])
       `shouldBe`
       Right [Out "blue", Out "blue"]
