@@ -347,8 +347,8 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
-  a <|> b | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) a b = Choose c `Then` identity
-          | otherwise = wrap $ Alt a b
+  l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c `Then` identity
+          | otherwise = wrap $ Alt l r
     where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
           choices (Choose choices `Then` continue) = Just (continue <$> choices)
           choices (Many rule `Then` continue) = fmap (const (Many rule `Then` continue)) <$> choices rule
