@@ -355,11 +355,13 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
     where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
           choices (Choose choices _ `Then` continue) = Just (continue <$> choices)
           choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
+          choices (Catch during handler `Then` continue) = ((Catch during handler `Then` continue) <$) <$> choices during
           choices (Return _) = Just IntMap.empty
           choices _ = Nothing
           atEnd :: Assignment ast grammar a -> Maybe (Assignment ast grammar a)
           atEnd (Choose _ atEnd `Then` continue) = continue <$> atEnd
           atEnd (Many rule `Then` continue) = Just (Many rule `Then` continue)
+          atEnd (Catch during handler `Then` continue) = Just (Catch during handler `Then` continue)
           atEnd (Return a) = Just (Return a)
           atEnd _ = Nothing
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
