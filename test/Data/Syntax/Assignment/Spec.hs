@@ -51,6 +51,11 @@ spec = do
       `shouldBe`
       Right [Out "blue", Out "blue"]
 
+    it "distributes through children rules" $
+      fst <$> runAssignment headF "(red (blue))" (children (many green) <|> children (many blue)) (makeState [node Red 0 12 [node Blue 5 11 []]])
+      `shouldBe`
+      Right [Out "(blue)"]
+
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
       fst <$> runAssignment headF "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
