@@ -56,6 +56,16 @@ spec = do
       `shouldBe`
       Right [Out "blue", Out "blue"]
 
+    it "distributes through overlapping committed choices, dropping anonymous nodes & matching the left alternative" $
+      fst <$> runAssignment headF "magenta green" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Green 8 13 []])
+      `shouldBe`
+      Right (Out "green")
+
+    it "distributes through overlapping committed choices, dropping anonymous nodes & matching the right alternative" $
+      fst <$> runAssignment headF "magenta blue" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Blue 8 12 []])
+      `shouldBe`
+      Right (Out "blue")
+
     it "alternates repetitions, matching the left alternative" $
       fst <$> runAssignment headF "green green" (many green <|> many blue) (makeState [node Green 0 5 [], node Green 6 11 []])
       `shouldBe`
