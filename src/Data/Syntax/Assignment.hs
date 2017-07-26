@@ -346,6 +346,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   empty = Choose mempty `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
+  (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   a        <|> b | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) a b = Choose c `Then` identity
                  | otherwise = wrap $ Alt a b
     where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
