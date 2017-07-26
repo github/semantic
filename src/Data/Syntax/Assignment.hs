@@ -123,7 +123,7 @@ data AssignmentF ast grammar a where
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
-  Catch :: HasCallStack => a -> (Error grammar -> a) -> AssignmentF ast grammar a
+  Catch :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> AssignmentF ast grammar a
 
 -- | Zero-width production of the current location.
 --
@@ -297,7 +297,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Many rule -> uncurry yield (runMany rule state)
                   Alt a b -> yield a state `catchError` (\ err -> yield b state { stateError = Just err })
                   Throw e -> Left e
-                  Catch during handler -> yield during state `catchError` (flip yield state . handler)
+                  Catch during handler -> (go during state `catchError` (flip go state . handler)) >>= uncurry yield
                   _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
 
                 state | _:_ <- expectedSymbols, all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
@@ -375,11 +375,11 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Throw e -> showsUnaryWith showsPrec "Throw" d e
-    Catch during handler -> showsBinaryWith sp (const (const (showChar '_'))) "Catch" d during handler
+    Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
   throwError error = withFrozenCallStack $ Throw error `Then` return
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> Assignment ast grammar a
-  catchError during handler = withFrozenCallStack $ Catch during handler `Then` identity
+  catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
