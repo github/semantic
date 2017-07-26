@@ -56,6 +56,11 @@ spec = do
       `shouldBe`
       Right [Out "blue", Out "blue"]
 
+    it "alternates repetitions, matching at the end of input" $
+      fst <$> runAssignment headF "" (many green <|> many blue) (makeState [])
+      `shouldBe`
+      Right []
+
     it "distributes through children rules" $
       fst <$> runAssignment headF "(red (blue))" (children (many green) <|> children (many blue)) (makeState [node Red 0 12 [node Blue 5 11 []]])
       `shouldBe`
