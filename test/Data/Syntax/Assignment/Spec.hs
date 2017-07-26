@@ -46,6 +46,11 @@ spec = do
       `shouldBe`
       Right (Out "(blue)")
 
+    it "alternates repetitions" $
+      fst <$> runAssignment headF "blue blue" (many green <|> many blue) (makeState [node Blue 0 4 [], node Blue 5 9 []])
+      `shouldBe`
+      Right [Out "blue", Out "blue"]
+
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
       fst <$> runAssignment headF "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
