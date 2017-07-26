@@ -41,6 +41,11 @@ spec = do
       `shouldBe`
       Right (Out "(green)")
 
+    it "distributes through overlapping committed choices, matching the right alternative" $
+      fst <$> runAssignment headF "(red (blue))" (symbol Red *> children green <|> symbol Red *> children blue) (makeState [node Red 0 12 [node Blue 5 11 []]])
+      `shouldBe`
+      Right (Out "(blue)")
+
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
       fst <$> runAssignment headF "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
