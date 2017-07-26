@@ -348,6 +348,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   Return a <|> _ = Return a
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c `Then` identity
           | otherwise = wrap $ Alt l r
     where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
