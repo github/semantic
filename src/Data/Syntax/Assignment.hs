@@ -351,7 +351,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
           | otherwise = wrap $ Alt l r
     where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
           choices (Choose choices `Then` continue) = Just (continue <$> choices)
-          choices (Many rule `Then` continue) = fmap (const (Many rule `Then` continue)) <$> choices rule
+          choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
           choices _ = Nothing
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
