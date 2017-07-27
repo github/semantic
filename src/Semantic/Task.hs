@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, TypeOperators, BangPatterns #-}
 module Semantic.Task
 ( Task
 , Level(..)
@@ -57,10 +57,10 @@ data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
   WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
-  WriteLog :: Level -> String -> TaskF ()
+  WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
-  Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
+  Diff :: Differ f a -> Both Blob -> Both (Term f a) -> TaskF (Diff f a)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
   LiftIO :: IO a -> TaskF a
@@ -81,12 +81,12 @@ data Level
 
 -- | Format a 'Message', optionally colourized.
 formatMessage :: Bool -> Message -> String
-formatMessage colourize (Message level message time) = showTime time . showChar ' ' . showLevel level . showString ": " . showString message . showChar '\n' $ ""
-  where showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
-        showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
-        showLevel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
-        showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
-        showTime = showString . Time.formatTime Time.defaultTimeLocale (Time.iso8601DateFormat (Just "%H:%M:%S%.%q"))
+formatMessage colourize (Message level message time) = showChar '[' . showTime time . showString "] " . showLevel level . showString " " . showString message . showChar '\n' $ ""
+  where showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "ERROR")
+        showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString " WARN")
+        showLevel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString " INFO")
+        showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "DEBUG")
+        showTime = showString . Time.formatTime Time.defaultTimeLocale (Time.iso8601DateFormat (Just "%H:%M:%S%..%q"))
 
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
@@ -109,8 +109,8 @@ writeToOutput path contents = WriteToOutput path contents `Then` return
 
 
 -- | A 'Task' which logs a message at a specific log level to stderr.
-writeLog :: Level -> String -> Task ()
-writeLog level message = WriteLog level message `Then` return
+writeLog :: Level -> String -> [(String, String)] -> Task ()
+writeLog level message pairs = WriteLog level message pairs `Then` return
 
 
 -- | A 'Task' which parses a 'Blob' with the given 'Parser'.
@@ -122,8 +122,8 @@ decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fiel
 decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Differ f a -> Both (Term f a) -> Task (Diff f a)
-diff differ terms = Diff differ terms `Then` return
+diff :: Differ f a -> Both Blob -> Both (Term f a) -> Task (Diff f a)
+diff differ blobs terms = Diff differ blobs terms `Then` return
 
 -- | A 'Task' which renders some input using the supplied 'Renderer' function.
 render :: Renderer input output -> input -> Task output
@@ -202,43 +202,63 @@ runTaskWithOptions options task = do
                   ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` \ e -> pure (Left (displayException e))
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` \ e -> pure (Left (displayException e))
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-                  WriteLog level message
-                    | Just logLevel <- optionsLevel options, level <= logLevel -> Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message >>= yield
+                  WriteLog level msg pairs
+                    | Just logLevel <- optionsLevel options, level <= logLevel -> let message = printf "%-20s %s" msg (foldr (\ a b -> uncurry (printf "%s=%s") a <> " " <> b) ("" :: String) pairs) in Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message >>= yield
                     | otherwise -> pure () >>= yield
                   Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) (either (pure . Left) yield)
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
-                  Diff differ terms -> pure (differ terms) >>= yield
+                  Diff differ blobs terms -> do
+                    start <- liftIO Time.getCurrentTime
+                    !res <- pure (differ terms)
+                    end <- liftIO Time.getCurrentTime
+                    let (a, b) = runJoin blobs
+                    _ <- go $ writeLog Info "diff" [ ("before_path", blobPath a)
+                                                   , ("before_language", maybe "" show (blobLanguage a))
+                                                   , ("after_path", blobPath b)
+                                                   , ("after_language", maybe "" show (blobLanguage b))
+                                                   , ("time", show (Time.diffUTCTime end start)) ]
+                    yield res
                   Render renderer input -> pure (renderer input) >>= yield
                   Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
                   LiftIO action -> action >>= yield ) . fmap Right
 
 runParser :: Options -> Parser term -> Blob -> Task (Either String term)
 runParser options parser blob@Blob{..} = case parser of
-  ASTParser language -> liftIO $ Right <$> parseToAST language blob
-  AssignmentParser parser by assignment -> do
+  ASTParser language -> do
     start <- liftIO Time.getCurrentTime
-    res <- runParser options parser blob
+    let !res = liftIO (Right <$> parseToAST language blob)
     end <- liftIO Time.getCurrentTime
-    writeLog Info $ printf "parsed %10s:%-48s %10s" (showLanguage blob) blobPath (show (Time.diffUTCTime end start))
+    writeLog Info "parse" [ ("path", blobPath)
+                          , ("language", maybe "" show blobLanguage)
+                          , ("time", show (Time.diffUTCTime end start)) ]
+    res
+  AssignmentParser parser by assignment -> do
+    res <- runParser options parser blob
     case res of
-      Left err -> pure $ Left err
-      Right ast -> case Assignment.assignBy by blobSource assignment ast of
-        Left err -> do
-          let formatOptions = Assignment.defaultOptions
-                { Assignment.optionsColour = fromMaybe True (optionsColour options)
-                , Assignment.optionsIncludeSource = optionsPrintSource options
-                }
-          writeLog Error (Assignment.formatErrorWithOptions formatOptions blob err)
-          pure $ Left (blobPath <> ":" <> showLanguage blob <> " failed assignment")
-          -- pure (errorTerm blobSource)
-        Right term -> do
-          when (hasErrors term) $ writeLog Warning (blobPath <> ":" <> showLanguage blob <> " has parse errors")
-          pure $ Right term
+      Left err -> pure $ Left err -- Should never happen right now b/c ASTParser always returns Right ...
+      Right ast -> do
+        start <- liftIO Time.getCurrentTime
+        let !assigned = Assignment.assignBy by blobSource assignment ast
+        end <- liftIO Time.getCurrentTime
+        case assigned of
+          Left err -> do
+            let formatOptions = Assignment.defaultOptions
+                  { Assignment.optionsColour = fromMaybe True (optionsColour options)
+                  , Assignment.optionsIncludeSource = optionsPrintSource options
+                  }
+            writeLog Error (Assignment.formatErrorWithOptions formatOptions blob err) []
+            pure $ Left (showBlob blob <> " failed assignment")
+          Right term -> do
+            when (hasErrors term) $ writeLog Warning (showBlob blob <> " has parse errors") []
+            writeLog Info "assign" [ ("path", blobPath)
+                                   , ("language", maybe "" show blobLanguage)
+                                   , ("time", show (Time.diffUTCTime end start)) ]
+            pure $ Right term
   TreeSitterParser tslanguage -> liftIO $ Right <$> treeSitterParser tslanguage blob
   MarkdownParser -> pure $ Right (cmarkParser blobSource)
   LineByLineParser -> pure $ Right (lineByLineParser blobSource)
   where
-    showLanguage Blob{..} = maybe "" show blobLanguage
+    showBlob Blob{..} = blobPath <> ":" <> maybe "" show blobLanguage
     hasErrors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> Bool
     hasErrors = cata $ \ (_ :< syntax) -> case syntax of
       _ | Just err <- prj syntax -> const True (err :: Syntax.Error Bool)
