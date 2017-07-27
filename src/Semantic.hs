@@ -97,7 +97,7 @@ diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task 
 diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting (Both.fst terms))
   (False, True) -> pure (inserting (Both.snd terms))
-  _ -> diff differ terms
+  _ -> diff differ blobs terms
 
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
