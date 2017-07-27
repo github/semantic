@@ -185,9 +185,7 @@ runTaskWithOptions options task = do
   result <- run options logQueue task
   atomically (closeTMQueue logQueue)
   wait logging
-  case result of
-    Left err -> die err
-    Right output -> pure output
+  either die pure result
   where logSink options queue = do
           message <- atomically (readTMQueue queue)
           case message of
@@ -224,18 +222,13 @@ runTaskWithOptions options task = do
 
 runParser :: Options -> Parser term -> Blob -> Task (Either String term)
 runParser options parser blob@Blob{..} = case parser of
-  ASTParser language -> do
-    start <- liftIO Time.getCurrentTime
-    let !res = liftIO (Right <$> parseToAST language blob)
-    end <- liftIO Time.getCurrentTime
-    writeLog Info "parse" [ ("path", blobPath)
-                          , ("language", maybe "" show blobLanguage)
-                          , ("time", show (Time.diffUTCTime end start)) ]
-    res
+  ASTParser language -> logTiming "ts ast parse" $ liftIO $ (Right <$> parseToAST language blob) `catchError` \ e -> pure (Left (displayException e))
   AssignmentParser parser by assignment -> do
     res <- runParser options parser blob
     case res of
-      Left err -> pure $ Left err -- Should never happen right now b/c ASTParser always returns Right ...
+      Left err -> do
+        writeLog Error (showBlob blob <> " failed parsing") []
+        pure $ Left err
       Right ast -> do
         start <- liftIO Time.getCurrentTime
         let !assigned = Assignment.assignBy by blobSource assignment ast
@@ -254,11 +247,20 @@ runParser options parser blob@Blob{..} = case parser of
                                    , ("language", maybe "" show blobLanguage)
                                    , ("time", show (Time.diffUTCTime end start)) ]
             pure $ Right term
-  TreeSitterParser tslanguage -> liftIO $ Right <$> treeSitterParser tslanguage blob
-  MarkdownParser -> pure $ Right (cmarkParser blobSource)
-  LineByLineParser -> pure $ Right (lineByLineParser blobSource)
+  TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
+  MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
+  LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
   where
     showBlob Blob{..} = blobPath <> ":" <> maybe "" show blobLanguage
+    logTiming :: String -> Task a -> Task a
+    logTiming msg f = do
+      start <- liftIO Time.getCurrentTime
+      let !res = f
+      end <- liftIO Time.getCurrentTime
+      writeLog Info msg [ ("path", blobPath)
+                        , ("language", maybe "" show blobLanguage)
+                        , ("time", show (Time.diffUTCTime end start)) ]
+      res
     hasErrors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> Bool
     hasErrors = cata $ \ (_ :< syntax) -> case syntax of
       _ | Just err <- prj syntax -> const True (err :: Syntax.Error Bool)
