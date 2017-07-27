@@ -91,6 +91,26 @@ spec = do
       `shouldBe`
       Right [Out "(blue)"]
 
+    it "matches rules to the left of pure" $
+      fst <$> runAssignment headF "green" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Green 0 5 []])
+      `shouldBe`
+      Right (Out "green")
+
+    it "matches rules to the right of pure" $
+      fst <$> runAssignment headF "blue" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Blue 0 4 []])
+      `shouldBe`
+      Right (Out "blue")
+
+    it "matches other nodes with pure" $
+      fst <$> runAssignment headF "red" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Red 0 3 []])
+      `shouldBe`
+      Right (Out "other")
+
+    it "matches at end with pure" $
+      fst <$> runAssignment headF "red" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [])
+      `shouldBe`
+      Right (Out "other")
+
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
       fst <$> runAssignment headF "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
