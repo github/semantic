@@ -45,7 +45,6 @@ library
                      , Info
                      , Interpreter
                      , Language
-                     , Language.C
                      , Language.Markdown
                      , Language.Markdown.Syntax
                      , Language.Go
