@@ -16,7 +16,6 @@ import Data.Source
 import Data.Span
 import qualified Data.Syntax.Assignment as A
 import Language
-import qualified Language.C as C
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
@@ -27,7 +26,6 @@ import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
-import qualified Text.Parser.TreeSitter.C as TS
 import qualified Text.Parser.TreeSitter.Go as TS
 import qualified Text.Parser.TreeSitter.Ruby as TS
 import qualified Text.Parser.TreeSitter.TypeScript as TS
@@ -112,7 +110,6 @@ assignTerm language source annotation children allChildren =
     _ -> defaultTermAssignment source (category annotation) children allChildren
   where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm DefaultFields))
         assignTermByLanguage = case languageForTSLanguage language of
-          Just C -> C.termAssignment
           Just Language.Go -> Go.termAssignment
           Just Ruby -> Ruby.termAssignment
           Just TypeScript -> TS.termAssignment
@@ -166,7 +163,6 @@ categoryForLanguageProductionName = withDefaults . byLanguage
       s -> productionMap s
 
     byLanguage language = case languageForTSLanguage language of
-      Just C -> C.categoryForCProductionName
       Just Ruby -> Ruby.categoryForRubyName
       Just Language.Go -> Go.categoryForGoName
       Just TypeScript -> TS.categoryForTypeScriptName
@@ -175,8 +171,7 @@ categoryForLanguageProductionName = withDefaults . byLanguage
 
 languageForTSLanguage :: Ptr TS.Language -> Maybe Language
 languageForTSLanguage = flip lookup
-  [ (TS.tree_sitter_c, C)
-  , (TS.tree_sitter_go, Language.Go)
+  [ (TS.tree_sitter_go, Language.Go)
   , (TS.tree_sitter_ruby, Ruby)
   , (TS.tree_sitter_typescript, TypeScript)
   ]
