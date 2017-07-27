@@ -226,27 +226,18 @@ runParser options parser blob@Blob{..} = case parser of
   AssignmentParser parser by assignment -> do
     res <- runParser options parser blob
     case res of
-      Left err -> do
-        writeLog Error (showBlob blob <> " failed parsing") []
-        pure $ Left err
-      Right ast -> do
-        start <- liftIO Time.getCurrentTime
-        let !assigned = Assignment.assignBy by blobSource assignment ast
-        end <- liftIO Time.getCurrentTime
-        case assigned of
-          Left err -> do
-            let formatOptions = Assignment.defaultOptions
-                  { Assignment.optionsColour = fromMaybe True (optionsColour options)
-                  , Assignment.optionsIncludeSource = optionsPrintSource options
-                  }
-            writeLog Error (Assignment.formatErrorWithOptions formatOptions blob err) []
-            pure $ Left (showBlob blob <> " failed assignment")
-          Right term -> do
-            when (hasErrors term) $ writeLog Warning (showBlob blob <> " has parse errors") []
-            writeLog Info "assign" [ ("path", blobPath)
-                                   , ("language", maybe "" show blobLanguage)
-                                   , ("time", show (Time.diffUTCTime end start)) ]
-            pure $ Right term
+      Left err -> writeLog Error (showBlob blob <> " failed parsing") [] >> pure (Left err)
+      Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
+        Left err -> do
+          let formatOptions = Assignment.defaultOptions
+                { Assignment.optionsColour = fromMaybe True (optionsColour options)
+                , Assignment.optionsIncludeSource = optionsPrintSource options
+                }
+          writeLog Error (Assignment.formatErrorWithOptions formatOptions blob err) []
+          pure $ Left (showBlob blob <> " failed assignment")
+        Right term -> do
+          when (hasErrors term) $ writeLog Warning (showBlob blob <> " has parse errors") []
+          pure $ Right term
   TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
   MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
   LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
