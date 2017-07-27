@@ -115,7 +115,6 @@ library
                      , these
                      , time
                      , haskell-tree-sitter
-                     , c
                      , go
                      , ruby
                      , typescript
