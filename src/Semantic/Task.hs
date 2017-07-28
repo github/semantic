@@ -19,7 +19,8 @@ module Semantic.Task
 , Options(..)
 , defaultOptions
 , configureOptionsForHandle
-, nullFormatter
+, terminalFormatter
+, logfmtFormatter
 , runTask
 , runTaskWithOptions
 ) where
@@ -145,10 +146,6 @@ data Level
   | Debug
   deriving (Eq, Ord, Show)
 
--- | Null formatter for log messages (throw them away).
-nullFormatter :: Options -> Message -> String
-nullFormatter _ _ = ""
-
 -- | Format log messaging using "logfmt".
 --
 -- Logfmt is a loosely defined logging format (see https://brandur.org/logfmt)
@@ -205,7 +202,7 @@ defaultOptions = Options
   , optionsLevel = Just Warning
   , optionsPrintSource = False
   , optionsIsTerminal = False
-  , optionsFormatter = nullFormatter
+  , optionsFormatter = logfmtFormatter
   }
 
 configureOptionsForHandle :: Handle -> Options -> IO Options
@@ -214,7 +211,6 @@ configureOptionsForHandle handle options = do
   pure $ options
     { optionsIsTerminal = isTerminal
     , optionsFormatter = if isTerminal then terminalFormatter else logfmtFormatter
-    -- , optionsFormatter = logfmtFormatter
     }
 
 

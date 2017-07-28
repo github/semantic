@@ -45,7 +45,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
             (long "log-level" <> value (Just Task.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
       <*> switch (long "print-source" <> help "Include source references in logged errors where applicable.")
       <*> pure False
-      <*> pure Task.nullFormatter
+      <*> pure Task.logfmtFormatter
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
