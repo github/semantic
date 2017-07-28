@@ -242,8 +242,8 @@ runTaskWithOptions options task = do
         run options logQueue = go
           where go :: Task a -> IO (Either String a)
                 go = iterFreerA (\ task yield -> case task of
-                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left. displayException)
-                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left. displayException)
+                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . displayException)
+                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . displayException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
                   WriteLog level message pairs
                     | Just logLevel <- optionsLevel options, level <= logLevel -> Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs >>= yield
