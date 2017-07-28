@@ -67,6 +67,8 @@ module Data.Syntax.Assignment
 , Node(..)
 , nodeLocation
 -- Combinators
+, Alternative(..)
+, optional
 , location
 , Data.Syntax.Assignment.project
 , symbol
