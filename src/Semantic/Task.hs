@@ -197,8 +197,8 @@ runTaskWithOptions options task = do
         run options logQueue = go
           where go :: Task a -> IO (Either String a)
                 go = iterFreerA (\ task yield -> case task of
-                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` \ e -> pure (Left (displayException e))
-                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` \ e -> pure (Left (displayException e))
+                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left. displayException)
+                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left. displayException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
                   WriteLog level msg pairs
                     | Just logLevel <- optionsLevel options, level <= logLevel -> let message = printf "%-20s %s" msg (foldr (\ a b -> uncurry (printf "%s=%s") a <> " " <> b) ("" :: String) pairs) in Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message >>= yield
@@ -222,7 +222,7 @@ runTaskWithOptions options task = do
 
 runParser :: Options -> Parser term -> Blob -> Task (Either String term)
 runParser options parser blob@Blob{..} = case parser of
-  ASTParser language -> logTiming "ts ast parse" $ liftIO $ (Right <$> parseToAST language blob) `catchError` \ e -> pure (Left (displayException e))
+  ASTParser language -> logTiming "ts ast parse" $ liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
   AssignmentParser parser by assignment -> do
     res <- runParser options parser blob
     case res of
