@@ -8,6 +8,9 @@ xcuserdata
 profiles
 tags
 
+cabal.project.local
+dist-newstyle
+
 tmp/
 
 vendor/icu/tools
