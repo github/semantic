@@ -97,7 +97,14 @@ diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task 
 diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting (Both.fst terms))
   (False, True) -> pure (inserting (Both.snd terms))
-  _ -> diff differ blobs terms
+  _ -> time logTiming $ diff differ terms
+  where
+    (a, b) = runJoin blobs
+    logTiming delta = writeLog Info "diff" [ ("before_path", blobPath a)
+                                           , ("before_language", maybe "" show (blobLanguage a))
+                                           , ("after_path", blobPath b)
+                                           , ("after_language", maybe "" show (blobLanguage b))
+                                           , ("time", show delta) ]
 
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
