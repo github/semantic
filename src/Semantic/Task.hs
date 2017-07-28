@@ -201,7 +201,7 @@ runTaskWithOptions options task = do
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left. displayException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
                   WriteLog level msg pairs
-                    | Just logLevel <- optionsLevel options, level <= logLevel -> let message = printf "%-20s %s" msg (foldr (\ a b -> uncurry (printf "%s=%s") a <> " " <> b) ("" :: String) pairs) in Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message >>= yield
+                    | Just logLevel <- optionsLevel options, level <= logLevel -> let message = printf "%-20s %s" msg (unwords (uncurry (printf "%s=%s") <$> pairs)) in Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message >>= yield
                     | otherwise -> pure () >>= yield
                   Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) (either (pure . Left) yield)
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
