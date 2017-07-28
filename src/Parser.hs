@@ -58,8 +58,9 @@ parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
   Go -> TreeSitterParser tree_sitter_go
-  JSON -> TreeSitterParser tree_sitter_json
   JavaScript -> TreeSitterParser tree_sitter_typescript
+  JSON -> TreeSitterParser tree_sitter_json
+  JSX -> TreeSitterParser tree_sitter_typescript
   Ruby -> TreeSitterParser tree_sitter_ruby
   TypeScript -> TreeSitterParser tree_sitter_typescript
   _ -> LineByLineParser
