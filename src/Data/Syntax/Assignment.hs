@@ -69,6 +69,7 @@ module Data.Syntax.Assignment
 -- Combinators
 , Alternative(..)
 , optional
+, MonadError(..)
 , location
 , Data.Syntax.Assignment.project
 , symbol
