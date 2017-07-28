@@ -207,7 +207,7 @@ runTaskWithOptions options task = do
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
                   Diff differ blobs terms -> do
                     start <- liftIO Time.getCurrentTime
-                    !res <- pure (differ terms)
+                    let !res = differ terms
                     end <- liftIO Time.getCurrentTime
                     let (a, b) = runJoin blobs
                     _ <- go $ writeLog Info "diff" [ ("before_path", blobPath a)
