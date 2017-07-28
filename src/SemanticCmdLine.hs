@@ -40,7 +40,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
     optionsParser = Task.Options
-      <$> switch (long "disable-colours" <> long "disable-colors" <> help "Disable ANSI colors in log messages even if the terminal is a TTY.")
+      <$> switch (long "disable-colour" <> long "disable-color" <> help "Disable ANSI colors in log messages even if the terminal is a TTY.")
       <*> options [("error", Just Task.Error), ("warning", Just Task.Warning), ("info", Just Task.Info), ("debug", Just Task.Debug), ("none", Nothing)]
             (long "log-level" <> value (Just Task.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
       <*> switch (long "print-source" <> help "Include source references in logged errors where applicable.")

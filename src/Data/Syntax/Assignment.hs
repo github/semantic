@@ -75,10 +75,6 @@ module Data.Syntax.Assignment
 , while
 -- Results
 , Error(..)
-, Options(..)
-, defaultOptions
-, optionsForHandle
-, printError
 , formatError
 , formatErrorWithOptions
 , withSGRCode
@@ -107,7 +103,6 @@ import Prologue hiding (Alt, get, Location, State, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
-import System.IO (hIsTerminalDevice, hPutStr)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -184,46 +179,25 @@ deriving instance Show grammar => Show (Error grammar)
 nodeError :: [grammar] -> Node grammar -> Error grammar
 nodeError expected (Node actual _ (Info.Span spanStart _)) = Error spanStart expected (Just actual)
 
--- | Options for printing errors.
-data Options = Options
-  { optionsColour :: Bool -- ^ Whether to use colour formatting codes suitable for a terminal device.
-  , optionsIncludeSource :: Bool -- ^ Whether to include the source reference.
-  }
 
-defaultOptions :: Options
-defaultOptions = Options
-  { optionsColour = True
-  , optionsIncludeSource = True
-  }
+type IncludeSource = Bool
+type Colourize = Bool
 
-optionsForHandle :: Handle -> IO Options
-optionsForHandle handle = do
-  isTerminal <- hIsTerminalDevice handle
-  pure $ defaultOptions
-    { optionsColour = isTerminal
-    }
-
--- | Pretty-print an 'Error' to stderr, optionally with reference to the source where it occurred.
-printError :: Show grammar => Blob -> Error grammar -> IO ()
-printError blob error = do
-  options <- optionsForHandle stderr
-  hPutStr stderr $ formatErrorWithOptions options blob error
-
--- | Format an 'Error', optionally with reference to the source where it occurred.
+-- | Format an 'Error' with reference to the source where it occurred.
 --
--- > formatError = formatErrorWithOptions defaultOptions
+-- > formatError = formatErrorWithOptions True True
 formatError :: Show grammar => Blob -> Error grammar -> String
-formatError = formatErrorWithOptions defaultOptions
+formatError = formatErrorWithOptions True True
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
-formatErrorWithOptions :: Show grammar => Options -> Blob -> Error grammar -> String
-formatErrorWithOptions Options{..} Blob{..} Error{..}
+formatErrorWithOptions :: Show grammar => IncludeSource -> Colourize -> Blob -> Error grammar -> String
+formatErrorWithOptions includeSource colourize Blob{..} Error{..}
   = ($ "")
-  $ withSGRCode optionsColour [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
-  . withSGRCode optionsColour [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
-  . (if optionsIncludeSource
+  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
+  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
+  . (if includeSource
     then showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
-       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode optionsColour [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
+       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else identity)
   . showString (prettyCallStack callStack) . showChar '\n'
   where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])

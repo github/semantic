@@ -262,7 +262,7 @@ runTaskWithOptions options task = do
                   LiftIO action -> action >>= yield ) . fmap Right
 
 runParser :: Options -> Parser term -> Blob -> Task (Either String term)
-runParser options parser blob@Blob{..} = case parser of
+runParser options@Options{..} parser blob@Blob{..} = case parser of
   ASTParser language -> do
     logTiming "ts ast parse" $
       liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
@@ -272,11 +272,7 @@ runParser options parser blob@Blob{..} = case parser of
       Left err -> writeLog Error (showBlob blob <> " failed parsing") [] >> pure (Left err)
       Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
         Left err -> do
-          let formatOptions = Assignment.defaultOptions
-                { Assignment.optionsColour = True -- TODO
-                , Assignment.optionsIncludeSource = optionsPrintSource options
-                }
-          writeLog Error (Assignment.formatErrorWithOptions formatOptions blob err) []
+          writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && not optionsDisableColour) blob err) []
           pure $ Left (showBlob blob <> " failed assignment")
         Right term -> do
           when (hasErrors term) $ writeLog Warning (showBlob blob <> " has parse errors") []
