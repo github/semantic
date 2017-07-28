@@ -24,6 +24,7 @@ library
                      , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
+                     , Data.Output
                      , Data.Range
                      , Data.Record
                      , Data.Source
