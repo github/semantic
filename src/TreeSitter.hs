@@ -5,8 +5,10 @@ module TreeSitter
 , defaultTermAssignment
 ) where
 
-import Prologue hiding (Constructor)
 import Category
+import Control.Comonad (extract)
+import Control.Exception
+import Control.Monad ((<=<))
 import Data.Blob
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Functor.Foldable hiding (Nil)
@@ -15,6 +17,7 @@ import Data.Record
 import Data.Source
 import Data.Span
 import qualified Data.Syntax.Assignment as A
+import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
@@ -82,7 +85,7 @@ documentToTerm language document Blob{..} = do
           let allChildren = getChildren (fromIntegral (nodeChildCount node)) copyAll
 
           let source = slice (nodeRange node) blobSource
-          assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
+          assignTerm language source (range :. categoryForLanguageProductionName language (pack name) :. nodeSpan node :. Nil) children allChildren
           where getChildren count copy = do
                   nodes <- allocaArray count $ \ childNodesPtr -> do
                     _ <- with (nodeTSNode node) (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
@@ -127,7 +130,7 @@ defaultTermAssignment source category children allChildren
 
     -- Control flow statements
     (If, condition : body) -> S.If condition body
-    (Switch, _) -> uncurry S.Switch (Prologue.break ((== Case) . Info.category . extract) children)
+    (Switch, _) -> uncurry S.Switch (break ((== Case) . Info.category . extract) children)
     (Case, expr : body) -> S.Case expr body
     (While, expr : rest) -> S.While expr rest
 

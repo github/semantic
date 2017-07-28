@@ -6,10 +6,9 @@ module SES.Myers
 
 import Data.Array ((!))
 import qualified Data.Array as Array
+import Data.Foldable (find, toList)
 import Data.Ix
 import Data.These
-import GHC.Show hiding (show)
-import Prologue
 
 -- | An edit script, i.e. a sequence of changes/copies of elements.
 type EditScript a b = [These a b]

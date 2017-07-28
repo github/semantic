@@ -2,13 +2,13 @@
 module DiffSpec where
 
 import Category
+import Control.Comonad.Trans.Cofree (headF)
 import Data.Functor.Both
 import Data.Functor.Listable
 import RWS
 import Diff
 import Info
 import Interpreter
-import Prologue
 import SpecHelpers
 import Term
 import Test.Hspec

@@ -12,10 +12,23 @@ module RWS (
   , defaultD
   ) where
 
-import Prologue hiding (State, evalState, runState)
+import Control.Applicative (empty)
+import Control.Arrow ((&&&))
+import Control.Comonad
+import Control.Comonad.Trans.Cofree hiding (cofree, runCofree)
+import Control.Monad.Free
 import Control.Monad.State.Strict
+import Data.Foldable
+import Data.Function ((&), on)
+import Data.Functor.Foldable
+import Data.Hashable
+import Data.List (sortOn)
+import Data.Maybe
+import Data.Monoid (First(..))
 import Data.Record
+import Data.Semigroup hiding (First(..))
 import Data.These
+import Data.Traversable
 import Patch
 import Term
 import Data.Array.Unboxed
@@ -23,9 +36,8 @@ import Data.Functor.Classes
 import SES
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
-import Data.KdTree.Static hiding (toList)
+import Data.KdTree.Static hiding (empty, toList)
 import qualified Data.IntMap as IntMap
-import Data.Semigroup (Min(..), Option(..))
 
 import Control.Monad.Random
 import System.Random.Mersenne.Pure64
@@ -68,7 +80,7 @@ rws editDistance canCompare as bs =
   in fmap snd rwsDiffs
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
-type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
+type UnmappedTerms f fields = IntMap.IntMap (UnmappedTerm f fields)
 
 type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
 
@@ -228,8 +240,8 @@ setFeatureVector = setField
 minimumTermIndex :: [RWS.UnmappedTerm f fields] -> Int
 minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
 
-toMap :: [UnmappedTerm f fields] -> IntMap (UnmappedTerm f fields)
-toMap = IntMap.fromList . fmap (termIndex &&& identity)
+toMap :: [UnmappedTerm f fields] -> IntMap.IntMap (UnmappedTerm f fields)
+toMap = IntMap.fromList . fmap (termIndex &&& id)
 
 toKdTree :: [UnmappedTerm f fields] -> KdTree Double (UnmappedTerm f fields)
 toKdTree = build (elems . feature)
@@ -284,7 +296,7 @@ pqGramDecorator getLabel p q = cata algebra
         pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . extract)
-    padToSize n list = take n (list <> repeat Prologue.empty)
+    padToSize n list = take n (list <> repeat empty)
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector

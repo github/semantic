@@ -8,10 +8,15 @@ module Semantic
 ) where
 
 import Algorithm hiding (diff)
+import Control.Applicative ((<|>))
+import Control.Comonad.Cofree (hoistCofree)
+import Control.Monad ((<=<))
 import Data.Align.Generic (GAlign)
 import Data.Blob
+import Data.ByteString (ByteString)
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
+import Data.Output
 import Data.Record
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Union
@@ -22,7 +27,6 @@ import Interpreter
 import qualified Language
 import Patch
 import Parser
-import Prologue hiding (diff)
 import Renderer
 import Semantic.Task as Task
 import Term
@@ -36,8 +40,8 @@ import Term
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
-parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter blobExists
+parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
+parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . filter blobExists
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
@@ -61,8 +65,8 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
 
 
 
-diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both Blob] -> Task ByteString
-diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
+diffBlobPairs :: Output output => DiffRenderer output -> [Both Blob] -> Task ByteString
+diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output

@@ -8,13 +8,15 @@ module Data.Syntax.Algebra
 , cyclomaticComplexityAlgebra
 ) where
 
+import Control.Comonad (extract)
+import Data.Bifunctor (second)
+import Data.ByteString (ByteString)
 import Data.Functor.Foldable
 import Data.Record
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Union
-import Prologue
 import Term
 
 -- | An F-algebra on some carrier functor 'f'.

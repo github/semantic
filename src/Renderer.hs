@@ -18,12 +18,18 @@ module Renderer
 , File(..)
 ) where
 
+import Control.Comonad.Cofree (Cofree, unwrap)
+import Control.Comonad.Trans.Cofree (CofreeF(..))
+import Control.DeepSeq
 import Data.Aeson (Value, (.=))
+import Data.ByteString (ByteString)
+import Data.Foldable (asum)
 import qualified Data.Map as Map
+import Data.Output
 import Data.Syntax.Algebra (RAlgebra)
+import Data.Text (Text)
 import Diff (SyntaxDiff)
 import Info (DefaultFields)
-import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
@@ -66,7 +72,7 @@ deriving instance Show (TermRenderer output)
 --
 --   This type abstracts the type indices of 'DiffRenderer' and 'TermRenderer' s.t. multiple renderers can be present in a single list, alternation, etc., while retaining the ability to render and serialize. (Without 'SomeRenderer', the different output types of individual term/diff renderers prevent them from being used in a homogeneously typed setting.)
 data SomeRenderer f where
-  SomeRenderer :: (Monoid output, StringConv output ByteString, Show (f output)) => f output -> SomeRenderer f
+  SomeRenderer :: (Output output, Show (f output)) => f output -> SomeRenderer f
 
 deriving instance Show (SomeRenderer f)
 

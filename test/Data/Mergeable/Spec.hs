@@ -1,12 +1,11 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Data.Mergeable.Spec where
 
+import Control.Applicative (Alternative(..))
 import Data.Functor.Identity
 import Data.Functor.Listable
+import Data.Maybe (catMaybes)
 import Data.Mergeable
-import Data.String (String)
-import GHC.Show
-import Prologue
 import Syntax
 import Test.Hspec
 import Test.Hspec.LeanCheck
@@ -44,7 +43,7 @@ sequenceAltLaws value function = describe "sequenceAlt" $ do
     \ a -> sequenceAlt (pure <$> a) `shouldNotBe` (empty :: g (f a))
 
   prop "relationship with merge" . forAll (productWith ((Blind .) . fmap . getBlind) function value :: [Tier (Blind (f (g a)))]) $
-    \ a -> sequenceAlt (getBlind a) `shouldBe` merge identity (getBlind a)
+    \ a -> sequenceAlt (getBlind a) `shouldBe` merge id (getBlind a)
 
 
 withAlternativeInstances :: forall f a. (Listable a, Eq (f a), Show (f a)) => (forall g. (Alternative g, Eq (g (f a)), Show (g (f a))) => [Tier (f a)] -> [Tier (Blind (a -> g a))] -> Spec) -> [Tier (f a)] -> Spec

@@ -24,6 +24,7 @@ library
                      , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
+                     , Data.Output
                      , Data.Range
                      , Data.Record
                      , Data.Source
@@ -62,7 +63,6 @@ library
                      , Parser
                      , Patch
                      , Paths_semantic_diff
-                     , Prologue
                      , Renderer
                      , Renderer.JSON
                      , Renderer.Patch
@@ -78,9 +78,6 @@ library
                      , Syntax
                      , Term
                      , TreeSitter
-                     , FDoc.Term
-                     , FDoc.RecursionSchemes
-                     , FDoc.NatExample
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , ansi-terminal
@@ -91,6 +88,7 @@ library
                      , cmark
                      , comonad
                      , containers
+                     , deepseq
                      , directory
                      , effects
                      , filepath
@@ -105,7 +103,6 @@ library
                      , mtl
                      , optparse-applicative
                      , parallel
-                     , protolude
                      , recursion-schemes
                      , semigroups
                      , split
@@ -121,7 +118,7 @@ library
                      , python
                      , json
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, StrictData
+  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
@@ -134,7 +131,7 @@ executable semantic
   build-depends:       base
                      , semantic-diff
   default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
+  default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
 test-suite test
   type:                exitcode-stdio-1.0
@@ -162,7 +159,10 @@ test-suite test
                      , base
                      , bifunctors
                      , bytestring
+                     , comonad
+                     , deepseq
                      , filepath
+                     , free
                      , Glob
                      , haskell-tree-sitter
                      , hspec >= 2.4.1
@@ -179,7 +179,7 @@ test-suite test
                      , these
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
+  default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards
 
 source-repository head
   type:     git

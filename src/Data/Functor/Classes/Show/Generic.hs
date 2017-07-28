@@ -9,7 +9,6 @@ module Data.Functor.Classes.Show.Generic
 
 import Data.Functor.Classes
 import GHC.Generics
-import Prologue
 import Text.Show
 
 -- | Generically-derivable lifting of the 'Show' class to unary type constructors.
@@ -41,7 +40,7 @@ instance Show a => GShow1 (Either a) where gliftShowsPrec = liftShowsPrec
 -- Generics
 
 instance GShow1 U1 where
-  gliftShowsPrec _ _ _ _ = identity
+  gliftShowsPrec _ _ _ _ = id
 
 instance GShow1 Par1 where
   gliftShowsPrec sp _ d (Par1 a) = sp d a
