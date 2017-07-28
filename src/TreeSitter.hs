@@ -15,6 +15,7 @@ import Data.Record
 import Data.Source
 import Data.Span
 import qualified Data.Syntax.Assignment as A
+import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
 import qualified Language.TypeScript as TS
@@ -82,7 +83,7 @@ documentToTerm language document Blob{..} = do
           let allChildren = getChildren (fromIntegral (nodeChildCount node)) copyAll
 
           let source = slice (nodeRange node) blobSource
-          assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. nodeSpan node :. Nil) children allChildren
+          assignTerm language source (range :. categoryForLanguageProductionName language (pack name) :. nodeSpan node :. Nil) children allChildren
           where getChildren count copy = do
                   nodes <- allocaArray count $ \ childNodesPtr -> do
                     _ <- with (nodeTSNode node) (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
