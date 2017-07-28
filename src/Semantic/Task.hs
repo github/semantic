@@ -18,6 +18,7 @@ module Semantic.Task
 , Options(..)
 , defaultOptions
 , configureOptionsForHandle
+, nullFormatter
 , runTask
 , runTaskWithOptions
 ) where
@@ -39,6 +40,7 @@ import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.Format as Time
+import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
 import qualified Files
@@ -67,27 +69,6 @@ data TaskF output where
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Freer TaskF
-
--- | A log message at a specific level.
-data Message = Message Level String Time.UTCTime
-  deriving (Eq, Show)
-
-data Level
-  = Error
-  | Warning
-  | Info
-  | Debug
-  deriving (Eq, Ord, Show)
-
--- | Format a 'Message', optionally colourized.
-formatMessage :: Bool -> Message -> String
-formatMessage colourize (Message level message time) = showChar '[' . showTime time . showString "] " . showLevel level . showString " " . showString message . showChar '\n' $ ""
-  where showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "ERROR")
-        showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString " WARN")
-        showLevel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString " INFO")
-        showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "DEBUG")
-        showTime = showString . Time.formatTime Time.defaultTimeLocale (Time.iso8601DateFormat (Just "%H:%M:%S%..%q"))
-
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ f a = Both (Term f a) -> Diff f a
@@ -147,25 +128,88 @@ distributeFor inputs toTask = distribute (fmap toTask inputs)
 distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
+-- | A log message at a specific level.
+data Message = Message Level String [(String, String)] Time.UTCTime LocalTime.TimeZone
+  deriving (Eq, Show)
+
+data Level
+  = Error
+  | Warning
+  | Info
+  | Debug
+  deriving (Eq, Ord, Show)
+
+-- | Null formatter for log messages (throw them away).
+nullFormatter :: Options -> Message -> String
+nullFormatter _ _ = ""
+
+-- | Format log messaging using "logfmt".
+--
+-- Logfmt is a loosely defined logging format (see https://brandur.org/logfmt)
+-- for structured data, which plays very well with indexing tools like Splunk.
+--
+-- Example:
+--    time=2006-01-02T15:04:05Z07:00 msg="this is a message" key=val int=42 key2="val with word" float=33.33
+logfmtFormatter :: Options -> Message -> String
+logfmtFormatter Options{..} (Message level message pairs time zone) =
+    showPairs [
+        kv "time" (showTime zone time)
+      , kv "msg" (shows message)
+      , kv "level" (shows level)
+      ]
+  . showChar ' '
+  . showPairs ((\(k, v) -> kv k (shows v)) <$> pairs)
+  . showChar '\n' $ ""
+  where
+    kv k v = showString k . showChar '=' . v
+    showTime z = showString . Time.formatTime Time.defaultTimeLocale "%FT%XZ%z" . LocalTime.utcToZonedTime z
+    showPairs = foldr (.) identity . intersperse (showChar ' ')
+
+-- | Format log messages to a terminal. Suitable for local development.
+--
+terminalFormatter :: Options -> Message -> String
+terminalFormatter Options{..} (Message level message pairs time zone) =
+    showChar '[' . showTime zone time . showString "] "
+  . showLevel level . showChar ' '
+  . showString (printf "%-20s" message)
+  . showPairs pairs
+  . showChar '\n' $ ""
+  where
+    colourize = optionsIsTerminal && not optionsDisableColour
+    showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "ERROR")
+    showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString " WARN")
+    showLevel Info = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString " INFO")
+    showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid White, SetConsoleIntensity BoldIntensity] (showString "DEBUG")
+    showPairs pairs = foldr (.) identity $ intersperse (showChar ' ') (showPair <$> pairs)
+    showPair (k, v) = showString k . showChar '=' . Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString v)
+    showTime z = showString . Time.formatTime Time.defaultTimeLocale "%X" . LocalTime.utcToLocalTime z
+    -- showTime = showString . Time.formatTime Time.defaultTimeLocale (Time.iso8601DateFormat (Just "%H:%M:%S%..%q"))
+
 -- | Options controlling 'Task' logging, error handling, &c.
 data Options = Options
-  { optionsColour :: Maybe Bool -- ^ Whether to use colour formatting for errors. 'Nothing' implies automatic selection for the stderr handle, using colour for terminal handles but not for regular files.
+  { optionsDisableColour :: Bool -- ^ Whether to disable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
   , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
   , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
+  , optionsIsTerminal :: Bool -- ^ Whether a terminal is attached.
+  , optionsFormatter :: Options -> Message -> String -- ^ Log formatter to use.
   }
 
 defaultOptions :: Options
 defaultOptions = Options
-  { optionsColour = Nothing
+  { optionsDisableColour = False
   , optionsLevel = Just Warning
   , optionsPrintSource = False
+  , optionsIsTerminal = False
+  , optionsFormatter = nullFormatter
   }
 
 configureOptionsForHandle :: Handle -> Options -> IO Options
 configureOptionsForHandle handle options = do
   isTerminal <- hIsTerminalDevice handle
   pure $ options
-    { optionsColour = optionsColour options <|> Just isTerminal
+    { optionsIsTerminal = isTerminal
+    -- , optionsFormatter = if isTerminal then terminalFormatter else logfmtFormatter
+    , optionsFormatter = logfmtFormatter
     }
 
 
@@ -186,11 +230,11 @@ runTaskWithOptions options task = do
   atomically (closeTMQueue logQueue)
   wait logging
   either die pure result
-  where logSink options queue = do
+  where logSink options@Options{..} queue = do
           message <- atomically (readTMQueue queue)
           case message of
             Just message -> do
-              hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) message)
+              hPutStr stderr (optionsFormatter options message)
               logSink options queue
             _ -> pure ()
         run :: Options -> TMQueue Message -> Task a -> IO (Either String a)
@@ -200,8 +244,12 @@ runTaskWithOptions options task = do
                   ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left. displayException)
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left. displayException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-                  WriteLog level msg pairs
-                    | Just logLevel <- optionsLevel options, level <= logLevel -> let message = printf "%-20s %s" msg (unwords (uncurry (printf "%s=%s") <$> pairs)) in Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message >>= yield
+                  WriteLog level message pairs
+                    -- | Just logLevel <- optionsLevel options, level <= logLevel -> let message = printf "%-20s %s" msg (unwords (uncurry (printf "%s=%s") <$> pairs)) in Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message >>= yield
+                    | Just logLevel <- optionsLevel options, level <= logLevel -> do
+                      t <- Time.getCurrentTime
+                      z <- LocalTime.getTimeZone t
+                      atomically (writeTMQueue logQueue (Message level message pairs t z)) >>= yield
                     | otherwise -> pure () >>= yield
                   Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) (either (pure . Left) yield)
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
@@ -222,7 +270,13 @@ runTaskWithOptions options task = do
 
 runParser :: Options -> Parser term -> Blob -> Task (Either String term)
 runParser options parser blob@Blob{..} = case parser of
-  ASTParser language -> logTiming "ts ast parse" $ liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
+  ASTParser language -> do
+    let ps = [ ("path", blobPath) ]
+    writeLog Debug "debug" ps
+    writeLog Info "info" ps
+    writeLog Warning "warn" ps
+    writeLog Error "error" ps
+    logTiming "ts ast parse" $ liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
   AssignmentParser parser by assignment -> do
     res <- runParser options parser blob
     case res of
@@ -230,7 +284,7 @@ runParser options parser blob@Blob{..} = case parser of
       Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
         Left err -> do
           let formatOptions = Assignment.defaultOptions
-                { Assignment.optionsColour = fromMaybe True (optionsColour options)
+                { Assignment.optionsColour = True -- TODO
                 , Assignment.optionsIncludeSource = optionsPrintSource options
                 }
           writeLog Error (Assignment.formatErrorWithOptions formatOptions blob err) []
