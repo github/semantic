@@ -7,7 +7,6 @@ import Control.Monad.Free (wrap)
 import Data.Array.IArray
 import Data.Bifunctor
 import Data.Functor.Listable
-import Data.Maybe (catMaybes)
 import Data.Record
 import Data.These
 import Diff
