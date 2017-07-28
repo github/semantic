@@ -79,9 +79,6 @@ library
                      , Syntax
                      , Term
                      , TreeSitter
-                     , FDoc.Term
-                     , FDoc.RecursionSchemes
-                     , FDoc.NatExample
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , ansi-terminal
