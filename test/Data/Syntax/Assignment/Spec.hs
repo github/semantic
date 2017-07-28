@@ -36,6 +36,81 @@ spec = do
       `shouldBe`
         Right [Out "hello"]
 
+    it "distributes through overlapping committed choices, matching the left alternative" $
+      fst <$> runAssignment headF "(red (green))" (symbol Red *> children green <|> symbol Red *> children blue) (makeState [node Red 0 13 [node Green 5 12 []]])
+      `shouldBe`
+      Right (Out "(green)")
+
+    it "distributes through overlapping committed choices, matching the right alternative" $
+      fst <$> runAssignment headF "(red (blue))" (symbol Red *> children green <|> symbol Red *> children blue) (makeState [node Red 0 12 [node Blue 5 11 []]])
+      `shouldBe`
+      Right (Out "(blue)")
+
+    it "distributes through overlapping committed choices, matching the left alternatives" $
+      fst <$> runAssignment headF "magenta green green" (symbol Magenta *> many green <|> symbol Magenta *> many blue) (makeState [node Magenta 0 7 [], node Green 8 13 [], node Green 14 19 []])
+      `shouldBe`
+      Right [Out "green", Out "green"]
+
+    it "distributes through overlapping committed choices, matching the right alternatives" $
+      fst <$> runAssignment headF "magenta blue blue" (symbol Magenta *> many green <|> symbol Magenta *> many blue) (makeState [node Magenta 0 7 [], node Blue 8 12 [], node Blue 13 17 []])
+      `shouldBe`
+      Right [Out "blue", Out "blue"]
+
+    it "distributes through overlapping committed choices, matching the empty list" $
+      fst <$> runAssignment headF "magenta" (symbol Magenta *> (Left <$> many green) <|> symbol Magenta *> (Right <$> many blue)) (makeState [node Magenta 0 7 []])
+      `shouldBe`
+      Right (Left [])
+
+    it "distributes through overlapping committed choices, dropping anonymous nodes & matching the left alternative" $
+      fst <$> runAssignment headF "magenta green" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Green 8 13 []])
+      `shouldBe`
+      Right (Out "green")
+
+    it "distributes through overlapping committed choices, dropping anonymous nodes & matching the right alternative" $
+      fst <$> runAssignment headF "magenta blue" (symbol Magenta *> green <|> symbol Magenta *> blue) (makeState [node Magenta 0 7 [], node Blue 8 12 []])
+      `shouldBe`
+      Right (Out "blue")
+
+    it "alternates repetitions, matching the left alternative" $
+      fst <$> runAssignment headF "green green" (many green <|> many blue) (makeState [node Green 0 5 [], node Green 6 11 []])
+      `shouldBe`
+      Right [Out "green", Out "green"]
+
+    it "alternates repetitions, matching the right alternative" $
+      fst <$> runAssignment headF "blue blue" (many green <|> many blue) (makeState [node Blue 0 4 [], node Blue 5 9 []])
+      `shouldBe`
+      Right [Out "blue", Out "blue"]
+
+    it "alternates repetitions, matching at the end of input" $
+      fst <$> runAssignment headF "" (many green <|> many blue) (makeState [])
+      `shouldBe`
+      Right []
+
+    it "distributes through children rules" $
+      fst <$> runAssignment headF "(red (blue))" (children (many green) <|> children (many blue)) (makeState [node Red 0 12 [node Blue 5 11 []]])
+      `shouldBe`
+      Right [Out "(blue)"]
+
+    it "matches rules to the left of pure" $
+      fst <$> runAssignment headF "green" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Green 0 5 []])
+      `shouldBe`
+      Right (Out "green")
+
+    it "matches rules to the right of pure" $
+      fst <$> runAssignment headF "blue" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Blue 0 4 []])
+      `shouldBe`
+      Right (Out "blue")
+
+    it "matches other nodes with pure" $
+      fst <$> runAssignment headF "red" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Red 0 3 []])
+      `shouldBe`
+      Right (Out "other")
+
+    it "matches at end with pure" $
+      fst <$> runAssignment headF "red" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [])
+      `shouldBe`
+      Right (Out "other")
+
   describe "symbol" $ do
     it "matches nodes with the same symbol" $
       fst <$> runAssignment headF "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")

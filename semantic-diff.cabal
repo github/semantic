@@ -45,7 +45,6 @@ library
                      , Info
                      , Interpreter
                      , Language
-                     , Language.C
                      , Language.Markdown
                      , Language.Markdown.Syntax
                      , Language.Go
@@ -116,7 +115,6 @@ library
                      , these
                      , time
                      , haskell-tree-sitter
-                     , c
                      , go
                      , ruby
                      , typescript

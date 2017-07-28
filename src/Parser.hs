@@ -30,7 +30,6 @@ import Syntax hiding (Go)
 import Term
 import qualified Text.Parser.TreeSitter as TS
 import Text.Parser.TreeSitter.Language (Symbol)
-import Text.Parser.TreeSitter.C
 import Text.Parser.TreeSitter.Go
 import Text.Parser.TreeSitter.Python
 import Text.Parser.TreeSitter.Ruby
@@ -58,7 +57,6 @@ data Parser term where
 parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
-  C -> TreeSitterParser tree_sitter_c
   Go -> TreeSitterParser tree_sitter_go
   JSON -> TreeSitterParser tree_sitter_json
   JavaScript -> TreeSitterParser tree_sitter_typescript
