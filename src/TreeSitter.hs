@@ -5,8 +5,10 @@ module TreeSitter
 , defaultTermAssignment
 ) where
 
-import Prologue hiding (Constructor)
 import Category
+import Control.Comonad (extract)
+import Control.Exception
+import Control.Monad ((<=<))
 import Data.Blob
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Functor.Foldable hiding (Nil)
@@ -128,7 +130,7 @@ defaultTermAssignment source category children allChildren
 
     -- Control flow statements
     (If, condition : body) -> S.If condition body
-    (Switch, _) -> uncurry S.Switch (Prologue.break ((== Case) . Info.category . extract) children)
+    (Switch, _) -> uncurry S.Switch (break ((== Case) . Info.category . extract) children)
     (Case, expr : body) -> S.Case expr body
     (While, expr : rest) -> S.While expr rest
 

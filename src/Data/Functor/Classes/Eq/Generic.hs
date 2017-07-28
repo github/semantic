@@ -8,7 +8,6 @@ module Data.Functor.Classes.Eq.Generic
 import Control.Comonad.Cofree as Cofree
 import Data.Functor.Classes
 import GHC.Generics
-import Prologue
 
 -- | Generically-derivable lifting of the 'Eq' class to unary type constructors.
 class GEq1 f where

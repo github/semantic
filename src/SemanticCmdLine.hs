@@ -6,19 +6,24 @@ module SemanticCmdLine
 , runParse
 ) where
 
+import Control.Monad ((<=<))
 import Files (languageForFilePath)
+import Data.ByteString (ByteString)
+import Data.Foldable (find)
 import Data.Functor.Both hiding (fst, snd)
+import Data.List (intercalate)
 import Data.List.Split (splitWhen)
+import Data.Semigroup ((<>))
 import Data.Version (showVersion)
 import Development.GitRev
 import Language
 import Options.Applicative hiding (action)
-import Prologue hiding (concurrently, readFile)
 import Renderer
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
-import System.IO (stdin)
+import System.IO (Handle, stdin, stdout)
 import qualified Semantic (parseBlobs, diffBlobPairs)
+import Text.Read
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions

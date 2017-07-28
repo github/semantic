@@ -10,17 +10,21 @@ module Renderer.Patch
 import Alignment
 import Data.Bifunctor.Join
 import Data.Blob
+import Data.ByteString.Char8 (ByteString, pack)
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Functor.Both as Both
 import Data.List (span, unzip)
+import Data.Maybe (fromMaybe)
+import Data.Monoid (Sum(..))
 import Data.Output
 import Data.Range
 import Data.Record
+import Data.Semigroup ((<>))
 import Data.Source
 import Data.These
 import Diff
 import Patch
-import Prologue hiding (fst, snd)
+import Prelude hiding (fst, snd)
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
@@ -74,9 +78,9 @@ showHunk blobs hunk = maybeOffsetHeader <>
         maybeOffsetHeader = if lengthA > 0 && lengthB > 0
                             then offsetHeader
                             else mempty
-        offsetHeader = "@@ -" <> offsetA <> "," <> show lengthA <> " +" <> offsetB <> "," <> show lengthB <> " @@" <> "\n"
+        offsetHeader = "@@ -" <> offsetA <> "," <> pack (show lengthA) <> " +" <> offsetB <> "," <> pack (show lengthB) <> " @@" <> "\n"
         (lengthA, lengthB) = runJoin . fmap getSum $ hunkLength hunk
-        (offsetA, offsetB) = runJoin . fmap (show . getSum) $ offset hunk
+        (offsetA, offsetB) = runJoin . fmap (pack . show . getSum) $ offset hunk
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Functor f => HasField fields Range => Both Source -> Change (SplitDiff f (Record fields)) -> ByteString
@@ -117,7 +121,7 @@ header blobs = ByteString.intercalate "\n" ([filepathHeader, fileModeHeader] <> 
         beforeFilepath = "--- " <> modeHeader "a" modeA pathA
         afterFilepath = "+++ " <> modeHeader "b" modeB pathB
         sources = blobSource <$> blobs
-        (pathA, pathB) = case runJoin $ toS . blobPath <$> blobs of
+        (pathA, pathB) = case runJoin $ pack . blobPath <$> blobs of
           ("", path) -> (path, path)
           (path, "") -> (path, path)
           paths -> paths

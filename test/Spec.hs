@@ -1,6 +1,5 @@
 module Main where
 
-import Prologue
 import qualified AlignmentSpec
 import qualified CommandSpec
 import qualified Data.Mergeable.Spec

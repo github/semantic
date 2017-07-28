@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
+  {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Alignment
 ( hasChanges
 , numberedRows
@@ -8,19 +8,29 @@ module Alignment
 , modifyJoin
 ) where
 
-import Prologue hiding (fst, snd)
+import Data.Bifunctor (bimap, first, second)
+import Control.Arrow ((***))
+import Control.Comonad (extract)
+import Control.Monad (join)
+import Control.Monad.Free
 import Data.Align
 import Data.Bifunctor.Join
+import Data.Foldable (toList)
+import Data.Function (on)
 import Data.Functor.Both
-import Data.List (partition)
-import Data.Maybe (fromJust)
+import Data.Functor.Foldable
+import Data.Functor.Identity
+import Data.List (partition, sortBy)
+import Data.Maybe (catMaybes, fromJust, listToMaybe)
 import Data.Range
+import Data.Semigroup ((<>))
 import Data.Source
 import Data.Record
 import Data.These
 import Diff
 import Info
 import Patch
+import Prelude hiding (fst, snd)
 import SplitDiff
 import Term
 
@@ -30,7 +40,7 @@ numberedRows = countUp (both 1 1)
   where countUp _ [] = []
         countUp from (row : rows) = numberedLine from row : countUp (nextLineNumbers from row) rows
         numberedLine from row = fromJust ((,) <$> modifyJoin (uncurry These) from `applyThese` row)
-        nextLineNumbers from row = modifyJoin (fromThese identity identity) (succ <$ row) <*> from
+        nextLineNumbers from row = modifyJoin (fromThese id id) (succ <$ row) <*> from
 
 -- | Determine whether a line contains any patches.
 hasChanges :: (Foldable f, Functor f) => SplitDiff f annotation -> Bool
@@ -45,7 +55,7 @@ alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both So
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> alignSyntax' this (fst sources) term
   Insert term -> fmap (pure . SplitInsert) <$> alignSyntax' that (snd sources) term
-  Replace term1 term2 -> fmap (pure . SplitReplace) <$> alignWith (fmap (these identity identity const . runJoin) . Join)
+  Replace term1 term2 -> fmap (pure . SplitReplace) <$> alignWith (fmap (these id id const . runJoin) . Join)
     (alignSyntax' this (fst sources) term1)
     (alignSyntax' that (snd sources) term2)
   where getRange = byteRange . extract
@@ -93,7 +103,7 @@ alignBranch getRange children ranges = case intersectingChildren of
         (leftRange, rightRange) = splitThese headRanges
         alignAsymmetrically range advanceBy = let (line, remaining) = lineAndRemaining asymmetricalChildren range in
           line $ alignBranch getRange (remaining <> symmetricalChildren <> nonIntersectingChildren) (modifyJoin (advanceBy (drop 1)) ranges)
-        lineAndRemaining _ Nothing = (identity, [])
+        lineAndRemaining _ Nothing = (id, [])
         lineAndRemaining children (Just ranges) = let (intersections, remaining) = alignChildren getRange children ranges in
           ((:) $ (,) <$> ranges `applyToBoth` (sortBy (compare `on` getRange) <$> intersections), remaining)
 
@@ -106,9 +116,9 @@ alignChildren getRange (first:rest) headRanges
     -- It intersects on both sides, so we can just take the first line whole.
     (True, True) -> ((<>) <$> toTerms first <*> firstRemaining, restRemaining)
     -- It only intersects on the left, so split it up.
-    (True, False) -> ((<>) <$> toTerms (fromJust l) <*> firstRemaining, maybe identity (:) r restRemaining)
+    (True, False) -> ((<>) <$> toTerms (fromJust l) <*> firstRemaining, maybe id (:) r restRemaining)
     -- It only intersects on the right, so split it up.
-    (False, True) -> ((<>) <$> toTerms (fromJust r) <*> firstRemaining, maybe identity (:) l restRemaining)
+    (False, True) -> ((<>) <$> toTerms (fromJust r) <*> firstRemaining, maybe id (:) l restRemaining)
     -- It doesn’t intersect at all, so skip it and move along.
     (False, False) -> (firstRemaining, first:restRemaining)
   | otherwise = alignChildren getRange rest headRanges

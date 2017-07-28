@@ -9,10 +9,12 @@ module Data.Span
 , emptySpan
 ) where
 
+import Control.DeepSeq
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
+import Data.Hashable (Hashable)
 import Data.Semigroup
-import Prologue
+import GHC.Generics
 import Test.LeanCheck
 
 -- | Source position information
