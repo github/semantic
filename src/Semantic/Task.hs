@@ -135,8 +135,8 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 
 -- | A log message at a specific level.
-data Message = Message Level String [(String, String)] Time.UTCTime LocalTime.TimeZone
-  deriving (Eq, Show)
+data Message = Message Level String [(String, String)] LocalTime.ZonedTime
+  deriving (Show)
 
 data Level
   = Error
@@ -157,9 +157,9 @@ nullFormatter _ _ = ""
 -- Example:
 --    time=2006-01-02T15:04:05Z07:00 msg="this is a message" key=val int=42 key2="val with word" float=33.33
 logfmtFormatter :: Options -> Message -> String
-logfmtFormatter Options{..} (Message level message pairs time zone) =
+logfmtFormatter Options{..} (Message level message pairs time) =
     showPairs [
-        kv "time" (showTime zone time)
+        kv "time" (showTime time)
       , kv "msg" (shows message)
       , kv "level" (shows level)
       ]
@@ -168,14 +168,14 @@ logfmtFormatter Options{..} (Message level message pairs time zone) =
   . showChar '\n' $ ""
   where
     kv k v = showString k . showChar '=' . v
-    showTime z = showString . Time.formatTime Time.defaultTimeLocale "%FT%XZ%z" . LocalTime.utcToZonedTime z
+    showTime = showString . Time.formatTime Time.defaultTimeLocale "%FT%XZ%z"
     showPairs = foldr (.) identity . intersperse (showChar ' ')
 
 -- | Format log messages to a terminal. Suitable for local development.
 --
 terminalFormatter :: Options -> Message -> String
-terminalFormatter Options{..} (Message level message pairs time zone) =
-    showChar '[' . showTime zone time . showString "] "
+terminalFormatter Options{..} (Message level message pairs time) =
+    showChar '[' . showTime time . showString "] "
   . showLevel level . showChar ' '
   . showString (printf "%-20s" message)
   . showPairs pairs
@@ -188,7 +188,7 @@ terminalFormatter Options{..} (Message level message pairs time zone) =
     showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid White, SetConsoleIntensity BoldIntensity] (showString "DEBUG")
     showPairs pairs = foldr (.) identity $ intersperse (showChar ' ') (showPair <$> pairs)
     showPair (k, v) = showString k . showChar '=' . Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString v)
-    showTime z = showString . Time.formatTime Time.defaultTimeLocale "%X" . LocalTime.utcToLocalTime z
+    showTime = showString . Time.formatTime Time.defaultTimeLocale "%X"
 
 -- | Options controlling 'Task' logging, error handling, &c.
 data Options = Options
@@ -250,10 +250,7 @@ runTaskWithOptions options task = do
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left. displayException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
                   WriteLog level message pairs
-                    | Just logLevel <- optionsLevel options, level <= logLevel -> do
-                      time <- Time.getCurrentTime
-                      zone <- LocalTime.getTimeZone time
-                      atomically (writeTMQueue logQueue (Message level message pairs time zone)) >>= yield
+                    | Just logLevel <- optionsLevel options, level <= logLevel -> Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs >>= yield
                     | otherwise -> pure () >>= yield
                   Time report task -> do
                     start <- liftIO Time.getCurrentTime
