@@ -17,7 +17,7 @@ import Prologue hiding (concurrently, readFile)
 import Renderer
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
-import qualified Semantic.Log as Task
+import qualified Semantic.Log as Log
 import System.IO (stdin)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
@@ -33,20 +33,20 @@ runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRendere
 -- | A parser for the application's command-line arguments.
 --
 --   Returns a 'Task' to read the input, run the requested operation, and write the output to the specified output path or stdout.
-arguments :: ParserInfo (Task.Options, Task.Task ())
+arguments :: ParserInfo (Log.Options, Task.Task ())
 arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsParser)) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
-    optionsParser = Task.Options
+    optionsParser = Log.Options
       <$> switch (long "disable-colour" <> long "disable-color" <> help "Disable ANSI colors in log messages even if the terminal is a TTY.")
-      <*> options [("error", Just Task.Error), ("warning", Just Task.Warning), ("info", Just Task.Info), ("debug", Just Task.Debug), ("none", Nothing)]
-            (long "log-level" <> value (Just Task.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
+      <*> options [("error", Just Log.Error), ("warning", Just Log.Warning), ("info", Just Log.Info), ("debug", Just Log.Debug), ("none", Nothing)]
+            (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
       <*> switch (long "print-source" <> help "Include source references in logged errors where applicable.")
       <*> pure False
-      <*> pure Task.logfmtFormatter
+      <*> pure Log.logfmtFormatter
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
