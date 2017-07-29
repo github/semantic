@@ -16,7 +16,6 @@ module Semantic.Task
 , distribute
 , distributeFor
 , distributeFoldMap
-, Options(..)
 , defaultOptions
 , configureOptionsForHandle
 , terminalFormatter
@@ -41,7 +40,6 @@ import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
-import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
@@ -50,12 +48,11 @@ import Language
 import Language.Markdown
 import Parser
 import Prologue hiding (Location, show)
-import System.Console.ANSI
-import System.IO (hIsTerminalDevice, hPutStr)
+import System.IO (hPutStr)
 import Term
 import Text.Show
-import Text.Printf
 import TreeSitter
+import Semantic.Log
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
@@ -133,86 +130,6 @@ distributeFor inputs toTask = distribute (fmap toTask inputs)
 --   This is a concurrent analogue of 'foldMap'.
 distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
-
-
--- | A log message at a specific level.
-data Message = Message Level String [(String, String)] LocalTime.ZonedTime
-  deriving (Show)
-
-data Level
-  = Error
-  | Warning
-  | Info
-  | Debug
-  deriving (Eq, Ord, Show)
-
--- | Format log messaging using "logfmt".
---
--- Logfmt is a loosely defined logging format (see https://brandur.org/logfmt)
--- for structured data, which plays very well with indexing tools like Splunk.
---
--- Example:
---    time=2006-01-02T15:04:05Z07:00 msg="this is a message" key=val int=42 key2="val with word" float=33.33
-logfmtFormatter :: Options -> Message -> String
-logfmtFormatter Options{..} (Message level message pairs time) =
-    showPairs [
-        kv "time" (showTime time)
-      , kv "msg" (shows message)
-      , kv "level" (shows level)
-      ]
-  . showChar ' '
-  . showPairs ((\(k, v) -> kv k (shows v)) <$> pairs)
-  . showChar '\n' $ ""
-  where
-    kv k v = showString k . showChar '=' . v
-    showTime = showString . Time.formatTime Time.defaultTimeLocale "%FT%XZ%z"
-    showPairs = foldr (.) identity . intersperse (showChar ' ')
-
--- | Format log messages to a terminal. Suitable for local development.
---
-terminalFormatter :: Options -> Message -> String
-terminalFormatter Options{..} (Message level message pairs time) =
-    showChar '[' . showTime time . showString "] "
-  . showLevel level . showChar ' '
-  . showString (printf "%-20s" message)
-  . showPairs pairs
-  . showChar '\n' $ ""
-  where
-    colourize = optionsIsTerminal && not optionsDisableColour
-    showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "ERROR")
-    showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString " WARN")
-    showLevel Info = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString " INFO")
-    showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid White, SetConsoleIntensity BoldIntensity] (showString "DEBUG")
-    showPairs pairs = foldr (.) identity $ intersperse (showChar ' ') (showPair <$> pairs)
-    showPair (k, v) = showString k . showChar '=' . Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString v)
-    showTime = showString . Time.formatTime Time.defaultTimeLocale "%X"
-
--- | Options controlling 'Task' logging, error handling, &c.
-data Options = Options
-  { optionsDisableColour :: Bool -- ^ Whether to disable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
-  , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
-  , optionsIsTerminal :: Bool -- ^ Whether a terminal is attached.
-  , optionsFormatter :: Options -> Message -> String -- ^ Log formatter to use.
-  }
-
-defaultOptions :: Options
-defaultOptions = Options
-  { optionsDisableColour = False
-  , optionsLevel = Just Warning
-  , optionsPrintSource = False
-  , optionsIsTerminal = False
-  , optionsFormatter = logfmtFormatter
-  }
-
-configureOptionsForHandle :: Handle -> Options -> IO Options
-configureOptionsForHandle handle options = do
-  isTerminal <- hIsTerminalDevice handle
-  pure $ options
-    { optionsIsTerminal = isTerminal
-    , optionsFormatter = if isTerminal then terminalFormatter else logfmtFormatter
-    }
-
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --

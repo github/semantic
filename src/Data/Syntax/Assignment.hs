@@ -75,9 +75,7 @@ module Data.Syntax.Assignment
 , while
 -- Results
 , Error(..)
-, formatError
 , formatErrorWithOptions
-, withSGRCode
 -- Running
 , assignBy
 , runAssignment
@@ -183,12 +181,6 @@ nodeError expected (Node actual _ (Info.Span spanStart _)) = Error spanStart exp
 type IncludeSource = Bool
 type Colourize = Bool
 
--- | Format an 'Error' with reference to the source where it occurred.
---
--- > formatError = formatErrorWithOptions True True
-formatError :: Show grammar => Blob -> Error grammar -> String
-formatError = formatErrorWithOptions True True
-
 -- | Format an 'Error', optionally with reference to the source where it occurred.
 formatErrorWithOptions :: Show grammar => IncludeSource -> Colourize -> Blob -> Error grammar -> String
 formatErrorWithOptions includeSource colourize Blob{..} Error{..}
@@ -196,7 +188,7 @@ formatErrorWithOptions includeSource colourize Blob{..} Error{..}
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
   . (if includeSource
-    then showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
+    then showString (toS context) . (if "\n" `isSuffixOf` context then identity else showChar '\n')
        . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else identity)
   . showString (prettyCallStack callStack) . showChar '\n'

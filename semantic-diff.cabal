@@ -71,6 +71,7 @@ library
                      , Renderer.TOC
                      , RWS
                      , Semantic
+                     , Semantic.Log
                      , Semantic.Task
                      , SemanticCmdLine
                      , SES

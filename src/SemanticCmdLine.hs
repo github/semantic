@@ -17,6 +17,7 @@ import Prologue hiding (concurrently, readFile)
 import Renderer
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
+import qualified Semantic.Log as Task
 import System.IO (stdin)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 
