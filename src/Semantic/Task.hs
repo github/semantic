@@ -171,7 +171,7 @@ runTaskWithOptions options task = do
                     end <- liftIO Time.getCurrentTime
                     _ <- go $ report (Time.diffUTCTime end start)
                     either (pure . Left) yield res
-                  Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) (either (pure . Left) yield)
+                  Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) yield . join
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
                   Diff differ terms -> pure (differ terms) >>= yield
                   Render renderer input -> pure (renderer input) >>= yield
