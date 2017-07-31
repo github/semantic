@@ -28,7 +28,7 @@ We will get our data into production and in front of customers.
 Task                    | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score
 ----                    | ---        | ----------------- | ----------------------- | -----
 [Architecture review][] | @tclem     | 1                 | ✅                       |
-Production readiness    | @tclem     | 1                 | 3                       |
+Production readiness    | @tclem     | 1                 | ✅                       |
 Table of contents       |            |                   | ✅                       |
 GraphQL parse tree API  | @tclem     |                   | ✅                       |
 GraphQL diff API        |            | 3                 | 2                       |
@@ -47,3 +47,5 @@ Task                                | PRP        | Priority (1 to 3) | Amount of
 À la carte assignment of TypeScript |            |                   | 2?                      |
 🚀 LSP integration                   | @joshvera  | 2                 | 4?                      |
 Migration to à la carte syntax      | @robrix    | 2                 | 3                       |
+
+[roadmap project]: https://github.com/github/semantic-diff/projects/5
