@@ -35,8 +35,9 @@ logfmtFormatter Options{..} (Message level message pairs time) =
       ( kv "time" (showTime time)
       : kv "msg" (shows message)
       : kv "level" (shows level)
-      : kv "pid" (shows optionsProcessID)
-      : (uncurry kv . second shows <$> pairs) )
+      : kv "pid" (shows optionsProcessId)
+      : (uncurry kv . second shows <$> pairs)
+      <> [ kv "request_id" (shows x) | x <- toList optionsRequestId ] )
   . showChar '\n' $ ""
   where
     kv k v = showString k . showChar '=' . v
@@ -69,9 +70,10 @@ data Options = Options
   { optionsEnableColour :: Bool -- ^ Whether to enable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
   , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
   , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
+  , optionsRequestId :: Maybe String -- ^ Optional request id for tracing across systems.
   , optionsIsTerminal :: Bool -- ^ Whether a terminal is attached (set automaticaly at runtime).
   , optionsFormatter :: Options -> Message -> String -- ^ Log formatter to use (set automaticaly at runtime).
-  , optionsProcessID :: CPid -- ^ ProcessID (set automaticaly at runtime).
+  , optionsProcessId :: CPid -- ^ ProcessID (set automaticaly at runtime).
   }
 
 defaultOptions :: Options
@@ -79,9 +81,10 @@ defaultOptions = Options
   { optionsEnableColour = True
   , optionsLevel = Just Warning
   , optionsPrintSource = False
+  , optionsRequestId = Nothing
   , optionsIsTerminal = False
   , optionsFormatter = logfmtFormatter
-  , optionsProcessID = 0
+  , optionsProcessId = 0
   }
 
 configureOptionsForHandle :: Handle -> Options -> IO Options
@@ -91,7 +94,7 @@ configureOptionsForHandle handle options = do
   pure $ options
     { optionsIsTerminal = isTerminal
     , optionsFormatter = if isTerminal then terminalFormatter else logfmtFormatter
-    , optionsProcessID = pid
+    , optionsProcessId = pid
     }
 
 withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
