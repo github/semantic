@@ -162,14 +162,12 @@ runTaskWithOptions options task = do
                   ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . displayException)
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . displayException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-                  WriteLog level message pairs
-                    | Just logLevel <- optionsLevel options, level <= logLevel -> Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs >>= yield
-                    | otherwise -> pure () >>= yield
+                  WriteLog level message pairs -> queueLogMessage level message pairs >>= yield
                   Time message pairs task -> do
                     start <- Time.getCurrentTime
                     !res <- go task
-                    _ <- go $ writeLog Info message (pairs <> [("time", show (Time.diffUTCTime end start))])
                     end <- Time.getCurrentTime
+                    queueLogMessage Info message (pairs <> [("time", show (Time.diffUTCTime end start))])
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) yield . join
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
@@ -177,6 +175,10 @@ runTaskWithOptions options task = do
                   Render renderer input -> pure (renderer input) >>= yield
                   Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
                   LiftIO action -> action >>= yield ) . fmap Right
+                queueLogMessage level message pairs
+                  | Just logLevel <- optionsLevel options, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs
+                  | otherwise = pure ()
+
 
 runParser :: Options -> Parser term -> Blob -> Task (Either String term)
 runParser options@Options{..} parser blob@Blob{..} = case parser of
