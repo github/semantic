@@ -171,7 +171,6 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
-                     , protolude
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff
