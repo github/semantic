@@ -1,4 +1,4 @@
-  {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Alignment
 ( hasChanges
 , numberedRows
