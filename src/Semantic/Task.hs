@@ -59,7 +59,7 @@ data TaskF output where
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
   WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
   WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
-  Time :: (Time.NominalDiffTime -> Task ()) -> Task output -> TaskF output
+  Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
@@ -93,9 +93,9 @@ writeToOutput path contents = WriteToOutput path contents `Then` return
 writeLog :: Level -> String -> [(String, String)] -> Task ()
 writeLog level message pairs = WriteLog level message pairs `Then` return
 
--- | A 'Task' which measures timing of another 'Task'.
-time :: (Time.NominalDiffTime -> Task ()) -> Task output -> Task output
-time report task = Time report task `Then` return
+-- | A 'Task' which measures and logs the timing of another 'Task'.
+time :: String -> [(String, String)] -> Task output -> Task output
+time message pairs task = Time message pairs task `Then` return
 
 -- | A 'Task' which parses a 'Blob' with the given 'Parser'.
 parse :: Parser term -> Blob -> Task term
@@ -165,11 +165,11 @@ runTaskWithOptions options task = do
                   WriteLog level message pairs
                     | Just logLevel <- optionsLevel options, level <= logLevel -> Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs >>= yield
                     | otherwise -> pure () >>= yield
-                  Time report task -> do
+                  Time message pairs task -> do
                     start <- liftIO Time.getCurrentTime
                     !res <- go task
                     end <- liftIO Time.getCurrentTime
-                    _ <- go $ report (Time.diffUTCTime end start)
+                    _ <- go $ writeLog Info message (pairs <> [("time", show (Time.diffUTCTime end start))])
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) yield . join
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
@@ -204,9 +204,8 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
       _ | Just err <- prj syntax -> const True (err :: Syntax.Error Bool)
       _ -> or syntax
     logTiming :: String -> Task a -> Task a
-    logTiming msg = time $ \delta -> writeLog Info msg [ ("path", blobPath)
-                                                       , ("language", maybe "" show blobLanguage)
-                                                       , ("time", show delta) ]
+    logTiming msg = time msg [ ("path", blobPath)
+                             , ("language", maybe "" show blobLanguage)]
 
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return
