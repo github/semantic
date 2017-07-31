@@ -29,18 +29,16 @@ data Level
 --    time=2006-01-02T15:04:05Z07:00 msg="this is a message" key=val int=42 key2="val with word" float=33.33
 logfmtFormatter :: Options -> Message -> String
 logfmtFormatter Options{..} (Message level message pairs time) =
-    showPairs [
-        kv "time" (showTime time)
-      , kv "msg" (shows message)
-      , kv "level" (shows level)
-      ]
-  . showChar ' '
-  . showPairs ((\(k, v) -> kv k (shows v)) <$> pairs)
+    showPairs
+      (  kv "time" (showTime time)
+      : kv "msg" (shows message)
+      : kv "level" (shows level)
+      : (uncurry kv . second shows <$> pairs) )
   . showChar '\n' $ ""
   where
     kv k v = showString k . showChar '=' . v
-    showTime = showString . Time.formatTime Time.defaultTimeLocale "%FT%XZ%z"
     showPairs = foldr (.) identity . intersperse (showChar ' ')
+    showTime = showString . Time.formatTime Time.defaultTimeLocale "%FT%XZ%z"
 
 -- | Format log messages to a terminal. Suitable for local development.
 --
