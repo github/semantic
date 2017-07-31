@@ -52,7 +52,7 @@ terminalFormatter Options{..} (Message level message pairs time) =
   . showPairs pairs
   . showChar '\n' $ ""
   where
-    colourize = optionsIsTerminal && not optionsDisableColour
+    colourize = optionsIsTerminal && optionsEnableColour
     showLevel Error = withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "ERROR")
     showLevel Warning = withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString " WARN")
     showLevel Info = withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString " INFO")
@@ -63,7 +63,7 @@ terminalFormatter Options{..} (Message level message pairs time) =
 
 -- | Options controlling logging, error handling, &c.
 data Options = Options
-  { optionsDisableColour :: Bool -- ^ Whether to disable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
+  { optionsEnableColour :: Bool -- ^ Whether to enable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
   , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
   , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
   , optionsIsTerminal :: Bool -- ^ Whether a terminal is attached.
@@ -72,7 +72,7 @@ data Options = Options
 
 defaultOptions :: Options
 defaultOptions = Options
-  { optionsDisableColour = False
+  { optionsEnableColour = True
   , optionsLevel = Just Warning
   , optionsPrintSource = False
   , optionsIsTerminal = False

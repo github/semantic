@@ -189,7 +189,7 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
       Left err -> writeLog Error (showBlob blob <> " failed parsing") [] >> pure (Left err)
       Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
         Left err -> do
-          writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && not optionsDisableColour) blob err) []
+          writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) []
           pure $ Left (showBlob blob <> " failed assignment")
         Right term -> do
           when (hasErrors term) $ writeLog Warning (showBlob blob <> " has parse errors") []
