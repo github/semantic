@@ -10,14 +10,16 @@ import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
 import Data.Blob
+import Data.ByteString.Lazy (toStrict)
 import Data.Functor.Both (Both)
 import qualified Data.Map as Map
+import Data.Output
 import Data.Record
 import Data.Union
 import Info
 import Language
 import Patch
-import Prologue hiding ((++))
+import Prologue hiding ((++), toStrict)
 import Syntax as S
 
 --
@@ -32,8 +34,8 @@ renderJSONDiff blobs diff = Map.fromList
   , ("paths", toJSON (blobPath <$> toList blobs))
   ]
 
-instance StringConv (Map Text Value) ByteString where
-  strConv _ = toS . (<> "\n") . encode
+instance Output (Map Text Value) where
+  toOutput = toStrict . (<> "\n") . encode
 
 instance ToJSON a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
@@ -117,8 +119,8 @@ data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileC
 instance ToJSON a => ToJSON (File a) where
   toJSON File{..} = object [ "filePath" .= filePath, "language" .= fileLanguage, "programNode" .= fileContent ]
 
-instance StringConv [Value] ByteString where
-  strConv _ = toS . (<> "\n") . encode
+instance Output [Value] where
+  toOutput = toStrict . (<> "\n") . encode
 
 renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
 renderJSONTerm Blob{..} = pure . toJSON . File blobPath blobLanguage
