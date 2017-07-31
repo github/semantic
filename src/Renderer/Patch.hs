@@ -13,6 +13,7 @@ import Data.Blob
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Functor.Both as Both
 import Data.List (span, unzip)
+import Data.Output
 import Data.Range
 import Data.Record
 import Data.Source
@@ -40,8 +41,8 @@ instance Monoid File where
   mempty = File mempty
   mappend (File a) (File b) = File (a <> "\n" <> b)
 
-instance StringConv File ByteString where
-  strConv _ = unFile
+instance Output File where
+  toOutput = unFile
 
 
 -- | A hunk in a patch, including the offset, changes, and context.
