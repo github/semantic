@@ -49,3 +49,4 @@ Task                                | PRP        | Priority (1 to 3) | Amount of
 Migration to à la carte syntax      | @robrix    | 2                 | 3                       |
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
+[Architecture review]: https://github.com/github/architecture/issues/12
