@@ -166,10 +166,10 @@ runTaskWithOptions options task = do
                     | Just logLevel <- optionsLevel options, level <= logLevel -> Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs >>= yield
                     | otherwise -> pure () >>= yield
                   Time message pairs task -> do
-                    start <- liftIO Time.getCurrentTime
+                    start <- Time.getCurrentTime
                     !res <- go task
-                    end <- liftIO Time.getCurrentTime
                     _ <- go $ writeLog Info message (pairs <> [("time", show (Time.diffUTCTime end start))])
+                    end <- Time.getCurrentTime
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) yield . join
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
