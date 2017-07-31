@@ -167,7 +167,7 @@ runTaskWithOptions options task = do
                     start <- Time.getCurrentTime
                     !res <- go task
                     end <- Time.getCurrentTime
-                    queueLogMessage Info message (pairs <> [("time", show (Time.diffUTCTime end start))])
+                    queueLogMessage Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) yield . join
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield

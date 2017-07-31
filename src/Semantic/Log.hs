@@ -35,7 +35,8 @@ logfmtFormatter Options{..} (Message level message pairs time) =
       ( kv "time" (showTime time)
       : kv "msg" (shows message)
       : kv "level" (shows level)
-      : kv "pid" (shows optionsProcessID)
+      : kv "process_id" (shows optionsProcessID)
+      : kv "app" (showString "semantic")
       : (uncurry kv . second shows <$> pairs)
       <> [ kv "request_id" (shows x) | x <- toList optionsRequestID ] )
   . showChar '\n' $ ""
