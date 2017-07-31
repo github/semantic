@@ -45,8 +45,10 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <*> options [("error", Just Log.Error), ("warning", Just Log.Warning), ("info", Just Log.Info), ("debug", Just Log.Debug), ("none", Nothing)]
             (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
       <*> switch (long "print-source" <> help "Include source references in logged errors where applicable.")
-      <*> pure False
-      <*> pure Log.logfmtFormatter
+      -- The rest of the logging options are set automatically at runtime.
+      <*> pure False -- IsTerminal
+      <*> pure Log.logfmtFormatter -- Formatter
+      <*> pure 0 -- ProcessID
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")

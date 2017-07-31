@@ -116,6 +116,7 @@ library
                      , text >= 1.2.1.3
                      , these
                      , time
+                     , unix
                      , haskell-tree-sitter
                      , c
                      , go

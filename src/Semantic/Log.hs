@@ -6,6 +6,8 @@ import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
 import System.Console.ANSI
 import System.IO (hIsTerminalDevice)
+import System.Posix.Process
+import System.Posix.Types
 import Text.Show
 import Text.Printf
 
@@ -30,9 +32,10 @@ data Level
 logfmtFormatter :: Options -> Message -> String
 logfmtFormatter Options{..} (Message level message pairs time) =
     showPairs
-      (  kv "time" (showTime time)
+      ( kv "time" (showTime time)
       : kv "msg" (shows message)
       : kv "level" (shows level)
+      : kv "pid" (shows optionsProcessID)
       : (uncurry kv . second shows <$> pairs) )
   . showChar '\n' $ ""
   where
@@ -66,8 +69,9 @@ data Options = Options
   { optionsEnableColour :: Bool -- ^ Whether to enable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
   , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
   , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
-  , optionsIsTerminal :: Bool -- ^ Whether a terminal is attached.
-  , optionsFormatter :: Options -> Message -> String -- ^ Log formatter to use.
+  , optionsIsTerminal :: Bool -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , optionsFormatter :: Options -> Message -> String -- ^ Log formatter to use (set automaticaly at runtime).
+  , optionsProcessID :: CPid -- ^ ProcessID (set automaticaly at runtime).
   }
 
 defaultOptions :: Options
@@ -77,14 +81,17 @@ defaultOptions = Options
   , optionsPrintSource = False
   , optionsIsTerminal = False
   , optionsFormatter = logfmtFormatter
+  , optionsProcessID = 0
   }
 
 configureOptionsForHandle :: Handle -> Options -> IO Options
 configureOptionsForHandle handle options = do
+  pid <- getProcessID
   isTerminal <- hIsTerminalDevice handle
   pure $ options
     { optionsIsTerminal = isTerminal
     , optionsFormatter = if isTerminal then terminalFormatter else logfmtFormatter
+    , optionsProcessID = pid
     }
 
 withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
