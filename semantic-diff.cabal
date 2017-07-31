@@ -45,7 +45,6 @@ library
                      , Info
                      , Interpreter
                      , Language
-                     , Language.C
                      , Language.Markdown
                      , Language.Markdown.Syntax
                      , Language.Go
@@ -80,9 +79,6 @@ library
                      , Syntax
                      , Term
                      , TreeSitter
-                     , FDoc.Term
-                     , FDoc.RecursionSchemes
-                     , FDoc.NatExample
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , ansi-terminal
@@ -118,7 +114,6 @@ library
                      , time
                      , unix
                      , haskell-tree-sitter
-                     , c
                      , go
                      , ruby
                      , typescript
