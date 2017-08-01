@@ -83,45 +83,46 @@ assignment =
 
 expression :: Assignment
 expression =
-      beginBlock
-  <|> endBlock
-  <|> comment
-  <|> undef
-  <|> alias
-  <|> if'
-  <|> unless
-  <|> while'
-  <|> until'
-  <|> case'
-  <|> emptyStatement
+      alias
   <|> assignment'
-  <|> unary
+  <|> begin
+  <|> beginBlock
   <|> binary
-  <|> literal
+  <|> block
+  <|> call
+  <|> case'
+  <|> class'
+  <|> comment
+  <|> conditional
+  <|> emptyStatement
+  <|> endBlock
+  <|> for
+  <|> heredoc
+  <|> identifier
+  <|> if'
   <|> keyword
-  <|> mk Return Statement.Return
-  <|> mk Yield Statement.Yield
+  <|> lambda
+  <|> literal
+  <|> method
+  <|> methodCall
   <|> mk Break Statement.Break
   <|> mk Next Statement.Continue
   <|> mk Redo Statement.Retry
   <|> mk Retry Statement.Retry
-  <|> for
-  <|> class'
-  <|> singletonClass
-  <|> method
-  <|> singletonMethod
-  <|> lambda
+  <|> mk Return Statement.Return
+  <|> mk Yield Statement.Yield
   <|> module'
-  <|> identifier
-  <|> scopeResolution
-  <|> conditional
-  <|> methodCall
-  <|> call
-  <|> subscript
-  <|> begin
+  <|> pair
   <|> rescue
-  <|> block
-  <|> heredoc
+  <|> scopeResolution
+  <|> singletonClass
+  <|> singletonMethod
+  <|> subscript
+  <|> unary
+  <|> undef
+  <|> unless
+  <|> until'
+  <|> while'
   <|> parseError
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expression))
 
@@ -139,6 +140,9 @@ identifier =
   <|> mk Self
   <|> mk Super
   <|> mk Setter
+  <|> mk SplatArgument
+  <|> mk HashSplatArgument
+  <|> mk BlockArgument
   <|> mk ReservedIdentifier
   <|> mk Uninterpreted
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
@@ -274,24 +278,15 @@ case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> expression <*
     pattern = symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression)
 
 subscript :: Assignment
-subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscript <$> expression <*> many argument)
+subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscript <$> expression <*> many expression)
 
 pair :: Assignment
 pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
 
-argument :: Assignment
-argument =
-      mk SplatArgument
-  <|> mk HashSplatArgument
-  <|> mk BlockArgument
-  <|> pair
-  <|> expression
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
-
 methodCall :: Assignment
 methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> expression <*> args <*> (block <|> emptyTerm))
   where
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many argument) <|> pure []
+    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> expression)
@@ -333,7 +328,7 @@ assignment'
     expr =
           makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
       <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
-      <|> argument
+      <|> expression
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->
