@@ -1,9 +1,5 @@
 .DS_Store
-xcuserdata
-*.mode*
-*.pbxuser
-*.xcuserdatad
-*.xccheckout
+
 .stack-work
 profiles
 tags
