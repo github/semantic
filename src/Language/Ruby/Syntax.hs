@@ -125,7 +125,7 @@ expression =
   <|> until'
   <|> while'
   <|> parseError
-  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expression))
+  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
