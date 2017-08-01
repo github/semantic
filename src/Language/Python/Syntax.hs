@@ -465,8 +465,10 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
     nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
 
 conditionalExpression :: Assignment
-conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
-
+conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
+  expression >>= \ thenBranch -> 
+    many comment >> expression >>= \ conditional -> 
+      Statement.If conditional thenBranch <$> expressions)
 
 makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = cofree (a :< inj f)
