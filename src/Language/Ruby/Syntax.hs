@@ -383,7 +383,7 @@ binary = symbol Binary >>= \ loc -> children $ expression >>= \ lexpression -> g
       -- can't match hidden nodes (they aren't in the tree).
       -- <|> mk HiddenBinaryMinus Expression.Minus
       -- FIXME: This falls through to always assign binary as minus, which isn't correct.
-      <|> makeTerm loc <$> (Expression.Minus lexpression <$> expression)
+      <|> makeTerm loc <$> (Expression.Minus lexpression <$> (expression <|> emptyTerm))
       where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> expression))
             mkNot s constr = makeTerm loc <$ symbol s <*> (Expression.Not <$> (makeTerm <$> location <*> (constr lexpression <$> expression)))
 
