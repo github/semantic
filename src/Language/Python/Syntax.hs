@@ -106,6 +106,7 @@ assignment =
 expression :: Assignment
 expression =
       argument
+  <|> argumentList
   <|> assertStatement
   <|> assignment'
   <|> await
@@ -200,7 +201,10 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
     partialDecorator = (,) <$> symbol Decorator <*> children decorator'
-    decorator' = Declaration.Decorator <$> expression <*> ((<>) <$ symbol ArgumentList <*> children (many expression) <*> many comment <|> many comment)
+    decorator' = Declaration.Decorator <$> expression <*> many expression
+
+argumentList :: Assignment
+argumentList = makeTerm <$> symbol ArgumentList <*> children (many expression)
 
 withStatement :: Assignment
 withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with)
