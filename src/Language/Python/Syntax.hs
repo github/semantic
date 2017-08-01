@@ -299,9 +299,10 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
     bitwise location    = makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
 
 binaryOperator :: Assignment
-binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>= \ lexpression ->
-      makeTerm location <$> arithmetic lexpression
-  <|> makeTerm location <$> bitwise lexpression)
+binaryOperator = symbol BinaryOperator >>= \ loc -> children (
+  expression >>= \ lexpression ->
+        many comment >> makeTerm loc <$> arithmetic lexpression
+                       <|> makeTerm loc <$> bitwise lexpression)
   where
     arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expressions)
                           <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expressions)
