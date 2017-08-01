@@ -10,9 +10,8 @@ import qualified Syntax as S
 import Term
 
 -- | A programming language.
-data Language =
-      C
-    | Go
+data Language
+    = Go
     | JavaScript
     | JSON
     | Markdown
@@ -24,8 +23,6 @@ data Language =
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
-    ".h" -> Just C
-    ".c" -> Just C
     ".json" -> Just JSON
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
