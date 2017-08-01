@@ -288,8 +288,11 @@ methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> ex
   where
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
 
+
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> expression)
+call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expression <|> args))
+  where
+    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (expressions)
 
 rescue :: Assignment
 rescue =  rescue'
