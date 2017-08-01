@@ -200,7 +200,7 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
     partialDecorator = (,) <$> symbol Decorator <*> children decorator'
-    decorator' = Declaration.Decorator <$> expression <*> ((symbol ArgumentList *> children (many expression <|> many emptyTerm)) <|> many emptyTerm)
+    decorator' = Declaration.Decorator <$> expression <*> ((<>) <$ symbol ArgumentList <*> children (many expression) <*> many comment <|> many comment)
 
 withStatement :: Assignment
 withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with)
