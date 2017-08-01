@@ -1,33 +1,14 @@
 .DS_Store
-xcuserdata
-*.mode*
-*.pbxuser
-*.xcuserdatad
-*.xccheckout
+
 .stack-work
 profiles
 tags
 
+cabal.project.local
+dist-newstyle
+
 tmp/
 
-vendor/icu/tools
-vendor/icu/lib
-vendor/icu/layoutex
-vendor/icu/layout
-vendor/icu/i18n
-vendor/icu/test/
-vendor/icu/stubdata/
-vendor/icu/samples/
-vendor/icu/io/
-vendor/icu/icudefs.mk
-vendor/icu/extra/
-vendor/icu/data/
-vendor/icu/config/
-vendor/icu/config.status
-vendor/icu/config.log
-vendor/icu/common/
-vendor/icu/bin/
-vendor/icu/Makefile
 bin/
 
 *.hp
