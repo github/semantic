@@ -7,9 +7,9 @@ See also our [roadmap project][].
 
 ## Objectives
 
-- [Determine baselines](#determine-baselines)
-- [Get our data into production](#get-our-data-into-production)
-- [Improve our supported languages](#improve-our-supported-languages)
+- ❌ [Determine baselines](#determine-baselines)
+- ✅ [Get our data into production](#get-our-data-into-production)
+- ✅ [Improve our supported languages](#improve-our-supported-languages)
 
 ### Determine baselines
 
@@ -29,7 +29,7 @@ Task                    | PRP        | Priority (1 to 3) | Amount of work (1 to 
 ----                    | ---        | ----------------- | ----------------------- | -----
 [Architecture review][] | @tclem     | 1                 | ✅                       | 1/1
 Production readiness    | @tclem     | 1                 | ✅                       | 1/1
-Table of contents       |            |                   | ✅                       | 1/1
+Table of contents       | *          |                   | ✅                       | 1/1
 GraphQL parse tree API  | @tclem     |                   | ✅                       | 1/1
 GraphQL diff API        |            | 3                 | 2                       | 0/1
 ToC in Enterprise       | @joshvera  | 2                 | ✅                       | 1/1
@@ -43,19 +43,26 @@ Task                                | PRP        | Priority (1 to 3) | Amount of
 ----                                | ---        | ----------------- | ----------------------- | -----
 À la carte assignment of Python     | @rewinfrey | 2                 | ✅                       | 1/1
 À la carte assignment of Go         |            |                   | 2?                      | 0/1
-À la carte assignment of Ruby       |            |                   | ✅                      | 1/1
+À la carte assignment of Ruby       | @tclem     |                   | ✅                       | 1/1
 À la carte assignment of TypeScript |            |                   | 2?                      | 0/1
 🚀 LSP integration                   | @joshvera  | 2                 | 4?                      | 0.5/1?
-Migration to à la carte syntax      | @robrix    | 2                 | 3                       | 0/1
+Migration to à la carte syntax      | @robrix    | 2                 | 3                       | 0.5/1
+
 
 ### BONUS ROUND!
 
 We hadn’t planned on Bumblebee, but stuff got done anyway.
 
-Task            | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score
-----            | ---        | ----------------- | ----------------------- | -----
-[🐝][bumblebee] | @joshvera  | 1                 | ✅                       | 1/0
+| Task            | PRP       | Priority (1 to 3) | Amount of work (1 to 4) | Score |
+| --------------- | --------- | ----------------- | ----------------------- | ----- |
+| [🐝][bumblebee] | @joshvera | 1                 | ✅                       | 1/0 |
 
+
+### Summary
+
+9/14, or 64.3% (🐝 doesn’t add to the denominator because it wasn’t part of the plan). Some breakdown:
+
+- We 🚢’d table of contents on July 26th, 2017!
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
 [Architecture review]: https://github.com/github/architecture/issues/12
