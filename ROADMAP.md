@@ -17,8 +17,8 @@ We will select specific metrics believed to be key to our objectives, e.g. perfo
 
 Task                      | PRP | Priority (1 to 3) | Amount of work (1 to 4) | Score
 ----                      | --- | ----------------- | ----------------------- | -----
-Determine what to measure |     |                   | ?                       |
-Measure it                |     |                   | ???                     |
+Determine what to measure |     |                   | ?                       | 0/1
+Measure it                |     |                   | ???                     | 0/1
 
 
 ### Get our data into production
@@ -27,12 +27,12 @@ We will get our data into production and in front of customers.
 
 Task                    | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score
 ----                    | ---        | ----------------- | ----------------------- | -----
-[Architecture review][] | @tclem     | 1                 | ✅                       |
-Production readiness    | @tclem     | 1                 | ✅                       |
-Table of contents       |            |                   | ✅                       |
-GraphQL parse tree API  | @tclem     |                   | ✅                       |
-GraphQL diff API        |            | 3                 | 2                       |
-ToC in Enterprise       | @joshvera  | 2                 | 2                       |
+[Architecture review][] | @tclem     | 1                 | ✅                       | 1/1
+Production readiness    | @tclem     | 1                 | ✅                       | 1/1
+Table of contents       |            |                   | ✅                       | 1/1
+GraphQL parse tree API  | @tclem     |                   | ✅                       | 1/1
+GraphQL diff API        |            | 3                 | 2                       | 0/1
+ToC in Enterprise       | @joshvera  | 2                 | ✅                       | 1/1
 
 
 ### Improve our supported languages
@@ -41,12 +41,22 @@ We will add support for Python, improve our support for Ruby, Go, and JavaScript
 
 Task                                | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score
 ----                                | ---        | ----------------- | ----------------------- | -----
-À la carte assignment of Python     | @rewinfrey | 2                 | 2                       |
-À la carte assignment of Go         |            |                   | 2?                      |
-À la carte assignment of Ruby       |            |                   | 2?                      |
-À la carte assignment of TypeScript |            |                   | 2?                      |
-🚀 LSP integration                   | @joshvera  | 2                 | 4?                      |
-Migration to à la carte syntax      | @robrix    | 2                 | 3                       |
+À la carte assignment of Python     | @rewinfrey | 2                 | ✅                       | 1/1
+À la carte assignment of Go         |            |                   | 2?                      | 0/1
+À la carte assignment of Ruby       |            |                   | ✅                      | 1/1
+À la carte assignment of TypeScript |            |                   | 2?                      | 0/1
+🚀 LSP integration                   | @joshvera  | 2                 | 4?                      | 0.5/1?
+Migration to à la carte syntax      | @robrix    | 2                 | 3                       | 0/1
+
+### BONUS ROUND!
+
+We hadn’t planned on Bumblebee, but stuff got done anyway.
+
+Task            | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score
+----            | ---        | ----------------- | ----------------------- | -----
+[🐝][bumblebee] | @joshvera  | 1                 | ✅                       | 1/0
+
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
 [Architecture review]: https://github.com/github/architecture/issues/12
+[bumblebee]: https://donttrysohard.files.wordpress.com/2010/12/oprah-bees.gif
