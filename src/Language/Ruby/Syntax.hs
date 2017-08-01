@@ -367,13 +367,15 @@ binary = symbol Binary >>= \ loc -> children $ expression >>= \ lexpression -> g
       <|> mk AnonAmpersand Expression.BAnd
       <|> mk AnonCaret Expression.BXOr
       <|> mk AnonPipe Expression.BOr
-      -- TODO: binary minus (hidden node). Doesn't work b/c we can't match hidden nodes (they aren't in the tree).
-      -- <|> mk HiddenBinaryMinus Expression.Minus
       <|> mk AnonPlus Expression.Plus
-      -- TODO: binary star (hidden node)
       <|> mk AnonSlash Expression.DividedBy
       <|> mk AnonPercent Expression.Modulo
       <|> mk AnonStarStar Expression.Power
+      -- TODO: binary minus and binary star (hidden nodes). Doesn't work b/c we
+      -- can't match hidden nodes (they aren't in the tree).
+      -- <|> mk HiddenBinaryMinus Expression.Minus
+      -- FIXME: This falls through to always assign binary as minus, which isn't correct.
+      <|> makeTerm loc <$> (Expression.Minus lexpression <$> expression)
       where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> expression))
             mkNot s constr = makeTerm loc <$ symbol s <*> (Expression.Not <$> (makeTerm <$> location <*> (constr lexpression <$> expression)))
 
