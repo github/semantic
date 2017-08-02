@@ -270,6 +270,11 @@ spec = do
       `shouldBe`
         Right (Out "magenta", Out "red")
 
+    it "produces errors with callstacks pointing at the failing assignment" $
+      first (fmap fst . getCallStack . errorCallStack) (runAssignment headF "blue" red (makeState [node Blue 0 4 []]))
+      `shouldBe`
+      Left [ "symbol", "red" ]
+
 node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = cofree $ Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
 
