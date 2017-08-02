@@ -23,7 +23,7 @@ emptyTerm :: (HasCallStack, Empty :< fs) => Assignment.Assignment ast grammar (T
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 handleError :: (HasCallStack, Error :< fs, Show grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (Error (Just (fmap show err)) []) <* Assignment.source)
+handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (Error (fmap show err) []) <* Assignment.source)
 
 
 -- Undifferentiated
@@ -68,7 +68,7 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 
 -- | Syntax representing a parsing or assignment error.
-data Error a = Error { errorDetails :: Maybe (Assignment.Error String), errorChildren :: [a] }
+data Error a = Error { errorDetails :: Assignment.Error String, errorChildren :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq

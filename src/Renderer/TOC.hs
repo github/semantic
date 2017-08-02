@@ -115,7 +115,7 @@ declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syn
 declarationAlgebra blob@Blob{..} r
   | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource (extract identifier))
   | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource (extract identifier))
-  | Just (Syntax.Error err _) <- prj (tailF r) = Just $ ErrorDeclaration (maybe (getSource (headF r)) (T.pack . formatErrorWithOptions False False blob) err) blobLanguage
+  | Just (Syntax.Error err _) <- prj (tailF r) = Just $ ErrorDeclaration (T.pack (formatErrorWithOptions False False blob err)) blobLanguage
   | otherwise = Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange
 
@@ -125,7 +125,7 @@ markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fiel
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 markupSectionAlgebra blob@Blob{..} r
   | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just (Syntax.Error err _) <- prj (tailF r) = Just $ ErrorDeclaration (maybe (getSource (headF r)) (T.pack . formatErrorWithOptions False False blob) err) blobLanguage
+  | Just (Syntax.Error err _) <- prj (tailF r) = Just $ ErrorDeclaration (T.pack (formatErrorWithOptions False False blob err)) blobLanguage
   | otherwise = Nothing
   where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
         firstLine = T.takeWhile (/= '\n')
