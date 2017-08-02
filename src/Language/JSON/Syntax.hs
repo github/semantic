@@ -6,7 +6,7 @@ module Language.JSON.Syntax
   , Term)
   where
 
-import Data.Syntax (makeTerm, parseError)
+import Data.Syntax (handleError, makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -36,10 +36,10 @@ type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Te
 
 
 assignment :: Assignment
-assignment = object <|> array <|> parseError
+assignment = handleError $ object <|> array <|> parseError
 
 value :: Assignment
-value = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
+value = handleError $ object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
 
 object :: Assignment
 object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
