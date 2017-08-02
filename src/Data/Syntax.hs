@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, TypeOperators #-}
 module Data.Syntax where
 
 import Algorithm
@@ -7,9 +7,17 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.String
 import qualified Data.Syntax.Assignment as Assignment
+import Data.Union
 import GHC.Generics
 import Prologue
+import Term
 import Text.Show
+
+-- Combinators
+
+makeTerm :: (HasCallStack, f :< fs) => a -> f (Term (Union fs) a) -> Term (Union fs) a
+makeTerm a f = cofree (a :< inj f)
+
 
 -- Undifferentiated
 
