@@ -34,6 +34,7 @@ import Data.Blob
 import qualified Data.ByteString as B
 import Data.Functor.Both as Both
 import Data.Record
+import Data.Source (totalRange, totalSpan)
 import Data.String
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
@@ -192,7 +193,7 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
       Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
         Left err -> do
           writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (blobFields blob)
-          pure $ Left "failed assignment"
+          pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (fmap show err) []))
         Right term -> do
           for_ (errors term) $ \ err ->
             writeLog Warning (Assignment.formatErrorWithOptions optionsPrintSource optionsEnableColour blob err) (blobFields blob)
