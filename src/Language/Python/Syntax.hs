@@ -461,7 +461,7 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
              <|> makeTerm <$> symbol DictionaryComprehension <*> children (comprehensionDeclaration keyValue)
   where
     keyValue = makeTerm <$> location <*> (Literal.KeyValue <$> expression <*> expression)
-    comprehensionDeclaration preceeding = Declaration.Comprehension <$> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
+    comprehensionDeclaration preceeding = Declaration.Comprehension <$ many comment <*> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
     makeComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
     nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
 
