@@ -10,7 +10,7 @@ import Data.String
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
 import GHC.Generics
-import Prologue
+import Prologue hiding (show)
 import Term
 import Text.Show
 
@@ -21,6 +21,9 @@ makeTerm a f = cofree (a :< inj f)
 
 emptyTerm :: (HasCallStack, Empty :< fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
+
+handleError :: (HasCallStack, Error :< fs, Show grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (Error (Just (fmap show err)) []) <* Assignment.source)
 
 
 -- Undifferentiated
