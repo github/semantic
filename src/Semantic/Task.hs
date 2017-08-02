@@ -182,13 +182,14 @@ runTaskWithOptions options task = do
 
 
 runParser :: Options -> Blob -> Parser term -> Task (Either String term)
-runParser options@Options{..} blob@Blob{..} = go
-  where go parser = case parser of
+runParser Options{..} blob@Blob{..} = go
+  where go :: Parser term -> Task (Either String term)
+        go parser = case parser of
           ASTParser language -> do
             logTiming "ts ast parse" $
               liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
           AssignmentParser parser by assignment -> do
-            res <- runParser options blob parser
+            res <- go parser
             case res of
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
               Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
