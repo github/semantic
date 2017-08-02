@@ -134,7 +134,7 @@ project projection = Project projection `Then` return
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (symbol A *> b)@ is fine, but @many (symbol A)@ is not.
-symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+symbol :: (Enum grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) Nothing `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
