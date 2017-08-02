@@ -202,14 +202,13 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
   MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
   LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
   where
-    blobFields Blob{..} = maybe identity ((:) . (,) "language" . show) blobLanguage [("path", blobPath)]
+    blobFields Blob{..} = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
     errors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> [Assignment.Error String]
     errors = cata $ \ (_ :< syntax) -> case syntax of
       _ | Just (Syntax.Error err _) <- prj syntax -> [err]
       _ -> fold syntax
     logTiming :: String -> Task a -> Task a
-    logTiming msg = time msg [ ("path", blobPath)
-                             , ("language", maybe "" show blobLanguage)]
+    logTiming msg = time msg (blobFields blob)
 
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return
