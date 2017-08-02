@@ -72,8 +72,6 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
-, capture
-, escape
 , while
 -- Results
 , Error(..)
@@ -120,8 +118,6 @@ data AssignmentF ast grammar result a where
   Alt :: HasCallStack => a -> a -> AssignmentF ast grammar result a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar result a
   Catch :: HasCallStack => Assignment ast grammar result a -> (Error grammar -> Assignment ast grammar result a) -> AssignmentF ast grammar result a
-  Capture :: HasCallStack => Assignment ast grammar a a -> AssignmentF ast grammar result a
-  Escape :: HasCallStack => ((a -> result) -> Assignment ast grammar result result) -> AssignmentF ast grammar result a
 
 -- | Zero-width production of the current location.
 --
@@ -149,11 +145,6 @@ source = withFrozenCallStack $ Source `Then` return
 children :: HasCallStack => Assignment ast grammar result a -> Assignment ast grammar result a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
-capture :: HasCallStack => Assignment ast grammar a a -> Assignment ast grammar result a
-capture delimited = withFrozenCallStack $ Capture delimited `Then` return
-
-escape :: HasCallStack => ((a -> result) -> Assignment ast grammar result result) -> Assignment ast grammar result a
-escape cps = withFrozenCallStack $ Escape cps `Then` return
 
 -- | Collect a list of values until one fails a predicate.
 while :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
@@ -250,13 +241,13 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
               -> Assignment ast grammar a a                    -- ^ The 'Assignment' to run.
               -> State ast grammar                             -- ^ The current state.
               -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
-runAssignment toNode source = (\ assignment state -> go (capture assignment) state >>= requireExhaustive)
+runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar (State ast grammar -> Either (Error grammar) (delimited, State ast grammar)) result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
+  where go :: Assignment ast grammar a result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: AssignmentF ast grammar (State ast grammar -> Either (Error grammar) (delimited, State ast grammar)) x
+        run :: AssignmentF ast grammar a x
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
@@ -278,8 +269,6 @@ runAssignment toNode source = (\ assignment state -> go (capture assignment) sta
                   Alt a b -> yield a state `catchError` (\ err -> yield b state { stateError = Just err })
                   Throw e -> Left e
                   Catch during handler -> (go during state `catchError` (flip go state . handler)) >>= uncurry yield
-                  Capture delimited -> go delimited state >>= uncurry yield
-                  Escape withContinuation -> go (withContinuation yield) state
                   Choose{} -> Left (makeError node)
                   Project{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
@@ -292,7 +281,7 @@ runAssignment toNode source = (\ assignment state -> go (capture assignment) sta
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
                 makeError node = maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
-        runMany :: Assignment ast grammar (State ast grammar -> Either (Error grammar) (delimited, State ast grammar)) result -> State ast grammar -> ([result], State ast grammar)
+        runMany :: Assignment ast grammar a result -> State ast grammar -> ([result], State ast grammar)
         runMany rule = loop
           where loop state = case go rule state of
                   Left err -> ([], state { stateError = Just err })
@@ -368,8 +357,6 @@ instance Show grammar => Show1 (AssignmentF ast grammar result) where
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
-    Capture child -> showsUnaryWith (liftShowsPrec sp sl) "Capture" d child
-    Escape f -> showsUnaryWith (const (const (showChar '_'))) "Escape" d f
 
 instance MonadError (Error grammar) (Assignment ast grammar result) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar result a
