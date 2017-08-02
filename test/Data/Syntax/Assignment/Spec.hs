@@ -283,14 +283,14 @@ instance Symbol Grammar where
 data Out = Out ByteString | OutError ByteString
   deriving (Eq, Show)
 
-red :: Assignment (AST Grammar) Grammar Out
+red :: HasCallStack => Assignment (AST Grammar) Grammar Out
 red = Out <$ symbol Red <*> source
 
-green :: Assignment (AST Grammar) Grammar Out
+green :: HasCallStack => Assignment (AST Grammar) Grammar Out
 green = Out <$ symbol Green <*> source
 
-blue :: Assignment (AST Grammar) Grammar Out
+blue :: HasCallStack => Assignment (AST Grammar) Grammar Out
 blue = Out <$ symbol Blue <*> source
 
-magenta :: Assignment (AST Grammar) Grammar Out
+magenta :: HasCallStack => Assignment (AST Grammar) Grammar Out
 magenta = Out <$ symbol Magenta <*> source
