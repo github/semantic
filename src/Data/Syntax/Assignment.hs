@@ -243,11 +243,11 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
               -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
 runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar a result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
+  where go :: Assignment ast grammar parent result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: AssignmentF ast grammar a x
+        run :: AssignmentF ast grammar parent x
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
@@ -281,7 +281,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
                 makeError node = maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
-        runMany :: Assignment ast grammar a result -> State ast grammar -> ([result], State ast grammar)
+        runMany :: Assignment ast grammar parent result -> State ast grammar -> ([result], State ast grammar)
         runMany rule = loop
           where loop state = case go rule state of
                   Left err -> ([], state { stateError = Just err })
