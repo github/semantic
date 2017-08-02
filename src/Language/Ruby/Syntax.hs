@@ -7,7 +7,7 @@ module Language.Ruby.Syntax
 ) where
 
 import Data.Record
-import Data.Syntax (emptyTerm, parseError, makeTerm)
+import Data.Syntax (emptyTerm, handleError, parseError, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -83,7 +83,7 @@ assignment =
   <|> parseError
 
 expression :: Assignment
-expression =
+expression = handleError $
       beginBlock
   <|> endBlock
   <|> comment
