@@ -7,6 +7,7 @@ module Language.Ruby.Syntax
 ) where
 
 import Data.Record
+import Data.Syntax (emptyTerm, parseError, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -387,14 +388,5 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 
 -- Helper functions
 
-makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
-makeTerm a f = cofree $ a :< inj f
-
-emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
-
 invert :: Assignment -> Assignment
 invert term = makeTerm <$> location <*> fmap Expression.Not term
-
-parseError :: Assignment
-parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error Nothing [] <$ source)

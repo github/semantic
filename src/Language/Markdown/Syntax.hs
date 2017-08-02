@@ -8,10 +8,11 @@ module Language.Markdown.Syntax
 
 import qualified CMark
 import Data.Record
+import Data.Syntax (makeTerm)
+import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Markup as Markup
-import qualified Data.Syntax as Syntax
 import qualified Data.Text as Text
 import Data.Union
 import GHC.Stack
@@ -122,9 +123,6 @@ softBreak = makeTerm <$> symbol SoftBreak <*> pure Markup.LineBreak <* source
 
 
 -- Implementation details
-
-makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
-makeTerm a f = cofree $ a :< inj f
 
 nullText :: Text.Text -> Maybe ByteString
 nullText text = if Text.null text then Nothing else Just (toS text)

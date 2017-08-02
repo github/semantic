@@ -11,6 +11,7 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
+import Data.Syntax (emptyTerm, handleError, makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -461,16 +462,3 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
-
-
-makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
-makeTerm a f = cofree (a :< inj f)
-
-emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
-
-parseError :: Assignment
-parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error Nothing [] <$ source)
-
-handleError :: Assignment -> Assignment
-handleError = flip catchError (\ err -> makeTerm <$> location <*> pure (Syntax.Error (Just (fmap show err)) []) <* source)
