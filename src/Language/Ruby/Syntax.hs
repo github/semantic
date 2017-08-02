@@ -279,7 +279,7 @@ for = makeTerm <$> symbol For <*> children (forStatement <*> expressions)
       Statement.ForEach <$> (flip makeTerm (reverse rest) <$> location) <*> (pure x)
 
 case' :: Assignment
-case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> expression <*> whens)
+case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> whens)
   where
     whens = makeTerm <$> location <*> many (when' <|> else' <|> expressions)
     when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
