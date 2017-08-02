@@ -264,15 +264,17 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Alt a b -> yield a state `catchError` (\ err -> yield b state { stateError = Just err })
                   Throw e -> Left e
                   Catch during handler -> (go during state `catchError` (flip go state . handler)) >>= uncurry yield
-                  Choose{} -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
-                  Project{} -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
-                  Children{} -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
-                  Source -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
+                  Choose{} -> Left (makeError node)
+                  Project{} -> Left (makeError node)
+                  Children{} -> Left (makeError node)
+                  Source -> Left (makeError node)
 
                 state | _:_ <- expectedSymbols, all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices _ <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                                 | otherwise = []
+                makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
+                makeError node = maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
         runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
         runMany rule = loop
