@@ -194,17 +194,21 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
           writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) []
           pure $ Left (showBlob blob <> " failed assignment")
         Right term -> do
-          when (hasErrors term) $ writeLog Warning (showBlob blob <> " has parse errors") []
+          case errors term of
+            [] -> pure ()
+            es -> do
+              when (any isNothing es) $ writeLog Warning (showBlob blob <> " has parse errors") []
+              when (any isJust es) $ writeLog Warning (showBlob blob <> " has assignment errors") []
           pure $ Right term
   TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
   MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
   LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
   where
     showBlob Blob{..} = blobPath <> ":" <> maybe "" show blobLanguage
-    hasErrors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> Bool
-    hasErrors = cata $ \ (_ :< syntax) -> case syntax of
-      _ | Just err <- prj syntax -> const True (err :: Syntax.Error Bool)
-      _ -> or syntax
+    errors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> [Maybe (Assignment.Error String)]
+    errors = cata $ \ (_ :< syntax) -> case syntax of
+      _ | Just (Syntax.Error err _) <- prj syntax -> [err]
+      _ -> fold syntax
     logTiming :: String -> Task a -> Task a
     logTiming msg = time msg [ ("path", blobPath)
                              , ("language", maybe "" show blobLanguage)]
