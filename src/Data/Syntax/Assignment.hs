@@ -106,43 +106,43 @@ import Text.Show hiding (show)
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment ast grammar = Freer (AssignmentF ast grammar)
+type Assignment ast grammar result = Freer (AssignmentF ast grammar result)
 
-data AssignmentF ast grammar a where
-  Location :: HasCallStack => AssignmentF ast grammar (Record Location)
-  Project :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar a
-  Source :: HasCallStack => AssignmentF ast grammar ByteString
-  Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
-  Choose :: HasCallStack => IntMap.IntMap a -> Maybe a -> AssignmentF ast grammar a
-  Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
-  Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
-  Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
-  Catch :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> AssignmentF ast grammar a
+data AssignmentF ast grammar result a where
+  Location :: HasCallStack => AssignmentF ast grammar result (Record Location)
+  Project :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar result a
+  Source :: HasCallStack => AssignmentF ast grammar result ByteString
+  Children :: HasCallStack => Assignment ast grammar result a -> AssignmentF ast grammar result a
+  Choose :: HasCallStack => IntMap.IntMap a -> Maybe a -> AssignmentF ast grammar result a
+  Many :: HasCallStack => Assignment ast grammar result a -> AssignmentF ast grammar result [a]
+  Alt :: HasCallStack => a -> a -> AssignmentF ast grammar result a
+  Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar result a
+  Catch :: HasCallStack => Assignment ast grammar result a -> (Error grammar -> Assignment ast grammar result a) -> AssignmentF ast grammar result a
 
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
-location :: HasCallStack => Assignment ast grammar (Record Location)
+location :: HasCallStack => Assignment ast grammar result (Record Location)
 location = Location `Then` return
 
 -- | Zero-width projection of the current node.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (project f *> b)@ is fine, but @many (project f)@ is not.
-project :: HasCallStack => (forall x. Base ast x -> a) -> Assignment ast grammar a
+project :: HasCallStack => (forall x. Base ast x -> a) -> Assignment ast grammar result a
 project projection = Project projection `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (symbol A *> b)@ is fine, but @many (symbol A)@ is not.
-symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+symbol :: (Enum grammar, Eq grammar, HasCallStack) => grammar -> Assignment ast grammar result (Record Location)
 symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) Nothing `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
-source :: HasCallStack => Assignment ast grammar ByteString
+source :: HasCallStack => Assignment ast grammar result ByteString
 source = withFrozenCallStack $ Source `Then` return
 
 -- | Match a node by applying an assignment to its children.
-children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
+children :: HasCallStack => Assignment ast grammar result a -> Assignment ast grammar result a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 -- | Collect a list of values until one fails a predicate.
@@ -228,7 +228,7 @@ showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) sh
 assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast))
          => (forall x. Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
          -> Source.Source                          -- ^ The source for the parse tree.
-         -> Assignment ast grammar a               -- ^ The 'Assignment to run.
+         -> Assignment ast grammar a a             -- ^ The 'Assignment to run.
          -> ast                                    -- ^ The root of the ast.
          -> Either (Error grammar) a               -- ^ 'Either' an 'Error' or the assigned value.
 assignBy toNode source assignment = fmap fst . runAssignment toNode source assignment . makeState . pure
@@ -237,16 +237,16 @@ assignBy toNode source assignment = fmap fst . runAssignment toNode source assig
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast))
               => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                 -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
+              -> Assignment ast grammar a a                    -- ^ The 'Assignment' to run.
               -> State ast grammar                             -- ^ The current state.
               -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
 runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
+  where go :: Assignment ast grammar a result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: AssignmentF ast grammar x
+        run :: AssignmentF ast grammar a x
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
@@ -280,7 +280,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
                 makeError node = maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
-        runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
+        runMany :: Assignment ast grammar a result -> State ast grammar -> ([result], State ast grammar)
         runMany rule = loop
           where loop state = case go rule state of
                   Left err -> ([], state { stateError = Just err })
@@ -317,10 +317,10 @@ makeState = State 0 (Info.Pos 1 1) Nothing 0
 
 -- Instances
 
-instance Enum grammar => Alternative (Assignment ast grammar) where
-  empty :: HasCallStack => Assignment ast grammar a
+instance Enum grammar => Alternative (Assignment ast grammar result) where
+  empty :: HasCallStack => Assignment ast grammar result a
   empty = Choose mempty Nothing `Then` return
-  (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
+  (<|>) :: HasCallStack => Assignment ast grammar result a -> Assignment ast grammar result a -> Assignment ast grammar result a
   Return a <|> _ = Return a
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
@@ -328,24 +328,24 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` identity
           | otherwise = wrap $ Alt l r
-    where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
+    where choices :: Assignment ast grammar result a -> Maybe (IntMap (Assignment ast grammar result a))
           choices (Choose choices _ `Then` continue) = Just (continue <$> choices)
           choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
           choices (Catch during handler `Then` continue) = ((Catch during handler `Then` continue) <$) <$> choices during
           choices (Throw _ `Then` _) = Just IntMap.empty
           choices (Return _) = Just IntMap.empty
           choices _ = Nothing
-          atEnd :: Assignment ast grammar a -> Maybe (Assignment ast grammar a)
+          atEnd :: Assignment ast grammar result a -> Maybe (Assignment ast grammar result a)
           atEnd (Choose _ atEnd `Then` continue) = continue <$> atEnd
           atEnd (Many rule `Then` continue) = Just (Many rule `Then` continue)
           atEnd (Catch during handler `Then` continue) = Just (Catch during handler `Then` continue)
           atEnd (Throw err `Then` continue) = Just (Throw err `Then` continue)
           atEnd (Return a) = Just (Return a)
           atEnd _ = Nothing
-  many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
+  many :: HasCallStack => Assignment ast grammar result a -> Assignment ast grammar result [a]
   many a = Many a `Then` return
 
-instance Show grammar => Show1 (AssignmentF ast grammar) where
+instance Show grammar => Show1 (AssignmentF ast grammar result) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
     Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
@@ -357,9 +357,9 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
 
-instance MonadError (Error grammar) (Assignment ast grammar) where
-  throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
+instance MonadError (Error grammar) (Assignment ast grammar result) where
+  throwError :: HasCallStack => Error grammar -> Assignment ast grammar result a
   throwError error = withFrozenCallStack $ Throw error `Then` return
 
-  catchError :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> Assignment ast grammar a
+  catchError :: HasCallStack => Assignment ast grammar result a -> (Error grammar -> Assignment ast grammar result a) -> Assignment ast grammar result a
   catchError during handler = withFrozenCallStack $ Catch during handler `Then` return

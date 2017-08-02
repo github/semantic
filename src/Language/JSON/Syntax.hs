@@ -31,7 +31,7 @@ type Syntax =
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term Term
 
 
 makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
@@ -65,4 +65,3 @@ boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
 
 none :: Assignment
 none = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
-

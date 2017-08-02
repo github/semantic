@@ -72,7 +72,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term Term
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -393,7 +393,7 @@ makeTerm a f = cofree $ a :< inj f
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
-invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
+invert :: Assignment -> Assignment
 invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 parseError :: Assignment

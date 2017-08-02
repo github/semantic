@@ -44,7 +44,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST CMark.NodeType) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (AST CMark.NodeType) Grammar Term Term
 
 
 assignment :: Assignment
