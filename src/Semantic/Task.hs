@@ -170,7 +170,7 @@ runTaskWithOptions options task = do
                     end <- Time.getCurrentTime
                     queueLogMessage Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
                     either (pure . Left) yield res
-                  Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) yield . join
+                  Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield . join
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
                   Diff differ terms -> pure (differ terms) >>= yield
                   Render renderer input -> pure (renderer input) >>= yield
@@ -181,13 +181,13 @@ runTaskWithOptions options task = do
                   | otherwise = pure ()
 
 
-runParser :: Options -> Parser term -> Blob -> Task (Either String term)
-runParser options@Options{..} parser blob@Blob{..} = case parser of
+runParser :: Options -> Blob -> Parser term -> Task (Either String term)
+runParser options@Options{..} blob@Blob{..} parser = case parser of
   ASTParser language -> do
     logTiming "ts ast parse" $
       liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
   AssignmentParser parser by assignment -> do
-    res <- runParser options parser blob
+    res <- runParser options blob parser
     case res of
       Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
       Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
