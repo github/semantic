@@ -5,6 +5,7 @@ import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.Record
 import Data.String
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
@@ -17,6 +18,9 @@ import Text.Show
 
 makeTerm :: (HasCallStack, f :< fs) => a -> f (Term (Union fs) a) -> Term (Union fs) a
 makeTerm a f = cofree (a :< inj f)
+
+emptyTerm :: (HasCallStack, Empty :< fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 
 -- Undifferentiated
