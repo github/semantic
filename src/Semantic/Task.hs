@@ -201,7 +201,7 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
   MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
   LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
   where
-    blobFields Blob{..} = [("path", blobPath), ("language", show blobLanguage)]
+    blobFields Blob{..} = maybe identity ((:) . (,) "language" . show) blobLanguage [("path", blobPath)]
     showBlob Blob{..} = blobPath <> ":" <> maybe "" show blobLanguage
     errors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> [Assignment.Error String]
     errors = cata $ \ (_ :< syntax) -> case syntax of
