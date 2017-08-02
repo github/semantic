@@ -174,7 +174,10 @@ nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 data Error grammar = HasCallStack => Error { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: Maybe grammar }
 
 deriving instance Eq grammar => Eq (Error grammar)
+deriving instance Foldable Error
+deriving instance Functor Error
 deriving instance Show grammar => Show (Error grammar)
+deriving instance Traversable Error
 
 errorCallStack :: Error grammar -> CallStack
 errorCallStack Error{} = callStack
