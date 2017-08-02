@@ -24,6 +24,7 @@ library
                      , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
+                     , Data.Output
                      , Data.Range
                      , Data.Record
                      , Data.Source
@@ -70,6 +71,7 @@ library
                      , Renderer.TOC
                      , RWS
                      , Semantic
+                     , Semantic.Log
                      , Semantic.Task
                      , SemanticCmdLine
                      , SES
@@ -111,6 +113,7 @@ library
                      , text >= 1.2.1.3
                      , these
                      , time
+                     , unix
                      , haskell-tree-sitter
                      , go
                      , ruby

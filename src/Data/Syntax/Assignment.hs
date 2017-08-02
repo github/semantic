@@ -75,13 +75,8 @@ module Data.Syntax.Assignment
 , while
 -- Results
 , Error(..)
-, Options(..)
-, defaultOptions
-, optionsForHandle
-, printError
-, formatError
+, errorCallStack
 , formatErrorWithOptions
-, withSGRCode
 -- Running
 , assignBy
 , runAssignment
@@ -107,7 +102,6 @@ import Prologue hiding (Alt, get, Location, State, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 import Text.Show hiding (show)
-import System.IO (hIsTerminalDevice, hPutStr)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -181,49 +175,25 @@ data Error grammar = HasCallStack => Error { errorPos :: Info.Pos, errorExpected
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
 
-nodeError :: [grammar] -> Node grammar -> Error grammar
+errorCallStack :: Error grammar -> CallStack
+errorCallStack Error{} = callStack
+
+nodeError :: HasCallStack => [grammar] -> Node grammar -> Error grammar
 nodeError expected (Node actual _ (Info.Span spanStart _)) = Error spanStart expected (Just actual)
 
--- | Options for printing errors.
-data Options = Options
-  { optionsColour :: Bool -- ^ Whether to use colour formatting codes suitable for a terminal device.
-  , optionsIncludeSource :: Bool -- ^ Whether to include the source reference.
-  }
 
-defaultOptions :: Options
-defaultOptions = Options
-  { optionsColour = True
-  , optionsIncludeSource = True
-  }
-
-optionsForHandle :: Handle -> IO Options
-optionsForHandle handle = do
-  isTerminal <- hIsTerminalDevice handle
-  pure $ defaultOptions
-    { optionsColour = isTerminal
-    }
-
--- | Pretty-print an 'Error' to stderr, optionally with reference to the source where it occurred.
-printError :: Show grammar => Blob -> Error grammar -> IO ()
-printError blob error = do
-  options <- optionsForHandle stderr
-  hPutStr stderr $ formatErrorWithOptions options blob error
+type IncludeSource = Bool
+type Colourize = Bool
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
---
--- > formatError = formatErrorWithOptions defaultOptions
-formatError :: Show grammar => Blob -> Error grammar -> String
-formatError = formatErrorWithOptions defaultOptions
-
--- | Format an 'Error', optionally with reference to the source where it occurred.
-formatErrorWithOptions :: Show grammar => Options -> Blob -> Error grammar -> String
-formatErrorWithOptions Options{..} Blob{..} Error{..}
+formatErrorWithOptions :: Show grammar => IncludeSource -> Colourize -> Blob -> Error grammar -> String
+formatErrorWithOptions includeSource colourize Blob{..} Error{..}
   = ($ "")
-  $ withSGRCode optionsColour [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
-  . withSGRCode optionsColour [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
-  . (if optionsIncludeSource
-    then showString (toS context) . (if isSuffixOf "\n" context then identity else showChar '\n')
-       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode optionsColour [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
+  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
+  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
+  . (if includeSource
+    then showString (toS context) . (if "\n" `isSuffixOf` context then identity else showChar '\n')
+       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else identity)
   . showString (prettyCallStack callStack) . showChar '\n'
   where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
@@ -255,7 +225,7 @@ showPos :: Maybe FilePath -> Info.Pos -> ShowS
 showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
+assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast))
          => (forall x. Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
          -> Source.Source                          -- ^ The source for the parse tree.
          -> Assignment ast grammar a               -- ^ The 'Assignment to run.
@@ -264,7 +234,7 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (
 assignBy toNode source assignment = fmap fst . runAssignment toNode source assignment . makeState . pure
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast), HasCallStack)
+runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast))
               => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
@@ -298,12 +268,17 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Alt a b -> yield a state `catchError` (\ err -> yield b state { stateError = Just err })
                   Throw e -> Left e
                   Catch during handler -> (go during state `catchError` (flip go state . handler)) >>= uncurry yield
-                  _ -> Left (maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node)
+                  Choose{} -> Left (makeError node)
+                  Project{} -> Left (makeError node)
+                  Children{} -> Left (makeError node)
+                  Source -> Left (makeError node)
 
                 state | _:_ <- expectedSymbols, all ((== Regular) . symbolType) expectedSymbols = dropAnonymous initialState
                       | otherwise = initialState
                 expectedSymbols | Choose choices _ <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                                 | otherwise = []
+                makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
+                makeError node = maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
         runMany :: Assignment ast grammar result -> State ast grammar -> ([result], State ast grammar)
         runMany rule = loop

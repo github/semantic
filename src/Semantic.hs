@@ -12,6 +12,7 @@ import Data.Align.Generic (GAlign)
 import Data.Blob
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
+import Data.Output
 import Data.Record
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Union
@@ -36,8 +37,8 @@ import Term
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
-parseBlobs :: (Monoid output, StringConv output ByteString) => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer = fmap toS . distributeFoldMap (parseBlob renderer) . filter blobExists
+parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
+parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . filter blobExists
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
@@ -61,8 +62,8 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
 
 
 
-diffBlobPairs :: (Monoid output, StringConv output ByteString) => DiffRenderer output -> [Both Blob] -> Task ByteString
-diffBlobPairs renderer = fmap toS . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
+diffBlobPairs :: Output output => DiffRenderer output -> [Both Blob] -> Task ByteString
+diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
@@ -97,7 +98,13 @@ diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task 
 diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting (Both.fst terms))
   (False, True) -> pure (inserting (Both.snd terms))
-  _ -> diff differ terms
+  _ -> time "diff" logInfo $ diff differ terms
+  where
+    logInfo = let (a, b) = runJoin blobs in
+            [ ("before_path", blobPath a)
+            , ("before_language", maybe "" show (blobLanguage a))
+            , ("after_path", blobPath b)
+            , ("after_language", maybe "" show (blobLanguage b)) ]
 
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
