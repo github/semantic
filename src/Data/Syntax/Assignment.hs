@@ -72,6 +72,8 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
+, capture
+, escape
 , while
 -- Results
 , Error(..)
@@ -146,6 +148,12 @@ source = withFrozenCallStack $ Source `Then` return
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment ast grammar result a -> Assignment ast grammar result a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
+
+capture :: HasCallStack => Assignment ast grammar a a -> Assignment ast grammar result a
+capture delimited = withFrozenCallStack $ Capture delimited `Then` return
+
+escape :: HasCallStack => ((a -> result) -> Assignment ast grammar result result) -> Assignment ast grammar result a
+escape cps = withFrozenCallStack $ Escape cps `Then` return
 
 -- | Collect a list of values until one fails a predicate.
 while :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
