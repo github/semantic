@@ -397,4 +397,4 @@ invert :: Assignment -> Assignment
 invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 parseError :: Assignment
-parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
+parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error Nothing [] <$ source)

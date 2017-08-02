@@ -38,7 +38,7 @@ makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.T
 makeTerm a f = cofree (a :< inj f)
 
 parseError :: Assignment
-parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
+parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error Nothing [] <$ source)
 
 assignment :: Assignment
 assignment = object <|> array <|> parseError

@@ -5,6 +5,8 @@ import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.String
+import qualified Data.Syntax.Assignment as Assignment
 import GHC.Generics
 import Prologue
 import Text.Show
@@ -51,7 +53,7 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 
 -- | Syntax representing a parsing or assignment error.
-data Error a = Error [a]
+data Error a = Error { errorDetails :: Maybe (Assignment.Error String), errorChildren :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq

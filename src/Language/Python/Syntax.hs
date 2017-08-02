@@ -470,4 +470,4 @@ emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
 
 parseError :: Assignment
-parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
+parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error Nothing [] <$ source)
