@@ -104,7 +104,7 @@ assignment =
   <|> parseError
 
 expression :: Assignment
-expression =
+expression = capture $
       argument
   <|> assertStatement
   <|> assignment'
@@ -154,6 +154,7 @@ expression =
   <|> whileStatement
   <|> withStatement
   <|> yield
+  <|> escape (\ continue -> (continue .) . makeTerm <$> location <*> pure (Comment.Comment "nope"))
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
