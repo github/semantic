@@ -119,6 +119,7 @@ data AssignmentF ast grammar result a where
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar result a
   Catch :: HasCallStack => Assignment ast grammar result a -> (Error grammar -> Assignment ast grammar result a) -> AssignmentF ast grammar result a
   Capture :: HasCallStack => Assignment ast grammar a a -> AssignmentF ast grammar result a
+  Escape :: HasCallStack => ((a -> r) -> Assignment ast grammar result result) -> AssignmentF ast grammar result a
 
 -- | Zero-width production of the current location.
 --
@@ -270,6 +271,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Throw e -> Left e
                   Catch during handler -> (go during state `catchError` (flip go state . handler)) >>= uncurry yield
                   Capture _ -> Left (makeError node) -- FIXME: delimit control.
+                  Escape _ -> Left (makeError node) -- FIXME: escape control.
                   Choose{} -> Left (makeError node)
                   Project{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
@@ -359,6 +361,7 @@ instance Show grammar => Show1 (AssignmentF ast grammar result) where
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
     Capture child -> showsUnaryWith (liftShowsPrec sp sl) "Capture" d child
+    Escape f -> showsUnaryWith (const (const (showChar '_'))) "Escape" d f
 
 instance MonadError (Error grammar) (Assignment ast grammar result) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar result a
