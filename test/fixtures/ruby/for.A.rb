@@ -7,3 +7,5 @@ for x, y in z do
 end
 
 for n in 1..3 do true end
+
+for n, m in 1..3 do true end
