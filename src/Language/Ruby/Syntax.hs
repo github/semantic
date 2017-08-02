@@ -114,6 +114,7 @@ expression =
   <|> mk Yield Statement.Yield
   <|> module'
   <|> pair
+  <|> parenthesized_expressions
   <|> rescue
   <|> scopeResolution
   <|> singletonClass
@@ -129,6 +130,9 @@ expression =
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
+
+parenthesized_expressions :: Assignment
+parenthesized_expressions = makeTerm <$> symbol ParenthesizedStatements <*> children (many expression)
 
 identifier :: Assignment
 identifier =
