@@ -70,9 +70,9 @@ terminalFormatter Options{..} (Message level message pairs time) =
 data Options = Options
   { optionsEnableColour :: Bool -- ^ Whether to enable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
   , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
   , optionsRequestID :: Maybe String -- ^ Optional request id for tracing across systems.
   , optionsIsTerminal :: Bool -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , optionsFormatter :: Options -> Message -> String -- ^ Log formatter to use (set automaticaly at runtime).
   , optionsProcessID :: CPid -- ^ ProcessID (set automaticaly at runtime).
   }
@@ -81,9 +81,9 @@ defaultOptions :: Options
 defaultOptions = Options
   { optionsEnableColour = True
   , optionsLevel = Just Warning
-  , optionsPrintSource = False
   , optionsRequestID = Nothing
   , optionsIsTerminal = False
+  , optionsPrintSource = False
   , optionsFormatter = logfmtFormatter
   , optionsProcessID = 0
   }
@@ -95,6 +95,7 @@ configureOptionsForHandle handle options = do
   pure $ options
     { optionsIsTerminal = isTerminal
     , optionsFormatter = if isTerminal then terminalFormatter else logfmtFormatter
+    , optionsPrintSource = isTerminal
     , optionsProcessID = pid
     }
 
