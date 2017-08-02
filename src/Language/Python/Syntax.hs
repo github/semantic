@@ -104,7 +104,7 @@ assignment =
   <|> parseError
 
 expression :: Assignment
-expression =
+expression = flip catchError (\ err -> makeTerm <$> location <*> pure (Syntax.Error (Just (fmap show err)) []) <* source) $
       argument
   <|> assertStatement
   <|> assignment'
