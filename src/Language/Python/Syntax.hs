@@ -318,10 +318,10 @@ binaryOperator = symbol BinaryOperator >>= \ loc -> children (
                        <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expressions)
 
 booleanOperator :: Assignment
-booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= booleanOperator' )
+booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( many comment >> expression >>= booleanOperator' )
   where
-    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expression)
-                                <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
+    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$ many comment <*> expressions)
+                                <|> symbol AnonOr *> (Expression.Or lexpression <$ many comment <*> expressions)
 
 assignment' :: Assignment
 assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
