@@ -266,7 +266,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
                   Many rule -> uncurry yield (runMany rule state)
-                  Alt a b -> yield a state `catchError` (\ err -> yield b state { stateError = Just err })
+                  Alt a b -> yield a state `catchError` \ err -> yield b state { stateError = Just err }
                   Throw e -> Left e
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   Choose{} -> Left (makeError node)
