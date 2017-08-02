@@ -119,7 +119,7 @@ data AssignmentF ast grammar result a where
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar result a
   Catch :: HasCallStack => Assignment ast grammar result a -> (Error grammar -> Assignment ast grammar result a) -> AssignmentF ast grammar result a
   Capture :: HasCallStack => Assignment ast grammar a a -> AssignmentF ast grammar result a
-  Escape :: HasCallStack => ((a -> r) -> Assignment ast grammar result result) -> AssignmentF ast grammar result a
+  Escape :: HasCallStack => ((a -> result) -> Assignment ast grammar result result) -> AssignmentF ast grammar result a
 
 -- | Zero-width production of the current location.
 --
