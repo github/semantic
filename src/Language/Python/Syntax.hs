@@ -11,7 +11,7 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, makeTerm, parseError)
+import Data.Syntax (emptyTerm, handleError, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -100,9 +100,7 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment =
-      makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
-  <|> parseError
+assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
 expression = handleError $
@@ -141,7 +139,6 @@ expression = handleError $
   <|> nonlocalStatement
   <|> notOperator
   <|> parameter
-  <|> parseError
   <|> passStatement
   <|> printStatement
   <|> raiseStatement
@@ -160,7 +157,8 @@ expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
 
 literal :: Assignment
-literal =  boolean
+literal =  handleError
+        $  boolean
        <|> concatenatedString
        <|> dictionary
        <|> float
@@ -169,7 +167,6 @@ literal =  boolean
        <|> none
        <|> set
        <|> string
-       <|> parseError
 
 expressionStatement :: Assignment
 expressionStatement = mk <$> symbol ExpressionStatement <*> children (some expression)
@@ -368,11 +365,11 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
-import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
+import' =  handleError
+        $  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
-       <|> parseError
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
