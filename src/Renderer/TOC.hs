@@ -28,6 +28,7 @@ import Data.List.NonEmpty (nonEmpty)
 import Data.Output
 import Data.Record
 import Data.Source as Source
+import Data.Syntax.Assignment (formatErrorWithOptions)
 import Data.Text (toLower)
 import qualified Data.Text as T
 import Data.Text.Listable
@@ -111,10 +112,10 @@ syntaxDeclarationAlgebra Blob{..} r = case tailF r of
 declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Functor (Union fs), HasField fields Range)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra Blob{..} r
+declarationAlgebra blob@Blob{..} r
   | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource (extract identifier))
   | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource (extract identifier))
-  | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r)) blobLanguage
+  | Just (Syntax.Error err _) <- prj (tailF r) = Just $ ErrorDeclaration (maybe (getSource (headF r)) (T.pack . formatErrorWithOptions False False blob) err) blobLanguage
   | otherwise = Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange
 
@@ -122,9 +123,9 @@ declarationAlgebra Blob{..} r
 markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, Functor (Union fs), Foldable (Union fs))
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra Blob{..} r
+markupSectionAlgebra blob@Blob{..} r
   | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r)) blobLanguage
+  | Just (Syntax.Error err _) <- prj (tailF r) = Just $ ErrorDeclaration (maybe (getSource (headF r)) (T.pack . formatErrorWithOptions False False blob) err) blobLanguage
   | otherwise = Nothing
   where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
         firstLine = T.takeWhile (/= '\n')
