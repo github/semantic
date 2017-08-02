@@ -75,6 +75,7 @@ module Data.Syntax.Assignment
 , while
 -- Results
 , Error(..)
+, errorCallStack
 , formatErrorWithOptions
 -- Running
 , assignBy
@@ -173,6 +174,9 @@ data Error grammar = HasCallStack => Error { errorPos :: Info.Pos, errorExpected
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Show grammar => Show (Error grammar)
+
+errorCallStack :: Error grammar -> CallStack
+errorCallStack Error{} = callStack
 
 nodeError :: HasCallStack => [grammar] -> Node grammar -> Error grammar
 nodeError expected (Node actual _ (Info.Span spanStart _)) = Error spanStart expected (Just actual)
