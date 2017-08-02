@@ -19,7 +19,6 @@ import Data.Union
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
 import Prologue hiding (for, get, Location, state, unless)
-import Prelude (reverse)
 import qualified Term
 
 -- | The type of Ruby syntax.
@@ -271,16 +270,9 @@ until' =
       makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert expression <*> expressions)
   <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> expression <*> invert expression)
 
--- (for
---   (in
---     (one or more binding expressions)
---     (one and only one subject expression))
---   (body - zero or more expressions))
 for :: Assignment
-for = makeTerm <$> symbol For <*> children (forStatement <*> expressions)
-  where
-    forStatement = (reverse <$> (symbol In *> children (many expression))) >>= \ (x:rest) ->
-      Statement.ForEach <$> (flip makeTerm (reverse rest) <$> location) <*> (pure x)
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> expressions <*> inClause <*> expressions)
+  where inClause = symbol In *> children (expression)
 
 case' :: Assignment
 case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> whens)
