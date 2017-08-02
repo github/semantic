@@ -22,6 +22,9 @@ makeTerm a f = cofree (a :< inj f)
 emptyTerm :: (HasCallStack, Empty :< fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
+parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Eq grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+parseError = makeTerm <$> Assignment.symbol maxBound <*> (Error Nothing [] <$ Assignment.source)
+
 handleError :: (HasCallStack, Error :< fs, Show grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (Error (Just (fmap show err)) []) <* Assignment.source)
 
