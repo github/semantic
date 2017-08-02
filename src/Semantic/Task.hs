@@ -188,10 +188,10 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
   AssignmentParser parser by assignment -> do
     res <- runParser options parser blob
     case res of
-      Left err -> writeLog Error (showBlob blob <> " failed parsing") [] >> pure (Left err)
+      Left err -> writeLog Error (showBlob blob <> " failed parsing") (blobFields blob) >> pure (Left err)
       Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
         Left err -> do
-          writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) []
+          writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (blobFields blob)
           pure $ Left (showBlob blob <> " failed assignment")
         Right term -> do
           for_ (errors term) $ \ err ->
