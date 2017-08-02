@@ -198,7 +198,7 @@ runParser options@Options{..} parser blob@Blob{..} = case parser of
             [] -> pure ()
             es -> do
               when (any isNothing es) $ writeLog Warning (showBlob blob <> " has parse errors") []
-              when (any isJust es) $ writeLog Warning (showBlob blob <> " has assignment errors") []
+              when (any isJust es) $ writeLog Warning (showBlob blob <> " has assignment errors") [] -- FIXME: should log the individual assignment errors
           pure $ Right term
   TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
   MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
