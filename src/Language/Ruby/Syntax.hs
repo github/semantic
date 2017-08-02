@@ -72,7 +72,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term Term
+type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.

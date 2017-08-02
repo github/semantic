@@ -42,10 +42,10 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Eq grammar, Show grammar, Symbol grammar, Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs), Recursive ast, Foldable (Base ast))
-                   => Parser ast                                                                                     -- ^ A parser producing AST.
-                   -> (forall x. Base ast x -> Node grammar)                                                         -- ^ A function extracting the symbol and location.
-                   -> Assignment ast grammar (Term (Union fs) (Record Location)) (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
-                   -> Parser (Term (Union fs) (Record Location))                                                     -- ^ A parser producing 'Term's.
+                   => Parser ast                                                 -- ^ A parser producing AST.
+                   -> (forall x. Base ast x -> Node grammar)                     -- ^ A function extracting the symbol and location.
+                   -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
   -- | A parser for 'Markdown' using cmark.
