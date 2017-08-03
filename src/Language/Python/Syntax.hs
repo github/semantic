@@ -471,7 +471,7 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
   expression >>= \ thenBranch -> 
-    # TODO: `many comment` is too greedy (i.e. `self.assertEqual([ x() for x in lambda: True, lambda: False if x() ], [True])`)
+    -- TODO: `many comment` is too greedy (i.e. `self.assertEqual([ x() for x in lambda: True, lambda: False if x() ], [True])`)
     many comment >> expression >>= \ conditional -> 
       Statement.If conditional thenBranch <$> expressions)
 
