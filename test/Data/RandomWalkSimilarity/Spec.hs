@@ -2,16 +2,17 @@
 module Data.RandomWalkSimilarity.Spec where
 
 import Category
+import Control.Comonad.Trans.Cofree (headF)
+import Control.Monad.Free (wrap)
 import Data.Array.IArray
 import Data.Bifunctor
 import Data.Functor.Listable
-import RWS
 import Data.Record
 import Data.These
 import Diff
 import Info
 import Patch
-import Prologue
+import RWS
 import Syntax
 import Term
 import Test.Hspec

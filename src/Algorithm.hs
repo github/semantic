@@ -1,16 +1,18 @@
 {-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators #-}
 module Algorithm where
 
+import Control.Applicative (liftA2)
+import Control.Monad (guard)
 import Control.Monad.Free.Freer
+import Data.Function (on)
 import Data.Functor.Both
 import Data.Functor.Classes
+import Data.Maybe
 import Data.These
 import Data.Union
 import Diff
 import GHC.Generics
-import Prologue hiding (liftF)
 import Term
-import Text.Show
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term diff result where

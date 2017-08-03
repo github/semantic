@@ -10,10 +10,12 @@ module Data.Blob
 , nullOid
 ) where
 
+import Data.ByteString.Char8 (ByteString, pack)
+import Data.Maybe (isJust)
 import Data.Source as Source
+import Data.Word
 import Language
 import Numeric
-import Prologue
 
 -- | The source, oid, path, and Maybe BlobKind of a blob.
 data Blob = Blob
@@ -30,9 +32,9 @@ data BlobKind = PlainBlob Word32 | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
 modeToDigits :: BlobKind -> ByteString
-modeToDigits (PlainBlob mode) = toS $ showOct mode ""
-modeToDigits (ExecutableBlob mode) = toS $ showOct mode ""
-modeToDigits (SymlinkBlob mode) = toS $ showOct mode ""
+modeToDigits (PlainBlob mode) = pack $ showOct mode ""
+modeToDigits (ExecutableBlob mode) = pack $ showOct mode ""
+modeToDigits (SymlinkBlob mode) = pack $ showOct mode ""
 
 -- | The default plain blob mode
 defaultPlainBlob :: BlobKind

@@ -1,9 +1,10 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
 module Data.Record where
 
+import Control.DeepSeq
+import Data.Kind
 import Data.Functor.Listable
-import GHC.Show
-import Prologue
+import Data.Semigroup
 
 -- | A type-safe, extensible record structure.
 -- |

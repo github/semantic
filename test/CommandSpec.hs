@@ -6,7 +6,9 @@ import Data.Functor.Both as Both
 import Data.Maybe
 import Data.String
 import Language
-import Prologue hiding (readFile, toList)
+import Prelude hiding (readFile)
+import System.Exit (ExitCode(..))
+import System.IO (IOMode(..), openFile)
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 

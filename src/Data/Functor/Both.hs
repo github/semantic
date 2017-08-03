@@ -1,9 +1,11 @@
 {-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
 module Data.Functor.Both (Both, both, runBothWith, fst, snd, module X) where
 
+import Control.DeepSeq
 import Data.Bifunctor.Join as X
-import Prologue hiding (fst, snd)
-import qualified Prologue
+import Data.Semigroup
+import Prelude hiding (fst, snd)
+import qualified Prelude
 
 -- | A computation over both sides of a pair.
 type Both a = Join (,) a
@@ -18,11 +20,11 @@ runBothWith f = uncurry f . runJoin
 
 -- | Runs the left side of a `Both`.
 fst :: Both a -> a
-fst = Prologue.fst . runJoin
+fst = Prelude.fst . runJoin
 
 -- | Runs the right side of a `Both`.
 snd :: Both a -> a
-snd = Prologue.snd . runJoin
+snd = Prelude.snd . runJoin
 
 instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
   mempty = pure mempty

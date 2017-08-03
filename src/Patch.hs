@@ -14,10 +14,11 @@ module Patch
 , mapPatch
 ) where
 
+import Control.DeepSeq
 import Data.Align
 import Data.Functor.Listable
 import Data.These
-import Prologue
+import GHC.Generics
 
 -- | An operation to replace, insert, or delete an item.
 data Patch a

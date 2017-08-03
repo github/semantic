@@ -6,6 +6,8 @@ module Language.Ruby.Syntax
 , Term
 ) where
 
+import Control.Comonad.Cofree (Cofree(..))
+import Data.Maybe (fromMaybe)
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
@@ -18,7 +20,6 @@ import qualified Data.Syntax.Statement as Statement
 import Data.Union
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
-import Prologue hiding (for, get, Location, state, unless)
 import qualified Term
 
 -- | The type of Ruby syntax.
@@ -388,7 +389,7 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 -- Helper functions
 
 makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
-makeTerm a f = cofree $ a :< inj f
+makeTerm a f = a :< inj f
 
 emptyTerm :: Assignment
 emptyTerm = makeTerm <$> location <*> pure Syntax.Empty

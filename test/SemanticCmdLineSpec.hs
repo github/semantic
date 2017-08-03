@@ -1,12 +1,16 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module SemanticCmdLineSpec where
 
+import Control.Monad (when)
+import Data.ByteString (ByteString)
+import Data.Foldable (for_)
 import Data.Functor.Both
+import Data.Semigroup ((<>))
 import Language
-import Prologue
 import Renderer
 import Semantic.Task
 import SemanticCmdLine
+import System.IO (Handle)
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 
