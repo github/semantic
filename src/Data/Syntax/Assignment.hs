@@ -103,7 +103,7 @@ import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
-import Data.List.NonEmpty (nonEmpty)
+import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Maybe
 import Data.Record
 import Data.Semigroup
@@ -244,17 +244,17 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (
          -> Source.Source                          -- ^ The source for the parse tree.
          -> Assignment ast grammar a               -- ^ The 'Assignment to run.
          -> ast                                    -- ^ The root of the ast.
-         -> Either (Error grammar) a               -- ^ 'Either' an 'Error' or the assigned value.
-assignBy toNode source assignment = fmap fst . runAssignment toNode source assignment . makeState . pure
+         -> Either (Error grammar) (NonEmpty a)    -- ^ 'Either' an 'Error' or a 'NonEmpty' list of assigned values.
+assignBy toNode source assignment = fmap (fmap fst) . runAssignment toNode source assignment . makeState . pure
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast))
-              => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
-              -> Source.Source                                 -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
-              -> State ast grammar                             -- ^ The current state.
-              -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
-runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
+              => (forall x. Base ast x -> Node grammar)                   -- ^ A function to project a 'Node' from the ast.
+              -> Source.Source                                            -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                                 -- ^ The 'Assignment' to run.
+              -> State ast grammar                                        -- ^ The current state.
+              -> Either (Error grammar) (NonEmpty (a, State ast grammar)) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
+runAssignment toNode source = (\ assignment state -> go assignment state >>= fmap pure . requireExhaustive)
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
   where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)

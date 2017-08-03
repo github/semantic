@@ -37,6 +37,7 @@ import qualified Data.ByteString as B
 import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both
 import Data.Functor.Foldable (cata)
+import Data.List.NonEmpty
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source (totalRange, totalSpan)
@@ -200,7 +201,7 @@ runParser Options{..} blob@Blob{..} = go
                 Left err -> do
                   writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
                   pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (fmap show err) []))
-                Right term -> do
+                Right (term :| _) -> do
                   for_ (errors term) $ \ err ->
                     writeLog Warning (Assignment.formatErrorWithOptions optionsPrintSource optionsEnableColour blob err) blobFields
                   pure $ Right term
