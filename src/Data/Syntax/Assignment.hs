@@ -103,13 +103,14 @@ import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
-import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
+import Data.List.NonEmpty (head, NonEmpty(..), nonEmpty)
 import Data.Maybe
 import Data.Record
 import Data.Semigroup
 import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
+import Prelude hiding (head)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 
@@ -254,7 +255,7 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
               -> Assignment ast grammar a                                 -- ^ The 'Assignment' to run.
               -> State ast grammar                                        -- ^ The current state.
               -> Either (Error grammar) (NonEmpty (a, State ast grammar)) -- ^ 'Either' an 'Error' or the pair of the assigned value & updated state.
-runAssignment toNode source = (\ assignment state -> go assignment state >>= fmap pure . requireExhaustive)
+runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
   where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
@@ -270,7 +271,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= fma
                   Project projection -> yield (projection node) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
                   Children child -> do
-                    (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
+                    (a, state') <- go child state { stateNodes = toList node } >>= fmap head . requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes state })
                   Choose choices _ | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
                   _ -> anywhere (Just node)
@@ -302,9 +303,9 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= fma
                                     | otherwise -> ([a], state')
         {-# INLINE runMany #-}
 
-        requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (result, State ast grammar)
+        requireExhaustive :: (result, State ast grammar) -> Either (Error grammar) (NonEmpty (result, State ast grammar))
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
-          [] -> Right (a, state)
+          [] -> Right (pure (a, state))
           node : _ -> Left (fromMaybe (nodeError [] (toNode (F.project node))) (stateError state))
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
