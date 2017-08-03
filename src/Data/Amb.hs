@@ -2,6 +2,7 @@
 module Data.Amb where
 
 import Control.Monad.Error.Class
+import Data.Bifunctor
 import Data.List.NonEmpty
 import Data.Semigroup
 
@@ -9,6 +10,10 @@ data Amb l r
   = None l
   | Some (NonEmpty r)
   deriving (Eq, Foldable, Functor, Show, Traversable)
+
+instance Bifunctor Amb where
+  bimap f _ (None l) = None (f l)
+  bimap _ g (Some r) = Some (fmap g r)
 
 instance Semigroup (Amb l r) where
   l <> None _ = l
