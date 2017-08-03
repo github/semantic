@@ -1,6 +1,6 @@
 module Data.Output where
 
-import Prologue
+import Data.ByteString (ByteString)
 
 class Monoid o => Output o where
   toOutput :: o -> ByteString

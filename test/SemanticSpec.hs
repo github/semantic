@@ -1,10 +1,11 @@
 module SemanticSpec where
 
+import Control.Comonad.Cofree (Cofree(..))
 import Data.Blob
+import Data.Functor (void)
 import Data.Functor.Both as Both
 import Language
 import Patch
-import Prologue
 import Renderer
 import Semantic
 import Semantic.Task
@@ -17,11 +18,11 @@ spec = parallel $ do
   describe "parseBlob" $ do
     it "parses in the specified language" $ do
       Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob
-      void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Method [] (cofree (() :< Leaf "foo")) Nothing [] []) ])
+      void term `shouldBe` (() :< Indexed [ () :< Method [] (() :< Leaf "foo") Nothing [] [] ])
 
     it "parses line by line if not given a language" $ do
       Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob { blobLanguage = Nothing }
-      void term `shouldBe` cofree (() :< Indexed [ cofree (() :< Leaf "def foo\n"), cofree (() :< Leaf "end\n"), cofree (() :< Leaf "") ])
+      void term `shouldBe` (() :< Indexed [ () :< Leaf "def foo\n", () :< Leaf "end\n", () :< Leaf "" ])
 
     it "renders with the specified renderer" $ do
       output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
@@ -29,11 +30,11 @@ spec = parallel $ do
 
   describe "diffTermPair" $ do
     it "produces an Insert when the first blob is missing" $ do
-      result <- runTask (diffTermPair (both (emptyBlob "/foo") (sourceBlob "/foo" Nothing "")) (runBothWith replacing) (pure (cofree (() :< []))))
+      result <- runTask (diffTermPair (both (emptyBlob "/foo") (sourceBlob "/foo" Nothing "")) (runBothWith replacing) (pure (() :< [])))
       (() <$) <$> result `shouldBe` pure (Insert ())
 
     it "produces a Delete when the second blob is missing" $ do
-      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptyBlob "/foo")) (runBothWith replacing) (pure (cofree (() :< []))))
+      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptyBlob "/foo")) (runBothWith replacing) (pure (() :< [])))
       (() <$) <$> result `shouldBe` pure (Delete ())
 
   where

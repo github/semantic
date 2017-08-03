@@ -1,13 +1,15 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module IntegrationSpec where
 
+import Control.DeepSeq
+import qualified Data.ByteString as B
+import Data.Foldable (find, traverse_)
 import Data.Functor.Both
 import Data.List (union, concat, transpose)
+import Data.Maybe (fromMaybe)
+import Data.Semigroup ((<>))
 import qualified Data.Text as T
-import qualified Data.ByteString as B
 import Data.Text.Encoding (decodeUtf8)
-import GHC.Show (Show(..))
-import Prologue hiding (fst, snd, readFile)
 import System.FilePath
 import System.FilePath.Glob
 import SpecHelpers
@@ -87,7 +89,7 @@ examples directory = do
 
     lookupNormalized :: FilePath -> [FilePath] -> FilePath
     lookupNormalized name xs = fromMaybe
-      (panic ("cannot find " <> T.pack name <> " make sure .A, .B and exist." :: Text))
+      (error ("cannot find " <> name <> " make sure .A, .B and exist."))
       (lookupNormalized' name xs)
 
     lookupNormalized' :: FilePath -> [FilePath] -> Maybe FilePath
@@ -112,17 +114,17 @@ testDiff paths expectedOutput = do
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
-stripWhitespace :: ByteString -> ByteString
+stripWhitespace :: B.ByteString -> B.ByteString
 stripWhitespace = B.foldl' go B.empty
   where go acc x | x `B.elem` " \t\n" = acc
                  | otherwise = B.snoc acc x
 
--- | A wrapper around `ByteString` with a more readable `Show` instance.
-newtype Verbatim = Verbatim ByteString
+-- | A wrapper around 'B.ByteString' with a more readable 'Show' instance.
+newtype Verbatim = Verbatim B.ByteString
   deriving (Eq, NFData)
 
 instance Show Verbatim where
   showsPrec _ (Verbatim byteString) = ('\n':) . (T.unpack (decodeUtf8 byteString) ++)
 
-verbatim :: ByteString -> Verbatim
+verbatim :: B.ByteString -> Verbatim
 verbatim = Verbatim . stripWhitespace

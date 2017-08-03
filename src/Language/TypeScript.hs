@@ -1,10 +1,13 @@
 {-# LANGUAGE DataKinds #-}
 module Language.TypeScript where
 
+import Control.Comonad (extract)
+import Control.Comonad.Cofree (unwrap)
+import Data.Foldable (toList)
 import Data.Source
+import Data.Text (Text)
 import Info
 import Language
-import Prologue
 import qualified Syntax as S
 import Term
 
@@ -22,7 +25,7 @@ termAssignment _ category children =
     (CommaOperator, [ a, b ])
       | S.Indexed rest <- unwrap b
       -> Just $ S.Indexed $ a : rest
-    (FunctionCall, id : rest) -> case Prologue.break ((== Args) . Info.category . extract) rest of
+    (FunctionCall, id : rest) -> case break ((== Args) . Info.category . extract) rest of
       (typeArgs, [ args ]) -> let flatArgs = toList (unwrap args) in
            Just $ case unwrap id of
              S.MemberAccess target method -> S.MethodCall target method typeArgs flatArgs
@@ -49,12 +52,12 @@ termAssignment _ category children =
       , Finally <- Info.category (extract finally)
       -> Just $ S.Try [body] [catch] Nothing (Just finally)
     (ArrayLiteral, _) -> Just $ S.Array Nothing children
-    (Method, children) -> case Prologue.break ((== ExpressionStatements) . Info.category . extract) children of
-      (prev, [body]) -> case Prologue.break ((== Identifier) . Info.category . extract) prev of
+    (Method, children) -> case break ((== ExpressionStatements) . Info.category . extract) children of
+      (prev, [body]) -> case break ((== Identifier) . Info.category . extract) prev of
         (prev, [id, callSignature]) -> Just $ S.Method prev id Nothing (toList (unwrap callSignature)) (toList (unwrap body))
         _ -> Nothing -- No identifier found or callSignature found.
       _ -> Nothing -- No body found.``
-    (Class, identifier : rest) -> case Prologue.break ((== Other "class_body") . Info.category . extract) rest of
+    (Class, identifier : rest) -> case break ((== Other "class_body") . Info.category . extract) rest of
       (clauses, [ definitions ]) -> Just $ S.Class identifier clauses (toList (unwrap definitions))
       _ -> Nothing
     (Module, [ identifier, definitions ]) -> Just $ S.Module identifier (toList (unwrap definitions))
@@ -66,10 +69,8 @@ termAssignment _ category children =
       | S.Indexed _ <- unwrap statements
       -> Just $ S.Export Nothing (toList (unwrap statements))
       | otherwise -> Just $ S.Export (Just statements) []
-    (For, _)
-      | Just (exprs, body) <- unsnoc children
-      -> Just $ S.For exprs [body]
-    (Function, children) -> case Prologue.break ((== ExpressionStatements) . Info.category . extract) children of
+    (For, _:_) -> Just $ S.For (init children) [last children]
+    (Function, children) -> case break ((== ExpressionStatements) . Info.category . extract) children of
       (inits, [body]) -> case inits of
         [id, callSignature] -> Just $ S.Function id (toList (unwrap callSignature)) (toList (unwrap body))
         [callSignature] -> Just $ S.AnonymousFunction (toList (unwrap callSignature)) (toList (unwrap body))
