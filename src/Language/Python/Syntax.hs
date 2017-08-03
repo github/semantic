@@ -12,6 +12,7 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
+import Data.Tuple (swap)
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
