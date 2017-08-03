@@ -274,7 +274,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes state })
-                  Choose choices _ | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
+                  Choose choices atEnd | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> maybe id (flip (<>) . flip yield state) atEnd (yield choice state)
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
