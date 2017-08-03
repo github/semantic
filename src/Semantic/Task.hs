@@ -32,6 +32,7 @@ import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
+import Data.Amb
 import Data.Blob
 import qualified Data.ByteString as B
 import Data.Foldable (fold, for_)
@@ -198,10 +199,10 @@ runParser Options{..} blob@Blob{..} = go
             case res of
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
               Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
-                Left err -> do
+                None err -> do
                   writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
                   pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (fmap show err) []))
-                Right (term :| _) -> do
+                Some (term :| _) -> do
                   for_ (errors term) $ \ err ->
                     writeLog Warning (Assignment.formatErrorWithOptions optionsPrintSource optionsEnableColour blob err) blobFields
                   pure $ Right term
