@@ -345,9 +345,6 @@ data State ast grammar = State
 makeState :: [ast] -> State ast grammar
 makeState = State 0 (Info.Pos 1 1) Nothing Nothing 0
 
-setNextSet :: State ast grammar -> Maybe IntSet.IntSet -> State ast grammar
-setNextSet state nextSet = state { stateNextSet = nextSet }
-
 
 -- Instances
 
