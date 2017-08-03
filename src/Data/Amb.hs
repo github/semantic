@@ -18,3 +18,8 @@ instance Applicative (Amb l) where
   None l <*> _ = None l
   _ <*> None r = None r
   Some fs <*> Some as = Some (fs <*> as)
+
+instance Monad (Amb l) where
+  return = pure
+  None a >>= _ = None a
+  Some as >>= f = foldr1 (<>) (f <$> as)
