@@ -3,10 +3,12 @@ module Data.Syntax.Assignment.Spec where
 
 import Control.Comonad.Cofree (Cofree(..))
 import Control.Comonad.Trans.Cofree (headF)
+import Data.Bifunctor (first)
 import Data.ByteString.Char8 as B (ByteString, length, words)
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Syntax.Assignment
+import GHC.Stack (getCallStack)
 import Info
 import Prelude hiding (words)
 import Test.Hspec
