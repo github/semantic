@@ -70,6 +70,7 @@ library
                      , Renderer.TOC
                      , RWS
                      , Semantic
+                     , Semantic.Log
                      , Semantic.Task
                      , SemanticCmdLine
                      , SES
@@ -85,7 +86,7 @@ library
                      , async
                      , bifunctors
                      , bytestring
-                     , cmark
+                     , cmark-gfm
                      , comonad
                      , containers
                      , deepseq
@@ -111,6 +112,7 @@ library
                      , text >= 1.2.1.3
                      , these
                      , time
+                     , unix
                      , haskell-tree-sitter
                      , go
                      , ruby

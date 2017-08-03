@@ -273,6 +273,11 @@ spec = do
       `shouldBe`
         Right (Out "magenta", Out "red")
 
+    it "produces errors with callstacks pointing at the failing assignment" $
+      first (fmap fst . getCallStack . errorCallStack) (runAssignment headF "blue" red (makeState [node Blue 0 4 []]))
+      `shouldBe`
+      Left [ "symbol", "red" ]
+
 node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
 
@@ -286,14 +291,14 @@ instance Symbol Grammar where
 data Out = Out B.ByteString | OutError B.ByteString
   deriving (Eq, Show)
 
-red :: Assignment (AST Grammar) Grammar Out
+red :: HasCallStack => Assignment (AST Grammar) Grammar Out
 red = Out <$ symbol Red <*> source
 
-green :: Assignment (AST Grammar) Grammar Out
+green :: HasCallStack => Assignment (AST Grammar) Grammar Out
 green = Out <$ symbol Green <*> source
 
-blue :: Assignment (AST Grammar) Grammar Out
+blue :: HasCallStack => Assignment (AST Grammar) Grammar Out
 blue = Out <$ symbol Blue <*> source
 
-magenta :: Assignment (AST Grammar) Grammar Out
+magenta :: HasCallStack => Assignment (AST Grammar) Grammar Out
 magenta = Out <$ symbol Magenta <*> source
