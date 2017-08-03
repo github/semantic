@@ -87,7 +87,7 @@ library
                      , async
                      , bifunctors
                      , bytestring
-                     , cmark
+                     , cmark-gfm
                      , comonad
                      , containers
                      , directory
