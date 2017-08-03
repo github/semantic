@@ -16,5 +16,5 @@
             ->(Identifier) }
             { (FunctionCall
                 (Identifier)
-                (QualifiedIdentifier))
+                (QualifiedType))
             ->(Identifier) })))))))

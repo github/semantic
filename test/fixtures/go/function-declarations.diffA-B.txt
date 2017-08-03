@@ -3,5 +3,4 @@
     (Identifier))
   (Identifier)
   (Args)
-{ (Identifier)
-->(Identifier) })
+  (ParseError))

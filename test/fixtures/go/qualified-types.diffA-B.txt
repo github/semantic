@@ -8,5 +8,5 @@
       (TypeDecl
       { (Identifier)
       ->(Identifier) }
-      { (QualifiedIdentifier)
-      ->(QualifiedIdentifier) }))))
+      { (QualifiedType)
+      ->(QualifiedType) }))))

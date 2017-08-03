@@ -224,7 +224,7 @@ data Category
   -- | A decrement statement, e.g. i-- in Go.
   | DecrementStatement
   -- | A qualified identifier, e.g. Module.function in Go.
-  | QualifiedIdentifier
+  | QualifiedType
   | FieldDeclarations
   -- | A Go rune literal.
   | RuneLiteral
@@ -234,6 +234,8 @@ data Category
   | SingletonMethod
   -- | An arbitrary type annotation.
   | Ty
+  | ParenthesizedExpression
+  | ParenthesizedType
   deriving (Eq, Generic, Ord, Show, NFData)
 
 {-# DEPRECATED RescueModifier "Deprecated; use Modifier Rescue instead." #-}
@@ -360,7 +362,7 @@ instance Listable Category where
       --  \/ cons0 FunctionTy
       --  \/ cons0 IncrementStatement
       --  \/ cons0 DecrementStatement
-      --  \/ cons0 QualifiedIdentifier
+      --  \/ cons0 QualifiedType
       --  \/ cons0 FieldDeclarations
       --  \/ cons0 RuneLiteral
       --  \/ cons0 (Modifier If)

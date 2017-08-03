@@ -58,7 +58,7 @@ termAssignment source category children = case (category, children) of
   (FunctionTy, _) -> Just $ S.Ty children
   (IncrementStatement, _) -> Just $ S.Leaf (toText source)
   (DecrementStatement, _) -> Just $ S.Leaf (toText source)
-  (QualifiedIdentifier, _) -> Just $ S.Leaf (toText source)
+  (QualifiedType, _) -> Just $ S.Leaf (toText source)
   (Method, [receiverParams, name, body]) -> Just (S.Method [] name (Just receiverParams) [] (toList (unwrap body)))
   (Method, [receiverParams, name, params, body])
     -> Just (S.Method [] name (Just receiverParams) [params] (toList (unwrap body)))
@@ -73,6 +73,10 @@ termAssignment source category children = case (category, children) of
 categoryForGoName :: Text -> Category
 categoryForGoName name = case name of
   "identifier" -> Identifier
+  "package_identifier" -> Identifier
+  "type_identifier" -> Identifier
+  "field_identifier" -> Identifier
+  "label_name" -> Identifier
   "int_literal" -> NumberLiteral
   "float_literal" -> FloatLiteral
   "comment" -> Comment
@@ -124,11 +128,13 @@ categoryForGoName name = case name of
   "function_type" -> FunctionTy
   "inc_statement" -> IncrementStatement
   "dec_statement" -> DecrementStatement
-  "qualified_identifier" -> QualifiedIdentifier
+  "qualified_type" -> QualifiedType
   "break_statement" -> Break
   "continue_statement" -> Continue
   "rune_literal" -> RuneLiteral
   "method_declaration" -> Method
   "import_spec" -> Import
   "block" -> ExpressionStatements
+  "parenthesized_expression" -> ParenthesizedExpression
+  "parenthesized_type" -> ParenthesizedType
   s -> Other (toS s)
