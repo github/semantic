@@ -3,10 +3,10 @@ module Data.Syntax.Comment where
 
 import Algorithm
 import Data.Align.Generic
+import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
-import Prologue
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: ByteString }

@@ -1,11 +1,14 @@
 {-# LANGUAGE DataKinds, DeriveGeneric, DeriveAnyClass #-}
 module Language where
 
+import Control.Comonad
+import Control.Comonad.Trans.Cofree hiding (cofree)
+import Control.DeepSeq
 import Data.Aeson
+import Data.Foldable
 import Data.Record
-import Data.String
+import GHC.Generics
 import Info
-import Prologue
 import qualified Syntax as S
 import Term
 
@@ -14,6 +17,7 @@ data Language
     = Go
     | JavaScript
     | JSON
+    | JSX
     | Markdown
     | Python
     | Ruby
@@ -30,6 +34,7 @@ languageForType mediaType = case mediaType of
     ".js" -> Just TypeScript
     ".ts" -> Just TypeScript
     ".tsx" -> Just TypeScript
+    ".jsx" -> Just JSX
     ".py" -> Just Python
     _ -> Nothing
 

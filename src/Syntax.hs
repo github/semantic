@@ -1,15 +1,15 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
+import Control.DeepSeq
 import Data.Aeson
 import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Listable
 import Data.Mergeable
-import Data.Text (pack)
+import Data.Text (pack, Text)
 import GHC.Generics
-import Prologue
 
 -- | A node in an abstract syntax tree.
 --

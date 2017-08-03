@@ -1,11 +1,16 @@
 {-# LANGUAGE DataKinds #-}
 module Data.Syntax.Assignment.Spec where
 
-import Data.ByteString.Char8 as B (words, length)
+import Control.Comonad.Cofree (Cofree(..))
+import Control.Comonad.Trans.Cofree (headF)
+import Data.Bifunctor (first)
+import Data.ByteString.Char8 as B (ByteString, length, words)
+import Data.Semigroup ((<>))
 import Data.Source
 import Data.Syntax.Assignment
+import GHC.Stack (getCallStack)
 import Info
-import Prologue hiding (State)
+import Prelude hiding (words)
 import Test.Hspec
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
@@ -276,7 +281,7 @@ spec = do
       Left [ "symbol", "red" ]
 
 node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
-node symbol start end children = cofree $ Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
+node symbol start end children = Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
 
 data Grammar = Palette | Red | Green | Blue | Magenta
   deriving (Enum, Eq, Show)
@@ -285,7 +290,7 @@ instance Symbol Grammar where
   symbolType Magenta = Anonymous
   symbolType _ = Regular
 
-data Out = Out ByteString | OutError ByteString
+data Out = Out B.ByteString | OutError B.ByteString
   deriving (Eq, Show)
 
 red :: HasCallStack => Assignment (AST Grammar) Grammar Out

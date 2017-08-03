@@ -16,7 +16,6 @@ import qualified Term
 import Data.Record
 import Data.Union
 import GHC.Stack
-import Prologue hiding (Location)
 
 type Syntax =
   [ Literal.Array

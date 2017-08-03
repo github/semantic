@@ -26,16 +26,20 @@ module Semantic.Task
 
 import Control.Concurrent.STM.TMQueue
 import Control.Exception
+import Control.Monad (join)
+import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Blob
 import qualified Data.ByteString as B
+import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both
+import Data.Functor.Foldable (cata)
 import Data.Record
+import Data.Semigroup ((<>))
 import Data.Source (totalRange, totalSpan)
-import Data.String
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
@@ -45,20 +49,20 @@ import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
 import qualified Files
+import GHC.Conc (atomically)
 import Language
 import Language.Markdown
 import Parser
-import Prologue hiding (Location, show)
-import System.IO (hPutStr)
+import System.Exit (die)
+import System.IO (Handle, hPutStr, stderr)
 import Term
-import Text.Show
 import TreeSitter
 import Semantic.Log
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
-  WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
+  WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
@@ -85,8 +89,8 @@ readBlobs from = ReadBlobs from `Then` return
 readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
 readBlobPairs from = ReadBlobPairs from `Then` return
 
--- | A 'Task' which writes a 'ByteString' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Either Handle FilePath -> ByteString -> Task ()
+-- | A 'Task' which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
+writeToOutput :: Either Handle FilePath -> B.ByteString -> Task ()
 writeToOutput path contents = WriteToOutput path contents `Then` return
 
 
@@ -143,11 +147,11 @@ runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
   logQueue <- newTMQueueIO
-  logging <- async (logSink options logQueue)
+  logging <- Async.async (logSink options logQueue)
 
   result <- run options logQueue task
   atomically (closeTMQueue logQueue)
-  wait logging
+  Async.wait logging
   either die pure result
   where logSink options@Options{..} queue = do
           message <- atomically (readTMQueue queue)

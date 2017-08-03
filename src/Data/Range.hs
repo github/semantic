@@ -6,8 +6,9 @@ module Data.Range
 , intersectsRange
 ) where
 
+import Control.DeepSeq
 import Data.Semigroup
-import Prologue
+import GHC.Generics
 import Test.LeanCheck
 
 -- | A half-open interval of integers, defined by start & end indices.

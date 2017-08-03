@@ -10,6 +10,7 @@ import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, makeTerm)
 import qualified Data.Syntax as Syntax
@@ -25,7 +26,6 @@ import Data.Union
 import GHC.Generics
 import GHC.Stack
 import Language.Python.Grammar as Grammar
-import Prologue hiding (Location)
 import qualified Term
 
 type Syntax =
@@ -205,7 +205,7 @@ withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with
   where
     mk _ [child] = child
     mk l children = makeTerm l children
-    with = makeTerm <$> location <*> (uncurry Statement.Let . swap <$> withItem <*> expressions)
+    with = makeTerm <$> location <*> (uncurry (flip Statement.Let) <$> withItem <*> expressions)
     withItem = symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm))
 
 forStatement :: Assignment
@@ -228,7 +228,7 @@ tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> 
 
 exceptClause :: Assignment
 exceptClause = makeTerm <$> symbol ExceptClause <*> children
-  (Statement.Catch <$> ((makeTerm <$> location <*> (uncurry Statement.Let . swap <$> ((,) <$> expression <* symbol AnonAs <*> expression) <*> emptyTerm))
+  (Statement.Catch <$> ((makeTerm <$> location <*> (uncurry (flip Statement.Let) <$> ((,) <$> expression <* symbol AnonAs <*> expression) <*> emptyTerm))
                       <|> makeTerm <$> location <*> many expression)
                    <*> expressions)
 
@@ -237,8 +237,8 @@ functionDefinition =  (symbol FunctionDefinition >>= \ loc -> children (makeFunc
                   <|> (symbol AsyncFunctionDefinition >>= \ loc -> children (makeAsyncFunctionDeclaration loc <$> async' <*> expression <*> (symbol Parameters *> children (many expression)) <*> optional (symbol Type *> children expression) <*> expressions))
                   <|> (symbol Lambda >>= \ loc -> children (makeFunctionDeclaration loc <$> (makeTerm <$> symbol AnonLambda <*> (Syntax.Identifier <$> source)) <*> ((symbol LambdaParameters *> children (many expression)) <|> pure []) <*> optional (symbol Type *> children expression) <*> expressions))
   where
-    makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)
-    makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) identity ty)) async'
+    makeFunctionDeclaration loc functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) id ty)
+    makeAsyncFunctionDeclaration loc async' functionName' functionParameters ty functionBody = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) id ty)) async'
 
 async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)

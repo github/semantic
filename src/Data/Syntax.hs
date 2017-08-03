@@ -2,17 +2,17 @@
 module Data.Syntax where
 
 import Algorithm
+import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
+import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
-import Data.String
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
 import GHC.Generics
-import Prologue hiding (show)
+import GHC.Stack
 import Term
-import Text.Show
 
 -- Combinators
 

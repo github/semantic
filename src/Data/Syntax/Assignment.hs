@@ -67,6 +67,9 @@ module Data.Syntax.Assignment
 , Node(..)
 , nodeLocation
 -- Combinators
+, Alternative(..)
+, optional
+, MonadError(..)
 , location
 , Data.Syntax.Assignment.project
 , symbol
@@ -85,23 +88,30 @@ module Data.Syntax.Assignment
 , makeState
 ) where
 
+import Control.Arrow
+import Control.Applicative
+import Control.Comonad.Cofree
+import Control.Monad (guard)
+import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.Blob
 import Data.ByteString (isSuffixOf)
+import Data.ByteString.Char8 (ByteString, pack, unpack)
+import Data.Foldable
+import Data.Function
 import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
+import Data.Maybe
 import Data.Record
+import Data.Semigroup
 import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
-import Data.String
 import GHC.Stack
 import qualified Info
-import Prologue hiding (Alt, get, Location, State, state)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
-import Text.Show hiding (show)
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -196,11 +206,11 @@ formatErrorWithOptions includeSource colourize Blob{..} Error{..}
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
   . (if includeSource
-    then showString (toS context) . (if "\n" `isSuffixOf` context then identity else showChar '\n')
+    then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
        . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
-    else identity)
+    else id)
   . showString (prettyCallStack callStack) . showChar '\n'
-  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (toS (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
+  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (pack (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
 
@@ -330,9 +340,9 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
-  l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` identity
+  l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` id
           | otherwise = wrap $ Alt l r
-    where choices :: Assignment ast grammar a -> Maybe (IntMap (Assignment ast grammar a))
+    where choices :: Assignment ast grammar a -> Maybe (IntMap.IntMap (Assignment ast grammar a))
           choices (Choose choices _ `Then` continue) = Just (continue <$> choices)
           choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
           choices (Catch during handler `Then` continue) = ((Catch during handler `Then` continue) <$) <$> choices during
