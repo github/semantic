@@ -12,6 +12,7 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
+import Data.Tuple (swap)
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
@@ -107,6 +108,7 @@ assignment =
 expression :: Assignment
 expression =
       argument
+  <|> argumentList
   <|> assertStatement
   <|> assignment'
   <|> await
@@ -197,19 +199,24 @@ parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assign
     makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment identifier' value')
 
 decoratedDefinition :: Assignment
-decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> expression))
+decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> (functionDefinition <|> classDefinition)))
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
-    partialDecorator = (,) <$> symbol Decorator <*> children decorator'
-    decorator' = Declaration.Decorator <$> expression <*> ((symbol ArgumentList *> children (many expression <|> many emptyTerm)) <|> many emptyTerm)
+    partialDecorator = ((,) <$> symbol Decorator <*> children decorator') <|> ((,) <$> symbol Comment <* source <*> (Declaration.Decorator <$> emptyTerm <*> pure []))
+                               
+    decorator' = Declaration.Decorator <$> expression <*> many expression
+
+argumentList :: Assignment
+argumentList = makeTerm <$> symbol ArgumentList <*> children (many expression)
 
 withStatement :: Assignment
 withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with)
   where
     mk _ [child] = child
     mk l children = makeTerm l children
-    with = makeTerm <$> location <*> (uncurry (flip Statement.Let) <$> withItem <*> expressions)
-    withItem = symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm))
+    with = makeTerm <$> location <*> (uncurry Statement.Let . swap <$> withItem <*> expressions)
+    withItem = (symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm))) 
+            <|> ((,) <$> expression <*> emptyTerm)
 
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
@@ -266,18 +273,18 @@ ellipsis = makeTerm <$> symbol Grammar.Ellipsis <*> (Language.Python.Syntax.Elli
 comparisonOperator :: Assignment
 comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression >>= \ lexpression -> makeComparison loc lexpression)
   where
-    makeComparison loc lexpression =  makeTerm loc <$ symbol AnonLAngle       <*> (Expression.LessThan lexpression <$> expression)
-                                  <|> makeTerm loc <$ symbol AnonLAngleEqual  <*> (Expression.LessThanEqual lexpression <$> expression)
-                                  <|> makeTerm loc <$ symbol AnonRAngle       <*> (Expression.GreaterThan lexpression <$> expression)
-                                  <|> makeTerm loc <$ symbol AnonRAngleEqual  <*> (Expression.GreaterThanEqual lexpression <$> expression)
-                                  <|> makeTerm loc <$ symbol AnonEqualEqual   <*> (Expression.Equal lexpression <$> expression)
-                                  <|> makeTerm loc <$ symbol AnonBangEqual    <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
-                                  <|> makeTerm loc <$ symbol AnonLAngleRAngle <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
-                                  <|> makeTerm loc <$ symbol AnonNot          <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Member lexpression <$> expression)))
-                                  <|> makeTerm loc <$ symbol AnonIn           <*> (Expression.Member lexpression <$> expression)
+    makeComparison loc lexpression =  makeTerm loc <$ symbol AnonLAngle       <*> (Expression.LessThan lexpression <$> expressions)
+                                  <|> makeTerm loc <$ symbol AnonLAngleEqual  <*> (Expression.LessThanEqual lexpression <$> expressions)
+                                  <|> makeTerm loc <$ symbol AnonRAngle       <*> (Expression.GreaterThan lexpression <$> expressions)
+                                  <|> makeTerm loc <$ symbol AnonRAngleEqual  <*> (Expression.GreaterThanEqual lexpression <$> expressions)
+                                  <|> makeTerm loc <$ symbol AnonEqualEqual   <*> (Expression.Equal lexpression <$> expressions)
+                                  <|> makeTerm loc <$ symbol AnonBangEqual    <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
+                                  <|> makeTerm loc <$ symbol AnonLAngleRAngle <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
+                                  <|> makeTerm loc <$ symbol AnonNot          <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Member lexpression <$> expressions)))
+                                  <|> makeTerm loc <$ symbol AnonIn           <*> (Expression.Member lexpression <$> expressions)
                                                     -- source is used here to push the cursor to the next node to enable matching against `AnonNot`
-                                  <|> symbol AnonIs *> source *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expression)))
-                                                                <|> (makeTerm loc <$> Expression.Equal lexpression <$> expression))
+                                  <|> symbol AnonIs *> source *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
+                                                                <|> (makeTerm loc <$> Expression.Equal lexpression <$> expressions))
 
 notOperator :: Assignment
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
@@ -295,28 +302,31 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
     bitwise location    = makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
 
 binaryOperator :: Assignment
-binaryOperator = symbol BinaryOperator >>= \ location -> children (expression >>= \ lexpression ->
-      makeTerm location <$> arithmetic lexpression
-  <|> makeTerm location <$> bitwise lexpression)
+binaryOperator = symbol BinaryOperator >>= \ loc -> children (
+  expression >>= \ lexpression ->
+       makeTerm loc <$ comment <*> arithmetic lexpression
+   <|> makeTerm loc <$ comment <*> bitwise lexpression
+   <|> makeTerm loc <$> arithmetic lexpression
+   <|> makeTerm loc <$> bitwise lexpression)
   where
-    arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expression)
-                          <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expression)
-                          <|> symbol AnonStar *> (Expression.Times lexpression <$> expression)
-                          <|> symbol AnonSlash *> (Expression.DividedBy lexpression <$> expression)
-                          <|> symbol AnonSlashSlash *> (Expression.DividedBy lexpression <$> expression)
-                          <|> symbol AnonPercent *> (Expression.Modulo lexpression <$> expression)
-                          <|> symbol AnonStarStar *> (Expression.Power lexpression <$> expression)
-    bitwise lexpression =  symbol AnonPipe *> (Expression.BOr lexpression <$> expression)
-                       <|> symbol AnonAmpersand *> (Expression.BAnd lexpression <$> expression)
-                       <|> symbol AnonCaret *> (Expression.BXOr lexpression <$> expression)
-                       <|> symbol AnonLAngleLAngle *> (Expression.LShift lexpression <$> expression)
-                       <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expression)
+    arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expressions)
+                          <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expressions)
+                          <|> symbol AnonStar *> (Expression.Times lexpression <$> expressions)
+                          <|> symbol AnonSlash *> (Expression.DividedBy lexpression <$> expressions)
+                          <|> symbol AnonSlashSlash *> (Expression.DividedBy lexpression <$> expressions)
+                          <|> symbol AnonPercent *> (Expression.Modulo lexpression <$> expressions)
+                          <|> symbol AnonStarStar *> (Expression.Power lexpression <$> expressions)
+    bitwise lexpression =  symbol AnonPipe *> (Expression.BOr lexpression <$> expressions)
+                       <|> symbol AnonAmpersand *> (Expression.BAnd lexpression <$> expressions)
+                       <|> symbol AnonCaret *> (Expression.BXOr lexpression <$> expressions)
+                       <|> symbol AnonLAngleLAngle *> (Expression.LShift lexpression <$> expressions)
+                       <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expressions)
 
 booleanOperator :: Assignment
-booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= booleanOperator' )
+booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( many comment >> expression >>= booleanOperator' )
   where
-    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expression)
-                                <|> symbol AnonOr *> (Expression.Or lexpression <$> expression)
+    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$ many comment <*> expressions)
+                                <|> symbol AnonOr *> (Expression.Or lexpression <$ many comment <*> expressions)
 
 assignment' :: Assignment
 assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
@@ -356,7 +366,7 @@ string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 concatenatedString :: Assignment
-concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
+concatenatedString = makeTerm <$> symbol ConcatenatedString <*> (Literal.TextElement . mconcat <$> children (many ((symbol String *> source) <|> (symbol Comment *> source *> pure ""))))
 
 float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
@@ -456,13 +466,15 @@ comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehen
              <|> makeTerm <$> symbol DictionaryComprehension <*> children (comprehensionDeclaration keyValue)
   where
     keyValue = makeTerm <$> location <*> (Literal.KeyValue <$> expression <*> expression)
-    comprehensionDeclaration preceeding = Declaration.Comprehension <$> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
+    comprehensionDeclaration preceeding = Declaration.Comprehension <$ many comment <*> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
     makeComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
     nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
 
 conditionalExpression :: Assignment
-conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (expression >>= \ thenBranch -> expression >>= \ conditional -> Statement.If conditional thenBranch <$> (expression <|> emptyTerm))
-
+conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
+  expression >>= \ thenBranch -> 
+    many comment >> expression >>= \ conditional -> 
+      Statement.If conditional thenBranch <$> expressions)
 
 makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
 makeTerm a f = a :< inj f
