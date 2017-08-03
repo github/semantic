@@ -11,7 +11,7 @@ module Parser
 , rubyParser
 ) where
 
-import qualified CMark
+import qualified CMarkGFM
 import Data.Functor.Foldable hiding (fold, Nil)
 import Data.Record
 import Data.Source as Source
@@ -49,7 +49,7 @@ data Parser term where
   -- | A tree-sitter parser.
   TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (AST CMark.NodeType)
+  MarkdownParser :: Parser (AST CMarkGFM.NodeType)
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm DefaultFields)
 
