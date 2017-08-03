@@ -1,3 +1,4 @@
 {-(Program
   (AnonymousFunction
-    (Identifier)))-}
+    (ExpressionStatements
+      (Identifier))))-}

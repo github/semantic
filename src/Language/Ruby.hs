@@ -107,6 +107,7 @@ categoryForRubyName name = case name of
   "begin_block" -> BeginBlock
   "begin" -> Begin
   "binary" -> Binary
+  "block" -> ExpressionStatements
   "block_parameter" -> BlockParameter
   "block_parameters" -> Params
   "boolean" -> Boolean

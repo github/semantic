@@ -1,32 +1,39 @@
 (Program
-{+(AnonymousFunction)+}
 {+(AnonymousFunction
-    (Identifier))+}
+    (ExpressionStatements))+}
+{+(AnonymousFunction
+    (ExpressionStatements
+      (Identifier)))+}
   (AnonymousFunction
-  { (Identifier)
-  ->(Identifier) }
-  {+(KeywordParameter
-      (Identifier)
-      (Boolean))+}
-  {+(OptionalParameter
-      (Identifier)
-      (Identifier))+}
-  { (Binary
-      (Identifier)
-      (Other "+")
-      (IntegerLiteral))
-  ->(IntegerLiteral) })
-{+(AnonymousFunction)+}
+    (ExpressionStatements
+      (Params
+      { (Identifier)
+      ->(Identifier) }
+      {+(KeywordParameter
+          (Identifier)
+          (Boolean))+}
+      {+(OptionalParameter
+          (Identifier)
+          (Identifier))+})
+    {+(IntegerLiteral)+}
+    {-(Binary
+        (Identifier)
+        (Other "+")
+        (IntegerLiteral))-}))
 {+(AnonymousFunction
-    (Identifier))+}
+    (ExpressionStatements))+}
+{+(AnonymousFunction
+    (ExpressionStatements
+      (Identifier)))+}
 {+(AnonymousFunction
     (Identifier)
-    (IntegerLiteral))+}
+    (ExpressionStatements
+      (IntegerLiteral)))+}
 {+(AnonymousFunction
-    (Params
+    (Identifier)
+    (SplatParameter
+      (Identifier))
+    (Other "destructured_parameter"
       (Identifier)
-      (SplatParameter
-        (Identifier))
-      (Other "destructured_parameter"
-        (Identifier)
-        (Identifier))))+})
+      (Identifier))
+    (ExpressionStatements))+})

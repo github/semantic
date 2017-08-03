@@ -4,9 +4,7 @@
       (Identifier)
       (Ty
         (Other "union_type"
-          (Other "type_reference"
-          { (Identifier)
-          ->(Identifier) })
-          (Other "type_reference"
-          { (Identifier)
-          ->(Identifier) }))))))
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })))))

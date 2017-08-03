@@ -15,4 +15,4 @@
               (Identifier)
               (FunctionCall
                 (Identifier)
-                (QualifiedIdentifier)))))))))
+                (QualifiedType)))))))))
