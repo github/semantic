@@ -173,7 +173,6 @@ firstSet :: Enum grammar => Assignment ast grammar a -> Maybe [grammar]
 firstSet = iterFreer (\ assignment yield -> case assignment of
   Choose choices _ -> Just (toEnum <$> IntMap.keys choices)
   Alt a b -> yield a <> yield b
-  Many a -> firstSet a
   _ -> Nothing) . (Nothing <$)
 
 
