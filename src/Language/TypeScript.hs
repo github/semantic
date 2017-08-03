@@ -87,6 +87,10 @@ categoryForTypeScriptName category = case category of
   "this_expression" -> Identifier
   "null" -> Identifier
   "undefined" -> Identifier
+  "type_identifier" -> Identifier
+  "property_identifier" -> Identifier
+  "shorthand_property_identifier" -> Identifier
+  "nested_identifier" -> Identifier
   "arrow_function" -> Function
   "generator_function" -> Function
   "math_op" -> MathOperator -- math operator, e.g. +, -, *, /.
