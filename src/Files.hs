@@ -9,27 +9,33 @@ module Files
 import Control.Exception (catch, IOException)
 import Control.Monad.IO.Class
 import Data.Aeson
-import Data.These
-import Data.Functor.Both
 import qualified Data.Blob as Blob
+import Data.Functor.Both
+import Data.Maybe
+import Data.Semigroup
 import Data.Source
 import Data.String
+import Data.Text
+import Data.These
+import GHC.Generics
 import Language
-import Prologue hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
-import Prelude (fail)
+import Prelude hiding (readFile)
+import System.Exit
 import System.FilePath
+import System.IO (Handle)
+import Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m Blob.Blob
 readFile path language = do
-  raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe ByteString))
+  raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe B.ByteString))
   pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Maybe Language
-languageForFilePath = languageForType . toS . takeExtension
+languageForFilePath = languageForType . takeExtension
 
 -- | Read JSON encoded blob pairs from a handle.
 readBlobPairsFromHandle :: MonadIO m => Handle -> m [Both Blob.Blob]

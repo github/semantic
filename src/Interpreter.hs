@@ -7,17 +7,22 @@ module Interpreter
 ) where
 
 import Algorithm
+import Control.Comonad (extract)
+import Control.Comonad.Cofree (unwrap)
+import Control.Monad.Free (cutoff)
 import Control.Monad.Free.Freer hiding (cutoff)
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.Functor.Classes (Eq1)
-import RWS
+import Data.Hashable (Hashable)
+import Data.Maybe (isJust)
 import Data.Record
+import Data.Text (Text)
 import Data.These
 import Diff
 import Info hiding (Return)
 import Patch (inserting, deleting, replacing, patchSum)
-import Prologue hiding (lookup)
+import RWS
 import Syntax as S hiding (Return)
 import Term
 
@@ -107,7 +112,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
-comparableByCategory a b = category (headF a) == category (headF b)
+comparableByCategory (a :< _) (b :< _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
 comparableByConstructor :: GAlign f => ComparabilityRelation f fields

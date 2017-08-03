@@ -8,8 +8,12 @@ module Semantic
 ) where
 
 import Algorithm hiding (diff)
+import Control.Applicative ((<|>))
+import Control.Comonad.Cofree (hoistCofree)
+import Control.Monad ((<=<))
 import Data.Align.Generic (GAlign)
 import Data.Blob
+import Data.ByteString (ByteString)
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
 import Data.Output
@@ -23,7 +27,6 @@ import Interpreter
 import qualified Language
 import Patch
 import Parser
-import Prologue
 import Renderer
 import Semantic.Task as Task
 import Term

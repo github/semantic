@@ -5,11 +5,11 @@ module Language.Markdown
 , toGrammar
 ) where
 
+import Control.Comonad.Cofree
 import CMarkGFM
 import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
-import Prologue hiding (Location)
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
@@ -53,7 +53,7 @@ cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkT
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
-          in cofree $ (A.Node t range span) :< (toTerm range span <$> children)
+          in (A.Node t range span) :< (toTerm range span <$> children)
 
         toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ (if endLine <= startLine then max startColumn endColumn else endColumn)))
 

@@ -4,12 +4,15 @@ module Renderer.SExpression
 , renderSExpressionTerm
 ) where
 
+import Control.Comonad.Trans.Cofree hiding (runCofree)
+import Control.Monad.Trans.Free hiding (runFree)
 import Data.Bifunctor.Join
-import Data.ByteString hiding (foldr, spanEnd)
+import Data.ByteString.Char8 hiding (foldr, spanEnd)
 import Data.Record
-import Prologue hiding (replicate, encodeUtf8)
+import Data.Semigroup
 import Diff
 import Patch
+import Prelude hiding (replicate)
 import Term
 
 -- | Returns a ByteString SExpression formatted diff.
@@ -33,22 +36,19 @@ printDiff diff level = case runFree diff of
     pad :: Int -> ByteString
     pad n | n < 0 = ""
           | n < 1 = "\n"
-          | otherwise = "\n" <> replicate (2 * n) space
+          | otherwise = "\n" <> replicate (2 * n) ' '
 
 printTerm :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> ByteString
 printTerm term level = go term level 0
   where
     pad :: Int -> Int -> ByteString
     pad p n | n < 1 = ""
-            | otherwise = "\n" <> replicate (2 * (p + n)) space
+            | otherwise = "\n" <> replicate (2 * (p + n)) ' '
     go :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
     go term parentLevel level = case runCofree term of
       (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString
 showAnnotation Nil = ""
-showAnnotation (only :. Nil) = show only
-showAnnotation (first :. rest) = show first <> " " <> showAnnotation rest
-
-space :: Word8
-space = fromIntegral $ ord ' '
+showAnnotation (only :. Nil) = pack (show only)
+showAnnotation (first :. rest) = pack (show first) <> " " <> showAnnotation rest

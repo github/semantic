@@ -2,22 +2,26 @@
 module AlignmentSpec where
 
 import Alignment
+import Control.Arrow ((&&&))
+import Control.Comonad.Cofree (Cofree, hoistCofree)
+import Control.Monad.Free (Free, wrap)
 import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
-import Data.Functor.Both as Both
+import Data.Foldable (toList)
+import Data.Functor.Both as Both hiding (fst, snd)
 import Data.Functor.Listable
-import Data.List (nub)
+import Data.List (nub, sort)
+import Data.Maybe (catMaybes, fromMaybe)
 import Data.Monoid hiding ((<>))
 import Data.Range
 import Data.Record
+import Data.Semigroup ((<>))
 import qualified Data.Source as Source
 import qualified Data.Text as Text
 import Data.These
 import Patch
-import Prologue hiding (fst, snd)
-import qualified Prologue
 import SplitDiff
 import Syntax
 import Term
@@ -47,17 +51,17 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        join <$> traverse (modifyJoin (fromThese [] []) . fmap (pure . Prologue.fst)) (alignBranch Prologue.snd children ranges) `shouldBe` ranges
+        join <$> traverse (modifyJoin (fromThese [] []) . fmap (pure . fst)) (alignBranch snd children ranges) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        sort (nub (keysOfAlignedChildren (alignBranch Prologue.snd children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
+        sort (nub (keysOfAlignedChildren (alignBranch snd children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
 
     prop "covers every line of every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        sort (keysOfAlignedChildren (alignBranch Prologue.snd children ranges)) `shouldBe` sort (do
+        sort (keysOfAlignedChildren (alignBranch snd children ranges)) `shouldBe` sort (do
           line <- children
-          these (pure . Prologue.fst) (pure . Prologue.fst) (\ (k1, _) (k2, _) -> [ k1, k2 ]) . runJoin $ line)
+          these (pure . fst) (pure . fst) (\ (k1, _) (k2, _) -> [ k1, k2 ]) . runJoin $ line)
 
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
@@ -197,17 +201,17 @@ spec = parallel $ do
       \ xs -> counts (numberedRows (unListableF <$> xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin . unListableF <$> xs))
 
 data BranchElement
-  = Child Text (Join These Text)
-  | Margin (Join These Text)
+  = Child Text.Text (Join These Text.Text)
+  | Margin (Join These Text.Text)
   deriving Show
 
-branchElementKey :: BranchElement -> Maybe Text
+branchElementKey :: BranchElement -> Maybe Text.Text
 branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
-toAlignBranchInputs :: [BranchElement] -> (Both Source.Source, [Join These (Text, Range)], Both [Range])
+toAlignBranchInputs :: [BranchElement] -> (Both Source.Source, [Join These (Text.Text, Range)], Both [Range])
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . traverse go $ elements, ranges)
-  where go :: BranchElement -> State (Both Int) [Join These (Text, Range)]
+  where go :: BranchElement -> State (Both Int) [Join These (Text.Text, Range)]
         go child@(Child key _) = do
           lines <- traverse (\ (Child _ contents) -> do
             prev <- get
@@ -229,8 +233,8 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
         branchElementContents (Child _ contents) = contents
         branchElementContents (Margin contents) = contents
 
-keysOfAlignedChildren :: [Join These (Range, [(Text, Range)])] -> [Text]
-keysOfAlignedChildren lines = lines >>= these identity identity (<>) . runJoin . fmap (fmap Prologue.fst . Prologue.snd)
+keysOfAlignedChildren :: [Join These (Range, [(Text.Text, Range)])] -> [Text.Text]
+keysOfAlignedChildren lines = lines >>= these id id (<>) . runJoin . fmap (fmap fst . snd)
 
 joinCrosswalk :: Bicrosswalk p => Align f => (a -> f b) -> Join p a -> f (Join p b)
 joinCrosswalk f = fmap Join . bicrosswalk f f . runJoin
@@ -240,7 +244,7 @@ instance Listable BranchElement where
                 , Margin `mapT` joinTheseOf (Text.singleton `mapT` padding '-') ]
     where key = Text.singleton `mapT` [['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']]
           contents key = (wrap key . Text.singleton) `mapT` padding '*'
-          wrap key contents = "(" <> key <> contents <> ")" :: Text
+          wrap key contents = "(" <> key <> contents <> ")" :: Text.Text
           padding :: Char -> [Tier Char]
           padding char = frequency [ (10, [[char]])
                                    , (1, [['\n']]) ]
@@ -254,16 +258,16 @@ instance Listable BranchElement where
 
 
 counts :: [Join These (Int, a)] -> Both Int
-counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
+counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap fst <$> numbered))
 
 align :: Both Source.Source -> ConstructibleFree Syntax (Patch (Term Syntax (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff [] (Record '[Range]))
-align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
+align sources = PrettyDiff sources . fmap (fmap (getRange &&& id)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
 info start end = Range start end :. Nil
 
 prettyDiff :: Both Source.Source -> [Join These (ConstructibleFree [] (SplitPatch (Term [] (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff [] (Record '[Range]))
-prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
+prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& id) . deconstruct))
 
 data PrettyDiff a = PrettyDiff { unPrettySources :: Both Source.Source, unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
@@ -301,16 +305,16 @@ instance (Functor f, PatchConstructible patch) => PatchConstructible (Constructi
   delete = ConstructibleFree . pure . delete
 
 class SyntaxConstructible s where
-  leaf :: annotation -> Text -> s annotation
+  leaf :: annotation -> Text.Text -> s annotation
   branch :: annotation -> [s annotation] -> s annotation
 
 instance SyntaxConstructible (ConstructibleFree Syntax patch) where
-  leaf info = ConstructibleFree . free . Free . (info :<) . Leaf
-  branch info = ConstructibleFree . free . Free . (info :<) . Indexed . fmap deconstruct
+  leaf info = ConstructibleFree . wrap . (info :<) . Leaf
+  branch info = ConstructibleFree . wrap . (info :<) . Indexed . fmap deconstruct
 
 instance SyntaxConstructible (ConstructibleFree [] patch) where
-  leaf info = ConstructibleFree . free . Free . (info :<) . const []
-  branch info = ConstructibleFree . free . Free . (info :<) . fmap deconstruct
+  leaf info = ConstructibleFree . wrap . (info :<) . const []
+  branch info = ConstructibleFree . wrap . (info :<) . fmap deconstruct
 
 instance SyntaxConstructible (Cofree Syntax) where
   info `leaf` value = cofree $ info :< Leaf value
