@@ -127,7 +127,7 @@ data AssignmentF ast grammar a where
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: HasCallStack => IntMap.IntMap a -> Maybe a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
-  Alt :: HasCallStack => a -> a -> AssignmentF ast grammar a
+  Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
   Catch :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> AssignmentF ast grammar a
 
@@ -281,7 +281,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
                   Many rule -> fix (\ recur list state -> yield list state <> (go rule state >>= \ (a, state') -> recur [a] state')) [] state
-                  Alt a b -> Some (a :| [b]) >>= flip yield state
+                  Alt as -> Some as >>= flip yield state
                   Throw e -> None e
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   Choose{} -> None (makeError node)
@@ -334,8 +334,10 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
+  (Alt ls `Then` continueL) <|> r = Alt ((Left <$> ls) <> pure (Right r)) `Then` either continueL id
   l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` id
-          | otherwise = wrap $ Alt l r
+          | otherwise = wrap $ Alt (l :| [r])
     where choices :: Assignment ast grammar a -> Maybe (IntMap.IntMap (Assignment ast grammar a))
           choices (Choose choices _ `Then` continue) = Just (continue <$> choices)
           choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
@@ -361,7 +363,7 @@ instance Show grammar => Show1 (AssignmentF ast grammar) where
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose choices atEnd -> showsBinaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) (liftShowsPrec sp sl) "Choose" d (IntMap.toList choices) atEnd
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
-    Alt a b -> showsBinaryWith sp sp "Alt" d a b
+    Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
 
