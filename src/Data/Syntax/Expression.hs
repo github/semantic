@@ -6,7 +6,6 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
-import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callFunction :: !a, callParams :: ![a], callBlock :: !a }

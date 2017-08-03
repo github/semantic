@@ -27,22 +27,25 @@ module Data.Source
 , ListableByteString(..)
 ) where
 
+import Control.Arrow ((&&&))
 import Data.Array
 import qualified Data.ByteString as B
-import Data.Char (ord)
+import Data.Char (chr, ord)
 import Data.List (span)
+import Data.Monoid (First(..), Last(..))
 import Data.Range
+import Data.Semigroup hiding (First(..), Last(..))
 import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
-import Prologue
+import qualified Data.Text.Encoding as T
 import Test.LeanCheck
 
 -- | The contents of a source file, represented as a 'ByteString'.
 newtype Source = Source { sourceBytes :: B.ByteString }
   deriving (Eq, IsString, Show)
 
-fromBytes :: ByteString -> Source
+fromBytes :: B.ByteString -> Source
 fromBytes = Source
 
 
@@ -67,13 +70,13 @@ totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - st
 
 -- En/decoding
 
--- | Return a 'Source' from a 'ByteString'.
+-- | Return a 'Source' from a 'Text'.
 fromText :: T.Text -> Source
-fromText = Source . encodeUtf8
+fromText = Source . T.encodeUtf8
 
--- | Return the ByteString contained in the 'Source'.
-toText :: Source -> Text
-toText = decodeUtf8 . sourceBytes
+-- | Return the Text contained in the 'Source'.
+toText :: Source -> T.Text
+toText = T.decodeUtf8 . sourceBytes
 
 
 -- | Return a 'Source' that contains a slice of the given 'Source'.
@@ -148,12 +151,9 @@ instance Listable Source where
 newtype ListableByteString = ListableByteString { unListableByteString :: B.ByteString }
 
 instance Listable ListableByteString where
-  tiers = (ListableByteString . encodeUtf8 . T.pack) `mapT` strings
+  tiers = (ListableByteString . T.encodeUtf8 . T.pack) `mapT` strings
     where strings = foldr ((\\//) . listsOf . toTiers) []
             [ ['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']
             , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
             , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
             , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.
-
-instance StringConv Source ByteString where
-  strConv _ = sourceBytes

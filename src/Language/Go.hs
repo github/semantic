@@ -1,9 +1,13 @@
 {-# LANGUAGE DataKinds #-}
 module Language.Go where
 
+import Control.Comonad
+import Control.Comonad.Cofree
+import Data.Foldable (toList)
+import Data.Maybe
 import Data.Source
+import Data.Text
 import Info
-import Prologue
 import qualified Syntax as S
 import Term
 
@@ -137,4 +141,4 @@ categoryForGoName name = case name of
   "block" -> ExpressionStatements
   "parenthesized_expression" -> ParenthesizedExpression
   "parenthesized_type" -> ParenthesizedType
-  s -> Other (toS s)
+  s -> Other s

@@ -6,7 +6,6 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
-import Prologue
 
 data Function a = Function { functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)

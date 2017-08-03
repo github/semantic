@@ -18,13 +18,18 @@ module Renderer
 , File(..)
 ) where
 
+import Control.Comonad.Cofree (Cofree, unwrap)
+import Control.Comonad.Trans.Cofree (CofreeF(..))
+import Control.DeepSeq
 import Data.Aeson (Value, (.=))
+import Data.ByteString (ByteString)
+import Data.Foldable (asum)
 import qualified Data.Map as Map
 import Data.Output
 import Data.Syntax.Algebra (RAlgebra)
+import Data.Text (Text)
 import Diff (SyntaxDiff)
 import Info (DefaultFields)
-import Prologue
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R

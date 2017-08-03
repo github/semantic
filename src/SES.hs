@@ -4,7 +4,6 @@ module SES
 , Myers.ses
 ) where
 
-import Prologue
 import qualified SES.Myers as Myers
 
 -- | Edit constructor for two terms, if comparable. Otherwise returns Nothing.

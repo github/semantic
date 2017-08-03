@@ -6,9 +6,10 @@ module Test.Hspec.LeanCheck
 
 import Control.Exception
 import Data.Bifunctor (first)
-import Data.String (String)
+import Data.List (intercalate)
+import Data.Maybe (listToMaybe)
+import Data.Typeable
 import GHC.Show as Show (showsPrec)
-import Prologue
 import Test.Hspec
 import Test.Hspec.Core.Spec as Hspec
 import qualified Test.HUnit.Lang as HUnit

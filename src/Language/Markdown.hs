@@ -5,11 +5,11 @@ module Language.Markdown
 , toGrammar
 ) where
 
-import CMark
+import Control.Comonad.Cofree
+import CMarkGFM
 import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
-import Prologue hiding (Location)
 import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
@@ -33,15 +33,27 @@ data Grammar
   | Strong
   | Link
   | Image
+  | Strikethrough
+  | Table
+  | TableRow
+  | TableCell
   deriving (Bounded, Enum, Eq, Ord, Show)
 
+exts :: [CMarkExtension]
+exts = [
+    extStrikethrough
+  , extTable
+  , extAutolink
+  , extTagfilter
+  ]
+
 cmarkParser :: Source -> A.AST NodeType
-cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] exts (toText source)
   where toTerm :: Range -> Span -> Node -> A.AST NodeType
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
-          in cofree $ (A.Node t range span) :< (toTerm range span <$> children)
+          in (A.Node t range span) :< (toTerm range span <$> children)
 
         toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ (if endLine <= startLine then max startColumn endColumn else endColumn)))
 
@@ -68,6 +80,10 @@ toGrammar EMPH{} = Emphasis
 toGrammar STRONG{} = Strong
 toGrammar LINK{} = Link
 toGrammar IMAGE{} = Image
+toGrammar STRIKETHROUGH{} = Strikethrough
+toGrammar TABLE{} = Table
+toGrammar TABLE_ROW{} = TableRow
+toGrammar TABLE_CELL{} = TableCell
 
 
 instance Symbol Grammar where

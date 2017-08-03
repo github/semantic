@@ -1,8 +1,8 @@
 {-# LANGUAGE TypeOperators #-}
 module Data.Mergeable.Generic where
 
+import Control.Applicative
 import GHC.Generics
-import Prologue
 
 -- Classes
 
@@ -38,7 +38,7 @@ instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
   gmerge f (a :*: b) = (:*:) <$> gmerge f a <*> gmerge f b
 
 instance GMergeable [] where
-  gmerge f (x:xs) = ((:) <$> f x <|> pure identity) <*> gmerge f xs
+  gmerge f (x:xs) = ((:) <$> f x <|> pure id) <*> gmerge f xs
   gmerge _ [] = pure []
 
 instance GMergeable Maybe where

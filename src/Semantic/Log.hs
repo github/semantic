@@ -1,14 +1,15 @@
 module Semantic.Log where
 
-import Data.String
-import Prologue hiding (Location, show)
+import Data.Bifunctor (second)
+import Data.Foldable (toList)
+import Data.List (intersperse)
+import Data.Semigroup ((<>))
 import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
 import System.Console.ANSI
-import System.IO (hIsTerminalDevice)
+import System.IO (Handle, hIsTerminalDevice)
 import System.Posix.Process
 import System.Posix.Types
-import Text.Show
 import Text.Printf
 
 -- | A log message at a specific level.
@@ -42,7 +43,7 @@ logfmtFormatter Options{..} (Message level message pairs time) =
   . showChar '\n' $ ""
   where
     kv k v = showString k . showChar '=' . v
-    showPairs = foldr (.) identity . intersperse (showChar ' ')
+    showPairs = foldr (.) id . intersperse (showChar ' ')
     showTime = showString . Time.formatTime Time.defaultTimeLocale "%FT%XZ%z"
 
 -- | Format log messages to a terminal. Suitable for local development.
@@ -62,7 +63,7 @@ terminalFormatter Options{..} (Message level message pairs time) =
     showLevel Warning = withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString " WARN")
     showLevel Info = withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString " INFO")
     showLevel Debug = withSGRCode colourize [SetColor Foreground Vivid White, SetConsoleIntensity BoldIntensity] (showString "DEBUG")
-    showPairs pairs = foldr (.) identity $ intersperse (showChar ' ') (showPair <$> pairs)
+    showPairs pairs = foldr (.) id $ intersperse (showChar ' ') (showPair <$> pairs)
     showPair (k, v) = showString k . showChar '=' . withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString v)
     showTime = showString . Time.formatTime Time.defaultTimeLocale "%X"
 

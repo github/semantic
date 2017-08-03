@@ -24,9 +24,12 @@ module Data.Functor.Listable
 , ofWeight
 ) where
 
+import Control.Comonad.Cofree as Cofree
+import Control.Comonad.Trans.Cofree as CofreeF
+import Control.Monad.Free as Free
+import Control.Monad.Trans.Free as FreeF
 import Data.Bifunctor.Join
 import Data.These
-import Prologue
 import Test.LeanCheck
 
 type Tier a = [a]
@@ -114,24 +117,27 @@ instance Listable2 These where
   liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
 
 instance Listable1 f => Listable2 (CofreeF f) where
-  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<)
+  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (CofreeF.:<)
 
 instance (Listable1 f, Listable a) => Listable1 (CofreeF f a) where
   liftTiers = liftTiers2 tiers
 
-instance (Functor f, Listable1 f) => Listable1 (Cofree f) where
+instance (Functor f, Listable1 f) => Listable1 (Cofree.Cofree f) where
   liftTiers annotationTiers = go
     where go = liftCons1 (liftTiers2 annotationTiers go) cofree
+          cofree (a CofreeF.:< f) = a Cofree.:< f
 
 instance Listable1 f => Listable2 (FreeF f) where
-  liftTiers2 pureTiers recurTiers = liftCons1 pureTiers Pure \/ liftCons1 (liftTiers recurTiers) Free
+  liftTiers2 pureTiers recurTiers = liftCons1 pureTiers FreeF.Pure \/ liftCons1 (liftTiers recurTiers) FreeF.Free
 
 instance (Listable1 f, Listable a) => Listable1 (FreeF f a) where
   liftTiers = liftTiers2 tiers
 
-instance (Functor f, Listable1 f) => Listable1 (Free f) where
+instance (Functor f, Listable1 f) => Listable1 (Free.Free f) where
   liftTiers pureTiers = go
     where go = liftCons1 (liftTiers2 pureTiers go) free
+          free (FreeF.Free f) = Free.Free f
+          free (FreeF.Pure a) = Free.Pure a
 
 instance (Listable1 f, Listable a) => Listable (ListableF f a) where
   tiers = ListableF `mapT` tiers1

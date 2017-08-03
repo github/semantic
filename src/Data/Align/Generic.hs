@@ -3,10 +3,10 @@ module Data.Align.Generic where
 
 import Control.Monad
 import Data.Align
+import Data.Functor.Identity
 import Data.These
 import Data.Union
 import GHC.Generics
-import Prologue
 
 -- | Functors which can be aligned (structure-unioning-ly zipped). The default implementation will operate generically over the constructors in the aligning type.
 class GAlign f where
@@ -16,7 +16,7 @@ class GAlign f where
   galignWith f a b = to1 <$> galignWith f (from1 a) (from1 b)
 
 galign :: GAlign f => f a -> f b -> Maybe (f (These a b))
-galign = galignWith identity
+galign = galignWith id
 
 -- 'Data.Align.Align' instances
 

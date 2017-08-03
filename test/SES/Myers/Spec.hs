@@ -1,7 +1,6 @@
 module SES.Myers.Spec where
 
 import Data.These
-import Prologue
 import SES.Myers
 import Test.Hspec
 import Test.Hspec.LeanCheck
