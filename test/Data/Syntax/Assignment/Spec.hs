@@ -215,15 +215,15 @@ spec = do
       assignBy headF "hi" source (node Red 0 2 []) `shouldBe` Right "hi"
 
     it "advances past the current node" $
-      stateNodes . snd <$> runAssignment headF "hi" source (makeState [ node Red 0 2 [] ])
+      snd <$> runAssignment headF "hi" source (makeState [ node Red 0 2 [] ])
       `shouldBe`
-        Right []
+        Right (State 2 (Info.Pos 1 3) Nothing 1 [])
 
   describe "children" $ do
     it "advances past the current node" $
-      stateNodes . snd <$> runAssignment headF "a" (children (pure (Out ""))) (makeState [node Red 0 1 []])
+      snd <$> runAssignment headF "a" (children (pure (Out ""))) (makeState [node Red 0 1 []])
       `shouldBe`
-        Right []
+        Right (State 1 (Info.Pos 1 2) Nothing 1 [])
 
     it "matches if its subrule matches" $
       () <$ runAssignment headF "a" (children red) (makeState [node Blue 0 1 [node Red 0 1 []]])
