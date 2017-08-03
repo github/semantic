@@ -1,5 +1,7 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Data.Amb where
 
+import Control.Monad.Error.Class
 import Data.List.NonEmpty
 import Data.Semigroup
 
@@ -23,3 +25,8 @@ instance Monad (Amb l) where
   return = pure
   None a >>= _ = None a
   Some as >>= f = foldr1 (<>) (f <$> as)
+
+instance MonadError l (Amb l) where
+  throwError = None
+  None a  `catchError` f = f a
+  Some as `catchError` _ = Some as
