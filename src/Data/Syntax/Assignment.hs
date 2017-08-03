@@ -170,8 +170,9 @@ while predicate step = many $ do
 --
 --   In general, first sets can be computed for committed choices, repetitions of committed choices, and so on.
 firstSet :: Enum grammar => Assignment ast grammar a -> Maybe [grammar]
-firstSet = iterFreer (\ assignment _ -> case assignment of
+firstSet = iterFreer (\ assignment yield -> case assignment of
   Choose choices _ -> Just (toEnum <$> IntMap.keys choices)
+  Alt a b -> yield a <> yield b
   _ -> Nothing) . (Nothing <$)
 
 
