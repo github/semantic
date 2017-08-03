@@ -76,6 +76,8 @@ module Data.Syntax.Assignment
 , source
 , children
 , while
+-- Analysis
+, firstSet
 -- Results
 , Error(..)
 , errorCallStack
@@ -162,6 +164,15 @@ while predicate step = many $ do
   result <- step
   guard (predicate result)
   pure result
+
+
+-- | Return 'Just' the first set of symbols recognized by an assignment, or 'Nothing' if the first set cannot be computed.
+--
+--   In general, first sets can be computed for committed choices, repetitions of committed choices, and so on.
+firstSet :: Enum grammar => Assignment ast grammar a -> Maybe [grammar]
+firstSet = iterFreer (\ assignment _ -> case assignment of
+  Choose choices _ -> Just (toEnum <$> IntMap.keys choices)
+  _ -> Nothing) . (Nothing <$)
 
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
