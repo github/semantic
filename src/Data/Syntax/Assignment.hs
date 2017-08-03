@@ -289,7 +289,10 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes state })
                   Choose choices _ | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
-                  Catch during _ | IntSet.member (fromEnum (nodeSymbol (toNode node))) (fromMaybe IntSet.empty (stateNextSet state)) -> go during state >>= uncurry yield
+                  Catch during handler -> go during state `catchError` (
+                    if (IntSet.member (fromEnum (nodeSymbol (toNode node)))) (fromMaybe IntSet.empty (stateNextSet state))
+                      then Left
+                      else flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
