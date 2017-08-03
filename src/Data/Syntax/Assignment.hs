@@ -336,7 +336,7 @@ data State ast grammar = State
   { stateOffset :: Int                  -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: Info.Pos                -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateError :: Maybe (Error grammar) -- ^ The most recently encountered error. Preserved for improved error messages in the presence of backtracking.
-  , stateNextSet :: Maybe IntSet.IntSet
+  , stateNextSet :: Maybe IntSet.IntSet -- ^ The set of symbols recognized by the next rule, if knowable.
   , stateCounter :: Int                 -- ^ Always incrementing counter that tracks how many nodes have been visited.
   , stateNodes :: [ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
