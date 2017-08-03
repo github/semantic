@@ -5,5 +5,4 @@
       (Ty
         (Other "function_type"
           (Params)
-          (Other "type_reference"
-            (Identifier)))))))-}
+          (Identifier))))))-}

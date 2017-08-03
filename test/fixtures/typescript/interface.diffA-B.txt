@@ -6,7 +6,7 @@
       (Other "type_parameter"
         (Identifier)))-}
     (Other "property_signature"
-      (Other "reserved_identifier")
+      (Identifier)
       (Ty
         (Other "literal_type"
         { (StringLiteral)
@@ -16,6 +16,5 @@
     { (Identifier)
     ->(Identifier) }
       (Ty
-        (Other "type_reference"
-        { (Identifier)
-        ->(Identifier) })))))
+      { (Identifier)
+      ->(Identifier) }))))

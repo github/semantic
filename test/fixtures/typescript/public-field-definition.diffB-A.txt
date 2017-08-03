@@ -23,48 +23,41 @@
       { (Identifier)
       ->(Identifier) }
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
     {-(FieldDecl
         (Other "accessibility_modifier")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))-}
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
       { (Other "accessibility_modifier")
       ->(Other "readonly") }
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
     {+(FieldDecl
         (Other "readonly")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))+}
     {+(FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))+}
     {+(FieldDecl
         (Identifier)
@@ -74,14 +67,12 @@
         (Other "readonly")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (StringLiteral))-}
     {-(FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))-}
     {-(FieldDecl
         (Identifier)

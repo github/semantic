@@ -5,5 +5,4 @@
       (Ty
         (Other "array_type"
         {-(Params)-}
-          (Other "type_reference"
-            (Identifier)))))))
+          (Identifier))))))

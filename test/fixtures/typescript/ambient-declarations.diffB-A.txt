@@ -5,11 +5,10 @@
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier))))))+}
+          (Identifier)))))+}
 {+(Other "ambient_declaration"
-    (Other "ambient_variable"
-      (Other "ambient_binding"
+    (Other "variable_declaration"
+      (VarAssignment
         (Identifier)
         (Ty
           (Other "predefined_type")))))+}
@@ -98,5 +97,4 @@
       (Other "call_signature"
         (Params)
         (Ty
-          (Other "type_reference"
-            (Identifier))))))-})
+          (Identifier)))))-})

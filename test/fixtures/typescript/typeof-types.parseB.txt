@@ -9,5 +9,4 @@
     (VarAssignment
       (Identifier)
       (Ty
-        (Other "type_reference"
-          (Identifier))))))
+        (Identifier)))))

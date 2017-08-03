@@ -161,6 +161,6 @@ categoryForTypeScriptName category = case category of
   "type_annotation" -> Ty
   "template_chars" -> TemplateString
   "module" -> Module
-  "ambient_namespace" -> Namespace
+  "internal_module" -> Namespace
   "interface_declaration" -> Interface
   name -> Other name

@@ -7,14 +7,12 @@
           (Other "union_type"
             (Other "predefined_type")
             (Other "predefined_type"))
-          (Other "type_reference"
-            (Identifier)))
-        (Other "type_reference"
+          (Identifier))
+        (Other "generic_type"
           (Identifier)
           (Other "type_arguments"
             (Other "union_type"
               (Other "union_type"
                 (Other "predefined_type")
                 (Other "predefined_type"))
-              (Other "type_reference"
-                (Identifier)))))))))-}
+              (Identifier))))))))-}
