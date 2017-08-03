@@ -279,7 +279,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
-        run assignment _ yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
+        run assignment next yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state
@@ -293,7 +293,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 anywhere node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
-                  Many rule -> uncurry yield (runMany rule state)
+                  Many rule -> second (\ s -> s { stateNextSet = stateNextSet state }) <$> uncurry yield (runMany rule state { stateNextSet = next >>= firstSet })
                   Alt a b -> yield a state `catchError` \ err -> yield b state { stateError = Just err }
                   Throw e -> Left e
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
