@@ -104,6 +104,7 @@ import Data.Function
 import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
+import qualified Data.IntSet as IntSet
 import Data.Ix (inRange)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe
@@ -169,9 +170,9 @@ while predicate step = many $ do
 -- | Return 'Just' the first set of symbols recognized by an assignment, or 'Nothing' if the first set cannot be computed.
 --
 --   In general, first sets can be computed for committed choices, repetitions of committed choices, and so on.
-firstSet :: Enum grammar => Assignment ast grammar a -> Maybe [grammar]
+firstSet :: Assignment ast grammar a -> Maybe IntSet.IntSet
 firstSet = iterFreer (\ assignment yield -> case assignment of
-  Choose choices _ -> Just (toEnum <$> IntMap.keys choices)
+  Choose choices _ -> Just (IntMap.keysSet choices)
   Alt a b -> yield a <> yield b
   Many a -> firstSet a
   Catch during _ -> firstSet during
@@ -335,7 +336,7 @@ data State ast grammar = State
   { stateOffset :: Int                  -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: Info.Pos                -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateError :: Maybe (Error grammar) -- ^ The most recently encountered error. Preserved for improved error messages in the presence of backtracking.
-  , stateNextSet :: Maybe [grammar]
+  , stateNextSet :: Maybe IntSet.IntSet
   , stateCounter :: Int                 -- ^ Always incrementing counter that tracks how many nodes have been visited.
   , stateNodes :: [ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
