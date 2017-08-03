@@ -36,9 +36,10 @@ import Data.Amb
 import Data.Blob
 import qualified Data.ByteString as B
 import Data.Foldable (fold, for_)
-import Data.Functor.Both as Both
+import Data.Functor.Both as Both hiding (fst)
 import Data.Functor.Foldable (cata)
-import Data.List.NonEmpty
+import Data.List (minimumBy)
+import Data.Ord (comparing)
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source (totalRange, totalSpan)
@@ -202,8 +203,9 @@ runParser Options{..} blob@Blob{..} = go
                 None err -> do
                   writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
                   pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (fmap show err) []))
-                Some (term :| _) -> do
-                  for_ (errors term) $ \ err ->
+                Some terms -> do
+                  let (errs, term) = minimumBy (comparing (length . fst)) ((\ term -> (errors term, term)) <$> terms)
+                  for_ errs $ \ err ->
                     writeLog Warning (Assignment.formatErrorWithOptions optionsPrintSource optionsEnableColour blob err) blobFields
                   pure $ Right term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
