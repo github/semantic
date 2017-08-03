@@ -41,10 +41,11 @@ data Grammar
 
 exts :: [CMarkExtension]
 exts = [
-  extStrikethrough,
-  extTable,
-  extAutolink,
-  extTagfilter ]
+    extStrikethrough
+  , extTable
+  , extAutolink
+  , extTagfilter
+  ]
 
 cmarkParser :: Source -> A.AST NodeType
 cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] exts (toText source)
