@@ -294,8 +294,8 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 anywhere node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
-                  Many rule -> second (\ s -> s { stateNextSet = stateNextSet state }) <$> uncurry yield (runMany rule state { stateNextSet = next >>= firstSet })
-                  Alt a b -> (second (\ s -> s { stateNextSet = stateNextSet state }) <$> yield a state { stateNextSet = next >>= firstSet }) `catchError` \ err -> yield b state { stateError = Just err }
+                  Many rule -> second (setNextSet (stateNextSet state)) <$> uncurry yield (runMany rule (setNextSet (next >>= firstSet) state))
+                  Alt a b -> (second (setNextSet (stateNextSet state)) <$> yield a (setNextSet (next >>= firstSet) state)) `catchError` \ err -> yield b state { stateError = Just err }
                   Throw e -> Left e
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   Choose{} -> Left (makeError node)
