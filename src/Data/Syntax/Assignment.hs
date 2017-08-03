@@ -257,14 +257,15 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar
 runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
   where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar) (result, State ast grammar)
-        go assignment = iterFreer run ((pure .) . (,) <$> assignment)
+        go assignment = iterLookahead run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
         run :: AssignmentF ast grammar x
+            -> Maybe (Assignment ast grammar y)
             -> (x -> State ast grammar -> Either (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error grammar) (result, State ast grammar)
-        run assignment yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
+        run assignment _ yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state
