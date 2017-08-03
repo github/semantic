@@ -7,5 +7,4 @@
         (Identifier)
         (Params)
         (Ty
-          (Other "type_reference"
-            (Identifier)))))))+}
+          (Identifier))))))+}

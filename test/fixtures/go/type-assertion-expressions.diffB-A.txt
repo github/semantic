@@ -7,5 +7,5 @@
     (TypeAssertion
     { (Identifier)
     ->(Identifier) }
-    { (QualifiedIdentifier)
-    ->(QualifiedIdentifier) })))
+    { (QualifiedType)
+    ->(QualifiedType) })))

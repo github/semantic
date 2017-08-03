@@ -7,12 +7,14 @@
   { (For
       (ExpressionStatements
         (FunctionCall
-          (Identifier)
-          )(Other"goto_statement"(Identifier))))
+          (Identifier))
+        (Other "goto_statement"
+          (Identifier))))
   ->(For
-    (FunctionCall
-      (Identifier))
-    (Other"goto_statement"(Identifier))) }
+      (FunctionCall
+        (Identifier))
+      (Other "goto_statement"
+        (Identifier))) }
   {+(For
       (Other "expression_list"
         (Identifier))
@@ -39,7 +41,7 @@
         (FunctionCall
           (Identifier)
           (Identifier))
-      (Break)))+}
+        (Break)))+}
   {-(For
       (VarDecl
         (Other "expression_list"

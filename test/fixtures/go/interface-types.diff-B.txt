@@ -12,13 +12,13 @@
       (TypeDecl
         (Identifier)
         (Other "interface_type"
-          (QualifiedIdentifier))))
+          (QualifiedType))))
     (Other "type_declaration"
       (TypeDecl
         (Identifier)
         (Other "interface_type"
           (Identifier)
-          (QualifiedIdentifier)
+          (QualifiedType)
           (Other "method_spec"
             (Identifier)
             (Args

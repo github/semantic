@@ -3,6 +3,7 @@
   {+(Identifier)+}
   {+(Identifier)+}
   {+(Identifier)+}
-  { (Identifier)
-  ->(IntegerLiteral) }
-  {+(IntegerLiteral)+}))
+    (ExpressionStatements
+    {+(IntegerLiteral)+}
+    {+(IntegerLiteral)+}
+    {-(Identifier)-})))

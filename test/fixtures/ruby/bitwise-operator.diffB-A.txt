@@ -1,11 +1,13 @@
 (Program
   (Binary
     (Identifier)
-    { (Other "&") -> (Other "|") }
+  { (Other "&")
+  ->(Other "|") }
     (Identifier))
   (Binary
     (Identifier)
-    { (Other "<<") -> (Other ">>") }
+  { (Other "<<")
+  ->(Other ">>") }
     (Identifier))
 {+(Binary
     (Identifier)

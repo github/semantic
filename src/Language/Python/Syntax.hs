@@ -135,7 +135,7 @@ expression =
   <|> identifier
   <|> ifStatement
   <|> import'
-  <|> keyword
+  <|> identifier
   <|> literal
   <|> memberAccess
   <|> nonlocalStatement
@@ -282,9 +282,6 @@ comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression
 notOperator :: Assignment
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
 
-keyword :: Assignment
-keyword =  makeTerm <$> symbol KeywordIdentifier <*> children (Syntax.Identifier <$> source)
-
 tuple :: Assignment
 tuple = makeTerm <$> symbol Tuple <*> children (Literal.Tuple <$> many expression)
 
@@ -385,8 +382,8 @@ printStatement = do
     redirectCallTerm location print <|> printCallTerm location print
   where
     printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier <$> source)
-    redirectCallTerm location keyword = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location keyword)
-    printCallTerm location keyword = makeTerm location <$> (Expression.Call keyword <$> many expression <*> emptyTerm)
+    redirectCallTerm location identifier = makeTerm location <$ symbol Chevron <*> (flip Redirect <$> children expression <*> printCallTerm location identifier)
+    printCallTerm location identifier = makeTerm location <$> (Expression.Call identifier <$> many expression <*> emptyTerm)
 
 nonlocalStatement :: Assignment
 nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)

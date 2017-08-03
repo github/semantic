@@ -9,17 +9,15 @@
     {-(FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier))))-}))
-{+(Other "ambient_declaration"
-    (Interface
-      (Identifier)))+}
-{-(Other "ambient_declaration"
-    (Other "ambient_variable"
-      (Other "ambient_binding"
+          (Identifier)))-}))
+  (Other "ambient_declaration"
+  {+(Interface
+      (Identifier))+}
+  {-(Other "variable_declaration"
+      (VarAssignment
         (Identifier)
         (Ty
-          (Other "predefined_type")))))-}
+          (Other "predefined_type"))))-})
 {-(Other "ambient_declaration"
     (Other "ambient_function"
       (Identifier)
@@ -96,5 +94,4 @@
       (Other "call_signature"
         (Params)
         (Ty
-          (Other "type_reference"
-            (Identifier))))))+})
+          (Identifier)))))+})

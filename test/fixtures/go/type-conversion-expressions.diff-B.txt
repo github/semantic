@@ -6,13 +6,14 @@
     (Args)
     (TypeConversion
       (SliceTy
-        (QualifiedIdentifier))
+        (QualifiedType))
       (SubscriptAccess
         (Identifier)
         (Identifier)))
     (TypeConversion
-      (SliceTy
-        (QualifiedIdentifier))
+      (ParenthesizedType
+        (SliceTy
+          (QualifiedType)))
       (SubscriptAccess
         (Identifier)
         (Identifier)))
@@ -22,7 +23,8 @@
         (Identifier))
       (Identifier))
     (FunctionCall
-      (SubscriptAccess
-        (Identifier)
-        (Identifier))
+      (ParenthesizedExpression
+        (SubscriptAccess
+          (Identifier)
+          (Identifier)))
       (Identifier))))-}

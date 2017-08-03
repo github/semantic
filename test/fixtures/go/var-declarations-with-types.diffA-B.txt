@@ -6,19 +6,17 @@
     (Args)
     (Other "var_declaration"
       (VarAssignment
-        (Other "identifier_list"
-        { (Identifier)
-        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }
         (Identifier)
         (Other "expression_list"
           (NumberLiteral))))
     (Other "var_declaration"
       (VarAssignment
-        (Other "identifier_list"
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }
         (Identifier)
         (Other "expression_list"
           (NumberLiteral)

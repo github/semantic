@@ -6,8 +6,7 @@
     (Args)
     (Other "const_declaration"
       (VarAssignment
-        (Other "identifier_list"
-          (Identifier))
+        (Identifier)
         (Other "expression_list"
           (Other "composite_literal"
           { (Identifier)
@@ -20,14 +19,12 @@
               (StringLiteral))))))
     (Other "const_declaration"
       (VarAssignment
-        (Other "identifier_list"
-          (Identifier))
+        (Identifier)
         (Other "expression_list"
           (Other "composite_literal"
             (StructTy
               (FieldDecl
-                (Other "identifier_list"
-                  (Identifier))
+                (Identifier)
               { (Identifier)
               ->(Identifier) }))
             (Pair
@@ -37,9 +34,8 @@
             ->(NumberLiteral) })))))
     (Other "const_declaration"
       (VarAssignment
-        (Other "identifier_list"
-          (Identifier))
+        (Identifier)
         (Other "expression_list"
           (Other "composite_literal"
-          { (QualifiedIdentifier)
-          ->(QualifiedIdentifier) }))))))
+          { (QualifiedType)
+          ->(QualifiedType) }))))))

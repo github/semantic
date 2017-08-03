@@ -1,10 +1,14 @@
 (Program
   (SubscriptAccess
-    { (Identifier) -> (Identifier) }
-    { (StringLiteral) -> (Identifier) })
+  { (Identifier)
+  ->(Identifier) }
+  { (StringLiteral)
+  ->(Identifier) })
   (SubscriptAccess
-    { (Identifier) -> (Identifier) }
-    { (SymbolLiteral) -> (SymbolLiteral) })
+  { (Identifier)
+  ->(Identifier) }
+  { (SymbolLiteral)
+  ->(SymbolLiteral) })
 {+(Assignment
     (SubscriptAccess
       (Identifier)

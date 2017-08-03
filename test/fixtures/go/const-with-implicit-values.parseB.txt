@@ -6,13 +6,10 @@
     (Args)
     (Other "const_declaration"
       (VarAssignment
-        (Other "identifier_list"
-          (Identifier))
+        (Identifier)
         (Other "expression_list"
           (Identifier)))
       (VarAssignment
-        (Other "identifier_list"
-          (Identifier)))
+        (Identifier))
       (VarAssignment
-        (Other "identifier_list"
-          (Identifier))))))
+        (Identifier)))))

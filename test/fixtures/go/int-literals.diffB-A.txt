@@ -4,8 +4,7 @@
   (Identifier)
   (Args)
   (VarAssignment
-    (Other "identifier_list"
-      (Identifier))
+    (Identifier)
     (Other "expression_list"
     { (NumberLiteral)
     ->(NumberLiteral) }

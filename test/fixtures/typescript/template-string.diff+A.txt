@@ -1,4 +1,3 @@
 {+(Program
   (ExpressionStatements
-    (TemplateString
-      (TemplateString))))+}
+    (TemplateString)))+}
