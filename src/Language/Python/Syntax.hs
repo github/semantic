@@ -302,7 +302,9 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
 binaryOperator :: Assignment
 binaryOperator = symbol BinaryOperator >>= \ loc -> children (
   expression >>= \ lexpression ->
-    makeTerm loc <$> arithmetic lexpression
+       makeTerm loc <$ comment <*> arithmetic lexpression
+   <|> makeTerm loc <$ comment <*> bitwise lexpression
+   <|> makeTerm loc <$> arithmetic lexpression
    <|> makeTerm loc <$> bitwise lexpression)
   where
     arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expressions)
