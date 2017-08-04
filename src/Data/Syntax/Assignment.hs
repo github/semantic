@@ -276,7 +276,7 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
             -> (x -> State ast grammar -> Amb (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Amb (Error grammar) (result, State ast grammar)
-        run assignment yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
+        run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state
