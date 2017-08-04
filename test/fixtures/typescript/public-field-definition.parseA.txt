@@ -22,40 +22,34 @@
         (Other "readonly")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Other "readonly")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Other "readonly")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Identifier)

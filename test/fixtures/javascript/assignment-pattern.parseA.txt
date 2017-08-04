@@ -1,9 +1,8 @@
 (Program
   (Other "variable_declaration"
     (VarAssignment
-      (Other "destructuring_pattern"
-        (Object
-          (Other "assignment_pattern"
-            (Identifier)
-            (NumberLiteral))))
+      (Other "object_pattern"
+        (Other "assignment_pattern"
+          (Identifier)
+          (NumberLiteral)))
       (Identifier))))

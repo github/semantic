@@ -7,4 +7,4 @@
     (Other "type_declaration"
       (TypeDecl
         (Identifier)
-        (QualifiedIdentifier)))))-}
+        (QualifiedType)))))-}

@@ -28,4 +28,5 @@
       (Identifier))
     (AnonymousFunction
       (Identifier)
-      (IntegerLiteral))))
+      (ExpressionStatements
+        (IntegerLiteral)))))

@@ -4,8 +4,5 @@
       (Identifier)
       (Ty
         (Other "type_query"
-        {+(Identifier)+}
-        {-(Other "type_reference"
-            (Identifier))-}
-        {-(Other "type_reference"
-            (Identifier))-})))))
+          (Identifier)
+        {-(Identifier)-})))))

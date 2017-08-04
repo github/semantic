@@ -2,7 +2,7 @@
   (Interface
     (Identifier)
     (Other "property_signature"
-      (Other "reserved_identifier")
+      (Identifier)
       (Ty
         (Other "literal_type"
           (StringLiteral))))
@@ -10,5 +10,4 @@
       (Other "readonly")
       (Identifier)
       (Ty
-        (Other "type_reference"
-          (Identifier))))))
+        (Identifier)))))

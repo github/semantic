@@ -2,7 +2,7 @@
   (ExpressionStatements
     (Constructor
       (FunctionCall
-        (Other "reserved_identifier")
+        (Identifier)
         (Identifier)
         (NumberLiteral)
         (StringLiteral)))))

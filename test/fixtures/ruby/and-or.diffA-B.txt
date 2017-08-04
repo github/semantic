@@ -1,7 +1,8 @@
 (Program
   (Binary
     (Identifier)
-    { (Other "and") -> (Other "or") }
+  { (Other "and")
+  ->(Other "or") }
     (Identifier))
 {+(Binary
     (Binary
