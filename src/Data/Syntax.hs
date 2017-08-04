@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, MonoLocalBinds, TypeOperators #-}
 module Data.Syntax where
 
 import Algorithm
