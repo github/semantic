@@ -337,8 +337,8 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
   (Alt ls `Then` continueL) <|> r = Alt ((Left <$> ls) <> pure (Right r)) `Then` either continueL id
-  l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` id
-          | otherwise = wrap $ Alt (l :| [r])
+  l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = withFrozenCallStack $ Choose c (atEnd l <|> atEnd r) `Then` id
+          | otherwise = withFrozenCallStack $ wrap (Alt (l :| [r]))
     where choices :: Assignment ast grammar a -> Maybe (IntMap.IntMap (Assignment ast grammar a))
           choices (Choose choices _ `Then` continue) = Just (continue <$> choices)
           choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
