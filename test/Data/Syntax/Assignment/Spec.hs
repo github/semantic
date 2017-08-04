@@ -131,14 +131,14 @@ spec = do
         red
         (makeState [node Green 0 1 []])
         `shouldBe`
-          None (Error (Info.Pos 1 1) [Red] (Just Green))
+          None (Error (Info.Pos 1 1) [Red] Nothing)
 
     it "assignment returns unexpected end of input" $
       runAssignment headF "A"
         (symbol Green *> children (some red))
         (makeState [node Green 0 1 []])
         `shouldBe`
-          None (Error (Info.Pos 1 1) [Red])
+          None (Error (Info.Pos 1 1) [Red] Nothing)
 
   describe "catchError" $ do
     it "handler that always matches" $
@@ -193,7 +193,7 @@ spec = do
           ))
           (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
-            None (Error (Info.Pos 1 3) [Green])
+            None (Error (Info.Pos 1 3) [Green] Nothing)
 
       it "handler that doesn't match with apply" $
         fst <$> runAssignment headF "PG"
