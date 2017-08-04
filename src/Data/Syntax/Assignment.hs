@@ -312,10 +312,10 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
-  { stateOffset :: !Int       -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: !Info.Pos     -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateErrorCounter :: !Int -- ^ Monotonic counter tracking the number of error handlers invoked.
-  , stateNodes :: ![ast]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  { stateOffset :: {-# UNPACK #-} !Int       -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: {-# UNPACK #-} !Info.Pos     -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateErrorCounter :: {-# UNPACK #-} !Int -- ^ Monotonic counter tracking the number of error handlers invoked.
+  , stateNodes :: {-# UNPACK #-} ![ast]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
