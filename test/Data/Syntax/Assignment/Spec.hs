@@ -184,7 +184,7 @@ spec = do
           (symbol Palette *> children ( many (red `catchError` const blue) ))
           (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
-            None (Error (Info.Pos 1 2) [Blue] (Just Green))
+            None (Error (Info.Pos 1 2) [] (Just Green))
 
       it "handler that always matches with apply consumes and then errors" $
         runAssignment headF "PG"
