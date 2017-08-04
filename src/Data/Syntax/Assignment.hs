@@ -280,7 +280,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 anywhere node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
-                  Many rule -> fix (\ recur list state -> yield list state <> (go rule state >>= \ (a, state') -> if stateCounter state == stateCounter state' then yield (list <> [a]) state' else recur (list <> [a]) state')) [] state
+                  Many rule -> fix (\ recur list state -> (go rule state >>= \ (a, state') -> if stateCounter state == stateCounter state' then yield (list <> [a]) state' else recur (list <> [a]) state') <> yield list state) [] state
                   Alt as -> Some as >>= flip yield state
                   Throw e -> None e
                   Catch during handler -> let partial = go during state in (partial >>= uncurry yield) <> (partial `catchError` (flip go state { stateErrorCounter = succ (stateErrorCounter state) } . handler) >>= uncurry yield)
