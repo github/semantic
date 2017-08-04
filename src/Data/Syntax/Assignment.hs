@@ -251,7 +251,7 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Symbol grammar, Ix grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
+assignBy :: (Symbol grammar, Ix grammar, Eq ast, Recursive ast, Foldable (Base ast))
          => (forall x. Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
          -> Source.Source                          -- ^ The source for the parse tree.
          -> Assignment ast grammar a               -- ^ The 'Assignment to run.
@@ -261,7 +261,7 @@ assignBy toNode source assignment ast = fst <$> runAssignment toNode source assi
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
+runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq ast, Recursive ast, Foldable (Base ast))
               => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
