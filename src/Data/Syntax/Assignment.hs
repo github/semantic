@@ -280,7 +280,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 anywhere node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
-                  Many rule -> fix (\ recur list state -> (go rule state >>= \ (a, state') -> if stateCounter state == stateCounter state' then yield (list <> [a]) state' else recur (list <> [a]) state') <> yield list state) [] state
+                  Many rule -> fix (\ recur list state -> (go rule state >>= \ (a, state') -> if stateOffset state == stateOffset state' then yield (list <> [a]) state' else recur (list <> [a]) state') <> yield list state) [] state
                   Alt as -> Some as >>= flip yield state
                   Throw e -> None e
                   Catch during handler -> let partial = go during state >>= uncurry yield in partial <> partial `catchError` ((>>= uncurry yield) . flip go state { stateErrorCounter = succ (stateErrorCounter state) } . handler)
@@ -306,21 +306,20 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) (succ stateCounter) stateErrorCounter rest
+          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateErrorCounter rest
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
-  { stateOffset :: Int                  -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: Info.Pos                -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateCounter :: Int                 -- ^ Always incrementing counter that tracks how many nodes have been visited.
-  , stateErrorCounter :: Int            -- ^ Monotonic counter tracking the number of error handlers invoked.
-  , stateNodes :: [ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  { stateOffset :: Int       -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: Info.Pos     -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateErrorCounter :: Int -- ^ Monotonic counter tracking the number of error handlers invoked.
+  , stateNodes :: [ast]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
 makeState :: [ast] -> State ast grammar
-makeState = State 0 (Info.Pos 1 1) 0 0
+makeState = State 0 (Info.Pos 1 1) 0
 
 
 -- Instances
