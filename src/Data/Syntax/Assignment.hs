@@ -339,6 +339,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` id
           | otherwise = wrap (Alt (l :| [r]))
     where choices :: Assignment ast grammar a -> Maybe (IntMap.IntMap (Assignment ast grammar a))
+          choices (Location `Then` _) = Just IntMap.empty
           choices (Choose choices _ `Then` continue) = Just (continue <$> choices)
           choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
           choices (Catch during handler `Then` continue) = ((Catch during handler `Then` continue) <$) <$> choices during
@@ -346,6 +347,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
           choices (Return _) = Just IntMap.empty
           choices _ = Nothing
           atEnd :: Assignment ast grammar a -> Maybe (Assignment ast grammar a)
+          atEnd (Location `Then` continue) = Just (Location `Then` continue)
           atEnd (Choose _ atEnd `Then` continue) = continue <$> atEnd
           atEnd (Many rule `Then` continue) = Just (Many rule `Then` continue)
           atEnd (Throw err `Then` continue) = Just (Throw err `Then` continue)
