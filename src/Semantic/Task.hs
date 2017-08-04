@@ -36,7 +36,7 @@ import Data.Amb
 import Data.Blob
 import qualified Data.ByteString as B
 import Data.Foldable (fold, for_)
-import Data.Functor.Both as Both hiding (fst)
+import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
 import Data.List (minimumBy)
 import Data.Ord (comparing)
@@ -199,13 +199,13 @@ runParser Options{..} blob@Blob{..} = go
             res <- go parser
             case res of
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
-              Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
+              Right ast -> logTiming "assign" $ case Assignment.runAssignment by blobSource assignment (Assignment.makeState [ast]) of
                 None err -> do
                   writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
                   pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (fmap show err) []))
                 Some terms -> do
-                  let (errs, term) = minimumBy (comparing (length . fst)) ((\ term -> (errors term, term)) <$> terms)
-                  for_ errs $ \ err ->
+                  let (term, _) = minimumBy (comparing (Assignment.stateErrorCounter . snd)) terms
+                  for_ (errors term) $ \ err ->
                     writeLog Warning (Assignment.formatErrorWithOptions optionsPrintSource optionsEnableColour blob err) blobFields
                   pure $ Right term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
