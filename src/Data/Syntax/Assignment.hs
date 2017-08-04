@@ -296,7 +296,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
                 makeError node = maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
-        requireExhaustive :: (result, State ast grammar) -> Amb (Error grammar) (result, State ast grammar)
+        requireExhaustive :: HasCallStack => (result, State ast grammar) -> Amb (Error grammar) (result, State ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Some ((a, state) :| [])
           node : _ -> None (fromMaybe (nodeError [] (toNode (F.project node))) (stateError state))
