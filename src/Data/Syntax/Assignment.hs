@@ -283,7 +283,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Many rule -> fix (\ recur list state -> yield list state <> (go rule state >>= \ (a, state') -> if stateCounter state == stateCounter state' then yield (list <> [a]) state' else recur (list <> [a]) state')) [] state
                   Alt as -> Some as >>= flip yield state
                   Throw e -> None e
-                  Catch during handler -> let partial = go during state in (partial >>= uncurry yield) <> (partial `catchError` (flip go state . handler) >>= uncurry yield)
+                  Catch during handler -> let partial = go during state in (partial >>= uncurry yield) <> (partial `catchError` (flip go state { stateErrorCounter = succ (stateErrorCounter state) } . handler) >>= uncurry yield)
                   Choose{} -> None (makeError node)
                   Project{} -> None (makeError node)
                   Children{} -> None (makeError node)
@@ -306,7 +306,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) rest
+          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) stateErrorCounter rest
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -315,12 +315,13 @@ data State ast grammar = State
   , statePos :: Info.Pos                -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateError :: Maybe (Error grammar) -- ^ The most recently encountered error. Preserved for improved error messages in the presence of backtracking.
   , stateCounter :: Int                 -- ^ Always incrementing counter that tracks how many nodes have been visited.
+  , stateErrorCounter :: Int            -- ^ Monotonic counter tracking the number of error handlers invoked.
   , stateNodes :: [ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
 makeState :: [ast] -> State ast grammar
-makeState = State 0 (Info.Pos 1 1) Nothing 0
+makeState = State 0 (Info.Pos 1 1) Nothing 0 0
 
 
 -- Instances
