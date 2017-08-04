@@ -271,9 +271,9 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state <> anywhere (Just node)
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state) <> anywhere (Just node)
-                  Children child -> do
+                  Children child -> (do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
-                    yield a (advance state' { stateNodes = stateNodes state }) <> anywhere (Just node)
+                    yield a (advance state' { stateNodes = stateNodes state })) <> anywhere (Just node)
                   Choose choices _ | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state <> anywhere (Just node)
                   _ -> anywhere (Just node)
 
