@@ -40,7 +40,7 @@ instance Applicative (Amb l) where
 instance Monad (Amb l) where
   return = pure
   None a >>= _ = None a
-  Some as >>= f = foldr1 (<>) (f <$> as)
+  Some as >>= f = sconcat (f <$> as)
 
 instance MonadError l (Amb l) where
   throwError = None
