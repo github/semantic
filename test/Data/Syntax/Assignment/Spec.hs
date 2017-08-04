@@ -131,7 +131,7 @@ spec = do
         red
         (makeState [node Green 0 1 []])
         `shouldBe`
-          None (Error (Info.Pos 1 1) [Red] Nothing)
+          None (Error (Info.Pos 1 1) [Red] (Just Green))
 
     it "assignment returns unexpected end of input" $
       runAssignment headF "A"
