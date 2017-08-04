@@ -242,7 +242,7 @@ showPos :: Maybe FilePath -> Info.Pos -> ShowS
 showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast))
+assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
          => (forall x. Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
          -> Source.Source                          -- ^ The source for the parse tree.
          -> Assignment ast grammar a               -- ^ The 'Assignment to run.
@@ -251,7 +251,7 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (
 assignBy toNode source assignment = fmap fst . runAssignment toNode source assignment . makeState . pure
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Recursive ast, Foldable (Base ast))
+runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
               => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
@@ -281,7 +281,7 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                 anywhere node = case assignment of
                   Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
-                  Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if ((==) `on` stateOffset) state state' then pure ([], state') else recur state') <> pure ([], state)) state >>= uncurry yield
+                  Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') <> pure ([], state)) state >>= uncurry yield
                   Alt as -> Some as >>= flip yield state
                   Throw e -> None e
                   Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ (stateErrorCounter state) } . handler) >>= uncurry yield
