@@ -14,6 +14,9 @@ data Amb l r
   | Some (NonEmpty r) -- ^ One or more results.
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
+-- | Disambiguate an 'Amb' by case analysis.
+--
+--   If the value is @'None' l@, apply the first function to @l@; if it is @'Some' rs@, apply the second function to @rs@.
 disamb :: (l -> a) -> (NonEmpty r -> a) -> Amb l r -> a
 disamb f _ (None l) = f l
 disamb _ g (Some r) = g r
