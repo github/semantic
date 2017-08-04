@@ -284,7 +284,7 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                   Many rule -> fix (\ recur list state -> (go rule state >>= \ (a, state') -> (if stateOffset state == stateOffset state' then yield else recur) (list <> [a]) state') <> yield list state) [] state
                   Alt as -> Some as >>= flip yield state
                   Throw e -> None e
-                  Catch during handler -> let partial = go during state >>= uncurry yield in partial <> partial `catchError` ((>>= uncurry yield) . flip go state { stateErrorCounter = succ (stateErrorCounter state) } . handler)
+                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ (stateErrorCounter state) } . handler) >>= uncurry yield
                   Choose{} -> None (makeError node)
                   Project{} -> None (makeError node)
                   Children{} -> None (makeError node)
