@@ -136,13 +136,13 @@ data AssignmentF ast grammar a where
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
 location :: HasCallStack => Assignment ast grammar (Record Location)
-location = Location `Then` return
+location = withFrozenCallStack $ Location `Then` return
 
 -- | Zero-width projection of the current node.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (project f *> b)@ is fine, but @many (project f)@ is not.
 project :: HasCallStack => (forall x. Base ast x -> a) -> Assignment ast grammar a
-project projection = Project projection `Then` return
+project projection = withFrozenCallStack $ Project projection `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
