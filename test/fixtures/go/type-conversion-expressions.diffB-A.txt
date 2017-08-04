@@ -6,17 +6,18 @@
     (Args)
     (TypeConversion
       (SliceTy
-      { (QualifiedIdentifier)
-      ->(QualifiedIdentifier) })
+      { (QualifiedType)
+      ->(QualifiedType) })
       (SubscriptAccess
       { (Identifier)
       ->(Identifier) }
       { (Identifier)
       ->(Identifier) }))
     (TypeConversion
-      (SliceTy
-      { (QualifiedIdentifier)
-      ->(QualifiedIdentifier) })
+      (ParenthesizedType
+        (SliceTy
+        { (QualifiedType)
+        ->(QualifiedType) }))
       (SubscriptAccess
       { (Identifier)
       ->(Identifier) }
@@ -31,10 +32,11 @@
     { (Identifier)
     ->(Identifier) })
     (FunctionCall
-      (SubscriptAccess
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })
+      (ParenthesizedExpression
+        (SubscriptAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) }))
     { (Identifier)
     ->(Identifier) })))

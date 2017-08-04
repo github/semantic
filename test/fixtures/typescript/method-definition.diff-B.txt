@@ -5,7 +5,6 @@
       (Method
         (Other "accessibility_modifier")
         (Other "readonly")
-        (Other "reserved_identifier")
         (Identifier)
         (Params)
         (Ty

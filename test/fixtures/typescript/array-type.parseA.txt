@@ -4,5 +4,4 @@
       (Identifier)
       (Ty
         (Other "array_type"
-          (Other "type_reference"
-            (Identifier)))))))
+          (Identifier))))))

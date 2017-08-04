@@ -17,6 +17,7 @@ data Language
     = Go
     | JavaScript
     | JSON
+    | JSX
     | Markdown
     | Python
     | Ruby
@@ -33,6 +34,7 @@ languageForType mediaType = case mediaType of
     ".js" -> Just TypeScript
     ".ts" -> Just TypeScript
     ".tsx" -> Just TypeScript
+    ".jsx" -> Just JSX
     ".py" -> Just Python
     _ -> Nothing
 

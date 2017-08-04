@@ -6,7 +6,6 @@
       (Other "required_parameter"
         (Identifier)))
     (Ty
-      (Other "type_reference"
-        (Identifier)))
+      (Identifier))
     (ExpressionStatements
       (Identifier))))-}

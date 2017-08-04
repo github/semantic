@@ -21,6 +21,7 @@ import Options.Applicative hiding (action)
 import Renderer
 import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
+import qualified Semantic.Log as Log
 import System.IO (Handle, stdin, stdout)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 import Text.Read
@@ -37,19 +38,23 @@ runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRendere
 -- | A parser for the application's command-line arguments.
 --
 --   Returns a 'Task' to read the input, run the requested operation, and write the output to the specified output path or stdout.
-arguments :: ParserInfo (Task.Options, Task.Task ())
+arguments :: ParserInfo (Log.Options, Task.Task ())
 arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsParser)) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
-    optionsParser = Task.Options
-      <$> options [("yes", Just True), ("no", Just False), ("auto", Nothing)]
-            (long "colour" <> long "color" <> value Nothing <> help "Enable, disable, or decide automatically iff stderr is a terminal device, whether to use colour.")
-      <*> options [("error", Just Task.Error), ("warning", Just Task.Warning), ("info", Just Task.Info), ("debug", Just Task.Debug), ("none", Nothing)]
-            (long "log-level" <> value (Just Task.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
-      <*> switch (long "print-source" <> help "Include source references in logged errors where applicable.")
+    optionsParser = Log.Options
+      <$> (not <$> switch (long "disable-colour" <> long "disable-color" <> help "Disable ANSI colors in log messages even if the terminal is a TTY."))
+      <*> options [("error", Just Log.Error), ("warning", Just Log.Warning), ("info", Just Log.Info), ("debug", Just Log.Debug), ("none", Nothing)]
+            (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
+      <*> optional (strOption (long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id"))
+      -- The rest of the logging options are set automatically at runtime.
+      <*> pure False -- IsTerminal
+      <*> pure False -- PrintSource
+      <*> pure Log.logfmtFormatter -- Formatter
+      <*> pure 0 -- ProcessID
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
