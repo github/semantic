@@ -96,6 +96,7 @@ import Control.Monad (guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.Amb
+import Data.Array
 import Data.Blob
 import Data.ByteString (isSuffixOf)
 import Data.ByteString.Char8 (ByteString, pack, unpack)
@@ -103,7 +104,6 @@ import Data.Foldable
 import Data.Function
 import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
-import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
 import Data.List.NonEmpty ((<|), NonEmpty(..), nonEmpty)
 import Data.Maybe
@@ -127,7 +127,7 @@ data AssignmentF ast grammar a where
   Project :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
-  Choose :: HasCallStack => IntMap.IntMap a -> Maybe a -> AssignmentF ast grammar a
+  Choose :: HasCallStack => Array grammar (Maybe a) -> Maybe a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
@@ -148,8 +148,8 @@ project projection = withFrozenCallStack $ Project projection `Then` return
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (symbol A *> b)@ is fine, but @many (symbol A)@ is not.
-symbol :: (Enum grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = withFrozenCallStack $ Choose (IntMap.singleton (fromEnum s) ()) Nothing `Then` (const location)
+symbol :: (Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+symbol s = withFrozenCallStack $ Choose (array (s, s) [(s, Just ())]) Nothing `Then` (const location)
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
@@ -243,14 +243,14 @@ showPos :: Maybe FilePath -> Info.Pos -> ShowS
 showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
 
 
-firstSet :: Enum grammar => Assignment ast grammar a -> [grammar]
+firstSet :: Ix grammar => Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ assignment _ -> case assignment of
-  Choose choices _ -> toEnum <$> IntMap.keys choices
+  Choose choices _ -> catMaybes (uncurry (<$) <$> assocs choices)
   _ -> []) . ([] <$)
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
+assignBy :: (Symbol grammar, Ix grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
          => (forall x. Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
          -> Source.Source                          -- ^ The source for the parse tree.
          -> Assignment ast grammar a               -- ^ The 'Assignment to run.
@@ -260,7 +260,7 @@ assignBy toNode source assignment ast = fst <$> runAssignment toNode source assi
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
+runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
               => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
@@ -284,7 +284,7 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
-                  Choose choices _ | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
+                  Choose choices _ | symbol <- nodeSymbol (toNode node), inRange (bounds choices) symbol, Just choice <- choices ! symbol -> yield choice state
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
@@ -332,9 +332,9 @@ makeState = State 0 (Info.Pos 1 1) 0
 
 -- Instances
 
-instance Enum grammar => Alternative (Assignment ast grammar) where
+instance (Bounded grammar, Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Choose mempty Nothing `Then` return
+  empty = Choose (listArray (maxBound, maxBound) [Nothing]) Nothing `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
@@ -344,16 +344,18 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
   l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
-  l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` id
+  l <|> r | Just cl <- choices l, Just cr <- choices r = Choose (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) (atEnd l <|> atEnd r) `Then` id
           | otherwise = wrap (Alt (l :| [r]))
-    where choices :: Assignment ast grammar a -> Maybe (IntMap.IntMap (Assignment ast grammar a))
-          choices (Location `Then` _) = Just IntMap.empty
-          choices (Choose choices _ `Then` continue) = Just (continue <$> choices)
-          choices (Many rule `Then` continue) = ((Many rule `Then` continue) <$) <$> choices rule
-          choices (Catch during handler `Then` continue) = ((Catch during handler `Then` continue) <$) <$> choices during
-          choices (Throw _ `Then` _) = Just IntMap.empty
-          choices (Return _) = Just IntMap.empty
+    where choices :: Assignment ast grammar a -> Maybe (Array grammar (Maybe (Assignment ast grammar a)))
+          choices (Location `Then` _) = Just empty
+          choices (Choose choices _ `Then` continue) = Just (fmap continue <$> choices)
+          choices (Many rule `Then` continue) = fmap ((Many rule `Then` continue) <$) <$> choices rule
+          choices (Catch during handler `Then` continue) = fmap ((Catch during handler `Then` continue) <$) <$> choices during
+          choices (Throw _ `Then` _) = Just empty
+          choices (Return _) = Just empty
           choices _ = Nothing
+          empty = listArray (maxBound, maxBound) [Nothing]
+          unionBounds a b = (min (uncurry min (bounds a)) (uncurry min (bounds b)), max (uncurry max (bounds a)) (uncurry max (bounds b)))
           atEnd :: Assignment ast grammar a -> Maybe (Assignment ast grammar a)
           atEnd (Location `Then` continue) = Just (Location `Then` continue)
           atEnd (Choose _ atEnd `Then` continue) = continue <$> atEnd
@@ -364,13 +366,13 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance Show grammar => Show1 (AssignmentF ast grammar) where
+instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
     Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose choices atEnd -> showsBinaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) (liftShowsPrec sp sl) "Choose" d (IntMap.toList choices) atEnd
+    Choose choices atEnd -> showsBinaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) (liftShowsPrec sp sl) "Choose" d (catMaybes (uncurry (fmap . (,)) <$> assocs choices)) atEnd
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
