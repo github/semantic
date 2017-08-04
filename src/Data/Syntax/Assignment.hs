@@ -248,7 +248,8 @@ assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Eq ast, Recursive ast, Fo
          -> Assignment ast grammar a               -- ^ The 'Assignment to run.
          -> ast                                    -- ^ The root of the ast.
          -> Either (Error grammar) a               -- ^ 'Either' an 'Error' or an assigned value.
-assignBy toNode source assignment = fmap fst . runAssignment toNode source assignment . makeState . pure
+assignBy toNode source assignment ast = fst <$> runAssignment toNode source assignment (makeState [ast])
+{-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Enum grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
