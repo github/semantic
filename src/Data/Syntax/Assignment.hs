@@ -300,8 +300,7 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                   Source -> None (makeError node)
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
-                expectedSymbols | Choose choices _ <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
-                                | otherwise = []
+                expectedSymbols = firstSet (assignment `Then` return)
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
                 makeError node = maybe (Error statePos expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
