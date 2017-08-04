@@ -11,6 +11,11 @@ data Amb l r
   | Some (NonEmpty r)
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
+disamb :: (l -> a) -> (NonEmpty r -> a) -> Amb l r -> a
+disamb f _ (None l) = f l
+disamb _ g (Some r) = g r
+
+
 instance Bifunctor Amb where
   bimap f _ (None l) = None (f l)
   bimap _ g (Some r) = Some (fmap g r)
