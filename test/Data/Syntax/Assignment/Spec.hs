@@ -210,7 +210,7 @@ spec = do
         (symbol Palette *> children ( many (green <|> pure (Out "always")) ))
         (makeState [node Palette 0 1 [node Green 1 2 [], node Green 2 3 []]])
         `shouldBe`
-          Some ([Out "G", Out "G", Out "always"] :| [])
+          Some ([Out "G", Out "G", Out "always"] :| [[Out "G", Out "G"]])
 
   describe "source" $ do
     it "produces the node’s source" $
