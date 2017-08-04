@@ -347,7 +347,6 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
           atEnd :: Assignment ast grammar a -> Maybe (Assignment ast grammar a)
           atEnd (Choose _ atEnd `Then` continue) = continue <$> atEnd
           atEnd (Many rule `Then` continue) = Just (Many rule `Then` continue)
-          atEnd (Catch during handler `Then` continue) = Just (Catch during handler `Then` continue)
           atEnd (Throw err `Then` continue) = Just (Throw err `Then` continue)
           atEnd (Return a) = Just (Return a)
           atEnd _ = Nothing
