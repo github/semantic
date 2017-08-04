@@ -138,7 +138,7 @@ spec = do
         (symbol Green *> children (some red))
         (makeState [node Green 0 1 []])
         `shouldBe`
-          None (Error (Info.Pos 1 1) [Red] Nothing)
+          None (Error (Info.Pos 1 1) [Red])
 
   describe "catchError" $ do
     it "handler that always matches" $
@@ -193,7 +193,7 @@ spec = do
           ))
           (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
-            None (Error (Info.Pos 1 3) [Green] Nothing)
+            None (Error (Info.Pos 1 3) [Green])
 
       it "handler that doesn't match with apply" $
         fst <$> runAssignment headF "PG"
@@ -219,13 +219,13 @@ spec = do
     it "advances past the current node" $
       snd <$> runAssignment headF "hi" source (makeState [ node Red 0 2 [] ])
       `shouldBe`
-        Some ((State 2 (Info.Pos 1 3) Nothing 1 0 []) :| [])
+        Some ((State 2 (Info.Pos 1 3) 1 0 []) :| [])
 
   describe "children" $ do
     it "advances past the current node" $
       snd <$> runAssignment headF "a" (children (pure (Out ""))) (makeState [node Red 0 1 []])
       `shouldBe`
-        Some (State 1 (Info.Pos 1 2) Nothing 1 0 [] :| [])
+        Some (State 1 (Info.Pos 1 2) 1 0 [] :| [])
 
     it "matches if its subrule matches" $
       () <$ runAssignment headF "a" (children red) (makeState [node Blue 0 1 [node Red 0 1 []]])

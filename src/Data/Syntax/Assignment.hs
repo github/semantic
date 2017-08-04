@@ -299,21 +299,20 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
         requireExhaustive :: HasCallStack => (result, State ast grammar) -> Amb (Error grammar) (result, State ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
           [] -> Some ((a, state) :| [])
-          node : _ -> None (fromMaybe (nodeError [] (toNode (F.project node))) (stateError state))
+          node : _ -> None (nodeError [] (toNode (F.project node)))
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateError (succ stateCounter) stateErrorCounter rest
+          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) (succ stateCounter) stateErrorCounter rest
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
   { stateOffset :: Int                  -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: Info.Pos                -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateError :: Maybe (Error grammar) -- ^ The most recently encountered error. Preserved for improved error messages in the presence of backtracking.
   , stateCounter :: Int                 -- ^ Always incrementing counter that tracks how many nodes have been visited.
   , stateErrorCounter :: Int            -- ^ Monotonic counter tracking the number of error handlers invoked.
   , stateNodes :: [ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
@@ -321,7 +320,7 @@ data State ast grammar = State
   deriving (Eq, Show)
 
 makeState :: [ast] -> State ast grammar
-makeState = State 0 (Info.Pos 1 1) Nothing 0 0
+makeState = State 0 (Info.Pos 1 1) 0 0
 
 
 -- Instances
