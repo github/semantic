@@ -268,34 +268,34 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
             -> (x -> State ast grammar -> Amb (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Amb (Error grammar) (result, State ast grammar)
-        run assignment yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe (stateNodes state))
+        run assignment yield initialState = maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
                   Project projection -> yield (projection node) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
-                    yield a (advance state' { stateNodes = stateNodes state })
+                    yield a (advance state' { stateNodes = stateNodes })
                   Choose choices _ | Just choice <- IntMap.lookup (fromEnum (nodeSymbol (toNode node))) choices -> yield choice state
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
-                  Location -> yield (Info.Range (stateOffset state) (stateOffset state) :. Info.Span (statePos state) (statePos state) :. Nil) state
+                  Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Choose _ (Just atEnd) -> yield atEnd state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') <> pure ([], state)) state >>= uncurry yield
                   Alt as -> Some as >>= flip yield state
                   Throw e -> None e
-                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ (stateErrorCounter state) } . handler) >>= uncurry yield
+                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler) >>= uncurry yield
                   Choose{} -> None (makeError node)
                   Project{} -> None (makeError node)
                   Children{} -> None (makeError node)
                   Source -> None (makeError node)
 
-                state = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
+                state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols | Choose choices _ <- assignment = (toEnum :: Int -> grammar) <$> IntMap.keys choices
                                 | otherwise = []
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
-                makeError node = maybe (Error (statePos state) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
+                makeError node = maybe (Error statePos expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
         requireExhaustive :: HasCallStack => (result, State ast grammar) -> Amb (Error grammar) (result, State ast grammar)
         requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
