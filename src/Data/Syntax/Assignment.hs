@@ -104,7 +104,7 @@ import Data.Functor.Classes
 import Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (inRange)
-import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
+import Data.List.NonEmpty ((<|), NonEmpty(..), nonEmpty)
 import Data.Maybe
 import Data.Ord (comparing)
 import Data.Record
@@ -336,6 +336,7 @@ instance Enum grammar => Alternative (Assignment ast grammar) where
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
+  l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
   l <|> r | Just c <- (liftA2 (IntMap.unionWith (<|>)) `on` choices) l r = Choose c (atEnd l <|> atEnd r) `Then` id
           | otherwise = wrap (Alt (l :| [r]))
     where choices :: Assignment ast grammar a -> Maybe (IntMap.IntMap (Assignment ast grammar a))
