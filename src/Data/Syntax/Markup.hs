@@ -110,3 +110,9 @@ data LineBreak a = LineBreak
 
 instance Eq1 LineBreak where liftEq = genericLiftEq
 instance Show1 LineBreak where liftShowsPrec = genericLiftShowsPrec
+
+newtype Strikethrough a = Strikethrough [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Strikethrough where liftEq = genericLiftEq
+instance Show1 Strikethrough where liftShowsPrec = genericLiftShowsPrec

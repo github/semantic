@@ -41,6 +41,7 @@ type Syntax =
    , Markup.Link
    , Markup.Strong
    , Markup.Text
+   , Markup.Strikethrough
    -- Assignment errors; cmark does not provide parse errors.
    , Syntax.Error
    , []
@@ -94,13 +95,16 @@ htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = strong <|> emphasis <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
+inlineElement = strong <|> emphasis <|> strikethrough <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
 
 strong :: Assignment
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
 
 emphasis :: Assignment
 emphasis = makeTerm <$> symbol Emphasis <*> children (Markup.Emphasis <$> many inlineElement)
+
+strikethrough :: Assignment
+strikethrough = makeTerm <$> symbol Strikethrough <*> children (Markup.Strikethrough <$> many inlineElement)
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Markup.Text <$> source)
