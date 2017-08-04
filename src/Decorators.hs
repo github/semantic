@@ -49,11 +49,11 @@ instance ConstructorName (Union '[]) where
 instance ConstructorName f => ConstructorName (M1 D c f) where
   constructorName = constructorName . unM1
 
+instance (ConstructorName f, ConstructorName g) => ConstructorName (f :+: g) where
+  constructorName (L1 l) = constructorName l
+  constructorName (R1 r) = constructorName r
+
 instance Constructor c => ConstructorName (M1 C c f) where
   constructorName x = case conName x of
                         ":" -> ""
                         n -> n
-
-instance (ConstructorName f, ConstructorName g) => ConstructorName (f :+: g) where
-  constructorName (L1 l) = constructorName l
-  constructorName (R1 r) = constructorName r
