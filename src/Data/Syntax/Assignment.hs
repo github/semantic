@@ -283,7 +283,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Many rule -> fix (\ recur list state -> yield list state <> (go rule state >>= \ (a, state') -> if stateCounter state == stateCounter state' then yield (list <> [a]) state' else recur (list <> [a]) state')) [] state
                   Alt as -> Some as >>= flip yield state
                   Throw e -> None e
-                  Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
+                  Catch during handler -> (go during state >>= uncurry yield) <> (go during state `catchError` (flip go state . handler) >>= uncurry yield)
                   Choose{} -> None (makeError node)
                   Project{} -> None (makeError node)
                   Children{} -> None (makeError node)
