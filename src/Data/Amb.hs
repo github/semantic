@@ -6,9 +6,12 @@ import Data.Bifunctor
 import Data.List.NonEmpty
 import Data.Semigroup
 
+-- | The ambiguity monad, the result of nondeterministic choice.
+--
+--   Values are either the empty set (with an error value indicating why), or a 'NonEmpty' list of ambiguous results.
 data Amb l r
-  = None l
-  | Some (NonEmpty r)
+  = None l            -- ^ No results; an error.
+  | Some (NonEmpty r) -- ^ One or more results.
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 disamb :: (l -> a) -> (NonEmpty r -> a) -> Amb l r -> a
