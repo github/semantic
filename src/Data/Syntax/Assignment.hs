@@ -263,7 +263,7 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: forall x result. AssignmentF ast grammar x
+        run :: AssignmentF ast grammar x
             -> (x -> State ast grammar -> Amb (Error grammar) (result, State ast grammar))
             -> State ast grammar
             -> Amb (Error grammar) (result, State ast grammar)
