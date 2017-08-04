@@ -186,14 +186,14 @@ spec = do
           `shouldBe`
             None (Error (Info.Pos 1 2) [] (Just Green))
 
-      it "handler that always matches with apply consumes and then errors" $
-        runAssignment headF "PG"
+      it "handlers defer to later rules" $
+        fst <$> runAssignment headF "PG"
           (symbol Palette *> children (
             (,) <$> many (red `catchError` (\ _ -> OutError <$ location <*> source)) <*> green
           ))
           (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
-            None (Error (Info.Pos 1 3) [Green] Nothing)
+            Some (([], Out "G") :| [])
 
       it "handler that doesn't match with apply" $
         fst <$> runAssignment headF "PG"
