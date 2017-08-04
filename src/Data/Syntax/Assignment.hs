@@ -80,6 +80,7 @@ module Data.Syntax.Assignment
 , Error(..)
 , errorCallStack
 , formatErrorWithOptions
+, firstSet
 -- Running
 , assignBy
 , runAssignment
@@ -240,6 +241,13 @@ showSymbols (h:t) = shows h . showString ", " . showSymbols t
 
 showPos :: Maybe FilePath -> Info.Pos -> ShowS
 showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
+
+
+firstSet :: Enum grammar => Assignment ast grammar a -> [grammar]
+firstSet = iterFreer (\ assignment _ -> case assignment of
+  Choose choices _ -> toEnum <$> IntMap.keys choices
+  _ -> []) . ([] <$)
+
 
 -- | Run an assignment over an AST exhaustively.
 assignBy :: (Symbol grammar, Enum grammar, Eq grammar, Eq ast, Recursive ast, Foldable (Base ast))
