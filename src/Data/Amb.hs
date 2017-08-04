@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE MultiParamTypeClasses, NoStrictData #-}
 module Data.Amb where
 
 import Control.Monad.Error.Class
