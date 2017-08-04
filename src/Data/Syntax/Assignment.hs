@@ -174,9 +174,9 @@ type Location = '[Info.Range, Info.Span]
 type AST grammar = Cofree [] (Node grammar)
 
 data Node grammar = Node
-  { nodeSymbol :: !grammar
-  , nodeByteRange :: !Info.Range
-  , nodeSpan :: !Info.Span
+  { nodeSymbol :: {-# UNPACK #-} !grammar
+  , nodeByteRange :: {-# UNPACK #-} !Info.Range
+  , nodeSpan :: {-# UNPACK #-} !Info.Span
   }
   deriving (Eq, Show)
 
