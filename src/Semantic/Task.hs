@@ -35,10 +35,11 @@ import Control.Monad.Free.Freer
 import Data.Amb
 import Data.Blob
 import qualified Data.ByteString as B
-import Data.Foldable (fold, for_)
+import Data.Foldable (find, fold, for_)
 import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
 import Data.List (minimumBy)
+import Data.Maybe (fromMaybe)
 import Data.Ord (comparing)
 import Data.Record
 import Data.Semigroup ((<>))
@@ -204,7 +205,7 @@ runParser Options{..} blob@Blob{..} = go
                   writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
                   pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (fmap show err) []))
                 Some terms -> do
-                  let (term, _) = minimumBy (comparing (Assignment.stateErrorCounter . snd)) terms
+                  let (term, _) = fromMaybe (minimumBy (comparing (Assignment.stateErrorCounter . snd)) terms) (find ((== 0) . Assignment.stateErrorCounter . snd) terms)
                   for_ (errors term) $ \ err ->
                     writeLog Warning (Assignment.formatErrorWithOptions optionsPrintSource optionsEnableColour blob err) blobFields
                   pure $ Right term
