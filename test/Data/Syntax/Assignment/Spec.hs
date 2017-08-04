@@ -160,7 +160,7 @@ spec = do
         (red `catchError` const blue)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          None (Error (Info.Pos 1 1) [Blue] (Just Green))
+          None (Error (Info.Pos 1 1) [Red] (Just Green))
 
     describe "in many" $ do
       it "handler that always matches" $
