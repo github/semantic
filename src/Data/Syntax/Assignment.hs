@@ -367,6 +367,17 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
+instance Ix grammar => Parsing (Assignment ast grammar) where
+  try = id
+
+  (<?>) = const
+
+  unexpected = const empty
+
+  eof = pure ()
+
+  notFollowedBy = const (pure ())
+
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
   throwError error = withFrozenCallStack $ Throw (Just error) `Then` return
