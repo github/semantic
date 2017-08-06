@@ -316,6 +316,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   many a = Many a `Then` return
 
 instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
+  try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
