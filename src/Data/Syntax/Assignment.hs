@@ -392,6 +392,7 @@ instance MonadError (Error grammar) (Assignment ast grammar) where
 
 instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
+    End -> showString "End" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
     Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
@@ -401,4 +402,3 @@ instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
-    End -> showString "End" . showChar ' ' . sp d ()
