@@ -194,7 +194,7 @@ nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 
-data Error grammar = HasCallStack => Error { errorPos :: Info.Pos, errorExpected :: [grammar], errorActual :: Maybe grammar }
+data Error grammar = HasCallStack => Error { errorSpan :: Info.Span, errorExpected :: [grammar], errorActual :: Maybe grammar }
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Foldable Error
@@ -206,26 +206,26 @@ errorCallStack :: Error grammar -> CallStack
 errorCallStack Error{} = callStack
 
 nodeError :: HasCallStack => [grammar] -> Node grammar -> Error grammar
-nodeError expected (Node actual _ (Info.Span spanStart _)) = Error spanStart expected (Just actual)
+nodeError expected (Node actual _ span) = Error span expected (Just actual)
 
 
 type IncludeSource = Bool
 type Colourize = Bool
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
-formatError :: IncludeSource -> Colourize -> Blob -> Info.Pos -> [String] -> Maybe String -> String
-formatError includeSource colourize Blob{..} errorPos errorExpected errorActual
+formatError :: IncludeSource -> Colourize -> Blob -> Info.Span -> [String] -> Maybe String -> String
+formatError includeSource colourize Blob{..} errorSpan errorExpected errorActual
   = ($ "")
-  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
+  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (maybe Nothing (const (Just blobPath)) blobKind) errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
   . (if includeSource
     then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
-       . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
+       . showString (replicate (succ (Info.posColumn (Info.spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else id)
   . showString (prettyCallStack callStack) . showChar '\n'
-  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (pack (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine errorPos - 2, Info.posLine errorPos) i ])
+  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (pack (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine (Info.spanStart errorSpan) - 2, Info.posLine (Info.spanStart errorSpan)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine errorPos) :: Double)))
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine (Info.spanStart errorSpan)) :: Double)))
 
 withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
 withSGRCode useColour code content =
@@ -248,8 +248,9 @@ showSymbols [a, b] = showString a . showString " or " . showString b
 showSymbols [a, b, c] = showString a . showString ", " . showString b . showString ", or " . showString c
 showSymbols (h:t) = showString h . showString ", " . showSymbols t
 
-showPos :: Maybe FilePath -> Info.Pos -> ShowS
-showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
+showSpan :: Maybe FilePath -> Info.Span -> ShowS
+showSpan path Info.Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
+  where showPos Info.Pos{..} = shows posLine . showChar ':' . shows posColumn
 
 
 firstSet :: Ix grammar => Assignment ast grammar a -> [grammar]
@@ -314,7 +315,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
                 makeError :: HasCallStack => Maybe (F.Base ast ast) -> Error grammar
-                makeError node = maybe (Error statePos expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
+                makeError node = maybe (Error (Info.Span statePos statePos) expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
         requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error grammar, State ast) (result, State ast)
         requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
