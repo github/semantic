@@ -251,7 +251,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Project{} -> Left (makeError node, state)
                   Children{} -> Left (makeError node, state)
                   Source -> Left (makeError node, state)
-                  Label child _ -> go child state >>= uncurry yield
+                  Label child label -> go child state `catchError` (throwError . first (\ err -> err { errorExpected = [Left label] })) >>= uncurry yield
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
