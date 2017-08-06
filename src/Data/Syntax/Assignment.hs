@@ -354,12 +354,12 @@ instance (Bounded grammar, Ix grammar) => Alternative (Assignment ast grammar) w
     where choices :: Assignment ast grammar a -> Maybe ([grammar], Array grammar (Maybe (Assignment ast grammar a)))
           choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
           choices (Many rule `Then` continue) = second (fmap ((Many rule `Then` continue) <$)) <$> choices rule
-          choices (Catch during handler `Then` continue) = second (fmap (fmap (>>= continue))) <$> choices during
+          choices (Catch during _ `Then` continue) = second (fmap (fmap (>>= continue))) <$> choices during
           choices _ = Nothing
           unionBounds a b = (min (uncurry min (bounds a)) (uncurry min (bounds b)), max (uncurry max (bounds a)) (uncurry max (bounds b)))
           rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
-          rewrapFor (Many rule `Then` continue) = Just (<|> continue [])
-          rewrapFor (Catch during handler `Then` continue) = Just (`catchError` (continue <=< handler))
+          rewrapFor (Many _ `Then` continue) = Just (<|> continue [])
+          rewrapFor (Catch _ handler `Then` continue) = Just (`catchError` (continue <=< handler))
           rewrapFor _ = Nothing
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
