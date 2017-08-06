@@ -104,6 +104,7 @@ library
                      , mtl
                      , optparse-applicative
                      , parallel
+                     , parsers
                      , recursion-schemes
                      , semigroups
                      , split
