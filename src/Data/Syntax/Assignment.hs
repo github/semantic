@@ -321,7 +321,8 @@ instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
   a <?> s = withFrozenCallStack $ Label a s `Then` return
 
-  unexpected = const empty
+  unexpected :: HasCallStack => String -> Assignment ast grammar a
+  unexpected s = location >>= \ loc -> throwError (Error (Info.sourceSpan loc) [] (Just (Left s)))
 
   eof :: HasCallStack => Assignment ast grammar ()
   eof = withFrozenCallStack $ End `Then` return
