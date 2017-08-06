@@ -102,6 +102,7 @@ import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (isSuffixOf)
 import Data.ByteString.Char8 (ByteString, pack, unpack)
+import Data.Error
 import Data.Foldable
 import Data.Function
 import Data.Functor.Classes
@@ -192,18 +193,6 @@ data Node grammar = Node
 
 nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
-
-
-data Error grammar = HasCallStack => Error { errorSpan :: Info.Span, errorExpected :: [grammar], errorActual :: Maybe grammar }
-
-deriving instance Eq grammar => Eq (Error grammar)
-deriving instance Foldable Error
-deriving instance Functor Error
-deriving instance Show grammar => Show (Error grammar)
-deriving instance Traversable Error
-
-errorCallStack :: Error grammar -> CallStack
-errorCallStack Error{} = callStack
 
 nodeError :: HasCallStack => [grammar] -> Node grammar -> Error grammar
 nodeError expected (Node actual _ span) = Error span expected (Just actual)
