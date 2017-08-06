@@ -288,10 +288,7 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
                   Choose _ choices _ | symbol <- nodeSymbol (toNode node), inRange (bounds choices) symbol, Just choice <- choices ! symbol -> yield choice state
-                  Catch during handler -> go during state `catchError` (\ (err, state') -> if state == state' then
-                      go (handler err) state { stateErrorCounter = succ stateErrorCounter }
-                    else
-                      None (err, state')) >>= uncurry yield
+                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler . fst) >>= uncurry yield
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
