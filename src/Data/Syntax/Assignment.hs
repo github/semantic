@@ -171,10 +171,7 @@ while predicate step = many $ do
 
 -- | Collect a list of values failing a predicate.
 until :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
-until predicate step = many $ do
-  result <- step
-  guard (not (predicate result))
-  pure result
+until = while . (not .)
 
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
