@@ -293,7 +293,9 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Choose _ _ (Just atEnd) -> yield atEnd state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') <> pure ([], state)) state >>= uncurry yield
-                  Alt as -> Some as >>= flip yield state
+                  Alt as -> foldr (\ each next -> case yield each state of
+                    None (err, state') -> if state == state' then next else None (err, state')
+                    Some as -> Some as) (None (makeError node, state)) as
                   Throw e -> None (e, state)
                   Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler . fst) >>= uncurry yield
                   Choose{} -> None (makeError node, state)
