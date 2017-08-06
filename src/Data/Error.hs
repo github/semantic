@@ -56,8 +56,8 @@ withSGRCode useColour code content =
 
 showExpectation :: Colourize -> [String] -> Maybe String -> ShowS
 showExpectation colourize = go
-  where go [] Nothing = showString "no rule to match at " . showActual "end of input nodes"
-        go expected Nothing = showString "expected " . showSymbols colourize expected . showString " at " . showActual "end of input nodes"
+  where go [] Nothing = showString "no rule to match at " . showActual "end of branch"
+        go expected Nothing = showString "expected " . showSymbols colourize expected . showString " at " . showActual "end of branch"
         go expected (Just actual) = showString "expected " . showSymbols colourize expected . showString ", but got " . showActual actual
         showActual = withSGRCode colourize [SetColor Foreground Vivid Green] . showString
 
