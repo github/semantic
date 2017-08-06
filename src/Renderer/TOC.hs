@@ -26,7 +26,7 @@ import Data.Align (crosswalk)
 import Data.Bifunctor (bimap, first)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
-import Data.Error as Error (Error(..), formatError)
+import Data.Error as Error (formatError)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
@@ -125,7 +125,7 @@ declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syn
 declarationAlgebra blob@Blob{..} (a :< r)
   | Just (Declaration.Function (identifier, _) _ _) <- prj r = Just $ FunctionDeclaration (getSource (extract identifier))
   | Just (Declaration.Method _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
-  | Just (Syntax.Error errorExpected errorActual _) <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Error.Error (sourceSpan a) errorExpected errorActual))) blobLanguage
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange
 
@@ -135,7 +135,7 @@ markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fiel
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 markupSectionAlgebra blob@Blob{..} (a :< r)
   | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just (Syntax.Error errorExpected errorActual _) <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Error.Error (sourceSpan a) errorExpected errorActual))) blobLanguage
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
         firstLine = T.takeWhile (/= '\n')

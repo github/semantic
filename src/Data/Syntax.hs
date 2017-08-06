@@ -5,9 +5,11 @@ import Algorithm
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
+import qualified Data.Error as Error
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
+import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
 import GHC.Generics
@@ -23,7 +25,7 @@ emptyTerm :: (HasCallStack, Empty :< fs) => Assignment.Assignment ast grammar (T
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 handleError :: (HasCallStack, Error :< fs, Show grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-handleError = flip catchError (\ Assignment.Error{..} -> makeTerm <$> Assignment.location <*> pure (Error (either id show <$> errorExpected) (either id show <$> errorActual) []) <* Assignment.source)
+handleError = flip catchError (\ Error.Error{..} -> makeTerm <$> Assignment.location <*> pure (Error (getCallStack callStack) (either id show <$> errorExpected) (either id show <$> errorActual) []) <* Assignment.source)
 
 
 -- Undifferentiated
@@ -68,8 +70,11 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 
 -- | Syntax representing a parsing or assignment error.
-data Error a = Error { errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
+data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
+
+unError :: HasCallStack => Span -> Error a -> Error.Error String
+unError span Error{..} = Error.withCallStack (fromCallSiteList errorCallStack) (Error.Error span errorExpected errorActual)

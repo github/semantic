@@ -52,6 +52,7 @@ import Diff
 import Info
 import qualified Files
 import GHC.Conc (atomically)
+import GHC.Stack
 import Language
 import Language.Markdown
 import Parser
@@ -199,9 +200,9 @@ runParser Options{..} blob@Blob{..} = go
             case res of
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
               Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
-                Left err -> do
+                Left err@Error.Error{..} -> do
                   writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
-                  pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (Error.errorExpected err) (Error.errorActual err) []))
+                  pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (getCallStack (Error.errorCallStack err)) errorExpected errorActual []))
                 Right term -> do
                   for_ (errors term) $ \ err ->
                     writeLog Warning (Error.formatError optionsPrintSource optionsEnableColour blob err) blobFields
@@ -212,7 +213,7 @@ runParser Options{..} blob@Blob{..} = go
         blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
         errors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (a :< syntax) -> case syntax of
-          _ | Just (Syntax.Error expected actual _) <- prj syntax -> [Error.Error (sourceSpan a) expected actual]
+          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
           _ -> fold syntax
         logTiming :: String -> Task a -> Task a
         logTiming msg = time msg blobFields
