@@ -80,7 +80,7 @@ module Data.Syntax.Assignment
 , Error(..)
 , nodeError
 , errorCallStack
-, formatErrorWithOptions
+, formatError
 , firstSet
 -- Running
 , assignBy
@@ -213,8 +213,8 @@ type IncludeSource = Bool
 type Colourize = Bool
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
-formatErrorWithOptions :: IncludeSource -> Colourize -> Blob -> Info.Pos -> [String] -> Maybe String -> String
-formatErrorWithOptions includeSource colourize Blob{..} errorPos errorExpected errorActual
+formatError :: IncludeSource -> Colourize -> Blob -> Info.Pos -> [String] -> Maybe String -> String
+formatError includeSource colourize Blob{..} errorPos errorExpected errorActual
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
