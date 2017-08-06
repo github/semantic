@@ -8,6 +8,7 @@ module Language.Python.Syntax
 
 import Algorithm
 import Data.Align.Generic
+import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Tuple (swap)
@@ -410,7 +411,7 @@ raiseStatement :: Assignment
 raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> expressions)
 
 ifStatement :: Assignment
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> (makeTerm <$> location <*> manyTill expression (symbol ElseClause <|> symbol ElifClause)) <*> (flip (foldr makeElif) <$> many elifClause <*> (symbol ElseClause *> children expressions <|> emptyTerm)))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> void (symbol ElifClause) <|> eof)) <*> (flip (foldr makeElif) <$> many elifClause <*> (symbol ElseClause *> children expressions <|> emptyTerm)))
   where elifClause = (,) <$> symbol ElifClause <*> children (Statement.If <$> expression <*> expressions)
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
