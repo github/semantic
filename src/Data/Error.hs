@@ -45,7 +45,7 @@ formatError includeSource colourize Blob{..} Error{..}
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
 
-withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
+withSGRCode :: Colourize -> [SGR] -> ShowS -> ShowS
 withSGRCode useColour code content =
   if useColour then
     showString (setSGRCode code)
