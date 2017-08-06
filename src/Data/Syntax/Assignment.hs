@@ -126,6 +126,7 @@ import Text.Parser.TreeSitter.Language
 type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
 data AssignmentF ast grammar a where
+  End :: HasCallStack => AssignmentF ast grammar ()
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
   Project :: HasCallStack => (forall x. F.Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
@@ -305,6 +306,8 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Project{} -> Left (makeError node, state)
                   Children{} -> Left (makeError node, state)
                   Source -> Left (makeError node, state)
+                  End | Nothing <- node -> yield () state
+                      | otherwise -> Left (makeError node, state)
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
@@ -396,3 +399,4 @@ instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
+    End -> showString "End" . showChar ' ' . sp d ()
