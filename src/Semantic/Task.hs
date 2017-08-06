@@ -48,6 +48,7 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
+import Info
 import qualified Files
 import GHC.Conc (atomically)
 import Language
@@ -197,20 +198,20 @@ runParser Options{..} blob@Blob{..} = go
             case res of
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
               Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
-                Left err@Assignment.Error{..} -> do
+                Left Assignment.Error{..} -> do
                   writeLog Error (Assignment.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob errorPos (show <$> errorExpected) (show <$> errorActual)) blobFields
-                  pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (fmap show err) []))
+                  pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (show <$> errorExpected) (show <$> errorActual) []))
                 Right term -> do
-                  for_ (errors term) $ \ Assignment.Error{..} ->
+                  for_ (errors term) $ \ (errorPos, errorExpected, errorActual) ->
                     writeLog Warning (Assignment.formatError optionsPrintSource optionsEnableColour blob errorPos errorExpected errorActual) blobFields
                   pure $ Right term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
           LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
         blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
-        errors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> [Assignment.Error String]
-        errors = cata $ \ (_ :< syntax) -> case syntax of
-          _ | Just (Syntax.Error err _) <- prj syntax -> [err]
+        errors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> [(Pos, [String], Maybe String)]
+        errors = cata $ \ (a :< syntax) -> case syntax of
+          _ | Just (Syntax.Error expected actual _) <- prj syntax -> [(spanStart (sourceSpan a), expected, actual)]
           _ -> fold syntax
         logTiming :: String -> Task a -> Task a
         logTiming msg = time msg blobFields
