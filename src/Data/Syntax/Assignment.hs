@@ -163,14 +163,14 @@ children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 
 -- | Collect a list of values passing a predicate.
-while :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
+while :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 while predicate step = many $ do
   result <- step
   guard (predicate result)
   pure result
 
 -- | Collect a list of values failing a predicate.
-until :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
+until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 until = while . (not .)
 
 
