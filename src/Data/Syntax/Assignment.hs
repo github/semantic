@@ -89,7 +89,7 @@ module Data.Syntax.Assignment
 , makeState
 ) where
 
-import Control.Arrow
+import Control.Arrow ((&&&))
 import Control.Applicative
 import Control.Comonad.Cofree
 import Control.Monad (guard)
@@ -97,6 +97,7 @@ import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.Amb
 import Data.Array
+import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (isSuffixOf)
 import Data.ByteString.Char8 (ByteString, pack, unpack)
@@ -257,26 +258,26 @@ assignBy :: (Symbol grammar, Ix grammar, Eq ast, Recursive ast, Foldable (Base a
          -> Assignment ast grammar a               -- ^ The 'Assignment to run.
          -> ast                                    -- ^ The root of the ast.
          -> Either (Error grammar) a               -- ^ 'Either' an 'Error' or an assigned value.
-assignBy toNode source assignment ast = fst <$> runAssignment toNode source assignment (makeState [ast])
+assignBy toNode source assignment ast = bimap fst fst (runAssignment toNode source assignment (makeState [ast]))
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq ast, Recursive ast, Foldable (Base ast))
-              => (forall x. Base ast x -> Node grammar)        -- ^ A function to project a 'Node' from the ast.
-              -> Source.Source                                 -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                      -- ^ The 'Assignment' to run.
-              -> State ast grammar                             -- ^ The current state.
-              -> Either (Error grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
+              => (forall x. Base ast x -> Node grammar)                           -- ^ A function to project a 'Node' from the ast.
+              -> Source.Source                                                    -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                                         -- ^ The 'Assignment' to run.
+              -> State ast grammar                                                -- ^ The current state.
+              -> Either (Error grammar, State ast grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
 runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimumBy (comparing (stateErrorCounter . snd))) (go assignment state >>= requireExhaustive))
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar result -> State ast grammar -> Amb (Error grammar) (result, State ast grammar)
+  where go :: Assignment ast grammar result -> State ast grammar -> Amb (Error grammar, State ast grammar) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
         run :: AssignmentF ast grammar x
-            -> (x -> State ast grammar -> Amb (Error grammar) (result, State ast grammar))
+            -> (x -> State ast grammar -> Amb (Error grammar, State ast grammar) (result, State ast grammar))
             -> State ast grammar
-            -> Amb (Error grammar) (result, State ast grammar)
+            -> Amb (Error grammar, State ast grammar) (result, State ast grammar)
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
@@ -293,22 +294,22 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                   Choose _ _ (Just atEnd) -> yield atEnd state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') <> pure ([], state)) state >>= uncurry yield
                   Alt as -> Some as >>= flip yield state
-                  Throw e -> None e
-                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler) >>= uncurry yield
-                  Choose{} -> None (makeError node)
-                  Project{} -> None (makeError node)
-                  Children{} -> None (makeError node)
-                  Source -> None (makeError node)
+                  Throw e -> None (e, state)
+                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler . fst) >>= uncurry yield
+                  Choose{} -> None (makeError node, state)
+                  Project{} -> None (makeError node, state)
+                  Children{} -> None (makeError node, state)
+                  Source -> None (makeError node, state)
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
                 makeError node = maybe (Error statePos expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
-        requireExhaustive :: HasCallStack => (result, State ast grammar) -> Amb (Error grammar) (result, State ast grammar)
-        requireExhaustive (a, state) = case stateNodes (dropAnonymous state) of
-          [] -> Some ((a, state) :| [])
-          node : _ -> None (nodeError [] (toNode (F.project node)))
+        requireExhaustive :: HasCallStack => (result, State ast grammar) -> Amb (Error grammar, State ast grammar) (result, State ast grammar)
+        requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
+          [] -> Some ((a, state') :| [])
+          node : _ -> None (nodeError [] (toNode (F.project node)), state')
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
 
