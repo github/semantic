@@ -300,8 +300,9 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
   l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
-  l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $ Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) `Then` id
-          | otherwise = wrap (Alt (l :| [r]))
+  l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
+            withCallStack bestCallStack (Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) `Then` id)
+          | otherwise = withFrozenCallStack (Alt (l :| [r]) `Then` id)
     where choices :: Assignment ast grammar a -> Maybe ([grammar], Array grammar (Maybe (Assignment ast grammar a)))
           choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
           choices (Many rule `Then` continue) = second (fmap ((Many rule `Then` continue) <$)) <$> choices rule
@@ -315,6 +316,14 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
           rewrapFor (Many _ `Then` continue) = Just (<|> continue [])
           rewrapFor (Catch _ handler `Then` continue) = Just (`catchError` (continue <=< handler))
           rewrapFor _ = Nothing
+
+          assignmentCallStack (Choose{} `Then` _) = Just callStack
+          assignmentCallStack (Many{} `Then` _) = Just callStack
+          assignmentCallStack (Catch{} `Then` _) = Just callStack
+          assignmentCallStack (Label{} `Then` _) = Just callStack
+          assignmentCallStack _ = Nothing
+
+          bestCallStack = fromMaybe callStack (assignmentCallStack r <|> assignmentCallStack l)
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
