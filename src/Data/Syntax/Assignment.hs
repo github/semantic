@@ -76,6 +76,7 @@ module Data.Syntax.Assignment
 , source
 , children
 , while
+, until
 -- Results
 , Error(..)
 , nodeError
@@ -114,7 +115,7 @@ import Data.Semigroup
 import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
 import GHC.Stack
 import qualified Info
-import Prelude hiding (head)
+import Prelude hiding (head, until)
 import System.Console.ANSI
 import Text.Parser.TreeSitter.Language
 
@@ -166,6 +167,13 @@ while :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
 while predicate step = many $ do
   result <- step
   guard (predicate result)
+  pure result
+
+-- | Collect a list of values failing a predicate.
+until :: (Alternative m, Monad m) => (a -> Bool) -> m a -> m [a]
+until predicate step = many $ do
+  result <- step
+  guard (not (predicate result))
   pure result
 
 
