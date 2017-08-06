@@ -78,6 +78,7 @@ module Data.Syntax.Assignment
 , while
 -- Results
 , Error(..)
+, nodeError
 , errorCallStack
 , formatErrorWithOptions
 , firstSet
