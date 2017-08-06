@@ -5,6 +5,7 @@ import Control.Comonad.Cofree (Cofree(..))
 import Control.Comonad.Trans.Cofree (headF)
 import Data.Bifunctor (first)
 import Data.ByteString.Char8 as B (ByteString, length, words)
+import Data.Ix
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Syntax.Assignment
@@ -284,7 +285,7 @@ node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
 
 data Grammar = Palette | Red | Green | Blue | Magenta
-  deriving (Enum, Eq, Show)
+  deriving (Enum, Eq, Ix, Ord, Show)
 
 instance Symbol Grammar where
   symbolType Magenta = Anonymous
