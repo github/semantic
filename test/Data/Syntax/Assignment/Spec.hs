@@ -217,13 +217,13 @@ spec = do
     it "advances past the current node" $
       snd <$> runAssignment headF "hi" source (makeState [ node Red 0 2 [] ])
       `shouldBe`
-        Right (State 2 (Info.Pos 1 3) 0 [])
+        Right (State 2 (Info.Pos 1 3) [])
 
   describe "children" $ do
     it "advances past the current node" $
       snd <$> runAssignment headF "a" (children (pure (Out ""))) (makeState [node Red 0 1 []])
       `shouldBe`
-        Right (State 1 (Info.Pos 1 2) 0 [])
+        Right (State 1 (Info.Pos 1 2) [])
 
     it "matches if its subrule matches" $
       () <$ runAssignment headF "a" (children red) (makeState [node Blue 0 1 [node Red 0 1 []]])

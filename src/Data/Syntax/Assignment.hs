@@ -286,7 +286,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
                   Choose _ choices | symbol <- nodeSymbol (toNode node), inRange (bounds choices) symbol, Just choice <- choices ! symbol -> yield choice state
-                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler . fst) >>= uncurry yield
+                  Catch during handler -> go during state `catchError` (flip go state . handler . fst) >>= uncurry yield
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
@@ -315,20 +315,19 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateErrorCounter rest
+          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data State ast = State
   { stateOffset :: {-# UNPACK #-} !Int       -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: {-# UNPACK #-} !Info.Pos     -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateErrorCounter :: {-# UNPACK #-} !Int -- ^ Monotonic counter tracking the number of error handlers invoked.
   , stateNodes :: ![ast]                     -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
 makeState :: [ast] -> State ast
-makeState = State 0 (Info.Pos 1 1) 0
+makeState = State 0 (Info.Pos 1 1)
 
 
 -- Instances
