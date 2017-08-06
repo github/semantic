@@ -199,6 +199,14 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
   Choose symbols _ -> symbols
   _ -> []) . ([] <$)
 
+expectation :: Assignment ast grammar a -> [Either String grammar]
+expectation = iterFreer (\ assignment _ -> case assignment of
+  Choose symbols _ -> Right <$> symbols
+  Many a -> expectation a
+  Catch during _ -> expectation during
+  Label _ label -> [Left label]
+  _ -> []) . ([] <$)
+
 
 -- | Run an assignment over an AST exhaustively.
 assignBy :: (Symbol grammar, Ix grammar, Show grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
@@ -256,7 +264,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
                 makeError :: HasCallStack => Maybe (F.Base ast ast) -> Error (Either String grammar)
-                makeError node = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols) . toNode) node
+                makeError node = maybe (Error (Info.Span statePos statePos) (expectation (assignment `Then` return)) Nothing) (nodeError (expectation (assignment `Then` return)) . toNode) node
 
         requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error (Either String grammar), State ast) (result, State ast)
         requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
