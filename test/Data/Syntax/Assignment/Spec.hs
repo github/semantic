@@ -277,7 +277,7 @@ spec = do
         Right (Out "magenta", Out "red")
 
     it "produces errors with callstacks pointing at the failing assignment" $
-      first (fmap fst . getCallStack . errorCallStack) (runAssignment headF "blue" red (makeState [node Blue 0 4 []]))
+      first (fmap fst . getCallStack . errorCallStack . fst) (runAssignment headF "blue" red (makeState [node Blue 0 4 []]))
       `shouldBe`
       Left [ "symbol", "red" ]
 
