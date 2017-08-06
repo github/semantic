@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, StandaloneDeriving #-}
+{-# LANGUAGE GADTs, ImplicitParams, RankNTypes, StandaloneDeriving #-}
 module Data.Error where
 
 import Data.Blob
@@ -23,6 +23,9 @@ deriving instance Traversable Error
 errorCallStack :: Error grammar -> CallStack
 errorCallStack Error{} = callStack
 
+
+withCallStack :: CallStack -> (HasCallStack => a) -> a
+withCallStack cs action = let ?callStack = cs in action
 
 type IncludeSource = Bool
 type Colourize = Bool
