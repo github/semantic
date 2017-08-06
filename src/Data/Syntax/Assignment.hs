@@ -367,6 +367,13 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
+instance MonadError (Error grammar) (Assignment ast grammar) where
+  throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
+  throwError error = withFrozenCallStack $ Throw (Just error) `Then` return
+
+  catchError :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> Assignment ast grammar a
+  catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
+
 instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
@@ -378,10 +385,3 @@ instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
-
-instance MonadError (Error grammar) (Assignment ast grammar) where
-  throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
-  throwError error = withFrozenCallStack $ Throw (Just error) `Then` return
-
-  catchError :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> Assignment ast grammar a
-  catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
