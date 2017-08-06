@@ -35,7 +35,7 @@ formatError :: IncludeSource -> Colourize -> Blob -> Error String -> String
 formatError includeSource colourize Blob{..} Error{..}
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (maybe Nothing (const (Just blobPath)) blobKind) errorSpan . showString ": ")
-  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation errorExpected errorActual . showChar '\n'
+  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation colourize errorExpected errorActual . showChar '\n'
   . (if includeSource
     then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
        . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
@@ -54,17 +54,18 @@ withSGRCode useColour code content =
   else
     content
 
-showExpectation :: [String] -> Maybe String -> ShowS
-showExpectation [] Nothing = showString "no rule to match at end of input nodes"
-showExpectation expected Nothing = showString "expected " . showSymbols expected . showString " at end of input nodes"
-showExpectation expected (Just actual) = showString "expected " . showSymbols expected . showString ", but got " . showString actual
+showExpectation :: Colourize -> [String] -> Maybe String -> ShowS
+showExpectation _ [] Nothing = showString "no rule to match at end of input nodes"
+showExpectation colourize expected Nothing = showString "expected " . showSymbols colourize expected . showString " at end of input nodes"
+showExpectation colourize expected (Just actual) = showString "expected " . showSymbols colourize expected . showString ", but got " . showString actual
 
-showSymbols :: [String] -> ShowS
-showSymbols [] = showString "end of input nodes"
-showSymbols [symbol] = showString symbol
-showSymbols [a, b] = showString a . showString " or " . showString b
-showSymbols [a, b, c] = showString a . showString ", " . showString b . showString ", or " . showString c
-showSymbols (h:t) = showString h . showString ", " . showSymbols t
+showSymbols :: Colourize -> [String] -> ShowS
+showSymbols _ = go
+  where go [] = showString "end of input nodes"
+        go [symbol] = showString symbol
+        go [a, b] = showString a . showString " or " . showString b
+        go [a, b, c] = showString a . showString ", " . showString b . showString ", or " . showString c
+        go (h:t) = showString h . showString ", " . go t
 
 showSpan :: Maybe FilePath -> Span -> ShowS
 showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
