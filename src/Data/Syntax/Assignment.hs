@@ -313,6 +313,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
           choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
           choices (Many rule `Then` continue) = second (fmap ((Many rule `Then` continue) <$)) <$> choices rule
           choices (Catch during _ `Then` continue) = second (fmap (fmap (>>= continue))) <$> choices during
+          choices (Label rule label `Then` continue) = second (fmap ((Label rule label `Then` continue) <$)) <$> choices rule
           choices _ = Nothing
           unionBounds a b = (min (uncurry min (bounds a)) (uncurry min (bounds b)), max (uncurry max (bounds a)) (uncurry max (bounds b)))
           rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
