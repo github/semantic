@@ -158,8 +158,7 @@ expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
 
 literal :: Assignment
-literal =  handleError
-        $  boolean
+literal =  boolean
        <|> concatenatedString
        <|> dictionary
        <|> float
