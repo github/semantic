@@ -217,7 +217,7 @@ formatErrorWithOptions :: Show grammar => IncludeSource -> Colourize -> Blob -> 
 formatErrorWithOptions includeSource colourize Blob{..} Error{..}
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
-  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
+  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation (show <$> errorExpected) (show <$> errorActual) . showChar '\n')
   . (if includeSource
     then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
        . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
@@ -236,17 +236,17 @@ withSGRCode useColour code content =
   else
     content
 
-showExpectation :: Show grammar => [grammar] -> Maybe grammar -> ShowS
+showExpectation :: [String] -> Maybe String -> ShowS
 showExpectation [] Nothing = showString "no rule to match at end of input nodes"
 showExpectation expected Nothing = showString "expected " . showSymbols expected . showString " at end of input nodes"
-showExpectation expected (Just actual) = showString "expected " . showSymbols expected . showString ", but got " . shows actual
+showExpectation expected (Just actual) = showString "expected " . showSymbols expected . showString ", but got " . showString actual
 
-showSymbols :: Show grammar => [grammar] -> ShowS
+showSymbols :: [String] -> ShowS
 showSymbols [] = showString "end of input nodes"
-showSymbols [symbol] = shows symbol
-showSymbols [a, b] = shows a . showString " or " . shows b
-showSymbols [a, b, c] = shows a . showString ", " . shows b . showString ", or " . shows c
-showSymbols (h:t) = shows h . showString ", " . showSymbols t
+showSymbols [symbol] = showString symbol
+showSymbols [a, b] = showString a . showString " or " . showString b
+showSymbols [a, b, c] = showString a . showString ", " . showString b . showString ", or " . showString c
+showSymbols (h:t) = showString h . showString ", " . showSymbols t
 
 showPos :: Maybe FilePath -> Info.Pos -> ShowS
 showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . shows posLine . showChar ':' . shows posColumn
