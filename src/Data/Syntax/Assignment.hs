@@ -333,7 +333,7 @@ instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
-  a <?> s = withFrozenCallStack $ Label a s `Then` return
+  a <?> s = Label a s `Then` return
 
   unexpected :: HasCallStack => String -> Assignment ast grammar a
   unexpected s = location >>= \ loc -> throwError (Error (Info.sourceSpan loc) [] (Just (Left s)))
@@ -349,7 +349,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   throwError error = withFrozenCallStack $ Throw (Just error) `Then` return
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
-  catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
+  catchError during handler = Catch during handler `Then` return
 
 instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
