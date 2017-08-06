@@ -132,7 +132,7 @@ data AssignmentF ast grammar a where
   Choose :: HasCallStack => [grammar] -> Array grammar (Maybe a) -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
-  Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
+  Throw :: HasCallStack => Maybe (Error grammar) -> AssignmentF ast grammar a
   Catch :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> AssignmentF ast grammar a
 
 -- | Zero-width production of the current location.
@@ -298,7 +298,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt as -> sconcat (flip yield state <$> as)
-                  Throw e -> Left (e, state)
+                  Throw e -> Left (fromMaybe (makeError node) e, state)
                   Catch during _ -> go during state >>= uncurry yield
                   Choose{} -> Left (makeError node, state)
                   Project{} -> Left (makeError node, state)
@@ -378,7 +378,7 @@ instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
-  throwError error = withFrozenCallStack $ Throw error `Then` return
+  throwError error = withFrozenCallStack $ Throw (Just error) `Then` return
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = withFrozenCallStack $ Catch during handler `Then` return
