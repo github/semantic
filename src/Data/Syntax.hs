@@ -80,4 +80,4 @@ errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (fromCallSiteList errorCallStack) (withFrozenCallStack (Error.Error span errorExpected errorActual))
+unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList errorCallStack)) (Error.Error span errorExpected errorActual)
