@@ -302,7 +302,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
             withCallStack bestCallStack (Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) `Then` id)
-          | otherwise = withFrozenCallStack (Alt (l :| [r]) `Then` id)
+          | otherwise = withCallStack bestCallStack (Alt (l :| [r]) `Then` id)
     where choices :: Assignment ast grammar a -> Maybe ([grammar], Array grammar (Maybe (Assignment ast grammar a)))
           choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
           choices (Many rule `Then` continue) = second (fmap ((Many rule `Then` continue) <$)) <$> choices rule
