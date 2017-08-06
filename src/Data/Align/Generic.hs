@@ -4,6 +4,7 @@ module Data.Align.Generic where
 import Control.Monad
 import Data.Align
 import Data.Functor.Identity
+import Data.Proxy
 import Data.These
 import Data.Union
 import GHC.Generics
@@ -27,11 +28,8 @@ instance GAlign Maybe where
 instance GAlign Identity where
   galignWith f (Identity a) (Identity b) = Just (Identity (f (These a b)))
 
-instance (GAlign f, GAlign (Union fs)) => GAlign (Union (f ': fs)) where
-  galignWith f u1 u2 = case (decompose u1, decompose u2) of
-    (Left u1', Left u2') -> weaken <$> galignWith f u1' u2'
-    (Right r1, Right r2) -> inj <$> galignWith f r1 r2
-    _ -> Nothing
+instance (Apply1 GAlign fs) => GAlign (Union fs) where
+  galignWith f = (join .) . apply1_2' (Proxy :: Proxy GAlign) (\ inj -> (fmap inj .) . galignWith f)
 
 instance GAlign (Union '[]) where
   galignWith _ _ _ = Nothing
