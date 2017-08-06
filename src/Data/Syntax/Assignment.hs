@@ -297,6 +297,8 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
+                  End | Nothing <- node -> yield () state
+                      | otherwise -> Left (makeError node, state)
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt as -> sconcat (flip yield state <$> as)
@@ -306,8 +308,6 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Project{} -> Left (makeError node, state)
                   Children{} -> Left (makeError node, state)
                   Source -> Left (makeError node, state)
-                  End | Nothing <- node -> yield () state
-                      | otherwise -> Left (makeError node, state)
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
