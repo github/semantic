@@ -194,7 +194,7 @@ nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (E
 nodeError expected (Node actual _ span) = Error span expected (Just (Right actual))
 
 
-firstSet :: Ix grammar => Assignment ast grammar a -> [grammar]
+firstSet :: Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ assignment _ -> case assignment of
   Choose symbols _ -> symbols
   _ -> []) . ([] <$)
