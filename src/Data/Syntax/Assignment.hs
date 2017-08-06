@@ -297,7 +297,10 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                     None (err, state') -> if state == state' then next else None (err, state')
                     Some as -> Some as) (None (makeError node, state)) as
                   Throw e -> None (e, state)
-                  Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler . fst) >>= uncurry yield
+                  Catch during handler -> go during state `catchError` (\ (err, state') -> if state == state' then
+                      go (handler err) state { stateErrorCounter = succ stateErrorCounter }
+                    else
+                      None (err, state')) >>= uncurry yield
                   Choose{} -> None (makeError node, state)
                   Project{} -> None (makeError node, state)
                   Children{} -> None (makeError node, state)
