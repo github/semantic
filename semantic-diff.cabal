@@ -17,7 +17,6 @@ library
                      , Alignment
                      , Category
                      , Data.Align.Generic
-                     , Data.Amb
                      , Data.Blob
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
