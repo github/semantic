@@ -262,21 +262,21 @@ assignBy toNode source assignment ast = bimap fst fst (runAssignment toNode sour
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq ast, Recursive ast, Foldable (Base ast))
-              => (forall x. Base ast x -> Node grammar)                           -- ^ A function to project a 'Node' from the ast.
-              -> Source.Source                                                    -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                                         -- ^ The 'Assignment' to run.
-              -> State ast grammar                                                -- ^ The current state.
-              -> Either (Error grammar, State ast grammar) (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
+              => (forall x. Base ast x -> Node grammar)           -- ^ A function to project a 'Node' from the ast.
+              -> Source.Source                                    -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                         -- ^ The 'Assignment' to run.
+              -> State ast                                        -- ^ The current state.
+              -> Either (Error grammar, State ast) (a, State ast) -- ^ 'Either' an 'Error' or an assigned value & updated state.
 runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar result -> State ast grammar -> Either (Error grammar, State ast grammar) (result, State ast grammar)
+  where go :: Assignment ast grammar result -> State ast -> Either (Error grammar, State ast) (result, State ast)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
         run :: AssignmentF ast grammar x
-            -> (x -> State ast grammar -> Either (Error grammar, State ast grammar) (result, State ast grammar))
-            -> State ast grammar
-            -> Either (Error grammar, State ast grammar) (result, State ast grammar)
+            -> (x -> State ast -> Either (Error grammar, State ast) (result, State ast))
+            -> State ast
+            -> Either (Error grammar, State ast) (result, State ast)
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
@@ -305,7 +305,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                 makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
                 makeError node = maybe (Error statePos expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
-        requireExhaustive :: HasCallStack => (result, State ast grammar) -> Either (Error grammar, State ast grammar) (result, State ast grammar)
+        requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error grammar, State ast) (result, State ast)
         requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
           [] -> Right (a, state')
           node : _ -> Left (nodeError [] (toNode (F.project node)), state')
@@ -319,7 +319,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
-data State ast grammar = State
+data State ast = State
   { stateOffset :: {-# UNPACK #-} !Int       -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: {-# UNPACK #-} !Info.Pos     -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateErrorCounter :: {-# UNPACK #-} !Int -- ^ Monotonic counter tracking the number of error handlers invoked.
@@ -327,7 +327,7 @@ data State ast grammar = State
   }
   deriving (Eq, Show)
 
-makeState :: [ast] -> State ast grammar
+makeState :: [ast] -> State ast
 makeState = State 0 (Info.Pos 1 1) 0
 
 
