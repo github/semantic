@@ -136,6 +136,7 @@ data AssignmentF ast grammar a where
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
   Throw :: HasCallStack => Maybe (Error grammar) -> AssignmentF ast grammar a
   Catch :: HasCallStack => Assignment ast grammar a -> (Error grammar -> Assignment ast grammar a) -> AssignmentF ast grammar a
+  Label :: HasCallStack => Assignment ast grammar a -> String -> AssignmentF ast grammar a
 
 -- | Zero-width production of the current location.
 --
@@ -308,6 +309,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
                   Project{} -> Left (makeError node, state)
                   Children{} -> Left (makeError node, state)
                   Source -> Left (makeError node, state)
+                  Label child _ -> go child state >>= uncurry yield
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
@@ -402,3 +404,4 @@ instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
+    Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
