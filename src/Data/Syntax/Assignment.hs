@@ -343,6 +343,7 @@ instance (Bounded grammar, Ix grammar) => Alternative (Assignment ast grammar) w
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   (Throw Nothing `Then` _) <|> r = r
+  l <|> (Throw Nothing `Then` _) = l
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
