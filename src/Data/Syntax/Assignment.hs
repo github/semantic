@@ -68,7 +68,6 @@ module Data.Syntax.Assignment
 , nodeLocation
 -- Combinators
 , Alternative(..)
-, optional
 , MonadError(..)
 , location
 , project
@@ -89,6 +88,7 @@ module Data.Syntax.Assignment
 -- Implementation details (for testing)
 , State(..)
 , makeState
+, module Parsers
 ) where
 
 import Control.Arrow ((&&&))
@@ -117,6 +117,7 @@ import GHC.Stack
 import qualified Info
 import Prelude hiding (head, until)
 import System.Console.ANSI
+import Text.Parser.Combinators as Parsers
 import Text.Parser.TreeSitter.Language
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
