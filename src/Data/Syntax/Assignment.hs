@@ -93,7 +93,7 @@ module Data.Syntax.Assignment
 import Control.Arrow ((&&&))
 import Control.Applicative
 import Control.Comonad.Cofree
-import Control.Monad (guard)
+import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.Amb
@@ -130,7 +130,7 @@ data AssignmentF ast grammar a where
   Project :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
-  Choose :: HasCallStack => [grammar] -> Array grammar (Maybe a) -> Maybe a -> AssignmentF ast grammar a
+  Choose :: HasCallStack => [grammar] -> Array grammar (Maybe a) -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
   Throw :: HasCallStack => Error grammar -> AssignmentF ast grammar a
@@ -152,7 +152,7 @@ project projection = withFrozenCallStack $ Project projection `Then` return
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (symbol A *> b)@ is fine, but @many (symbol A)@ is not.
 symbol :: (Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = withFrozenCallStack $ Choose [s] (array (s, s) [(s, Just ())]) Nothing `Then` (const location)
+symbol s = withFrozenCallStack $ Choose [s] (array (s, s) [(s, Just location)]) `Then` id
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
@@ -248,7 +248,7 @@ showPos path Info.Pos{..} = maybe (showParen True (showString "interactive")) sh
 
 firstSet :: Ix grammar => Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ assignment _ -> case assignment of
-  Choose symbols _ _ -> symbols
+  Choose symbols _ -> symbols
   _ -> []) . ([] <$)
 
 
@@ -287,13 +287,12 @@ runAssignment toNode source = (\ assignment state -> disamb Left (Right . minimu
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
-                  Choose _ choices _ | symbol <- nodeSymbol (toNode node), inRange (bounds choices) symbol, Just choice <- choices ! symbol -> yield choice state
+                  Choose _ choices | symbol <- nodeSymbol (toNode node), inRange (bounds choices) symbol, Just choice <- choices ! symbol -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state { stateErrorCounter = succ stateErrorCounter } . handler . fst) >>= uncurry yield
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
-                  Choose _ _ (Just atEnd) -> yield atEnd state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt as -> foldr (\ each next -> case yield each state of
                     None (err, state') -> if state == state' then next else None (err, state')
@@ -340,7 +339,7 @@ makeState = State 0 (Info.Pos 1 1) 0
 
 instance (Bounded grammar, Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Choose [] (listArray (maxBound, maxBound) [Nothing]) Nothing `Then` return
+  empty = Choose [] (listArray (maxBound, maxBound) [Nothing]) `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
@@ -350,25 +349,18 @@ instance (Bounded grammar, Ix grammar) => Alternative (Assignment ast grammar) w
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
   l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
-  l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) (atEnd l <|> atEnd r) `Then` id
+  l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor l <|> rewrapFor r) $ Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) `Then` id
           | otherwise = wrap (Alt (l :| [r]))
     where choices :: Assignment ast grammar a -> Maybe ([grammar], Array grammar (Maybe (Assignment ast grammar a)))
-          choices (Location `Then` _) = Just ([], empty)
-          choices (Choose symbols choices _ `Then` continue) = Just (symbols, fmap continue <$> choices)
+          choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
           choices (Many rule `Then` continue) = second (fmap ((Many rule `Then` continue) <$)) <$> choices rule
-          choices (Catch during handler `Then` continue) = second (fmap ((Catch during handler `Then` continue) <$)) <$> choices during
-          choices (Throw _ `Then` _) = Just ([], empty)
-          choices (Return _) = Just ([], empty)
+          choices (Catch during handler `Then` continue) = second (fmap (fmap (>>= continue))) <$> choices during
           choices _ = Nothing
-          empty = listArray (maxBound, maxBound) [Nothing]
           unionBounds a b = (min (uncurry min (bounds a)) (uncurry min (bounds b)), max (uncurry max (bounds a)) (uncurry max (bounds b)))
-          atEnd :: Assignment ast grammar a -> Maybe (Assignment ast grammar a)
-          atEnd (Location `Then` continue) = Just (Location `Then` continue)
-          atEnd (Choose _ _ atEnd `Then` continue) = continue <$> atEnd
-          atEnd (Many rule `Then` continue) = Just (Many rule `Then` continue)
-          atEnd (Throw err `Then` continue) = Just (Throw err `Then` continue)
-          atEnd (Return a) = Just (Return a)
-          atEnd _ = Nothing
+          rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
+          rewrapFor (Many rule `Then` continue) = Just (<|> continue [])
+          rewrapFor (Catch during handler `Then` continue) = Just (`catchError` (continue <=< handler))
+          rewrapFor _ = Nothing
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
@@ -378,13 +370,11 @@ instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
     Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose symbols choices atEnd -> showsTernaryWith showsPrec (const (liftShowList sp sl)) (liftShowsPrec sp sl) "Choose" d symbols ((choices !) <$> symbols) atEnd
+    Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols ((choices !) <$> symbols)
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
-    where showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
-          showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $ showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
