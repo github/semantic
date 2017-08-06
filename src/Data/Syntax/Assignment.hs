@@ -337,7 +337,7 @@ makeState = State 0 (Info.Pos 1 1)
 
 -- Instances
 
-instance (Bounded grammar, Ix grammar) => Alternative (Assignment ast grammar) where
+instance Ix grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Throw Nothing `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
