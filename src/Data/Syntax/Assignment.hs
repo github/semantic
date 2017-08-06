@@ -301,8 +301,8 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
   l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
-            withBestCallStack (withFrozenCallStack (Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) `Then` id))
-          | otherwise = withBestCallStack (withFrozenCallStack (Alt (l :| [r]) `Then` id))
+            withBestCallStack (Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) `Then` id)
+          | otherwise = withBestCallStack (Alt (l :| [r]) `Then` id)
     where choices :: Assignment ast grammar a -> Maybe ([grammar], Array grammar (Maybe (Assignment ast grammar a)))
           choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
           choices (Many rule `Then` continue) = second (fmap ((Many rule `Then` continue) <$)) <$> choices rule
@@ -323,7 +323,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
           assignmentCallStack (Label{} `Then` _) = Just callStack
           assignmentCallStack _ = Nothing
 
-          withBestCallStack = withCallStack (fromMaybe callStack (((<|>) `on` assignmentCallStack) r l))
+          withBestCallStack = withCallStack (freezeCallStack (fromMaybe callStack (((<|>) `on` assignmentCallStack) r l)))
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
