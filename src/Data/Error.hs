@@ -28,8 +28,8 @@ type IncludeSource = Bool
 type Colourize = Bool
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
-formatError :: IncludeSource -> Colourize -> Blob -> Span -> [String] -> Maybe String -> String
-formatError includeSource colourize Blob{..} errorSpan errorExpected errorActual
+formatError :: IncludeSource -> Colourize -> Blob -> Error String -> String
+formatError includeSource colourize Blob{..} Error{..}
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (maybe Nothing (const (Just blobPath)) blobKind) errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
