@@ -323,7 +323,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
           assignmentCallStack (Label{} `Then` _) = Just callStack
           assignmentCallStack _ = Nothing
 
-          bestCallStack = fromMaybe callStack (assignmentCallStack r <|> assignmentCallStack l)
+          bestCallStack = fromMaybe callStack (((<|>) `on` assignmentCallStack) r l)
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
