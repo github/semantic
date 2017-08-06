@@ -10,7 +10,6 @@ import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Maybe (fromMaybe)
 import Data.Tuple (swap)
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, makeTerm)
