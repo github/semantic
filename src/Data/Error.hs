@@ -60,12 +60,13 @@ showExpectation colourize expected Nothing = showString "expected " . showSymbol
 showExpectation colourize expected (Just actual) = showString "expected " . showSymbols colourize expected . showString ", but got " . showString actual
 
 showSymbols :: Colourize -> [String] -> ShowS
-showSymbols _ = go
+showSymbols colourize = go
   where go [] = showString "end of input nodes"
-        go [symbol] = showString symbol
-        go [a, b] = showString a . showString " or " . showString b
-        go [a, b, c] = showString a . showString ", " . showString b . showString ", or " . showString c
-        go (h:t) = showString h . showString ", " . go t
+        go [symbol] = showSymbol symbol
+        go [a, b] = showSymbol a . showString " or " . showSymbol b
+        go [a, b, c] = showSymbol a . showString ", " . showSymbol b . showString ", or " . showSymbol c
+        go (h:t) = showSymbol h . showString ", " . go t
+        showSymbol = withSGRCode colourize [SetColor Foreground Vivid Red] . showString
 
 showSpan :: Maybe FilePath -> Span -> ShowS
 showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
