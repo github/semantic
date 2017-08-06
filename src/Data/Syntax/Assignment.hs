@@ -380,7 +380,8 @@ instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   eof :: HasCallStack => Assignment ast grammar ()
   eof = withFrozenCallStack $ End `Then` return
 
-  notFollowedBy a = a *> unexpected (show a) <|> pure ()
+  notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
+  notFollowedBy a = withFrozenCallStack $ a *> unexpected (show a) <|> pure ()
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
