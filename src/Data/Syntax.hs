@@ -25,7 +25,7 @@ emptyTerm :: (HasCallStack, Empty :< fs) => Assignment.Assignment ast grammar (T
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 handleError :: (HasCallStack, Error :< fs, Show grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-handleError = flip catchError (\ Error.Error{..} -> makeTerm <$> Assignment.location <*> pure (Error (getCallStack callStack) (either id show <$> errorExpected) (either id show <$> errorActual) []) <* Assignment.source)
+handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 
 -- Undifferentiated
