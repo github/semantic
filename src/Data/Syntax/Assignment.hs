@@ -375,7 +375,8 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
 instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   try = id
 
-  (<?>) = const
+  (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
+  a <?> s = withFrozenCallStack $ Label a s `Then` return
 
   unexpected = const empty
 
