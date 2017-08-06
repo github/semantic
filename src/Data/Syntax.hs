@@ -76,5 +76,8 @@ data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [S
 instance Eq1 Error where liftEq = genericLiftEq
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
+errorSyntax :: Error.Error String -> Error a
+errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual []
+
 unError :: HasCallStack => Span -> Error a -> Error.Error String
 unError span Error{..} = Error.withCallStack (fromCallSiteList errorCallStack) (Error.Error span errorExpected errorActual)
