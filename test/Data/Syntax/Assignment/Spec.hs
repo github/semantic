@@ -218,13 +218,13 @@ spec = do
     it "advances past the current node" $
       snd <$> runAssignment headF "hi" source (makeState [ node Red 0 2 [] ])
       `shouldBe`
-        Right (State 2 (Info.Pos 1 3) [])
+        Right (State 2 (Pos 1 3) [])
 
   describe "children" $ do
     it "advances past the current node" $
       snd <$> runAssignment headF "a" (children (pure (Out ""))) (makeState [node Red 0 1 []])
       `shouldBe`
-        Right (State 1 (Info.Pos 1 2) [])
+        Right (State 1 (Pos 1 2) [])
 
     it "matches if its subrule matches" $
       () <$ runAssignment headF "a" (children red) (makeState [node Blue 0 1 [node Red 0 1 []]])
@@ -282,7 +282,7 @@ spec = do
       Left [ "symbol", "red" ]
 
 node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
-node symbol start end children = Node symbol (Range start end) (Info.Span (Info.Pos 1 (succ start)) (Info.Pos 1 (succ end))) :< children
+node symbol start end children = Node symbol (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end))) :< children
 
 data Grammar = Palette | Red | Green | Blue | Magenta
   deriving (Enum, Eq, Ix, Ord, Show)
