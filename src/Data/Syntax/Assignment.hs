@@ -377,7 +377,8 @@ instance Ix grammar => Parsing (Assignment ast grammar) where
 
   unexpected = const empty
 
-  eof = pure ()
+  eof :: HasCallStack => Assignment ast grammar ()
+  eof = withFrozenCallStack $ End `Then` return
 
   notFollowedBy = const (pure ())
 
