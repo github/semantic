@@ -26,6 +26,7 @@ import Data.Align (crosswalk)
 import Data.Bifunctor (bimap, first)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
+import Data.Error (formatError)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
@@ -38,7 +39,6 @@ import Data.Output
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
-import Data.Syntax.Assignment (formatError)
 import Data.Text (toLower)
 import qualified Data.Text as T
 import Data.Text.Listable

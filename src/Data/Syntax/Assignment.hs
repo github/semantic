@@ -78,9 +78,8 @@ module Data.Syntax.Assignment
 , until
 -- Results
 , Error(..)
-, nodeError
 , errorCallStack
-, formatError
+, nodeError
 , firstSet
 -- Running
 , assignBy
@@ -99,9 +98,7 @@ import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.Array
 import Data.Bifunctor
-import Data.Blob
-import Data.ByteString (isSuffixOf)
-import Data.ByteString.Char8 (ByteString, pack, unpack)
+import Data.ByteString (ByteString)
 import Data.Error
 import Data.Foldable
 import Data.Function
@@ -109,15 +106,14 @@ import Data.Functor.Classes
 import qualified Data.Functor.Foldable as F hiding (Nil)
 import Data.Ix (inRange)
 import Data.List (union)
-import Data.List.NonEmpty ((<|), NonEmpty(..), nonEmpty)
+import Data.List.NonEmpty ((<|), NonEmpty(..))
 import Data.Maybe
 import Data.Record
 import Data.Semigroup
-import qualified Data.Source as Source (Source, fromBytes, slice, sourceBytes, sourceLines)
+import qualified Data.Source as Source (Source, slice, sourceBytes)
 import GHC.Stack
 import qualified Info
 import Prelude hiding (head, until)
-import System.Console.ANSI
 import Text.Parser.Combinators as Parsers
 import Text.Parser.TreeSitter.Language
 
@@ -196,50 +192,6 @@ nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 nodeError :: HasCallStack => [grammar] -> Node grammar -> Error grammar
 nodeError expected (Node actual _ span) = Error span expected (Just actual)
-
-
-type IncludeSource = Bool
-type Colourize = Bool
-
--- | Format an 'Error', optionally with reference to the source where it occurred.
-formatError :: IncludeSource -> Colourize -> Blob -> Info.Span -> [String] -> Maybe String -> String
-formatError includeSource colourize Blob{..} errorSpan errorExpected errorActual
-  = ($ "")
-  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (maybe Nothing (const (Just blobPath)) blobKind) errorSpan . showString ": ")
-  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
-  . (if includeSource
-    then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
-       . showString (replicate (succ (Info.posColumn (Info.spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
-    else id)
-  . showString (prettyCallStack callStack) . showChar '\n'
-  where context = maybe "\n" (Source.sourceBytes . sconcat) (nonEmpty [ Source.fromBytes (pack (showLineNumber i)) <> Source.fromBytes ": " <> l | (i, l) <- zip [1..] (Source.sourceLines blobSource), inRange (Info.posLine (Info.spanStart errorSpan) - 2, Info.posLine (Info.spanStart errorSpan)) i ])
-        showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (Info.posLine (Info.spanStart errorSpan)) :: Double)))
-
-withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
-withSGRCode useColour code content =
-  if useColour then
-    showString (setSGRCode code)
-    . content
-    . showString (setSGRCode [])
-  else
-    content
-
-showExpectation :: [String] -> Maybe String -> ShowS
-showExpectation [] Nothing = showString "no rule to match at end of input nodes"
-showExpectation expected Nothing = showString "expected " . showSymbols expected . showString " at end of input nodes"
-showExpectation expected (Just actual) = showString "expected " . showSymbols expected . showString ", but got " . showString actual
-
-showSymbols :: [String] -> ShowS
-showSymbols [] = showString "end of input nodes"
-showSymbols [symbol] = showString symbol
-showSymbols [a, b] = showString a . showString " or " . showString b
-showSymbols [a, b, c] = showString a . showString ", " . showString b . showString ", or " . showString c
-showSymbols (h:t) = showString h . showString ", " . showSymbols t
-
-showSpan :: Maybe FilePath -> Info.Span -> ShowS
-showSpan path Info.Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
-  where showPos Info.Pos{..} = shows posLine . showChar ':' . shows posColumn
 
 
 firstSet :: Ix grammar => Assignment ast grammar a -> [grammar]

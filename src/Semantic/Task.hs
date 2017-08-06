@@ -34,6 +34,7 @@ import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Blob
 import qualified Data.ByteString as B
+import qualified Data.Error as Error
 import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
@@ -199,11 +200,11 @@ runParser Options{..} blob@Blob{..} = go
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
               Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
                 Left Assignment.Error{..} -> do
-                  writeLog Error (Assignment.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob errorSpan (show <$> errorExpected) (show <$> errorActual)) blobFields
+                  writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob errorSpan (show <$> errorExpected) (show <$> errorActual)) blobFields
                   pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (show <$> errorExpected) (show <$> errorActual) []))
                 Right term -> do
                   for_ (errors term) $ \ (errorSpan, errorExpected, errorActual) ->
-                    writeLog Warning (Assignment.formatError optionsPrintSource optionsEnableColour blob errorSpan errorExpected errorActual) blobFields
+                    writeLog Warning (Error.formatError optionsPrintSource optionsEnableColour blob errorSpan errorExpected errorActual) blobFields
                   pure $ Right term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
