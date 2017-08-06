@@ -52,7 +52,6 @@ import Diff
 import Info
 import qualified Files
 import GHC.Conc (atomically)
-import GHC.Stack
 import Language
 import Language.Markdown
 import Parser
@@ -200,9 +199,9 @@ runParser Options{..} blob@Blob{..} = go
             case res of
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
               Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
-                Left err@Error.Error{..} -> do
+                Left err -> do
                   writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
-                  pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.Error (getCallStack (Error.errorCallStack err)) errorExpected errorActual []))
+                  pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.errorSyntax err []))
                 Right term -> do
                   for_ (errors term) $ \ err ->
                     writeLog Warning (Error.formatError optionsPrintSource optionsEnableColour blob err) blobFields
