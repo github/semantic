@@ -288,6 +288,7 @@ makeState = State 0 (Info.Pos 1 1)
 instance Ix grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Throw Nothing `Then` return
+
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   (Throw Nothing `Then` _) <|> r = r
@@ -307,11 +308,14 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
           choices (Catch during _ `Then` continue) = second (fmap (fmap (>>= continue))) <$> choices during
           choices (Label rule label `Then` continue) = second (fmap ((Label rule label `Then` continue) <$)) <$> choices rule
           choices _ = Nothing
+
           unionBounds a b = (min (uncurry min (bounds a)) (uncurry min (bounds b)), max (uncurry max (bounds a)) (uncurry max (bounds b)))
+
           rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
           rewrapFor (Many _ `Then` continue) = Just (<|> continue [])
           rewrapFor (Catch _ handler `Then` continue) = Just (`catchError` (continue <=< handler))
           rewrapFor _ = Nothing
+
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
