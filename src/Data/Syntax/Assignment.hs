@@ -71,7 +71,7 @@ module Data.Syntax.Assignment
 , optional
 , MonadError(..)
 , location
-, Data.Syntax.Assignment.project
+, project
 , symbol
 , source
 , children
@@ -105,7 +105,7 @@ import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Foldable
 import Data.Function
 import Data.Functor.Classes
-import Data.Functor.Foldable as F hiding (Nil)
+import qualified Data.Functor.Foldable as F hiding (Nil)
 import Data.Ix (inRange)
 import Data.List (union)
 import Data.List.NonEmpty ((<|), NonEmpty(..), nonEmpty)
@@ -126,7 +126,7 @@ type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
 data AssignmentF ast grammar a where
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
-  Project :: HasCallStack => (forall x. Base ast x -> a) -> AssignmentF ast grammar a
+  Project :: HasCallStack => (forall x. F.Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: HasCallStack => [grammar] -> Array grammar (Maybe a) -> AssignmentF ast grammar a
@@ -144,7 +144,7 @@ location = withFrozenCallStack $ Location `Then` return
 -- | Zero-width projection of the current node.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (project f *> b)@ is fine, but @many (project f)@ is not.
-project :: HasCallStack => (forall x. Base ast x -> a) -> Assignment ast grammar a
+project :: HasCallStack => (forall x. F.Base ast x -> a) -> Assignment ast grammar a
 project projection = withFrozenCallStack $ Project projection `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
@@ -256,18 +256,18 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Symbol grammar, Ix grammar, Eq ast, Recursive ast, Foldable (Base ast))
-         => (forall x. Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
-         -> Source.Source                          -- ^ The source for the parse tree.
-         -> Assignment ast grammar a               -- ^ The 'Assignment to run.
-         -> ast                                    -- ^ The root of the ast.
-         -> Either (Error grammar) a               -- ^ 'Either' an 'Error' or an assigned value.
+assignBy :: (Symbol grammar, Ix grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
+         => (forall x. F.Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
+         -> Source.Source                            -- ^ The source for the parse tree.
+         -> Assignment ast grammar a                 -- ^ The 'Assignment to run.
+         -> ast                                      -- ^ The root of the ast.
+         -> Either (Error grammar) a                 -- ^ 'Either' an 'Error' or an assigned value.
 assignBy toNode source assignment ast = bimap fst fst (runAssignment toNode source assignment (makeState [ast]))
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq ast, Recursive ast, Foldable (Base ast))
-              => (forall x. Base ast x -> Node grammar)           -- ^ A function to project a 'Node' from the ast.
+runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
+              => (forall x. F.Base ast x -> Node grammar)         -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                    -- ^ The source for the parse tree.
               -> Assignment ast grammar a                         -- ^ The 'Assignment' to run.
               -> State ast                                        -- ^ The current state.
@@ -307,7 +307,7 @@ runAssignment toNode source = (\ assignment state -> go assignment state >>= req
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
-                makeError :: HasCallStack => Maybe (Base ast ast) -> Error grammar
+                makeError :: HasCallStack => Maybe (F.Base ast ast) -> Error grammar
                 makeError node = maybe (Error statePos expectedSymbols Nothing) (nodeError expectedSymbols . toNode) node
 
         requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error grammar, State ast) (result, State ast)
