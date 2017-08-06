@@ -339,7 +339,7 @@ makeState = State 0 (Info.Pos 1 1)
 
 instance (Bounded grammar, Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Choose [] (listArray (maxBound, maxBound) [Nothing]) `Then` return
+  empty = Throw Nothing `Then` return
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
   (Throw Nothing `Then` _) <|> r = r
