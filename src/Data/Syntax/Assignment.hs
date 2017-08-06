@@ -213,11 +213,11 @@ type IncludeSource = Bool
 type Colourize = Bool
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
-formatErrorWithOptions :: Show grammar => IncludeSource -> Colourize -> Blob -> Error grammar -> String
-formatErrorWithOptions includeSource colourize Blob{..} Error{..}
+formatErrorWithOptions :: IncludeSource -> Colourize -> Blob -> Info.Pos -> [String] -> Maybe String -> String
+formatErrorWithOptions includeSource colourize Blob{..} errorPos errorExpected errorActual
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showPos (maybe Nothing (const (Just blobPath)) blobKind) errorPos . showString ": ")
-  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation (show <$> errorExpected) (show <$> errorActual) . showChar '\n')
+  . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error" . showString ": " . showExpectation errorExpected errorActual . showChar '\n')
   . (if includeSource
     then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
        . showString (replicate (succ (Info.posColumn errorPos + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
