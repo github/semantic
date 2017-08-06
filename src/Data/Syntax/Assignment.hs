@@ -370,7 +370,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance Ix grammar => Parsing (Assignment ast grammar) where
+instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   try = id
 
   (<?>) = const
@@ -380,7 +380,7 @@ instance Ix grammar => Parsing (Assignment ast grammar) where
   eof :: HasCallStack => Assignment ast grammar ()
   eof = withFrozenCallStack $ End `Then` return
 
-  notFollowedBy = const (pure ())
+  notFollowedBy a = a *> unexpected (show a) <|> pure ()
 
 instance MonadError (Error grammar) (Assignment ast grammar) where
   throwError :: HasCallStack => Error grammar -> Assignment ast grammar a
