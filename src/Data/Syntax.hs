@@ -79,5 +79,5 @@ instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual
 
-unError :: HasCallStack => Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (fromCallSiteList errorCallStack) (Error.Error span errorExpected errorActual)
+unError :: Span -> Error a -> Error.Error String
+unError span Error{..} = Error.withCallStack (fromCallSiteList errorCallStack) (withFrozenCallStack (Error.Error span errorExpected errorActual))
