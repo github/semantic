@@ -278,9 +278,9 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
 
 -- | State kept while running 'Assignment's.
 data State ast = State
-  { stateOffset :: {-# UNPACK #-} !Int       -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Info.Pos     -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateNodes :: ![ast]                     -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  { stateOffset :: {-# UNPACK #-} !Int   -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: {-# UNPACK #-} !Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateNodes :: ![ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
   deriving (Eq, Show)
 
