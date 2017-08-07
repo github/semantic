@@ -33,6 +33,9 @@ type Syntax =
    , Markup.Section
    , Markup.ThematicBreak
    , Markup.UnorderedList
+   , Markup.Table
+   , Markup.TableRow
+   , Markup.TableCell
    -- Inline elements
    , Markup.Code
    , Markup.Emphasis
@@ -58,7 +61,7 @@ assignment = makeTerm <$> symbol Document <*> children (Markup.Document <$> many
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section
+blockElement = paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section <|> table
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -91,6 +94,14 @@ thematicBreak = makeTerm <$> symbol ThematicBreak <*> pure Markup.ThematicBreak 
 htmlBlock :: Assignment
 htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
 
+table :: Assignment
+table = makeTerm <$> symbol Table <*> children (Markup.Table <$> many tableRow)
+
+tableRow :: Assignment
+tableRow = makeTerm <$> symbol TableRow <*> children (Markup.TableRow <$> many tableCell)
+
+tableCell :: Assignment
+tableCell = makeTerm <$> symbol TableCell <*> children (Markup.TableCell <$> many inlineElement)
 
 -- Inline elements
 
