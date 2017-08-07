@@ -6,6 +6,7 @@ import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
+import Data.Ix
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
@@ -26,6 +27,9 @@ emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 handleError :: (HasCallStack, Error :< fs, Show grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
+
+parseError :: (HasCallStack, Error :< fs, Bounded grammar, Ix grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+parseError = makeTerm <$> Assignment.symbol maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] Nothing []) <* Assignment.source
 
 
 -- Undifferentiated
