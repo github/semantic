@@ -2,12 +2,13 @@
 module Algorithm where
 
 import Control.Applicative (liftA2)
-import Control.Monad (guard)
+import Control.Monad (guard, join)
 import Control.Monad.Free.Freer
 import Data.Function (on)
 import Data.Functor.Both
 import Data.Functor.Classes
 import Data.Maybe
+import Data.Proxy
 import Data.These
 import Data.Union
 import Diff
@@ -100,20 +101,12 @@ class Diffable f where
 -- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
 -- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
-instance (Diffable f, Diffable (Union fs)) => Diffable (Union (f ': fs)) where
-  algorithmFor u1 u2 = case (decompose u1, decompose u2) of
-    (Left l1, Left l2) -> fmap weaken <$> algorithmFor l1 l2
-    (Right r1, Right r2) -> fmap inj <$> algorithmFor r1 r2
-    _ -> Nothing
+instance Apply1 Diffable fs => Diffable (Union fs) where
+  algorithmFor u1 u2 = join (apply1_2' (Proxy :: Proxy Diffable) (\ reinj f1 f2 -> fmap reinj <$> algorithmFor f1 f2) u1 u2)
 
 -- | Diff two list parameters using RWS.
 instance Diffable [] where
   algorithmFor a b = Just (byRWS a b)
-
--- | Diffing an empty Union is technically impossible because Union '[] uninhabited.
--- This instance is included because GHC cannot prove that.
-instance Diffable (Union '[]) where
-  algorithmFor _ _ = Nothing
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class Diffable' f where
