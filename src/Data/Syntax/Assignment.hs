@@ -302,7 +302,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
   l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
-            withBestCallStack (Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocs cl <> assocs cr)) `Then` id)
+            withBestCallStack (Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocsFor sl cl <> assocsFor sr cr)) `Then` id)
           | otherwise = withBestCallStack (Alt (l :| [r]) `Then` id)
     where choices :: Assignment ast grammar a -> Maybe ([grammar], Array grammar (Maybe (Assignment ast grammar a)))
           choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
@@ -310,6 +310,8 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
           choices (Catch during _ `Then` continue) = second (fmap (fmap (>>= continue))) <$> choices during
           choices (Label rule label `Then` continue) = second (fmap ((Label rule label `Then` continue) <$)) <$> choices rule
           choices _ = Nothing
+
+          assocsFor symbols array = (id &&& (array !)) <$> symbols
 
           unionBounds a b = (min (uncurry min (bounds a)) (uncurry min (bounds b)), max (uncurry max (bounds a)) (uncurry max (bounds b)))
 
