@@ -96,7 +96,6 @@ import Control.Comonad.Cofree
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
-import Data.Array
 import Data.Bifunctor
 import Data.ByteString (ByteString)
 import Data.Error
@@ -104,7 +103,8 @@ import Data.Foldable
 import Data.Function
 import Data.Functor.Classes
 import qualified Data.Functor.Foldable as F hiding (Nil)
-import Data.Ix (inRange)
+import qualified Data.IntMap.Lazy as IntMap
+import Data.Ix (Ix(..))
 import Data.List (union)
 import Data.List.NonEmpty ((<|), NonEmpty(..))
 import Data.Maybe
@@ -128,7 +128,7 @@ data AssignmentF ast grammar a where
   Project :: HasCallStack => (forall x. F.Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
-  Choose :: HasCallStack => [grammar] -> Array grammar (Maybe a) -> AssignmentF ast grammar a
+  Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
   Throw :: HasCallStack => Maybe (Error (Either String grammar)) -> AssignmentF ast grammar a
@@ -150,8 +150,8 @@ project projection = withFrozenCallStack $ Project projection `Then` return
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 --
 --   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (symbol A *> b)@ is fine, but @many (symbol A)@ is not.
-symbol :: (Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = withFrozenCallStack $ Choose [s] (array (s, s) [(s, Just location)]) `Then` id
+symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+symbol s = withFrozenCallStack $ Choose [s] (IntMap.singleton (toIndex s) location) `Then` id
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
@@ -172,6 +172,10 @@ while predicate step = many $ do
 -- | Collect a list of values failing a predicate.
 until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 until = while . (not .)
+
+
+toIndex :: (Bounded grammar, Ix grammar) => grammar -> Int
+toIndex = index (minBound, maxBound)
 
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
@@ -202,7 +206,7 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Symbol grammar, Ix grammar, Show grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
+assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
          => (forall x. F.Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
          -> Source.Source                            -- ^ The source for the parse tree.
          -> Assignment ast grammar a                 -- ^ The 'Assignment to run.
@@ -212,7 +216,7 @@ assignBy toNode source assignment ast = bimap (fmap (either id show)) fst (runAs
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
+runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
               => (forall x. F.Base ast x -> Node grammar)                         -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                                    -- ^ The source for the parse tree.
               -> Assignment ast grammar a                                         -- ^ The 'Assignment' to run.
@@ -236,7 +240,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
-                  Choose _ choices | symbol <- nodeSymbol (toNode node), inRange (bounds choices) symbol, Just choice <- choices ! symbol -> yield choice state
+                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode node))) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
@@ -302,18 +306,14 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
   l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
-            withBestCallStack (Choose (sl `union` sr) (accumArray (\ a b -> liftA2 (<|>) a b <|> a <|> b) Nothing (unionBounds cl cr) (assocsFor sl cl <> assocsFor sr cr)) `Then` id)
+            withBestCallStack (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) `Then` id)
           | otherwise = withBestCallStack (Alt (l :| [r]) `Then` id)
-    where choices :: Assignment ast grammar a -> Maybe ([grammar], Array grammar (Maybe (Assignment ast grammar a)))
-          choices (Choose symbols choices `Then` continue) = Just (symbols, fmap continue <$> choices)
-          choices (Many rule `Then` continue) = second (fmap ((Many rule `Then` continue) <$)) <$> choices rule
-          choices (Catch during _ `Then` continue) = second (fmap (fmap (>>= continue))) <$> choices during
-          choices (Label rule label `Then` continue) = second (fmap ((Label rule label `Then` continue) <$)) <$> choices rule
+    where choices :: Assignment ast grammar a -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar a))
+          choices (Choose symbols choices `Then` continue) = Just (symbols, continue <$> choices)
+          choices (Many rule `Then` continue) = second ((Many rule `Then` continue) <$) <$> choices rule
+          choices (Catch during _ `Then` continue) = second (fmap (>>= continue)) <$> choices during
+          choices (Label rule label `Then` continue) = second ((Label rule label `Then` continue) <$) <$> choices rule
           choices _ = Nothing
-
-          assocsFor symbols array = (id &&& (array !)) <$> symbols
-
-          unionBounds a b = (min (uncurry min (bounds a)) (uncurry min (bounds b)), max (uncurry max (bounds a)) (uncurry max (bounds b)))
 
           rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
           rewrapFor (Many _ `Then` continue) = Just (<|> continue [])
@@ -361,7 +361,7 @@ instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
     Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols ((choices !) <$> symbols)
+    Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
