@@ -218,7 +218,7 @@ runAssignment :: forall grammar a ast. (Symbol grammar, Ix grammar, Eq ast, F.Re
               -> Assignment ast grammar a                                         -- ^ The 'Assignment' to run.
               -> State ast                                                        -- ^ The current state.
               -> Either (Error (Either String grammar)) (a, State ast) -- ^ 'Either' an 'Error' or an assigned value & updated state.
-runAssignment toNode source = (\ assignment state -> go assignment state >>= requireExhaustive)
+runAssignment toNode source = \ assignment state -> go assignment state >>= requireExhaustive
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
   where go :: Assignment ast grammar result -> State ast -> Either (Error (Either String grammar)) (result, State ast)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
