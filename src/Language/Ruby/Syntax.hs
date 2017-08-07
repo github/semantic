@@ -8,7 +8,7 @@ module Language.Ruby.Syntax
 
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (emptyTerm, makeTerm)
+import Data.Syntax (emptyTerm, makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -78,7 +78,7 @@ type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Te
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
+assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
 expression =
@@ -121,6 +121,7 @@ expression =
   <|> rescue
   <|> block
   <|> heredoc
+  <|> parseError
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expression))
 
 expressions :: Assignment
@@ -202,6 +203,7 @@ parameter =
   <|> mk OptionalParameter
   <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
   <|> expression
+  <|> parseError
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 method :: Assignment

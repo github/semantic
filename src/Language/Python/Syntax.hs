@@ -14,7 +14,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
 import Data.Tuple (swap)
 import Data.Record
-import Data.Syntax (emptyTerm, makeTerm)
+import Data.Syntax (emptyTerm, makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -102,7 +102,7 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
+assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
 expression =
@@ -142,6 +142,7 @@ expression =
   <|> nonlocalStatement
   <|> notOperator
   <|> parameter
+  <|> parseError
   <|> passStatement
   <|> printStatement
   <|> raiseStatement
@@ -377,6 +378,7 @@ import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import 
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+       <|> parseError
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
