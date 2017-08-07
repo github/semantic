@@ -257,7 +257,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
                 makeError :: HasCallStack => Maybe (F.Base ast ast) -> Error (Either String grammar)
-                makeError node = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols) . toNode) node
+                makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols) . toNode)
 
         requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error (Either String grammar)) (result, State ast)
         requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
