@@ -34,6 +34,9 @@ type Syntax =
    , Markup.Section
    , Markup.ThematicBreak
    , Markup.UnorderedList
+   , Markup.Table
+   , Markup.TableRow
+   , Markup.TableCell
    -- Inline elements
    , Markup.Code
    , Markup.Emphasis
@@ -42,6 +45,7 @@ type Syntax =
    , Markup.Link
    , Markup.Strong
    , Markup.Text
+   , Markup.Strikethrough
    -- Assignment errors; cmark does not provide parse errors.
    , Syntax.Error
    , []
@@ -58,7 +62,7 @@ assignment = makeTerm <$> symbol Document <*> children (Markup.Document <$> many
 -- Block elements
 
 blockElement :: Assignment
-blockElement = handleError $ paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section
+blockElement = handleError $ paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section <|> table
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -91,17 +95,28 @@ thematicBreak = makeTerm <$> symbol ThematicBreak <*> pure Markup.ThematicBreak 
 htmlBlock :: Assignment
 htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
 
+table :: Assignment
+table = makeTerm <$> symbol Table <*> children (Markup.Table <$> many tableRow)
+
+tableRow :: Assignment
+tableRow = makeTerm <$> symbol TableRow <*> children (Markup.TableRow <$> many tableCell)
+
+tableCell :: Assignment
+tableCell = makeTerm <$> symbol TableCell <*> children (Markup.TableCell <$> many inlineElement)
 
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = handleError $ strong <|> emphasis <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
+inlineElement = handleError $ strong <|> emphasis <|> strikethrough <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
 
 strong :: Assignment
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
 
 emphasis :: Assignment
 emphasis = makeTerm <$> symbol Emphasis <*> children (Markup.Emphasis <$> many inlineElement)
+
+strikethrough :: Assignment
+strikethrough = makeTerm <$> symbol Strikethrough <*> children (Markup.Strikethrough <$> many inlineElement)
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Markup.Text <$> source)
