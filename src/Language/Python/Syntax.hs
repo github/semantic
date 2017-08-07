@@ -14,7 +14,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
 import Data.Tuple (swap)
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, makeTerm)
+import Data.Syntax (emptyTerm, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -105,7 +105,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError $
+expression =
       argument
   <|> argumentList
   <|> assertStatement
@@ -373,8 +373,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
-import' =  handleError
-        $  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
+import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)

@@ -8,7 +8,7 @@ module Language.Ruby.Syntax
 
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, makeTerm)
+import Data.Syntax (emptyTerm, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -81,7 +81,7 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError $
+expression =
       beginBlock
   <|> endBlock
   <|> comment

@@ -11,7 +11,7 @@ import qualified CMarkGFM
 import Data.ByteString (ByteString)
 import Data.Function (on)
 import Data.Record
-import Data.Syntax (handleError, makeTerm)
+import Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -62,7 +62,7 @@ assignment = makeTerm <$> symbol Document <*> children (Markup.Document <$> many
 -- Block elements
 
 blockElement :: Assignment
-blockElement = handleError $ paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section <|> table
+blockElement = paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section <|> table
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -107,7 +107,7 @@ tableCell = makeTerm <$> symbol TableCell <*> children (Markup.TableCell <$> man
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = handleError $ strong <|> emphasis <|> strikethrough <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
+inlineElement = strong <|> emphasis <|> strikethrough <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
 
 strong :: Assignment
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
