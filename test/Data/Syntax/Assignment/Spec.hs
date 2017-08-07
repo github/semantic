@@ -123,20 +123,20 @@ spec = do
       fst <$> runAssignment headF "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
 
     it "does not advance past the current node" $
-      first fst (runAssignment headF "hi" (symbol Red) (makeState [ node Red 0 2 [] ])) `shouldBe` Left (Error (Span (Pos 1 1) (Pos 1 3)) [] (Just (Right Red)))
+      runAssignment headF "hi" (symbol Red) (makeState [ node Red 0 2 [] ]) `shouldBe` Left (Error (Span (Pos 1 1) (Pos 1 3)) [] (Just (Right Red)))
 
   describe "without catchError" $ do
     it "assignment returns unexpected symbol error" $
-      first fst (runAssignment headF "A"
+      runAssignment headF "A"
         red
-        (makeState [node Green 0 1 []]))
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
 
     it "assignment returns unexpected end of input" $
-      first fst (runAssignment headF "A"
+      runAssignment headF "A"
         (symbol Green *> children (some red))
-        (makeState [node Green 0 1 []]))
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
 
@@ -156,9 +156,9 @@ spec = do
           Right (Out "A")
 
     it "handler that doesn't match produces error" $
-      first fst (runAssignment headF "A"
+      runAssignment headF "A"
         (red `catchError` const blue)
-        (makeState [node Green 0 1 []]))
+        (makeState [node Green 0 1 []])
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Blue] (Just (Right Green)))
 
@@ -180,18 +180,18 @@ spec = do
             Right [Out "G"]
 
       it "handler that doesn't match produces error" $
-        first fst (runAssignment headF "PG"
+        runAssignment headF "PG"
           (symbol Palette *> children ( many (red `catchError` const blue) ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]]))
+          (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Left (Error (Span (Pos 1 2) (Pos 1 3)) [] (Just (Right Green)))
 
       it "handlers are greedy" $
-        first fst (runAssignment headF "PG"
+        runAssignment headF "PG"
           (symbol Palette *> children (
             (,) <$> many (red `catchError` (\ _ -> OutError <$ location <*> source)) <*> green
           ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]]))
+          (makeState [node Palette 0 1 [node Green 1 2 []]])
           `shouldBe`
             Left (Error (Span (Pos 1 3) (Pos 1 3)) [Right Green] Nothing)
 
@@ -233,7 +233,7 @@ spec = do
         Right ()
 
     it "does not match if its subrule does not match" $
-      first fst (runAssignment headF "a" (children red) (makeState [node Blue 0 1 [node Green 0 1 []]]))
+      runAssignment headF "a" (children red) (makeState [node Blue 0 1 [node Green 0 1 []]])
       `shouldBe`
         Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
 
@@ -278,7 +278,7 @@ spec = do
         Right (Out "magenta", Out "red")
 
     it "produces errors with callstacks pointing at the failing assignment" $
-      first (fmap fst . getCallStack . errorCallStack . fst) (runAssignment headF "blue" red (makeState [node Blue 0 4 []]))
+      first (fmap fst . getCallStack . errorCallStack) (runAssignment headF "blue" red (makeState [node Blue 0 4 []]))
       `shouldBe`
       Left [ "symbol", "red" ]
 
