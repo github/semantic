@@ -97,11 +97,10 @@ expression =
   <|> unary
   <|> binary
   <|> literal
-  <|> mk Return Statement.Return
-  <|> mk Yield Statement.Yield
-  <|> mk Break Statement.Break
-  <|> mk Next Statement.Continue
-  <|> mk Retry Statement.Retry
+  <|> mk ReturnStatement Statement.Return
+  <|> mk YieldExpression Statement.Yield
+  <|> mk BreakStatement Statement.Break
+  <|> mk ContinueStatement Statement.Continue
   <|> for
   <|> class'
   <|> method
@@ -116,7 +115,7 @@ expression =
   <|> rescue
   <|> block
   <|> parseError
-  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expression))
+  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (children expression))
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
