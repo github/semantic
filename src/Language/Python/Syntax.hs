@@ -12,7 +12,6 @@ import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
-import Data.Tuple (swap)
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, makeTerm)
 import qualified Data.Syntax as Syntax
@@ -211,7 +210,7 @@ withStatement = mk <$> symbol WithStatement <*> children (some with)
   where
     mk _ [child] = child
     mk l children = makeTerm l children
-    with = makeTerm <$> location <*> (uncurry Statement.Let . swap <$> withItem <*> expressions)
+    with = makeTerm <$> location <*> (uncurry (flip Statement.Let) <$> withItem <*> expressions)
     withItem = (symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm)))
             <|> ((,) <$> expression <*> emptyTerm)
 
