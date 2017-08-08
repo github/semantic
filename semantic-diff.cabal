@@ -56,6 +56,7 @@ library
                      , Language.Ruby.Grammar
                      , Language.Ruby.Syntax
                      , Language.TypeScript
+                     , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
                      , Language.Python
                      , Language.Python.Grammar
