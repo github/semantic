@@ -216,7 +216,7 @@ withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with
             <|> ((,) <$> expression <*> emptyTerm)
 
 forStatement :: Assignment
-forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> eof)) <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
   where
     make loc binding subject body forElseClause = case forElseClause of
       Nothing -> makeTerm loc (Statement.ForEach binding subject body)
