@@ -12,9 +12,8 @@ import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
-import Data.Tuple (swap)
 import Data.Record
-import Data.Syntax (emptyTerm, makeTerm, parseError)
+import Data.Syntax (emptyTerm, handleError, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -102,10 +101,10 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression =
+expression = handleError $
       argument
   <|> argumentList
   <|> assertStatement
@@ -142,7 +141,6 @@ expression =
   <|> nonlocalStatement
   <|> notOperator
   <|> parameter
-  <|> parseError
   <|> passStatement
   <|> printStatement
   <|> raiseStatement
@@ -208,16 +206,16 @@ argumentList :: Assignment
 argumentList = makeTerm <$> symbol ArgumentList <*> children (many expression)
 
 withStatement :: Assignment
-withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with)
+withStatement = mk <$> symbol WithStatement <*> children (some with)
   where
     mk _ [child] = child
     mk l children = makeTerm l children
-    with = makeTerm <$> location <*> (uncurry Statement.Let . swap <$> withItem <*> expressions)
-    withItem = (symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm)))
-            <|> ((,) <$> expression <*> emptyTerm)
+    with = makeTerm <$> location <*> (withItem <*> (makeTerm <$> location <*> manyTill expression (void (symbol WithItem) <|> eof)))
+    withItem = symbol WithItem *> children (flip Statement.Let <$> expression <*> (expression <|> emptyTerm))
+            <|> flip Statement.Let <$> expression <*> emptyTerm
 
 forStatement :: Assignment
-forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> expressions <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> eof)) <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
   where
     make loc binding subject body forElseClause = case forElseClause of
       Nothing -> makeTerm loc (Statement.ForEach binding subject body)
@@ -353,7 +351,7 @@ set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
 
 dictionary :: Assignment
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many (pair <|> comment))
-  where pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+  where pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$ many comment <*> expression <* many comment <*> expression <* many comment)
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
@@ -378,7 +376,6 @@ import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import 
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
-       <|> parseError
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
