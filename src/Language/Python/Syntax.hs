@@ -14,7 +14,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
 import Data.Tuple (swap)
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, makeTerm, parseError)
+import Data.Syntax (emptyTerm, handleError, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -102,7 +102,7 @@ instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
 expression = handleError $
