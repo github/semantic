@@ -41,7 +41,7 @@ formatError includeSource colourize Blob{..} Error{..}
     then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
        . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else id)
-  . showCallStack callStack . showChar '\n'
+  . showCallStack colourize callStack . showChar '\n'
   where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromBytes (pack (showLineNumber i)) <> fromBytes ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
@@ -75,8 +75,8 @@ showSpan :: Maybe FilePath -> Span -> ShowS
 showSpan path Span{..} = maybe (showParen True (showString "interactive")) showString path . showChar ':' . (if spanStart == spanEnd then showPos spanStart else showPos spanStart . showChar '-' . showPos spanEnd)
   where showPos Pos{..} = shows posLine . showChar ':' . shows posColumn
 
-showCallStack :: CallStack -> ShowS
-showCallStack callStack = foldr (.) id (intersperse (showChar '\n') (uncurry showCallSite <$> getCallStack callStack))
+showCallStack :: Colourize -> CallStack -> ShowS
+showCallStack colourize callStack = foldr (.) id (intersperse (showChar '\n') (uncurry (showCallSite colourize) <$> getCallStack callStack))
 
-showCallSite :: String -> SrcLoc -> ShowS
-showCallSite symbol SrcLoc{..} = showString symbol . showChar ' ' . showParen True (showSpan (Just srcLocFile) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol)))
+showCallSite :: Colourize -> String -> SrcLoc -> ShowS
+showCallSite colourize symbol SrcLoc{..} = showString symbol . showChar ' ' . withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showParen True (showSpan (Just srcLocFile) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))))
