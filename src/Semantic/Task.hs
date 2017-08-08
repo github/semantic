@@ -200,8 +200,9 @@ runParser Options{..} blob@Blob{..} = go
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
               Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
                 Left err -> do
-                  writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
-                  pure $ Right (Syntax.makeTerm (totalRange blobSource :. totalSpan blobSource :. Nil) (Syntax.errorSyntax err []))
+                  let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
+                  writeLog Error formatted blobFields
+                  pure $ Left formatted
                 Right term -> do
                   for_ (errors term) $ \ err ->
                     writeLog Warning (Error.formatError optionsPrintSource optionsEnableColour blob err) blobFields
