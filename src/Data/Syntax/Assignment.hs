@@ -217,10 +217,10 @@ assignBy toNode source assignment ast = bimap (fmap (either id show)) fst (runAs
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
-              => (forall x. F.Base ast x -> Node grammar)                         -- ^ A function to project a 'Node' from the ast.
-              -> Source.Source                                                    -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                                         -- ^ The 'Assignment' to run.
-              -> State ast                                                        -- ^ The current state.
+              => (forall x. F.Base ast x -> Node grammar)              -- ^ A function to project a 'Node' from the ast.
+              -> Source.Source                                         -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                              -- ^ The 'Assignment' to run.
+              -> State ast                                             -- ^ The current state.
               -> Either (Error (Either String grammar)) (a, State ast) -- ^ 'Either' an 'Error' or an assigned value & updated state.
 runAssignment toNode source = \ assignment state -> go assignment state >>= requireExhaustive
   -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
