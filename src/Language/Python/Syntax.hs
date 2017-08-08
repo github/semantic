@@ -210,9 +210,9 @@ withStatement = mk <$> symbol WithStatement <*> children (some with)
   where
     mk _ [child] = child
     mk l children = makeTerm l children
-    with = makeTerm <$> location <*> (uncurry (flip Statement.Let) <$> withItem <*> expressions)
-    withItem = (symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm)))
-            <|> ((,) <$> expression <*> emptyTerm)
+    with = makeTerm <$> location <*> (withItem <*> expressions)
+    withItem = symbol WithItem *> children (flip Statement.Let <$> expression <*> (expression <|> emptyTerm))
+            <|> flip Statement.Let <$> expression <*> emptyTerm
 
 forStatement :: Assignment
 forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> eof)) <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
