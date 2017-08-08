@@ -373,8 +373,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
-import' = handleError $
-           makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
+import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
