@@ -207,7 +207,7 @@ argumentList :: Assignment
 argumentList = makeTerm <$> symbol ArgumentList <*> children (many expression)
 
 withStatement :: Assignment
-withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with)
+withStatement = mk <$> symbol WithStatement <*> children (some with)
   where
     mk _ [child] = child
     mk l children = makeTerm l children
