@@ -204,7 +204,7 @@ runParser Options{..} blob@Blob{..} = go
                   pure $ Left formatted
                 Right term -> do
                   for_ (errors term) $ \ err ->
-                    writeLog Warning (Error.formatError optionsPrintSource optionsEnableColour blob err) blobFields
+                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
                   pure $ Right term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
