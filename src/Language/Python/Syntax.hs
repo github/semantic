@@ -142,7 +142,6 @@ expression = handleError $
   <|> nonlocalStatement
   <|> notOperator
   <|> parameter
-  <|> parseError
   <|> passStatement
   <|> printStatement
   <|> raiseStatement
@@ -379,7 +378,6 @@ import' = handleError $
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> many expression)
        <|> makeTerm <$> symbol AliasedImport <*> children (flip Statement.Let <$> expression <*> expression <*> emptyTerm)
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
-       <|> parseError
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
