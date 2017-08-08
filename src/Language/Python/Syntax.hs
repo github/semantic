@@ -351,7 +351,7 @@ set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
 
 dictionary :: Assignment
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many (pair <|> comment))
-  where pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+  where pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$ many comment <*> expression <* many comment <*> expression <* many comment)
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
