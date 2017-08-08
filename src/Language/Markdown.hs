@@ -7,6 +7,7 @@ module Language.Markdown
 
 import Control.Comonad.Cofree
 import CMarkGFM
+import Data.Ix
 import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
@@ -37,7 +38,7 @@ data Grammar
   | Table
   | TableRow
   | TableCell
-  deriving (Bounded, Enum, Eq, Ord, Show)
+  deriving (Bounded, Enum, Eq, Ix, Ord, Show)
 
 exts :: [CMarkExtension]
 exts = [
