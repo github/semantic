@@ -191,7 +191,7 @@ runParser :: Options -> Blob -> Parser term -> Task (Either String term)
 runParser Options{..} blob@Blob{..} = go
   where go :: Parser term -> Task (Either String term)
         go parser = case parser of
-          ASTParser language -> do
+          ASTParser language ->
             logTiming "ts ast parse" $
               liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
           AssignmentParser parser by assignment -> do
