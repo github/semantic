@@ -286,7 +286,7 @@ node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = Node symbol (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end))) :< children
 
 data Grammar = Palette | Red | Green | Blue | Magenta
-  deriving (Enum, Eq, Ix, Ord, Show)
+  deriving (Bounded, Enum, Eq, Ix, Ord, Show)
 
 instance Symbol Grammar where
   symbolType Magenta = Anonymous
