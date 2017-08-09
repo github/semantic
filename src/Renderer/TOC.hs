@@ -26,6 +26,7 @@ import Data.Align (crosswalk)
 import Data.Bifunctor (bimap, first)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
+import Data.Error as Error (formatError)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
@@ -118,23 +119,23 @@ syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Functor (Union fs), HasField fields Range)
+declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra Blob{..} (a :< r)
+declarationAlgebra blob@Blob{..} (a :< r)
   | Just (Declaration.Function (identifier, _) _ _) <- prj r = Just $ FunctionDeclaration (getSource (extract identifier))
   | Just (Declaration.Method _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
-  | Just Syntax.Error{} <- prj r = Just $ ErrorDeclaration (getSource a) blobLanguage
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, Functor (Union fs), Foldable (Union fs))
+markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply1 Functor fs, Apply1 Foldable fs)
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra Blob{..} (a :< r)
+markupSectionAlgebra blob@Blob{..} (a :< r)
   | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just Syntax.Error{} <- prj r = Just $ ErrorDeclaration (getSource a) blobLanguage
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
         firstLine = T.takeWhile (/= '\n')
@@ -151,7 +152,7 @@ data Entry a
 
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
-tableOfContentsBy :: Traversable f
+tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
@@ -162,7 +163,7 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
           (_     , entries) -> entries
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
-termTableOfContentsBy :: Traversable f
+termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)
                       -> Term f annotation
                       -> [a]
@@ -199,7 +200,7 @@ recordSummary record = case getDeclaration record of
   Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
   Nothing -> const Nothing
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Both Blob -> Diff f (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -209,15 +210,15 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Blob -> Term f (Record fields) -> Summaries
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
 renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where toMap [] = mempty
         toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Diff f (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
-termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Term f (Record fields) -> [JSONSummary]
+termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
 termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name

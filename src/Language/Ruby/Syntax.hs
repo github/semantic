@@ -6,9 +6,9 @@ module Language.Ruby.Syntax
 , Term
 ) where
 
-import Control.Comonad.Cofree (Cofree(..))
 import Data.Maybe (fromMaybe)
 import Data.Record
+import Data.Syntax (emptyTerm, makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -78,9 +78,7 @@ type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Te
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment =
-      makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
-  <|> parseError
+assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
 expression =
@@ -389,14 +387,5 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 
 -- Helper functions
 
-makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
-makeTerm a f = a :< inj f
-
-emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
-
-invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
+invert :: Assignment -> Assignment
 invert term = makeTerm <$> location <*> fmap Expression.Not term
-
-parseError :: Assignment
-parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)

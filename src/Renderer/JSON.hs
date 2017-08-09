@@ -19,6 +19,7 @@ import Data.Foldable (toList)
 import Data.Functor.Both (Both)
 import qualified Data.Map as Map
 import Data.Output
+import Data.Proxy
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Text (pack, Text)
@@ -110,10 +111,8 @@ instance ToJSON a => ToJSONFields [a] where
 instance ToJSON recur => ToJSONFields (Syntax recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
 
-instance (Foldable f, ToJSON a, ToJSONFields (Union fs a)) => ToJSONFields (Union (f ': fs) a) where
-  toJSONFields u = case decompose u of
-    Left u' -> toJSONFields u'
-    Right r -> [ "children" .= toList r ]
+instance (Apply1 Foldable fs, ToJSON a) => ToJSONFields (Union fs a) where
+  toJSONFields = apply1 (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
 
 instance ToJSONFields (Union '[] a) where
   toJSONFields _ = []

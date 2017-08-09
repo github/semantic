@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, TypeOperators, UndecidableInstances #-}
 module Decorators
 ( ConstructorLabel(..)
 , constructorNameAndConstantFields
@@ -8,6 +8,7 @@ module Decorators
 import Data.Aeson
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Functor.Classes (Show1 (liftShowsPrec))
+import Data.Proxy
 import Data.Text.Encoding (decodeUtf8)
 import Data.Union
 import GHC.Generics
@@ -22,8 +23,8 @@ constructorNameAndConstantFields :: Show1 f => TermF f a b -> ByteString
 constructorNameAndConstantFields (_ :< f) = pack (liftShowsPrec (const (const id)) (const id) 0 f "")
 
 -- | Compute a 'ConstructorLabel' label for a 'Union' of syntax 'Term's.
-constructorLabel :: ConstructorName f => TermF f a b -> ConstructorLabel
-constructorLabel (_ :< f) = ConstructorLabel $ pack (constructorName f)
+constructorLabel :: Apply1 ConstructorName fs => TermF (Union fs) a b -> ConstructorLabel
+constructorLabel (_ :< u) = ConstructorLabel $ pack (apply1 (Proxy :: Proxy ConstructorName) constructorName u)
 
 
 newtype ConstructorLabel = ConstructorLabel ByteString
@@ -38,22 +39,21 @@ instance ToJSONFields ConstructorLabel where
 class ConstructorName f where
   constructorName :: f a -> String
 
-instance (Generic1 f, ConstructorName (Rep1 f), ConstructorName (Union fs)) => ConstructorName (Union (f ': fs)) where
-  constructorName union = case decompose union of
-    Left rest -> constructorName rest
-    Right f -> constructorName (from1 f)
+instance (Generic1 f, GConstructorName (Rep1 f)) => ConstructorName f where
+  constructorName = gconstructorName . from1
 
-instance ConstructorName (Union '[]) where
-  constructorName _ = ""
 
-instance ConstructorName f => ConstructorName (M1 D c f) where
-  constructorName = constructorName . unM1
+class GConstructorName f where
+  gconstructorName :: f a -> String
 
-instance Constructor c => ConstructorName (M1 C c f) where
-  constructorName x = case conName x of
+instance GConstructorName f => GConstructorName (M1 D c f) where
+  gconstructorName = gconstructorName . unM1
+
+instance (GConstructorName f, GConstructorName g) => GConstructorName (f :+: g) where
+  gconstructorName (L1 l) = gconstructorName l
+  gconstructorName (R1 r) = gconstructorName r
+
+instance Constructor c => GConstructorName (M1 C c f) where
+  gconstructorName x = case conName x of
                         ":" -> ""
                         n -> n
-
-instance (ConstructorName f, ConstructorName g) => ConstructorName (f :+: g) where
-  constructorName (L1 l) = constructorName l
-  constructorName (R1 r) = constructorName r
