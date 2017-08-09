@@ -119,7 +119,6 @@ expression =
   <|> classDefinition
   <|> comment
   <|> comparisonOperator
-  <|> comprehension
   <|> conditionalExpression
   <|> continueStatement
   <|> decoratedDefinition
