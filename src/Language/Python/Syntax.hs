@@ -456,15 +456,12 @@ none :: Assignment
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
 comprehension :: Assignment
-comprehension =  makeTerm <$> symbol GeneratorExpression <*> children (comprehensionDeclaration expression)
-             <|> makeTerm <$> symbol ListComprehension <*> children (comprehensionDeclaration expression)
-             <|> makeTerm <$> symbol SetComprehension <*> children (comprehensionDeclaration expression)
-             <|> makeTerm <$> symbol DictionaryComprehension <*> children (comprehensionDeclaration keyValue)
-  where
-    keyValue = makeTerm <$> location <*> (Literal.KeyValue <$> expression <*> expression)
-    comprehensionDeclaration preceeding = Declaration.Comprehension <$ many comment <*> preceeding <* symbol Variables <*> children (many expression) <*> (flip (foldr makeComprehension) <$> many nestedComprehension <*> expression)
-    makeComprehension (loc, makeRest) rest = makeTerm loc (makeRest rest)
-    nestedComprehension = (,) <$> location <*> (Declaration.Comprehension <$> expression <* symbol Variables <*> children (many expression))
+comprehension = symbol ListComprehension >>= \ loc -> children (mk loc <$> expression <*> forInClause <*> (ifClause <|> emptyTerm)) 
+  where forInClause = symbol ForInClause *> children ((,) <$> variables <*> expressions)
+        variables = symbol Variables *> children expression
+        ifClause = symbol IfClause *> children expression
+        mk loc expr (bindings, context) ifExpr = makeTerm loc (Declaration.Comprehension expr bindings context ifExpr)
+  
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
