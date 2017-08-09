@@ -219,7 +219,7 @@ withStatement = symbol WithStatement >>= \ loc -> children (mk loc <$> some with
     mk _ [child] = child
     mk l children = makeTerm l children
     with = makeTerm <$> location <*> (uncurry Statement.Let . swap <$> withItem <*> expressions)
-    withItem = (symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm))) 
+    withItem = (symbol WithItem *> children ((,) <$> expression <*> (expression <|> emptyTerm)))
             <|> ((,) <$> expression <*> emptyTerm)
 
 forStatement :: Assignment
@@ -479,8 +479,8 @@ ifClause = symbol IfClause *> children expressions
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
-  expression >>= \ thenBranch -> 
-    many comment >> expression >>= \ conditional -> 
+  expression >>= \ thenBranch ->
+    many comment >> expression >>= \ conditional ->
       Statement.If conditional thenBranch <$> expressions)
 
 makeTerm :: (HasCallStack, f :< fs) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
