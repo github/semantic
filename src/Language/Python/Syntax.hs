@@ -131,10 +131,12 @@ expression =
   <|> expressionList
   <|> expressionStatement
   <|> finallyClause
+  <|> forInClause
   <|> forStatement
   <|> functionDefinition
   <|> globalStatement
   <|> identifier
+  <|> ifClause
   <|> ifStatement
   <|> import'
   <|> identifier
@@ -154,6 +156,7 @@ expression =
   <|> tuple
   <|> type'
   <|> unaryOperator
+  <|> variables
   <|> whileStatement
   <|> withStatement
   <|> yield
@@ -163,12 +166,14 @@ expressions = makeTerm <$> location <*> many expression
 
 literal :: Assignment
 literal =  boolean
+       <|> comprehension
        <|> concatenatedString
        <|> dictionary
        <|> float
        <|> integer
        <|> list'
        <|> none
+       <|> pair
        <|> set
        <|> string
        <|> parseError
@@ -352,8 +357,10 @@ set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
 
 dictionary :: Assignment
-dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many (pair <|> comment))
-  where pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many expression)
+
+pair :: Assignment
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
@@ -456,12 +463,19 @@ none :: Assignment
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
 
 comprehension :: Assignment
-comprehension = symbol ListComprehension >>= \ loc -> children (mk loc <$> expression <*> forInClause <*> (ifClause <|> emptyTerm)) 
-  where forInClause = symbol ForInClause *> children ((,) <$> variables <*> expressions)
-        variables = symbol Variables *> children expression
-        ifClause = symbol IfClause *> children expression
-        mk loc expr (bindings, context) ifExpr = makeTerm loc (Declaration.Comprehension expr bindings context ifExpr)
-  
+comprehension =  makeTerm <$> symbol ListComprehension       <*> children (Declaration.Comprehension <$> expression <*> expressions)
+             <|> makeTerm <$> symbol GeneratorExpression     <*> children (Declaration.Comprehension <$> expression <*> expressions)
+             <|> makeTerm <$> symbol SetComprehension        <*> children (Declaration.Comprehension <$> expression <*> expressions)
+             <|> makeTerm <$> symbol DictionaryComprehension <*> children (Declaration.Comprehension <$> expression <*> expressions)
+
+forInClause :: Assignment
+forInClause = symbol ForInClause *> children expressions
+
+variables :: Assignment
+variables = symbol Variables *> children expressions
+
+ifClause :: Assignment
+ifClause = symbol IfClause *> children expressions
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
