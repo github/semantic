@@ -123,16 +123,8 @@ expressions = makeTerm <$> location <*> many expression
 identifier :: Assignment
 identifier =
       mk Identifier
-  <|> mk Constant
-  <|> mk InstanceVariable
-  <|> mk ClassVariable
-  <|> mk GlobalVariable
-  <|> mk Operator
-  <|> mk Self
+  <|> mk NestedIdentifier
   <|> mk Super
-  <|> mk Setter
-  <|> mk ReservedIdentifier
-  <|> mk Uninterpreted
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 literal :: Assignment
@@ -142,38 +134,35 @@ literal =
   <|> makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
   <|> makeTerm <$> symbol Grammar.Null <*> (Literal.Null <$ source)
    -- TODO: Do we want to represent the difference between .. and ...
-  <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
-  <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pair)
-  -- TODO: Give subshell it's own literal and allow interpolation
-  <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
+  <|> makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pair)
   -- TODO: Handle interpolation
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
-  -- TODO: this isn't quite right `"a" "b"` ends up as TextElement {textElementContent = "\"a\"\"b\""}
-  <|> makeTerm <$> symbol ChainedString <*> children (Literal.TextElement . mconcat <$> many (symbol String *> source))
   -- TODO: Handle interpolation, dedicated literal?
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
-  -- TODO: Handle interpolation
-  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
 
 class' :: Assignment
 class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> expression <*> (superclass <|> pure []) <*> many expression)
-  where superclass = pure <$ symbol Superclass <*> children expression
+  where superclass = pure <$ symbol ClassHeritage <*> children expression
 
 module' :: Assignment
 module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> expression <*> many expression)
 
 parameter :: Assignment
 parameter =
-      mk SplatParameter
-  <|> mk HashSplatParameter
-  <|> mk BlockParameter
-  <|> mk KeywordParameter
-  <|> mk OptionalParameter
-  <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
-  <|> expression
+      requiredParameter
+  <|> restParameter
+  <|> optionalParameter
   <|> parseError
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+
+requiredParameter :: Assignment
+requiredParameter = makeTerm <$> symbol RequiredParameter <*> children ((,,,) <$> optional accessibilityModifier <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
+
+restParameter :: Assignment
+restParameter = makeTerm <$> symbol RestParameter <*> children ((,) <$> identifier <*> optional typeAnnotation)
+
+optionalParameter :: Assignment
+optionalParameter = makeTerm <$> symbol OptionalParameter <*> children ((,,,) <$> optional accessibilityModifier <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
 
 method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> expression <*> params <*> expressions)
