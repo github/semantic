@@ -5,6 +5,7 @@ profiles
 tags
 
 cabal.project.local
+dist
 dist-newstyle
 
 tmp/
