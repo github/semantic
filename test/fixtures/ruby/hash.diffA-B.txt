@@ -5,18 +5,16 @@
     ->(Identifier) }
     { (StringLiteral)
     ->(StringLiteral) })
-  {+(Pair
-      (Identifier)
-      (IntegerLiteral))+}
-  {+(Pair
-      (Identifier)
-      (Boolean))+}
-  {-(Pair
-      (SymbolLiteral)
-      (IntegerLiteral))-}
-  {-(Pair
-      (StringLiteral)
-      (Boolean))-}
+    (Pair
+    { (SymbolLiteral)
+    ->(Identifier) }
+    { (IntegerLiteral)
+    ->(IntegerLiteral) })
+    (Pair
+    { (StringLiteral)
+    ->(Identifier) }
+    { (Boolean)
+    ->(Boolean) })
   {-(Pair
       (SymbolLiteral)
       (IntegerLiteral))-}))
