@@ -2,5 +2,3 @@ packages: ./ languages/*/ tools/*/
 optional-packages: vendor/*/
 
 jobs: $ncpus
-
-constraints: cmark-gfm < 0.1.2
