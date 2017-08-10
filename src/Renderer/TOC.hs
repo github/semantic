@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MonoLocalBinds, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MonoLocalBinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Data.Syntax.Algebra
 ( FAlgebra
 , RAlgebra

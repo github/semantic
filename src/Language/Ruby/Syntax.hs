@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MonoLocalBinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Ruby.Syntax
 ( assignment
 , Syntax
