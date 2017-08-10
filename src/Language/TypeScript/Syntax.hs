@@ -67,6 +67,7 @@ type Syntax = '[
   , Statement.Try
   , Statement.While
   , Statement.Yield
+  , Syntax.AccessibilityModifier
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
@@ -153,6 +154,9 @@ parameter =
   <|> restParameter
   <|> optionalParameter
   <|> parseError
+
+accessibilityModifier :: Assignment
+accessibilityModifier = makeTerm <$> symbol AccessibilityModifier <*> (Syntax.AccessibilityModifier <$> source)
 
 requiredParameter :: Assignment
 requiredParameter = makeTerm <$> symbol RequiredParameter <*> children ((,,,) <$> optional accessibilityModifier <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
