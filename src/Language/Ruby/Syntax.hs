@@ -374,8 +374,7 @@ binary = symbol Binary >>= \ loc -> children $ expression >>= \ lexpression -> g
       <|> mk AnonSlash Expression.DividedBy
       <|> mk AnonPercent Expression.Modulo
       <|> mk AnonStarStar Expression.Power
-      where mk :: f :< Syntax => Grammar -> (Term -> Term -> f Term) -> Assignment
-            mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> expression))
+      where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> expression))
             mkNot s constr = makeTerm loc <$ symbol s <*> (Expression.Not <$> (makeTerm <$> location <*> (constr lexpression <$> expression)))
 
 conditional :: Assignment
