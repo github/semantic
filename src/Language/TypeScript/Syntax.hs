@@ -49,7 +49,6 @@ type Syntax = '[
   , Literal.KeyValue
   , Literal.Null
   , Literal.String
-  , Literal.Symbol
   , Literal.TextElement
   , Statement.Assignment
   , Statement.Break
