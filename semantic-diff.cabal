@@ -7,7 +7,7 @@ author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
 copyright:           2016 GitHub
 category:            Web
-build-type:          Custom
+build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
@@ -18,6 +18,7 @@ library
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
+                     , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
@@ -105,6 +106,7 @@ library
                      , mtl
                      , optparse-applicative
                      , parallel
+                     , parsers
                      , recursion-schemes
                      , semigroups
                      , split
@@ -182,12 +184,6 @@ test-suite test
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards
-
-custom-setup
-  setup-depends:  base >= 4.8 && < 5
-                , Cabal
-                , directory
-                , process
 
 source-repository head
   type:     git

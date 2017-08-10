@@ -22,19 +22,27 @@
             (Identifier)))
         (Return
           (Identifier)))
+    {+(Method
+        (Identifier)
+        (Params
+          (Other "required_parameter"
+            (Identifier)))
+        (Return
+          (Identifier)))+}
       (Method
       { (Identifier)
       ->(Identifier) }
         (Params
           (Other "required_parameter"
-            (Identifier)))
+          { (Identifier)
+          ->(Identifier) }))
         (Return
-          (Identifier)))
-      (Method
-      { (Identifier)
-      ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) }))
+    {-(Method
+        (Identifier)
         (Params
           (Other "required_parameter"
             (Identifier)))
         (Return
-          (Identifier))))))
+          (Identifier)))-})))

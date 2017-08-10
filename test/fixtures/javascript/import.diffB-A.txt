@@ -3,83 +3,61 @@
   { (StringLiteral)
   ->(StringLiteral) }
     (Identifier))
-{+(Import
-    (StringLiteral)
+  (Import
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Other "namespace_import"
-      (Identifier)))+}
-{+(Import
-    (StringLiteral)
+    { (Identifier)
+    ->(Identifier) }))
+  (Import
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Other "named_imports"
       (Other "import_specifier"
-        (Identifier))))+}
-{+(Import
-    (StringLiteral)
+      { (Identifier)
+      ->(Identifier) })))
+  (Import
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Other "named_imports"
       (Other "import_specifier"
-        (Identifier))
+      { (Identifier)
+      ->(Identifier) })
       (Other "import_specifier"
-        (Identifier))))+}
-{+(Import
-    (StringLiteral)
+      { (Identifier)
+      ->(Identifier) })))
+  (Import
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Other "named_imports"
       (Other "import_specifier"
-        (Identifier))
+      { (Identifier)
+      ->(Identifier) })
       (Other "import_specifier"
-        (Identifier)
-        (Identifier))))+}
-{+(Import
-    (StringLiteral)
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })))
+  (Import
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Identifier)
     (Other "named_imports"
       (Other "import_specifier"
-        (Identifier))
+      { (Identifier)
+      ->(Identifier) })
       (Other "import_specifier"
-        (Identifier)
-        (Identifier))))+}
-{+(Import
-    (StringLiteral)
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })))
+  (Import
+  { (StringLiteral)
+  ->(StringLiteral) }
     (Identifier)
     (Other "namespace_import"
-      (Identifier)))+}
-{+(Import
-    (StringLiteral))+}
-{-(Import
-    (StringLiteral)
-    (Other "namespace_import"
-      (Identifier)))-}
-{-(Import
-    (StringLiteral)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))))-}
-{-(Import
-    (StringLiteral)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))
-      (Other "import_specifier"
-        (Identifier))))-}
-{-(Import
-    (StringLiteral)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))
-      (Other "import_specifier"
-        (Identifier)
-        (Identifier))))-}
-{-(Import
-    (StringLiteral)
-    (Identifier)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))
-      (Other "import_specifier"
-        (Identifier)
-        (Identifier))))-}
-{-(Import
-    (StringLiteral)
-    (Identifier)
-    (Other "namespace_import"
-      (Identifier)))-}
-{-(Import
-    (StringLiteral))-})
+    { (Identifier)
+    ->(Identifier) }))
+  (Import
+  { (StringLiteral)
+  ->(StringLiteral) }))

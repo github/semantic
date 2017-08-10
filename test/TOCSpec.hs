@@ -162,7 +162,7 @@ spec = parallel $ do
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[5,7]},\"category\":\"Heading 2\",\"term\":\"## Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[5,7]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
 type Diff' = SyntaxDiff (Maybe Declaration ': DefaultFields)

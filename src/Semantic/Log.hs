@@ -1,6 +1,7 @@
 module Semantic.Log where
 
 import Data.Bifunctor (second)
+import Data.Error (withSGRCode)
 import Data.Foldable (toList)
 import Data.List (intersperse)
 import Data.Semigroup ((<>))
@@ -99,12 +100,3 @@ configureOptionsForHandle handle options = do
     , optionsPrintSource = isTerminal
     , optionsProcessID = pid
     }
-
-withSGRCode :: Bool -> [SGR] -> ShowS -> ShowS
-withSGRCode useColour code content =
-  if useColour then
-    showString (setSGRCode code)
-    . content
-    . showString (setSGRCode [])
-  else
-    content

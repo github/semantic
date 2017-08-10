@@ -26,7 +26,7 @@ module Semantic.Task
 
 import Control.Concurrent.STM.TMQueue
 import Control.Exception
-import Control.Monad (join, when)
+import Control.Monad (join)
 import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
@@ -34,8 +34,9 @@ import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Blob
 import qualified Data.ByteString as B
-import Data.Foldable (fold)
-import Data.Functor.Both as Both
+import qualified Data.Error as Error
+import Data.Foldable (fold, for_)
+import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
 import Data.Record
 import Data.Semigroup ((<>))
@@ -47,6 +48,7 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
+import Info
 import qualified Files
 import GHC.Conc (atomically)
 import Language
@@ -173,7 +175,7 @@ runTaskWithOptions options task = do
                     end <- Time.getCurrentTime
                     queueLogMessage Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
                     either (pure . Left) yield res
-                  Parse parser blob -> go (runParser options parser blob) >>= either (pure . Left) yield . join
+                  Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield . join
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
                   Diff differ terms -> pure (differ terms) >>= yield
                   Render renderer input -> pure (renderer input) >>= yield
@@ -184,34 +186,36 @@ runTaskWithOptions options task = do
                   | otherwise = pure ()
 
 
-runParser :: Options -> Parser term -> Blob -> Task (Either String term)
-runParser options@Options{..} parser blob@Blob{..} = case parser of
-  ASTParser language -> do
-    logTiming "ts ast parse" $
-      liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
-  AssignmentParser parser by assignment -> do
-    res <- runParser options parser blob
-    case res of
-      Left err -> writeLog Error (showBlob blob <> " failed parsing") [] >> pure (Left err)
-      Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
-        Left err -> do
-          writeLog Error (Assignment.formatErrorWithOptions optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) []
-          pure $ Left (showBlob blob <> " failed assignment")
-        Right term -> do
-          when (hasErrors term) $ writeLog Warning (showBlob blob <> " has parse errors") []
-          pure $ Right term
-  TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
-  MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
-  LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
-  where
-    showBlob Blob{..} = blobPath <> ":" <> maybe "" show blobLanguage
-    hasErrors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> Bool
-    hasErrors = cata $ \ (_ :< syntax) -> case syntax of
-      _ | Just err <- prj syntax -> const True (err :: Syntax.Error Bool)
-      _ -> or syntax
-    logTiming :: String -> Task a -> Task a
-    logTiming msg = time msg [ ("path", blobPath)
-                             , ("language", maybe "" show blobLanguage)]
+runParser :: Options -> Blob -> Parser term -> Task (Either String term)
+runParser Options{..} blob@Blob{..} = go
+  where go :: Parser term -> Task (Either String term)
+        go parser = case parser of
+          ASTParser language ->
+            logTiming "ts ast parse" $
+              liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
+          AssignmentParser parser by assignment -> do
+            res <- go parser
+            case res of
+              Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
+              Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
+                Left err -> do
+                  let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
+                  writeLog Error formatted blobFields
+                  pure $ Left formatted
+                Right term -> do
+                  for_ (errors term) $ \ err ->
+                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
+                  pure $ Right term
+          TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
+          MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
+          LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
+        blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
+        errors :: (Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors = cata $ \ (a :< syntax) -> case syntax of
+          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
+          _ -> fold syntax
+        logTiming :: String -> Task a -> Task a
+        logTiming msg = time msg blobFields
 
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return

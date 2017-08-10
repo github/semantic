@@ -15,23 +15,30 @@
             ->(Identifier) })))
         (FunctionCall
           (Identifier)))
-      (Case
+    {+(Case
         (Case
           (Other "expression_list"
             (RelationalOperator
-            { (Identifier)
-            ->(Identifier) }
-            { (Identifier)
-            ->(Identifier) })))
+              (Identifier)
+              (Identifier))))
         (FunctionCall
-          (Identifier)))
+          (Identifier)))+}
       (Case
         (Case
           (Other "expression_list"
             (RelationalOperator
             { (Identifier)
             ->(Identifier) }
-              (NumberLiteral))))
+            { (Identifier)
+            ->(NumberLiteral) })))
         (FunctionCall
         { (Identifier)
-        ->(Identifier) })))))
+        ->(Identifier) }))
+    {-(Case
+        (Case
+          (Other "expression_list"
+            (RelationalOperator
+              (Identifier)
+              (NumberLiteral))))
+        (FunctionCall
+          (Identifier)))-})))

@@ -1,13 +1,13 @@
 (Program
-{+(IntegerLiteral)+}
-{+(IntegerLiteral)+}
+{ (IntegerLiteral)
+->(IntegerLiteral) }
 {+(IntegerLiteral)+}
 {+(IntegerLiteral)+}
 { (IntegerLiteral)
 ->(IntegerLiteral) }
 {+(IntegerLiteral)+}
+{+(IntegerLiteral)+}
 {+(NumberLiteral)+}
-{-(IntegerLiteral)-}
 {-(IntegerLiteral)-}
 {-(IntegerLiteral)-}
 {-(IntegerLiteral)-}

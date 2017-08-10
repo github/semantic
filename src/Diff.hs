@@ -50,7 +50,7 @@ mapAnnotations :: (Functor f, Functor g)
 mapAnnotations f = Free.hoistFree (first (fmap f)) . fmap (fmap (fmap f))
 
 
-instance (NFData (f (Diff f a)), NFData (Term f a), NFData a, Functor f) => NFData (Diff f a) where
+instance (NFData (f (Diff f a)), NFData (f (Term f a)), NFData a, Functor f) => NFData (Diff f a) where
   rnf fa = case runFree fa of
     FreeF.Free f -> rnf f `seq` ()
     FreeF.Pure a -> rnf a `seq` ()

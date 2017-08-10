@@ -11,10 +11,11 @@ import qualified CMarkGFM
 import Data.ByteString (ByteString)
 import Data.Function (on)
 import Data.Record
+import Data.Syntax (makeTerm)
+import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Markup as Markup
-import qualified Data.Syntax as Syntax
 import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
@@ -140,9 +141,6 @@ softBreak = makeTerm <$> symbol SoftBreak <*> pure Markup.LineBreak <* source
 
 
 -- Implementation details
-
-makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
-makeTerm a f = a :< inj f
 
 nullText :: Text.Text -> Maybe ByteString
 nullText text = if Text.null text then Nothing else Just (encodeUtf8 text)
