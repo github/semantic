@@ -78,7 +78,6 @@ termAssignment _ category children =
       _ -> Nothing -- No body found.
     (Ty, children) -> Just $ S.Ty children
     (Interface, children) -> toInterface children
-    (Other "parenthesized_expression", [child]) -> Just (unwrap child)
     _ -> Nothing
 
 categoryForTypeScriptName :: Text -> Category
