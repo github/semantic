@@ -220,7 +220,7 @@ statement =
   <|> labeledStatement
 
 propertyName :: Assignment
-propertyName = makeTerm PropertyIdentifier <*> (Syntax.Identifier <$> source) <|> string <|> number
+propertyName = makeTerm <$> PropertyIdentifier <*> ((Syntax.Identifier <$> source) <|> string <|> number)
 
 callSignature :: Assignment
 callSignature = makeTerm <$> symbol CallSignature <*> ((,,) <$> optional typeParameters <*> formalParameters <*> optional typeAnnotation)
