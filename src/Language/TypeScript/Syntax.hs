@@ -178,14 +178,15 @@ destructuringPattern = makeTerm <$> symbol ObjectPattern <*> (Literal.Hash <$> m
 spreadElement :: Assignment
 spreadElement = symbol SpreadElement *> children expression
 
-readonly' = symbol Readonly *> children source
+readonly' :: Assignment
+readonly' = makeTerm <$> symbol Readonly <*> children (Syntax.Identifier <$> source)
 
 methodDefinition :: Assignment
 methodDefinition = makeVisibility <$>
   symbol MethodDefinition
   <*> children ((,,,,,) <$> optional accessibilityModifier' <*> optional readonly' <*> emptyTerm <*> propertyName <*> callSignature <*> statements)
   where
-    makeVisibility loc (modifier, empty, readonly, propertyName, callSignature, statements) = maybe method'' (\x -> makeTerm loc (Type.Visibility (maybe method'' (const (makeReadonly loc method'')) readonly) x)) modifier
+    makeVisibility loc (modifier, readonly, empty, propertyName, callSignature, statements) = maybe method'' (\x -> makeTerm loc (Type.Visibility (maybe method'' (const (makeReadonly loc method'')) readonly) x)) modifier
       where method'' = method' loc empty propertyName callSignature statements
 
     method' loc term name signature statements = makeTerm loc (Declaration.Method term name signature statements)
