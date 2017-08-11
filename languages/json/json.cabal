@@ -13,7 +13,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Text.Parser.TreeSitter.JSON
+  exposed-modules:     TreeSitter.JSON
   build-depends:       base >= 4.7 && < 5
                      , haskell-tree-sitter
   default-language:    Haskell2010
