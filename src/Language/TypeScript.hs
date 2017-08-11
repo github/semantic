@@ -132,6 +132,7 @@ categoryForTypeScriptName category = case category of
   "member_access" -> MemberAccess
   "op" -> Operator
   "subscript_access" -> SubscriptAccess
+  "subscript_expression" -> SubscriptAccess
   "regex" -> Regex
   "template_string" -> TemplateString
   "switch_statement" -> Switch
