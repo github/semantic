@@ -59,7 +59,7 @@ parseToAST language Blob{..} = bracket TS.ts_document_new TS.ts_document_free $ 
 
   anaM toAST root
 
-toAST :: forall grammar . (Bounded grammar, Enum grammar) => Node -> IO (Base (A.AST grammar) Node)
+toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (A.AST grammar) TS.Node)
 toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
@@ -72,13 +72,13 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Ptr TS.Language -> Ptr Document -> Blob -> IO (SyntaxTerm DefaultFields)
+documentToTerm :: Ptr TS.Language -> Ptr TS.Document -> Blob -> IO (SyntaxTerm DefaultFields)
 documentToTerm language document Blob{..} = do
   root <- alloca (\ rootPtr -> do
     TS.ts_document_root_node_p document rootPtr
     peek rootPtr)
   toTerm root
-  where toTerm :: Node -> IO (SyntaxTerm DefaultFields)
+  where toTerm :: TS.Node -> IO (SyntaxTerm DefaultFields)
         toTerm node@TS.Node{..} = do
           name <- peekCString nodeType
 

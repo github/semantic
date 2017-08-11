@@ -30,8 +30,7 @@ import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import Syntax hiding (Go)
 import Term
-import qualified TreeSitter as TS
-import TreeSitter.Language (Symbol)
+import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
 import TreeSitter.Python
 import TreeSitter.Ruby
@@ -43,7 +42,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, Symbol grammar, Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs, Eq ast, Recursive ast, Foldable (Base ast))
+  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs, Eq ast, Recursive ast, Foldable (Base ast))
                    => Parser ast                                                 -- ^ A parser producing AST.
                    -> (forall x. Base ast x -> Node grammar)                     -- ^ A function extracting the symbol and location.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
