@@ -6,10 +6,12 @@ module TreeSitter
 
 import Category
 import Control.Comonad (extract)
+import Control.Comonad.Cofree (unwrap)
 import Control.Exception
 import Control.Monad ((<=<))
 import Data.Blob
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
+import Data.Foldable (toList)
 import Data.Functor.Foldable hiding (Nil)
 import Data.Range
 import Data.Record
@@ -130,7 +132,7 @@ defaultTermAssignment source annotation children allChildren
 
     -- Control flow statements
     (If, condition : body) -> toTerm $ S.If condition body
-    (Switch, _) -> toTerm $ uncurry S.Switch (break ((== Case) . Info.category . extract) children)
+    (Switch, _) -> let (subject, body) = break ((== Other "switch_body") . Info.category . extract) children in toTerm $ S.Switch subject (body >>= toList . unwrap)
     (Case, expr : body) -> toTerm $ S.Case expr body
     (While, expr : rest) -> toTerm $ S.While expr rest
 
