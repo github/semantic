@@ -160,6 +160,7 @@ defaultTermAssignment source annotation children allChildren
                 [_, Other s, _]
                   | s `elem` ["<=", "<", ">=", ">"] -> RelationalOperator
                   | s `elem` ["*", "+", "-", "/", "%"] -> MathOperator
+                  | s `elem` ["&&", "||"] -> BooleanOperator
                 _ -> Operator
       pure (cofree ((setCategory annotation c) :< S.Operator cs))
 
