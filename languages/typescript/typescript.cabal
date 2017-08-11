@@ -1,4 +1,4 @@
-name:                typescript
+name:                tree-sitter-typescript
 version:             0.1.0
 synopsis:            tree-sitter typescript language bindings
 description:         Please see README.md

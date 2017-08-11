@@ -120,7 +120,7 @@ library
                      , tree-sitter-json
                      , tree-sitter-python
                      , tree-sitter-ruby
-                     , typescript
+                     , tree-sitter-typescript
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
