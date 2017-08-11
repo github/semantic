@@ -119,7 +119,7 @@ library
                      , tree-sitter-go
                      , tree-sitter-json
                      , tree-sitter-python
-                     , ruby
+                     , tree-sitter-ruby
                      , typescript
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData

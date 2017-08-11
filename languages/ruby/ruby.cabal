@@ -1,4 +1,4 @@
-name:                ruby
+name:                tree-sitter-ruby
 version:             0.1.0
 synopsis:            tree-sitter ruby language bindings
 description:         Please see README.md
