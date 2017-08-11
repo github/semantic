@@ -150,7 +150,12 @@ defaultTermAssignment source annotation children allChildren
     (Other "unary_expression", _) -> do
       cs <- allChildren
       let c = case category . extract <$> cs of
-                [Other "-", _] -> MathOperator
+                [Other s, _]
+                  | s `elem` ["-", "+", "++", "--"] -> MathOperator
+                  | s == "~" -> BitwiseOperator
+                  | s == "!" -> BooleanOperator
+                [_, Other t]
+                  | t `elem` ["--", "++"] -> MathOperator
                 _ -> Operator
       pure (cofree ((setCategory annotation c) :< S.Operator cs))
 
@@ -158,9 +163,10 @@ defaultTermAssignment source annotation children allChildren
       cs <- allChildren
       let c = case category . extract <$> cs of
                 [_, Other s, _]
-                  | s `elem` ["<=", "<", ">=", ">"] -> RelationalOperator
+                  | s `elem` ["<=", "<", ">=", ">", "==", "===", "!=", "!=="] -> RelationalOperator
                   | s `elem` ["*", "+", "-", "/", "%"] -> MathOperator
                   | s `elem` ["&&", "||"] -> BooleanOperator
+                  | s `elem` [">>", ">>=", ">>>", ">>>=", "<<", "<<=", "&", "^", "|"] -> BitwiseOperator
                 _ -> Operator
       pure (cofree ((setCategory annotation c) :< S.Operator cs))
 
