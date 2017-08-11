@@ -21,6 +21,18 @@ data Method a = Method { methodReceiver :: !a, methodName :: !a, methodParameter
 instance Eq1 Method where liftEq = genericLiftEq
 instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 
+data RequiredParameter a = RequiredParameter { requiredParameter :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 RequiredParameter where liftEq = genericLiftEq
+instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
+
+data OptionalParameter a = OptionalParameter { optionalParameter :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 OptionalParameter where liftEq = genericLiftEq
+instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Should we replace this with Function and differentiate by context?
 -- TODO: How should we distinguish class/instance methods?
 
