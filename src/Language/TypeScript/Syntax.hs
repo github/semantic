@@ -170,7 +170,7 @@ parameter =
   <|> optionalParameter
 
 accessibilityModifier' :: Assignment
-accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> (Syntax.Identifier <$> source)
+accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (Syntax.Identifier <$> source)
 
 destructuringPattern :: Assignment
 destructuringPattern = makeTerm <$> symbol ObjectPattern <*> (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
