@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
 
 module Language.TypeScript.Syntax
 ( assignment
@@ -7,9 +7,16 @@ module Language.TypeScript.Syntax
 , Term
 ) where
 
+import Algorithm
+import GHC.Generics
 import Control.Comonad.Cofree (Cofree(..))
+import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Show.Generic
+import Data.ByteString (ByteString)
+import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
+import Data.Syntax (emptyTerm, handleError, makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -73,20 +80,29 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.Program
   , Type.Annotation
+  , Type.Readonly
+  , Type.TypeParameters
+  , Type.TypeParameter
+  , Type.Visibility
   , []
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
+-- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
+data ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
+instance Show1 ShorthandPropertyIdentifier where liftShowsPrec = genericLiftShowsPrec
+
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment =
-      makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
-  <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression =
+expression = handleError $
   comment
   <|> if'
   <|> while'
@@ -114,7 +130,6 @@ expression =
   <|> begin
   <|> rescue
   <|> block
-  <|> parseError
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (children expression))
 
 expressions :: Assignment
@@ -153,19 +168,80 @@ parameter =
       requiredParameter
   <|> restParameter
   <|> optionalParameter
-  <|> parseError
 
-accessibilityModifier :: Assignment
-accessibilityModifier = makeTerm <$> symbol AccessibilityModifier <*> (Syntax.AccessibilityModifier <$> source)
+accessibilityModifier' :: Assignment
+accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> (Syntax.Identifier <$> source)
+
+destructuringPattern :: Assignment
+destructuringPattern = makeTerm <$> symbol ObjectPattern <*> (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
+
+spreadElement :: Assignment
+spreadElement = symbol SpreadElement *> children expression
+
+readonly' = symbol Readonly *> children source
+
+methodDefinition :: Assignment
+methodDefinition = makeVisibility <$>
+  symbol MethodDefinition
+  <*> children ((,,,,) <$> optional accessibilityModifier' <*> optional readonly' <*> propertyName <*> callSignature <*> statementBlock)
+  where
+    makeVisibility loc (modifier, readonly, propertyName, callSignature, statements) = maybe method' (Type.Visibility <$> (makeReadonly loc method' readonly) <*>) modifier
+      where method' = makeTerm loc (Declaration.Method <$> propertyName <*> callSignature <*> statements)
+    makeReadonly loc term = maybe term (makeTerm loc . const (Type.Readonly term))
+    method' = makeTerm loc (Declaration.Method <$> propertyName <*> callSignature <*> statements)
+
+statementBlock :: Assignment
+statementBlock = symbol StatementBlock *> many statement
+
+statement :: Assignment
+statement =
+  exportStatement
+  <|> importStatement
+  <|> debuggerStatement
+  <|> expressionStatement
+  <|> declaration
+  <|> statementBlock
+  <|> ifStatement
+  <|> switchStatement
+  <|> forStatement
+  <|> forInStatement
+  <|> forOfStatement
+  <|> whileStatement
+  <|> doStatement
+  <|> tryStatement
+  <|> withStatement
+  <|> breakStatement
+  <|> continueStatement
+  <|> returnStatement
+  <|> throwStatement
+  <|> emptyStatement
+  <|> labeledStatement
+
+propertyName :: Assignment
+propertyName = makeTerm PropertyIdentifier <*> (Syntax.Identifier <$> source) <|> string <|> number
+
+callSignature :: Assignment
+callSignature = makeTerm <$> symbol CallSignature <*> ((,,) <$> optional typeParameters <*> formalParameters <*> optional typeAnnotation)
+  where makeAnnotation (typeParams, params, annotation) = maybe params' (makeTerm . Type.Annotation) typeParams
+
+
+assignmentPattern :: Assignment
+assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> shorthandPropertyIdentifier <*> initializer
+
+shorthandPropertyIdentifier :: Assignment
+shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (Language.TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment
-requiredParameter = makeTerm <$> symbol RequiredParameter <*> children ((,,,) <$> optional accessibilityModifier <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
+requiredParameter = makeVisibility <$> symbol RequiredParameter <*> children ((,,,) <$> optional accessibilityModifier' <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
+  where makeVisibility loc (modifier, identifier, annotation, initializer) = maybe method' (makeTerm . Visibility method') modifier
+        param' identifier initializer = makeTerm loc (fmap Declaration.RequiredParameter . term')
+          where term' = maybe identifier (Statement.Assignment <$> identifier <*>) initializer
 
 restParameter :: Assignment
 restParameter = makeTerm <$> symbol RestParameter <*> children ((,) <$> identifier <*> optional typeAnnotation)
 
 optionalParameter :: Assignment
-optionalParameter = makeTerm <$> symbol OptionalParameter <*> children ((,,,) <$> optional accessibilityModifier <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
+optionalParameter = makeTerm <$> symbol OptionalParameter <*> children ((,,,) <$> optional accessibilityModifier' <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
 
 method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> expression <*> params <*> expressions)
@@ -329,15 +405,5 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 
 
 -- Helper functions
-
-makeTerm :: (f :< fs, HasCallStack) => a -> f (Term.Term (Union fs) a) -> Term.Term (Union fs) a
-makeTerm a f = a :< inj f
-
-emptyTerm :: Assignment
-emptyTerm = makeTerm <$> location <*> pure Syntax.Empty
-
 invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
-
-parseError :: Assignment
-parseError = makeTerm <$> symbol ParseError <*> (Syntax.Error [] <$ source)
