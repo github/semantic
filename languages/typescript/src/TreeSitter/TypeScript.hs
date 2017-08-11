@@ -1,4 +1,6 @@
-module TreeSitter.TypeScript where
+module TreeSitter.TypeScript
+( tree_sitter_typescript
+) where
 
 import Foreign.Ptr
 import TreeSitter.Language

@@ -1,4 +1,6 @@
-module TreeSitter.JSON where
+module TreeSitter.JSON
+( tree_sitter_json
+) where
 
 import Foreign.Ptr
 import TreeSitter.Language

@@ -1,4 +1,6 @@
-module TreeSitter.Go where
+module TreeSitter.Go
+( tree_sitter_go
+) where
 
 import Foreign.Ptr
 import TreeSitter.Language
