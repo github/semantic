@@ -69,7 +69,7 @@ termAssignment _ category children =
       | S.Indexed _ <- unwrap statements
       -> Just $ S.Export Nothing (toList (unwrap statements))
       | otherwise -> Just $ S.Export (Just statements) []
-    (For, _:_) -> Just $ S.For (init children >>= unwrapExpressionStatements) [last children]
+    (For, _:_) -> Just $ S.For (init children >>= flattenExpressionStatements) [last children]
     (Function, children) -> case break ((== ExpressionStatements) . Info.category . extract) children of
       (inits, [body]) -> case inits of
         [id, callSignature] -> Just $ S.Function id (toList (unwrap callSignature)) (toList (unwrap body))
@@ -79,8 +79,8 @@ termAssignment _ category children =
     (Ty, children) -> Just $ S.Ty children
     (Interface, children) -> toInterface children
     _ -> Nothing
-    where unwrapExpressionStatements term
-            | Info.category (extract term) == ExpressionStatements = toList (unwrap term)
+    where flattenExpressionStatements term
+            | Info.category (extract term) `elem` [ExpressionStatements, Other "sequence_expression"] = toList (unwrap term) >>= flattenExpressionStatements
             | otherwise = [term]
 
 categoryForTypeScriptName :: Text -> Category
