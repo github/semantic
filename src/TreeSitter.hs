@@ -27,8 +27,9 @@ import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
 import qualified Syntax as S
 import Term
-import TreeSitter hiding (Language(..))
-import qualified TreeSitter as TS
+import qualified TreeSitter.Document as TS
+import qualified TreeSitter.Node as TS
+import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Go as TS
 import qualified TreeSitter.Ruby as TS
 import qualified TreeSitter.TypeScript as TS
@@ -36,33 +37,33 @@ import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
 treeSitterParser :: Ptr TS.Language -> Blob -> IO (SyntaxTerm DefaultFields)
-treeSitterParser language blob = bracket ts_document_new ts_document_free $ \ document -> do
-  ts_document_set_language document language
+treeSitterParser language blob = bracket TS.ts_document_new TS.ts_document_free $ \ document -> do
+  TS.ts_document_set_language document language
   unsafeUseAsCStringLen (sourceBytes (blobSource blob)) $ \ (sourceBytes, len) -> do
-    ts_document_set_input_string_with_length document sourceBytes len
-    ts_document_parse_halt_on_error document
+    TS.ts_document_set_input_string_with_length document sourceBytes len
+    TS.ts_document_parse_halt_on_error document
     term <- documentToTerm language document blob
     pure term
 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Blob -> IO (A.AST grammar)
-parseToAST language Blob{..} = bracket ts_document_new ts_document_free $ \ document -> do
-  ts_document_set_language document language
+parseToAST language Blob{..} = bracket TS.ts_document_new TS.ts_document_free $ \ document -> do
+  TS.ts_document_set_language document language
   root <- unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
-    ts_document_set_input_string_with_length document source len
-    ts_document_parse_halt_on_error document
+    TS.ts_document_set_input_string_with_length document source len
+    TS.ts_document_parse_halt_on_error document
     alloca (\ rootPtr -> do
-      ts_document_root_node_p document rootPtr
+      TS.ts_document_root_node_p document rootPtr
       peek rootPtr)
 
   anaM toAST root
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => Node -> IO (Base (A.AST grammar) Node)
-toAST node@Node{..} = do
+toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
-    _ <- with nodeTSNode (\ nodePtr -> ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
+    _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
     peekArray count childNodesPtr
   pure $! A.Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (nodeRange node) (nodeSpan node) :< children
 
@@ -74,37 +75,37 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 documentToTerm :: Ptr TS.Language -> Ptr Document -> Blob -> IO (SyntaxTerm DefaultFields)
 documentToTerm language document Blob{..} = do
   root <- alloca (\ rootPtr -> do
-    ts_document_root_node_p document rootPtr
+    TS.ts_document_root_node_p document rootPtr
     peek rootPtr)
   toTerm root
   where toTerm :: Node -> IO (SyntaxTerm DefaultFields)
-        toTerm node = do
-          name <- peekCString (nodeType node)
+        toTerm node@TS.Node{..} = do
+          name <- peekCString nodeType
 
-          children <- getChildren (fromIntegral (nodeNamedChildCount node)) copyNamed
-          let allChildren = getChildren (fromIntegral (nodeChildCount node)) copyAll
+          children <- getChildren (fromIntegral nodeNamedChildCount) copyNamed
+          let allChildren = getChildren (fromIntegral nodeChildCount) copyAll
 
           let source = slice (nodeRange node) blobSource
           assignTerm language source (range :. categoryForLanguageProductionName language (pack name) :. nodeSpan node :. Nil) children allChildren
           where getChildren count copy = do
                   nodes <- allocaArray count $ \ childNodesPtr -> do
-                    _ <- with (nodeTSNode node) (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
+                    _ <- with nodeTSNode (\ nodePtr -> copy nodePtr childNodesPtr (fromIntegral count))
                     peekArray count childNodesPtr
                   children <- traverse toTerm nodes
                   return $! filter isNonEmpty children
                 range = nodeRange node
-        copyNamed = ts_node_copy_named_child_nodes document
-        copyAll = ts_node_copy_child_nodes document
+        copyNamed = TS.ts_node_copy_named_child_nodes document
+        copyAll = TS.ts_node_copy_child_nodes document
 
 isNonEmpty :: HasField fields Category => SyntaxTerm fields -> Bool
 isNonEmpty = (/= Empty) . category . extract
 
-nodeRange :: Node -> Range
-nodeRange Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
+nodeRange :: TS.Node -> Range
+nodeRange TS.Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
 
-nodeSpan :: Node -> Span
-nodeSpan Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
-  where pointPos TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
+nodeSpan :: TS.Node -> Span
+nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
+  where pointPos TS.TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
 
 assignTerm :: Ptr TS.Language -> Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
 assignTerm language source annotation children allChildren =
