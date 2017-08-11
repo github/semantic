@@ -1,4 +1,4 @@
-name:                go
+name:                tree-sitter-go
 version:             0.1.0
 synopsis:            tree-sitter go language bindings
 description:         Please see README.md

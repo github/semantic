@@ -116,7 +116,7 @@ library
                      , time
                      , unix
                      , haskell-tree-sitter
-                     , go
+                     , tree-sitter-go
                      , ruby
                      , typescript
                      , python
