@@ -1,4 +1,4 @@
-name:                python
+name:                tree-sitter-python
 version:             0.1.0
 synopsis:            tree-sitter python language bindings
 homepage:            https://github.com/github/semantic-diff#readme
