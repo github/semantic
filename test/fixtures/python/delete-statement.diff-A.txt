@@ -1,0 +1,10 @@
+(Program
+{-(Call
+    (Identifier)
+    (Subscript
+      (Identifier)
+      (Integer))
+    (Subscript
+      (Identifier)
+      (Integer))
+    (Empty))-})

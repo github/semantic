@@ -1,0 +1,27 @@
+(Program
+{-(Hash
+    (KeyValue
+      (Identifier)
+      (Integer)))-}
+  (Hash)
+{+(Hash
+    (KeyValue
+      (Identifier)
+      (Integer)))+}
+{+(Hash
+    (KeyValue
+      (Identifier)
+      (Identifier))
+    (KeyValue
+      (Identifier)
+      (Identifier)))+}
+{-(Assignment
+    (Identifier)
+    (Hash
+      (Comment)
+      (KeyValue
+        (Identifier)
+        (Identifier))
+      (KeyValue
+        (Identifier)
+        (Identifier))))-})

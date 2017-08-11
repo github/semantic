@@ -1,0 +1,10 @@
+(Program
+{+(Annotation
+    (Function
+      (Identifier)
+      (
+        (Plus
+          (Integer)
+          (
+            (Integer)))))
+    (Empty))+})

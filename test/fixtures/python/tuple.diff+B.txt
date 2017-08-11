@@ -1,0 +1,10 @@
+(Program
+{+(Tuple
+    (Identifier)
+    (Identifier)
+    (Identifier))+}
+{+(Tuple
+    (Identifier)
+    (Identifier))+}
+{+(Tuple
+    (Identifier))+})

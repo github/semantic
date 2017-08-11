@@ -1,0 +1,19 @@
+(Program
+  (Return
+    (
+      (Plus
+      { (Identifier)
+      ->(Identifier) }
+        (
+        { (Identifier)
+        ->(Identifier) }))
+    { (Identifier)
+    ->(Identifier) }))
+  (Return
+    (Empty))
+{+(Return
+    (Not
+      (Identifier)))+}
+{-(Return
+    (Not
+      (Identifier)))-})

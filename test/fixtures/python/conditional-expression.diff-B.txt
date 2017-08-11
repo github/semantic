@@ -1,0 +1,17 @@
+(Program
+{-(Assignment
+    (Identifier)
+    (If
+      (Identifier)
+      (Identifier)
+      (
+        (Identifier))))-}
+{-(If
+    (Identifier)
+    (Call
+      (Identifier)
+      (Empty))
+    (
+      (Call
+        (Identifier)
+        (Empty))))-})

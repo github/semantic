@@ -1,0 +1,20 @@
+(Program
+{+(Let
+    (Identifier)
+    (Call
+      (Identifier)
+      (Identifier)
+      (TextElement)
+      (Empty))
+    (
+      (Assignment
+        (Identifier)
+        (Boolean))
+      (ForEach
+        (
+          (Identifier))
+        (Identifier)
+        (
+          (Assignment
+            (Identifier)
+            (Boolean))))))+})

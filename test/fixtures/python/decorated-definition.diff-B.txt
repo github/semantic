@@ -1,0 +1,37 @@
+(Program
+{-(Decorator
+    (ScopeResolution
+      (Identifier)
+      (Identifier))
+    (Class
+      (Identifier)
+      (Decorator
+        (ScopeResolution
+          (Identifier))
+        ([])
+        (Decorator
+          (ScopeResolution
+            (Identifier))
+          (
+            (Identifier))
+          (Decorator
+            (ScopeResolution
+              (Identifier))
+            (
+              (Identifier))
+            (Decorator
+              (ScopeResolution
+                (Identifier))
+              (
+                (Integer)
+                (Assignment
+                  (Identifier)
+                  (Boolean))
+                (Identifier)
+                (Identifier))
+              (Annotation
+                (Function
+                  (Identifier)
+                  (
+                    (Identifier)))
+                (Empty))))))))-})

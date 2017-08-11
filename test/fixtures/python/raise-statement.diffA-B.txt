@@ -1,0 +1,19 @@
+(Program
+  (Throw
+    (
+      (Call
+        (Identifier)
+      {+(TextElement)+}
+      {-(TextElement)-}
+        (Empty))))
+  (Throw
+    (
+      (Call
+        (Identifier)
+      {+(TextElement)+}
+      {-(TextElement)-}
+        (Empty))
+    { (Identifier)
+    ->(Identifier) }))
+  (Throw
+    ([])))

@@ -1,0 +1,16 @@
+(Program
+{-(Call
+    (Identifier)
+    (TextElement)
+    (Empty))-}
+{-(Call
+    (Identifier)
+    (TextElement)
+    (Null)
+    (Empty))-}
+{-(Call
+    (Identifier)
+    (TextElement)
+    (Identifier)
+    (Identifier)
+    (Empty))-})

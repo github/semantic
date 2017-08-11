@@ -1,0 +1,16 @@
+(Program
+{-(Hash
+    (KeyValue
+      (Identifier)
+      (Integer)))-}
+{-(Hash)-}
+{-(Assignment
+    (Identifier)
+    (Hash
+      (Comment)
+      (KeyValue
+        (Identifier)
+        (Identifier))
+      (KeyValue
+        (Identifier)
+        (Identifier))))-})
