@@ -80,7 +80,7 @@ termAssignment _ category children =
     (Interface, children) -> toInterface children
     _ -> Nothing
     where flattenExpressionStatements term
-            | Info.category (extract term) `elem` [ExpressionStatements, Other "sequence_expression"] = toList (unwrap term) >>= flattenExpressionStatements
+            | Info.category (extract term) `elem` [ExpressionStatements, CommaOperator] = toList (unwrap term) >>= flattenExpressionStatements
             | otherwise = [term]
 
 categoryForTypeScriptName :: Text -> Category
@@ -101,6 +101,7 @@ categoryForTypeScriptName category = case category of
   "update_expression" -> MathOperator -- math operator, e.g. ++, --
   "bool_op" -> BooleanOperator -- boolean operator, e.g. ||, &&.
   "comma_op" -> CommaOperator -- comma operator, e.g. expr1, expr2.
+  "sequence_expression" -> CommaOperator -- comma operator, e.g. expr1, expr2.
   "delete_op" -> Operator -- delete operator, e.g. delete x[2].
   "type_op" -> Operator -- type operator, e.g. typeof Object.
   "void_op" -> Operator -- void operator, e.g. void 2.
