@@ -183,15 +183,16 @@ readonly' = symbol Readonly *> children source
 methodDefinition :: Assignment
 methodDefinition = makeVisibility <$>
   symbol MethodDefinition
-  <*> children ((,,,,) <$> optional accessibilityModifier' <*> optional readonly' <*> propertyName <*> callSignature <*> statementBlock)
+  <*> children ((,,,,,) <$> optional accessibilityModifier' <*> optional readonly' <*> emptyTerm <*> propertyName <*> callSignature <*> statements)
   where
-    makeVisibility loc (modifier, readonly, propertyName, callSignature, statements) = maybe method' (Type.Visibility <$> (makeReadonly loc method' readonly) <*>) modifier
-      where method' = makeTerm loc (Declaration.Method <$> propertyName <*> callSignature <*> statements)
-    makeReadonly loc term = maybe term (makeTerm loc . const (Type.Readonly term))
-    method' = makeTerm loc (Declaration.Method <$> propertyName <*> callSignature <*> statements)
+    makeVisibility loc (modifier, empty, readonly, propertyName, callSignature, statements) = maybe method'' (\x -> makeTerm loc (Type.Visibility (maybe method'' (const (makeReadonly loc method'')) readonly) x)) modifier
+      where method'' = method' loc empty propertyName callSignature statements
 
-statementBlock :: Assignment
-statementBlock = symbol StatementBlock *> many statement
+    method' loc term name signature statements = makeTerm loc (Declaration.Method term name signature statements)
+    makeReadonly loc = makeTerm loc . Type.Readonly
+
+statements :: Assignment
+statements = makeTerm <$> location <*> many statement
 
 statement :: Assignment
 statement =
