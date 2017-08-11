@@ -174,7 +174,5 @@ categoryForTypeScriptName category = case category of
   "module" -> Module
   "internal_module" -> Namespace
   "interface_declaration" -> Interface
-  "unary_expression" -> Operator
-  "binary_expression" -> Operator
   "parenthesized_expression" -> ParenthesizedExpression
   name -> Other name

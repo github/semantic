@@ -147,6 +147,22 @@ defaultTermAssignment source annotation children allChildren
 
     (ParenthesizedExpression, [child]) -> pure child
 
+    (Other "unary_expression", _) -> do
+      cs <- allChildren
+      let c = case category . extract <$> cs of
+                [Other "-", _] -> MathOperator
+                _ -> Operator
+      pure (cofree ((setCategory annotation c) :< S.Operator cs))
+
+    (Other "binary_expression", _) -> do
+      cs <- allChildren
+      let c = case category . extract <$> cs of
+                [_, Other s, _]
+                  | s `elem` ["<=", "<", ">=", ">"] -> RelationalOperator
+                  | s `elem` ["*", "+", "-", "/", "%"] -> MathOperator
+                _ -> Operator
+      pure (cofree ((setCategory annotation c) :< S.Operator cs))
+
     (_, []) -> toTerm $ S.Leaf (toText source)
     (_, children) -> toTerm $ S.Indexed children
   where operatorCategories =
