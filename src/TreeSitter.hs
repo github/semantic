@@ -121,30 +121,32 @@ assignTerm language source annotation children allChildren =
 defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
 defaultTermAssignment source annotation children allChildren
   | category annotation `elem` operatorCategories = cofree . (annotation :<) . S.Operator <$> allChildren
-  | otherwise = pure . cofree . (annotation :<) $ case (category annotation, children) of
-    (ParseError, children) -> S.ParseError children
+  | otherwise = pure $! case (category annotation, children) of
+    (ParseError, children) -> toTerm $ S.ParseError children
 
-    (Comment, _) -> S.Comment (toText source)
+    (Comment, _) -> toTerm $ S.Comment (toText source)
 
-    (Pair, [key, value]) -> S.Pair key value
+    (Pair, [key, value]) -> toTerm $ S.Pair key value
 
     -- Control flow statements
-    (If, condition : body) -> S.If condition body
-    (Switch, _) -> uncurry S.Switch (break ((== Case) . Info.category . extract) children)
-    (Case, expr : body) -> S.Case expr body
-    (While, expr : rest) -> S.While expr rest
+    (If, condition : body) -> toTerm $ S.If condition body
+    (Switch, _) -> toTerm $ uncurry S.Switch (break ((== Case) . Info.category . extract) children)
+    (Case, expr : body) -> toTerm $ S.Case expr body
+    (While, expr : rest) -> toTerm $ S.While expr rest
 
     -- Statements
-    (Return, _) -> S.Return children
-    (Yield, _) -> S.Yield children
-    (Throw, [expr]) -> S.Throw expr
-    (Break, [label]) -> S.Break (Just label)
-    (Break, []) -> S.Break Nothing
-    (Continue, [label]) -> S.Continue (Just label)
-    (Continue, []) -> S.Continue Nothing
+    (Return, _) -> toTerm $ S.Return children
+    (Yield, _) -> toTerm $ S.Yield children
+    (Throw, [expr]) -> toTerm $ S.Throw expr
+    (Break, [label]) -> toTerm $ S.Break (Just label)
+    (Break, []) -> toTerm $ S.Break Nothing
+    (Continue, [label]) -> toTerm $ S.Continue (Just label)
+    (Continue, []) -> toTerm $ S.Continue Nothing
 
-    (_, []) -> S.Leaf (toText source)
-    (_, children) -> S.Indexed children
+    (ParenthesizedExpression, [child]) -> child
+
+    (_, []) -> toTerm $ S.Leaf (toText source)
+    (_, children) -> toTerm $ S.Indexed children
   where operatorCategories =
           [ Operator
           , Binary
@@ -156,6 +158,7 @@ defaultTermAssignment source annotation children allChildren
           , RelationalOperator
           , BitwiseOperator
           ]
+        toTerm = cofree . (annotation :<)
 
 
 categoryForLanguageProductionName :: Ptr TS.Language -> Text -> Category
