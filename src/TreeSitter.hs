@@ -123,7 +123,7 @@ assignTerm language source annotation children allChildren =
 defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
 defaultTermAssignment source annotation children allChildren
   | category annotation `elem` operatorCategories = cofree . (annotation :<) . S.Operator <$> allChildren
-  | otherwise = pure $! case (category annotation, children) of
+  | otherwise = case (category annotation, children) of
     (ParseError, children) -> toTerm $ S.ParseError children
 
     (Comment, _) -> toTerm $ S.Comment (toText source)
@@ -145,7 +145,7 @@ defaultTermAssignment source annotation children allChildren
     (Continue, [label]) -> toTerm $ S.Continue (Just label)
     (Continue, []) -> toTerm $ S.Continue Nothing
 
-    (ParenthesizedExpression, [child]) -> child
+    (ParenthesizedExpression, [child]) -> pure child
 
     (_, []) -> toTerm $ S.Leaf (toText source)
     (_, children) -> toTerm $ S.Indexed children
@@ -160,7 +160,7 @@ defaultTermAssignment source annotation children allChildren
           , RelationalOperator
           , BitwiseOperator
           ]
-        toTerm = cofree . (annotation :<)
+        toTerm = pure . cofree . (annotation :<)
 
 
 categoryForLanguageProductionName :: Ptr TS.Language -> Text -> Category
