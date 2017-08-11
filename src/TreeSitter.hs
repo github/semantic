@@ -108,9 +108,9 @@ nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos no
 
 assignTerm :: Ptr TS.Language -> Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
 assignTerm language source annotation children allChildren =
-  cofree . (annotation :<) <$> case assignTermByLanguage source (category annotation) children of
-    Just a -> pure a
-    _ -> defaultTermAssignment source (category annotation) children allChildren
+  case assignTermByLanguage source (category annotation) children of
+    Just a -> pure (cofree (annotation :< a))
+    _ -> defaultTermAssignment source annotation children allChildren
   where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm DefaultFields))
         assignTermByLanguage = case languageForTSLanguage language of
           Just Language.Go -> Go.termAssignment
@@ -118,10 +118,10 @@ assignTerm language source annotation children allChildren =
           Just TypeScript -> TS.termAssignment
           _ -> \ _ _ _ -> Nothing
 
-defaultTermAssignment :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (S.Syntax (SyntaxTerm DefaultFields))
-defaultTermAssignment source category children allChildren
-  | category `elem` operatorCategories = S.Operator <$> allChildren
-  | otherwise = pure $! case (category, children) of
+defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
+defaultTermAssignment source annotation children allChildren
+  | category annotation `elem` operatorCategories = cofree . (annotation :<) . S.Operator <$> allChildren
+  | otherwise = pure . cofree . (annotation :<) $ case (category annotation, children) of
     (ParseError, children) -> S.ParseError children
 
     (Comment, _) -> S.Comment (toText source)
