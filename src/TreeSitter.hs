@@ -2,7 +2,6 @@
 module TreeSitter
 ( treeSitterParser
 , parseToAST
-, defaultTermAssignment
 ) where
 
 import Category
