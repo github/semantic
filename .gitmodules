@@ -14,13 +14,13 @@
 	path = vendor/effects
 	url = https://github.com/joshvera/effects.git
 [submodule "languages/ruby/vendor/tree-sitter-ruby"]
-	path = languages/ruby/vendor/tree-sitter-ruby
+	path = vendor/tree-sitter-ruby
 	url = https://github.com/tree-sitter/tree-sitter-ruby.git
 [submodule "languages/c/vendor/tree-sitter-c"]
 	path = languages/c/vendor/tree-sitter-c
 	url = https://github.com/tree-sitter/tree-sitter-c.git
 [submodule "languages/go/vendor/tree-sitter-go"]
-	path = languages/go/vendor/tree-sitter-go
+	path = vendor/tree-sitter-go
 	url = https://github.com/tree-sitter/tree-sitter-go.git
 [submodule "languages/javascript/vendor/tree-sitter-javascript"]
 	path = languages/javascript/vendor/tree-sitter-javascript
@@ -29,13 +29,13 @@
 	path = vendor/haskell-tree-sitter
 	url = https://github.com/tree-sitter/haskell-tree-sitter.git
 [submodule "languages/typescript/vendor/tree-sitter-typescript"]
-	path = languages/typescript/vendor/tree-sitter-typescript
+	path = vendor/tree-sitter-typescript
 	url = https://github.com/tree-sitter/tree-sitter-typescript/
 [submodule "languages/python/vendor/tree-sitter-python"]
-	path = languages/python/vendor/tree-sitter-python
+	path = vendor/tree-sitter-python
 	url = https://github.com/tree-sitter/tree-sitter-python.git
 [submodule "languages/json/vendor/tree-sitter-json"]
-	path = languages/json/vendor/tree-sitter-json
+	path = vendor/tree-sitter-json
 	url = https://github.com/tree-sitter/tree-sitter-json
 [submodule "vendor/freer-cofreer"]
 	path = vendor/freer-cofreer
