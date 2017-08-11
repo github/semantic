@@ -30,13 +30,13 @@ import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import Syntax hiding (Go)
 import Term
-import qualified Text.Parser.TreeSitter as TS
-import Text.Parser.TreeSitter.Language (Symbol)
-import Text.Parser.TreeSitter.Go
-import Text.Parser.TreeSitter.Python
-import Text.Parser.TreeSitter.Ruby
-import Text.Parser.TreeSitter.TypeScript
-import Text.Parser.TreeSitter.JSON
+import qualified TreeSitter as TS
+import TreeSitter.Language (Symbol)
+import TreeSitter.Go
+import TreeSitter.Python
+import TreeSitter.Ruby
+import TreeSitter.TypeScript
+import TreeSitter.JSON
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where

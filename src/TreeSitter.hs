@@ -27,11 +27,11 @@ import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
 import qualified Syntax as S
 import Term
-import Text.Parser.TreeSitter hiding (Language(..))
-import qualified Text.Parser.TreeSitter as TS
-import qualified Text.Parser.TreeSitter.Go as TS
-import qualified Text.Parser.TreeSitter.Ruby as TS
-import qualified Text.Parser.TreeSitter.TypeScript as TS
+import TreeSitter hiding (Language(..))
+import qualified TreeSitter as TS
+import qualified TreeSitter.Go as TS
+import qualified TreeSitter.Ruby as TS
+import qualified TreeSitter.TypeScript as TS
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
