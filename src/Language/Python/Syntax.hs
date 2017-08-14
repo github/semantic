@@ -320,7 +320,7 @@ binaryOperator = symbol BinaryOperator >>= \ loc -> children (
                        <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expressions)
 
 booleanOperator :: Assignment
-booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( many comment >> expression >>= booleanOperator' )
+booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( contextualize comment expression >>= booleanOperator' )
   where
     booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> contextualize comment expressions)
                                 <|> symbol AnonOr *> (Expression.Or lexpression <$> contextualize comment expressions)
