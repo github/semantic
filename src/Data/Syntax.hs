@@ -6,6 +6,7 @@ import Control.Applicative
 import Control.Comonad.Trans.Cofree (headF)
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
+import Data.Bifunctor (first)
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
 import Data.Foldable (toList)
@@ -67,6 +68,18 @@ postContextualize context rule end = make <$> rule <*> Assignment.manyThrough co
   where make node (cs, end) = case nonEmpty cs of
           Just cs -> (makeTerm1 (Context cs node), end)
           _ -> (node, end)
+
+contextualizeLast :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+                  => m (Term (Union fs) a)
+                  -> m [Term (Union fs) a]
+                  -> m [Term (Union fs) a]
+contextualizeLast context terms = make <$> terms <*> many context
+  where make terms context = case (nonEmpty context, unsnoc terms) of
+          (Just cs, Just (init, last)) -> init <> [makeTerm1 (Context cs last)]
+          _ -> terms <> context
+
+        unsnoc [] = Nothing
+        unsnoc (a:as) = Just (maybe ([], a) (first (a:)) (unsnoc as))
 
 infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack, Apply1 Foldable fs)
              => m (Term (Union fs) a)
