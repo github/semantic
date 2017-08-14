@@ -13,7 +13,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, makeTerm)
+import Data.Syntax (contextualize, emptyTerm, handleError, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -271,19 +271,19 @@ ellipsis :: Assignment
 ellipsis = makeTerm <$> token Grammar.Ellipsis <*> pure Language.Python.Syntax.Ellipsis
 
 comparisonOperator :: Assignment
-comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression >>= \ lexpression -> makeComparison loc lexpression)
-  where
-    makeComparison loc lexpression =  makeTerm loc <$ symbol AnonLAngle       <*> (Expression.LessThan lexpression <$> expressions)
-                                  <|> makeTerm loc <$ symbol AnonLAngleEqual  <*> (Expression.LessThanEqual lexpression <$> expressions)
-                                  <|> makeTerm loc <$ symbol AnonRAngle       <*> (Expression.GreaterThan lexpression <$> expressions)
-                                  <|> makeTerm loc <$ symbol AnonRAngleEqual  <*> (Expression.GreaterThanEqual lexpression <$> expressions)
-                                  <|> makeTerm loc <$ symbol AnonEqualEqual   <*> (Expression.Equal lexpression <$> expressions)
-                                  <|> makeTerm loc <$ symbol AnonBangEqual    <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
-                                  <|> makeTerm loc <$ symbol AnonLAngleRAngle <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
-                                  <|> makeTerm loc <$ symbol AnonNot          <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Member lexpression <$> expressions)))
-                                  <|> makeTerm loc <$ symbol AnonIn           <*> (Expression.Member lexpression <$> expressions)
-                                  <|> token AnonIs *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
-                                                                <|> makeTerm loc <$> Expression.Equal lexpression <$> expressions)
+comparisonOperator = makeTerm' <$> symbol ComparisonOperator <*> children (infixChoice expression expression
+  [ (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inj .) . Expression.Equal            <$ symbol AnonEqualEqual
+  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  , (inj .) . invert Expression.Equal     <$ symbol AnonLAngleRAngle
+  , (inj .) . invert Expression.Member    <$ symbol AnonNot
+  , (inj .) . Expression.Member           <$ symbol AnonIn
+  , token AnonIs *> ((inj .) . invert Expression.Equal <$ symbol AnonNot <|> pure ((inj .) . Expression.Equal))
+  ])
+  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 notOperator :: Assignment
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
