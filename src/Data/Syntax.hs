@@ -2,6 +2,7 @@
 module Data.Syntax where
 
 import Algorithm
+import Control.Applicative
 import Control.Comonad.Trans.Cofree (headF)
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
@@ -37,6 +38,16 @@ handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pur
 
 parseError :: (HasCallStack, Error :< fs, Bounded grammar, Ix grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 parseError = makeTerm <$> Assignment.symbol maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] Nothing []) <* Assignment.source
+
+
+contextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+              => m (Term (Union fs) a)
+              -> m (Term (Union fs) a)
+              -> m (Term (Union fs) a)
+contextualize context rule = make <$> Assignment.manyThrough context rule
+  where make (cs, node) = case nonEmpty cs of
+          Just cs -> makeTerm (sconcat (headF . runCofree <$> cs)) (Context (toList cs) node)
+          _ -> node
 
 
 -- Undifferentiated
