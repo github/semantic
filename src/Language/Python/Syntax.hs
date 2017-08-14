@@ -353,7 +353,7 @@ dictionary :: Assignment
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many expression)
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+pair = makeTerm' <$> symbol Pair <*> children (infixTerm expression expression [ (inj .) . Literal.KeyValue <$ symbol AnonColon ])
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
