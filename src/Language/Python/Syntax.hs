@@ -320,10 +320,10 @@ binaryOperator = symbol BinaryOperator >>= \ loc -> children (
                        <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expressions)
 
 booleanOperator :: Assignment
-booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( contextualize comment expression >>= booleanOperator' )
+booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( term expression >>= booleanOperator' )
   where
-    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> contextualize comment expressions)
-                                <|> symbol AnonOr *> (Expression.Or lexpression <$> contextualize comment expressions)
+    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> term expressions)
+                                <|> symbol AnonOr *> (Expression.Or lexpression <$> term expressions)
 
 assignment' :: Assignment
 assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
@@ -356,7 +356,7 @@ dictionary :: Assignment
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many expression)
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> contextualize comment expression <*> contextualize comment expression <* many comment)
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> term expression <*> term expression <* many comment)
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
