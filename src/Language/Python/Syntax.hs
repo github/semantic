@@ -350,7 +350,7 @@ set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
 
 dictionary :: Assignment
-dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many expression) <* many comment
+dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many expression)
 
 pair :: Assignment
 pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression <* many comment)
