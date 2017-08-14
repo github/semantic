@@ -72,8 +72,8 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              => m (Term (Union fs) a)
              -> m (Term (Union fs) a)
              -> m (Term (Union fs) a)
-             -> [m (Term (Union fs) a -> Term (Union fs) a -> Union fs a)]
-             -> m (Union fs a)
+             -> [m (Term (Union fs) a -> Term (Union fs) a -> Union fs (Term (Union fs) a))]
+             -> m (Union fs (Term (Union fs) a))
 infixContext context left right operators = uncurry (&) <$> postContextualize context left (Assignment.choice operators) <*> (fst <$> postContextualize context right Assignment.eof)
 
 
