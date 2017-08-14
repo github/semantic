@@ -4,6 +4,7 @@ module Data.Align.Generic where
 import Control.Monad
 import Data.Align
 import Data.Functor.Identity
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Proxy
 import Data.These
 import Data.Union
@@ -33,6 +34,9 @@ instance (Apply1 GAlign fs) => GAlign (Union fs) where
 
 instance GAlign (Union '[]) where
   galignWith _ _ _ = Nothing
+
+instance GAlign NonEmpty where
+  galignWith f (a:|as) (b:|bs) = Just (f (These a b) :| alignWith f as bs)
 
 -- | Implements a function suitable for use as the definition of 'galign' for 'Align'able functors.
 galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))
