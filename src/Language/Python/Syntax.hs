@@ -74,6 +74,7 @@ type Syntax =
    , Statement.While
    , Statement.Yield
    , Language.Python.Syntax.Ellipsis
+   , Syntax.Context
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
