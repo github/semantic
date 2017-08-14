@@ -475,3 +475,6 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
   expression >>= \ thenBranch ->
     many comment >> expression >>= \ conditional ->
       Statement.If conditional thenBranch <$> expressions)
+
+term :: Assignment -> Assignment
+term = contextualize comment
