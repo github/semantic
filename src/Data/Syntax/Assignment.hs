@@ -76,6 +76,7 @@ module Data.Syntax.Assignment
 , children
 , while
 , until
+, manyThrough
 -- Results
 , Error(..)
 , errorCallStack
@@ -172,6 +173,10 @@ while predicate step = many $ do
 -- | Collect a list of values failing a predicate.
 until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 until = while . (not .)
+
+manyThrough :: Alternative m => m a -> m b -> m ([a], b)
+manyThrough step stop = go
+  where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
 
 toIndex :: (Bounded grammar, Ix grammar) => grammar -> Int
