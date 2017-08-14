@@ -13,7 +13,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, emptyTerm, handleError, makeTerm, makeTerm', makeTerm1, makeTerm1')
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -321,21 +321,22 @@ booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression 
 
 assignment' :: Assignment
 assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
-           <|> makeTerm <$> symbol AugmentedAssignment <*> children (expressionList >>= \ lvalue -> Statement.Assignment lvalue <$>
-                 (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus lvalue      <$> rvalue)
-              <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus lvalue     <$> rvalue)
-              <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times lvalue     <$> rvalue)
-              <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power lvalue     <$> rvalue)
-              <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy lvalue <$> rvalue)
-              <|> makeTerm <$> symbol AnonSlashSlashEqual         <*> (Expression.DividedBy lvalue <$> rvalue)
-              <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr lvalue       <$> rvalue)
-              <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd lvalue      <$> rvalue)
-              <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo lvalue    <$> rvalue)
-              <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift lvalue    <$> rvalue)
-              <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift lvalue    <$> rvalue)
-              <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr lvalue      <$> rvalue)))
-  where
-    rvalue = expressionList <|> assignment' <|> yield
+           <|> makeTerm <$> symbol AugmentedAssignment <*> children (infixChoice expressionList rvalue
+                  [ assign ((inj .) . Expression.Plus)      <$ symbol AnonPlusEqual
+                  , assign ((inj .) . Expression.Minus)     <$ symbol AnonMinusEqual
+                  , assign ((inj .) . Expression.Times)     <$ symbol AnonStarEqual
+                  , assign ((inj .) . Expression.Power)     <$ symbol AnonStarStarEqual
+                  , assign ((inj .) . Expression.DividedBy) <$ symbol AnonSlashEqual
+                  , assign ((inj .) . Expression.DividedBy) <$ symbol AnonSlashSlashEqual
+                  , assign ((inj .) . Expression.BOr)       <$ symbol AnonPipeEqual
+                  , assign ((inj .) . Expression.BAnd)      <$ symbol AnonAmpersandEqual
+                  , assign ((inj .) . Expression.Modulo)    <$ symbol AnonPercentEqual
+                  , assign ((inj .) . Expression.RShift)    <$ symbol AnonRAngleRAngleEqual
+                  , assign ((inj .) . Expression.LShift)    <$ symbol AnonLAngleLAngleEqual
+                  , assign ((inj .) . Expression.BXOr)      <$ symbol AnonCaretEqual
+                  ])
+  where rvalue = expressionList <|> assignment' <|> yield
+        assign c l r = Statement.Assignment l (makeTerm1' (c l r))
 
 yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> emptyTerm ))
