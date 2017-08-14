@@ -143,7 +143,6 @@ instance Eq c => Diffable' (K1 i c) where
 instance Diffable' U1 where
   algorithmFor' _ _ = Just (pure U1)
 
--- | Diff two recursively defined parameters (Rec1 is the Generic1 newtype representing recursive type parameters).
--- i.e. data Tree a = Leaf a | Node (Tree a) (Tree a) (the two 'Tree a' in 'Node (Tree a) (Tree a)' are Rec1 type parameters).
+-- | Diff two lists of parameters.
 instance Diffable' (Rec1 []) where
   algorithmFor' a b = fmap Rec1 <$> Just ((byRWS `on` unRec1) a b)
