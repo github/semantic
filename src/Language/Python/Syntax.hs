@@ -471,10 +471,7 @@ ifClause :: Assignment
 ifClause = symbol IfClause *> children expressions
 
 conditionalExpression :: Assignment
-conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
-  expression >>= \ thenBranch ->
-    expression >>= \ conditional ->
-      Statement.If conditional thenBranch <$> expressions)
+conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (flip Statement.If <$> expression <*> expression <*> expressions)
 
 term :: Assignment -> Assignment
 term = contextualize comment
