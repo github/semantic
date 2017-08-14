@@ -9,6 +9,7 @@ import Data.Align.Generic
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
 import Data.Foldable (toList)
+import Data.Function ((&))
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
@@ -66,6 +67,14 @@ postContextualize context rule end = make <$> rule <*> Assignment.manyThrough co
   where make node (cs, end) = case nonEmpty cs of
           Just cs -> (makeTerm1 (Context cs node), end)
           _ -> (node, end)
+
+infixContext :: (Context :< fs, Alternative m, Semigroup a, HasCallStack, Apply1 Foldable fs)
+             => m (Term (Union fs) a)
+             -> m (Term (Union fs) a)
+             -> m (Term (Union fs) a)
+             -> [m (Term (Union fs) a -> Term (Union fs) a -> Union fs a)]
+             -> m (Union fs a)
+infixContext context left right operators = uncurry (&) <$> postContextualize context left (Assignment.choice operators) <*> right
 
 
 -- Undifferentiated
