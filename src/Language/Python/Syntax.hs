@@ -11,6 +11,7 @@ import Data.Align.Generic
 import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
@@ -470,7 +471,7 @@ conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (flip Statement.If <$> expression <*> expression <*> expressions)
 
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> comment <* eof
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 manyTermsTill :: Show b => Assignment.Assignment (AST Grammar) Grammar Term -> Assignment.Assignment (AST Grammar) Grammar b -> Assignment.Assignment (AST Grammar) Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
