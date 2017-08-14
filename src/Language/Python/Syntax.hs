@@ -202,7 +202,7 @@ decoratedDefinition :: Assignment
 decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> (functionDefinition <|> classDefinition)))
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
-    partialDecorator = ((,) <$> symbol Decorator <*> children decorator') <|> ((,) <$> symbol Comment <* source <*> (Declaration.Decorator <$> emptyTerm <*> pure []))
+    partialDecorator = ((,) <$> symbol Decorator <*> children decorator') <|> ((,) <$> token Comment <*> (Declaration.Decorator <$> emptyTerm <*> pure []))
     decorator' = Declaration.Decorator <$> expression <*> many expression
 
 argumentList :: Assignment
@@ -268,7 +268,7 @@ dottedName :: Assignment
 dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
 ellipsis :: Assignment
-ellipsis = makeTerm <$> symbol Grammar.Ellipsis <*> (Language.Python.Syntax.Ellipsis <$ source)
+ellipsis = makeTerm <$> token Grammar.Ellipsis <*> pure Language.Python.Syntax.Ellipsis
 
 comparisonOperator :: Assignment
 comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression >>= \ lexpression -> makeComparison loc lexpression)
@@ -283,7 +283,7 @@ comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression
                                   <|> makeTerm loc <$ symbol AnonNot          <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Member lexpression <$> expressions)))
                                   <|> makeTerm loc <$ symbol AnonIn           <*> (Expression.Member lexpression <$> expressions)
                                                     -- source is used here to push the cursor to the next node to enable matching against `AnonNot`
-                                  <|> symbol AnonIs *> source *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
+                                  <|> token AnonIs *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
                                                                 <|> (makeTerm loc <$> Expression.Equal lexpression <$> expressions))
 
 notOperator :: Assignment
@@ -440,8 +440,8 @@ subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$>
 
 slice :: Assignment
 slice = makeTerm <$> symbol Slice <*> children
-  (Expression.Enumeration <$> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source))
-                          <*> ((emptyTerm <* symbol AnonColon <* source) <|> (expression <* symbol AnonColon <* source) <|> (expression <|> emptyTerm))
+  (Expression.Enumeration <$> ((emptyTerm <* token AnonColon) <|> (expression <* token AnonColon))
+                          <*> ((emptyTerm <* token AnonColon) <|> (expression <* token AnonColon) <|> (expression <|> emptyTerm))
                           <*> (expression <|> emptyTerm))
 
 call :: Assignment
@@ -449,8 +449,8 @@ call = makeTerm <$> symbol Call <*> children (Expression.Call <$> expression <*>
                                                                                 <|> some comprehension) <*> emptyTerm)
 
 boolean :: Assignment
-boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
-       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
+       <|> makeTerm <$> token Grammar.False <*> pure Literal.false
 
 none :: Assignment
 none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
