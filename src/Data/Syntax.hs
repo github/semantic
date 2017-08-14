@@ -54,7 +54,7 @@ contextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply
               -> m (Term (Union fs) a)
 contextualize context rule = make <$> Assignment.manyThrough context rule
   where make (cs, node) = case nonEmpty cs of
-          Just cs -> makeTerm (sconcat (headF . runCofree <$> cs)) (Context (toList cs) node)
+          Just cs -> makeTerm1 (Context (toList cs) node)
           _ -> node
 
 
