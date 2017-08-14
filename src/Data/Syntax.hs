@@ -57,6 +57,16 @@ contextualize context rule = make <$> Assignment.manyThrough context rule
           Just cs -> makeTerm1 (Context (toList cs) node)
           _ -> node
 
+postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+                  => m (Term (Union fs) a)
+                  -> m (Term (Union fs) a)
+                  -> m b
+                  -> m (Term (Union fs) a, b)
+postContextualize context rule end = make <$> rule <*> Assignment.manyThrough context end
+  where make node (cs, end) = case nonEmpty cs of
+          Just cs -> (makeTerm1 (Context (toList cs) node), end)
+          _ -> (node, end)
+
 
 -- Undifferentiated
 
