@@ -2,14 +2,18 @@
 module Data.Syntax where
 
 import Algorithm
+import Control.Comonad.Trans.Cofree (headF)
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
+import Data.Foldable (toList)
 import Data.Ix
+import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
+import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
@@ -19,16 +23,19 @@ import Term
 
 -- Combinators
 
-makeTerm :: (HasCallStack, f :< fs) => a -> f (Term (Union fs) a) -> Term (Union fs) a
-makeTerm a f = cofree (a :< inj f)
+makeTerm :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => a -> f (Term (Union fs) a) -> Term (Union fs) a
+makeTerm a = makeTerm' a . inj
 
-emptyTerm :: (HasCallStack, Empty :< fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
+makeTerm' a f = cofree (sconcat (a :| (headF . runCofree <$> toList f)) :< f)
+
+emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
-handleError :: (HasCallStack, Error :< fs, Show grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError :: (HasCallStack, Error :< fs, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
-parseError :: (HasCallStack, Error :< fs, Bounded grammar, Ix grammar) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+parseError :: (HasCallStack, Error :< fs, Bounded grammar, Ix grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 parseError = makeTerm <$> Assignment.symbol maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] Nothing []) <* Assignment.source
 
 
