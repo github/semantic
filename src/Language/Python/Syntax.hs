@@ -202,7 +202,7 @@ decoratedDefinition :: Assignment
 decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> (functionDefinition <|> classDefinition)))
   where
     makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
-    partialDecorator = ((,) <$> symbol Decorator <*> children decorator') <|> ((,) <$> token Comment <*> (Declaration.Decorator <$> emptyTerm <*> pure []))
+    partialDecorator = (,) <$> symbol Decorator <*> children decorator'
     decorator' = Declaration.Decorator <$> expression <*> many expression
 
 argumentList :: Assignment
