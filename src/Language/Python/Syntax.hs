@@ -315,10 +315,10 @@ binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm exp
   ])
 
 booleanOperator :: Assignment
-booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= booleanOperator' )
-  where
-    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expressions)
-                                <|> symbol AnonOr *> (Expression.Or lexpression <$> expressions)
+booleanOperator = makeTerm' <$> symbol BooleanOperator <*> children (infixTerm expression expression
+  [ (inj .) . Expression.And <$ symbol AnonAnd
+  , (inj .) . Expression.Or  <$ symbol AnonOr
+  ])
 
 assignment' :: Assignment
 assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
