@@ -295,7 +295,7 @@ makeState = State 0 (Info.Pos 1 1)
 
 -- Instances
 
-instance Ix grammar => Alternative (Assignment ast grammar) where
+instance Eq grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Throw Nothing `Then` return
 
@@ -336,7 +336,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Show grammar) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -359,7 +359,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = Catch during handler `Then` return
 
-instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
+instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
