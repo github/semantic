@@ -30,8 +30,11 @@ makeTerm a = makeTerm' a . inj
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
 makeTerm' a f = cofree (sconcat (a :| (headF . runCofree <$> toList f)) :< f)
 
-makeTerm1 :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
-makeTerm1 f = case toList f of
+makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
+makeTerm1 = makeTerm1' . inj
+
+makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
+makeTerm1' f = case toList f of
   a : _ -> makeTerm' (headF (runCofree a)) f
   _ -> error "makeTerm1: empty structure"
 
