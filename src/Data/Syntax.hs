@@ -68,13 +68,13 @@ postContextualize context rule end = make <$> rule <*> Assignment.manyThrough co
           Just cs -> (makeTerm1 (Context cs node), end)
           _ -> (node, end)
 
-infixContext :: (Context :< fs, Alternative m, Semigroup a, HasCallStack, Apply1 Foldable fs)
+infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack, Apply1 Foldable fs)
              => m (Term (Union fs) a)
              -> m (Term (Union fs) a)
              -> m (Term (Union fs) a)
              -> [m (Term (Union fs) a -> Term (Union fs) a -> Union fs a)]
              -> m (Union fs a)
-infixContext context left right operators = uncurry (&) <$> postContextualize context left (Assignment.choice operators) <*> right
+infixContext context left right operators = uncurry (&) <$> postContextualize context left (Assignment.choice operators) <*> (fst <$> postContextualize context right Assignment.eof)
 
 
 -- Undifferentiated
