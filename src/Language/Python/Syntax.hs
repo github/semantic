@@ -323,8 +323,8 @@ binaryOperator = symbol BinaryOperator >>= \ loc -> children (
 booleanOperator :: Assignment
 booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( many comment >> expression >>= booleanOperator' )
   where
-    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$ many comment <*> expressions)
-                                <|> symbol AnonOr *> (Expression.Or lexpression <$ many comment <*> expressions)
+    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> contextualize comment expressions)
+                                <|> symbol AnonOr *> (Expression.Or lexpression <$> contextualize comment expressions)
 
 assignment' :: Assignment
 assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
