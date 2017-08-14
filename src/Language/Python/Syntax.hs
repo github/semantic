@@ -473,7 +473,7 @@ ifClause = symbol IfClause *> children expressions
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
   expression >>= \ thenBranch ->
-    many comment >> expression >>= \ conditional ->
+    expression >>= \ conditional ->
       Statement.If conditional thenBranch <$> expressions)
 
 term :: Assignment -> Assignment
