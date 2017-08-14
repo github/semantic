@@ -105,7 +105,7 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError $
+expression = handleError . term $
       argument
   <|> argumentList
   <|> assertStatement
@@ -320,10 +320,10 @@ binaryOperator = symbol BinaryOperator >>= \ loc -> children (
                        <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expressions)
 
 booleanOperator :: Assignment
-booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( term expression >>= booleanOperator' )
+booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= booleanOperator' )
   where
-    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> term expressions)
-                                <|> symbol AnonOr *> (Expression.Or lexpression <$> term expressions)
+    booleanOperator' lexpression =  symbol AnonAnd *> (Expression.And lexpression <$> expressions)
+                                <|> symbol AnonOr *> (Expression.Or lexpression <$> expressions)
 
 assignment' :: Assignment
 assignment' =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
@@ -353,10 +353,10 @@ set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> many expression)
 
 dictionary :: Assignment
-dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many expression)
+dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> many expression) <* many comment
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> term expression <*> term expression <* many comment)
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression <* many comment)
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> many expression)
