@@ -80,3 +80,10 @@ instance (Listable head, Listable (Record tail)) => Listable (Record (head ': ta
 
 instance Listable (Record '[]) where
   tiers = cons0 Nil
+
+
+instance (Semigroup head, Semigroup (Record tail)) => Semigroup (Record (head ': tail)) where
+  (h1 :. t1) <> (h2 :. t2) = (h1 <> h2) :. (t1 <> t2)
+
+instance Semigroup (Record '[]) where
+  _ <> _ = Nil
