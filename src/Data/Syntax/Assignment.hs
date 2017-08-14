@@ -74,6 +74,7 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
+, advance
 , while
 , until
 , manyThrough
@@ -129,6 +130,7 @@ data AssignmentF ast grammar a where
   Project :: HasCallStack => (forall x. F.Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
+  Advance :: HasCallStack => AssignmentF ast grammar ()
   Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
@@ -162,6 +164,8 @@ source = withFrozenCallStack $ Source `Then` return
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
+advance :: HasCallStack => Assignment ast grammar ()
+advance = withFrozenCallStack $ Advance `Then` return
 
 -- | Collect a list of values passing a predicate.
 while :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
@@ -245,6 +249,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
+                  Advance -> yield () (advance state)
                   Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode node))) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
@@ -261,6 +266,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   Project{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
                   Source -> Left (makeError node)
+                  Advance{} -> Left (makeError node)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
@@ -362,6 +368,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
 instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
+    Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
     Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
