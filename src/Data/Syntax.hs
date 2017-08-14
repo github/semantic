@@ -92,3 +92,10 @@ errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected error
 
 unError :: Span -> Error a -> Error.Error String
 unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList errorCallStack)) (Error.Error span errorExpected errorActual)
+
+
+data Context a = Context { contextTerms :: [a], contextSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Context where liftEq = genericLiftEq
+instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
