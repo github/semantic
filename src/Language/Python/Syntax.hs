@@ -470,7 +470,7 @@ conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (flip Statement.If <$> expression <*> expression <*> expressions)
 
 term :: Assignment -> Assignment
-term = contextualize comment
+term term = contextualize comment term <|> comment <* eof
 
 infixTerm :: HasCallStack
           => Assignment
