@@ -116,7 +116,6 @@ expression = handleError $
   <|> breakStatement
   <|> call
   <|> classDefinition
-  <|> comment
   <|> comparisonOperator
   <|> conditionalExpression
   <|> continueStatement
