@@ -383,7 +383,7 @@ import' =  makeTerm <$> symbol ImportStatement <*> children (Declaration.Import 
        <|> makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
 assertStatement :: Assignment
-assertStatement = makeTerm <$ symbol AssertStatement <*> location <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
+assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> many expression <*> emptyTerm)
 
 printStatement :: Assignment
 printStatement = do
