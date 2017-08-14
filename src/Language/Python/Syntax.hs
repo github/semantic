@@ -271,7 +271,7 @@ ellipsis :: Assignment
 ellipsis = makeTerm <$> token Grammar.Ellipsis <*> pure Language.Python.Syntax.Ellipsis
 
 comparisonOperator :: Assignment
-comparisonOperator = makeTerm' <$> symbol ComparisonOperator <*> children (infixChoice expression expression
+comparisonOperator = makeTerm' <$> symbol ComparisonOperator <*> children (infixTerm expression expression
   [ (inj .) . Expression.LessThan         <$ symbol AnonLAngle
   , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
   , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
@@ -298,7 +298,7 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
     bitwise location    = makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
 
 binaryOperator :: Assignment
-binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixChoice expression expression
+binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression expression
   [ (inj .) . Expression.Plus      <$ symbol AnonPlus
   , (inj .) . Expression.Minus     <$ symbol AnonMinus
   , (inj .) . Expression.Times     <$ symbol AnonStar
