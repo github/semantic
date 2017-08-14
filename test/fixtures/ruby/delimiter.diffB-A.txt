@@ -3,10 +3,10 @@
 { (StringLiteral)
 ->(StringLiteral) }
 {+(StringLiteral)+}
+{+(StringLiteral)+}
+{+(StringLiteral)+}
 { (StringLiteral)
 ->(StringLiteral) }
-{+(StringLiteral)+}
-{+(StringLiteral)+}
 {-(StringLiteral)-}
 {-(StringLiteral)-}
 {-(StringLiteral)-}

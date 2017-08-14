@@ -54,32 +54,25 @@
         (Ty
           (Identifier))
         (NumberLiteral))
-    {+(FieldDecl
-        (Other "accessibility_modifier")
-        (Other "readonly")
-        (Identifier)
+      (FieldDecl
+      { (Other "readonly")
+      ->(Other "accessibility_modifier") }
+      { (Identifier)
+      ->(Other "readonly") }
+      { (Ty
+          (Identifier))
+      ->(Identifier) }
+      { (NumberLiteral)
+      ->(Ty
+          (Identifier)) }
+      {+(StringLiteral)+})
+      (FieldDecl
+      { (Identifier)
+      ->(Identifier) }
         (Ty
           (Identifier))
-        (StringLiteral))+}
-    {+(FieldDecl
+        (NumberLiteral))
+      (FieldDecl
         (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))+}
-    {+(FieldDecl
-        (Identifier)
-        (NumberLiteral))+}
-    {-(FieldDecl
-        (Other "readonly")
-        (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))-}
-    {-(FieldDecl
-        (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))-}
-    {-(FieldDecl
-        (Identifier)
-        (NumberLiteral))-})))
+      { (NumberLiteral)
+      ->(NumberLiteral) }))))

@@ -1,0 +1,4 @@
+packages: ./ languages/*/ tools/*/
+optional-packages: vendor/*/
+
+jobs: $ncpus

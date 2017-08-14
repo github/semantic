@@ -14,6 +14,7 @@ module Parser
 import Control.Comonad.Trans.Cofree (headF)
 import qualified CMarkGFM
 import Data.Functor.Foldable hiding (fold, Nil)
+import Data.Ix
 import Data.Record
 import Data.Source as Source
 import qualified Data.Syntax as Syntax
@@ -41,8 +42,8 @@ import Text.Parser.TreeSitter.JSON
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
-  -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Enum grammar, Eq grammar, Show grammar, Symbol grammar, Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs, Recursive ast, Foldable (Base ast))
+  -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
+  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, Symbol grammar, Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs, Eq ast, Recursive ast, Foldable (Base ast))
                    => Parser ast                                                 -- ^ A parser producing AST.
                    -> (forall x. Base ast x -> Node grammar)                     -- ^ A function extracting the symbol and location.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
