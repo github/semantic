@@ -75,6 +75,7 @@ module Data.Syntax.Assignment
 , source
 , children
 , advance
+, token
 , while
 , until
 , manyThrough
@@ -166,6 +167,10 @@ children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 advance :: HasCallStack => Assignment ast grammar ()
 advance = withFrozenCallStack $ Advance `Then` return
+
+token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+token s = symbol s <* advance
+
 
 -- | Collect a list of values passing a predicate.
 while :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
