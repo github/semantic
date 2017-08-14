@@ -36,7 +36,7 @@ makeTerm1 = makeTerm1' . inj
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
 makeTerm1' f = case toList f of
   a : _ -> makeTerm' (headF (runCofree a)) f
-  _ -> error "makeTerm1: empty structure"
+  _ -> error "makeTerm1': empty structure"
 
 emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
