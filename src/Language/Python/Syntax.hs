@@ -298,25 +298,20 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
     bitwise location    = makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
 
 binaryOperator :: Assignment
-binaryOperator = symbol BinaryOperator >>= \ loc -> children (
-  expression >>= \ lexpression ->
-       makeTerm loc <$ comment <*> arithmetic lexpression
-   <|> makeTerm loc <$ comment <*> bitwise lexpression
-   <|> makeTerm loc <$> arithmetic lexpression
-   <|> makeTerm loc <$> bitwise lexpression)
-  where
-    arithmetic lexpression =  symbol AnonPlus *> (Expression.Plus lexpression <$> expressions)
-                          <|> symbol AnonMinus *> (Expression.Minus lexpression <$> expressions)
-                          <|> symbol AnonStar *> (Expression.Times lexpression <$> expressions)
-                          <|> symbol AnonSlash *> (Expression.DividedBy lexpression <$> expressions)
-                          <|> symbol AnonSlashSlash *> (Expression.DividedBy lexpression <$> expressions)
-                          <|> symbol AnonPercent *> (Expression.Modulo lexpression <$> expressions)
-                          <|> symbol AnonStarStar *> (Expression.Power lexpression <$> expressions)
-    bitwise lexpression =  symbol AnonPipe *> (Expression.BOr lexpression <$> expressions)
-                       <|> symbol AnonAmpersand *> (Expression.BAnd lexpression <$> expressions)
-                       <|> symbol AnonCaret *> (Expression.BXOr lexpression <$> expressions)
-                       <|> symbol AnonLAngleLAngle *> (Expression.LShift lexpression <$> expressions)
-                       <|> symbol AnonRAngleRAngle *> (Expression.RShift lexpression <$> expressions)
+binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixChoice expression expression
+  [ (inj .) . Expression.Plus      <$ symbol AnonPlus
+  , (inj .) . Expression.Minus     <$ symbol AnonMinus
+  , (inj .) . Expression.Times     <$ symbol AnonStar
+  , (inj .) . Expression.DividedBy <$ symbol AnonSlash
+  , (inj .) . Expression.DividedBy <$ symbol AnonSlashSlash
+  , (inj .) . Expression.Modulo    <$ symbol AnonPercent
+  , (inj .) . Expression.Power     <$ symbol AnonStarStar
+  , (inj .) . Expression.BOr       <$ symbol AnonPipe
+  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersand
+  , (inj .) . Expression.BXOr      <$ symbol AnonCaret
+  , (inj .) . Expression.LShift    <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift    <$ symbol AnonRAngleRAngle
+  ])
 
 booleanOperator :: Assignment
 booleanOperator = makeTerm <$> symbol BooleanOperator <*> children ( expression >>= booleanOperator' )
