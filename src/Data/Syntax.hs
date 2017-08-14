@@ -59,15 +59,24 @@ contextualize context rule = make <$> Assignment.manyThrough context rule
           Just cs -> makeTerm1 (Context cs node)
           _ -> node
 
-postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
-                  => m (Term (Union fs) a)
-                  -> m (Term (Union fs) a)
-                  -> m b
-                  -> m (Term (Union fs) a, b)
-postContextualize context rule end = make <$> rule <*> Assignment.manyThrough context end
+postContextualizeThrough :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+                         => m (Term (Union fs) a)
+                         -> m (Term (Union fs) a)
+                         -> m b
+                         -> m (Term (Union fs) a, b)
+postContextualizeThrough context rule end = make <$> rule <*> Assignment.manyThrough context end
   where make node (cs, end) = case nonEmpty cs of
           Just cs -> (makeTerm1 (Context cs node), end)
           _ -> (node, end)
+
+postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+                  => m (Term (Union fs) a)
+                  -> m (Term (Union fs) a)
+                  -> m (Term (Union fs) a)
+postContextualize context rule = make <$> rule <*> many context
+  where make node cs = case nonEmpty cs of
+          Just cs -> makeTerm1 (Context cs node)
+          _ -> node
 
 contextualizeLast :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
                   => m (Term (Union fs) a)
@@ -87,7 +96,7 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Term (Union fs) a)
              -> [m (Term (Union fs) a -> Term (Union fs) a -> Union fs (Term (Union fs) a))]
              -> m (Union fs (Term (Union fs) a))
-infixContext context left right operators = uncurry (&) <$> postContextualize context left (Assignment.choice operators) <*> (fst <$> postContextualize context right Assignment.eof)
+infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (Assignment.choice operators) <*> postContextualize context right
 
 
 -- Undifferentiated
