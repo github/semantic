@@ -82,12 +82,21 @@ type Syntax = '[
   , Type.Annotation
   , Type.Readonly
   , Type.TypeParameters
-  , Type.TypeParameter
+  , Language.TypeScript.Syntax.TypeParameter
+  , Language.TypeScript.Syntax.Constraint
+  , Language.TypeScript.Syntax.ParenthesizedType
+  , Language.TypeScript.Syntax.PredefinedType
+  , Language.TypeScript.Syntax.TypeIdentifier
+  , Language.TypeScript.Syntax.NestedIdentifier
+  , Language.TypeScript.Syntax.NestedTypeIdentifier
+  , Language.TypeScript.Syntax.GenericType
+  , Language.TypeScript.Syntax.TypeArguments
+  , Language.TypeScript.Syntax.TypePredicate
   , Type.Visibility
   , []
   ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
+type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
@@ -96,6 +105,144 @@ data ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
 
 instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
 instance Show1 ShorthandPropertyIdentifier where liftShowsPrec = genericLiftShowsPrec
+
+data Union a = Union { unionElements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Language.TypeScript.Syntax.Union where liftEq = genericLiftEq
+instance Show1 Language.TypeScript.Syntax.Union where liftShowsPrec = genericLiftShowsPrec
+
+data Intersection a = Intersection { intersectionElements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Intersection where liftEq = genericLiftEq
+instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
+
+data Function a = Function { functionTypeParameters :: !a, functionFormalParameters :: !a, functionType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Function where liftEq = genericLiftEq
+instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
+
+data Tuple a = Tuple { tupleElements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Tuple where liftEq = genericLiftEq
+instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
+
+data Constructor a = Constructor { constructorTypeParameters :: !a, constructorFormalParameters :: !a, constructorType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Language.TypeScript.Syntax.Constructor where liftEq = genericLiftEq
+instance Show1 Language.TypeScript.Syntax.Constructor where liftShowsPrec = genericLiftShowsPrec
+
+data TypeParameter a = TypeParameter { typeParameter :: !a, typeParameterConstraint :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypeParameter where liftEq = genericLiftEq
+instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
+
+data Constraint a = Constraint { constraintType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Constraint where liftEq = genericLiftEq
+instance Show1 Constraint where liftShowsPrec = genericLiftShowsPrec
+
+data ParenthesizedType a = ParenthesizedType { parenthesizedType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ParenthesizedType where liftEq = genericLiftEq
+instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
+
+data PredefinedType a = PredefinedType { predefinedType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 PredefinedType where liftEq = genericLiftEq
+instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
+
+data TypeIdentifier a = TypeIdentifier ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypeIdentifier where liftEq = genericLiftEq
+instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
+
+data NestedIdentifier a = NestedIdentifier !a !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 NestedIdentifier where liftEq = genericLiftEq
+instance Show1 NestedIdentifier where liftShowsPrec = genericLiftShowsPrec
+
+data NestedTypeIdentifier a = NestedTypeIdentifier !a !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 NestedTypeIdentifier where liftEq = genericLiftEq
+instance Show1 NestedTypeIdentifier where liftShowsPrec = genericLiftShowsPrec
+
+data GenericType a = GenericType { genericTypeIdentifier :: !a, genericTypeArguments :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 GenericType where liftEq = genericLiftEq
+instance Show1 GenericType where liftShowsPrec = genericLiftShowsPrec
+
+data TypePredicate a = TypePredicate { typePredicateIdentifier :: !a, typePredicateType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypePredicate where liftEq = genericLiftEq
+instance Show1 TypePredicate where liftShowsPrec = genericLiftShowsPrec
+
+data ObjectType a = ObjectType { objectTypeElements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ObjectType where liftEq = genericLiftEq
+instance Show1 ObjectType where liftShowsPrec = genericLiftShowsPrec
+
+data ArrayType a = ArrayType { arrayType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ArrayType where liftEq = genericLiftEq
+instance Show1 ArrayType where liftShowsPrec = genericLiftShowsPrec
+
+data FlowMaybeType a = FlowMaybeType { flowMaybeType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 FlowMaybeType where liftEq = genericLiftEq
+instance Show1 FlowMaybeType where liftShowsPrec = genericLiftShowsPrec
+
+data TypeQuery a = TypeQuery { typeQuerySubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypeQuery where liftEq = genericLiftEq
+instance Show1 TypeQuery where liftShowsPrec = genericLiftShowsPrec
+
+data IndexTypeQuery a = IndexTypeQuery { indexTypeQuerySubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 IndexTypeQuery where liftEq = genericLiftEq
+instance Show1 IndexTypeQuery where liftShowsPrec = genericLiftShowsPrec
+
+data TypeArguments a = TypeArguments { typeArguments :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypeArguments where liftEq = genericLiftEq
+instance Show1 TypeArguments where liftShowsPrec = genericLiftShowsPrec
+
+data ThisType a = ThisType ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ThisType where liftEq = genericLiftEq
+instance Show1 ThisType where liftShowsPrec = genericLiftShowsPrec
+
+data ExistentialType a = ExistentialType ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ExistentialType where liftEq = genericLiftEq
+instance Show1 ExistentialType where liftShowsPrec = genericLiftShowsPrec
+
+data LiteralType a = LiteralType { literalTypeSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 LiteralType where liftEq = genericLiftEq
+instance Show1 LiteralType where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
@@ -138,7 +285,6 @@ expressions = makeTerm <$> location <*> many expression
 identifier :: Assignment
 identifier =
       mk Identifier
-  <|> mk NestedIdentifier
   <|> mk Super
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
@@ -189,8 +335,87 @@ methodDefinition = makeVisibility <$>
     makeVisibility loc (modifier, readonly, empty, propertyName, callSignature, statements) = maybe method'' (\x -> makeTerm loc (Type.Visibility (maybe method'' (const (makeReadonly loc method'')) readonly) x)) modifier
       where method'' = method' loc empty propertyName callSignature statements
 
-    method' loc term name signature statements = makeTerm loc (Declaration.Method term name signature statements)
+    method' loc term name (typeParams, params, annotation) statements = makeTerm loc (Declaration.Method term name params statements)
     makeReadonly loc = makeTerm loc . Type.Readonly
+
+    callSignature =  symbol CallSignature *> children ((,,) <$> optional typeParameters <*> formalParameters <*> optional typeAnnotation)
+    formalParameters = symbol FormalParameters *> children (many parameter)
+    typeParameters = symbol TypeParameters *> children (many typeParameter')
+    typeAnnotation = symbol TypeAnnotation *> children ty
+
+typeParameter' :: Assignment
+typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (Language.TypeScript.Syntax.TypeParameter <$> ty <*> (fromMaybe <$> emptyTerm <*> optional constraint))
+
+constraint :: Assignment
+constraint = makeTerm <$> symbol Grammar.Constraint <*> children (Language.TypeScript.Syntax.Constraint <$> ty)
+
+ty :: Assignment
+ty = primaryType <|> unionType <|> intersectionType <|> functionTy <|> constructorTy
+
+primaryType = parenthesizedTy <|> predefinedTy <|> typeIdentifier <|> nestedTypeIdentifier <|> genericType <|> typePredicate <|> objectType <|> arrayTy <|> tupleType <|> flowMaybeTy <|> typeQuery <|> indexTypeQuery <|> thisType <|> existentialType <|> literalType
+
+parenthesizedTy :: Assignment
+parenthesizedTy = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Language.TypeScript.Syntax.ParenthesizedType <$> ty)
+
+predefinedTy :: Assignment
+predefinedTy = makeTerm <$> symbol Grammar.PredefinedType <*> children (Language.TypeScript.Syntax.PredefinedType <$> ty)
+
+typeIdentifier :: Assignment
+typeIdentifier = makeTerm <$> symbol Grammar.TypeIdentifier <*> children (Language.TypeScript.Syntax.TypeIdentifier <$> source)
+
+nestedIdentifier :: Assignment
+nestedIdentifier = makeTerm <$> symbol Grammar.NestedIdentifier <*> children (Language.TypeScript.Syntax.NestedIdentifier <$> (identifier <|> nestedIdentifier) <*> identifier)
+
+nestedTypeIdentifier :: Assignment
+nestedTypeIdentifier = makeTerm <$> symbol Grammar.NestedTypeIdentifier <*> children (Language.TypeScript.Syntax.NestedTypeIdentifier <$> (identifier <|> nestedIdentifier) <*> typeIdentifier)
+
+genericType :: Assignment
+genericType = makeTerm <$> symbol Grammar.GenericType <*> children (Language.TypeScript.Syntax.GenericType <$> (typeIdentifier <|> nestedTypeIdentifier) <*> typeArguments')
+
+typeArguments' :: Assignment
+typeArguments' = makeTerm <$> symbol Grammar.TypeArguments <*> children (Language.TypeScript.Syntax.TypeArguments <$> some ty)
+
+typePredicate :: Assignment
+typePredicate = makeTerm <$> symbol Grammar.TypePredicate <*> children (Language.TypeScript.Syntax.TypePredicate <$> identifier <*> ty)
+
+objectType :: Assignment
+objectType = makeTerm <$> symbol Grammar.ObjectType <*> children (Language.TypeScript.Syntax.ObjectType <$> some (exportStatement <|> propertySignature <|> callSignature <|> constructSignature <|> indexSignature <|> methodSignature))
+
+arrayTy :: Assignment
+arrayTy = makeTerm <$> symbol Grammar.ArrayType <*> children (Language.TypeScript.Syntax.ArrayType <$> ty)
+
+flowMaybeTy :: Assignment
+flowMaybeTy = makeTerm <$> symbol Grammar.FlowMaybeType <*> children (Language.TypeScript.Syntax.FlowMaybeType <$> primaryType)
+
+typeQuery :: Assignment
+typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (Language.TypeScript.Syntax.TypeQuery <$> (identifier <|> nestedIdentifier))
+
+indexTypeQuery :: Assignment
+indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <$> children (Language.TypeScript.Syntax.IndexTypeQuery <$> (identifier <|> nestedIdentifier))
+
+thisType :: Assignment
+thisType = makeTerm <$> symbol Grammar.ThisType <$> children (Language.TypeScript.Syntax.ThisType <$> source)
+
+existentialType :: Assignment
+existentialType = makeTerm <$> symbol Grammar.ExistentialType <$> (Language.TypeScript.Syntax.ExistentialType <$> source)
+
+literalType :: Assignment
+literalType = makeTerm <$> symbol Grammar.LiteralType <$> (Language.TypeScript.Syntax.LiteralType <$> (number <|> string <|> true <|> false))
+
+unionType :: Assignment
+unionType = makeTerm <$> symbol UnionType <*> children (Language.TypeScript.Syntax.Union <$> ty <*> ty)
+
+intersectionType :: Assignment
+intersectionType = makeTerm <$> symbol IntersectionType <*> children (Language.TypeScript.Syntax.Intersection <$> ty <*> ty)
+
+functionTy :: Assignment
+functionTy = makeTerm <$> symbol FunctionType <*> children (Language.TypeScript.Syntax.Function <$> optional typeParameters <*> formalParameters <*> ty)
+
+tupleType :: Assignment
+tupleType = makeTerm <$> symbol TupleType <*> children (Language.TypeScript.Syntax.Tuple <$> many ty)
+
+constructorTy :: Assignment
+constructorTy = makeTerm <$> symbol ConstructorType <*> children (Language.TypeScript.Syntax.Constructor <$> optional typeParameters <*> formalParameters <*> ty)
 
 statements :: Assignment
 statements = makeTerm <$> location <*> many statement
@@ -221,11 +446,6 @@ statement =
 
 propertyName :: Assignment
 propertyName = makeTerm <$> PropertyIdentifier <*> ((Syntax.Identifier <$> source) <|> string <|> number)
-
-callSignature :: Assignment
-callSignature = makeTerm <$> symbol CallSignature <*> ((,,) <$> optional typeParameters <*> formalParameters <*> optional typeAnnotation)
-  where makeAnnotation (typeParams, params, annotation) = maybe params' (makeTerm . Type.Annotation) typeParams
-
 
 assignmentPattern :: Assignment
 assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> shorthandPropertyIdentifier <*> initializer
@@ -407,5 +627,5 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 
 
 -- Helper functions
-invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Union fs) (Record Location))
+invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Data.Union.Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Data.Union.Union fs) (Record Location))
 invert term = makeTerm <$> location <*> fmap Expression.Not term
