@@ -7,6 +7,7 @@ import Control.Monad.Free.Freer
 import Data.Function (on)
 import Data.Functor.Both
 import Data.Functor.Classes
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
 import Data.Proxy
 import Data.These
@@ -146,3 +147,9 @@ instance Diffable' U1 where
 -- | Diff two lists of parameters.
 instance Diffable' (Rec1 []) where
   algorithmFor' a b = fmap Rec1 <$> Just ((byRWS `on` unRec1) a b)
+
+-- | Diff two non-empty lists of parameters.
+instance Diffable' (Rec1 NonEmpty) where
+  algorithmFor' (Rec1 (a:|as)) (Rec1 (b:|bs)) = Just $ do
+    d:ds <- byRWS (a:as) (b:bs)
+    pure (Rec1 (d :| ds))
