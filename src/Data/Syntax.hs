@@ -54,7 +54,7 @@ contextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply
               -> m (Term (Union fs) a)
 contextualize context rule = make <$> Assignment.manyThrough context rule
   where make (cs, node) = case nonEmpty cs of
-          Just cs -> makeTerm1 (Context (toList cs) node)
+          Just cs -> makeTerm1 (Context cs node)
           _ -> node
 
 postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
@@ -64,7 +64,7 @@ postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, A
                   -> m (Term (Union fs) a, b)
 postContextualize context rule end = make <$> rule <*> Assignment.manyThrough context end
   where make node (cs, end) = case nonEmpty cs of
-          Just cs -> (makeTerm1 (Context (toList cs) node), end)
+          Just cs -> (makeTerm1 (Context cs node), end)
           _ -> (node, end)
 
 
@@ -123,7 +123,7 @@ unError :: Span -> Error a -> Error.Error String
 unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList errorCallStack)) (Error.Error span errorExpected errorActual)
 
 
-data Context a = Context { contextTerms :: [a], contextSubject :: a }
+data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Context where liftEq = genericLiftEq
