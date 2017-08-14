@@ -183,7 +183,7 @@ while predicate step = many $ do
 until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 until = while . (not .)
 
-manyThrough :: Alternative m => m a -> m b -> m ([a], b)
+manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
 manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
