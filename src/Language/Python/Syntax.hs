@@ -206,7 +206,7 @@ decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> 
     decorator' = Declaration.Decorator <$> expression <*> many expression
 
 argumentList :: Assignment
-argumentList = makeTerm <$> symbol ArgumentList <*> children (many expression)
+argumentList = symbol ArgumentList *> children expressions
 
 withStatement :: Assignment
 withStatement = mk <$> symbol WithStatement <*> children (some with)
@@ -218,14 +218,14 @@ withStatement = mk <$> symbol WithStatement <*> children (some with)
             <|> flip Statement.Let <$> expression <*> emptyTerm
 
 forStatement :: Assignment
-forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (makeTerm <$> symbol Variables <*> children (many expression)) <*> expressionList <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> eof)) <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
+forStatement = symbol ForStatement >>= \ loc -> children (make loc <$> (symbol Variables *> children expressions) <*> expressionList <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> eof)) <*> optional (symbol ElseClause *> children expressions))
   where
     make loc binding subject body forElseClause = case forElseClause of
       Nothing -> makeTerm loc (Statement.ForEach binding subject body)
       Just a -> makeTerm loc (Statement.Else (makeTerm loc $ Statement.ForEach binding subject body) a)
 
 whileStatement :: Assignment
-whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> eof)) <*> optional (makeTerm <$> symbol ElseClause <*> children (many expression)))
+whileStatement = symbol WhileStatement >>= \ loc -> children (make loc <$> expression <*> (makeTerm <$> location <*> manyTill expression (void (symbol ElseClause) <|> eof)) <*> optional (symbol ElseClause *> children expressions))
   where
     make loc whileCondition whileBody whileElseClause = case whileElseClause of
       Nothing -> makeTerm loc (Statement.While whileCondition whileBody)
