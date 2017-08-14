@@ -13,7 +13,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -471,3 +471,10 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 term :: Assignment -> Assignment
 term = contextualize comment
+
+infixTerm :: HasCallStack
+          => Assignment
+          -> Assignment
+          -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment (AST Grammar) Grammar (Union Syntax Term)
+infixTerm = infixContext comment
