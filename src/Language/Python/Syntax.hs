@@ -283,7 +283,7 @@ comparisonOperator = symbol ComparisonOperator >>= \ loc -> children (expression
                                   <|> makeTerm loc <$ symbol AnonNot          <*> (Expression.Not <$> (makeTerm <$> location <*> (Expression.Member lexpression <$> expressions)))
                                   <|> makeTerm loc <$ symbol AnonIn           <*> (Expression.Member lexpression <$> expressions)
                                   <|> token AnonIs *> (symbol AnonNot *> (makeTerm loc <$> Expression.Not <$> (makeTerm <$> location <*> (Expression.Equal lexpression <$> expressions)))
-                                                                <|> (makeTerm loc <$> Expression.Equal lexpression <$> expressions))
+                                                                <|> makeTerm loc <$> Expression.Equal lexpression <$> expressions)
 
 notOperator :: Assignment
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> expression)
