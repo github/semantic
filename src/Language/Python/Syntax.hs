@@ -365,7 +365,7 @@ string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 concatenatedString :: Assignment
-concatenatedString = makeTerm <$> symbol ConcatenatedString <*> (Literal.TextElement . mconcat <$> children (many ((symbol String *> source) <|> (symbol Comment *> source *> pure ""))))
+concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (many (term (makeTerm <$> symbol String <*> (Literal.TextElement <$> source))))
 
 float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
