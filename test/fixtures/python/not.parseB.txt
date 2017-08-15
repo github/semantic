@@ -1,0 +1,5 @@
+(Program
+  (Not
+    (Identifier))
+  (Not
+    (Identifier)))

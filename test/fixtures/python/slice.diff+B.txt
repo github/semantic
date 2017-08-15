@@ -1,0 +1,26 @@
+{+(Program
+  (Subscript
+    (Identifier)
+    (Enumeration
+      (Integer)
+      (Integer)
+      (Empty))
+    (Ellipsis))
+  (Subscript
+    (Identifier)
+    (Enumeration
+      (Empty)
+      (Empty)
+      (Empty)))
+  (Subscript
+    (Identifier)
+    (Enumeration
+      (Integer)
+      (Empty)
+      (Empty)))
+  (Subscript
+    (Identifier)
+    (Enumeration
+      (Empty)
+      (Empty)
+      (Empty))))+}

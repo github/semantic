@@ -1,0 +1,23 @@
+(Program
+{+(Identifier)+}
+{+(Plus
+    (Identifier)
+    (
+      (Identifier)))+}
+  (
+    (Integer)
+    (Integer)
+    (Integer))
+{+(
+    (Integer)
+    (Integer)
+    (Integer))+}
+{-(Identifier)-}
+{-(
+    (Integer)
+    (Integer)
+    (Integer))-}
+{-(Plus
+    (Identifier)
+    (
+      (Identifier)))-})
