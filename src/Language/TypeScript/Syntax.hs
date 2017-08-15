@@ -94,6 +94,12 @@ type Syntax = '[
   , Language.TypeScript.Syntax.TypePredicate
   , Language.TypeScript.Syntax.Annotation
   , Language.TypeScript.Syntax.CallSignature
+  , Language.TypeScript.Syntax.ArrayType
+  , Language.TypeScript.Syntax.FlowMaybeType
+  , Language.TypeScript.Syntax.TypeQuery
+  , Language.TypeScript.Syntax.IndexTypeQuery
+  , Language.TypeScript.Syntax.ThisType
+  , Language.TypeScript.Syntax.ExistentialType
   , Type.Visibility
   , []
   ]
