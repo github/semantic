@@ -92,6 +92,8 @@ type Syntax = '[
   , Language.TypeScript.Syntax.GenericType
   , Language.TypeScript.Syntax.TypeArguments
   , Language.TypeScript.Syntax.TypePredicate
+  , Language.TypeScript.Syntax.Annotation
+  , Language.TypeScript.Syntax.CallSignature
   , Type.Visibility
   , []
   ]
@@ -141,6 +143,12 @@ data TypeParameter a = TypeParameter { typeParameter :: !a, typeParameterConstra
 
 instance Eq1 TypeParameter where liftEq = genericLiftEq
 instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
+
+data Annotation a = Annotation { typeAnnotation :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Annotation where liftEq = genericLiftEq
+instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
 data Constraint a = Constraint { constraintType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -196,6 +204,12 @@ data ObjectType a = ObjectType { objectTypeElements :: ![a] }
 instance Eq1 ObjectType where liftEq = genericLiftEq
 instance Show1 ObjectType where liftShowsPrec = genericLiftShowsPrec
 
+data Export a = Export { exportElements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Export where liftEq = genericLiftEq
+instance Show1 Export where liftShowsPrec = genericLiftShowsPrec
+
 data ArrayType a = ArrayType { arrayType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -243,6 +257,18 @@ data LiteralType a = LiteralType { literalTypeSubject :: !a }
 
 instance Eq1 LiteralType where liftEq = genericLiftEq
 instance Show1 LiteralType where liftShowsPrec = genericLiftShowsPrec
+
+data PropertySignature a = PropertySignature { modifiers :: ![a], propertySignaturePropertyName :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 PropertySignature where liftEq = genericLiftEq
+instance Show1 PropertySignature where liftShowsPrec = genericLiftShowsPrec
+
+data CallSignature a = CallSignature { callSignatureTypeParameters :: !a, callSignatureParameters :: ![a], callSignatureType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 CallSignature where liftEq = genericLiftEq
+instance Show1 CallSignature where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
@@ -328,20 +354,26 @@ readonly' :: Assignment
 readonly' = makeTerm <$> symbol Readonly <*> children (Syntax.Identifier <$> source)
 
 methodDefinition :: Assignment
-methodDefinition = makeVisibility <$>
+methodDefinition = makeMethod <$>
   symbol MethodDefinition
-  <*> children ((,,,,,) <$> optional accessibilityModifier' <*> optional readonly' <*> emptyTerm <*> propertyName <*> callSignature <*> statements)
+  <*> children ((,,,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> emptyTerm <*> emptyTerm <*> callSignatureParts <*> emptyTerm)
   where
-    makeVisibility loc (modifier, readonly, empty, propertyName, callSignature, statements) = maybe method'' (\x -> makeTerm loc (Type.Visibility (maybe method'' (const (makeReadonly loc method'')) readonly) x)) modifier
-      where method'' = method' loc empty propertyName callSignature statements
+    makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
-    method' loc term name (typeParams, params, annotation) statements = makeTerm loc (Declaration.Method term name params statements)
-    makeReadonly loc = makeTerm loc . Type.Readonly
+callSignatureParts :: HasCallStack => Assignment.Assignment (AST Grammar) Grammar (Term, [Term], Term)
+callSignatureParts =  symbol Grammar.CallSignature *> children ((,,) <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional typeAnnotation'))
 
-    callSignature =  symbol CallSignature *> children ((,,) <$> optional typeParameters <*> formalParameters <*> optional typeAnnotation)
-    formalParameters = symbol FormalParameters *> children (many parameter)
-    typeParameters = symbol TypeParameters *> children (many typeParameter')
-    typeAnnotation = symbol TypeAnnotation *> children ty
+callSignature :: Assignment
+callSignature =  makeTerm <$> symbol Grammar.CallSignature <*> children (Language.TypeScript.Syntax.CallSignature <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional typeAnnotation'))
+
+formalParameters :: HasCallStack => Assignment.Assignment (AST Grammar) Grammar [Term]
+formalParameters = symbol FormalParameters *> children (many parameter)
+
+typeParameters :: Assignment
+typeParameters = makeTerm <$> symbol TypeParameters <*> children (Type.TypeParameters <$> many typeParameter')
+
+typeAnnotation' :: Assignment
+typeAnnotation' = makeTerm <$> symbol TypeAnnotation <*> children (Language.TypeScript.Syntax.Annotation <$> ty)
 
 typeParameter' :: Assignment
 typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (Language.TypeScript.Syntax.TypeParameter <$> ty <*> (fromMaybe <$> emptyTerm <*> optional constraint))
@@ -444,26 +476,33 @@ statement =
   <|> emptyStatement
   <|> labeledStatement
 
+exportStatement :: Assignment
+exportStatement = makeTerm <$> Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> ((<>) <$> fromClause <|> (exportClause <*> fromClause) <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias))
+
+propertySignature :: Assignment
+propertySignature = makePropertySignature <$> Grammar.PropertySignature <*> children ((,,,) <$> optional accessibilityModifier <*> optional readonly <*> propertyName <*> optional typeAnnotation')
+  where makePropertySignature (modifier, readonly, propertyName, annotation) = Language.TypeScript.Syntax.PropertySignature [modifier, readonly, annotation] propertyName
+
 propertyName :: Assignment
-propertyName = makeTerm <$> PropertyIdentifier <*> ((Syntax.Identifier <$> source) <|> string <|> number)
+propertyName = makeTerm <$> PropertyIdentifier <*> children ((Syntax.Identifier <$> source) <|> string <|> number)
 
 assignmentPattern :: Assignment
-assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> shorthandPropertyIdentifier <*> initializer
+assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Assignment <$> shorthandPropertyIdentifier <*> initializer)
 
 shorthandPropertyIdentifier :: Assignment
 shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (Language.TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment
-requiredParameter = makeVisibility <$> symbol RequiredParameter <*> children ((,,,) <$> optional accessibilityModifier' <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
+requiredParameter = makeVisibility <$> symbol RequiredParameter <*> children ((,,,) <$> optional accessibilityModifier' <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation' <*> optional initializer)
   where makeVisibility loc (modifier, identifier, annotation, initializer) = maybe method' (makeTerm . Visibility method') modifier
         param' identifier initializer = makeTerm loc (fmap Declaration.RequiredParameter . term')
           where term' = maybe identifier (Statement.Assignment <$> identifier <*>) initializer
 
 restParameter :: Assignment
-restParameter = makeTerm <$> symbol RestParameter <*> children ((,) <$> identifier <*> optional typeAnnotation)
+restParameter = makeTerm <$> symbol RestParameter <*> children ((,) <$> identifier <*> optional typeAnnotation')
 
 optionalParameter :: Assignment
-optionalParameter = makeTerm <$> symbol OptionalParameter <*> children ((,,,) <$> optional accessibilityModifier' <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation <*> optional initializer)
+optionalParameter = makeTerm <$> symbol OptionalParameter <*> children ((,,,) <$> optional accessibilityModifier' <*> (identifier <|> destructuringPattern) <*> optional typeAnnotation' <*> optional initializer)
 
 method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> expression <*> params <*> expressions)

@@ -25,17 +25,11 @@ data Visibility a = Visibility { visibilitySubject :: !a, visibilityType :: !a }
 instance Eq1 Visibility where liftEq = genericLiftEq
 instance Show1 Visibility where liftShowsPrec = genericLiftShowsPrec
 
-data TypeParameters a = TypeParameters { typeParametersSubject :: !a, typeParameters :: ![a] }
+data TypeParameters a = TypeParameters { typeParameters :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 TypeParameters where liftEq = genericLiftEq
 instance Show1 TypeParameters where liftShowsPrec = genericLiftShowsPrec
-
-data TypeParameter a = TypeParameter { typeParameter :: !a, constraint :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 TypeParameter where liftEq = genericLiftEq
-instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
 
 data Readonly a = Readonly a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
