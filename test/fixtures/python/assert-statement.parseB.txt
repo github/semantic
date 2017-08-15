@@ -8,4 +8,6 @@
     (Identifier)
     (Identifier)
     (Empty))
-  (Comment))
+  (Context
+    (Comment)
+    (Empty)))

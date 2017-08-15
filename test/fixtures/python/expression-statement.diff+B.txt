@@ -10,5 +10,4 @@
     (Integer))
   (Plus
     (Identifier)
-    (
-      (Identifier))))+}
+    (Identifier)))+}

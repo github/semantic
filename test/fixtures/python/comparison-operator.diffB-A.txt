@@ -1,86 +1,67 @@
 (Program
 {+(LessThan
     (Identifier)
-    (
-      (Identifier)))+}
+    (Identifier))+}
 {+(LessThanEqual
     (Identifier)
-    (
-      (Identifier)))+}
+    (Identifier))+}
 {+(Not
     (Equal
       (Identifier)
-      (
-        (Identifier))))+}
+      (Identifier)))+}
 {+(GreaterThanEqual
     (Identifier)
-    (
-      (Identifier)))+}
+    (Identifier))+}
 {+(GreaterThan
     (Identifier)
-    (
-      (Identifier)))+}
-{+(Not
-    (Equal
-      (Identifier)
-      (
-        (Identifier))))+}
-{+(Member
-    (Identifier)
-    (
-      (Identifier)))+}
-{+(Equal
-    (Identifier)
-    (
-      (Identifier)))+}
-{+(Not
-    (Member
-      (Identifier)
-      (
-        (Identifier))))+}
+    (Identifier))+}
   (Not
     (Equal
     { (Identifier)
     ->(Identifier) }
-      (
-      {+(Identifier)+}
-      {-(Identifier)-})))
+    { (Identifier)
+    ->(Identifier) }))
+{+(Member
+    (Identifier)
+    (Identifier))+}
+{+(Equal
+    (Identifier)
+    (Identifier))+}
+{+(Not
+    (Member
+      (Identifier)
+      (Identifier)))+}
+{+(Not
+    (Equal
+      (Identifier)
+      (Identifier)))+}
 {-(Not
     (Member
       (Identifier)
-      (
-        (Identifier))))-}
+      (Identifier)))-}
 {-(Equal
     (Identifier)
-    (
-      (Identifier)))-}
+    (Identifier))-}
 {-(Member
     (Identifier)
-    (
-      (Identifier)))-}
+    (Identifier))-}
 {-(Not
     (Equal
       (Identifier)
-      (
-        (Identifier))))-}
+      (Identifier)))-}
 {-(GreaterThan
     (Identifier)
-    (
-      (Identifier)))-}
+    (Identifier))-}
 {-(GreaterThanEqual
     (Identifier)
-    (
-      (Identifier)))-}
+    (Identifier))-}
 {-(Not
     (Equal
       (Identifier)
-      (
-        (Identifier))))-}
+      (Identifier)))-}
 {-(LessThanEqual
     (Identifier)
-    (
-      (Identifier)))-}
+    (Identifier))-}
 {-(LessThan
     (Identifier)
-    (
-      (Identifier)))-})
+    (Identifier))-})

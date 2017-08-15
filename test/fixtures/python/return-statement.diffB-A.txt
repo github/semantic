@@ -3,8 +3,7 @@
     (
       (Plus
         (Identifier)
-        (
-          (Identifier)))
+        (Identifier))
       (Identifier)))-}
   (Return
     (Empty))
@@ -14,8 +13,7 @@
   ->(
       (Plus
         (Identifier)
-        (
-          (Identifier)))
+        (Identifier))
       (Identifier)) })
 {+(Return
     (Not

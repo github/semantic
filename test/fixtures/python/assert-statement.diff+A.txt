@@ -3,9 +3,10 @@
     (Identifier)
     (Identifier)
     (Empty))
-  (Comment)
-  (Call
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Empty)))+}
+  (Context
+    (Comment)
+    (Call
+      (Identifier)
+      (Identifier)
+      (Identifier)
+      (Empty))))+}
