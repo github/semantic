@@ -3,4 +3,9 @@
     (Identifier)
     (When
       (Args
-        (Identifier)))))
+        (Identifier))))
+  (Case
+    (When
+      (Args
+        (Boolean))
+      (StringLiteral))))

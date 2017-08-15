@@ -11,4 +11,9 @@
         (Args
           (Identifier))
         (Else
-          (Identifier)))-})))
+          (Identifier)))-}))
+{+(Case
+    (When
+      (Args
+        (Boolean))
+      (StringLiteral)))+})
