@@ -63,7 +63,7 @@ We hadn’t planned on Bumblebee, but stuff got done anyway.
 
 ### Summary
 
-12/14, or ~86% (🐝, the patent, & JSON and Markdown support don’t add to the denominator because they weren’t planned). Some breakdown:
+9/14, or 64.3% of the planned tasks; 12/14, or ~86%, including the unplanned tasks. Some breakdown:
 
 **Successes:**
 
