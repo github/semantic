@@ -1,5 +1,0 @@
-{+(Program
-  (Yield
-    (Empty))
-  (Yield
-    (Empty)))+}

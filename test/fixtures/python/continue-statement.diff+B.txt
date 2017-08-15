@@ -1,5 +1,0 @@
-{+(Program
-  (Continue
-    (Empty))
-  (Continue
-    (Empty)))+}

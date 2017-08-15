@@ -1,6 +1,0 @@
-{+(Program
-  (
-    (TextElement)
-    (TextElement)
-    (TextElement)
-    (TextElement)))+}

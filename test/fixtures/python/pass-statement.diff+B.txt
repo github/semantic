@@ -1,5 +1,0 @@
-{+(Program
-  (NoOp
-    (Empty))
-  (NoOp
-    (Empty)))+}

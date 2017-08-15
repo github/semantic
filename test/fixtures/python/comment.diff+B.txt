@@ -1,6 +1,0 @@
-{+(Program
-  (Context
-    (Comment)
-    (Comment)
-    (Comment)
-    (Empty)))+}

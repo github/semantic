@@ -1,5 +1,0 @@
-{+(Program
-  (Break
-    (Empty))
-  (Break
-    (Empty)))+}

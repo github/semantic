@@ -1,6 +1,0 @@
-{+(Program
-  (Function
-    (Identifier)
-    (Params)
-    (Return
-      (Boolean))))+}

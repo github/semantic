@@ -1,7 +1,0 @@
-{+(Program
-  (Unless
-    (Negate
-      (Identifier)))
-  (Unless
-    (Negate
-      (Identifier))))+}

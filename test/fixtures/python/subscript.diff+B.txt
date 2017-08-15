@@ -1,4 +1,0 @@
-{+(Program
-  (Subscript
-    (Identifier)
-    (Identifier)))+}
