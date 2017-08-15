@@ -1,13 +1,13 @@
-(Program
-{-(Hash)-}
-{-(Hash
+{-(Program
+  (Hash)
+  (Hash
     (KeyValue
       (Identifier)
-      (Integer)))-}
-{-(Hash
+      (Integer)))
+  (Hash
     (KeyValue
       (Identifier)
       (Identifier))
     (KeyValue
       (Identifier)
-      (Identifier)))-})
+      (Identifier))))-}

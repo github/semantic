@@ -1,13 +1,13 @@
-(Program
-{+(Return
+{+(Program
+  (Return
     (
       (Plus
         (Identifier)
         (
           (Identifier)))
-      (Identifier)))+}
-{+(Return
-    (Empty))+}
-{+(Return
+      (Identifier)))
+  (Return
+    (Empty))
+  (Return
     (Not
-      (Identifier)))+})
+      (Identifier))))+}

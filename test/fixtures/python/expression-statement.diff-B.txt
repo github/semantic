@@ -1,14 +1,14 @@
-(Program
-{-(
+{-(Program
+  (
     (Integer)
     (Integer)
-    (Integer))-}
-{-(Identifier)-}
-{-(
+    (Integer))
+  (Identifier)
+  (
     (Integer)
     (Integer)
-    (Integer))-}
-{-(Plus
+    (Integer))
+  (Plus
     (Identifier)
     (
-      (Identifier)))-})
+      (Identifier))))-}

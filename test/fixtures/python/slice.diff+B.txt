@@ -1,26 +1,26 @@
-(Program
-{+(Subscript
+{+(Program
+  (Subscript
     (Identifier)
     (Enumeration
       (Integer)
       (Integer)
       (Empty))
-    (Ellipsis))+}
-{+(Subscript
+    (Ellipsis))
+  (Subscript
     (Identifier)
     (Enumeration
       (Empty)
       (Empty)
-      (Empty)))+}
-{+(Subscript
+      (Empty)))
+  (Subscript
     (Identifier)
     (Enumeration
       (Integer)
       (Empty)
-      (Empty)))+}
-{+(Subscript
+      (Empty)))
+  (Subscript
     (Identifier)
     (Enumeration
       (Empty)
       (Empty)
-      (Empty)))+})
+      (Empty))))+}

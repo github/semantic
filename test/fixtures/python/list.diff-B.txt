@@ -1,8 +1,8 @@
-(Program
-{-(Array
-    (Identifier))-}
-{-(Array
+{-(Program
+  (Array
+    (Identifier))
+  (Array
     (Integer)
-    (Integer))-}
-{-(Array
-    (Identifier))-})
+    (Integer))
+  (Array
+    (Identifier)))-}

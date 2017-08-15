@@ -1,6 +1,6 @@
-(Program
-{+(Hash)+}
-{+(Set
+{+(Program
+  (Hash)
+  (Set
     (Integer)
     (Integer)
-    (Integer))+})
+    (Integer)))+}

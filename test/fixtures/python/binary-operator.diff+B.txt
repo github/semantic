@@ -1,49 +1,49 @@
-(Program
-{+(RShift
+{+(Program
+  (RShift
     (Identifier)
     (
-      (Identifier)))+}
-{+(LShift
+      (Identifier)))
+  (LShift
     (Identifier)
     (
-      (Identifier)))+}
-{+(BXOr
+      (Identifier)))
+  (BXOr
     (Identifier)
     (
-      (Identifier)))+}
-{+(BAnd
+      (Identifier)))
+  (BAnd
     (Identifier)
     (
-      (Identifier)))+}
-{+(Modulo
+      (Identifier)))
+  (Modulo
     (Identifier)
     (
-      (Identifier)))+}
-{+(Power
+      (Identifier)))
+  (Power
     (Identifier)
     (
-      (Identifier)))+}
-{+(DividedBy
+      (Identifier)))
+  (DividedBy
     (Identifier)
     (
-      (Identifier)))+}
-{+(Modulo
+      (Identifier)))
+  (Modulo
     (Identifier)
     (
-      (Identifier)))+}
-{+(DividedBy
+      (Identifier)))
+  (DividedBy
     (Identifier)
     (
-      (Identifier)))+}
-{+(Times
+      (Identifier)))
+  (Times
     (Identifier)
     (
-      (Identifier)))+}
-{+(Minus
+      (Identifier)))
+  (Minus
     (Identifier)
     (
-      (Identifier)))+}
-{+(Plus
+      (Identifier)))
+  (Plus
     (Identifier)
     (
-      (Identifier)))+})
+      (Identifier))))+}

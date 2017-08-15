@@ -1,5 +1,5 @@
-(Program
-{-(While
+{-(Program
+  (While
     (Identifier)
     (
       (Break
@@ -7,4 +7,4 @@
       (Continue
         (Identifier))
       (NoOp
-        (Identifier))))-})
+        (Identifier)))))-}

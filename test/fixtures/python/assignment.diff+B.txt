@@ -1,16 +1,16 @@
-(Program
-{+(Assignment
+{+(Program
+  (Assignment
     (
       (Identifier)
       (Identifier))
     (
       (Integer)
-      (Integer)))+}
-{+(Assignment
+      (Integer)))
+  (Assignment
     (Identifier)
-    (Integer))+}
-{+(Assignment
+    (Integer))
+  (Assignment
     (Identifier)
     (
       (Integer)
-      (Integer)))+})
+      (Integer))))+}

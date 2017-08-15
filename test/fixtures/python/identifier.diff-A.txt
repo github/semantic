@@ -1,2 +1,2 @@
-(Program
-{-(Identifier)-})
+{-(Program
+  (Identifier))-}

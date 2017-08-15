@@ -1,15 +1,15 @@
-(Program
-{-(Comprehension
+{-(Program
+  (Comprehension
     (Identifier)
     (
       (
         (
           (Identifier))
-        (Identifier))))-}
-{-(Comprehension
+        (Identifier))))
+  (Comprehension
     (Identifier)
     (
       (
         (
           (Identifier))
-        (Identifier))))-})
+        (Identifier)))))-}

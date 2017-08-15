@@ -1,6 +1,6 @@
-(Program
-{-(Complement
-    (Identifier))-}
-{-(Negate
-    (Identifier))-}
-{-(Identifier)-})
+{-(Program
+  (Complement
+    (Identifier))
+  (Negate
+    (Identifier))
+  (Identifier))-}

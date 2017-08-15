@@ -1,5 +1,5 @@
-(Program
-{+(Decorator
+{+(Program
+  (Decorator
     (ScopeResolution
       (Identifier)
       (Identifier))
@@ -34,4 +34,4 @@
                   (Identifier)
                   (
                     (Identifier)))
-                (Empty))))))))+})
+                (Empty)))))))))+}

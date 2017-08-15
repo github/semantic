@@ -1,5 +1,5 @@
-(Program
-{+(If
+{+(Program
+  (If
     (Identifier)
     (
       (Identifier)
@@ -11,4 +11,4 @@
         (Identifier))
       (
         (Identifier)
-        (Identifier))))+})
+        (Identifier)))))+}

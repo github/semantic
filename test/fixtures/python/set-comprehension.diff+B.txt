@@ -1,12 +1,12 @@
-(Program
-{+(Comprehension
+{+(Program
+  (Comprehension
     (Identifier)
     (
       (
         (
           (Identifier))
-        (Identifier))))+}
-{+(Comprehension
+        (Identifier))))
+  (Comprehension
     (Plus
       (Identifier)
       (
@@ -15,4 +15,4 @@
       (
         (
           (Identifier))
-        (Identifier))))+})
+        (Identifier)))))+}

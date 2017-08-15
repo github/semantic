@@ -1,2 +1,2 @@
-(Program
-{-(TextElement)-})
+{-(Program
+  (TextElement))-}

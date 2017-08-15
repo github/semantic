@@ -1,16 +1,16 @@
-(Program
-{-(Assignment
+{-(Program
+  (Assignment
     (Identifier)
     (RShift
       (Identifier)
-      (Integer)))-}
-{-(Assignment
+      (Integer)))
+  (Assignment
     (Identifier)
     (DividedBy
       (Identifier)
-      (Integer)))-}
-{-(Assignment
+      (Integer)))
+  (Assignment
     (Identifier)
     (Plus
       (Identifier)
-      (Integer)))-})
+      (Integer))))-}

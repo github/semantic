@@ -1,5 +1,5 @@
-(Program
-{+(Else
+{+(Program
+  (Else
     (ForEach
       (
         (Identifier)
@@ -24,8 +24,8 @@
       (Call
         (Identifier)
         (Identifier)
-        (Empty))))+}
-{+(ForEach
+        (Empty))))
+  (ForEach
     (
       (Identifier))
     (Array
@@ -36,4 +36,4 @@
       (Tuple
         (Integer)))
     (
-      (Identifier)))+})
+      (Identifier))))+}

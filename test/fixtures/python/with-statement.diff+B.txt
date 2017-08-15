@@ -1,6 +1,6 @@
-(Program
-{+(Let
+{+(Program
+  (Let
     (Identifier)
     (Identifier)
     (
-      (Identifier)))+})
+      (Identifier))))+}

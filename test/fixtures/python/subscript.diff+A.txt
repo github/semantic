@@ -1,4 +1,4 @@
-(Program
-{+(Subscript
+{+(Program
+  (Subscript
     (Identifier)
-    (Identifier))+})
+    (Identifier)))+}

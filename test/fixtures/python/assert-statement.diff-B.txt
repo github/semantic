@@ -1,11 +1,11 @@
-(Program
-{-(Call
+{-(Program
+  (Call
     (Identifier)
     (Identifier)
     (Identifier)
-    (Empty))-}
-{-(Call
+    (Empty))
+  (Call
     (Identifier)
     (Identifier)
-    (Empty))-}
-{-(Comment)-})
+    (Empty))
+  (Comment))-}

@@ -1,2 +1,2 @@
-(Program
-{-(Null)-})
+{-(Program
+  (Null))-}

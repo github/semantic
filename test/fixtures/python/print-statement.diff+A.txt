@@ -1,28 +1,28 @@
-(Program
-{+(Call
+{+(Program
+  (Call
     (Identifier)
     (Identifier)
     (Identifier)
-    (Empty))+}
-{+(Call
+    (Empty))
+  (Call
     (Identifier)
     (Identifier)
-    (Empty))+}
-{+(Call
-    (Identifier)
-    (Or
-      (Integer)
-      (
-        (Integer)))
-    (Empty))+}
-{+(Call
+    (Empty))
+  (Call
     (Identifier)
     (Or
       (Integer)
       (
         (Integer)))
+    (Empty))
+  (Call
+    (Identifier)
     (Or
       (Integer)
       (
         (Integer)))
-    (Empty))+})
+    (Or
+      (Integer)
+      (
+        (Integer)))
+    (Empty)))+}

@@ -1,5 +1,5 @@
-(Program
-{+(Break
-    (Identifier))+}
-{+(Break
-    (Identifier))+})
+{+(Program
+  (Break
+    (Identifier))
+  (Break
+    (Identifier)))+}

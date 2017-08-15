@@ -1,12 +1,12 @@
-(Program
-{+(Assignment
+{+(Program
+  (Assignment
     (Identifier)
     (If
       (Identifier)
       (Identifier)
       (
-        (Identifier))))+}
-{+(If
+        (Identifier))))
+  (If
     (Identifier)
     (Call
       (Identifier)
@@ -14,4 +14,4 @@
     (
       (Call
         (Identifier)
-        (Empty))))+})
+        (Empty)))))+}

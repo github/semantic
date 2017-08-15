@@ -1,10 +1,10 @@
-(Program
-{+(TextElement)+}
-{+(TextElement)+}
-{+(TextElement)+}
-{+(TextElement)+}
-{+(TextElement)+}
-{+(TextElement)+}
-{+(TextElement)+}
-{+(TextElement)+}
-{+(TextElement)+})
+{+(Program
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement))+}

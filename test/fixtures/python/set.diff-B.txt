@@ -1,7 +1,7 @@
-(Program
-{-(Set
-    (Integer))-}
-{-(Set
+{-(Program
+  (Set
+    (Integer))
+  (Set
     (Integer)
     (Integer)
-    (Integer))-})
+    (Integer)))-}

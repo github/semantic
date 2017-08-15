@@ -1,15 +1,15 @@
-(Program
-{-(If
+{-(Program
+  (If
     (Identifier)
     (Call
       (Identifier)
       (Empty))
     (
-      (Identifier)))-}
-{-(Assignment
+      (Identifier)))
+  (Assignment
     (Identifier)
     (If
       (Identifier)
       (Identifier)
       (
-        (Identifier))))-})
+        (Identifier)))))-}

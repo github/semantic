@@ -1,10 +1,10 @@
-(Program
-{-(Tuple
+{-(Program
+  (Tuple
     (Identifier)
     (Identifier)
-    (Identifier))-}
-{-(Tuple
+    (Identifier))
+  (Tuple
     (Identifier)
-    (Identifier))-}
-{-(Tuple
-    (Identifier))-})
+    (Identifier))
+  (Tuple
+    (Identifier)))-}

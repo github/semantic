@@ -1,5 +1,5 @@
-(Program
-{+(NoOp
-    (Identifier))+}
-{+(NoOp
-    (Identifier))+})
+{+(Program
+  (NoOp
+    (Identifier))
+  (NoOp
+    (Identifier)))+}

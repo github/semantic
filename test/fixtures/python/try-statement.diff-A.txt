@@ -1,5 +1,5 @@
-(Program
-{-(Try
+{-(Program
+  (Try
     (Identifier)
     (Identifier)
     (Catch
@@ -27,11 +27,11 @@
       (
         (Identifier)
         (Identifier))
-      ([])))-}
-{-(Try
+      ([])))
+  (Try
     (Identifier)
     (Identifier)
     (Finally
       (
         (Identifier)
-        (Identifier))))-})
+        (Identifier)))))-}

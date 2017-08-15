@@ -1,16 +1,16 @@
-(Program
-{-(Negate
-    (Integer))-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Negate
-    (Integer))-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Integer)-}
-{-(Integer)-})
+{-(Program
+  (Negate
+    (Integer))
+  (Integer)
+  (Integer)
+  (Integer)
+  (Negate
+    (Integer))
+  (Integer)
+  (Integer)
+  (Integer)
+  (Integer)
+  (Integer)
+  (Integer)
+  (Integer)
+  (Integer))-}

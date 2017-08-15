@@ -1,5 +1,5 @@
-(Program
-{+(Let
+{+(Program
+  (Let
     (Empty)
     (MemberAccess
       (Identifier)
@@ -7,8 +7,8 @@
     (
       (Assignment
         (Identifier)
-        (Boolean))))+}
-{+(
+        (Boolean))))
+  (
     (Let
       (Empty)
       (Call
@@ -31,4 +31,4 @@
         (Identifier)
         (Empty))
       (
-        (Identifier))))+})
+        (Identifier)))))+}

@@ -1,9 +1,9 @@
-(Program
-{+(MemberAccess
+{+(Program
+  (MemberAccess
     (Identifier)
-    (Identifier))+}
-{+(MemberAccess
+    (Identifier))
+  (MemberAccess
     (MemberAccess
       (Identifier)
       (Identifier))
-    (Identifier))+})
+    (Identifier)))+}

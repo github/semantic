@@ -1,19 +1,19 @@
-(Program
-{+(Call
+{+(Program
+  (Call
     (Identifier)
-    (Empty))+}
-{+(Call
-    (Identifier)
-    (Identifier)
-    (Empty))+}
-{+(Call
+    (Empty))
+  (Call
     (Identifier)
     (Identifier)
+    (Empty))
+  (Call
     (Identifier)
-    (Empty))+}
-{+(Call
+    (Identifier)
+    (Identifier)
+    (Empty))
+  (Call
     (MemberAccess
       (Identifier)
       (Identifier))
     (Integer)
-    (Empty))+})
+    (Empty)))+}

@@ -1,4 +1,4 @@
-(Program
-{+(Comment)+}
-{+(Comment)+}
-{+(Comment)+})
+{+(Program
+  (Comment)
+  (Comment)
+  (Comment))+}

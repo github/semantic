@@ -1,5 +1,5 @@
-(Program
-{+(Comprehension
+{+(Program
+  (Comprehension
     (KeyValue
       (Identifier)
       (Identifier))
@@ -7,8 +7,8 @@
       (
         (
           (Identifier))
-        (Identifier))))+}
-{+(Comprehension
+        (Identifier))))
+  (Comprehension
     (KeyValue
       (Identifier)
       (Identifier))
@@ -18,4 +18,4 @@
           (Identifier))
         (Identifier))
       (
-        (Identifier))))+})
+        (Identifier)))))+}

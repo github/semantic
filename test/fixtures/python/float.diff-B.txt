@@ -1,12 +1,12 @@
-(Program
-{-(Negate
-    (Float))-}
-{-(Float)-}
-{-(Float)-}
-{-(Float)-}
-{-(Float)-}
-{-(Float)-}
-{-(Float)-}
-{-(Float)-}
-{-(Float)-}
-{-(Float)-})
+{-(Program
+  (Negate
+    (Float))
+  (Float)
+  (Float)
+  (Float)
+  (Float)
+  (Float)
+  (Float)
+  (Float)
+  (Float)
+  (Float))-}

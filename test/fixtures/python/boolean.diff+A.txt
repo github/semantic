@@ -1,4 +1,4 @@
-(Program
-{+(Boolean)+}
-{+(Boolean)+}
-{+(Boolean)+})
+{+(Program
+  (Boolean)
+  (Boolean)
+  (Boolean))+}

@@ -1,2 +1,2 @@
-(Program
-{-(Ellipsis)-})
+{-(Program
+  (Ellipsis))-}

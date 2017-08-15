@@ -1,13 +1,13 @@
-(Program
-{-(Call
+{-(Program
+  (Call
     (Identifier)
     (Identifier)
-    (Empty))-}
-{-(Call
+    (Empty))
+  (Call
     (Identifier)
-    (Empty))-}
-{-(Call
+    (Empty))
+  (Call
     (Identifier)
     (Identifier)
     (Identifier)
-    (Empty))-})
+    (Empty)))-}

@@ -1,7 +1,7 @@
-(Program
-{+(If
+{+(Program
+  (If
     (Identifier)
     (
       (Identifier)
       (Identifier))
-    (Empty))+})
+    (Empty)))+}

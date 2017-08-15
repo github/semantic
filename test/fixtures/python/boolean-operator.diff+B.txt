@@ -1,9 +1,9 @@
-(Program
-{+(Or
+{+(Program
+  (Or
     (Identifier)
     (
-      (Identifier)))+}
-{+(And
+      (Identifier)))
+  (And
     (Identifier)
     (
-      (Identifier)))+})
+      (Identifier))))+}

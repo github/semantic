@@ -1,45 +1,45 @@
-(Program
-{-(LessThan
+{-(Program
+  (LessThan
     (Identifier)
     (
-      (Identifier)))-}
-{-(LessThanEqual
+      (Identifier)))
+  (LessThanEqual
     (Identifier)
     (
-      (Identifier)))-}
-{-(Not
+      (Identifier)))
+  (Not
     (Equal
       (Identifier)
       (
-        (Identifier))))-}
-{-(GreaterThanEqual
+        (Identifier))))
+  (GreaterThanEqual
     (Identifier)
     (
-      (Identifier)))-}
-{-(GreaterThan
+      (Identifier)))
+  (GreaterThan
     (Identifier)
     (
-      (Identifier)))-}
-{-(Not
+      (Identifier)))
+  (Not
     (Equal
       (Identifier)
       (
-        (Identifier))))-}
-{-(Member
+        (Identifier))))
+  (Member
     (Identifier)
     (
-      (Identifier)))-}
-{-(Equal
+      (Identifier)))
+  (Equal
     (Identifier)
     (
-      (Identifier)))-}
-{-(Not
+      (Identifier)))
+  (Not
     (Member
       (Identifier)
       (
-        (Identifier))))-}
-{-(Not
+        (Identifier))))
+  (Not
     (Equal
       (Identifier)
       (
-        (Identifier))))-})
+        (Identifier)))))-}

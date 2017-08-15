@@ -1,5 +1,5 @@
-(Program
-{+(Continue
-    (Identifier))+}
-{+(Continue
-    (Identifier))+})
+{+(Program
+  (Continue
+    (Identifier))
+  (Continue
+    (Identifier)))+}

@@ -1,5 +1,5 @@
-(Program
-{+(Call
+{+(Program
+  (Call
     (Identifier)
     (Subscript
       (Identifier)
@@ -7,4 +7,4 @@
     (Subscript
       (Identifier)
       (Integer))
-    (Empty))+})
+    (Empty)))+}

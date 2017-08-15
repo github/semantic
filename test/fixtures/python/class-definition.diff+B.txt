@@ -1,5 +1,5 @@
-(Program
-{+(Class
+{+(Program
+  (Class
     (Identifier)
     (Identifier)
     (Annotation
@@ -9,8 +9,8 @@
         (
           (Return
             (Empty))))
-      (Empty)))+}
-{+(Class
+      (Empty)))
+  (Class
     (Identifier)
     (Annotation
       (Function
@@ -19,4 +19,4 @@
         (
           (Return
             (Identifier))))
-      (Empty)))+})
+      (Empty))))+}

@@ -1,6 +1,6 @@
-(Program
-{+(MemberAccess
+{+(Program
+  (MemberAccess
     (MemberAccess
       (Identifier)
       (Identifier))
-    (Identifier))+})
+    (Identifier)))+}

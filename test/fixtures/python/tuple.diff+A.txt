@@ -1,8 +1,8 @@
-(Program
-{+(Tuple
+{+(Program
+  (Tuple
     (Identifier)
-    (Identifier))+}
-{+(Tuple
+    (Identifier))
+  (Tuple
     (Identifier)
     (Identifier)
-    (Identifier))+})
+    (Identifier)))+}

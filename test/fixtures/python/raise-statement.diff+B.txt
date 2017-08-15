@@ -1,16 +1,16 @@
-(Program
-{+(Throw
+{+(Program
+  (Throw
     (
       (Call
         (Identifier)
         (TextElement)
-        (Empty))))+}
-{+(Throw
+        (Empty))))
+  (Throw
     (
       (Call
         (Identifier)
         (TextElement)
         (Empty))
-      (Identifier)))+}
-{+(Throw
-    ([]))+})
+      (Identifier)))
+  (Throw
+    ([])))+}

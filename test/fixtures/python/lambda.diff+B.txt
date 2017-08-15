@@ -1,5 +1,5 @@
-(Program
-{+(Annotation
+{+(Program
+  (Annotation
     (Function
       (Identifier)
       (Identifier)
@@ -8,4 +8,4 @@
           (Identifier)
           (
             (Integer)))))
-    (Empty))+})
+    (Empty)))+}

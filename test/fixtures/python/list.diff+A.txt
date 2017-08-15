@@ -1,10 +1,10 @@
-(Program
-{+(Array)+}
-{+(Array
+{+(Program
+  (Array)
+  (Array
     (Integer)
     (Integer)
-    (Integer))+}
-{+(Array
+    (Integer))
+  (Array
     (Identifier)
     (Identifier)
-    (Identifier))+})
+    (Identifier)))+}

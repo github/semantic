@@ -1,10 +1,10 @@
-(Program
-{+(Hash
+{+(Program
+  (Hash
     (KeyValue
       (Identifier)
-      (Integer)))+}
-{+(Hash)+}
-{+(Assignment
+      (Integer)))
+  (Hash)
+  (Assignment
     (Identifier)
     (Hash
       (Comment)
@@ -13,4 +13,4 @@
         (Identifier))
       (KeyValue
         (Identifier)
-        (Identifier))))+})
+        (Identifier)))))+}

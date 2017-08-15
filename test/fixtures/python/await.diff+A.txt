@@ -1,12 +1,12 @@
-(Program
-{+(Call
+{+(Program
+  (Call
     (Identifier)
     (Plus
       (Integer)
       (
         (Integer)))
-    (Empty))+}
-{+(Call
+    (Empty))
+  (Call
     (Identifier)
     (Identifier)
-    (Empty))+})
+    (Empty)))+}

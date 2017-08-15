@@ -1,5 +1,5 @@
-(Program
-{+(Not
-    (Identifier))+}
-{+(Not
-    (Identifier))+})
+{+(Program
+  (Not
+    (Identifier))
+  (Not
+    (Identifier)))+}

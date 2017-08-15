@@ -1,5 +1,5 @@
-(Program
-{-(Comprehension
+{-(Program
+  (Comprehension
     (Identifier)
     (
       (
@@ -17,8 +17,8 @@
       (
         (Call
           (Identifier)
-          (Empty)))))-}
-{-(Comprehension
+          (Empty)))))
+  (Comprehension
     (Plus
       (Identifier)
       (
@@ -27,4 +27,4 @@
       (
         (
           (Identifier))
-        (Identifier))))-})
+        (Identifier)))))-}
