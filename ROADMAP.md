@@ -53,14 +53,17 @@ Migration to à la carte syntax      | @robrix    | 2                 | 3       
 
 We hadn’t planned on Bumblebee, but stuff got done anyway.
 
-| Task            | PRP       | Priority (1 to 3) | Amount of work (1 to 4) | Score |
-| --------------- | --------- | ----------------- | ----------------------- | ----- |
-| [🐝][bumblebee] | @joshvera | 1                 | ✅                       | 1/0 |
+| Task            | PRP        | Priority (1 to 3) | Amount of work (1 to 4) | Score |
+| --------------- | ---------- | ----------------- | ----------------------- | ----- |
+| [🐝][bumblebee] | @joshvera  | 1                 | ✅                       | 1/0  |
+| Patent          | @rewinfrey | 1                 | ✅                       | 1/0  |
+| JSON            | @joshvera  | 1                 | ✅                       | 1/0  |
+| Markdown        | @robrix    | 1                 | ✅                       | 1/0  |
 
 
 ### Summary
 
-9/14, or 64.3% (🐝 doesn’t add to the denominator because it wasn’t part of the plan). Some breakdown:
+12/14, or ~86% (🐝, the patent, & JSON and Markdown support don’t add to the denominator because they weren’t planned). Some breakdown:
 
 - We 🚢’d table of contents on July 26th, 2017!
 
