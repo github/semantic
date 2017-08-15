@@ -114,13 +114,13 @@ data ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
 instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
 instance Show1 ShorthandPropertyIdentifier where liftShowsPrec = genericLiftShowsPrec
 
-data Union a = Union { unionElements :: ![a] }
+data Union a = Union { unionLeft :: !a, unionRight :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Language.TypeScript.Syntax.Union where liftEq = genericLiftEq
 instance Show1 Language.TypeScript.Syntax.Union where liftShowsPrec = genericLiftShowsPrec
 
-data Intersection a = Intersection { intersectionElements :: ![a] }
+data Intersection a = Intersection { intersectionLeft :: !a, intersectionRight :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Intersection where liftEq = genericLiftEq
