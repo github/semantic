@@ -1,2 +1,4 @@
+test/corpus linguist-vendored
+test/fixtures linguist-vendored
 test/repos linguist-vendored
 vendor linguist-vendored
