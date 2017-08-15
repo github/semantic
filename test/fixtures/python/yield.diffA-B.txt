@@ -1,3 +1,5 @@
-{-(Program
+(Program
   (Yield
-    (Empty)))-}
+    (Empty))
+{+(Yield
+    (Empty))+})
