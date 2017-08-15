@@ -1,4 +1,0 @@
-{+(Program
-  (Identifier)
-  (EndBlock
-    (Identifier)))+}

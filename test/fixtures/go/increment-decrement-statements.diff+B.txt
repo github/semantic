@@ -1,8 +1,0 @@
-{+(Program
-  (Module
-    (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (IncrementStatement)
-    (IncrementStatement)))+}

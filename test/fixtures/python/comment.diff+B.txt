@@ -1,4 +1,0 @@
-{+(Program
-  (Comment)
-  (Comment)
-  (Comment))+}

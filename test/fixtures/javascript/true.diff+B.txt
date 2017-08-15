@@ -1,3 +1,0 @@
-{+(Program
-  (Return
-    (Boolean)))+}

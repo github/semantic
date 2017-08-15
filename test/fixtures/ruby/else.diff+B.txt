@@ -1,7 +1,0 @@
-{+(Program
-  (Begin
-    (MethodCall
-      (Identifier))
-    (Else
-      (MethodCall
-        (Identifier)))))+}

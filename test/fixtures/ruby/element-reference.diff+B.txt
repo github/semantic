@@ -1,7 +1,0 @@
-{+(Program
-  (SubscriptAccess
-    (Identifier)
-    (StringLiteral))
-  (SubscriptAccess
-    (Identifier)
-    (SymbolLiteral)))+}
