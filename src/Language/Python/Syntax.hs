@@ -14,7 +14,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -272,7 +272,7 @@ ellipsis :: Assignment
 ellipsis = makeTerm <$> token Grammar.Ellipsis <*> pure Language.Python.Syntax.Ellipsis
 
 comparisonOperator :: Assignment
-comparisonOperator = symbol ComparisonOperator *> children (expression `chainl1` choice
+comparisonOperator = symbol ComparisonOperator *> children (expression `chainl1Term` choice
   [ (makeTerm1 .) . Expression.LessThan         <$ symbol AnonLAngle
   , (makeTerm1 .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
   , (makeTerm1 .) . Expression.GreaterThan      <$ symbol AnonRAngle
@@ -472,6 +472,9 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 term :: Assignment -> Assignment
 term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+
+chainl1Term :: Assignment -> Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Term) -> Assignment
+chainl1Term expr op = postContextualize (comment <|> symbol AnonLambda *> empty) expr `chainl1` op
 
 manyTermsTill :: Show b => Assignment.Assignment (AST Grammar) Grammar Term -> Assignment.Assignment (AST Grammar) Grammar b -> Assignment.Assignment (AST Grammar) Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
