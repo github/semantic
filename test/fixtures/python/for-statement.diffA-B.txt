@@ -1,0 +1,54 @@
+(Program
+{+(ForEach
+    (
+      (Identifier))
+    (Array
+      (Tuple
+        (Integer))
+      (Tuple
+        (Integer))
+      (Tuple
+        (Integer)))
+    (
+      (Identifier)))+}
+  (Else
+    (ForEach
+      (
+        (Identifier)
+      {+(Identifier)+}
+      {-(Identifier)-})
+      (Identifier)
+      (
+        (Call
+          (Identifier)
+          (Identifier)
+          (Empty))
+        (ForEach
+          (
+            (Identifier)
+          { (Identifier)
+          ->(Identifier) })
+          (Identifier)
+          (
+            (Call
+              (Identifier)
+              (Identifier)
+              (Empty))))))
+    (
+      (Call
+        (Identifier)
+      {+(Identifier)+}
+      {-(Identifier)-}
+        (Empty))))
+{-(ForEach
+    (
+      (Identifier))
+    (Array
+      (Tuple
+        (Integer))
+      (Tuple
+        (Integer))
+      (Tuple
+        (Integer)))
+    (
+      (Identifier)))-})

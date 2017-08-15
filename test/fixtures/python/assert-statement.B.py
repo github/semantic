@@ -1,2 +1,2 @@
 assert c, a
-assert b
+assert b # comment

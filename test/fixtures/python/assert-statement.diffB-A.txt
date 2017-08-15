@@ -1,0 +1,16 @@
+(Program
+  (Call
+    (Identifier)
+  {-(Identifier)-}
+    (Identifier)
+    (Empty))
+{-(Call
+    (Identifier)
+    (Identifier)
+    (Empty))-}
+  (Comment)
+{+(Call
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (Empty))+})

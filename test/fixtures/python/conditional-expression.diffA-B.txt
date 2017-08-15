@@ -1,0 +1,26 @@
+(Program
+{+(Assignment
+    (Identifier)
+    (If
+      (Identifier)
+      (Identifier)
+      (
+        (Identifier))))+}
+  (If
+  { (Identifier)
+  ->(Identifier) }
+    (Call
+      (Identifier)
+      (Empty))
+    (
+    { (Identifier)
+    ->(Call
+        (Identifier)
+        (Empty)) }))
+{-(Assignment
+    (Identifier)
+    (If
+      (Identifier)
+      (Identifier)
+      (
+        (Identifier))))-})

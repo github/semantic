@@ -1,0 +1,15 @@
+(Program
+  (MemberAccess
+  { (MemberAccess
+      (Identifier)
+      (Identifier))
+  ->(Identifier) }
+  { (Identifier)
+  ->(Identifier) })
+  (MemberAccess
+  { (Identifier)
+  ->(MemberAccess
+      (Identifier)
+      (Identifier)) }
+  { (Identifier)
+  ->(Identifier) }))

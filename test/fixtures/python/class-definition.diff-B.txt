@@ -1,0 +1,22 @@
+{-(Program
+  (Class
+    (Identifier)
+    (Identifier)
+    (Annotation
+      (Function
+        (Identifier)
+        (Identifier)
+        (
+          (Return
+            (Empty))))
+      (Empty)))
+  (Class
+    (Identifier)
+    (Annotation
+      (Function
+        (Identifier)
+        (Identifier)
+        (
+          (Return
+            (Identifier))))
+      (Empty))))-}

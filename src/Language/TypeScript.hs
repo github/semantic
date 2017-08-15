@@ -69,7 +69,7 @@ termAssignment _ category children =
       | S.Indexed _ <- unwrap statements
       -> Just $ S.Export Nothing (toList (unwrap statements))
       | otherwise -> Just $ S.Export (Just statements) []
-    (For, _:_) -> Just $ S.For (init children) [last children]
+    (For, _:_) -> Just $ S.For (init children >>= flattenExpressionStatements) [last children]
     (Function, children) -> case break ((== ExpressionStatements) . Info.category . extract) children of
       (inits, [body]) -> case inits of
         [id, callSignature] -> Just $ S.Function id (toList (unwrap callSignature)) (toList (unwrap body))
@@ -79,6 +79,9 @@ termAssignment _ category children =
     (Ty, children) -> Just $ S.Ty children
     (Interface, children) -> toInterface children
     _ -> Nothing
+    where flattenExpressionStatements term
+            | Info.category (extract term) `elem` [ExpressionStatements, CommaOperator] = toList (unwrap term) >>= flattenExpressionStatements
+            | otherwise = [term]
 
 categoryForTypeScriptName :: Text -> Category
 categoryForTypeScriptName category = case category of
@@ -95,8 +98,10 @@ categoryForTypeScriptName category = case category of
   "arrow_function" -> Function
   "generator_function" -> Function
   "math_op" -> MathOperator -- math operator, e.g. +, -, *, /.
+  "update_expression" -> MathOperator -- math operator, e.g. ++, --
   "bool_op" -> BooleanOperator -- boolean operator, e.g. ||, &&.
   "comma_op" -> CommaOperator -- comma operator, e.g. expr1, expr2.
+  "sequence_expression" -> CommaOperator -- comma operator, e.g. expr1, expr2.
   "delete_op" -> Operator -- delete operator, e.g. delete x[2].
   "type_op" -> Operator -- type operator, e.g. typeof Object.
   "void_op" -> Operator -- void operator, e.g. void 2.
@@ -109,12 +114,15 @@ categoryForTypeScriptName category = case category of
   "new_expression" -> Constructor
   "class"  -> Class
   "catch" -> Catch
+  "catch_clause" -> Catch
   "finally" -> Finally
+  "finally_clause" -> Finally
   "if_statement" -> If
   "trailing_if_statement" -> If
   "empty_statement" -> Empty
   "program" -> Program
   "function_call" -> FunctionCall
+  "call_expression" -> FunctionCall
   "pair" -> Pair
   "string" -> StringLiteral
   "integer" -> IntegerLiteral
@@ -128,17 +136,23 @@ categoryForTypeScriptName category = case category of
   "arguments" -> Args
   "statement_block" -> ExpressionStatements
   "assignment" -> Assignment
+  "assignment_expression" -> Assignment
   "member_access" -> MemberAccess
+  "member_expression" -> MemberAccess
   "op" -> Operator
   "subscript_access" -> SubscriptAccess
+  "subscript_expression" -> SubscriptAccess
   "regex" -> Regex
   "template_string" -> TemplateString
   "switch_statement" -> Switch
   "math_assignment" -> MathAssignment
+  "augmented_assignment_expression" -> MathAssignment
   "case" -> Case
+  "switch_case" -> Case
   "true" -> Boolean
   "false" -> Boolean
   "ternary" -> Ternary
+  "ternary_expression" -> Ternary
   "while_statement" -> While
   "trailing_while_statement" -> While
   "do_statement" -> DoWhile
@@ -164,4 +178,5 @@ categoryForTypeScriptName category = case category of
   "module" -> Module
   "internal_module" -> Namespace
   "interface_declaration" -> Interface
+  "parenthesized_expression" -> ParenthesizedExpression
   name -> Other name

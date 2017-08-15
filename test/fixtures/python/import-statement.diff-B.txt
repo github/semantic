@@ -1,0 +1,13 @@
+{-(Program
+  (Import
+    (ScopeResolution
+      (Identifier))
+    (ScopeResolution
+      (Identifier)))
+  (Import
+    (Let
+      (Identifier)
+      (ScopeResolution
+        (Identifier)
+        (Identifier))
+      (Empty))))-}
