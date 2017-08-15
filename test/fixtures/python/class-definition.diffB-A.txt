@@ -1,0 +1,32 @@
+(Program
+  (Class
+  { (Identifier)
+  ->(Identifier) }
+  {-(Identifier)-}
+    (Annotation
+      (Function
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (
+          (Return
+          { (Empty)
+          ->(Identifier) })))
+      (Empty)))
+{+(Class
+    (Identifier)
+    (NoOp
+      (Identifier)))+}
+  (Class
+    (Identifier)
+  {+(Identifier)+}
+    (Annotation
+      (Function
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (
+          (Return
+          { (Identifier)
+          ->(Empty) })))
+      (Empty))))

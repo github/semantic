@@ -1,5 +1,0 @@
-{+(Program
-  (Module
-    (Constant)
-    (Method
-      (Identifier))))+}

@@ -1,6 +1,3 @@
-test/diffs linguist-vendored
-test/diffs-todo linguist-vendored
-test/crashers linguist-vendored
-test/crashers-todo linguist-vendored
+test/fixtures linguist-vendored
 test/repos linguist-vendored
 vendor linguist-vendored

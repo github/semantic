@@ -1,0 +1,13 @@
+{+(Program
+  (Call
+    (Identifier)
+    (Identifier)
+    (Empty))
+  (Call
+    (Identifier)
+    (Empty))
+  (Call
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (Empty)))+}

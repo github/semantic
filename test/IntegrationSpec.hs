@@ -58,25 +58,15 @@ examples directory = do
   bs <- globFor "*.B.*"
   sExpAs <- globFor "*.parseA.txt"
   sExpBs <- globFor "*.parseB.txt"
-  sExpDiffsAddA <- globFor "*.diff+A.txt"
-  sExpDiffsRemoveA <- globFor "*.diff-A.txt"
-  sExpDiffsAddB <- globFor "*.diff+B.txt"
-  sExpDiffsRemoveB <- globFor "*.diff-B.txt"
   sExpDiffsAB <- globFor "*.diffA-B.txt"
   sExpDiffsBA <- globFor "*.diffB-A.txt"
 
   let exampleDiff lefts rights out name = DiffExample (lookupNormalized name lefts) (lookupNormalized name rights) out
-  let exampleAddDiff files out name = DiffExample "" (lookupNormalized name files) out
-  let exampleRemoveDiff files out name = DiffExample (lookupNormalized name files) "" out
   let exampleParse files out name = ParseExample (lookupNormalized name files) out
 
   let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
   pure $ merge [ getExamples (exampleParse as) sExpAs keys
                , getExamples (exampleParse bs) sExpBs keys
-               , getExamples (exampleAddDiff as) sExpDiffsAddA keys
-               , getExamples (exampleRemoveDiff as) sExpDiffsRemoveA keys
-               , getExamples (exampleAddDiff bs) sExpDiffsAddB keys
-               , getExamples (exampleRemoveDiff bs) sExpDiffsRemoveB keys
                , getExamples (exampleDiff as bs) sExpDiffsAB keys
                , getExamples (exampleDiff bs as) sExpDiffsBA keys ]
   where

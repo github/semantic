@@ -29,6 +29,7 @@ import Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m Blob.Blob
+readFile path@"/dev/null" _ = pure (Blob.emptyBlob path)
 readFile path language = do
   raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe B.ByteString))
   pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)

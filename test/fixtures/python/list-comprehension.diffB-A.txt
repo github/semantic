@@ -1,0 +1,38 @@
+(Program
+  (Comprehension
+  { (Identifier)
+  ->(Identifier) }
+    (
+      (
+        (
+        {+(Identifier)+}
+        {-(Identifier)-})
+      {+(Identifier)+}
+      {-(Identifier)-})
+    {-(
+        (Call
+          (Identifier)
+          (Empty)))-}
+    {-(
+        (
+          (Identifier))
+        (Identifier))-}
+    {-(
+        (Call
+          (Identifier)
+          (Empty)))-}))
+  (Comprehension
+  { (Plus
+      (Identifier)
+      (
+        (Integer)))
+  ->(Identifier) }
+    (
+      (
+        (
+        {+(Identifier)+}
+        {-(Identifier)-})
+      {+(Identifier)+}
+      {-(Identifier)-})
+    {+(
+        (Identifier))+})))

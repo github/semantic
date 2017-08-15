@@ -1,0 +1,6 @@
+(Program
+  (Not
+  { (Identifier)
+  ->(Identifier) })
+{+(Not
+    (Identifier))+})

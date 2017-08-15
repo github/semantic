@@ -1,4 +1,0 @@
-{+(Program
-  (Modifier Rescue
-    (Identifier)
-    (Boolean)))+}

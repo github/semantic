@@ -11,7 +11,7 @@ import Data.Ix
 import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
-import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
+import TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
   = Document

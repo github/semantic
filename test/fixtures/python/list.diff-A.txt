@@ -1,0 +1,10 @@
+{-(Program
+  (Array)
+  (Array
+    (Integer)
+    (Integer)
+    (Integer))
+  (Array
+    (Identifier)
+    (Identifier)
+    (Identifier)))-}

@@ -116,11 +116,11 @@ library
                      , time
                      , unix
                      , haskell-tree-sitter
-                     , go
-                     , ruby
-                     , typescript
-                     , python
-                     , json
+                     , tree-sitter-go
+                     , tree-sitter-json
+                     , tree-sitter-python
+                     , tree-sitter-ruby
+                     , tree-sitter-typescript
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j

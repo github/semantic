@@ -1,8 +1,0 @@
-{+(Program
-  (Other "lexical_declaration"
-    (VarAssignment
-      (Identifier)
-      (Ty
-        (Other "tuple_type"
-          (Identifier)
-          (Identifier))))))+}

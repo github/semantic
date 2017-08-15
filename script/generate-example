@@ -32,10 +32,6 @@ generate_example () {
   fileB="$2"
   parseFileA="${fileA%%.*}.parseA.txt"
   parseFileB="${fileB%%.*}.parseB.txt"
-  diffFileAddA="${fileA%%.*}.diff+A.txt"
-  diffFileRemoveA="${fileA%%.*}.diff-A.txt"
-  diffFileAddB="${fileB%%.*}.diff+B.txt"
-  diffFileRemoveB="${fileB%%.*}.diff-B.txt"
   diffFileAB="${fileA%%.*}.diffA-B.txt"
   diffFileBA="${fileB%%.*}.diffB-A.txt"
 
@@ -44,18 +40,6 @@ generate_example () {
 
   status $parseFileB
   "$(dirname "$0")/run" semantic parse --sexpression $fileB > $parseFileB
-
-  status $diffFileAddA
-  "$(dirname "$0")/run" semantic diff --sexpression /dev/null $fileA > $diffFileAddA
-
-  status $diffFileRemoveA
-  "$(dirname "$0")/run" semantic diff --sexpression $fileA /dev/null > $diffFileRemoveA
-
-  status $diffFileAddB
-  "$(dirname "$0")/run" semantic diff --sexpression /dev/null $fileB > $diffFileAddB
-
-  status $diffFileRemoveB
-  "$(dirname "$0")/run" semantic diff --sexpression $fileB /dev/null > $diffFileRemoveB
 
   status $diffFileAB
   "$(dirname "$0")/run" semantic diff --sexpression $fileA $fileB > $diffFileAB

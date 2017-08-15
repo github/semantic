@@ -1,9 +1,0 @@
-{+(Program
-  (Other "variable_declaration"
-    (VarDecl
-      (Identifier))
-    (VarAssignment
-      (Identifier)
-      (Object))
-    (VarDecl
-      (Identifier))))+}
