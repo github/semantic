@@ -429,16 +429,16 @@ typeQuery :: Assignment
 typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (Language.TypeScript.Syntax.TypeQuery <$> (identifier <|> nestedIdentifier))
 
 indexTypeQuery :: Assignment
-indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <$> children (Language.TypeScript.Syntax.IndexTypeQuery <$> (identifier <|> nestedIdentifier))
+indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (Language.TypeScript.Syntax.IndexTypeQuery <$> (identifier <|> nestedIdentifier))
 
 thisType :: Assignment
-thisType = makeTerm <$> symbol Grammar.ThisType <$> children (Language.TypeScript.Syntax.ThisType <$> source)
+thisType = makeTerm <$> symbol Grammar.ThisType <*> children (Language.TypeScript.Syntax.ThisType <$> source)
 
 existentialType :: Assignment
-existentialType = makeTerm <$> symbol Grammar.ExistentialType <$> (Language.TypeScript.Syntax.ExistentialType <$> source)
+existentialType = makeTerm <$> symbol Grammar.ExistentialType <*> (Language.TypeScript.Syntax.ExistentialType <$> source)
 
 literalType :: Assignment
-literalType = makeTerm <$> symbol Grammar.LiteralType <$> (Language.TypeScript.Syntax.LiteralType <$> (number <|> string <|> true <|> false))
+literalType = makeTerm <$> symbol Grammar.LiteralType <*> (Language.TypeScript.Syntax.LiteralType <$> (number <|> string <|> true <|> false))
 
 unionType :: Assignment
 unionType = makeTerm <$> symbol UnionType <*> children (Language.TypeScript.Syntax.Union <$> ty <*> ty)
