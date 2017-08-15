@@ -1,4 +1,0 @@
-{+(Program
-  (Assignment
-    (Identifier)
-    (IntegerLiteral)))+}

@@ -1,5 +1,0 @@
-{+(Program
-  (Binary
-    (Identifier)
-    (Other "&&")
-    (Identifier)))+}

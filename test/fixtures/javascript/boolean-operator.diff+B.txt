@@ -1,6 +1,0 @@
-{+(Program
-  (ExpressionStatements
-    (BooleanOperator
-      (Identifier)
-      (Other "&&")
-      (Identifier))))+}

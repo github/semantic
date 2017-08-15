@@ -1,8 +1,0 @@
-{+(Program
-  (IntegerLiteral)
-  (IntegerLiteral)
-  (IntegerLiteral)
-  (IntegerLiteral)
-  (IntegerLiteral)
-  (IntegerLiteral)
-  (NumberLiteral))+}

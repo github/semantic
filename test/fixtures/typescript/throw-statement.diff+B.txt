@@ -1,6 +1,0 @@
-{+(Program
-  (Throw
-    (Constructor
-      (FunctionCall
-        (Identifier)
-        (StringLiteral)))))+}
