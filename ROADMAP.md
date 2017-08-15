@@ -65,7 +65,23 @@ We hadn’t planned on Bumblebee, but stuff got done anyway.
 
 12/14, or ~86% (🐝, the patent, & JSON and Markdown support don’t add to the denominator because they weren’t planned). Some breakdown:
 
+**Successes:**
+
 - We 🚢’d table of contents on July 26th, 2017!
+- ToC is stable, well-received, & acceptably magical (users don’t have to know how we do it to rely on it).
+- We 🚢d a patent application!
+- We’ve laid a solid foundation for future work with à la carte syntax.
+- `tree-sitter` & our grammars are only getting better.
+- Having our tech stack in prod, both on bare metal & k8s, is a lot of effort we aren’t going to have to re-do.
+- Our datadog dashboard has been super effective for gauging the effects of changes.
+- We’re all learning & improving. We support each other via 🍐ing, review, & other conversations. We’ve got a good balance of skills.
+- We’re getting better at working with other teams (e.g. appsec).
+- The indexer proposal would be really good for us 😎
+- We’re integrating into established patterns with Semiotic (building on top of mu, etc.).
+- The GraphQL API really works.
+- Data Science is an auspicious place for us.
+- Our colleagues all across the company have been super supportive of us & interested in what we’re doing 💖
+- Performance improved by multiple orders of magnitude in some cases.
 
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
 [Architecture review]: https://github.com/github/architecture/issues/12
