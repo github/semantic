@@ -23,8 +23,7 @@
         (Identifier))
       (Identifier))
     (FunctionCall
-      (ParenthesizedExpression
-        (SubscriptAccess
-          (Identifier)
-          (Identifier)))
+      (SubscriptAccess
+        (Identifier)
+        (Identifier))
       (Identifier))))

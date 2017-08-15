@@ -12,10 +12,9 @@
       (Identifier)
       (ChannelTy
         (Identifier))
-      (ParenthesizedExpression
-        (RelationalOperator
-          (Identifier)
-          (Identifier))))
+      (RelationalOperator
+        (Identifier)
+        (Identifier)))
     (FunctionCall
       (Identifier)
       (ChannelTy

@@ -32,11 +32,10 @@
     { (Identifier)
     ->(Identifier) })
     (FunctionCall
-      (ParenthesizedExpression
-        (SubscriptAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) }))
+      (SubscriptAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
     { (Identifier)
     ->(Identifier) })))
