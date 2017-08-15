@@ -2,11 +2,12 @@
   (For
   { (Identifier)
   ->(Identifier) }
-  { (ArrayLiteral
-      (IntegerLiteral)
-      (IntegerLiteral)
-      (IntegerLiteral))
-  ->(Identifier) }
+    (Other "in"
+    {+(Identifier)+}
+    {-(ArrayLiteral
+        (IntegerLiteral)
+        (IntegerLiteral)
+        (IntegerLiteral))-})
   { (MethodCall
       (Identifier)
       (Identifier))
@@ -14,5 +15,6 @@
 {+(For
     (Identifier)
     (Identifier)
-    (Identifier)
+    (Other "in"
+      (Identifier))
     (Identifier))+})
