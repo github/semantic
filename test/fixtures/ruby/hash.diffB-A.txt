@@ -1,17 +1,20 @@
 (Program
   (Object
     (Pair
-      { (Identifier) -> (SymbolLiteral) }
-      { (StringLiteral) -> (StringLiteral) })
-  {+(Pair
-      (SymbolLiteral)
-      (IntegerLiteral))+}
+    { (Identifier)
+    ->(SymbolLiteral) }
+    { (StringLiteral)
+    ->(StringLiteral) })
     (Pair
-      { (Identifier) -> (StringLiteral) }
-      { (IntegerLiteral) -> (Boolean) })
+    { (Identifier)
+    ->(SymbolLiteral) }
+    { (IntegerLiteral)
+    ->(IntegerLiteral) })
+    (Pair
+    { (Identifier)
+    ->(StringLiteral) }
+    { (Boolean)
+    ->(Boolean) })
   {+(Pair
       (SymbolLiteral)
-      (IntegerLiteral))+}
-  {-(Pair
-      (Identifier)
-      (Boolean))-}))
+      (IntegerLiteral))+}))

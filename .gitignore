@@ -1,14 +1,11 @@
 .DS_Store
-xcuserdata
-*.mode*
-*.pbxuser
-*.xcuserdatad
-*.xccheckout
+
 .stack-work
 profiles
 tags
 
 cabal.project.local
+dist
 dist-newstyle
 
 tmp/

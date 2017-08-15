@@ -9,8 +9,8 @@
         (Identifier)
         (StructTy
           (FieldDecl
-            (Other "identifier_list"
-            { (Identifier)
-            ->(Identifier) }
-            {-(Identifier)-})
-            (Identifier)))))))
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }
+          {-(Identifier)-}))))))

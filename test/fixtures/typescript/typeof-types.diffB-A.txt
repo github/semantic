@@ -3,13 +3,13 @@
     (VarAssignment
       (Identifier)
       (Ty
-        (Other "type_reference"
-        { (Identifier)
-        ->(Identifier) }))))
+      { (Other "type_query"
+          (Identifier))
+      ->(Identifier) })))
   (Other "lexical_declaration"
     (VarAssignment
       (Identifier)
       (Ty
-        (Other "type_query"
-        { (Identifier)
-        ->(Identifier) })))))
+      { (Identifier)
+      ->(Other "type_query"
+          (Identifier)) }))))

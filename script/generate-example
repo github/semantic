@@ -40,28 +40,28 @@ generate_example () {
   diffFileBA="${fileB%%.*}.diffB-A.txt"
 
   status $parseFileA
-  stack exec semantic parse -- --sexpression $fileA > $parseFileA
+  "$(dirname "$0")/run" semantic parse --sexpression $fileA > $parseFileA
 
   status $parseFileB
-  stack exec semantic parse -- --sexpression $fileB > $parseFileB
+  "$(dirname "$0")/run" semantic parse --sexpression $fileB > $parseFileB
 
   status $diffFileAddA
-  stack exec semantic diff -- --sexpression /dev/null $fileA > $diffFileAddA
+  "$(dirname "$0")/run" semantic diff --sexpression /dev/null $fileA > $diffFileAddA
 
   status $diffFileRemoveA
-  stack exec semantic diff -- --sexpression $fileA /dev/null > $diffFileRemoveA
+  "$(dirname "$0")/run" semantic diff --sexpression $fileA /dev/null > $diffFileRemoveA
 
   status $diffFileAddB
-  stack exec semantic diff -- --sexpression /dev/null $fileB > $diffFileAddB
+  "$(dirname "$0")/run" semantic diff --sexpression /dev/null $fileB > $diffFileAddB
 
   status $diffFileRemoveB
-  stack exec semantic diff -- --sexpression $fileB /dev/null > $diffFileRemoveB
+  "$(dirname "$0")/run" semantic diff --sexpression $fileB /dev/null > $diffFileRemoveB
 
   status $diffFileAB
-  stack exec semantic diff -- --sexpression $fileA $fileB > $diffFileAB
+  "$(dirname "$0")/run" semantic diff --sexpression $fileA $fileB > $diffFileAB
 
   status $diffFileBA
-  stack exec semantic diff -- --sexpression $fileB $fileA > $diffFileBA
+  "$(dirname "$0")/run" semantic diff --sexpression $fileB $fileA > $diffFileBA
 }
 
 if [[ -d $1 ]]; then

@@ -1,0 +1,21 @@
+(Program
+  (Call
+    (Identifier)
+  {-(Identifier)-}
+    (Empty))
+  (Call
+    (Identifier)
+  {+(Identifier)+}
+    (Empty))
+  (Call
+    (Identifier)
+  {-(Identifier)-}
+    (Identifier)
+  {+(Identifier)+}
+    (Empty))
+{+(Call
+    (MemberAccess
+      (Identifier)
+      (Identifier))
+    (Integer)
+    (Empty))+})

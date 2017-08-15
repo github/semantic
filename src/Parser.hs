@@ -11,13 +11,16 @@ module Parser
 , rubyParser
 ) where
 
-import qualified CMark
+import Control.Comonad.Trans.Cofree (headF)
+import qualified CMarkGFM
 import Data.Functor.Foldable hiding (fold, Nil)
+import Data.Ix
 import Data.Record
 import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import Data.Union
+import Foreign.Ptr
 import Info hiding (Empty, Go)
 import Language
 import Language.Markdown
@@ -25,23 +28,21 @@ import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
-import Prologue hiding (Location)
 import Syntax hiding (Go)
 import Term
-import qualified Text.Parser.TreeSitter as TS
-import Text.Parser.TreeSitter.Language (Symbol)
-import Text.Parser.TreeSitter.Go
-import Text.Parser.TreeSitter.Python
-import Text.Parser.TreeSitter.Ruby
-import Text.Parser.TreeSitter.TypeScript
-import Text.Parser.TreeSitter.JSON
+import qualified TreeSitter.Language as TS (Language, Symbol)
+import TreeSitter.Go
+import TreeSitter.Python
+import TreeSitter.Ruby
+import TreeSitter.TypeScript
+import TreeSitter.JSON
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
-  -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type. Assignment errors will result in a top-level 'Syntax.Error' node.
-  AssignmentParser :: (Enum grammar, Eq grammar, Show grammar, Symbol grammar, Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs), Recursive ast, Foldable (Base ast))
+  -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
+  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs, Eq ast, Recursive ast, Foldable (Base ast))
                    => Parser ast                                                 -- ^ A parser producing AST.
                    -> (forall x. Base ast x -> Node grammar)                     -- ^ A function extracting the symbol and location.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
@@ -49,7 +50,7 @@ data Parser term where
   -- | A tree-sitter parser.
   TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (AST CMark.NodeType)
+  MarkdownParser :: Parser (AST CMarkGFM.NodeType)
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm DefaultFields)
 
@@ -58,8 +59,9 @@ parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
   Go -> TreeSitterParser tree_sitter_go
-  JSON -> TreeSitterParser tree_sitter_json
   JavaScript -> TreeSitterParser tree_sitter_typescript
+  JSON -> TreeSitterParser tree_sitter_json
+  JSX -> TreeSitterParser tree_sitter_typescript
   Ruby -> TreeSitterParser tree_sitter_ruby
   TypeScript -> TreeSitterParser tree_sitter_typescript
   _ -> LineByLineParser

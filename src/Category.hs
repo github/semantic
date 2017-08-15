@@ -3,10 +3,11 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Category where
 
-import Prologue
+import Control.DeepSeq
 import Data.Functor.Listable
-import Data.Text (pack)
-import Data.Text.Encoding (encodeUtf8)
+import Data.Hashable
+import Data.Text (Text)
+import GHC.Generics
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
@@ -224,7 +225,7 @@ data Category
   -- | A decrement statement, e.g. i-- in Go.
   | DecrementStatement
   -- | A qualified identifier, e.g. Module.function in Go.
-  | QualifiedIdentifier
+  | QualifiedType
   | FieldDeclarations
   -- | A Go rune literal.
   | RuneLiteral
@@ -234,6 +235,8 @@ data Category
   | SingletonMethod
   -- | An arbitrary type annotation.
   | Ty
+  | ParenthesizedExpression
+  | ParenthesizedType
   deriving (Eq, Generic, Ord, Show, NFData)
 
 {-# DEPRECATED RescueModifier "Deprecated; use Modifier Rescue instead." #-}
@@ -242,12 +245,6 @@ data Category
 -- Instances
 
 instance Hashable Category
-
-instance (StringConv Category Text) where
-  strConv _ = pack . show
-
-instance (StringConv Category ByteString) where
-  strConv _ = encodeUtf8 . show
 
 instance Listable Category where
   tiers = cons0 Program
@@ -360,7 +357,7 @@ instance Listable Category where
       --  \/ cons0 FunctionTy
       --  \/ cons0 IncrementStatement
       --  \/ cons0 DecrementStatement
-      --  \/ cons0 QualifiedIdentifier
+      --  \/ cons0 QualifiedType
       --  \/ cons0 FieldDeclarations
       --  \/ cons0 RuneLiteral
       --  \/ cons0 (Modifier If)

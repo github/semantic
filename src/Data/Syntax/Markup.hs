@@ -3,10 +3,10 @@ module Data.Syntax.Markup where
 
 import Algorithm
 import Data.Align.Generic
+import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
-import Prologue hiding (Text)
 
 
 newtype Document a = Document [a]
@@ -66,6 +66,24 @@ data HTMLBlock a = HTMLBlock ByteString
 instance Eq1 HTMLBlock where liftEq = genericLiftEq
 instance Show1 HTMLBlock where liftShowsPrec = genericLiftShowsPrec
 
+newtype Table a = Table [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Table where liftEq = genericLiftEq
+instance Show1 Table where liftShowsPrec = genericLiftShowsPrec
+
+newtype TableRow a = TableRow [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TableRow where liftEq = genericLiftEq
+instance Show1 TableRow where liftShowsPrec = genericLiftShowsPrec
+
+newtype TableCell a = TableCell [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TableCell where liftEq = genericLiftEq
+instance Show1 TableCell where liftShowsPrec = genericLiftShowsPrec
+
 
 -- Inline elements
 
@@ -110,3 +128,9 @@ data LineBreak a = LineBreak
 
 instance Eq1 LineBreak where liftEq = genericLiftEq
 instance Show1 LineBreak where liftShowsPrec = genericLiftShowsPrec
+
+newtype Strikethrough a = Strikethrough [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Strikethrough where liftEq = genericLiftEq
+instance Show1 Strikethrough where liftShowsPrec = genericLiftShowsPrec

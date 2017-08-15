@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, TypeOperators, BangPatterns #-}
 module Semantic.Task
 ( Task
 , Level(..)
@@ -8,6 +8,7 @@ module Semantic.Task
 , readBlobPairs
 , writeToOutput
 , writeLog
+, time
 , parse
 , decorate
 , diff
@@ -15,48 +16,56 @@ module Semantic.Task
 , distribute
 , distributeFor
 , distributeFoldMap
-, Options(..)
 , defaultOptions
 , configureOptionsForHandle
+, terminalFormatter
+, logfmtFormatter
 , runTask
 , runTaskWithOptions
 ) where
 
 import Control.Concurrent.STM.TMQueue
+import Control.Exception
+import Control.Monad (join)
+import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Blob
 import qualified Data.ByteString as B
-import Data.Functor.Both as Both
+import qualified Data.Error as Error
+import Data.Foldable (fold, for_)
+import Data.Functor.Both as Both hiding (snd)
+import Data.Functor.Foldable (cata)
 import Data.Record
-import Data.Source
-import Data.String
+import Data.Semigroup ((<>))
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
-import qualified Data.Time.Format as Time
+import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
+import Info
 import qualified Files
+import GHC.Conc (atomically)
 import Language
 import Language.Markdown
 import Parser
-import Prologue hiding (Location, show)
-import System.Console.ANSI
-import System.IO (hIsTerminalDevice, hPutStr)
+import System.Exit (die)
+import System.IO (Handle, hPutStr, stderr)
 import Term
-import Text.Show
 import TreeSitter
+import Semantic.Log
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
-  WriteToOutput :: Either Handle FilePath -> ByteString -> TaskF ()
-  WriteLog :: Level -> String -> TaskF ()
+  WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
+  WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
+  Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
@@ -66,27 +75,6 @@ data TaskF output where
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Freer TaskF
-
--- | A log message at a specific level.
-data Message = Message Level String Time.UTCTime
-  deriving (Eq, Show)
-
-data Level
-  = Error
-  | Warning
-  | Info
-  | Debug
-  deriving (Eq, Ord, Show)
-
--- | Format a 'Message', optionally colourized.
-formatMessage :: Bool -> Message -> String
-formatMessage colourize (Message level message time) = showTime time . showChar ' ' . showLevel level . showString ": " . showString message . showChar '\n' $ ""
-  where showLevel Error = Assignment.withSGRCode colourize [SetColor Foreground Vivid Red, SetConsoleIntensity BoldIntensity] (showString "error")
-        showLevel Warning = Assignment.withSGRCode colourize [SetColor Foreground Vivid Yellow, SetConsoleIntensity BoldIntensity] (showString "warning")
-        showLevel Info = Assignment.withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showString "info")
-        showLevel Debug = Assignment.withSGRCode colourize [SetColor Foreground Vivid Cyan, SetConsoleIntensity BoldIntensity] (showString "debug")
-        showTime = showString . Time.formatTime Time.defaultTimeLocale (Time.iso8601DateFormat (Just "%H:%M:%S%Q"))
-
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ f a = Both (Term f a) -> Diff f a
@@ -102,15 +90,18 @@ readBlobs from = ReadBlobs from `Then` return
 readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
 readBlobPairs from = ReadBlobPairs from `Then` return
 
--- | A 'Task' which writes a 'ByteString' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Either Handle FilePath -> ByteString -> Task ()
+-- | A 'Task' which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
+writeToOutput :: Either Handle FilePath -> B.ByteString -> Task ()
 writeToOutput path contents = WriteToOutput path contents `Then` return
 
 
 -- | A 'Task' which logs a message at a specific log level to stderr.
-writeLog :: Level -> String -> Task ()
-writeLog level message = WriteLog level message `Then` return
+writeLog :: Level -> String -> [(String, String)] -> Task ()
+writeLog level message pairs = WriteLog level message pairs `Then` return
 
+-- | A 'Task' which measures and logs the timing of another 'Task'.
+time :: String -> [(String, String)] -> Task output -> Task output
+time message pairs task = Time message pairs task `Then` return
 
 -- | A 'Task' which parses a 'Blob' with the given 'Parser'.
 parse :: Parser term -> Blob -> Task term
@@ -146,28 +137,6 @@ distributeFor inputs toTask = distribute (fmap toTask inputs)
 distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
--- | Options controlling 'Task' logging, error handling, &c.
-data Options = Options
-  { optionsColour :: Maybe Bool -- ^ Whether to use colour formatting for errors. 'Nothing' implies automatic selection for the stderr handle, using colour for terminal handles but not for regular files.
-  , optionsLevel :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors.
-  }
-
-defaultOptions :: Options
-defaultOptions = Options
-  { optionsColour = Nothing
-  , optionsLevel = Just Warning
-  , optionsPrintSource = False
-  }
-
-configureOptionsForHandle :: Handle -> Options -> IO Options
-configureOptionsForHandle handle options = do
-  isTerminal <- hIsTerminalDevice handle
-  pure $ options
-    { optionsColour = optionsColour options <|> Just isTerminal
-    }
-
-
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
 -- > runTask = runTaskWithOptions defaultOptions
@@ -179,61 +148,74 @@ runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
   logQueue <- newTMQueueIO
-  logging <- async (logSink options logQueue)
+  logging <- Async.async (logSink options logQueue)
 
-  result <- runFreerM (\ task -> case task of
-    ReadBlobs source -> pure <$ writeLog Info "ReadBlobs" <*> either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source
-    ReadBlobPairs source -> pure <$ writeLog Info "ReadBlobPairs" <*> either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source
-    WriteToOutput destination contents -> pure <$ writeLog Info "WriteToOutput" <*> liftIO (either B.hPutStr B.writeFile destination contents)
-    WriteLog level message
-      | Just logLevel <- optionsLevel options, level <= logLevel -> pure <$> liftIO (Time.getCurrentTime >>= atomically . writeTMQueue logQueue . Message level message)
-      | otherwise -> pure (pure ())
-    Parse parser blob -> pure <$ writeLog Info "Parse" <*> runParser options parser blob
-    Decorate algebra term -> pure <$ writeLog Info "Decorate" <*> pure (decoratorWithAlgebra algebra term)
-    Diff differ terms -> pure <$ writeLog Info "Diff" <*> pure (differ terms)
-    Render renderer input -> pure <$ writeLog Info "Render" <*> pure (renderer input)
-    Distribute tasks -> pure <$ writeLog Info "Distribute" <*> liftIO (Async.mapConcurrently runTask tasks >>= pure . withStrategy (parTraversable rseq))
-    LiftIO action -> pure action)
-    task
+  result <- run options logQueue task
   atomically (closeTMQueue logQueue)
-  wait logging
-  pure result
-  where logSink options queue = do
+  Async.wait logging
+  either die pure result
+  where logSink options@Options{..} queue = do
           message <- atomically (readTMQueue queue)
           case message of
             Just message -> do
-              hPutStr stderr (formatMessage (fromMaybe True (optionsColour options)) message)
+              hPutStr stderr (optionsFormatter options message)
               logSink options queue
             _ -> pure ()
+        run :: Options -> TMQueue Message -> Task a -> IO (Either String a)
+        run options logQueue = go
+          where go :: Task a -> IO (Either String a)
+                go = iterFreerA (\ task yield -> case task of
+                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . displayException)
+                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . displayException)
+                  WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
+                  WriteLog level message pairs -> queueLogMessage level message pairs >>= yield
+                  Time message pairs task -> do
+                    start <- Time.getCurrentTime
+                    !res <- go task
+                    end <- Time.getCurrentTime
+                    queueLogMessage Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
+                    either (pure . Left) yield res
+                  Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield . join
+                  Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
+                  Diff differ terms -> pure (differ terms) >>= yield
+                  Render renderer input -> pure (renderer input) >>= yield
+                  Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
+                  LiftIO action -> action >>= yield ) . fmap Right
+                queueLogMessage level message pairs
+                  | Just logLevel <- optionsLevel options, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs
+                  | otherwise = pure ()
 
-runParser :: Options -> Parser term -> Blob -> Task term
-runParser options parser blob@Blob{..} = case parser of
-  ASTParser language -> liftIO $ parseToAST language blob
-  AssignmentParser parser by assignment -> do
-    ast <- runParser options parser blob
-    case Assignment.assignBy by blobSource assignment ast of
-      Left err -> do
-        let formatOptions = Assignment.defaultOptions
-              { Assignment.optionsColour = fromMaybe True (optionsColour options)
-              , Assignment.optionsIncludeSource = optionsPrintSource options
-              }
-        writeLog Warning (Assignment.formatErrorWithOptions formatOptions blob err)
-        pure (errorTerm blobSource)
-      Right term -> do
-        when (hasErrors term) $ writeLog Warning (blobPath <> ":" <> show blobLanguage <> " has parse errors")
-        pure term
-  TreeSitterParser tslanguage -> liftIO $ treeSitterParser tslanguage blob
-  MarkdownParser -> pure (cmarkParser blobSource)
-  LineByLineParser -> pure (lineByLineParser blobSource)
 
-errorTerm :: Syntax.Error :< fs => Source -> Term (Union fs) (Record Assignment.Location)
-errorTerm source = cofree ((totalRange source :. totalSpan source :. Nil) :< inj (Syntax.Error []))
-
-hasErrors :: (Syntax.Error :< fs, Foldable (Union fs), Functor (Union fs)) => Term (Union fs) (Record Assignment.Location) -> Bool
-hasErrors = cata $ \ (_ :< syntax) -> case syntax of
-  _ | Just err <- prj syntax -> const True (err :: Syntax.Error Bool)
-  _ -> or syntax
-
+runParser :: Options -> Blob -> Parser term -> Task (Either String term)
+runParser Options{..} blob@Blob{..} = go
+  where go :: Parser term -> Task (Either String term)
+        go parser = case parser of
+          ASTParser language ->
+            logTiming "ts ast parse" $
+              liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
+          AssignmentParser parser by assignment -> do
+            res <- go parser
+            case res of
+              Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
+              Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
+                Left err -> do
+                  let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
+                  writeLog Error formatted blobFields
+                  pure $ Left formatted
+                Right term -> do
+                  for_ (errors term) $ \ err ->
+                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
+                  pure $ Right term
+          TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
+          MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
+          LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
+        blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
+        errors :: (Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors = cata $ \ (a :< syntax) -> case syntax of
+          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
+          _ -> fold syntax
+        logTiming :: String -> Task a -> Task a
+        logTiming msg = time msg blobFields
 
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return

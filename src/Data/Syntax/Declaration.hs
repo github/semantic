@@ -6,7 +6,6 @@ import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
-import Prologue
 
 data Function a = Function { functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -71,8 +70,8 @@ instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = genericLiftShowsPrec
 
 
--- | Comprehension (e.g. ((a for b in c) in Python)
-data Comprehension a = Comprehension { comprehensionMap :: !a, comprehensionBindings :: ![a], comprehensionContext :: !a }
+-- | Comprehension (e.g. ((a for b in c if a()) in Python)
+data Comprehension a = Comprehension { comprehensionValue :: !a, comprehensionBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Comprehension where liftEq = genericLiftEq

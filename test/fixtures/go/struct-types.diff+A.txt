@@ -19,18 +19,16 @@
         (Identifier)
         (StructTy
           (FieldDecl
-            (Other "identifier_list"
-              (Identifier)
-              (Identifier))
+            (Identifier)
+            (Identifier)
             (Identifier)))))
     (Other "type_declaration"
       (TypeDecl
         (Identifier)
         (StructTy
           (FieldDecl
-            (QualifiedIdentifier))
+            (QualifiedType))
           (FieldDecl
-            (Other "identifier_list"
-              (Identifier))
+            (Identifier)
             (Identifier)
             (StringLiteral)))))))+}

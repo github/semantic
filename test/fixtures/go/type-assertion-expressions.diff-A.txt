@@ -6,4 +6,4 @@
     (Args)
     (TypeAssertion
       (Identifier)
-      (QualifiedIdentifier))))-}
+      (QualifiedType))))-}

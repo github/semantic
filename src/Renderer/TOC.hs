@@ -17,16 +17,27 @@ module Renderer.TOC
 , entrySummary
 ) where
 
+import Control.Comonad (extract)
+import Control.Comonad.Cofree (unwrap)
+import Control.DeepSeq
+import Control.Monad.Free (iter)
 import Data.Aeson
 import Data.Align (crosswalk)
+import Data.Bifunctor (bimap, first)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
+import Data.Error as Error (formatError)
+import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
+import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
+import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
+import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Record
+import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
 import Data.Text (toLower)
 import qualified Data.Text as T
@@ -34,10 +45,10 @@ import Data.Text.Listable
 import Data.These
 import Data.Union
 import Diff
+import GHC.Generics
 import Info
 import Language
 import Patch
-import Prologue hiding (toStrict)
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Syntax as S
@@ -47,7 +58,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
 import Term
 
-data Summaries = Summaries { changes, errors :: !(Map Text [Value]) }
+data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
 
 instance Monoid Summaries where
@@ -62,12 +73,12 @@ instance ToJSON Summaries where
 
 data JSONSummary
   = JSONSummary
-    { summaryCategoryName :: Text
-    , summaryTermName :: Text
+    { summaryCategoryName :: T.Text
+    , summaryTermName :: T.Text
     , summarySpan :: Span
-    , summaryChangeType :: Text
+    , summaryChangeType :: T.Text
     }
-  | ErrorSummary { error :: Text, errorSpan :: Span, errorLanguage :: Maybe Language }
+  | ErrorSummary { error :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
@@ -80,10 +91,10 @@ isValidSummary _ = True
 
 -- | A declaration’s identifier and type.
 data Declaration
-  = MethodDeclaration   { declarationIdentifier :: Text }
-  | FunctionDeclaration { declarationIdentifier :: Text }
-  | SectionDeclaration  { declarationIdentifier :: Text, declarationLevel :: Int }
-  | ErrorDeclaration    { declarationIdentifier :: Text, declarationLanguage :: Maybe Language }
+  = MethodDeclaration   { declarationIdentifier :: T.Text }
+  | FunctionDeclaration { declarationIdentifier :: T.Text }
+  | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
+  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, NFData, Show)
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
@@ -96,35 +107,35 @@ declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Decl
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
 syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (SyntaxTermF fields) (SyntaxTerm fields) (Maybe Declaration)
-syntaxDeclarationAlgebra Blob{..} r = case tailF r of
+syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
     | S.Indexed [receiverParams] <- unwrap receiver
     , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
     | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange (headF r)) blobSource)) blobLanguage
+  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
   _ -> Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Functor (Union fs), HasField fields Range)
+declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra Blob{..} r
-  | Just (Declaration.Function (identifier, _) _ _) <- prj (tailF r) = Just $ FunctionDeclaration (getSource (extract identifier))
-  | Just (Declaration.Method _ (identifier, _) _ _) <- prj (tailF r) = Just $ MethodDeclaration (getSource (extract identifier))
-  | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r)) blobLanguage
+declarationAlgebra blob@Blob{..} (a :< r)
+  | Just (Declaration.Function (identifier, _) _ _) <- prj r = Just $ FunctionDeclaration (getSource (extract identifier))
+  | Just (Declaration.Method _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, Functor (Union fs), Foldable (Union fs))
+markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply1 Functor fs, Apply1 Foldable fs)
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra Blob{..} r
-  | Just (Markup.Section level (heading, _) _) <- prj (tailF r) = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just Syntax.Error{} <- prj (tailF r) = Just $ ErrorDeclaration (getSource (headF r)) blobLanguage
+markupSectionAlgebra blob@Blob{..} (a :< r)
+  | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
         firstLine = T.takeWhile (/= '\n')
@@ -141,7 +152,7 @@ data Entry a
 
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
-tableOfContentsBy :: Traversable f
+tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
@@ -152,7 +163,7 @@ tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap
           (_     , entries) -> entries
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
-termTableOfContentsBy :: Traversable f
+termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)
                       -> Term f annotation
                       -> [a]
@@ -183,39 +194,39 @@ entrySummary entry = case entry of
   Replaced a  -> recordSummary a "modified"
 
 -- | Construct a 'JSONSummary' from a node annotation and a change type label.
-recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Text -> Maybe JSONSummary
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> T.Text -> Maybe JSONSummary
 recordSummary record = case getDeclaration record of
   Just (ErrorDeclaration text language) -> Just . const (ErrorSummary text (sourceSpan record) language)
   Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
   Nothing -> const Nothing
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Both Blob -> Diff f (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
-        summaryKey = toS $ case runJoin (blobPath <$> blobs) of
+        summaryKey = T.pack $ case runJoin (blobPath <$> blobs) of
           (before, after) | null before -> after
                           | null after -> before
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Blob -> Term f (Record fields) -> Summaries
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
 renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where toMap [] = mempty
-        toMap as = Map.singleton (toS blobPath) (toJSON <$> as)
+        toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Diff f (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
-termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Traversable f) => Term f (Record fields) -> [JSONSummary]
+termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
 termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
-toCategoryName :: Declaration -> Text
+toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
   MethodDeclaration _ -> "Method"
-  SectionDeclaration _ l -> "Heading " <> show l
+  SectionDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
 
 instance Listable Declaration where

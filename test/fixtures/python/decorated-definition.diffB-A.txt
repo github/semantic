@@ -1,0 +1,72 @@
+(Program
+  (Decorator
+    (ScopeResolution
+      (Identifier)
+      (Identifier))
+    (Class
+    { (Identifier)
+    ->(Identifier) }
+      (Decorator
+        (ScopeResolution
+          (Identifier))
+        ([])
+        (Decorator
+          (ScopeResolution
+          {+(Identifier)+}
+          {-(Identifier)-})
+          (
+          {+(Integer)+}
+          {-(Identifier)-})
+          (Decorator
+            (ScopeResolution
+            { (Identifier)
+            ->(Identifier) })
+            (
+            {+(Integer)+}
+            {+(Integer)+}
+            {-(Identifier)-})
+            (Decorator
+              (ScopeResolution
+                (Identifier))
+              (
+              {+(Assignment
+                  (Identifier)
+                  (Boolean))+}
+              {-(Integer)-}
+              {-(Assignment
+                  (Identifier)
+                  (Boolean))-}
+              {-(Identifier)-}
+              {-(Identifier)-})
+            { (Annotation
+                (Function
+                  (Identifier)
+                  (
+                    (Identifier)))
+                (Empty))
+            ->(Decorator
+                (ScopeResolution
+                  (Identifier))
+                (
+                  (Identifier))
+                (Decorator
+                  (ScopeResolution
+                    (Identifier))
+                  (
+                    (Identifier))
+                  (Decorator
+                    (ScopeResolution
+                      (Identifier))
+                    (
+                      (Integer)
+                      (Assignment
+                        (Identifier)
+                        (Boolean))
+                      (Identifier)
+                      (Identifier))
+                    (Annotation
+                      (Function
+                        (Identifier)
+                        (
+                          (Identifier)))
+                      (Empty))))) })))))))

@@ -1,7 +1,41 @@
-(ParseError
+(Program
   (Module
     (Identifier))
-  (Identifier)
-  (Args)
-{ (Identifier)
-->(Identifier) })
+  (Function
+    (Identifier)
+    (Args))
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+    (Args))
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+    (Args
+      (ParameterDecl
+        (Identifier)
+        (Identifier))
+      (Identifier)
+      (Identifier)
+      (ParameterDecl
+        (Identifier)
+        (Identifier)))
+    (Identifier))
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+    (Args)
+    (Args
+      (Identifier)
+      (Identifier)))
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+    (Args)
+    (Args
+      (ParameterDecl
+        (Identifier)
+        (Identifier))
+      (ParameterDecl
+        (Identifier)
+        (Identifier)))))

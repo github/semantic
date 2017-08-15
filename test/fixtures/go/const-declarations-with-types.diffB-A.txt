@@ -6,13 +6,13 @@
     (Args)
     (Other "const_declaration"
       (VarAssignment
-        (Other "identifier_list"
-        { (Identifier)
-        ->(Identifier) }
-        {-(Identifier)-})
-      { (Identifier)
-      ->(Identifier) }
-        (Other "expression_list"
-        { (NumberLiteral)
-        ->(NumberLiteral) }
-        {-(NumberLiteral)-})))))
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(Other "expression_list"
+          (NumberLiteral))+}
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Other "expression_list"
+          (NumberLiteral)
+          (NumberLiteral))-}))))

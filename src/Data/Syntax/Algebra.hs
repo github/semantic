@@ -8,13 +8,15 @@ module Data.Syntax.Algebra
 , cyclomaticComplexityAlgebra
 ) where
 
+import Control.Comonad (extract)
+import Data.Bifunctor (second)
+import Data.ByteString (ByteString)
 import Data.Functor.Foldable
 import Data.Record
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Union
-import Prologue
 import Term
 
 -- | An F-algebra on some carrier functor 'f'.
@@ -41,7 +43,7 @@ newtype Identifier = Identifier ByteString
 -- | Produce the identifier for a given term, if any.
 --
 --   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
-identifierAlgebra :: (Syntax.Identifier :< fs, Declaration.Method :< fs, Declaration.Class :< fs, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier)
+identifierAlgebra :: (Syntax.Identifier :< fs, Declaration.Method :< fs, Declaration.Class :< fs, Apply1 Foldable fs, Apply1 Functor fs) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier)
 identifierAlgebra (_ :< union) = case union of
   _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier s)
   _ | Just Declaration.Class{..} <- prj union -> classIdentifier
@@ -57,7 +59,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   TODO: Explicit returns at the end of methods should only count once.
 --   TODO: Anonymous functions should not increase parent scope’s complexity.
 --   TODO: Inner functions should not increase parent scope’s complexity.
-cyclomaticComplexityAlgebra :: (Declaration.Method :< fs, Statement.Return :< fs, Statement.Yield :< fs, Traversable (Union fs)) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
+cyclomaticComplexityAlgebra :: (Declaration.Method :< fs, Statement.Return :< fs, Statement.Yield :< fs, Apply1 Foldable fs, Apply1 Functor fs) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
 cyclomaticComplexityAlgebra (_ :< union) = case union of
   _ | Just Declaration.Method{} <- prj union -> succ (sum union)
   _ | Just Statement.Return{} <- prj union -> succ (sum union)

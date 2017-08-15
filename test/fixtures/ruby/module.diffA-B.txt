@@ -6,4 +6,5 @@
 {-(Module
     (ScopeOperator
       (Constant)
+      (Other "::")
       (Constant)))-})

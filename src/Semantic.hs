@@ -8,8 +8,12 @@ module Semantic
 ) where
 
 import Algorithm hiding (diff)
+import Control.Applicative ((<|>))
+import Control.Comonad.Cofree (hoistCofree)
+import Control.Monad ((<=<))
 import Data.Align.Generic (GAlign)
 import Data.Blob
+import Data.ByteString (ByteString)
 import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
 import Data.Output
@@ -23,7 +27,6 @@ import Interpreter
 import qualified Language
 import Patch
 import Parser
-import Prologue
 import Renderer
 import Semantic.Task as Task
 import Term
@@ -98,7 +101,13 @@ diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task 
 diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting (Both.fst terms))
   (False, True) -> pure (inserting (Both.snd terms))
-  _ -> diff differ terms
+  _ -> time "diff" logInfo $ diff differ terms
+  where
+    logInfo = let (a, b) = runJoin blobs in
+            [ ("before_path", blobPath a)
+            , ("before_language", maybe "" show (blobLanguage a))
+            , ("after_path", blobPath b)
+            , ("after_language", maybe "" show (blobLanguage b)) ]
 
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]

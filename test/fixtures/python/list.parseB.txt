@@ -1,0 +1,8 @@
+(Program
+  (Array
+    (Identifier))
+  (Array
+    (Integer)
+    (Integer))
+  (Array
+    (Identifier)))

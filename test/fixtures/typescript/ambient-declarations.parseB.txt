@@ -35,5 +35,4 @@
       (Other "call_signature"
         (Params)
         (Ty
-          (Other "type_reference"
-            (Identifier)))))))
+          (Identifier))))))

@@ -8,15 +8,15 @@
       (Identifier)
       (Identifier)
       (Identifier))+}
+  {+(FunctionCall
+      (Identifier)
+      (Identifier)
+      (Identifier))+}
     (FunctionCall
     { (Identifier)
     ->(Identifier) }
       (Identifier)
       (Identifier))
-  {+(FunctionCall
-      (Identifier)
-      (Identifier)
-      (Identifier))+}
   {-(FunctionCall
       (Identifier)
       (Identifier)

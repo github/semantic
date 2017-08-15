@@ -8,4 +8,5 @@
   (Class
     (ScopeOperator
       (Constant)
+      (Other "::")
       (Constant))))

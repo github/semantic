@@ -7,8 +7,7 @@
           (Identifier)))
       (Other "class_heritage"
         (Other "extends_clause"
-          (Other "type_reference"
-            (Identifier))))
+          (Identifier)))
       (FieldDecl
         (Identifier)
         (NumberLiteral))

@@ -7,7 +7,7 @@ author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
 copyright:           2016 GitHub
 category:            Web
-build-type:          Custom
+build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
@@ -18,6 +18,7 @@ library
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
+                     , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
@@ -63,7 +64,6 @@ library
                      , Parser
                      , Patch
                      , Paths_semantic_diff
-                     , Prologue
                      , Renderer
                      , Renderer.JSON
                      , Renderer.Patch
@@ -71,6 +71,7 @@ library
                      , Renderer.TOC
                      , RWS
                      , Semantic
+                     , Semantic.Log
                      , Semantic.Task
                      , SemanticCmdLine
                      , SES
@@ -86,9 +87,10 @@ library
                      , async
                      , bifunctors
                      , bytestring
-                     , cmark
+                     , cmark-gfm
                      , comonad
                      , containers
+                     , deepseq
                      , directory
                      , effects
                      , filepath
@@ -103,7 +105,7 @@ library
                      , mtl
                      , optparse-applicative
                      , parallel
-                     , protolude
+                     , parsers
                      , recursion-schemes
                      , semigroups
                      , split
@@ -112,14 +114,15 @@ library
                      , text >= 1.2.1.3
                      , these
                      , time
+                     , unix
                      , haskell-tree-sitter
-                     , go
-                     , ruby
-                     , typescript
-                     , python
-                     , json
+                     , tree-sitter-go
+                     , tree-sitter-json
+                     , tree-sitter-python
+                     , tree-sitter-ruby
+                     , tree-sitter-typescript
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, StrictData
+  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
@@ -132,7 +135,7 @@ executable semantic
   build-depends:       base
                      , semantic-diff
   default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
+  default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
 test-suite test
   type:                exitcode-stdio-1.0
@@ -160,7 +163,10 @@ test-suite test
                      , base
                      , bifunctors
                      , bytestring
+                     , comonad
+                     , deepseq
                      , filepath
+                     , free
                      , Glob
                      , haskell-tree-sitter
                      , hspec >= 2.4.1
@@ -169,7 +175,6 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
-                     , protolude
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff
@@ -177,13 +182,7 @@ test-suite test
                      , these
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
-
-custom-setup
-  setup-depends:  base >= 4.8 && < 5
-                , Cabal
-                , directory
-                , process
+  default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards
 
 source-repository head
   type:     git

@@ -17,15 +17,13 @@
         (Other "readonly")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))+}
     {+(FieldDecl
         (Other "accessibility_modifier")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))+}
     {-(FieldDecl
         (Other "accessibility_modifier")
@@ -37,59 +35,44 @@
         (Other "readonly")
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))-}
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
       (FieldDecl
       { (Other "readonly")
       ->(Other "accessibility_modifier") }
         (Identifier)
         (Ty
-          (Other "type_reference"
-            (Identifier)))
+          (Identifier))
         (NumberLiteral))
-    {+(FieldDecl
-        (Other "accessibility_modifier")
-        (Other "readonly")
-        (Identifier)
+      (FieldDecl
+      { (Other "readonly")
+      ->(Other "accessibility_modifier") }
+      { (Identifier)
+      ->(Other "readonly") }
+      { (Ty
+          (Identifier))
+      ->(Identifier) }
+      { (NumberLiteral)
+      ->(Ty
+          (Identifier)) }
+      {+(StringLiteral)+})
+      (FieldDecl
+      { (Identifier)
+      ->(Identifier) }
         (Ty
-          (Other "type_reference"
-            (Identifier)))
-        (StringLiteral))+}
-    {+(FieldDecl
+          (Identifier))
+        (NumberLiteral))
+      (FieldDecl
         (Identifier)
-        (Ty
-          (Other "type_reference"
-            (Identifier)))
-        (NumberLiteral))+}
-    {+(FieldDecl
-        (Identifier)
-        (NumberLiteral))+}
-    {-(FieldDecl
-        (Other "readonly")
-        (Identifier)
-        (Ty
-          (Other "type_reference"
-            (Identifier)))
-        (NumberLiteral))-}
-    {-(FieldDecl
-        (Identifier)
-        (Ty
-          (Other "type_reference"
-            (Identifier)))
-        (NumberLiteral))-}
-    {-(FieldDecl
-        (Identifier)
-        (NumberLiteral))-})))
+      { (NumberLiteral)
+      ->(NumberLiteral) }))))

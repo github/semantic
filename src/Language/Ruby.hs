@@ -1,13 +1,17 @@
 {-# LANGUAGE DataKinds #-}
 module Language.Ruby where
 
+import Control.Comonad
+import Control.Comonad.Cofree
+import Data.Foldable (toList)
 import Data.List (partition)
+import Data.Semigroup
 import Data.Source
+import Data.Text (Text)
 import Info
-import Prologue
 import Language
 import qualified Syntax as S
-import Term
+import Term hiding ((:<))
 
 termAssignment
   :: Source -- ^ The source of the term.
@@ -44,7 +48,7 @@ termAssignment _ category children
       -> Just $ S.Class constant [superclass] body
     (Class, constant : rest) -> Just $ S.Class constant [] rest
     (SingletonClass, identifier : rest) -> Just $ S.Class identifier [] rest
-    (Case, _) -> Just $ uncurry S.Switch (Prologue.break ((== When) . Info.category . extract) children)
+    (Case, _) -> Just $ uncurry S.Switch (break ((== When) . Info.category . extract) children)
     (When, expr : body) -> Just $ S.Case expr body
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (MethodCall, fn : args)
@@ -55,10 +59,10 @@ termAssignment _ category children
       -> Just $ S.FunctionCall fn [] (toList . unwrap =<< args)
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
-    (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
-    (Unless, expr : rest) -> Just $ S.If (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
-    (Modifier Until, [ lhs, rhs ]) -> Just $ S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
-    (Until, expr : rest) -> Just $ S.While (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
+    (Modifier Unless, [lhs, rhs]) -> Just $ S.If (setCategory (extract rhs) Negate :< S.Negate rhs) [lhs]
+    (Unless, expr : rest) -> Just $ S.If ((setCategory (extract expr) Negate) :< S.Negate expr) rest
+    (Modifier Until, [ lhs, rhs ]) -> Just $ S.While (setCategory (extract rhs) Negate :< S.Negate rhs) [lhs]
+    (Until, expr : rest) -> Just $ S.While (setCategory (extract expr) Negate :< S.Negate expr) rest
     (Elsif, condition : body ) -> Just $ S.If condition body
     (SubscriptAccess, [ base, element ]) -> Just $ S.SubscriptAccess base element
     (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest
@@ -92,8 +96,6 @@ termAssignment _ category children
     (Modifier While, [ lhs, condition ]) -> Just $ S.While condition [lhs]
     _ | category `elem` [ BeginBlock, EndBlock ] -> Just $ S.BlockStatement children
     _  -> Nothing
-  where
-    withRecord record syntax = cofree (record :< syntax)
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName name = case name of
@@ -105,6 +107,7 @@ categoryForRubyName name = case name of
   "begin_block" -> BeginBlock
   "begin" -> Begin
   "binary" -> Binary
+  "block" -> ExpressionStatements
   "block_parameter" -> BlockParameter
   "block_parameters" -> Params
   "boolean" -> Boolean

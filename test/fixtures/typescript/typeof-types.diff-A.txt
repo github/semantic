@@ -3,8 +3,7 @@
     (VarAssignment
       (Identifier)
       (Ty
-        (Other "type_reference"
-          (Identifier)))))
+        (Identifier))))
   (Other "lexical_declaration"
     (VarAssignment
       (Identifier)

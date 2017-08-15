@@ -1,0 +1,13 @@
+(Program
+  (Return
+    (Empty))
+  (Return
+    (
+      (Plus
+        (Identifier)
+        (
+          (Identifier)))
+      (Identifier)))
+  (Return
+    (Not
+      (Identifier))))
