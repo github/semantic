@@ -136,6 +136,7 @@ parenthesized_expressions = makeTerm <$> symbol ParenthesizedStatements <*> chil
 identifier :: Assignment
 identifier =
       mk Identifier
+  <|> mk Identifier'
   <|> mk Constant
   <|> mk InstanceVariable
   <|> mk ClassVariable
@@ -251,7 +252,7 @@ if' =  ifElsif If
    <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
   where
     ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
-    expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof) <|> emptyTerm
+    expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
 
 else' :: Assignment
 else' = makeTerm <$> symbol Else <*> children (many expression)
@@ -260,7 +261,7 @@ unless :: Assignment
 unless =
       makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional else'))
   <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> expression <*> invert expression <*> emptyTerm)
-  where expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> eof) <|> emptyTerm
+  where expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> eof)
 
 while' :: Assignment
 while' =
@@ -277,7 +278,7 @@ for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> 
   where inClause = symbol In *> children (expression)
 
 case' :: Assignment
-case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> whens)
+case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (symbol When *> emptyTerm <|> expression) <*> whens)
   where
     whens = makeTerm <$> location <*> many (when' <|> else' <|> expression)
     when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
