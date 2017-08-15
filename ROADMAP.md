@@ -83,6 +83,25 @@ We hadn’t planned on Bumblebee, but stuff got done anyway.
 - Our colleagues all across the company have been super supportive of us & interested in what we’re doing 💖
 - Performance improved by multiple orders of magnitude in some cases.
 
+**Challenges:**
+
+- Getting our tech stack into prod was really hard, e.g. with appsec’s (legit!) concerns re: C parsers. Semiotic in Go means we all have to become fluent in another set of technologies. Learned corners of our tech stack, e.g. Haskell can’t interrupt FFI code. Owning everything from infrastructure on up stretches us pretty thin.
+- Patent application was time-consuming.
+- Tensions between different syntax representations.
+- Productionizing LSP is very hard. It’s not clear what the server-side infrastructure would look like.
+- Editing environment has got worse. Tooling feels slow, unproductive.
+- Shipping on bare metal + k8s required 2x effort.
+- This doc was pretty much write-only.
+- We never got as far as picking & tracking metrics.
+- Transition to `Assignment` has been challenging, e.g. maintaining two code paths, unclear migration path, simultaneously solving problems in language assignments and in `Assignment` itself. `Assignment` also required more tuning than anticipated, and writing the assignments is more time-consuming than anticipated.
+- Overestimated our bandwidth.
+- Dependencies on other teams can slow us down if we haven’t got on their roadmap early on.
+- Nobody’s actually using our GraphQL API.
+- Acting in response to requests rather than offline + cached is hard; performance constraints dominate.
+- We hadn’t really discussed our overall mission. Long-term goals are unclear.
+
+All in all, we did a good job this quarter, and laid a good foundation for the future. Nice one 🤘🏻
+
 [roadmap project]: https://github.com/github/semantic-diff/projects/5
 [Architecture review]: https://github.com/github/architecture/issues/12
 [bumblebee]: https://donttrysohard.files.wordpress.com/2010/12/oprah-bees.gif
