@@ -8,7 +8,8 @@ module Language.Ruby.Syntax
 
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (emptyTerm, makeTerm, parseError)
+import Data.Functor (void)
+import Data.Syntax (emptyTerm, makeTerm, parseError, handleError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -78,10 +79,10 @@ type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Te
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression =
+expression = handleError $
       alias
   <|> assignment'
   <|> begin
@@ -246,18 +247,20 @@ undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> name <*> som
   where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 if' :: Assignment
-if' =
-      ifElsif If
-  <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
-  where ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
+if' =  ifElsif If
+   <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
+  where
+    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
+    expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof) <|> emptyTerm
 
 else' :: Assignment
 else' = makeTerm <$> symbol Else <*> children (many expression)
 
 unless :: Assignment
 unless =
-      makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions <*> (fromMaybe <$> emptyTerm <*> optional else'))
+      makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional else'))
   <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> expression <*> invert expression <*> emptyTerm)
+  where expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> eof) <|> emptyTerm
 
 while' :: Assignment
 while' =
@@ -270,13 +273,13 @@ until' =
   <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> expression <*> invert expression)
 
 for :: Assignment
-for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> expressions <*> inClause <*> expressions)
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTill expression (symbol In)) <*> inClause <*> expressions)
   where inClause = symbol In *> children (expression)
 
 case' :: Assignment
 case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> whens)
   where
-    whens = makeTerm <$> location <*> many (when' <|> else' <|> expressions)
+    whens = makeTerm <$> location <*> many (when' <|> else' <|> expression)
     when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
     pattern = symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression)
 
@@ -343,8 +346,8 @@ unary = symbol Unary >>= \ location ->
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
   <|> makeTerm location <$> children (Expression.Call <$> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier <$> source)) <*> some expression <*> emptyTerm)
+  <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
-  <|> makeTerm location . Expression.Negate <$> children expression -- Unary minus (e.g. `-a`). HiddenUnaryMinus nodes are hidden, so we can't match on the symbol.
 
 binary  :: Assignment
 binary = symbol Binary >>= \ loc -> children $ (expression <|> emptyTerm) >>= \ lexpression -> go loc lexpression
