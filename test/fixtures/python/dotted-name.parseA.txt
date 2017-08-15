@@ -1,0 +1,9 @@
+(Program
+  (MemberAccess
+    (Identifier)
+    (Identifier))
+  (MemberAccess
+    (MemberAccess
+      (Identifier)
+      (Identifier))
+    (Identifier)))

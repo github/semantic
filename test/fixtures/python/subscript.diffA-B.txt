@@ -1,0 +1,6 @@
+(Program
+  (Subscript
+  { (Identifier)
+  ->(Identifier) }
+  {+(Identifier)+}
+  {-(Identifier)-}))

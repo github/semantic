@@ -1,0 +1,11 @@
+{+(Program
+  (Call
+    (Identifier)
+    (Identifier)
+    (Empty))
+  (Comment)
+  (Call
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (Empty)))+}

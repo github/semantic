@@ -1,0 +1,6 @@
+{-(Program
+  (Negate
+    (Identifier))
+  (Identifier)
+  (Complement
+    (Identifier)))-}
