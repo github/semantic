@@ -1,10 +1,12 @@
 {+(Program
   (For
     (Identifier)
-    (Identifier)
+    (Other "in"
+      (Identifier))
     (Identifier))
   (For
     (Identifier)
     (Identifier)
-    (Identifier)
+    (Other "in"
+      (Identifier))
     (Identifier)))+}
