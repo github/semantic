@@ -1,8 +1,0 @@
-{+(Program
-  (Other "lexical_declaration"
-    (VarAssignment
-      (Identifier)
-      (Ty
-        (Other "intersection_type"
-          (Identifier)
-          (Identifier))))))+}

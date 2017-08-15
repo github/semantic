@@ -1,9 +1,0 @@
-{+(Program
-  (AnonymousFunction
-    (ExpressionStatements
-      (Params
-        (Identifier))
-      (Binary
-        (Identifier)
-        (Other "+")
-        (IntegerLiteral)))))+}

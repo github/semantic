@@ -1,0 +1,12 @@
+(Program
+{+(Set
+    (Integer))+}
+{+(Set
+    (Integer)
+    (Integer)
+    (Integer))+}
+{-(Hash)-}
+{-(Set
+    (Integer)
+    (Integer)
+    (Integer))-})

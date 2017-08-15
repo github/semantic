@@ -1,7 +1,0 @@
-{+(Program
-  (Method
-    (Identifier)
-    (Begin
-      (MethodCall
-        (Identifier)
-        (StringLiteral)))))+}

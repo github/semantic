@@ -1,5 +1,0 @@
-{+(Program
-  (Begin
-    (Identifier)
-    (Ensure
-      (Identifier))))+}

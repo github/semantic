@@ -1,0 +1,18 @@
+{+(Program
+  (Import
+    (ScopeResolution
+      (Identifier))
+    (Let
+      (Identifier)
+      (ScopeResolution
+        (Identifier))
+      (Empty)))
+  (Import
+    (Let
+      (Identifier)
+      (ScopeResolution
+        (Identifier)
+        (Identifier))
+      (Empty))
+    (ScopeResolution
+      (Identifier))))+}

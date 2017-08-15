@@ -1,0 +1,11 @@
+{-(Program
+  (Annotation
+    (Function
+      (Identifier)
+      (Identifier)
+      (
+        (Plus
+          (Identifier)
+          (
+            (Integer)))))
+    (Empty)))-}

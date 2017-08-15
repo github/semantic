@@ -1,0 +1,12 @@
+(Program
+  (Call
+    (Identifier)
+    (Subscript
+    { (Identifier)
+    ->(Identifier) }
+      (Integer))
+    (Subscript
+    { (Identifier)
+    ->(Identifier) }
+      (Integer))
+    (Empty)))

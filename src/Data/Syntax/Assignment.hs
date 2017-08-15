@@ -115,7 +115,7 @@ import GHC.Stack
 import qualified Info
 import Prelude hiding (head, until)
 import Text.Parser.Combinators as Parsers
-import Text.Parser.TreeSitter.Language
+import TreeSitter.Language
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --

@@ -1,0 +1,31 @@
+(Program
+  (Comprehension
+    (KeyValue
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) })
+    (
+      (
+        (
+        {+(Identifier)+}
+        {-(Identifier)-})
+      {+(Identifier)+}
+      {-(Identifier)-})
+    {+(
+        (Identifier))+}))
+  (Comprehension
+    (KeyValue
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Integer) })
+    (
+      (
+        (
+        {+(Identifier)+}
+        {-(Identifier)-})
+      {+(Identifier)+}
+      {-(Identifier)-})
+    {-(
+        (Identifier))-})))

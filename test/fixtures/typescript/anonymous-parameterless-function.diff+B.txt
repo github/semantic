@@ -1,6 +1,0 @@
-{+(Program
-  (ExpressionStatements
-    (Function
-      (Params)
-      (Return
-        (StringLiteral)))))+}

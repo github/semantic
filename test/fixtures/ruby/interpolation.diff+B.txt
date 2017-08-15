@@ -1,5 +1,0 @@
-{+(Program
-  (SymbolLiteral
-    (Identifier))
-  (StringLiteral
-    (Identifier)))+}

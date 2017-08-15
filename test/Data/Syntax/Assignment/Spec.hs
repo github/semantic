@@ -14,7 +14,7 @@ import Data.Syntax.Assignment
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
 import Test.Hspec
-import Text.Parser.TreeSitter.Language (Symbol(..), SymbolType(..))
+import TreeSitter.Language (Symbol(..), SymbolType(..))
 
 spec :: Spec
 spec = do

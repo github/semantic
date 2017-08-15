@@ -1,4 +1,3 @@
-packages: ./ languages/*/ tools/*/
-optional-packages: vendor/*/
+packages: ./ vendor/*/ vendor/haskell-tree-sitter/languages/*/
 
 jobs: $ncpus
