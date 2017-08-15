@@ -1,4 +1,0 @@
-{+(Program
-  (Other "ambient_declaration"
-    (Namespace
-      (Identifier))))+}

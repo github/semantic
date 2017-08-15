@@ -1,4 +1,0 @@
-{+(Program
-  (SymbolLiteral)
-  (SymbolLiteral)
-  (SymbolLiteral))+}

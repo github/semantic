@@ -1,5 +1,0 @@
-{+(Program
-  (Identifier)
-  (Identifier)
-  (Boolean)
-  (Boolean))+}

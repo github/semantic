@@ -1,7 +1,0 @@
-{+(Program
-  (ExpressionStatements
-    (Assignment
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (NumberLiteral))))+}
