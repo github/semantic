@@ -56,6 +56,7 @@ parseError :: (HasCallStack, Error :< fs, Bounded grammar, Ix grammar, Apply1 Fo
 parseError = makeTerm <$> Assignment.symbol maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] Nothing []) <* Assignment.source
 
 
+-- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
 contextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
               => m (Term (Union fs) a)
               -> m (Term (Union fs) a)
@@ -65,6 +66,7 @@ contextualize context rule = make <$> Assignment.manyThrough context rule
           Just cs -> makeTerm1 (Context cs node)
           _ -> node
 
+-- | Match context terms after a subject term and before a delimiter, returning the delimiter paired with a Context term if any context terms matched, or the subject term otherwise.
 postContextualizeThrough :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
                          => m (Term (Union fs) a)
                          -> m (Term (Union fs) a)
@@ -75,6 +77,7 @@ postContextualizeThrough context rule end = make <$> rule <*> Assignment.manyThr
           Just cs -> (makeTerm1 (Context cs node), end)
           _ -> (node, end)
 
+-- | Match context terms after a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
 postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
                   => m (Term (Union fs) a)
                   -> m (Term (Union fs) a)
@@ -84,6 +87,7 @@ postContextualize context rule = make <$> rule <*> many context
           Just cs -> makeTerm1 (Context cs node)
           _ -> node
 
+-- | Match infix terms separated by any of a list of operators, with optional context terms following each operand.
 infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack, Apply1 Foldable fs)
              => m (Term (Union fs) a)
              -> m (Term (Union fs) a)
