@@ -340,6 +340,18 @@ expression = handleError $
   <|> block
   where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (children expression))
 
+number :: Assignment
+number = makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
+
+string :: Assignment
+string = makeTerm <$> symbol Grammar.String <*> (Literal.TextElement <$> source)
+
+true :: Assignment
+true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
+
+false :: Assignment
+false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
 
