@@ -343,27 +343,30 @@ begin = makeTerm <$> symbol Begin <*> children (Statement.Try <$> expressions <*
 assignment' :: Assignment
 assignment'
    =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lhs <*> rhs)
-  <|> makeTerm <$> symbol OperatorAssignment <*> children (lhs >>= \ var -> Statement.Assignment var <$>
-         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
-      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
-      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
-      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> expression)
-      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
-      <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
-      <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> expression)
-      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> expression)
-      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
-      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
-      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
+  <|> makeTerm' <$> symbol OperatorAssignment <*> children (infixTerm lhs expression
+        [ assign Expression.Plus      <$ symbol AnonPlusEqual
+        , assign Expression.Minus     <$ symbol AnonMinusEqual
+        , assign Expression.Times     <$ symbol AnonStarEqual
+        , assign Expression.Power     <$ symbol AnonStarStarEqual
+        , assign Expression.DividedBy <$ symbol AnonSlashEqual
+        , assign Expression.And       <$ symbol AnonPipePipeEqual
+        , assign Expression.BOr       <$ symbol AnonPipeEqual
+        , assign Expression.And       <$ symbol AnonAmpersandAmpersandEqual
+        , assign Expression.BAnd      <$ symbol AnonAmpersandEqual
+        , assign Expression.Modulo    <$ symbol AnonPercentEqual
+        , assign Expression.RShift    <$ symbol AnonRAngleRAngleEqual
+        , assign Expression.LShift    <$ symbol AnonLAngleLAngleEqual
+        , assign Expression.BXOr      <$ symbol AnonCaretEqual
+        ])
   where
-    lhs = makeTerm <$> symbol LeftAssignmentList <*> children (many expr) <|> expr
-    rhs = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr =
-          makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
-      <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
-      <|> expression
+    assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+    assign c l r = inj (Statement.Assignment l (makeTerm1 (c l r)))
+
+    lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
+    rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
+    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier <$> source)
+       <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
+       <|> expression
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->
