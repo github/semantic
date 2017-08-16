@@ -176,17 +176,17 @@ identifier =
 
 literal :: Assignment
 literal =
-      makeTerm <$> symbol Grammar.True     <*> (Literal.true <$ source)
-  <|> makeTerm <$> symbol Grammar.False    <*> (Literal.false <$ source)
+      makeTerm <$> token  Grammar.True     <*> pure Literal.true
+  <|> makeTerm <$> token  Grammar.False    <*> pure Literal.false
+  <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
   <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
   <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
-  <|> makeTerm <$> symbol Grammar.Nil      <*> (Literal.Null <$ source)
   <|> makeTerm <$> symbol Grammar.Rational <*> (Language.Ruby.Syntax.Rational <$> source)
   <|> makeTerm <$> symbol Grammar.Complex  <*> (Language.Ruby.Syntax.Complex <$> source)
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
-  <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many pair)
+  <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> (many . term) pair)
   -- TODO: Give subshell it's own literal and allow interpolation
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   -- TODO: Handle interpolation
@@ -319,7 +319,6 @@ methodCall :: Assignment
 methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> expression <*> args <*> (block <|> emptyTerm))
   where
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
-
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expression <|> args))
