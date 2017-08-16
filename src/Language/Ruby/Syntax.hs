@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
 module Language.Ruby.Syntax
 ( assignment
 , Syntax
@@ -6,10 +6,16 @@ module Language.Ruby.Syntax
 , Term
 ) where
 
+import Algorithm
+import Data.Align.Generic
+import Data.ByteString
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
-import Data.Syntax (emptyTerm, makeTerm, parseError, handleError)
+import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Show.Generic
+import Data.List.NonEmpty (some1)
+import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -19,6 +25,7 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Data.Union
+import GHC.Generics
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
 import qualified Term
@@ -39,6 +46,8 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
+  , Language.Ruby.Syntax.Rational
+  , Language.Ruby.Syntax.Complex
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -66,6 +75,7 @@ type Syntax = '[
   , Statement.Try
   , Statement.While
   , Statement.Yield
+  , Syntax.Context
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
@@ -76,13 +86,26 @@ type Syntax = '[
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
+-- Rational literal e.g. `2/3r`
+newtype Rational a = Rational ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Language.Ruby.Syntax.Rational where liftEq = genericLiftEq
+instance Show1 Language.Ruby.Syntax.Rational where liftShowsPrec = genericLiftShowsPrec
+
+newtype Complex a = Complex ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Language.Ruby.Syntax.Complex where liftEq = genericLiftEq
+instance Show1 Language.Ruby.Syntax.Complex where liftShowsPrec = genericLiftShowsPrec
+
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError $
+expression = handleError . term $
       alias
   <|> assignment'
   <|> begin
@@ -92,7 +115,6 @@ expression = handleError $
   <|> call
   <|> case'
   <|> class'
-  <|> comment
   <|> conditional
   <|> emptyStatement
   <|> endBlock
@@ -154,15 +176,17 @@ identifier =
 
 literal :: Assignment
 literal =
-      makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
-  <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
-  <|> makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
-  <|> makeTerm <$> symbol Grammar.Float <*> (Literal.Float <$> source)
-  <|> makeTerm <$> symbol Grammar.Nil <*> (Literal.Null <$ source)
+      makeTerm <$> symbol Grammar.True     <*> (Literal.true <$ source)
+  <|> makeTerm <$> symbol Grammar.False    <*> (Literal.false <$ source)
+  <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
+  <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
+  <|> makeTerm <$> symbol Grammar.Nil      <*> (Literal.Null <$ source)
+  <|> makeTerm <$> symbol Grammar.Rational <*> (Language.Ruby.Syntax.Rational <$> source)
+  <|> makeTerm <$> symbol Grammar.Complex  <*> (Language.Ruby.Syntax.Complex <$> source)
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
-  <|> makeTerm <$> symbol Hash <*> children (Literal.Hash <$> many pair)
+  <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many pair)
   -- TODO: Give subshell it's own literal and allow interpolation
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   -- TODO: Handle interpolation
@@ -350,39 +374,32 @@ unary = symbol Unary >>= \ location ->
   <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
 
+-- TODO: Distinguish `===` from `==` ?
+-- TODO: Distinuish `=~` and `!~` ?
 binary  :: Assignment
-binary = symbol Binary >>= \ loc -> children $ (expression <|> emptyTerm) >>= \ lexpression -> go loc lexpression
-  where
-    go loc lexpression
-       =  mk AnonAnd Expression.And
-      <|> mk AnonAmpersandAmpersand Expression.And
-      <|> mk AnonOr Expression.Or
-      <|> mk AnonPipePipe Expression.Or
-      <|> mk AnonLAngleLAngle Expression.LShift
-      <|> mk AnonRAngleRAngle Expression.RShift
-      <|> mk AnonEqualEqual Expression.Equal
-      <|> mkNot AnonBangEqual Expression.Equal
-       -- TODO: Distinguish `===` from `==` ?
-      <|> mk AnonEqualEqualEqual Expression.Equal
-      <|> mk AnonLAngleEqualRAngle Expression.Comparison
-      -- TODO: Distinuish `=~` and `!~` ?
-      <|> mk AnonEqualTilde Expression.Equal
-      <|> mkNot AnonBangTilde Expression.Equal
-      <|> mk AnonLAngle Expression.LessThan
-      <|> mk AnonLAngleEqual Expression.LessThanEqual
-      <|> mk AnonRAngle Expression.GreaterThan
-      <|> mk AnonRAngleEqual Expression.GreaterThanEqual
-      <|> mk AnonAmpersand Expression.BAnd
-      <|> mk AnonCaret Expression.BXOr
-      <|> mk AnonPipe Expression.BOr
-      <|> mk AnonPlus Expression.Plus
-      <|> mk AnonSlash Expression.DividedBy
-      <|> mk AnonPercent Expression.Modulo
-      <|> mk AnonStarStar Expression.Power
-      <|> mk AnonMinus' Expression.Minus
-      <|> mk AnonStar' Expression.Times
-      where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> expression))
-            mkNot s constr = makeTerm loc <$ symbol s <*> (Expression.Not <$> (makeTerm <$> location <*> (constr lexpression <$> expression)))
+binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
+  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
+  , (inj .) . Expression.Minus            <$ symbol AnonMinus'
+  , (inj .) . Expression.Times            <$ symbol AnonStar'
+  , (inj .) . Expression.Power            <$ symbol AnonStarStar
+  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.And              <$ (symbol AnonAnd <|> symbol AnonAmpersandAmpersand)
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inj .) . Expression.Or               <$ (symbol AnonOr <|> symbol AnonPipePipe)
+  , (inj .) . Expression.BOr              <$ symbol AnonPipe
+  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual <|> symbol AnonEqualTilde)
+  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangTilde)
+  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
+  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  ])
+  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> expression <*> expression <*> expression)
@@ -395,3 +412,15 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 
 invert :: Assignment -> Assignment
 invert term = makeTerm <$> location <*> fmap Expression.Not term
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+term :: Assignment -> Assignment
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+
+-- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
+infixTerm :: HasCallStack
+         => Assignment
+         -> Assignment
+         -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Union Syntax Term)]
+         -> Assignment.Assignment (AST Grammar) Grammar (Union Syntax Term)
+infixTerm = infixContext comment
