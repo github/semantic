@@ -332,6 +332,7 @@ instance Functor (Assignment ast grammar) where
 instance Applicative (Assignment ast grammar) where
   pure = Pure
   Pure f <*> a = fmap f a
+  Map f a <*> b = Then a ((<$> b) . f)
   Then action yield <*> a = Then action ((<*> a) . yield)
   action <*> a = Then action (<$> a)
 
