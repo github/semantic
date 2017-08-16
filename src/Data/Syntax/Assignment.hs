@@ -224,17 +224,17 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 -- | Run an assignment over an AST exhaustively.
 assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
-         => (forall x. F.Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
-         -> Source.Source                            -- ^ The source for the parse tree.
-         -> Assignment ast grammar a                 -- ^ The 'Assignment to run.
-         -> ast                                      -- ^ The root of the ast.
-         -> Either (Error String) a                  -- ^ 'Either' an 'Error' or an assigned value.
+         => (F.Base ast () -> Node grammar) -- ^ A function to project a 'Node' from the ast.
+         -> Source.Source                   -- ^ The source for the parse tree.
+         -> Assignment ast grammar a        -- ^ The 'Assignment to run.
+         -> ast                             -- ^ The root of the ast.
+         -> Either (Error String) a         -- ^ 'Either' an 'Error' or an assigned value.
 assignBy toNode source assignment ast = bimap (fmap (either id show)) fst (runAssignment toNode source assignment (makeState [ast]))
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
-              => (forall x. F.Base ast x -> Node grammar)              -- ^ A function to project a 'Node' from the ast.
+              => (F.Base ast () -> Node grammar)                       -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                         -- ^ The source for the parse tree.
               -> Assignment ast grammar a                              -- ^ The 'Assignment' to run.
               -> State ast                                             -- ^ The current state.
@@ -251,14 +251,14 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
             -> Either (Error (Either String grammar)) (result, State ast)
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
           where atNode node = case assignment of
-                  Location -> yield (nodeLocation (toNode node)) state
+                  Location -> yield (nodeLocation (toNode (() <$ node))) state
                   CurrentNode -> yield (() <$ node) state
-                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (() <$ node))) source)) (advance state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
                   Advance -> yield () (advance state)
-                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode node))) choices -> yield choice state
+                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode (() <$ node)))) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
@@ -281,19 +281,19 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
                 makeError :: HasCallStack => Maybe (F.Base ast ast) -> Error (Either String grammar)
-                makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols) . toNode)
+                makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols) . toNode . fmap (const ()))
 
         requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error (Either String grammar)) (result, State ast)
         requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
           [] -> Right (a, state')
-          node : _ -> Left (nodeError [] (toNode (F.project node)))
+          node : _ -> Left (nodeError [] (toNode (() <$ F.project node)))
 
-        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
+        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . fmap (const ()) . F.project) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
+          , Node{..} <- toNode (() <$ F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
