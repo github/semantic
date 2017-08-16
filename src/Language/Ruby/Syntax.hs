@@ -86,13 +86,14 @@ type Syntax = '[
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
 
--- Rational literal e.g. `2/3r`
+-- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Language.Ruby.Syntax.Rational where liftEq = genericLiftEq
 instance Show1 Language.Ruby.Syntax.Rational where liftShowsPrec = genericLiftShowsPrec
 
+-- Complex literals e.g. `3 + 2i`
 newtype Complex a = Complex ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
