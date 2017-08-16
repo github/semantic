@@ -99,6 +99,7 @@ import Control.Applicative
 import Control.Comonad.Cofree
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
+import Control.Monad.State.Class
 import Control.Monad.Free.Freer
 import Data.Bifunctor
 import Data.ByteString (ByteString)
@@ -127,6 +128,8 @@ import TreeSitter.Language
 type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
 data AssignmentF ast grammar a where
+  Get :: AssignmentF ast grammar (State ast)
+  Put :: State ast -> AssignmentF ast grammar ()
   End :: HasCallStack => AssignmentF ast grammar ()
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
   Project :: HasCallStack => (forall x. F.Base ast x -> a) -> AssignmentF ast grammar a
@@ -264,6 +267,8 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
+                  Get -> yield state state
+                  Put s -> yield () s
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
@@ -350,7 +355,7 @@ instance Eq grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Eq grammar, Show grammar) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Show grammar, Show ast) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -373,8 +378,14 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = Catch during handler `Then` return
 
-instance Show grammar => Show1 (AssignmentF ast grammar) where
+instance MonadState (State ast) (Assignment ast grammar) where
+  get = Get `Then` return
+  put s = Put s `Then` return
+
+instance (Show grammar, Show ast) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
+    Get -> showString "Get"
+    Put s -> showsUnaryWith showsPrec "Put" d s
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
