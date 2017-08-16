@@ -152,7 +152,7 @@ location = do
     _ -> Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil
 
 -- | Zero-width production of the current node.
-currentNode :: (Eq grammar, Eq (ast (Cofree ast (Node grammar))), Functor ast, HasCallStack) => Assignment ast grammar (CofreeF ast (Node grammar) ())
+currentNode :: (Eq grammar, Eq (ast (AST ast grammar)), Functor ast, HasCallStack) => Assignment ast grammar (CofreeF ast (Node grammar) ())
 currentNode = do
   State{..} <- get
   guard (not (null stateNodes))
@@ -228,16 +228,16 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (Cofree ast (Node grammar))), Foldable ast)
+assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast)
          => Source.Source             -- ^ The source for the parse tree.
          -> Assignment ast grammar a  -- ^ The 'Assignment to run.
-         -> Cofree ast (Node grammar) -- ^ The root of the ast.
+         -> AST ast grammar           -- ^ The root of the ast.
          -> Either (Error String) a   -- ^ 'Either' an 'Error' or an assigned value.
 assignBy source assignment ast = bimap (fmap (either id show)) fst (runAssignment source assignment (makeState [ast]))
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (ast (Cofree ast (Node grammar))), Foldable ast)
+runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast)
               => Source.Source                                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
               -> State ast grammar                                             -- ^ The current state.
@@ -295,21 +295,21 @@ advanceState state@State{..}
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
-  { stateOffset :: {-# UNPACK #-} !Int         -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Info.Pos       -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateNodes :: ![Cofree ast (Node grammar)] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  { stateOffset :: {-# UNPACK #-} !Int   -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: {-# UNPACK #-} !Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateNodes :: ![AST ast grammar]     -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
 
-deriving instance (Eq grammar, Eq (ast (Cofree ast (Node grammar)))) => Eq (State ast grammar)
-deriving instance (Show grammar, Show (ast (Cofree ast (Node grammar)))) => Show (State ast grammar)
+deriving instance (Eq grammar, Eq (ast (AST ast grammar))) => Eq (State ast grammar)
+deriving instance (Show grammar, Show (ast (AST ast grammar))) => Show (State ast grammar)
 
-makeState :: [Cofree ast (Node grammar)] -> State ast grammar
+makeState :: [AST ast grammar] -> State ast grammar
 makeState = State 0 (Info.Pos 1 1)
 
 
 -- Instances
 
-instance (Eq grammar, Eq (ast (Cofree ast (Node grammar)))) => Alternative (Assignment ast grammar) where
+instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Throw Nothing `Then` return
 
@@ -351,7 +351,7 @@ instance (Eq grammar, Eq (ast (Cofree ast (Node grammar)))) => Alternative (Assi
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Eq grammar, Eq (ast (Cofree ast (Node grammar))), Show grammar, Show (ast (Cofree ast (Node grammar)))) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -378,7 +378,7 @@ instance MonadState (State ast grammar) (Assignment ast grammar) where
   get = Get `Then` return
   put s = Put s `Then` return
 
-instance (Show grammar, Show (ast (Cofree ast (Node grammar)))) => Show1 (AssignmentF ast grammar) where
+instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Get -> showString "Get"
     Put s -> showsUnaryWith showsPrec "Put" d s
