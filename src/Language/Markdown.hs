@@ -10,7 +10,7 @@ import Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import CMarkGFM
 import Data.Ix
 import Data.Source
-import qualified Data.Syntax.Assignment as A (Node(..))
+import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
@@ -49,9 +49,9 @@ exts = [
   , extTagfilter
   ]
 
-cmarkParser :: Source -> Cofree (CofreeF [] NodeType) (A.Node Grammar)
+cmarkParser :: Source -> A.AST (CofreeF [] NodeType) Grammar
 cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] exts (toText source)
-  where toTerm :: Range -> Span -> Node -> Cofree (CofreeF [] NodeType) (A.Node Grammar)
+  where toTerm :: Range -> Span -> Node -> A.AST (CofreeF [] NodeType) Grammar
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
