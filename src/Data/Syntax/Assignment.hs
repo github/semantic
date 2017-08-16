@@ -280,10 +280,10 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                 makeError :: HasCallStack => Maybe (Node grammar) -> Error (Either String grammar)
                 makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
-        requireExhaustive :: HasCallStack => (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
-        requireExhaustive (a, state) = let state' = skipTokens state in case stateNodes state' of
-          [] -> Right (a, state')
-          node : _ -> Left (nodeError [] (headF (runCofree node)))
+requireExhaustive :: (Symbol grammar, HasCallStack) => (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
+requireExhaustive (a, state) = let state' = skipTokens state in case stateNodes state' of
+  [] -> Right (a, state')
+  node : _ -> Left (nodeError [] (headF (runCofree node)))
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
 skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
