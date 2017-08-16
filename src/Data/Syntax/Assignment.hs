@@ -99,8 +99,8 @@ import Control.Applicative
 import Control.Comonad.Cofree
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
-import Control.Monad.State.Class
 import Control.Monad.Free.Freer
+import Control.Monad.State.Class
 import Data.Bifunctor
 import Data.ByteString (ByteString)
 import Data.Error
