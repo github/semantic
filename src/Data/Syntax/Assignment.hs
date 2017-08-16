@@ -132,6 +132,7 @@ data AssignmentF ast grammar a where
   Get :: AssignmentF ast grammar (State ast grammar)
   Put :: State ast grammar -> AssignmentF ast grammar ()
   End :: HasCallStack => AssignmentF ast grammar ()
+  Location :: HasCallStack => AssignmentF ast grammar (Record Location)
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: HasCallStack => AssignmentF ast grammar ()
@@ -146,11 +147,7 @@ data AssignmentF ast grammar a where
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
 location :: HasCallStack => Assignment ast grammar (Record Location)
-location = do
-  State{..} <- get
-  pure $ case stateNodes of
-    (node :< _) : _ -> nodeLocation node
-    _ -> Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil
+location = withFrozenCallStack $ Location `Then` return
 
 -- | Zero-width production of the current node.
 currentNode :: (Eq grammar, Eq (ast (AST ast grammar)), Functor ast, HasCallStack) => Assignment ast grammar (CofreeF ast (Node grammar) ())
@@ -255,6 +252,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> Either (Error (Either String grammar)) (result, State ast grammar)
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (node :< f) = case assignment of
+                  Location -> yield (nodeLocation node) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
@@ -268,6 +266,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Get -> yield state state
                   Put s -> yield () s
                   End -> requireExhaustive ((), state) >>= uncurry yield
+                  Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt as -> sconcat (flip yield state <$> as)
                   Throw e -> Left (fromMaybe (makeError node) e)
@@ -325,6 +324,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   (Get `Then` continueL) <|> (Get `Then` continueR) = Get `Then` uncurry (<|>) . (continueL &&& continueR)
   (Put sl `Then` continueL) <|> (Put sr `Then` continueR) | sl == sr = Put sl `Then` uncurry (<|>) . (continueL &&& continueR)
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
+  (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
@@ -388,6 +388,7 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
     Put s -> showsUnaryWith showsPrec "Put" d s
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
+    Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
