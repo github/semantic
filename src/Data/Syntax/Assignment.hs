@@ -217,6 +217,7 @@ firstSet :: Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ assignment _ -> case assignment of
   Choose symbols _ -> symbols
   Catch during _ -> firstSet during
+  Label child _ -> firstSet child
   _ -> []) . ([] <$)
 
 
