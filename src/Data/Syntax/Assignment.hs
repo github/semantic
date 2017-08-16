@@ -137,7 +137,7 @@ data AssignmentF ast grammar a where
   Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => [a] -> AssignmentF ast grammar a
-  Throw :: HasCallStack => Maybe (Error (Either String grammar)) -> AssignmentF ast grammar a
+  Throw :: HasCallStack => Error (Either String grammar) -> AssignmentF ast grammar a
   Catch :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
   Label :: HasCallStack => Assignment ast grammar a -> String -> AssignmentF ast grammar a
 
@@ -265,7 +265,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt [] -> Left (makeError node)
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
-                  Throw e -> Left (fromMaybe (makeError node) e)
+                  Throw e -> Left e
                   Catch during _ -> go during state >>= uncurry yield
                   Choose{} -> Left (makeError node)
                   CurrentNode{} -> Left (makeError node)
@@ -311,12 +311,12 @@ makeState = State 0 (Info.Pos 1 1)
 
 instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Throw Nothing `Then` return
+  empty = Alt [] `Then` return
 
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
-  (Throw Nothing `Then` _) <|> r = r
-  l <|> (Throw Nothing `Then` _) = l
+  (Alt [] `Then` _) <|> r = r
+  l <|> (Alt [] `Then` _) = l
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
@@ -371,7 +371,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST a
 
 instance MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
-  throwError error = withFrozenCallStack $ Throw (Just error) `Then` return
+  throwError error = withFrozenCallStack $ Throw error `Then` return
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = Catch during handler `Then` return
