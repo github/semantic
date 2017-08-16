@@ -43,6 +43,7 @@ makeTerm1' f = case toList f of
   a : _ -> makeTerm' (headF (runCofree a)) f
   _ -> error "makeTerm1': empty structure"
 
+-- | Construct an empty term at the current position.
 emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
