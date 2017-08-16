@@ -76,7 +76,6 @@ module Data.Syntax.Assignment
 , children
 , advance
 , token
-, infixChoice
 , while
 , until
 , manyThrough
@@ -171,9 +170,6 @@ advance = withFrozenCallStack $ Advance `Then` return
 
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 token s = symbol s <* advance
-
-infixChoice :: (Alternative m, HasCallStack) => m a -> m b -> [m (a -> b -> c)] -> m c
-infixChoice left right operators = (&) <$> left <*> choice operators <*> right
 
 
 -- | Collect a list of values passing a predicate.
