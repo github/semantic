@@ -125,6 +125,7 @@ import TreeSitter.Language
 --   This is essentially a parser.
 data Assignment ast grammar a where
   Pure :: a -> Assignment ast grammar a
+  Map :: (b -> a) -> Assignment ast grammar b -> Assignment ast grammar a
   Then :: Assignment ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
   End :: HasCallStack => Assignment ast grammar ()
   Location :: HasCallStack => Assignment ast grammar (Record Location)
@@ -261,6 +262,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 
                 anywhere node = case assignment of
                   Pure a -> yield a state
+                  Map f a -> first f <$> go a state >>= uncurry yield
                   Then step continue -> go step state >>= uncurry go . first continue >>= uncurry yield
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
@@ -408,6 +410,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
 instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (Assignment ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Pure a -> showsUnaryWith sp "Pure" d a
+    Map f action -> showsBinaryWith (const showString) (liftShowsPrec ((. f) . sp) (sl . fmap f)) "Map" d "_" action
     Then step yield -> showsBinaryWith (liftShowsPrec ((. yield) . liftShowsPrec sp sl) (liftShowList sp sl . fmap yield)) (const showString) "Then" d step "_"
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
