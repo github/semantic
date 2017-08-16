@@ -110,7 +110,7 @@ import Data.Functor.Classes
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (Ix(..))
 import Data.List (union)
-import Data.List.NonEmpty ((<|), NonEmpty(..))
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
 import Data.Record
 import Data.Semigroup
@@ -136,7 +136,7 @@ data AssignmentF ast grammar a where
   Advance :: HasCallStack => AssignmentF ast grammar ()
   Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
-  Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
+  Alt :: HasCallStack => [a] -> AssignmentF ast grammar a
   Throw :: HasCallStack => Maybe (Error (Either String grammar)) -> AssignmentF ast grammar a
   Catch :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
   Label :: HasCallStack => Assignment ast grammar a -> String -> AssignmentF ast grammar a
@@ -263,7 +263,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
-                  Alt as -> sconcat (flip yield state <$> as)
+                  Alt [] -> Left (makeError node)
+                  Alt (a:as) -> sconcat (flip yield state <$> a:|as)
                   Throw e -> Left (fromMaybe (makeError node) e)
                   Catch during _ -> go during state >>= uncurry yield
                   Choose{} -> Left (makeError node)
@@ -325,10 +326,10 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
-  l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
+  l <|> (Alt rs `Then` continueR) = Alt (l : (continueR <$> rs)) `Then` id
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
             withBestCallStack (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) `Then` id)
-          | otherwise = withBestCallStack (Alt (l :| [r]) `Then` id)
+          | otherwise = withBestCallStack (Alt [l, r] `Then` id)
     where choices :: Assignment ast grammar a -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar a))
           choices (Choose symbols choices `Then` continue) = Just (symbols, continue <$> choices)
           choices (Many rule `Then` continue) = second ((Many rule `Then` continue) <$) <$> choices rule
