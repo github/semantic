@@ -3,7 +3,8 @@ module Algorithm where
 
 import Control.Applicative (liftA2)
 import Control.Monad (guard, join)
-import Control.Monad.Free.Freer
+import Control.Monad.Free (wrap)
+import Control.Monad.Free.Freer hiding (wrap)
 import Data.Function (on)
 import Data.Functor.Both
 import Data.Functor.Classes
