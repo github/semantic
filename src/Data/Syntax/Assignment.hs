@@ -165,9 +165,11 @@ source = withFrozenCallStack $ Source `Then` return
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
+-- | Advance past the current node.
 advance :: HasCallStack => Assignment ast grammar ()
 advance = withFrozenCallStack $ Advance `Then` return
 
+-- | Match and advance past a node with the given symbol.
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 token s = symbol s <* advance
 
