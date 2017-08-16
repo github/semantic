@@ -152,7 +152,7 @@ location = do
     _ -> Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil
 
 -- | Zero-width production of the current node.
-currentNode :: (Eq grammar, Functor ast, HasCallStack) => Assignment ast grammar (CofreeF ast (Node grammar) ())
+currentNode :: (Eq grammar, Eq (ast (Cofree ast (Node grammar))), Functor ast, HasCallStack) => Assignment ast grammar (CofreeF ast (Node grammar) ())
 currentNode = do
   State{..} <- get
   guard (not (null stateNodes))
@@ -309,7 +309,7 @@ makeState = State 0 (Info.Pos 1 1)
 
 -- Instances
 
-instance Eq grammar => Alternative (Assignment ast grammar) where
+instance (Eq grammar, Eq (ast (Cofree ast (Node grammar)))) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Throw Nothing `Then` return
 
@@ -319,6 +319,7 @@ instance Eq grammar => Alternative (Assignment ast grammar) where
   l <|> (Throw Nothing `Then` _) = l
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
   (Get `Then` continueL) <|> (Get `Then` continueR) = Get `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Put sl `Then` continueL) <|> (Put sr `Then` continueR) | sl == sr = Put sl `Then` uncurry (<|>) . (continueL &&& continueR)
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
@@ -350,7 +351,7 @@ instance Eq grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Eq grammar, Show grammar, Show (ast (Cofree ast (Node grammar)))) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Eq (ast (Cofree ast (Node grammar))), Show grammar, Show (ast (Cofree ast (Node grammar)))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
