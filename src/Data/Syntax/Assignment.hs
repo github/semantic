@@ -275,17 +275,17 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Source -> Left (makeError node)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
 
-                state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
+                state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
                 makeError :: HasCallStack => Maybe (Node grammar) -> Error (Either String grammar)
                 makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
         requireExhaustive :: HasCallStack => (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
-        requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
+        requireExhaustive (a, state) = let state' = skipTokens state in case stateNodes state' of
           [] -> Right (a, state')
           node : _ -> Left (nodeError [] (headF (runCofree node)))
 
-        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
+        skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
