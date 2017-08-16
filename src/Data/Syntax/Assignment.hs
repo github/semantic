@@ -70,7 +70,7 @@ module Data.Syntax.Assignment
 , Alternative(..)
 , MonadError(..)
 , location
-, project
+, currentNode
 , symbol
 , source
 , children
@@ -132,7 +132,7 @@ data AssignmentF ast grammar a where
   Put :: State ast -> AssignmentF ast grammar ()
   End :: HasCallStack => AssignmentF ast grammar ()
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
-  Project :: HasCallStack => AssignmentF ast grammar (F.Base ast ())
+  CurrentNode :: HasCallStack => AssignmentF ast grammar (F.Base ast ())
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: HasCallStack => AssignmentF ast grammar ()
@@ -149,9 +149,9 @@ data AssignmentF ast grammar a where
 location :: HasCallStack => Assignment ast grammar (Record Location)
 location = withFrozenCallStack $ Location `Then` return
 
--- | Zero-width projection of the current node.
-project :: HasCallStack => Assignment ast grammar (F.Base ast ())
-project = Project `Then` return
+-- | Zero-width production of the current node.
+currentNode :: HasCallStack => Assignment ast grammar (F.Base ast ())
+currentNode = CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
@@ -252,7 +252,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode node)) state
-                  Project -> yield (() <$ node) state
+                  CurrentNode -> yield (() <$ node) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
@@ -272,7 +272,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   Throw e -> Left (fromMaybe (makeError node) e)
                   Catch during _ -> go during state >>= uncurry yield
                   Choose{} -> Left (makeError node)
-                  Project{} -> Left (makeError node)
+                  CurrentNode{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
                   Source -> Left (makeError node)
                   Advance{} -> Left (makeError node)
@@ -385,7 +385,7 @@ instance (Show grammar, Show ast) => Show1 (AssignmentF ast grammar) where
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
-    Project -> showString "Project"
+    CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
