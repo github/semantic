@@ -285,7 +285,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
           [] -> Right (a, state')
           node : _ -> Left (nodeError [] (headF (runCofree node)))
 
-        skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
+skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
+skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
