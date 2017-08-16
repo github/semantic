@@ -134,6 +134,7 @@ data AssignmentF ast grammar a where
   End :: HasCallStack => AssignmentF ast grammar ()
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
+  Advance :: HasCallStack => AssignmentF ast grammar ()
   Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
@@ -171,7 +172,7 @@ children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
 advance :: HasCallStack => Assignment ast grammar ()
-advance = modify advanceState
+advance = withFrozenCallStack $ Advance `Then` return
 
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 token s = symbol s <* advance
@@ -258,6 +259,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
                     yield a (advanceState state' { stateNodes = stateNodes })
+                  Advance -> yield () (advanceState state)
                   Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
@@ -273,6 +275,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Choose{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
                   Source -> Left (makeError node)
+                  Advance{} -> Left (makeError node)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
@@ -384,6 +387,7 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
     Get -> showString "Get"
     Put s -> showsUnaryWith showsPrec "Put" d s
     End -> showString "End" . showChar ' ' . sp d ()
+    Advance -> showString "Advance" . showChar ' ' . sp d ()
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
