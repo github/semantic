@@ -86,7 +86,7 @@ module Data.Syntax.Assignment
 , nodeError
 , firstSet
 -- Running
-, assignBy
+, assign
 , runAssignment
 -- Implementation details (for testing)
 , State(..)
@@ -222,13 +222,13 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
-         => Source.Source             -- ^ The source for the parse tree.
-         -> Assignment ast grammar a  -- ^ The 'Assignment to run.
-         -> AST ast grammar           -- ^ The root of the ast.
-         -> Either (Error String) a   -- ^ 'Either' an 'Error' or an assigned value.
-assignBy source assignment ast = bimap (fmap (either id show)) fst (runAssignment source assignment (makeState [ast]))
-{-# INLINE assignBy #-}
+assign :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+       => Source.Source             -- ^ The source for the parse tree.
+       -> Assignment ast grammar a  -- ^ The 'Assignment to run.
+       -> AST ast grammar           -- ^ The root of the ast.
+       -> Either (Error String) a   -- ^ 'Either' an 'Error' or an assigned value.
+assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment source assignment (makeState [ast]))
+{-# INLINE assign #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
