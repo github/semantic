@@ -94,12 +94,22 @@ type Syntax = '[
   , Language.TypeScript.Syntax.TypePredicate
   , Language.TypeScript.Syntax.Annotation
   , Language.TypeScript.Syntax.CallSignature
+  , Language.TypeScript.Syntax.ConstructSignature
   , Language.TypeScript.Syntax.ArrayType
   , Language.TypeScript.Syntax.FlowMaybeType
   , Language.TypeScript.Syntax.TypeQuery
   , Language.TypeScript.Syntax.IndexTypeQuery
   , Language.TypeScript.Syntax.ThisType
   , Language.TypeScript.Syntax.ExistentialType
+  , Language.TypeScript.Syntax.MethodSignature
+  , Language.TypeScript.Syntax.IndexSignature
+  , Language.TypeScript.Syntax.ObjectType
+  , Language.TypeScript.Syntax.LiteralType
+  , Language.TypeScript.Syntax.Union
+  , Language.TypeScript.Syntax.Intersection
+  , Language.TypeScript.Syntax.Function
+  , Language.TypeScript.Syntax.Tuple
+  , Language.TypeScript.Syntax.Constructor
   , Type.Visibility
   , []
   ]
@@ -275,6 +285,25 @@ data CallSignature a = CallSignature { callSignatureTypeParameters :: !a, callSi
 
 instance Eq1 CallSignature where liftEq = genericLiftEq
 instance Show1 CallSignature where liftShowsPrec = genericLiftShowsPrec
+
+-- | Todo: Move type params and type to context
+data ConstructSignature a = ConstructSignature { constructSignatureTypeParameters :: !a, constructSignatureParameters :: ![a], constructSignatureType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ConstructSignature where liftEq = genericLiftEq
+instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
+
+data IndexSignature a = IndexSignature { indexSignatureSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 IndexSignature where liftEq = genericLiftEq
+instance Show1 IndexSignature where liftShowsPrec = genericLiftShowsPrec
+
+data MethodSignature a = MethodSignature { methodSignatureContext :: ![a], methodSignatureName :: !a, methodSignatureParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 MethodSignature where liftEq = genericLiftEq
+instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
