@@ -207,11 +207,11 @@ parameter =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> expression <*> params <*> expressions)
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> [] <*> emptyTerm <*> expression <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 singletonMethod :: Assignment
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> expression <*> expression <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> [] <*> expression <*> expression <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
