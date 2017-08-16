@@ -140,6 +140,10 @@ spec = do
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
 
+  describe "eof" $ do
+    it "matches at the end of branches" $
+      fst <$> runAssignment headF "" eof (makeState [] :: State (AST Grammar)) `shouldBe` Right ()
+
   describe "catchError" $ do
     it "handler that always matches" $
       fst <$> runAssignment headF "A"
