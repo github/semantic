@@ -101,7 +101,6 @@ import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
-import Control.Monad.State.Class
 import Data.Bifunctor
 import Data.ByteString (ByteString)
 import Data.Error
@@ -129,8 +128,6 @@ import TreeSitter.Language
 type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
 data AssignmentF ast grammar a where
-  Get :: AssignmentF ast grammar (State ast grammar)
-  Put :: State ast grammar -> AssignmentF ast grammar ()
   End :: HasCallStack => AssignmentF ast grammar ()
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
   CurrentNode :: HasCallStack => AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
@@ -262,8 +259,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
-                  Get -> yield state state
-                  Put s -> yield () s
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
@@ -321,8 +316,6 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   (Throw Nothing `Then` _) <|> r = r
   l <|> (Throw Nothing `Then` _) = l
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
-  (Get `Then` continueL) <|> (Get `Then` continueR) = Get `Then` uncurry (<|>) . (continueL &&& continueR)
-  (Put sl `Then` continueL) <|> (Put sr `Then` continueR) | sl == sr = Put sl `Then` uncurry (<|>) . (continueL &&& continueR)
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
@@ -378,14 +371,8 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = Catch during handler `Then` return
 
-instance MonadState (State ast grammar) (Assignment ast grammar) where
-  get = Get `Then` return
-  put s = Put s `Then` return
-
 instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
-    Get -> showString "Get"
-    Put s -> showsUnaryWith showsPrec "Put" d s
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
