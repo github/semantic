@@ -99,7 +99,6 @@ import Control.Comonad.Cofree as Cofree
 import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
-import Control.Monad.Free.Freer
 import Data.Bifunctor
 import Data.ByteString (ByteString)
 import Data.Error
@@ -124,21 +123,23 @@ import TreeSitter.Language
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment ast grammar = Freer (AssignmentF ast grammar)
+data Assignment ast grammar a where
+  Return :: a -> Assignment ast grammar a
+  Then :: Assignment ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
+  End :: HasCallStack => Assignment ast grammar ()
+  Location :: HasCallStack => Assignment ast grammar (Record Location)
+  CurrentNode :: HasCallStack => Assignment ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+  Source :: HasCallStack => Assignment ast grammar ByteString
+  Children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
+  Advance :: HasCallStack => Assignment ast grammar ()
+  Choose :: HasCallStack => [grammar] -> IntMap.IntMap (Assignment ast grammar a) -> Assignment ast grammar a
+  Many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
+  Alt :: HasCallStack => [Assignment ast grammar a] -> Assignment ast grammar a
+  Throw :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
+  Catch :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
+  Label :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
 
-data AssignmentF ast grammar a where
-  End :: HasCallStack => AssignmentF ast grammar ()
-  Location :: HasCallStack => AssignmentF ast grammar (Record Location)
-  CurrentNode :: HasCallStack => AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
-  Source :: HasCallStack => AssignmentF ast grammar ByteString
-  Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
-  Advance :: HasCallStack => AssignmentF ast grammar ()
-  Choose :: HasCallStack => [grammar] -> IntMap.IntMap (Assignment ast grammar a) -> AssignmentF ast grammar a
-  Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
-  Alt :: HasCallStack => [Assignment ast grammar a] -> AssignmentF ast grammar a
-  Throw :: HasCallStack => Error (Either String grammar) -> AssignmentF ast grammar a
-  Catch :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
-  Label :: HasCallStack => Assignment ast grammar a -> String -> AssignmentF ast grammar a
+infixl 1 `Then`
 
 -- | Zero-width production of the current location.
 --
@@ -241,7 +242,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: AssignmentF ast grammar x
+        run :: Assignment ast grammar x
             -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
@@ -259,6 +260,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
+                  Return a -> yield a state
+                  Then step continue -> go step state >>= uncurry go . first continue >>= uncurry yield
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
@@ -306,7 +309,34 @@ makeState :: [AST ast grammar] -> State ast grammar
 makeState = State 0 (Info.Pos 1 1)
 
 
+iterFreer :: (forall x. Assignment ast grammar x -> (x -> a) -> a) -> Assignment ast grammar a -> a
+iterFreer algebra = go
+  where go (Return result) = result
+        go (Then action continue) = algebra action (go . continue)
+        go other = algebra other id
+        {-# INLINE go #-}
+{-# INLINE iterFreer #-}
+
+
 -- Instances
+
+instance Functor (Assignment ast grammar) where
+  fmap f = go
+    where go (Return result) = Return (f result)
+          go (Then step yield) = Then step (go . yield)
+          go other = Then other (return . f)
+
+instance Applicative (Assignment ast grammar) where
+  pure = Return
+  Return f <*> a = fmap f a
+  Then action yield <*> a = Then action ((<*> a) . yield)
+  action <*> a = Then action (<$> a)
+
+instance Monad (Assignment ast grammar) where
+  return = pure
+  Return a >>= f = f a
+  Then action yield >>= f = Then action (f <=< yield)
+  other >>= f = Then other f
 
 instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
@@ -375,8 +405,10 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = Catch during handler `Then` return
 
-instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
+instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (Assignment ast grammar) where
   liftShowsPrec sp sl d a = case a of
+    Return a -> showsUnaryWith sp "Return" d a
+    Then step yield -> showsBinaryWith (liftShowsPrec ((. yield) . liftShowsPrec sp sl) (liftShowList sp sl . fmap yield)) (const showString) "Then" d step "_"
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
@@ -389,3 +421,6 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
+
+instance (Show grammar, Show (ast (AST ast grammar)), Show result) => Show (Assignment ast grammar result) where
+  showsPrec = showsPrec1
