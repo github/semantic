@@ -417,8 +417,8 @@ term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> som
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack
-         => Assignment
-         -> Assignment
-         -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Union Syntax Term)]
-         -> Assignment.Assignment (AST Grammar) Grammar (Union Syntax Term)
+          => Assignment
+          -> Assignment
+          -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment (AST Grammar) Grammar (Union Syntax Term)
 infixTerm = infixContext comment
