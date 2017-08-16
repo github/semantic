@@ -212,7 +212,7 @@ nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (Either String grammar)
-nodeError expected (Node actual _ span) = Error span expected (Just (Right actual))
+nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 
 firstSet :: Assignment ast grammar a -> [grammar]
