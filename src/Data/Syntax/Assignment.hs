@@ -124,7 +124,7 @@ import TreeSitter.Language
 --
 --   This is essentially a parser.
 data Assignment ast grammar a where
-  Return :: a -> Assignment ast grammar a
+  Pure :: a -> Assignment ast grammar a
   Then :: Assignment ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
   End :: HasCallStack => Assignment ast grammar ()
   Location :: HasCallStack => Assignment ast grammar (Record Location)
@@ -260,7 +260,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
-                  Return a -> yield a state
+                  Pure a -> yield a state
                   Then step continue -> go step state >>= uncurry go . first continue >>= uncurry yield
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
@@ -311,7 +311,7 @@ makeState = State 0 (Info.Pos 1 1)
 
 iterFreer :: (forall x. Assignment ast grammar x -> (x -> a) -> a) -> Assignment ast grammar a -> a
 iterFreer algebra = go
-  where go (Return result) = result
+  where go (Pure result) = result
         go (Then action continue) = algebra action (go . continue)
         go other = algebra other id
         {-# INLINE go #-}
@@ -322,19 +322,19 @@ iterFreer algebra = go
 
 instance Functor (Assignment ast grammar) where
   fmap f = go
-    where go (Return result) = Return (f result)
+    where go (Pure result) = Pure (f result)
           go (Then step yield) = Then step (go . yield)
           go other = Then other (return . f)
 
 instance Applicative (Assignment ast grammar) where
-  pure = Return
-  Return f <*> a = fmap f a
+  pure = Pure
+  Pure f <*> a = fmap f a
   Then action yield <*> a = Then action ((<*> a) . yield)
   action <*> a = Then action (<$> a)
 
 instance Monad (Assignment ast grammar) where
   return = pure
-  Return a >>= f = f a
+  Pure a >>= f = f a
   Then action yield >>= f = Then action (f <=< yield)
   other >>= f = Then other f
 
@@ -343,7 +343,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   empty = Alt [] `Then` return
 
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
-  Return a <|> _ = Return a
+  Pure a <|> _ = Pure a
   (Alt [] `Then` _) <|> r = r
   l <|> (Alt [] `Then` _) = l
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
@@ -407,7 +407,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
 
 instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (Assignment ast grammar) where
   liftShowsPrec sp sl d a = case a of
-    Return a -> showsUnaryWith sp "Return" d a
+    Pure a -> showsUnaryWith sp "Pure" d a
     Then step yield -> showsBinaryWith (liftShowsPrec ((. yield) . liftShowsPrec sp sl) (liftShowList sp sl . fmap yield)) (const showString) "Then" d step "_"
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
