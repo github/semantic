@@ -39,7 +39,7 @@ import TreeSitter.JSON
 -- | A parser from 'Source' onto some term type.
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
-  ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
+  ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq (ast (Cofree ast (Node grammar))), Apply1 Foldable fs, Apply1 Functor fs, Foldable ast)
                    => Parser (Cofree ast (Node grammar))                         -- ^ A parser producing AST.

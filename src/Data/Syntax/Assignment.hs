@@ -204,7 +204,7 @@ toIndex = index (minBound, maxBound)
 type Location = '[Info.Range, Info.Span]
 
 -- | An AST node labelled with symbols and source location.
-type AST grammar = Cofree [] (Node grammar)
+type AST f grammar = Cofree f (Node grammar)
 
 data Node grammar = Node
   { nodeSymbol :: !grammar

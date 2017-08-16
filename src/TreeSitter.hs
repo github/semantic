@@ -48,7 +48,7 @@ treeSitterParser language blob = bracket TS.ts_document_new TS.ts_document_free 
 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
-parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Blob -> IO (A.AST grammar)
+parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Blob -> IO (A.AST [] grammar)
 parseToAST language Blob{..} = bracket TS.ts_document_new TS.ts_document_free $ \ document -> do
   TS.ts_document_set_language document language
   root <- unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
@@ -60,7 +60,7 @@ parseToAST language Blob{..} = bracket TS.ts_document_new TS.ts_document_free $ 
 
   anaM toAST root
 
-toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (A.AST grammar) TS.Node)
+toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (A.AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
