@@ -185,6 +185,7 @@ while predicate step = many $ do
 until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 until = while . (not .)
 
+-- | Match the first operand until the second operand matches, returning both results. Like 'manyTill', but returning the terminal value.
 manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
 manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
