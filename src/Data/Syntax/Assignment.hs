@@ -131,7 +131,6 @@ type Assignment ast grammar = Freer (AssignmentF ast grammar)
 data AssignmentF ast grammar a where
   Get :: AssignmentF ast grammar (State ast grammar)
   Put :: State ast grammar -> AssignmentF ast grammar ()
-  End :: HasCallStack => AssignmentF ast grammar ()
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
@@ -265,7 +264,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                 anywhere node = case assignment of
                   Get -> yield state state
                   Put s -> yield () s
-                  End -> requireExhaustive ((), state) >>= uncurry yield
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt as -> sconcat (flip yield state <$> as)
                   Throw e -> Left (fromMaybe (makeError node) e)
@@ -352,7 +350,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Eq grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Symbol grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -363,7 +361,9 @@ instance (Eq grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST a
   unexpected s = location >>= \ loc -> throwError (Error (Info.sourceSpan loc) [] (Just (Left s)))
 
   eof :: HasCallStack => Assignment ast grammar ()
-  eof = withFrozenCallStack $ End `Then` return
+  eof = do
+    state <- get
+    guard (not (null (stateNodes (skipTokens state))))
 
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
   notFollowedBy a = a *> unexpected (show a) <|> pure ()
@@ -383,7 +383,6 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
   liftShowsPrec sp sl d a = case a of
     Get -> showString "Get"
     Put s -> showsUnaryWith showsPrec "Put" d s
-    End -> showString "End" . showChar ' ' . sp d ()
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
