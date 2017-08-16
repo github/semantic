@@ -318,6 +318,7 @@ instance Eq grammar => Alternative (Assignment ast grammar) where
   (Throw Nothing `Then` _) <|> r = r
   l <|> (Throw Nothing `Then` _) = l
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
+  (Get `Then` continueL) <|> (Get `Then` continueR) = Get `Then` uncurry (<|>) . (continueL &&& continueR)
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
   (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
