@@ -97,6 +97,7 @@ module Data.Syntax.Assignment
 import Control.Arrow ((&&&))
 import Control.Applicative
 import Control.Comonad.Cofree
+import Control.Comonad.Trans.Cofree (CofreeF, headF)
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
@@ -107,7 +108,6 @@ import Data.Error
 import Data.Foldable
 import Data.Function
 import Data.Functor.Classes
-import qualified Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (Ix(..))
 import Data.List (union)
@@ -119,6 +119,7 @@ import qualified Data.Source as Source (Source, slice, sourceBytes)
 import GHC.Stack
 import qualified Info
 import Prelude hiding (until)
+import Term (runCofree)
 import Text.Parser.Combinators as Parsers
 import TreeSitter.Language
 
@@ -128,8 +129,8 @@ import TreeSitter.Language
 type Assignment ast grammar = Freer (AssignmentF ast grammar)
 
 data AssignmentF ast grammar a where
-  Get :: AssignmentF ast grammar (State ast)
-  Put :: State ast -> AssignmentF ast grammar ()
+  Get :: AssignmentF ast grammar (State ast grammar)
+  Put :: State ast grammar -> AssignmentF ast grammar ()
   End :: HasCallStack => AssignmentF ast grammar ()
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
   Source :: HasCallStack => AssignmentF ast grammar ByteString
@@ -149,11 +150,11 @@ location :: HasCallStack => Assignment ast grammar (Record Location)
 location = withFrozenCallStack $ Location `Then` return
 
 -- | Zero-width production of the current node.
-currentNode :: (Eq grammar, Functor (F.Base ast), HasCallStack) => Assignment ast grammar (F.Base ast ())
+currentNode :: (Eq grammar, Functor ast, HasCallStack) => Assignment ast grammar (CofreeF ast (Node grammar) ())
 currentNode = do
   State{..} <- get
   guard (not (null stateNodes))
-  pure (() <$ head stateNodes)
+  pure (() <$ runCofree (head stateNodes))
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
@@ -225,41 +226,39 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (F.Base ast ast), F.Recursive ast, Foldable (F.Base ast))
-         => (F.Base ast () -> Node grammar) -- ^ A function to project a 'Node' from the ast.
-         -> Source.Source                   -- ^ The source for the parse tree.
-         -> Assignment ast grammar a        -- ^ The 'Assignment to run.
-         -> ast                             -- ^ The root of the ast.
-         -> Either (Error String) a         -- ^ 'Either' an 'Error' or an assigned value.
-assignBy toNode source assignment ast = bimap (fmap (either id show)) fst (runAssignment toNode source assignment (makeState [ast]))
+assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (Cofree ast (Node grammar))), Foldable ast)
+         => Source.Source             -- ^ The source for the parse tree.
+         -> Assignment ast grammar a  -- ^ The 'Assignment to run.
+         -> Cofree ast (Node grammar) -- ^ The root of the ast.
+         -> Either (Error String) a   -- ^ 'Either' an 'Error' or an assigned value.
+assignBy source assignment ast = bimap (fmap (either id show)) fst (runAssignment source assignment (makeState [ast]))
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (F.Base ast ast), F.Recursive ast, Foldable (F.Base ast))
-              => (F.Base ast () -> Node grammar)                       -- ^ A function to project a 'Node' from the ast.
-              -> Source.Source                                         -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                              -- ^ The 'Assignment' to run.
-              -> State ast                                             -- ^ The current state.
-              -> Either (Error (Either String grammar)) (a, State ast) -- ^ 'Either' an 'Error' or an assigned value & updated state.
-runAssignment toNode source = \ assignment state -> go assignment state >>= requireExhaustive
-  -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar result -> State ast -> Either (Error (Either String grammar)) (result, State ast)
+runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (ast (Cofree ast (Node grammar))), Foldable ast)
+              => Source.Source                                                 -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
+              -> State ast grammar                                             -- ^ The current state.
+              -> Either (Error (Either String grammar)) (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
+runAssignment source = \ assignment state -> go assignment state >>= requireExhaustive
+  -- Note: We explicitly bind source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
+  where go :: Assignment ast grammar result -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
         run :: AssignmentF ast grammar x
-            -> (x -> State ast -> Either (Error (Either String grammar)) (result, State ast))
-            -> State ast
-            -> Either (Error (Either String grammar)) (result, State ast)
+            -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
+            -> State ast grammar
+            -> Either (Error (Either String grammar)) (result, State ast grammar)
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
-          where atNode node = case assignment of
-                  Location -> yield (nodeLocation (toNode (() <$ node))) state
-                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (() <$ node))) source)) (advance state)
+          where atNode (node :< f) = case assignment of
+                  Location -> yield (nodeLocation node) state
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advance state)
                   Children child -> do
-                    (a, state') <- go child state { stateNodes = F.project <$> toList node } >>= requireExhaustive
+                    (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
                   Advance -> yield () (advance state)
-                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode (() <$ node)))) choices -> yield choice state
+                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
@@ -280,34 +279,33 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
-                makeError :: HasCallStack => Maybe (F.Base ast ast) -> Error (Either String grammar)
-                makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols) . toNode . fmap (const ()))
+                makeError :: HasCallStack => Maybe (Node grammar) -> Error (Either String grammar)
+                makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
-        requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error (Either String grammar)) (result, State ast)
+        requireExhaustive :: HasCallStack => (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
         requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
           [] -> Right (a, state')
-          node : _ -> Left (nodeError [] (toNode (() <$ node)))
+          node : _ -> Left (nodeError [] (headF (runCofree node)))
 
-        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . fmap (const ())) (stateNodes state) }
+        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
-          | node : rest <- stateNodes
-          , Node{..} <- toNode (() <$ node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
+          | (Node{..} :< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
-data State ast = State
-  { stateOffset :: {-# UNPACK #-} !Int   -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateNodes :: ![F.Base ast ast]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+data State ast grammar = State
+  { stateOffset :: {-# UNPACK #-} !Int         -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: {-# UNPACK #-} !Info.Pos       -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateNodes :: ![Cofree ast (Node grammar)] -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
 
-deriving instance (Eq (F.Base ast ast)) => Eq (State ast)
-deriving instance (Show (F.Base ast ast)) => Show (State ast)
+deriving instance (Eq grammar, Eq (ast (Cofree ast (Node grammar)))) => Eq (State ast grammar)
+deriving instance (Show grammar, Show (ast (Cofree ast (Node grammar)))) => Show (State ast grammar)
 
-makeState :: F.Recursive ast => [ast] -> State ast
-makeState = State 0 (Info.Pos 1 1) . fmap F.project
+makeState :: [Cofree ast (Node grammar)] -> State ast grammar
+makeState = State 0 (Info.Pos 1 1)
 
 
 -- Instances
@@ -353,7 +351,7 @@ instance Eq grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Eq grammar, Show grammar, Show (F.Base ast ast)) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Show grammar, Show (ast (Cofree ast (Node grammar)))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -376,11 +374,11 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = Catch during handler `Then` return
 
-instance MonadState (State ast) (Assignment ast grammar) where
+instance MonadState (State ast grammar) (Assignment ast grammar) where
   get = Get `Then` return
   put s = Put s `Then` return
 
-instance (Show grammar, Show (F.Base ast ast)) => Show1 (AssignmentF ast grammar) where
+instance (Show grammar, Show (ast (Cofree ast (Node grammar)))) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Get -> showString "Get"
     Put s -> showsUnaryWith showsPrec "Put" d s

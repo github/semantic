@@ -193,11 +193,11 @@ runParser Options{..} blob@Blob{..} = go
           ASTParser language ->
             logTiming "ts ast parse" $
               liftIO $ (Right <$> parseToAST language blob) `catchError` (pure . Left. displayException)
-          AssignmentParser parser by assignment -> do
+          AssignmentParser parser assignment -> do
             res <- go parser
             case res of
               Left err -> writeLog Error "failed parsing" blobFields >> pure (Left err)
-              Right ast -> logTiming "assign" $ case Assignment.assignBy by blobSource assignment ast of
+              Right ast -> logTiming "assign" $ case Assignment.assignBy blobSource assignment ast of
                 Left err -> do
                   let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
                   writeLog Error formatted blobFields
