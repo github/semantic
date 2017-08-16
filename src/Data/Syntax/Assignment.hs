@@ -126,6 +126,7 @@ import TreeSitter.Language
 data Assignment ast grammar a where
   Pure :: a -> Assignment ast grammar a
   Map :: (b -> a) -> Assignment ast grammar b -> Assignment ast grammar a
+  Seq :: (c -> b -> a) -> Assignment ast grammar c -> Assignment ast grammar b -> Assignment ast grammar a
   Then :: Assignment ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
   End :: HasCallStack => Assignment ast grammar ()
   Location :: HasCallStack => Assignment ast grammar (Record Location)
@@ -263,6 +264,10 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                 anywhere node = case assignment of
                   Pure a -> yield a state
                   Map f a -> first f <$> go a state >>= uncurry yield
+                  Seq f a b -> do
+                    (a', state') <- go a state
+                    (b', state'') <- go b state'
+                    yield (f a' b') state''
                   Then step continue -> go step state >>= uncurry go . first continue >>= uncurry yield
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
@@ -325,14 +330,16 @@ iterFreer algebra = go
 instance Functor (Assignment ast grammar) where
   fmap f = go
     where go (Pure result) = Pure (f result)
-          go (Then step yield) = Then step (go . yield)
           go (Map g action) = Map (f . g) action
+          go (Seq g step1 step2) = Seq ((f .) . g) step1 step2
+          go (Then step yield) = Then step (go . yield)
           go action = Map f action
 
 instance Applicative (Assignment ast grammar) where
   pure = Pure
   Pure f <*> a = fmap f a
-  Map f a <*> b = Then a ((<$> b) . f)
+  Map f a <*> b = Seq f a b
+  Seq f a b <*> c = Seq (uncurry . f) a ((,) <$> b <*> c)
   Then action yield <*> a = Then action ((<*> a) . yield)
   action <*> a = Then action (<$> a)
 
@@ -340,6 +347,7 @@ instance Monad (Assignment ast grammar) where
   return = pure
   Pure a >>= f = f a
   Map f a >>= g = a >>= (g . f)
+  Seq f a b >>= g = Then a (g <=< flip fmap b . f)
   Then action yield >>= f = Then action (f <=< yield)
   other >>= f = Then other f
 
@@ -414,6 +422,7 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (Assignment ast g
   liftShowsPrec sp sl d a = case a of
     Pure a -> showsUnaryWith sp "Pure" d a
     Map f action -> showsBinaryWith (const showString) (liftShowsPrec ((. f) . sp) (sl . fmap f)) "Map" d "_" action
+    Seq f a b -> liftShowsPrec sp sl d (Then a (flip fmap b . f))
     Then step yield -> showsBinaryWith (liftShowsPrec ((. yield) . liftShowsPrec sp sl) (liftShowList sp sl . fmap yield)) (const showString) "Then" d step "_"
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
