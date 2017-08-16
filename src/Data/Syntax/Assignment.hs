@@ -76,7 +76,6 @@ module Data.Syntax.Assignment
 , children
 , advance
 , token
-, infixChoice
 , while
 , until
 , manyThrough
@@ -163,14 +162,13 @@ source = withFrozenCallStack $ Source `Then` return
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
+-- | Advance past the current node.
 advance :: HasCallStack => Assignment ast grammar ()
 advance = withFrozenCallStack $ Advance `Then` return
 
+-- | Match and advance past a node with the given symbol.
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 token s = symbol s <* advance
-
-infixChoice :: (Alternative m, HasCallStack) => m a -> m b -> [m (a -> b -> c)] -> m c
-infixChoice left right operators = (&) <$> left <*> choice operators <*> right
 
 
 -- | Collect a list of values passing a predicate.
@@ -184,6 +182,7 @@ while predicate step = many $ do
 until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 until = while . (not .)
 
+-- | Match the first operand until the second operand matches, returning both results. Like 'manyTill', but returning the terminal value.
 manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
 manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go

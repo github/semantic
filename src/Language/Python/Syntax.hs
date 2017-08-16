@@ -470,15 +470,19 @@ ifClause = symbol IfClause *> children expressions
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (flip Statement.If <$> expression <*> expression <*> expressions)
 
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
 term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
+-- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
 chainl1Term :: Assignment -> Assignment.Assignment [] Grammar (Term -> Term -> Term) -> Assignment
 chainl1Term expr op = postContextualize (comment <|> symbol AnonLambda *> empty) expr `chainl1` op
 
+-- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
 
+-- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack
           => Assignment
           -> Assignment
