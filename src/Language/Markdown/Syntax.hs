@@ -68,16 +68,16 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = (:<) <$> symbol List <*> (project (\ (Node (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) _ _ Term.:< _) -> case listType of
+list = (:<) <$> symbol List <*> ((\ (Node (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) _ _ Term.:< _) -> case listType of
   CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
-  CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) <*> children (many item))
+  CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) <$> project <*> children (many item))
 
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 section :: Assignment
 section = makeTerm <$> symbol Heading <*> (heading >>= \ headingTerm -> Markup.Section (level headingTerm) headingTerm <$> while (((<) `on` level) headingTerm) blockElement)
-  where heading = makeTerm <$> symbol Heading <*> (project (\ (Node (CMarkGFM.HEADING level) _ _ Term.:< _) -> Markup.Heading level) <*> children (many inlineElement))
+  where heading = makeTerm <$> symbol Heading <*> ((\ (Node (CMarkGFM.HEADING level) _ _ Term.:< _) -> Markup.Heading level) <$> project <*> children (many inlineElement))
         level term = case term of
           _ | Just section <- prj (unwrap term) -> level (Markup.sectionHeading section)
           _ | Just heading <- prj (unwrap term) -> Markup.headingLevel heading
@@ -87,7 +87,7 @@ blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> (project (\ (Node (CMarkGFM.CODE_BLOCK language _) _ _ Term.:< _) -> Markup.Code (nullText language)) <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> ((\ (Node (CMarkGFM.CODE_BLOCK language _) _ _ Term.:< _) -> Markup.Code (nullText language)) <$> project <*> source)
 
 thematicBreak :: Assignment
 thematicBreak = makeTerm <$> token ThematicBreak <*> pure Markup.ThematicBreak
@@ -125,10 +125,10 @@ htmlInline :: Assignment
 htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
 
 link :: Assignment
-link = makeTerm <$> symbol Link <*> project (\ (Node (CMarkGFM.LINK url title) _ _ Term.:< _) -> Markup.Link (encodeUtf8 url) (nullText title)) <* source
+link = makeTerm <$> symbol Link <*> ((\ (Node (CMarkGFM.LINK url title) _ _ Term.:< _) -> Markup.Link (encodeUtf8 url) (nullText title)) <$> project) <* advance
 
 image :: Assignment
-image = makeTerm <$> symbol Image <*> project (\ (Node (CMarkGFM.IMAGE url title) _ _ Term.:< _) -> Markup.Image (encodeUtf8 url) (nullText title)) <* source
+image = makeTerm <$> symbol Image <*> ((\ (Node (CMarkGFM.IMAGE url title) _ _ Term.:< _) -> Markup.Image (encodeUtf8 url) (nullText title)) <$> project) <* advance
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
