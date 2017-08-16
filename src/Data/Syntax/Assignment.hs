@@ -135,7 +135,7 @@ data AssignmentF ast grammar a where
   Advance :: HasCallStack => AssignmentF ast grammar ()
   Choose :: HasCallStack => [grammar] -> IntMap.IntMap (Assignment ast grammar a) -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
-  Alt :: HasCallStack => [a] -> AssignmentF ast grammar a
+  Alt :: HasCallStack => [Assignment ast grammar a] -> AssignmentF ast grammar a
   Throw :: HasCallStack => Error (Either String grammar) -> AssignmentF ast grammar a
   Catch :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
   Label :: HasCallStack => Assignment ast grammar a -> String -> AssignmentF ast grammar a
@@ -263,7 +263,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt [] -> Left (makeError node)
-                  Alt (a:as) -> sconcat (flip yield state <$> a:|as)
+                  Alt (a:as) -> sconcat (flip go state <$> a:|as) >>= uncurry yield
                   Throw e -> Left e
                   Catch during _ -> go during state >>= uncurry yield
                   Choose{} -> Left (makeError node)
@@ -323,12 +323,12 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   (Advance `Then` continueL) <|> (Advance `Then` continueR) = Advance `Then` uncurry (<|>) . (continueL &&& continueR)
   (End `Then` continueL) <|> (End `Then` continueR) = End `Then` uncurry (<|>) . (continueL &&& continueR)
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
-  (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
-  (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
-  l <|> (Alt rs `Then` continueR) = Alt (l : (continueR <$> rs)) `Then` id
+  (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt (((>>= continueL) <$> ls) <> ((>>= continueR) <$> rs)) `Then` return
+  (Alt ls `Then` continueL) <|> r = Alt (((>>= continueL) <$> ls) <> pure r) `Then` return
+  l <|> (Alt rs `Then` continueR) = Alt (l : ((>>= continueR) <$> rs)) `Then` return
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
             withBestCallStack (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) `Then` return)
-          | otherwise = withBestCallStack (Alt [l, r] `Then` id)
+          | otherwise = withBestCallStack (Alt [l, r] `Then` return)
     where choices :: Assignment ast grammar a -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar a))
           choices (Choose symbols choices `Then` continue) = Just (symbols, (>>= continue) <$> choices)
           choices (Many rule `Then` continue) = second ((Many rule `Then` continue) <$) <$> choices rule
@@ -385,7 +385,7 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList (liftShowsPrec sp sl) (liftShowList sp sl))) "Choose" d symbols (IntMap.toList choices)
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
-    Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
+    Alt as -> showsUnaryWith (const (liftShowList sp sl)) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
