@@ -133,6 +133,7 @@ data AssignmentF ast grammar a where
   Put :: State ast grammar -> AssignmentF ast grammar ()
   End :: HasCallStack => AssignmentF ast grammar ()
   Location :: HasCallStack => AssignmentF ast grammar (Record Location)
+  CurrentNode :: HasCallStack => AssignmentF ast grammar (CofreeF ast (Node grammar) ())
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: HasCallStack => AssignmentF ast grammar ()
@@ -150,11 +151,8 @@ location :: HasCallStack => Assignment ast grammar (Record Location)
 location = withFrozenCallStack $ Location `Then` return
 
 -- | Zero-width production of the current node.
-currentNode :: (Eq grammar, Eq (ast (AST ast grammar)), Functor ast, HasCallStack) => Assignment ast grammar (CofreeF ast (Node grammar) ())
-currentNode = do
-  State{..} <- get
-  guard (not (null stateNodes))
-  pure (() <$ runCofree (head stateNodes))
+currentNode :: HasCallStack => Assignment ast grammar (CofreeF ast (Node grammar) ())
+currentNode = CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
@@ -251,9 +249,10 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
-          where atNode (node :< f) = case assignment of
-                  Location -> yield (nodeLocation node) state
-                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
+          where atNode node = case assignment of
+                  Location -> yield (nodeLocation (toNode (() <$ node))) state
+                  CurrentNode -> yield (() <$ node) state
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (() <$ node))) source)) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
                     yield a (advanceState state' { stateNodes = stateNodes })
@@ -272,6 +271,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Throw e -> Left (fromMaybe (makeError node) e)
                   Catch during _ -> go during state >>= uncurry yield
                   Choose{} -> Left (makeError node)
+                  CurrentNode{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
                   Source -> Left (makeError node)
                   Advance{} -> Left (makeError node)
@@ -389,6 +389,7 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
+    CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
     Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
