@@ -255,11 +255,11 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> Either (Error (Either String grammar)) (result, State ast grammar)
         run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (node :< f) = case assignment of
-                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advance state)
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
-                    yield a (advance state' { stateNodes = stateNodes })
-                  Advance -> yield () (advance state)
+                    yield a (advanceState state' { stateNodes = stateNodes })
+                  Advance -> yield () (advanceState state)
                   Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
@@ -290,10 +290,11 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 
         dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
 
-        -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
-        advance state@State{..}
-          | (Node{..} :< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
-          | otherwise = state
+-- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
+advanceState :: State ast grammar -> State ast grammar
+advanceState state@State{..}
+  | (Node{..} :< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
+  | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
