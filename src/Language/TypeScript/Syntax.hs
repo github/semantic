@@ -136,7 +136,7 @@ data Intersection a = Intersection { intersectionLeft :: !a, intersectionRight :
 instance Eq1 Intersection where liftEq = genericLiftEq
 instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
 
-data Function a = Function { functionTypeParameters :: !a, functionFormalParameters :: !a, functionType :: !a }
+data Function a = Function { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Function where liftEq = genericLiftEq
@@ -148,7 +148,7 @@ data Tuple a = Tuple { tupleElements :: ![a] }
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
-data Constructor a = Constructor { constructorTypeParameters :: !a, constructorFormalParameters :: !a, constructorType :: !a }
+data Constructor a = Constructor { constructorTypeParameters :: !a, constructorFormalParameters :: ![a], constructorType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Language.TypeScript.Syntax.Constructor where liftEq = genericLiftEq
@@ -401,6 +401,16 @@ callSignatureParts =  symbol Grammar.CallSignature *> children ((,,) <$> (fromMa
 callSignature :: Assignment
 callSignature =  makeTerm <$> symbol Grammar.CallSignature <*> children (Language.TypeScript.Syntax.CallSignature <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional typeAnnotation'))
 
+constructSignature :: Assignment
+constructSignature = makeTerm <$> symbol Grammar.ConstructSignature <*> children (Language.TypeScript.Syntax.ConstructSignature <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional typeAnnotation'))
+
+indexSignature :: Assignment
+indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (Language.TypeScript.Syntax.IndexSignature <$> (identifier <|> typeAnnotation'))
+
+methodSignature :: Assignment
+methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> propertyName <*> callSignatureParts)
+  where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Language.TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
+
 formalParameters :: HasCallStack => Assignment.Assignment (AST Grammar) Grammar [Term]
 formalParameters = symbol FormalParameters *> children (many parameter)
 
@@ -476,13 +486,13 @@ intersectionType :: Assignment
 intersectionType = makeTerm <$> symbol IntersectionType <*> children (Language.TypeScript.Syntax.Intersection <$> ty <*> ty)
 
 functionTy :: Assignment
-functionTy = makeTerm <$> symbol FunctionType <*> children (Language.TypeScript.Syntax.Function <$> optional typeParameters <*> formalParameters <*> ty)
+functionTy = makeTerm <$> symbol FunctionType <*> children (Language.TypeScript.Syntax.Function <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
 
 tupleType :: Assignment
 tupleType = makeTerm <$> symbol TupleType <*> children (Language.TypeScript.Syntax.Tuple <$> many ty)
 
 constructorTy :: Assignment
-constructorTy = makeTerm <$> symbol ConstructorType <*> children (Language.TypeScript.Syntax.Constructor <$> optional typeParameters <*> formalParameters <*> ty)
+constructorTy = makeTerm <$> symbol ConstructorType <*> children (Language.TypeScript.Syntax.Constructor <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
 
 statements :: Assignment
 statements = makeTerm <$> location <*> many statement
