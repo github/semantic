@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and Span). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -118,7 +118,7 @@ import Data.Semigroup
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import GHC.Stack
 import qualified Info
-import Prelude hiding (head, until)
+import Prelude hiding (until)
 import Text.Parser.Combinators as Parsers
 import TreeSitter.Language
 
@@ -223,7 +223,7 @@ firstSet = iterFreer (\ assignment _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
+assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (F.Base ast ast), F.Recursive ast, Foldable (F.Base ast))
          => (F.Base ast () -> Node grammar) -- ^ A function to project a 'Node' from the ast.
          -> Source.Source                   -- ^ The source for the parse tree.
          -> Assignment ast grammar a        -- ^ The 'Assignment to run.
@@ -233,7 +233,7 @@ assignBy toNode source assignment ast = bimap (fmap (either id show)) fst (runAs
 {-# INLINE assignBy #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
+runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (F.Base ast ast), F.Recursive ast, Foldable (F.Base ast))
               => (F.Base ast () -> Node grammar)                       -- ^ A function to project a 'Node' from the ast.
               -> Source.Source                                         -- ^ The source for the parse tree.
               -> Assignment ast grammar a                              -- ^ The 'Assignment' to run.
@@ -249,13 +249,13 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
             -> (x -> State ast -> Either (Error (Either String grammar)) (result, State ast))
             -> State ast
             -> Either (Error (Either String grammar)) (result, State ast)
-        run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
+        run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode node = case assignment of
                   Location -> yield (nodeLocation (toNode (() <$ node))) state
                   CurrentNode -> yield (() <$ node) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode (() <$ node))) source)) (advance state)
                   Children child -> do
-                    (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
+                    (a, state') <- go child state { stateNodes = F.project <$> toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
                   Advance -> yield () (advance state)
                   Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode (() <$ node)))) choices -> yield choice state
@@ -286,26 +286,28 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
         requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error (Either String grammar)) (result, State ast)
         requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
           [] -> Right (a, state')
-          node : _ -> Left (nodeError [] (toNode (() <$ F.project node)))
+          node : _ -> Left (nodeError [] (toNode (() <$ node)))
 
-        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . fmap (const ()) . F.project) (stateNodes state) }
+        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . fmap (const ())) (stateNodes state) }
 
         -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
         advance state@State{..}
           | node : rest <- stateNodes
-          , Node{..} <- toNode (() <$ F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
+          , Node{..} <- toNode (() <$ node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
           | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data State ast = State
   { stateOffset :: {-# UNPACK #-} !Int   -- ^ The offset into the Source thus far reached, measured in bytes.
   , statePos :: {-# UNPACK #-} !Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateNodes :: ![ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  , stateNodes :: ![F.Base ast ast]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
-  deriving (Eq, Show)
 
-makeState :: [ast] -> State ast
-makeState = State 0 (Info.Pos 1 1)
+deriving instance (Eq (F.Base ast ast)) => Eq (State ast)
+deriving instance (Show (F.Base ast ast)) => Show (State ast)
+
+makeState :: F.Recursive ast => [ast] -> State ast
+makeState = State 0 (Info.Pos 1 1) . fmap F.project
 
 
 -- Instances
@@ -351,7 +353,7 @@ instance Eq grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Eq grammar, Show grammar, Show ast) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Show grammar, Show (F.Base ast ast)) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -378,7 +380,7 @@ instance MonadState (State ast) (Assignment ast grammar) where
   get = Get `Then` return
   put s = Put s `Then` return
 
-instance (Show grammar, Show ast) => Show1 (AssignmentF ast grammar) where
+instance (Show grammar, Show (F.Base ast ast)) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     Get -> showString "Get"
     Put s -> showsUnaryWith showsPrec "Put" d s
