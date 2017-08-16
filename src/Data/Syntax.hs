@@ -47,9 +47,11 @@ makeTerm1' f = case toList f of
 emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
+-- | Catch assignment errors into an error term.
 handleError :: (HasCallStack, Error :< fs, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
+-- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< fs, Bounded grammar, Ix grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 parseError = makeTerm <$> Assignment.symbol maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] Nothing []) <* Assignment.source
 
