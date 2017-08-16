@@ -318,6 +318,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   (Throw err `Then` continue) <|> _ = Throw err `Then` continue
   (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
   (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
+  (CurrentNode `Then` continueL) <|> (CurrentNode `Then` continueR) = CurrentNode `Then` uncurry (<|>) . (continueL &&& continueR)
   (Advance `Then` continueL) <|> (Advance `Then` continueR) = Advance `Then` uncurry (<|>) . (continueL &&& continueR)
   (End `Then` continueL) <|> (End `Then` continueR) = End `Then` uncurry (<|>) . (continueL &&& continueR)
   (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
