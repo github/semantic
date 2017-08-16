@@ -339,6 +339,7 @@ instance Applicative (Assignment ast grammar) where
 instance Monad (Assignment ast grammar) where
   return = pure
   Pure a >>= f = f a
+  Map f a >>= g = a >>= (g . f)
   Then action yield >>= f = Then action (f <=< yield)
   other >>= f = Then other f
 
