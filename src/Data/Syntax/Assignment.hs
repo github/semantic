@@ -326,7 +326,8 @@ instance Functor (Assignment ast grammar) where
   fmap f = go
     where go (Pure result) = Pure (f result)
           go (Then step yield) = Then step (go . yield)
-          go other = Then other (return . f)
+          go (Map g action) = Map (f . g) action
+          go action = Map f action
 
 instance Applicative (Assignment ast grammar) where
   pure = Pure
