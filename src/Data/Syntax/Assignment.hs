@@ -264,8 +264,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
-                  End | Nothing <- node -> yield () state
-                      | otherwise -> Left (makeError node)
+                  End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt as -> sconcat (flip yield state <$> as)
