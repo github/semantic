@@ -2,8 +2,7 @@
 {+(Identifier)+}
 {+(Plus
     (Identifier)
-    (
-      (Identifier)))+}
+    (Identifier))+}
   (
     (Integer)
     (Integer)
@@ -19,5 +18,4 @@
     (Integer))-}
 {-(Plus
     (Identifier)
-    (
-      (Identifier)))-})
+    (Identifier))-})

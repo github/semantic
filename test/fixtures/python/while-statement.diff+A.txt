@@ -3,8 +3,8 @@
     (Identifier)
     (
       (NoOp
-        (Identifier))
+        (Empty))
       (Break
-        (Identifier))
+        (Empty))
       (Continue
-        (Identifier)))))+}
+        (Empty)))))+}

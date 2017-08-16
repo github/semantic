@@ -9,8 +9,8 @@ module Interpreter
 import Algorithm
 import Control.Comonad (extract)
 import Control.Comonad.Cofree (unwrap)
-import Control.Monad.Free (cutoff)
-import Control.Monad.Free.Freer hiding (cutoff)
+import Control.Monad.Free (cutoff, wrap)
+import Control.Monad.Free.Freer hiding (cutoff, wrap)
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.Functor.Classes (Eq1)

@@ -74,8 +74,11 @@ module Data.Syntax.Assignment
 , symbol
 , source
 , children
+, advance
+, token
 , while
 , until
+, manyThrough
 -- Results
 , Error(..)
 , errorCallStack
@@ -128,6 +131,7 @@ data AssignmentF ast grammar a where
   Project :: HasCallStack => (forall x. F.Base ast x -> a) -> AssignmentF ast grammar a
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
+  Advance :: HasCallStack => AssignmentF ast grammar ()
   Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
@@ -161,6 +165,14 @@ source = withFrozenCallStack $ Source `Then` return
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
 children forEach = withFrozenCallStack $ Children forEach `Then` return
 
+-- | Advance past the current node.
+advance :: HasCallStack => Assignment ast grammar ()
+advance = withFrozenCallStack $ Advance `Then` return
+
+-- | Match and advance past a node with the given symbol.
+token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+token s = symbol s <* advance
+
 
 -- | Collect a list of values passing a predicate.
 while :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
@@ -172,6 +184,11 @@ while predicate step = many $ do
 -- | Collect a list of values failing a predicate.
 until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
 until = while . (not .)
+
+-- | Match the first operand until the second operand matches, returning both results. Like 'manyTill', but returning the terminal value.
+manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
+manyThrough step stop = go
+  where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
 
 toIndex :: (Bounded grammar, Ix grammar) => grammar -> Int
@@ -240,6 +257,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
                     yield a (advance state' { stateNodes = stateNodes })
+                  Advance -> yield () (advance state)
                   Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode node))) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
@@ -255,6 +273,7 @@ runAssignment toNode source = \ assignment state -> go assignment state >>= requ
                   Project{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
                   Source -> Left (makeError node)
+                  Advance{} -> Left (makeError node)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
@@ -289,7 +308,7 @@ makeState = State 0 (Info.Pos 1 1)
 
 -- Instances
 
-instance Ix grammar => Alternative (Assignment ast grammar) where
+instance Eq grammar => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = Throw Nothing `Then` return
 
@@ -330,7 +349,7 @@ instance Ix grammar => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = Many a `Then` return
 
-instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Show grammar) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -344,7 +363,7 @@ instance (Ix grammar, Show grammar) => Parsing (Assignment ast grammar) where
   eof = withFrozenCallStack $ End `Then` return
 
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
-  notFollowedBy a = withFrozenCallStack $ a *> unexpected (show a) <|> pure ()
+  notFollowedBy a = a *> unexpected (show a) <|> pure ()
 
 instance MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
@@ -353,9 +372,10 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError during handler = Catch during handler `Then` return
 
-instance (Ix grammar, Show grammar) => Show1 (AssignmentF ast grammar) where
+instance Show grammar => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
+    Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
     Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
     Source -> showString "Source" . showChar ' ' . sp d ""
