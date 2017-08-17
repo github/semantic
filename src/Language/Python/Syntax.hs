@@ -106,67 +106,71 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError . term $
-      argument
-  <|> argumentList
-  <|> assertStatement
-  <|> assignment'
-  <|> await
-  <|> binaryOperator
-  <|> boolean
-  <|> booleanOperator
-  <|> breakStatement
-  <|> call
-  <|> classDefinition
-  <|> comparisonOperator
-  <|> comprehension
-  <|> concatenatedString
-  <|> conditionalExpression
-  <|> continueStatement
-  <|> decoratedDefinition
-  <|> deleteStatement
-  <|> dictionary
-  <|> dottedName
-  <|> ellipsis
-  <|> exceptClause
-  <|> execStatement
-  <|> expressionList
-  <|> expressionStatement
-  <|> finallyClause
-  <|> float
-  <|> forInClause
-  <|> forStatement
-  <|> functionDefinition
-  <|> globalStatement
-  <|> identifier
-  <|> ifClause
-  <|> ifStatement
-  <|> import'
-  <|> identifier
-  <|> integer
-  <|> list'
-  <|> memberAccess
-  <|> none
-  <|> nonlocalStatement
-  <|> notOperator
-  <|> pair
-  <|> parameter
-  <|> passStatement
-  <|> printStatement
-  <|> raiseStatement
-  <|> returnStatement
-  <|> set
-  <|> slice
-  <|> string
-  <|> subscript
-  <|> tryStatement
-  <|> tuple
-  <|> type'
-  <|> unaryOperator
-  <|> variables
-  <|> whileStatement
-  <|> withStatement
-  <|> yield
+expression = handleError (term everything)
+  where everything = abcd <|> efil <|> pstv
+        abcd = a <|> b <|> c <|> d
+        efil = e <|> f <|> i <|> l
+        pstv = p <|> s <|> t <|> v
+        a =   argument
+          <|> argumentList
+          <|> assertStatement
+          <|> assignment'
+          <|> await
+        b =   binaryOperator
+          <|> boolean
+          <|> booleanOperator
+          <|> breakStatement
+          <|> call
+          <|> classDefinition
+        c =   comparisonOperator
+          <|> comprehension
+          <|> concatenatedString
+          <|> conditionalExpression
+          <|> continueStatement
+        d =   decoratedDefinition
+          <|> deleteStatement
+          <|> dictionary
+          <|> dottedName
+        e =   ellipsis
+          <|> exceptClause
+          <|> execStatement
+          <|> expressionList
+          <|> expressionStatement
+        f =   finallyClause
+          <|> float
+          <|> forInClause
+          <|> forStatement
+          <|> functionDefinition
+          <|> globalStatement
+        i =   identifier
+          <|> ifClause
+          <|> ifStatement
+          <|> import'
+          <|> identifier
+          <|> integer
+        l =   list'
+          <|> memberAccess
+          <|> none
+          <|> nonlocalStatement
+          <|> notOperator
+        p =   pair
+          <|> parameter
+          <|> passStatement
+          <|> printStatement
+          <|> raiseStatement
+          <|> returnStatement
+        s =   set
+          <|> slice
+          <|> string
+          <|> subscript
+        t =   tryStatement
+          <|> tuple
+          <|> type'
+          <|> unaryOperator
+        v =   variables
+          <|> whileStatement
+          <|> withStatement
+          <|> yield
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
