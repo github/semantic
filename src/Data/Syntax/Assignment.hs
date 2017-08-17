@@ -260,8 +260,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
-                    (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
-                    yield a (advanceState state' { stateNodes = stateNodes })
+                    (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive
+                    yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
                   Advance -> yield () (advanceState state)
                   Choose _ choices _ | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
