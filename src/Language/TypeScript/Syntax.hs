@@ -652,11 +652,9 @@ block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> empt
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-if' :: Assignment
-if' =
-      ifElsif If
-  <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
-  where ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
+ifStatement :: Assignment
+ifStatement = ifElseif If
+  where ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> parenthesizedExpression <*> statement <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
 
 else' :: Assignment
 else' = makeTerm <$> symbol Else <*> children (many expression)
