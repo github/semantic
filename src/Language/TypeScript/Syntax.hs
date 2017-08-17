@@ -110,6 +110,8 @@ type Syntax = '[
   , Language.TypeScript.Syntax.Function
   , Language.TypeScript.Syntax.Tuple
   , Language.TypeScript.Syntax.Constructor
+  , Language.TypeScript.Syntax.TypeAssertion
+  , Language.TypeScript.Syntax.Cast
   , Type.Visibility
   , []
   ]
@@ -159,6 +161,18 @@ data TypeParameter a = TypeParameter { typeParameter :: !a, typeParameterConstra
 
 instance Eq1 TypeParameter where liftEq = genericLiftEq
 instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
+
+data TypeAssertion a = TypeAssertion { typeAssertionParameters :: !a, typeAssertionExpression :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypeAssertion where liftEq = genericLiftEq
+instance Show1 TypeAssertion where liftShowsPrec = genericLiftShowsPrec
+
+data Cast a =  Cast { castSubject :: !a, castType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Cast where liftEq = genericLiftEq
+instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
 data Annotation a = Annotation { typeAnnotation :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
