@@ -240,6 +240,12 @@ data Export a = Export { exportElements :: ![a] }
 instance Eq1 Export where liftEq = genericLiftEq
 instance Show1 Export where liftShowsPrec = genericLiftShowsPrec
 
+data Import a = Import { importElements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
 data ArrayType a = ArrayType { arrayType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
