@@ -592,6 +592,19 @@ statement =
   <|> emptyStatement
   <|> labeledStatement
 
+importStatement :: Assignment
+importStatement = makeTerm <$> Grammar.ImportStatement <*> children (Language.TypeScript.Syntax.Import <$> ((importClause <*> fromClause) <|> importRequireClause <|> string))
+
+debuggerStatement :: Assignment
+debuggerStatement = makeTerm <$> Grammar.DebuggerStatement <*> children (Language.TypeScript.Syntax.Debugger <$ source)
+
+expressionStatement' :: Assignment
+expressionStatement' = makeTerm <$> Grammar.ExpressionStatement <*> children (Language.TypeScript.Syntax.ExpressionStatement <$> (expression <|> sequenceExpression))
+
+declaration :: Assignment
+declaration = exportStatement <|> importAlias <|> function <|> internalModule <|> ambientFunction <|> generatorFunction <|> class' <|> module' <|> variableDeclaration <|> lexicalDeclaration <|> typeAliasDeclaration <|> enumDeclaration <|> interfaceDeclaration <|> ambientDeclaration
+
+-- | Not sure if this use of <> is right.
 exportStatement :: Assignment
 exportStatement = makeTerm <$> Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> ((<>) <$> fromClause <|> (exportClause <*> fromClause) <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias))
 
