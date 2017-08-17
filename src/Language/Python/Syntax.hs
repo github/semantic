@@ -107,7 +107,12 @@ assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Progr
 
 expression :: Assignment
 expression = handleError (term everything)
-  where everything = abcd <|> efil <|> pstv
+  where -- Alright, so.
+        -- It’s *much* more efficient to merge IntMaps of similar size than it is to left-associatively keep merging single-element IntMaps into a single large one. We’re talking ~5% productivity. Chunking it manually like this brings that up to a whopping 20% user (albeit a rosier ~45% elapsed) in my test case, and speeds up the construction of the assignment by a large margin.
+        -- We may at some point wish to write something to perform this chunking for us.
+        -- Medium-term, we should consider the construction of choices from first principles; maybe there’s a better API for us to construct these tables.
+        -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
+        everything = abcd <|> efil <|> pstv
         abcd = a <|> b <|> c <|> d
         efil = e <|> f <|> i <|> l
         pstv = p <|> s <|> t <|> v
