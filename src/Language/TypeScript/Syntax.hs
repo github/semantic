@@ -573,7 +573,7 @@ statement =
   exportStatement
   <|> importStatement
   <|> debuggerStatement
-  <|> expressionStatement
+  <|> expressionStatement'
   <|> declaration
   <|> statementBlock
   <|> ifStatement
