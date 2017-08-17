@@ -565,8 +565,8 @@ tupleType = makeTerm <$> symbol TupleType <*> children (Language.TypeScript.Synt
 constructorTy :: Assignment
 constructorTy = makeTerm <$> symbol ConstructorType <*> children (Language.TypeScript.Syntax.Constructor <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
 
-statements :: Assignment
-statements = makeTerm <$> location <*> many statement
+statementBlock :: Assignment
+statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
 statement :: Assignment
 statement =
