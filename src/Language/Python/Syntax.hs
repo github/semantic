@@ -113,15 +113,19 @@ expression = handleError . term $
   <|> assignment'
   <|> await
   <|> binaryOperator
+  <|> boolean
   <|> booleanOperator
   <|> breakStatement
   <|> call
   <|> classDefinition
   <|> comparisonOperator
+  <|> comprehension
+  <|> concatenatedString
   <|> conditionalExpression
   <|> continueStatement
   <|> decoratedDefinition
   <|> deleteStatement
+  <|> dictionary
   <|> dottedName
   <|> ellipsis
   <|> exceptClause
@@ -129,6 +133,7 @@ expression = handleError . term $
   <|> expressionList
   <|> expressionStatement
   <|> finallyClause
+  <|> float
   <|> forInClause
   <|> forStatement
   <|> functionDefinition
@@ -138,16 +143,21 @@ expression = handleError . term $
   <|> ifStatement
   <|> import'
   <|> identifier
-  <|> literal
+  <|> integer
+  <|> list'
   <|> memberAccess
+  <|> none
   <|> nonlocalStatement
   <|> notOperator
+  <|> pair
   <|> parameter
   <|> passStatement
   <|> printStatement
   <|> raiseStatement
   <|> returnStatement
+  <|> set
   <|> slice
+  <|> string
   <|> subscript
   <|> tryStatement
   <|> tuple
@@ -160,19 +170,6 @@ expression = handleError . term $
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
-
-literal :: Assignment
-literal =  boolean
-       <|> comprehension
-       <|> concatenatedString
-       <|> dictionary
-       <|> float
-       <|> integer
-       <|> list'
-       <|> none
-       <|> pair
-       <|> set
-       <|> string
 
 expressionStatement :: Assignment
 expressionStatement = mk <$> symbol ExpressionStatement <*> children (some expression)
