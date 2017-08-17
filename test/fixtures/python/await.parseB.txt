@@ -3,8 +3,7 @@
     (Identifier)
     (Plus
       (Integer)
-      (
-        (Integer)))
+      (Integer))
     (Empty))
   (Call
     (Identifier)

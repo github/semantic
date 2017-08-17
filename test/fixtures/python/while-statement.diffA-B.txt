@@ -4,14 +4,14 @@
   ->(Identifier) }
     (
     { (NoOp
-        (Identifier))
+        (Empty))
     ->(Break
-        (Identifier)) }
+        (Empty)) }
     { (Break
-        (Identifier))
+        (Empty))
     ->(Continue
-        (Identifier)) }
+        (Empty)) }
     { (Continue
-        (Identifier))
+        (Empty))
     ->(NoOp
-        (Identifier)) })))
+        (Empty)) })))

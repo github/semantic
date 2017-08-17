@@ -1,49 +1,37 @@
 (Program
   (RShift
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (LShift
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (BXOr
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (BAnd
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (Modulo
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (Power
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (DividedBy
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (Modulo
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (DividedBy
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (Times
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (Minus
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (Plus
     (Identifier)
-    (
-      (Identifier))))
+    (Identifier)))
