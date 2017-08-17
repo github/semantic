@@ -325,6 +325,24 @@ data MethodSignature a = MethodSignature { methodSignatureContext :: ![a], metho
 instance Eq1 MethodSignature where liftEq = genericLiftEq
 instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
 
+data Debugger a = Debugger
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Debugger where liftEq = genericLiftEq
+instance Show1 Debugger where liftShowsPrec = genericLiftShowsPrec
+
+data ExpressionStatement a = ExpressionStatement { expressionStatement :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ExpressionStatement where liftEq = genericLiftEq
+instance Show1 ExpressionStatement where liftShowsPrec = genericLiftShowsPrec
+
+data NonNullExpression a = NonNullExpression { nonNullExpression :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 NonNullExpression where liftEq = genericLiftEq
+instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
+
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
