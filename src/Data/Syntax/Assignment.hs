@@ -124,47 +124,53 @@ import TreeSitter.Language
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment ast grammar = Freer (AssignmentF ast grammar)
+type Assignment ast grammar = Freer (Tracing (AssignmentF ast grammar))
 
 data AssignmentF ast grammar a where
-  End :: HasCallStack => AssignmentF ast grammar ()
-  Location :: HasCallStack => AssignmentF ast grammar (Record Location)
-  CurrentNode :: HasCallStack => AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
-  Source :: HasCallStack => AssignmentF ast grammar ByteString
-  Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
-  Advance :: HasCallStack => AssignmentF ast grammar ()
-  Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
-  Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
-  Alt :: HasCallStack => [a] -> AssignmentF ast grammar a
-  Throw :: HasCallStack => Error (Either String grammar) -> AssignmentF ast grammar a
-  Catch :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
-  Label :: HasCallStack => Assignment ast grammar a -> String -> AssignmentF ast grammar a
+  End :: AssignmentF ast grammar ()
+  Location :: AssignmentF ast grammar (Record Location)
+  CurrentNode :: AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+  Source :: AssignmentF ast grammar ByteString
+  Children :: Assignment ast grammar a -> AssignmentF ast grammar a
+  Advance :: AssignmentF ast grammar ()
+  Choose :: [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
+  Many :: Assignment ast grammar a -> AssignmentF ast grammar [a]
+  Alt :: [a] -> AssignmentF ast grammar a
+  Throw :: Error (Either String grammar) -> AssignmentF ast grammar a
+  Catch :: Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
+  Label :: Assignment ast grammar a -> String -> AssignmentF ast grammar a
+
+data Tracing f a where
+  Tracing :: HasCallStack => { runTracing :: f a } -> Tracing f a
+
+tracing :: HasCallStack => f a -> Tracing f a
+tracing f = withFrozenCallStack (Tracing f)
 
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
 location :: HasCallStack => Assignment ast grammar (Record Location)
-location = withFrozenCallStack $ Location `Then` return
+location = tracing Location `Then` return
 
 -- | Zero-width production of the current node.
 currentNode :: HasCallStack => Assignment ast grammar (CofreeF.CofreeF ast (Node grammar) ())
-currentNode = CurrentNode `Then` return
+currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = withFrozenCallStack $ Choose [s] (IntMap.singleton (toIndex s) location) `Then` id
+symbol s = tracing (Choose [s] (IntMap.singleton (toIndex s) location)) `Then` id
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
-source = withFrozenCallStack $ Source `Then` return
+source = tracing Source `Then` return
 
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
-children forEach = withFrozenCallStack $ Children forEach `Then` return
+children child = tracing (Children child) `Then` return
 
 -- | Advance past the current node.
 advance :: HasCallStack => Assignment ast grammar ()
-advance = withFrozenCallStack $ Advance `Then` return
+advance = tracing Advance `Then` return
 
 -- | Match and advance past a node with the given symbol.
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
@@ -213,7 +219,7 @@ nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 
 firstSet :: Assignment ast grammar a -> [grammar]
-firstSet = iterFreer (\ assignment _ -> case assignment of
+firstSet = iterFreer (\ (Tracing assignment) _ -> case assignment of
   Choose symbols _ -> symbols
   Catch during _ -> firstSet during
   Label child _ -> firstSet child
@@ -241,11 +247,11 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: AssignmentF ast grammar x
+        run :: Tracing (AssignmentF ast grammar) x
             -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
-        run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
+        run (Tracing assignment) yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (node :< f) = case assignment of
                   Location -> yield (nodeLocation node) state
                   CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
@@ -262,19 +268,14 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
-                  Alt [] -> Left (makeError node)
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
                   Throw e -> Left e
                   Catch during _ -> go during state >>= uncurry yield
-                  Choose{} -> Left (makeError node)
-                  CurrentNode{} -> Left (makeError node)
-                  Children{} -> Left (makeError node)
-                  Source -> Left (makeError node)
-                  Advance{} -> Left (makeError node)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
+                  _ -> Left (makeError node)
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
-                expectedSymbols = firstSet (assignment `Then` return)
+                expectedSymbols = firstSet (Tracing assignment `Then` return)
                 makeError :: HasCallStack => Maybe (Node grammar) -> Error (Either String grammar)
                 makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
@@ -310,70 +311,65 @@ makeState = State 0 (Info.Pos 1 1)
 
 instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Alt [] `Then` return
+  empty = tracing (Alt []) `Then` return
 
   (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
-  (Alt [] `Then` _) <|> r = r
-  l <|> (Alt [] `Then` _) = l
-  (Throw err `Then` continue) <|> _ = Throw err `Then` continue
-  (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
-  (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
-  (CurrentNode `Then` continueL) <|> (CurrentNode `Then` continueR) = CurrentNode `Then` uncurry (<|>) . (continueL &&& continueR)
-  (Advance `Then` continueL) <|> (Advance `Then` continueR) = Advance `Then` uncurry (<|>) . (continueL &&& continueR)
-  (End `Then` continueL) <|> (End `Then` continueR) = End `Then` uncurry (<|>) . (continueL &&& continueR)
-  (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
-  (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
-  (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
-  l <|> (Alt rs `Then` continueR) = Alt (l : (continueR <$> rs)) `Then` id
+  (Tracing (Alt []) `Then` _) <|> r = r
+  l <|> (Tracing (Alt []) `Then` _) = l
+  (Tracing (Throw err) `Then` continue) <|> _ = Tracing (Throw err) `Then` continue
+  (Tracing (Children l) `Then` continueL) <|> (Tracing (Children r) `Then` continueR) = Tracing (Children (Left <$> l <|> Right <$> r)) `Then` either continueL continueR
+  (Tracing Location `Then` continueL) <|> (Tracing Location `Then` continueR) = Tracing Location `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Tracing CurrentNode `Then` continueL) <|> (Tracing CurrentNode `Then` continueR) = Tracing CurrentNode `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Tracing Advance `Then` continueL) <|> (Tracing Advance `Then` continueR) = Tracing Advance `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Tracing End `Then` continueL) <|> (Tracing End `Then` continueR) = Tracing End `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Tracing Source `Then` continueL) <|> (Tracing Source `Then` continueR) = Tracing Source `Then` uncurry (<|>) . (continueL &&& continueR)
+  (Tracing (Alt ls) `Then` continueL) <|> (Tracing (Alt rs) `Then` continueR) = Tracing (Alt ((Left <$> ls) <> (Right <$> rs))) `Then` either continueL continueR
+  (Tracing (Alt ls) `Then` continueL) <|> r = Tracing (Alt ((continueL <$> ls) <> pure r)) `Then` id
+  l <|> (Tracing (Alt rs) `Then` continueR) = Tracing (Alt (l : (continueR <$> rs))) `Then` id
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
-            withBestCallStack (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) `Then` id)
-          | otherwise = withBestCallStack (Alt [l, r] `Then` id)
+            tracing (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr)) `Then` id
+          | otherwise = tracing (Alt [l, r]) `Then` id
     where choices :: Assignment ast grammar a -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar a))
-          choices (Choose symbols choices `Then` continue) = Just (symbols, continue <$> choices)
-          choices (Many rule `Then` continue) = second ((Many rule `Then` continue) <$) <$> choices rule
-          choices (Catch during _ `Then` continue) = second (fmap (>>= continue)) <$> choices during
-          choices (Label rule label `Then` continue) = second ((Label rule label `Then` continue) <$) <$> choices rule
+          choices (Tracing (Choose symbols choices) `Then` continue) = Just (symbols, continue <$> choices)
+          choices (Tracing (Many rule) `Then` continue) = second ((Tracing (Many rule) `Then` continue) <$) <$> choices rule
+          choices (Tracing (Catch during _) `Then` continue) = second (fmap (>>= continue)) <$> choices during
+          choices (Tracing (Label rule label) `Then` continue) = second ((Tracing (Label rule label) `Then` continue) <$) <$> choices rule
           choices _ = Nothing
 
           rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
-          rewrapFor (Many _ `Then` continue) = Just (<|> continue [])
-          rewrapFor (Catch _ handler `Then` continue) = Just (`catchError` (continue <=< handler))
+          rewrapFor (Tracing (Many _) `Then` continue) = Just (<|> continue [])
+          rewrapFor (Tracing (Catch _ handler) `Then` continue) = Just (`catchError` (continue <=< handler))
           rewrapFor _ = Nothing
 
-          assignmentCallStack (Choose{} `Then` _) = Just callStack
-          assignmentCallStack (Many{} `Then` _) = Just callStack
-          assignmentCallStack (Catch{} `Then` _) = Just callStack
-          assignmentCallStack (Label{} `Then` _) = Just callStack
-          assignmentCallStack _ = Nothing
-
-          withBestCallStack = withCallStack (freezeCallStack (fromMaybe callStack (((<|>) `on` assignmentCallStack) r l)))
-
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
-  many a = Many a `Then` return
+  many a = tracing (Many a) `Then` return
 
 instance (Eq grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
-  a <?> s = Label a s `Then` return
+  a <?> s = tracing (Label a s) `Then` return
 
   unexpected :: HasCallStack => String -> Assignment ast grammar a
   unexpected s = location >>= \ loc -> throwError (Error (Info.sourceSpan loc) [] (Just (Left s)))
 
   eof :: HasCallStack => Assignment ast grammar ()
-  eof = withFrozenCallStack $ End `Then` return
+  eof = tracing End `Then` return
 
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
   notFollowedBy a = a *> unexpected (show a) <|> pure ()
 
 instance MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
-  throwError error = withFrozenCallStack $ Throw error `Then` return
+  throwError error = tracing (Throw error) `Then` return
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
-  catchError during handler = Catch during handler `Then` return
+  catchError during handler = tracing (Catch during handler) `Then` return
+
+instance Show1 f => Show1 (Tracing f) where
+  liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
 
 instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
