@@ -133,7 +133,7 @@ data AssignmentF ast grammar a where
   Source :: HasCallStack => AssignmentF ast grammar ByteString
   Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: HasCallStack => AssignmentF ast grammar ()
-  Choose :: HasCallStack => [grammar] -> IntMap.IntMap (Assignment ast grammar a) -> AssignmentF ast grammar a
+  Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
   Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: HasCallStack => [a] -> AssignmentF ast grammar a
   Throw :: HasCallStack => Error (Either String grammar) -> AssignmentF ast grammar a
@@ -152,7 +152,7 @@ currentNode = CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = withFrozenCallStack $ Choose [s] (IntMap.singleton (toIndex s) location) `Then` return
+symbol s = withFrozenCallStack $ Choose [s] (IntMap.singleton (toIndex s) location) `Then` id
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
@@ -254,7 +254,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                     (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
                     yield a (advanceState state' { stateNodes = stateNodes })
                   Advance -> yield () (advanceState state)
-                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> go choice state >>= uncurry yield
+                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
@@ -327,10 +327,10 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
   l <|> (Alt rs `Then` continueR) = Alt (l : (continueR <$> rs)) `Then` id
   l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
-            withBestCallStack (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) `Then` return)
+            withBestCallStack (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) `Then` id)
           | otherwise = withBestCallStack (Alt [l, r] `Then` id)
     where choices :: Assignment ast grammar a -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar a))
-          choices (Choose symbols choices `Then` continue) = Just (symbols, (>>= continue) <$> choices)
+          choices (Choose symbols choices `Then` continue) = Just (symbols, continue <$> choices)
           choices (Many rule `Then` continue) = second ((Many rule `Then` continue) <$) <$> choices rule
           choices (Catch during _ `Then` continue) = second (fmap (>>= continue)) <$> choices during
           choices (Label rule label `Then` continue) = second ((Label rule label `Then` continue) <$) <$> choices rule
@@ -383,7 +383,7 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
     CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList (liftShowsPrec sp sl) (liftShowList sp sl))) "Choose" d symbols (IntMap.toList choices)
+    Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
