@@ -142,6 +142,7 @@ data AssignmentF ast grammar a where
 
 data Tracing f a where
   Tracing :: HasCallStack => { runTracing :: f a } -> Tracing f a
+  -- Tracing :: { tracingSymbol :: String, tracingLocation :: SrcLoc, runTracing :: f a } -> Tracing f a
 
 tracing :: HasCallStack => f a -> Tracing f a
 tracing f = withFrozenCallStack (Tracing f)
@@ -290,21 +291,22 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | (Node{..} Cofree.:< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
+  | (Node{..} Cofree.:< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallStack rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
-  { stateOffset :: {-# UNPACK #-} !Int   -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateNodes :: ![AST ast grammar]     -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  { stateOffset :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: {-# UNPACK #-} !Info.Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateCallStack :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
+  , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
 
 deriving instance (Eq grammar, Eq (ast (AST ast grammar))) => Eq (State ast grammar)
 deriving instance (Show grammar, Show (ast (AST ast grammar))) => Show (State ast grammar)
 
 makeState :: [AST ast grammar] -> State ast grammar
-makeState = State 0 (Info.Pos 1 1)
+makeState = State 0 (Info.Pos 1 1) []
 
 
 -- Instances
