@@ -337,7 +337,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
             (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
             _ | Just (sl, cl) <- choices l
               , Just (sr, cr) <- choices r
-              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) (atEnd l <|> atEnd r)) id
+              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) ((<|>) <$> atEnd l <*> atEnd r)) id
               | otherwise -> rebuild (Alt [l, r]) id
             where distribute :: (l ~ lr, r ~ lr) => AssignmentF ast grammar lr -> Assignment ast grammar a
                   distribute a = rebuild a (uncurry (<|>) . (continueL &&& continueR))
