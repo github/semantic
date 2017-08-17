@@ -97,7 +97,7 @@ import Control.Arrow ((&&&))
 import Control.Applicative
 import Control.Comonad.Cofree as Cofree
 import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
-import Control.Monad ((<=<), guard)
+import Control.Monad (guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.Bifunctor
@@ -133,7 +133,7 @@ data AssignmentF ast grammar a where
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: AssignmentF ast grammar ()
-  Choose :: [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
+  Choose :: [grammar] -> IntMap.IntMap a -> Maybe a -> AssignmentF ast grammar a
   Many :: Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: [a] -> AssignmentF ast grammar a
   Throw :: Error (Either String grammar) -> AssignmentF ast grammar a
@@ -161,7 +161,7 @@ currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = tracing (Choose [s] (IntMap.singleton (toIndex s) location)) `Then` id
+symbol s = tracing (Choose [s] (IntMap.singleton (toIndex s) location) Nothing) `Then` id
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
@@ -223,7 +223,7 @@ nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 firstSet :: Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
-  Choose symbols _ -> symbols
+  Choose symbols _ _ -> symbols
   Catch during _ -> firstSet during
   Label child _ -> firstSet child
   _ -> []) . ([] <$)
@@ -263,7 +263,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                     (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
                     yield a (advanceState state' { stateNodes = stateNodes })
                   Advance -> yield () (advanceState state)
-                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
+                  Choose _ choices _ | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
@@ -275,6 +275,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Throw e -> Left e
                   Catch during _ -> go during state >>= uncurry yield
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
+                  Choose _ _ (Just atEnd) | Nothing <- node -> yield atEnd state
                   _ -> Left (makeError node)
 
                 state@State{..} = traceState callSite (if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState)
@@ -340,7 +341,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
             (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
             _ | Just (sl, cl) <- choices l
               , Just (sr, cr) <- choices r
-              -> fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $ rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr)) id
+              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) (atEnd l <|> atEnd r)) id
               | otherwise -> rebuild (Alt [l, r]) id
             where distribute :: (l ~ lr, r ~ lr) => AssignmentF ast grammar lr -> Assignment ast grammar a
                   distribute a = rebuild a (uncurry (<|>) . (continueL &&& continueR))
@@ -350,16 +351,18 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
                   rebuild a c = Tracing (callSiteL <|> callSiteR) a `Then` c
 
           choices :: Assignment ast grammar z -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar z))
-          choices (Tracing _ (Choose symbols choices) `Then` continue) = Just (symbols, continue <$> choices)
+          choices (Tracing _ (Choose symbols choices _) `Then` continue) = Just (symbols, continue <$> choices)
           choices (Tracing cs (Many rule) `Then` continue) = second ((Tracing cs (Many rule) `Then` continue) <$) <$> choices rule
           choices (Tracing _ (Catch during _) `Then` continue) = second (fmap (>>= continue)) <$> choices during
           choices (Tracing cs (Label rule label) `Then` continue) = second ((Tracing cs (Label rule label) `Then` continue) <$) <$> choices rule
           choices _ = Nothing
 
-          rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
-          rewrapFor (Tracing _ (Many _) `Then` continue) = Just (<|> continue [])
-          rewrapFor (Tracing _ (Catch _ handler) `Then` continue) = Just (`catchError` (continue <=< handler))
-          rewrapFor _ = Nothing
+          atEnd :: Assignment ast grammar z -> Maybe (Assignment ast grammar z)
+          atEnd (Tracing _ (Choose _ _ atEnd) `Then` continue) = continue <$> atEnd
+          atEnd rule@(Tracing _ (Many _) `Then` _) = Just rule
+          atEnd rule@(Tracing _ (Catch _ _) `Then` _) = Just rule
+          atEnd rule@(Tracing _ (Label inner _) `Then` _) = rule <$ atEnd inner
+          atEnd _ = Nothing
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = tracing (Many a) `Then` return
@@ -398,9 +401,11 @@ instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast 
     CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
+    Choose symbols choices atEnd -> showsTernaryWith showsPrec (const (liftShowList sp sl)) (liftShowsPrec sp sl) "Choose" d symbols (IntMap.toList choices) atEnd
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
+    where showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
+          showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $ showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z
