@@ -332,33 +332,54 @@ assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Prog
 expression :: Assignment
 expression = handleError $
   comment
-  <|> if'
-  <|> while'
-  <|> until'
-  <|> case'
-  <|> emptyStatement
-  <|> assignment'
-  <|> unary
-  <|> binary
-  <|> literal
-  <|> mk ReturnStatement Statement.Return
-  <|> mk YieldExpression Statement.Yield
-  <|> mk BreakStatement Statement.Break
-  <|> mk ContinueStatement Statement.Continue
-  <|> for
+  <|> typeAssertion
+  <|> asExpression
+  <|> nonNullExpression'
+  <|> importAlias
+  <|> internalModule
+  <|> super
+  <|> abstractClass
+  <|> object
+  <|> array
+  <|> jsxElement
+  <|> jsxSelfClosingElement
   <|> class'
-  <|> method
-  <|> lambda
-  <|> module'
+  <|> anonymousClass
+  <|> function
+  <|> arrowFunction
+  <|> generatorFunction
+  <|> assignmentExpression
+  <|> augmentedAssignmentExpression
+  <|> awaitExpression
+  <|> unaryExpression
+  <|> binaryExpression
+  <|> ternaryExpression
+  <|> updateExpression
+  <|> callExpression
+  <|> memberExpression
+  <|> newExpression
+  <|> parenthesizedExpression
+  <|> subscriptExpression
+  <|> yieldExpression
+  <|> thisExpression
+  <|> number
+  <|> string
+  <|> templateString
+  <|> regex
+  <|> true
+  <|> false
+  <|> null
+  <|> undefined
   <|> identifier
-  <|> conditional
-  <|> methodCall
-  <|> call
-  <|> subscript
-  <|> begin
-  <|> rescue
-  <|> block
-  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (children expression))
+
+typeAssertion :: Assignment
+typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> (Language.TypeScript.Syntax.TypeAssertion <$> typeArguments <*> expression)
+
+asExpression :: Assignment
+asExpression = makeTerm <$> symbol AsExpression <*> (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <*> templateString))
+
+nonNullExpression' :: Assignment
+nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> (Language.TypeScript.Syntax.NonNullExpression <$> expression)
 
 number :: Assignment
 number = makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
