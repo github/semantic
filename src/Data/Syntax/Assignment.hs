@@ -254,8 +254,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
-        run (Tracing callSite assignment) yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
-          where atNode (node :< f) = case assignment of
+        run t yield initialState = expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
+          where atNode (node :< f) = case runTracing t of
                   Location -> yield (nodeLocation node) state
                   CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
@@ -267,7 +267,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
-                anywhere node = case assignment of
+                anywhere node = case runTracing t of
                   End -> requireExhaustive ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
@@ -278,10 +278,9 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Choose _ _ (Just atEnd) | Nothing <- node -> yield atEnd state
                   _ -> Left (makeError node)
 
-                state@State{..} = traceState callSite (if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState)
-                expectedSymbols = firstSet (Tracing callSite assignment `Then` return)
-                makeError :: HasCallStack => Maybe (Node grammar) -> Error (Either String grammar)
-                makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
+                state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
+                expectedSymbols = firstSet (t `Then` return)
+                makeError = withCallStack (fromCallSiteList (maybe id (:) (tracingCallSite t) stateCallSites)) $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
 requireExhaustive :: (Symbol grammar, HasCallStack) => (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
 requireExhaustive (a, state) = let state' = skipTokens state in case stateNodes state' of
@@ -290,9 +289,6 @@ requireExhaustive (a, state) = let state' = skipTokens state in case stateNodes 
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
 skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . CofreeF.headF . runCofree) (stateNodes state) }
-
-traceState :: Maybe (String, SrcLoc) -> State ast grammar -> State ast grammar
-traceState callSite state = state { stateCallSites = maybe id (:) callSite (stateCallSites state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
