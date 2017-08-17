@@ -2,7 +2,6 @@
 module Data.Syntax.Assignment.Spec where
 
 import Control.Comonad.Cofree (Cofree(..))
-import Control.Comonad.Trans.Cofree (headF)
 import Data.Bifunctor (first)
 import Data.ByteString.Char8 as B (ByteString, length, words)
 import Data.Ix
