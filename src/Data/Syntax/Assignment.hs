@@ -241,40 +241,47 @@ runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol gram
 runAssignment source = \ assignment state -> go assignment state >>= requireExhaustive
   -- Note: We explicitly bind source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
   where go :: Assignment ast grammar result -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar)
-        go assignment initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
+        go assignment = iterFreer run ((pure .) . (,) <$> assignment)
+        {-# INLINE go #-}
+
+        run :: Assignment ast grammar x
+            -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
+            -> State ast grammar
+            -> Either (Error (Either String grammar)) (result, State ast grammar)
+        run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (node :< f) = case assignment of
-                  Location -> pure (nodeLocation node, state)
-                  CurrentNode -> pure (node CofreeF.:< (() <$ f), state)
-                  Source -> pure (Source.sourceBytes (Source.slice (nodeByteRange node) source), advanceState state)
+                  Location -> yield (nodeLocation node) state
+                  CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f } >>= requireExhaustive
-                    pure (a, advanceState state' { stateNodes = stateNodes })
-                  Advance -> pure ((), advanceState state)
-                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> go choice state
-                  Catch during handler -> go during state `catchError` (flip go state . handler)
+                    yield a (advanceState state' { stateNodes = stateNodes })
+                  Advance -> yield () (advanceState state)
+                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> go choice state >>= uncurry yield
+                  Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
                 anywhere node = case assignment of
-                  Pure a -> pure (a, state)
-                  Map f a -> first f <$> go a state
+                  Pure a -> yield a state
+                  Map f a -> first f <$> go a state >>= uncurry yield
                   Seq f a b -> do
                     (a', state') <- go a state
                     (b', state'') <- go b state'
-                    pure (f a' b', state'')
-                  Then step continue -> go step state >>= uncurry go . first continue
-                  End -> requireExhaustive ((), state)
-                  Location -> pure (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil, state)
-                  Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state
+                    yield (f a' b') state''
+                  Then step continue -> go step state >>= uncurry go . first continue >>= uncurry yield
+                  End -> requireExhaustive ((), state) >>= uncurry yield
+                  Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
+                  Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt [] -> Left (makeError node)
-                  Alt (a:as) -> sconcat (flip go state <$> a:|as)
+                  Alt (a:as) -> sconcat (flip go state <$> a:|as) >>= uncurry yield
                   Throw e -> Left e
-                  Catch during _ -> go during state
+                  Catch during _ -> go during state >>= uncurry yield
                   Choose{} -> Left (makeError node)
                   CurrentNode{} -> Left (makeError node)
                   Children{} -> Left (makeError node)
                   Source -> Left (makeError node)
                   Advance{} -> Left (makeError node)
-                  Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] })
+                  Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
                 expectedSymbols = firstSet (assignment `Then` return)
