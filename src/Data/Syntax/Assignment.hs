@@ -356,7 +356,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
           atEnd :: Assignment ast grammar z -> Maybe (Assignment ast grammar z)
           atEnd (Tracing _ (Choose _ _ atEnd) `Then` continue) = continue <$> atEnd
           atEnd (Tracing _ (Many rule) `Then` continue) = Just (pure <$> rule <|> pure [] >>= continue)
-          atEnd rule@(Tracing _ (Catch _ _) `Then` _) = Just rule
+          atEnd (Tracing _ (Catch during handler) `Then` continue) = (>>= continue) <$> atEnd during <|> Just (location >>= \ (_ :. span :. Nil) -> handler (Error span (Right <$> firstSet during) Nothing) >>= continue)
           atEnd (Tracing _ (Label inner _) `Then` continue) = (>>= continue) <$> atEnd inner
           atEnd _ = Nothing
 
