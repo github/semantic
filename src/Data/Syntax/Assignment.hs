@@ -280,7 +280,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
                 expectedSymbols = firstSet (t `Then` return)
-                makeError = withCallStack (fromCallSiteList (maybe id (:) (tracingCallSite t) stateCallSites)) $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
+                makeError = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) (tracingCallSite t) stateCallSites))) $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
 requireExhaustive :: (Symbol grammar, HasCallStack) => (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
 requireExhaustive (a, state) = let state' = skipTokens state in case stateNodes state' of
