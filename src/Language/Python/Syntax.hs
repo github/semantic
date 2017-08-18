@@ -11,7 +11,7 @@ import Data.Align.Generic
 import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.List.NonEmpty (some1)
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
@@ -478,7 +478,7 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
 
 -- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
 chainl1Term :: Assignment -> Assignment.Assignment [] Grammar (Term -> Term -> Term) -> Assignment
