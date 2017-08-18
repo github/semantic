@@ -142,7 +142,6 @@ data AssignmentF ast grammar a where
 
 data Tracing f a where
   Tracing :: { tracingCallSite :: Maybe (String, SrcLoc), runTracing :: f a } -> Tracing f a
-  -- Tracing :: { tracingSymbol :: String, tracingLocation :: SrcLoc, runTracing :: f a } -> Tracing f a
 
 tracing :: HasCallStack => f a -> Tracing f a
 tracing f = case getCallStack callStack of
