@@ -145,8 +145,8 @@ data Tracing f a where
   -- Tracing :: { tracingSymbol :: String, tracingLocation :: SrcLoc, runTracing :: f a } -> Tracing f a
 
 tracing :: HasCallStack => f a -> Tracing f a
-tracing f = case getCallStack (popCallStack callStack) of
-  (site : _) -> Tracing (Just site) f
+tracing f = case getCallStack callStack of
+  (_ : site : _) -> Tracing (Just site) f
   _ -> Tracing Nothing f
 
 -- | Zero-width production of the current location.
