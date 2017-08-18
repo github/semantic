@@ -357,7 +357,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
           atEnd (Tracing _ (Choose _ _ atEnd) `Then` continue) = continue <$> atEnd
           atEnd (Tracing _ (Many rule) `Then` continue) = Just (pure <$> rule <|> pure [] >>= continue)
           atEnd rule@(Tracing _ (Catch _ _) `Then` _) = Just rule
-          atEnd rule@(Tracing _ (Label inner _) `Then` _) = rule <$ atEnd inner
+          atEnd (Tracing _ (Label inner _) `Then` continue) = (>>= continue) <$> atEnd inner
           atEnd _ = Nothing
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
