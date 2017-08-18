@@ -337,7 +337,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
             (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
             _ | Just (sl, cl) <- choices l
               , Just (sr, cr) <- choices r
-              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) ((<|>) <$> atEnd l <*> atEnd r)) id
+              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) (merge <$> atEnd l <*> atEnd r)) id
               | otherwise -> rebuild (Alt [l, r]) id
             where distribute :: (l ~ lr, r ~ lr) => AssignmentF ast grammar lr -> Assignment ast grammar a
                   distribute a = rebuild a (uncurry (<|>) . (continueL &&& continueR))
@@ -345,6 +345,8 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
                   alternate a = rebuild a (either continueL continueR)
                   rebuild :: AssignmentF ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
                   rebuild a c = Tracing (callSiteL <|> callSiteR) a `Then` c
+
+                  merge l r = rebuild (Alt [l, r]) id
 
           choices :: Assignment ast grammar z -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar z))
           choices (Tracing _ (Choose symbols choices _) `Then` continue) = Just (symbols, continue <$> choices)
@@ -355,9 +357,9 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
 
           atEnd :: Assignment ast grammar z -> Maybe (Assignment ast grammar z)
           atEnd (Tracing _ (Choose _ _ atEnd) `Then` continue) = continue <$> atEnd
-          atEnd (Tracing _ (Many rule) `Then` continue) = Just (pure <$> rule <|> pure [] >>= continue)
-          atEnd (Tracing _ (Catch during handler) `Then` continue) = (>>= continue) <$> atEnd during <|> Just (location >>= \ (_ :. span :. Nil) -> handler (Error span (Right <$> firstSet during) Nothing) >>= continue)
-          atEnd (Tracing _ (Label inner _) `Then` continue) = (>>= continue) <$> atEnd inner
+          atEnd rule@(Tracing _ (Many _) `Then` _) = Just rule
+          atEnd rule@(Tracing _ (Catch _ _) `Then` _) = Just rule
+          atEnd rule@(Tracing _ (Label inner _) `Then` _) = rule <$ atEnd inner
           atEnd _ = Nothing
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
