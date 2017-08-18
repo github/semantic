@@ -286,7 +286,7 @@ spec = do
     it "produces errors with callstacks pointing at the failing assignment" $
       first (fmap fst . getCallStack . errorCallStack) (runAssignment "blue" red (makeState [node Blue 0 4 []]))
       `shouldBe`
-      Left [ "symbol", "red" ]
+      Left [ "symbol" ]
 
 node :: symbol -> Int -> Int -> [AST [] symbol] -> AST [] symbol
 node symbol start end children = Node symbol (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end))) :< children
