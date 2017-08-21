@@ -31,7 +31,7 @@ type Syntax =
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 
 assignment :: Assignment

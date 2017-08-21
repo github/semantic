@@ -11,7 +11,7 @@ import Data.Align.Generic
 import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.List.NonEmpty (some1)
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
@@ -85,7 +85,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
@@ -106,73 +106,79 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError . term $
-      argument
-  <|> argumentList
-  <|> assertStatement
-  <|> assignment'
-  <|> await
-  <|> binaryOperator
-  <|> booleanOperator
-  <|> breakStatement
-  <|> call
-  <|> classDefinition
-  <|> comparisonOperator
-  <|> conditionalExpression
-  <|> continueStatement
-  <|> decoratedDefinition
-  <|> deleteStatement
-  <|> dottedName
-  <|> ellipsis
-  <|> exceptClause
-  <|> execStatement
-  <|> expressionList
-  <|> expressionStatement
-  <|> finallyClause
-  <|> forInClause
-  <|> forStatement
-  <|> functionDefinition
-  <|> globalStatement
-  <|> identifier
-  <|> ifClause
-  <|> ifStatement
-  <|> import'
-  <|> identifier
-  <|> literal
-  <|> memberAccess
-  <|> nonlocalStatement
-  <|> notOperator
-  <|> parameter
-  <|> passStatement
-  <|> printStatement
-  <|> raiseStatement
-  <|> returnStatement
-  <|> slice
-  <|> subscript
-  <|> tryStatement
-  <|> tuple
-  <|> type'
-  <|> unaryOperator
-  <|> variables
-  <|> whileStatement
-  <|> withStatement
-  <|> yield
+expression = handleError (term everything)
+  where -- Alright, so.
+        -- It’s *much* more efficient to merge IntMaps of similar size than it is to left-associatively keep merging single-element IntMaps into a single large one. We’re talking ~5% productivity. Chunking it manually like this brings that up to a whopping 20% user (albeit a rosier ~45% elapsed) in my test case, and speeds up the construction of the assignment by a large margin.
+        -- We may at some point wish to write something to perform this chunking for us.
+        -- Medium-term, we should consider the construction of choices from first principles; maybe there’s a better API for us to construct these tables.
+        -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
+        everything = abcd <|> efil <|> pstv
+        abcd = a <|> b <|> c <|> d
+        efil = e <|> f <|> i <|> l
+        pstv = p <|> s <|> t <|> v
+        a =   argument
+          <|> argumentList
+          <|> assertStatement
+          <|> assignment'
+          <|> await
+        b =   binaryOperator
+          <|> boolean
+          <|> booleanOperator
+          <|> breakStatement
+          <|> call
+          <|> classDefinition
+        c =   comparisonOperator
+          <|> comprehension
+          <|> concatenatedString
+          <|> conditionalExpression
+          <|> continueStatement
+        d =   decoratedDefinition
+          <|> deleteStatement
+          <|> dictionary
+          <|> dottedName
+        e =   ellipsis
+          <|> exceptClause
+          <|> execStatement
+          <|> expressionList
+          <|> expressionStatement
+        f =   finallyClause
+          <|> float
+          <|> forInClause
+          <|> forStatement
+          <|> functionDefinition
+          <|> globalStatement
+        i =   identifier
+          <|> ifClause
+          <|> ifStatement
+          <|> import'
+          <|> identifier
+          <|> integer
+        l =   list'
+          <|> memberAccess
+          <|> none
+          <|> nonlocalStatement
+          <|> notOperator
+        p =   pair
+          <|> parameter
+          <|> passStatement
+          <|> printStatement
+          <|> raiseStatement
+          <|> returnStatement
+        s =   set
+          <|> slice
+          <|> string
+          <|> subscript
+        t =   tryStatement
+          <|> tuple
+          <|> type'
+          <|> unaryOperator
+        v =   variables
+          <|> whileStatement
+          <|> withStatement
+          <|> yield
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
-
-literal :: Assignment
-literal =  boolean
-       <|> comprehension
-       <|> concatenatedString
-       <|> dictionary
-       <|> float
-       <|> integer
-       <|> list'
-       <|> none
-       <|> pair
-       <|> set
-       <|> string
 
 expressionStatement :: Assignment
 expressionStatement = mk <$> symbol ExpressionStatement <*> children (some expression)
@@ -200,11 +206,9 @@ parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assign
     makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment identifier' value')
 
 decoratedDefinition :: Assignment
-decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> term (functionDefinition <|> classDefinition)))
+decoratedDefinition = symbol DecoratedDefinition *> children (term decorator)
   where
-    makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
-    partialDecorator = (,) <$> symbol Decorator <*> children decorator'
-    decorator' = Declaration.Decorator <$> expression <*> many expression
+    decorator = makeTerm <$> symbol Decorator <*> (children (Declaration.Decorator <$> expression <*> many expression) <*> term (decorator <|> functionDefinition <|> classDefinition))
 
 argumentList :: Assignment
 argumentList = symbol ArgumentList *> children expressions
@@ -472,20 +476,20 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
 
 -- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
-chainl1Term :: Assignment -> Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Term) -> Assignment
+chainl1Term :: Assignment -> Assignment.Assignment [] Grammar (Term -> Term -> Term) -> Assignment
 chainl1Term expr op = postContextualize (comment <|> symbol AnonLambda *> empty) expr `chainl1` op
 
 -- | Match a series of terms or comments until a delimiter is matched.
-manyTermsTill :: Show b => Assignment.Assignment (AST Grammar) Grammar Term -> Assignment.Assignment (AST Grammar) Grammar b -> Assignment.Assignment (AST Grammar) Grammar [Term]
+manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack
           => Assignment
           -> Assignment
-          -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment (AST Grammar) Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext comment
