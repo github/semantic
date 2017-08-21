@@ -876,7 +876,6 @@ assignment'
          (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
       <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
       <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
-      <|> makeTerm <$> symbol AnonStarStarEqual           <*> (Expression.Power var     <$> expression)
       <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
       <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
       <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
