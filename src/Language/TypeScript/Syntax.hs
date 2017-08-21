@@ -909,7 +909,6 @@ assignment'
     rhs = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
     expr =
           makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
-      <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
       <|> argument
 
 unary :: Assignment
