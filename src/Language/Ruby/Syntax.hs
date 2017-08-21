@@ -6,14 +6,9 @@ module Language.Ruby.Syntax
 , Term
 ) where
 
-import Algorithm
-import Data.Align.Generic
-import Data.ByteString
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Show.Generic
 import Data.List.NonEmpty (some1)
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
@@ -25,7 +20,6 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import Data.Union
-import GHC.Generics
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
 import qualified Term
@@ -46,15 +40,15 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
-  , Language.Ruby.Syntax.Rational
-  , Language.Ruby.Syntax.Complex
   , Literal.Array
   , Literal.Boolean
+  , Literal.Complex
   , Literal.Float
   , Literal.Hash
   , Literal.Integer
   , Literal.KeyValue
   , Literal.Null
+  , Literal.Rational
   , Literal.String
   , Literal.Symbol
   , Literal.TextElement
@@ -85,21 +79,6 @@ type Syntax = '[
 
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
-
--- Rational literals e.g. `2/3r`
-newtype Rational a = Rational ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Language.Ruby.Syntax.Rational where liftEq = genericLiftEq
-instance Show1 Language.Ruby.Syntax.Rational where liftShowsPrec = genericLiftShowsPrec
-
--- Complex literals e.g. `3 + 2i`
-newtype Complex a = Complex ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Language.Ruby.Syntax.Complex where liftEq = genericLiftEq
-instance Show1 Language.Ruby.Syntax.Complex where liftShowsPrec = genericLiftShowsPrec
-
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
@@ -183,8 +162,8 @@ literal =
   <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
   <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
   <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
-  <|> makeTerm <$> symbol Grammar.Rational <*> (Language.Ruby.Syntax.Rational <$> source)
-  <|> makeTerm <$> symbol Grammar.Complex  <*> (Language.Ruby.Syntax.Complex <$> source)
+  <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> source)
+  <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> source)
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
