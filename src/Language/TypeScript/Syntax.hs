@@ -485,7 +485,7 @@ expression = handleError $
   <|> identifier
 
 anonymousClass :: Assignment
-anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> emptyTerm <*> pure [] <*> superclass <*> classBodyStatements)
+anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> superclass <*> classBodyStatements)
   where superclass = pure <$ symbol Grammar.ClassHeritage <*> children expression
 
 abstractClass :: Assignment
