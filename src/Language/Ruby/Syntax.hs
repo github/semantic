@@ -398,6 +398,6 @@ term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> som
 infixTerm :: HasCallStack
           => Assignment
           -> Assignment
-          -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment (AST Grammar) Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext comment
