@@ -127,6 +127,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.JsxOpeningElement
   , Language.TypeScript.Syntax.JsxText
   , Language.TypeScript.Syntax.JsxClosingElement
+  , Language.TypeScript.Syntax.SequenceExpression
   , Type.Visibility
   , []
   ]
@@ -442,6 +443,12 @@ data ImplementsClause a = ImplementsClause { implementsClauseTypes :: ![a] }
 instance Eq1 ImplementsClause where liftEq = genericLiftEq
 instance Show1 ImplementsClause where liftShowsPrec = genericLiftShowsPrec
 
+data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 SequenceExpression where liftEq = genericLiftEq
+instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
+
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
@@ -590,6 +597,9 @@ jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children 
 
 jsxAttribute :: Assignment
 jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (Language.TypeScript.Syntax.JsxAttribute <$> propertyIdentifier <*> (number <|> string <|> jsxExpression'))
+
+sequenceExpression :: Assignment
+sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Language.TypeScript.Syntax.SequenceExpression <$> expression <*> (sequenceExpression <|> expression))
 
 parameter :: Assignment
 parameter =
