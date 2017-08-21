@@ -560,7 +560,7 @@ class' = makeClass <$> symbol Class <*> children ((,,,) <$> expression <*> (many
         makeClass loc (expression, typeParams, superclass', statements) = makeTerm loc (Declaration.Class typeParams expression superclass' statements)
 
 object :: Assignment
-object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandReservedIdentifier))
+object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
 
 array :: Assignment
 array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many (expression <|> spreadElement))
