@@ -513,9 +513,6 @@ asExpression = makeTerm <$> symbol AsExpression <*> (Language.TypeScript.Syntax.
 templateString :: Assignment
 templateString = makeTerm <$> symbol TemplateString <*> (Literal.String <$> many templateSubstitution)
 
-templateChars :: Assignment
-templateChars = makeTerm <$> symbol AnonTemplateChars <*> (Literal.TextElement <$> source)
-
 templateSubstitution :: Assignment
 templateSubstitution = symbol TemplateSubstitution *> children expression
 
