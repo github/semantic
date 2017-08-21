@@ -148,6 +148,10 @@ tracing f = case getCallStack callStack of
   (_ : site : _) -> Tracing (Just site) f
   _ -> Tracing Nothing f
 
+assignmentCallSite :: Assignment ast grammar a -> Maybe (String, SrcLoc)
+assignmentCallSite (Tracing site _ `Then` _) = site
+assignmentCallSite _ = Nothing
+
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
@@ -243,7 +247,7 @@ runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol gram
               -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
               -> State ast grammar                                             -- ^ The current state.
               -> Either (Error (Either String grammar)) (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
-runAssignment source = \ assignment state -> go assignment state >>= requireExhaustive
+runAssignment source = \ assignment state -> go assignment state >>= requireExhaustive (assignmentCallSite assignment)
   -- Note: We explicitly bind source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
   where go :: Assignment ast grammar result -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
@@ -259,7 +263,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
-                    (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive
+                    (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
                   Advance -> yield () (advanceState state)
                   Choose _ choices _ | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
@@ -267,7 +271,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   _ -> anywhere (Just node)
 
                 anywhere node = case runTracing t of
-                  End -> requireExhaustive ((), state) >>= uncurry yield
+                  End -> requireExhaustive (tracingCallSite t) ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
@@ -279,12 +283,15 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 
                 state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
                 expectedSymbols = firstSet (t `Then` return)
-                makeError = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) (tracingCallSite t) stateCallSites))) $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
+                makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
-requireExhaustive :: (Symbol grammar, HasCallStack) => (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
-requireExhaustive (a, state) = let state' = skipTokens state in case stateNodes state' of
+requireExhaustive :: (Symbol grammar, HasCallStack) => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
+requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
   [] -> Right (a, state')
-  (node :< _) : _ -> Left (nodeError [] node)
+  (node :< _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
+
+withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallStack => a) -> a
+withStateCallStack callSite state action = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state)))) action
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
 skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . CofreeF.headF . runCofree) (stateNodes state) }
