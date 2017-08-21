@@ -43,7 +43,7 @@ instance Eq1 Variable where liftEq = genericLiftEq
 instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 
-data Class a = Class { classIdentifier :: !a, classContext :: ![a], classSuperclasses :: ![a], classBody :: ![a] }
+data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Class where liftEq = genericLiftEq
