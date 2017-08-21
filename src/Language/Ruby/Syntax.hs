@@ -192,11 +192,11 @@ endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many expression)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> expression <*> (superclass <|> pure []) <*> many expression)
+class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> pure [] <*> expression <*> (superclass <|> pure []) <*> many expression)
   where superclass = pure <$ symbol Superclass <*> children expression
 
 singletonClass :: Assignment
-singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> expression <*> pure [] <*> many expression)
+singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> pure [] <*> expression <*> pure [] <*> many expression)
 
 module' :: Assignment
 module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> expression <*> many expression)
