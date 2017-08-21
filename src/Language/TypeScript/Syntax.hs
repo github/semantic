@@ -912,7 +912,7 @@ assignment'
       <|> argument
 
 unary :: Assignment
-unary = symbol Unary >>= \ location ->
+unary = symbol UnaryExpression >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
