@@ -413,7 +413,7 @@ data JsxClosingElement a = JsxClosingElement { jsxClosingElementIdentifier :: !a
 instance Eq1 JsxClosingElement where liftEq = genericLiftEq
 instance Show1 JsxClosingElement where liftShowsPrec = genericLiftShowsPrec
 
-data JsxSelfClosingElement a = JsxSelfClosingElement { jsxSelfClosingElementIdentifier :: !a }
+data JsxSelfClosingElement a = JsxSelfClosingElement { jsxSelfClosingElementIdentifier :: !a, jsxSelfClosingElementAttributes :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 JsxSelfClosingElement where liftEq = genericLiftEq
