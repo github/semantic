@@ -903,7 +903,7 @@ unary = symbol Unary >>= \ location ->
   <|> makeTerm location . Expression.Negate <$> children expression -- Unary minus (e.g. `-a`). HiddenUnaryMinus nodes are hidden, so we can't match on the symbol.
 
 binary  :: Assignment
-binary = symbol Binary >>= \ loc -> children $ expression >>= \ lexpression -> go loc lexpression
+binary = symbol BinaryExpression >>= \ loc -> children $ expression >>= \ lexpression -> go loc lexpression
   where
     go loc lexpression
        =  mk AnonAnd Expression.And
