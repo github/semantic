@@ -206,11 +206,9 @@ parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assign
     makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment identifier' value')
 
 decoratedDefinition :: Assignment
-decoratedDefinition = symbol DecoratedDefinition *> children (makeDecorator <$> partialDecorator <*> (flip (foldr makeDecorator) <$> many partialDecorator <*> term (functionDefinition <|> classDefinition)))
+decoratedDefinition = symbol DecoratedDefinition *> children (term decorator)
   where
-    makeDecorator (loc, partialDecorator') next = makeTerm loc (partialDecorator' next)
-    partialDecorator = (,) <$> symbol Decorator <*> children decorator'
-    decorator' = Declaration.Decorator <$> expression <*> many expression
+    decorator = makeTerm <$> symbol Decorator <*> (children (Declaration.Decorator <$> expression <*> many expression) <*> term (decorator <|> functionDefinition <|> classDefinition))
 
 argumentList :: Assignment
 argumentList = symbol ArgumentList *> children expressions
