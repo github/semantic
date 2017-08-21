@@ -44,6 +44,20 @@ newtype Float a = Float { floatContent :: ByteString }
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
+-- Rational literals e.g. `2/3r`
+newtype Rational a = Rational ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Data.Syntax.Literal.Rational where liftEq = genericLiftEq
+instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftShowsPrec
+
+-- Complex literals e.g. `3 + 2i`
+newtype Complex a = Complex ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Data.Syntax.Literal.Complex where liftEq = genericLiftEq
+instance Show1 Data.Syntax.Literal.Complex where liftShowsPrec = genericLiftShowsPrec
+
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [a] }
