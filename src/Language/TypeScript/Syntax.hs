@@ -598,6 +598,9 @@ jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children 
 jsxAttribute :: Assignment
 jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (Language.TypeScript.Syntax.JsxAttribute <$> propertyIdentifier <*> (number <|> string <|> jsxExpression'))
 
+propertyIdentifier :: Assignment
+propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> children (Syntax.Identifier <$> source)
+
 sequenceExpression :: Assignment
 sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Language.TypeScript.Syntax.SequenceExpression <$> expression <*> (sequenceExpression <|> expression))
 
