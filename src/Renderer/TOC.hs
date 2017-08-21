@@ -124,7 +124,7 @@ declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syn
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 declarationAlgebra blob@Blob{..} (a :< r)
   | Just (Declaration.Function (identifier, _) _ _) <- prj r = Just $ FunctionDeclaration (getSource (extract identifier))
-  | Just (Declaration.Method _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
+  | Just (Declaration.Method _ _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
   | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange
