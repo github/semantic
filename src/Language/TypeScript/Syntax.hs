@@ -555,7 +555,7 @@ literal =
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> expression <*> (many typeParameter' <|> pure []) (superclass <|> pure []) <*> classBodyStatements)
+class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> expression <*> (many typeParameter' <|> pure []) <*> (superclass <|> pure []) <*> classBodyStatements)
   where superclass = pure <$ symbol Grammar.ClassHeritage <*> children expression
 
 object :: Assignment
