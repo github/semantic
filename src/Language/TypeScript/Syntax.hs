@@ -122,6 +122,11 @@ type Syntax = '[
   , Language.TypeScript.Syntax.AbstractClass
   , Language.TypeScript.Syntax.ExtendsClause
   , Language.TypeScript.Syntax.ImplementsClause
+  , Language.TypeScript.Syntax.JsxElement
+  , Language.TypeScript.Syntax.JsxSelfClosingElement
+  , Language.TypeScript.Syntax.JsxOpeningElement
+  , Language.TypeScript.Syntax.JsxText
+  , Language.TypeScript.Syntax.JsxClosingElement
   , Type.Visibility
   , []
   ]
