@@ -916,10 +916,6 @@ binary = symbol BinaryExpression >>= \ loc -> children $ expression >>= \ lexpre
       <|> mkNot AnonBangEqual Expression.Equal
        -- TODO: Distinguish `===` from `==` ?
       <|> mk AnonEqualEqualEqual Expression.Equal
-      <|> mk AnonLAngleEqualRAngle Expression.Comparison
-      -- TODO: Distinuish `=~` and `!~` ?
-      <|> mk AnonEqualTilde Expression.Equal
-      <|> mkNot AnonBangTilde Expression.Equal
       <|> mk AnonLAngle Expression.LessThan
       <|> mk AnonLAngleEqual Expression.LessThanEqual
       <|> mk AnonRAngle Expression.GreaterThan
@@ -933,7 +929,6 @@ binary = symbol BinaryExpression >>= \ loc -> children $ expression >>= \ lexpre
       -- TODO: binary star (hidden node)
       <|> mk AnonSlash Expression.DividedBy
       <|> mk AnonPercent Expression.Modulo
-      <|> mk AnonStarStar Expression.Power
       where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> expression))
             mkNot s constr = makeTerm loc <$ symbol s <*> (Expression.Not <$> (makeTerm <$> location <*> (constr lexpression <$> expression)))
 
