@@ -143,14 +143,14 @@ data AssignmentF ast grammar a where
 data Tracing f a where
   Tracing :: { tracingCallSite :: Maybe (String, SrcLoc), runTracing :: f a } -> Tracing f a
 
+assignmentCallSite :: Assignment ast grammar a -> Maybe (String, SrcLoc)
+assignmentCallSite (Tracing site _ `Then` _) = site
+assignmentCallSite _ = Nothing
+
 tracing :: HasCallStack => f a -> Tracing f a
 tracing f = case getCallStack callStack of
   (_ : site : _) -> Tracing (Just site) f
   _ -> Tracing Nothing f
-
-assignmentCallSite :: Assignment ast grammar a -> Maybe (String, SrcLoc)
-assignmentCallSite (Tracing site _ `Then` _) = site
-assignmentCallSite _ = Nothing
 
 -- | Zero-width production of the current location.
 --
