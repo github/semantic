@@ -93,3 +93,6 @@ instance Pretty1 Patch where
   liftPretty p _ (Replace a b) = pretty ("Replace" :: String) <> flatAlt (nest 2 (line <> vsep [ p a, p b ])) (space <> p a <+> p b)
   liftPretty p _ (Insert b) = pretty ("Insert" :: String) <> flatAlt (nest 2 (line <> p b)) (space <> p b)
   liftPretty p _ (Delete a) = pretty ("Delete" :: String) <> flatAlt (nest 2 (line <> p a)) (space <> p a)
+
+instance Pretty a => Pretty (Patch a) where
+  pretty = pretty1
