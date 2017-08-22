@@ -33,8 +33,10 @@ import qualified Term
 type Syntax =
   '[ Declaration.Function
    , Declaration.Method
+   , Declaration.Module
    , Syntax.Error
    , Syntax.Empty
+   , Syntax.Identifier
    , Syntax.Program
    , []
    ]
@@ -44,7 +46,16 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
+assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many packageClause)
+
+packageClause :: Assignment
+packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> packageIdentifier <*> many expression)
 
 expression :: Assignment
-expression = emptyTerm
+expression = literal
+
+literal :: Assignment
+literal = packageIdentifier
+
+packageIdentifier :: Assignment
+packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier <$> source)
