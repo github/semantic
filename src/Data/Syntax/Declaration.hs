@@ -7,7 +7,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
 
-data Function a = Function { functionName :: !a, functionParameters :: ![a], functionBody :: !a }
+data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Function where liftEq = genericLiftEq

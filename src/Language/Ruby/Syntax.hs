@@ -229,11 +229,11 @@ lambda = symbol Lambda >>= \ loc -> children $ do
   name <- makeTerm loc <$> (Syntax.Identifier <$> source)
   params <- (symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure []
   body <- expressions
-  pure $ makeTerm loc (Declaration.Function name params body)
+  pure $ makeTerm loc (Declaration.Function [] name params body)
 
 block :: Assignment
-block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> emptyTerm <*> params <*> expressions)
-     <|> makeTerm <$> symbol Block <*> children (Declaration.Function <$> emptyTerm <*> params <*> expressions)
+block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
+     <|> makeTerm <$> symbol Block <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
   where params = (symbol BlockParameters) *> children (many parameter) <|> pure []
 
 comment :: Assignment
