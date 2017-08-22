@@ -79,6 +79,7 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
+  , Syntax.Context
   , Type.Annotation
   , Type.Readonly
   , Type.TypeParameters
