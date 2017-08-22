@@ -16,7 +16,7 @@ import Data.ByteString (ByteString)
 import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, makeTerm)
+import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -890,44 +890,39 @@ unary :: Assignment
 unary = symbol UnaryExpression >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
-  <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
   <|> children ( symbol AnonPlus *> expression )
   <|> makeTerm location . Expression.Negate <$> children expression -- Unary minus (e.g. `-a`). HiddenUnaryMinus nodes are hidden, so we can't match on the symbol.
 
 binary  :: Assignment
-binary = symbol BinaryExpression >>= \ loc -> children $ expression >>= \ lexpression -> go loc lexpression
-  where
-    go loc lexpression
-       =  mk AnonAnd Expression.And
-      <|> mk AnonAmpersandAmpersand Expression.And
-      <|> mk AnonOr Expression.Or
-      <|> mk AnonPipePipe Expression.Or
-      <|> mk AnonLAngleLAngle Expression.LShift
-      <|> mk AnonRAngleRAngle Expression.RShift
-      <|> mk AnonEqualEqual Expression.Equal
-      <|> mkNot AnonBangEqual Expression.Equal
-       -- TODO: Distinguish `===` from `==` ?
-      <|> mk AnonEqualEqualEqual Expression.Equal
-      <|> mk AnonLAngle Expression.LessThan
-      <|> mk AnonLAngleEqual Expression.LessThanEqual
-      <|> mk AnonRAngle Expression.GreaterThan
-      <|> mk AnonRAngleEqual Expression.GreaterThanEqual
-      <|> mk AnonAmpersand Expression.BAnd
-      <|> mk AnonCaret Expression.BXOr
-      <|> mk AnonPipe Expression.BOr
-      -- TODO: binary minus (hidden node). Doesn't work b/c we can't match hidden nodes (they aren't in the tree).
-      -- <|> mk HiddenBinaryMinus Expression.Minus
-      <|> mk AnonPlus Expression.Plus
-      -- TODO: binary star (hidden node)
-      <|> mk AnonSlash Expression.DividedBy
-      <|> mk AnonPercent Expression.Modulo
-      where mk s constr = makeTerm loc <$> (symbol s *> (constr lexpression <$> expression))
-            mkNot s constr = makeTerm loc <$ symbol s <*> (Expression.Not <$> (makeTerm <$> location <*> (constr lexpression <$> expression)))
+binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
+  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
+  , (inj .) . Expression.Minus            <$ symbol AnonMinus
+  , (inj .) . Expression.Times            <$ symbol AnonStar
+  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Expression.BOr              <$ symbol AnonPipe
+  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
+  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
+  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  ])
+  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
 
-
--- Helper functions
-invert :: (Expression.Boolean :< fs, HasCallStack) => Assignment.Assignment ast grammar (Term.Term (Data.Union.Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term.Term (Data.Union.Union fs) (Record Location))
-invert term = makeTerm <$> location <*> fmap Expression.Not term
+-- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
+infixTerm :: HasCallStack
+          => Assignment
+          -> Assignment
+          -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
+          -> Assignment.Assignment (AST Grammar) Grammar (Data.Union.Union Syntax Term)
+infixTerm = infixContext comment
