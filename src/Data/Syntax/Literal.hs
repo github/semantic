@@ -5,10 +5,11 @@ import Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Orphans
+import Data.Functor.Classes.Pretty
 import Data.Functor.Classes.Show.Generic
+import Data.Text.Encoding
 import GHC.Generics
-import Prelude hiding (String)
+import Prelude
 
 -- Boolean
 
@@ -29,10 +30,13 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | A literal integer of unspecified width. No particular base is implied.
 newtype Integer a = Integer { integerContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 Data.Syntax.Literal.Integer where
+  liftPretty _ _ (Integer s) = pretty ("Integer" :: Prelude.String) <+> prettyBytes s
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
 -- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
@@ -40,32 +44,42 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 
 -- | A literal float of unspecified width.
 newtype Float a = Float { floatContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
+instance Pretty1 Data.Syntax.Literal.Float where
+  liftPretty _ _ (Float s) = pretty ("Float" :: Prelude.String) <+> prettyBytes s
+
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.Rational where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftShowsPrec
 
+instance Pretty1 Data.Syntax.Literal.Rational where
+  liftPretty _ _ (Rational s) = pretty ("Rational" :: Prelude.String) <+> prettyBytes s
+
 -- Complex literals e.g. `3 + 2i`
 newtype Complex a = Complex ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.Complex where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.Complex where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 Complex where
+  liftPretty _ _ (Complex s) = pretty ("Complex" :: Prelude.String) <+> prettyBytes s
+
 
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
 
-instance Eq1 String where liftEq = genericLiftEq
-instance Show1 String where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Data.Syntax.Literal.String where liftEq = genericLiftEq
+instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Should string literal bodies include escapes too?
 
@@ -79,10 +93,13 @@ instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 TextElement where
+  liftPretty _ _ (TextElement s) = pretty ("TextElement" :: Prelude.String) <+> prettyBytes s
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
@@ -91,10 +108,13 @@ instance Eq1 Null where liftEq = genericLiftEq
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 Symbol where
+  liftPretty _ _ (Symbol s) = pretty ("Symbol" :: Prelude.String) <+> prettyBytes s
 
 -- TODO: Heredoc-style string literals?
 -- TODO: Character literals.
@@ -140,3 +160,6 @@ instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
 -- TODO: Regexp literals.
+
+prettyBytes :: ByteString -> Doc ann
+prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))
