@@ -22,8 +22,10 @@ import Data.Functor.Both
 import Data.Functor.Classes.Pretty
 import Data.Functor.Foldable
 import Data.Maybe
+import Data.Proxy
 import Data.Record
 import Data.These
+import Data.Union
 import Syntax
 
 -- | A Term with an abstract syntax tree and an annotation.
@@ -76,3 +78,6 @@ instance Pretty1 f => Pretty1 (Cofree.Cofree f) where
 
 instance (Pretty1 f, Pretty a) => Pretty (Cofree.Cofree f a) where
   pretty = pretty1
+
+instance Apply1 Pretty1 fs => Pretty1 (Union fs) where
+  liftPretty p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
