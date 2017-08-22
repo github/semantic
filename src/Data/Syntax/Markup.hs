@@ -5,8 +5,9 @@ import Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Orphans
+import Data.Functor.Classes.Pretty
 import Data.Functor.Classes.Show.Generic
+import Data.Text.Encoding (decodeUtf8With)
 import GHC.Generics
 
 
@@ -62,10 +63,13 @@ instance Eq1 ThematicBreak where liftEq = genericLiftEq
 instance Show1 ThematicBreak where liftShowsPrec = genericLiftShowsPrec
 
 data HTMLBlock a = HTMLBlock ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 HTMLBlock where liftEq = genericLiftEq
 instance Show1 HTMLBlock where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 HTMLBlock where
+  liftPretty _ _ (HTMLBlock s) = pretty ("HTMLBlock" :: String) <+> prettyBytes s
 
 newtype Table a = Table [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
@@ -101,25 +105,34 @@ instance Eq1 Emphasis where liftEq = genericLiftEq
 instance Show1 Emphasis where liftShowsPrec = genericLiftShowsPrec
 
 newtype Text a = Text ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
 
+instance Pretty1 Text where
+  liftPretty _ _ (Text s) = pretty ("Text" :: String) <+> prettyBytes s
+
 data Link a = Link { linkURL :: ByteString, linkTitle :: Maybe ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Link where liftEq = genericLiftEq
 instance Show1 Link where liftShowsPrec = genericLiftShowsPrec
 
+instance Pretty1 Link where
+  liftPretty _ _ (Link u t) = pretty ("Link" :: String) <+> prettyBytes u <+> liftPretty prettyBytes (list . map prettyBytes) t
+
 data Image a = Image { imageURL :: ByteString, imageTitle :: Maybe ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Image where liftEq = genericLiftEq
 instance Show1 Image where liftShowsPrec = genericLiftShowsPrec
 
+instance Pretty1 Image where
+  liftPretty _ _ (Image u t) = pretty ("Image" :: String) <+> prettyBytes u <+> liftPretty prettyBytes (list . map prettyBytes) t
+
 data Code a = Code { codeLanguage :: Maybe ByteString, codeContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Code where liftEq = genericLiftEq
 instance Show1 Code where liftShowsPrec = genericLiftShowsPrec
@@ -135,3 +148,6 @@ newtype Strikethrough a = Strikethrough [a]
 
 instance Eq1 Strikethrough where liftEq = genericLiftEq
 instance Show1 Strikethrough where liftShowsPrec = genericLiftShowsPrec
+
+prettyBytes :: ByteString -> Doc ann
+prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))
