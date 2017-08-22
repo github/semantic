@@ -127,6 +127,8 @@ type Syntax = '[
   , Language.TypeScript.Syntax.JsxOpeningElement
   , Language.TypeScript.Syntax.JsxText
   , Language.TypeScript.Syntax.JsxClosingElement
+  , Language.TypeScript.Syntax.JsxExpression
+  , Language.TypeScript.Syntax.JsxAttribute
   , Language.TypeScript.Syntax.SequenceExpression
   , Type.Visibility
   , []
