@@ -16,6 +16,7 @@ import Data.ByteString (ByteString)
 import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
+import Data.Maybe (catMaybes)
 import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
@@ -875,8 +876,7 @@ call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expres
 rescue :: Assignment
 rescue =  rescue'
       <|> makeTerm <$> symbol RescueModifier <*> children (Statement.Try <$> expression <*> many (makeTerm <$> location <*> (Statement.Catch <$> expression <*> emptyTerm)))
-      <|> makeTerm <$> symbol Ensure <*> children (Statement.Finally <$> expressions)
-      <|> makeTerm <$> symbol Else <*> children (Statement.Else <$> emptyTerm <*> expressions)
+      <|> makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> expressions)
   where
     rescue' = makeTerm <$> symbol Rescue <*> children (Statement.Catch <$> exceptions <*> (rescue' <|> expressions))
     exceptions = makeTerm <$> location <*> many ex
@@ -884,7 +884,11 @@ rescue =  rescue'
       <|> makeTerm <$> symbol ExceptionVariable <*> children (many expression)
 
 tryStatement :: Assignment
-tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expressions <*> many rescue)
+tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> statementBlock <*> optional catchClause <*> optional finallyClause)
+  where
+    makeTry loc (statementBlock', catch, finally) = makeTerm loc (Statement.Try statementBlock' (catMaybes [catch, finally]))
+    catchClause = makeTerm <$> symbol CatchClause <*> (Statement.Catch <$> (identifier <|> emptyTerm) <*> statementBlock)
+    finallyClause = makeTerm <$> symbol FinallyClause <*> (Statement.Finally <$> statementBlock)
 
 unary :: Assignment
 unary = symbol UnaryExpression >>= \ location ->
