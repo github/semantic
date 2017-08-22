@@ -665,7 +665,6 @@ constraint = makeTerm <$> symbol Grammar.Constraint <*> children (Language.TypeS
 
 function :: Assignment
 function = makeFunction <$> symbol Grammar.Function <*> children ((,,) <$> identifier <*> callSignatureParts <*> statements)
-  where makeFunction loc (id, (typeParams, params, annotation), statements) = makeTerm loc (Declaration.Function [typeParams, annotation] id params)
 
 ty :: Assignment
 ty = primaryType <|> unionType <|> intersectionType <|> functionTy <|> constructorTy
