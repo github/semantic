@@ -5,6 +5,7 @@ import Control.DeepSeq
 import Data.Kind
 import Data.Functor.Listable
 import Data.Semigroup
+import Data.Text.Prettyprint.Doc
 
 -- | A type-safe, extensible record structure.
 -- |
@@ -87,3 +88,13 @@ instance (Semigroup head, Semigroup (Record tail)) => Semigroup (Record (head ':
 
 instance Semigroup (Record '[]) where
   _ <> _ = Nil
+
+
+instance (Pretty first, Pretty (Record (second ': rest))) => Pretty (Record (first ': second ': rest)) where
+  pretty (a :. rest) = pretty a <+> pretty rest
+
+instance Pretty last => Pretty (Record '[ last ]) where
+  pretty (a :. Nil) = pretty a
+
+instance Pretty (Record '[]) where
+  pretty _ = emptyDoc
