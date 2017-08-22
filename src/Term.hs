@@ -73,3 +73,6 @@ runCofree (a Cofree.:< f) = a CofreeF.:< f
 
 instance Pretty1 f => Pretty1 (Cofree.Cofree f) where
   liftPretty p pl = go where go (a Cofree.:< f) = p a <+> liftPretty go (liftPrettyList p pl) f
+
+instance (Pretty1 f, Pretty a) => Pretty (Cofree.Cofree f a) where
+  pretty = pretty1
