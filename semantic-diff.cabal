@@ -21,7 +21,6 @@ library
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
-                     , Data.Functor.Classes.Pretty.Orphans
                      , Data.Functor.Classes.Show.Generic
                      , Data.Functor.Listable
                      , Data.Mergeable
