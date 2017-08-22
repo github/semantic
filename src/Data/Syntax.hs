@@ -13,12 +13,13 @@ import Data.Function ((&))
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Orphans
+import Data.Functor.Classes.Pretty
 import Data.Functor.Classes.Show.Generic
 import Data.Record
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
+import Data.Text.Encoding (decodeUtf8With)
 import Data.Union
 import GHC.Generics
 import GHC.Stack
@@ -101,10 +102,13 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 -- Undifferentiated
 
 newtype Leaf a = Leaf { leafContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Leaf where liftEq = genericLiftEq
 instance Show1 Leaf where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 Leaf where
+  liftPretty _ _ (Leaf s) = pretty ("Leaf" :: String) <+> prettyBytes s
 
 newtype Branch a = Branch { branchElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
@@ -117,10 +121,13 @@ instance Show1 Branch where liftShowsPrec = genericLiftShowsPrec
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 Identifier where
+  liftPretty _ _ (Identifier s) = pretty ("Identifier" :: String) <+> prettyBytes s
 
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
@@ -141,10 +148,13 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 Error where
+  liftPretty _ pl (Error cs e a c) = nest 2 (concatWith (\ x y -> x <> hardline <> y) [ pretty ("Error" :: String), pretty (Error.showExpectation False e a ""), pretty (Error.showCallStack False (fromCallSiteList cs) ""), pl c])
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual
@@ -158,3 +168,6 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+
+prettyBytes :: ByteString -> Doc ann
+prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))
