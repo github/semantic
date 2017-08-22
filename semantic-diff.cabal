@@ -106,6 +106,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , prettyprinter
                      , recursion-schemes
                      , semigroups
                      , split
