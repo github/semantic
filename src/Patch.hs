@@ -90,9 +90,9 @@ instance Crosswalk Patch where
   crosswalk f (Delete a) = Delete <$> f a
 
 instance Pretty1 Patch where
-  liftPretty p _ (Replace a b) = pretty ("Replace" :: String) <> flatAlt (nest 2 (line <> vsep [ p a, p b ])) (space <> p a <+> p b)
-  liftPretty p _ (Insert b) = pretty ("Insert" :: String) <> flatAlt (nest 2 (line <> p b)) (space <> p b)
-  liftPretty p _ (Delete a) = pretty ("Delete" :: String) <> flatAlt (nest 2 (line <> p a)) (space <> p a)
+  liftPretty p _ (Replace a b) = nest 2 (vsep [ pretty ("Replace" :: String), p a, p b ])
+  liftPretty p _ (Insert b) = nest 2 (vsep [ pretty ("Insert" :: String), p b ])
+  liftPretty p _ (Delete a) = nest 2 (vsep [ pretty ("Delete" :: String), p a ])
 
 instance Pretty a => Pretty (Patch a) where
   pretty = pretty1
