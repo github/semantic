@@ -839,11 +839,6 @@ while' =
       makeTerm <$> symbol While         <*> children      (Statement.While <$> expression <*> expressions)
   <|> makeTerm <$> symbol WhileModifier <*> children (flip Statement.While <$> expression <*> expression)
 
-until' :: Assignment
-until' =
-      makeTerm <$> symbol Until         <*> children      (Statement.While <$> invert expression <*> expressions)
-  <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> expression <*> invert expression)
-
 for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> vars <*> expression <*> expressions)
   where vars = makeTerm <$> location <*> some expression
