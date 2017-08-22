@@ -883,28 +883,6 @@ rescue =  rescue'
     ex =  makeTerm <$> symbol Exceptions <*> children (many expression)
       <|> makeTerm <$> symbol ExceptionVariable <*> children (many expression)
 
-assignment' :: Assignment
-assignment'
-   =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lhs <*> rhs)
-  <|> makeTerm <$> symbol OperatorAssignment <*> children (lhs >>= \ var -> Statement.Assignment var <$>
-         (makeTerm <$> symbol AnonPlusEqual               <*> (Expression.Plus var      <$> expression)
-      <|> makeTerm <$> symbol AnonMinusEqual              <*> (Expression.Minus var     <$> expression)
-      <|> makeTerm <$> symbol AnonStarEqual               <*> (Expression.Times var     <$> expression)
-      <|> makeTerm <$> symbol AnonSlashEqual              <*> (Expression.DividedBy var <$> expression)
-      <|> makeTerm <$> symbol AnonPipePipeEqual           <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$> symbol AnonPipeEqual               <*> (Expression.BOr var       <$> expression)
-      <|> makeTerm <$> symbol AnonAmpersandAmpersandEqual <*> (Expression.And var       <$> expression)
-      <|> makeTerm <$> symbol AnonAmpersandEqual          <*> (Expression.BAnd var      <$> expression)
-      <|> makeTerm <$> symbol AnonPercentEqual            <*> (Expression.Modulo var    <$> expression)
-      <|> makeTerm <$> symbol AnonRAngleRAngleEqual       <*> (Expression.RShift var    <$> expression)
-      <|> makeTerm <$> symbol AnonLAngleLAngleEqual       <*> (Expression.LShift var    <$> expression)
-      <|> makeTerm <$> symbol AnonCaretEqual              <*> (Expression.BXOr var      <$> expression)))
-  where
-    lhs = makeTerm <$> symbol LeftAssignmentList <*> children (many expr) <|> expr
-    rhs = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr =
-          makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
-      <|> argument
 tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expressions <*> many rescue)
 
