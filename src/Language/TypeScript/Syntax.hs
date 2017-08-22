@@ -897,8 +897,8 @@ unary = symbol UnaryExpression >>= \ location ->
   <|> children ( symbol AnonPlus *> expression )
   <|> makeTerm location . Expression.Negate <$> children expression -- Unary minus (e.g. `-a`). HiddenUnaryMinus nodes are hidden, so we can't match on the symbol.
 
-binary  :: Assignment
-binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
+binaryExpression  :: Assignment
+binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
   , (inj .) . Expression.Minus            <$ symbol AnonMinus
   , (inj .) . Expression.Times            <$ symbol AnonStar
