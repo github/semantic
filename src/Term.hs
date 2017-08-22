@@ -19,6 +19,7 @@ import Control.DeepSeq
 import Control.Monad.Free
 import Data.Align.Generic
 import Data.Functor.Both
+import Data.Functor.Classes.Pretty
 import Data.Functor.Foldable
 import Data.Maybe
 import Data.Record
@@ -68,3 +69,7 @@ cofree (a CofreeF.:< f) = a Cofree.:< f
 
 runCofree :: Cofree.Cofree f a -> CofreeF.CofreeF f a (Cofree.Cofree f a)
 runCofree (a Cofree.:< f) = a CofreeF.:< f
+
+
+instance Pretty1 f => Pretty1 (Cofree.Cofree f) where
+  liftPretty p pl = go where go (a Cofree.:< f) = p a <+> liftPretty go (liftPrettyList p pl) f
