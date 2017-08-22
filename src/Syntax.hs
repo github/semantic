@@ -6,6 +6,7 @@ import Data.Aeson
 import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Pretty
 import Data.Functor.Listable
 import Data.Mergeable
 import Data.Text (pack, Text)
@@ -110,7 +111,7 @@ data Syntax f
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
   | Send f f
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Pretty1, Show, Traversable, ToJSON, NFData)
 
 
 extractLeafValue :: Syntax a -> Maybe Text
