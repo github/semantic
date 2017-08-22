@@ -883,9 +883,6 @@ rescue =  rescue'
     ex =  makeTerm <$> symbol Exceptions <*> children (many expression)
       <|> makeTerm <$> symbol ExceptionVariable <*> children (many expression)
 
-begin :: Assignment
-begin = makeTerm <$> symbol Begin <*> children (Statement.Try <$> expressions <*> many rescue)
-
 assignment' :: Assignment
 assignment'
    =  makeTerm <$> symbol Assignment <*> children (Statement.Assignment <$> lhs <*> rhs)
@@ -908,6 +905,8 @@ assignment'
     expr =
           makeTerm <$> symbol RestAssignment <*> (Syntax.Identifier <$> source)
       <|> argument
+tryStatement :: Assignment
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> expressions <*> many rescue)
 
 unary :: Assignment
 unary = symbol UnaryExpression >>= \ location ->
