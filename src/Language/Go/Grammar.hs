@@ -2,8 +2,8 @@
 module Language.Go.Grammar where
 
 import Language.Haskell.TH
-import TreeSitter.Language
 import TreeSitter.Go
+import TreeSitter.Language
 
 -- | Statically-known rules corresponding to symbols in the grammar.
 -- v1 - bump this to regenerate

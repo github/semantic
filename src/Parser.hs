@@ -5,6 +5,7 @@ module Parser
 , parserForLanguage
 , lineByLineParser
 -- À la carte parsers
+, goParser
 , jsonParser
 , markdownParser
 , pythonParser
@@ -23,6 +24,7 @@ import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
 import Language
+import qualified Language.Go.Syntax as Go
 import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
@@ -63,6 +65,9 @@ parserForLanguage (Just language) = case language of
   Ruby -> TreeSitterParser tree_sitter_ruby
   TypeScript -> TreeSitterParser tree_sitter_typescript
   _ -> LineByLineParser
+
+goParser :: Parser Go.Term
+goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
