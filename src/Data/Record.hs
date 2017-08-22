@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Record where
 
 import Control.DeepSeq
@@ -90,11 +90,8 @@ instance Semigroup (Record '[]) where
   _ <> _ = Nil
 
 
-instance (Pretty first, Pretty (Record (second ': rest))) => Pretty (Record (first ': second ': rest)) where
-  pretty (a :. rest) = pretty a <+> pretty rest
-
-instance Pretty last => Pretty (Record '[ last ]) where
-  pretty (a :. Nil) = pretty a
-
-instance Pretty (Record '[]) where
-  pretty _ = emptyDoc
+instance ConstrainAll Pretty ts => Pretty (Record ts) where
+  pretty = tupled . collectPretty
+    where collectPretty :: ConstrainAll Pretty ts => Record ts -> [Doc ann]
+          collectPretty Nil = []
+          collectPretty (first :. rest) = pretty first : collectPretty rest
