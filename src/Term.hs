@@ -74,10 +74,10 @@ runCofree (a Cofree.:< f) = a CofreeF.:< f
 
 
 instance Pretty1 f => Pretty1 (Cofree.Cofree f) where
-  liftPretty p pl = go where go (a Cofree.:< f) = p a <+> liftPretty go (liftPrettyList p pl) f
+  liftPretty p pl = go where go (a Cofree.:< f) = p a <+> liftPretty go (list . map (liftPretty p pl)) f
 
 instance (Pretty1 f, Pretty a) => Pretty (Cofree.Cofree f a) where
-  pretty = pretty1
+  pretty = liftPretty pretty prettyList
 
 instance Apply1 Pretty1 fs => Pretty1 (Union fs) where
   liftPretty p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)

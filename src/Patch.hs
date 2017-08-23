@@ -95,4 +95,4 @@ instance Pretty1 Patch where
   liftPretty p _ (Delete a) = nest 2 (vsep [ pretty ("Delete" :: String), p a ])
 
 instance Pretty a => Pretty (Patch a) where
-  pretty = pretty1
+  pretty = liftPretty pretty prettyList

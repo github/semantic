@@ -68,7 +68,7 @@ runFree (Free.Pure a) = FreeF.Pure a
 
 instance Pretty1 f => Pretty1 (Free.Free f) where
   liftPretty p pl = go where go (Free.Pure a) = p a
-                             go (Free.Free f) = liftPretty go (liftPrettyList p pl) f
+                             go (Free.Free f) = liftPretty go (list . map (liftPretty p pl)) f
 
 instance (Pretty1 f, Pretty a) => Pretty (Free.Free f a) where
-  pretty = pretty1
+  pretty = liftPretty pretty prettyList
