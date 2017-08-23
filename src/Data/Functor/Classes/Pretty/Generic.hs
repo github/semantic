@@ -1,10 +1,15 @@
 {-# LANGUAGE TypeOperators #-}
 module Data.Functor.Classes.Pretty.Generic
 ( Pretty1(..)
+, genericLiftPretty
 ) where
 
 import Data.Text.Prettyprint.Doc
 import GHC.Generics
+
+genericLiftPretty :: (Generic1 f, GPretty1 (Rep1 f)) => (a -> Doc ann) -> ([a] -> Doc ann) -> f a -> Doc ann
+genericLiftPretty pretty' prettyList' = gliftPretty pretty' prettyList' . from1
+
 
 class GPretty1 f where
   gliftPretty :: (a -> Doc ann) -> ([a] -> Doc ann) -> f a -> Doc ann
