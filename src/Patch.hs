@@ -89,10 +89,7 @@ instance Crosswalk Patch where
   crosswalk f (Insert b) = Insert <$> f b
   crosswalk f (Delete a) = Delete <$> f a
 
-instance Pretty1 Patch where
-  liftPretty p _ (Replace a b) = nest 2 (vsep [ pretty ("Replace" :: String), p a, p b ])
-  liftPretty p _ (Insert b) = nest 2 (vsep [ pretty ("Insert" :: String), p b ])
-  liftPretty p _ (Delete a) = nest 2 (vsep [ pretty ("Delete" :: String), p a ])
+instance Pretty1 Patch where liftPretty = genericLiftPretty
 
 instance Pretty a => Pretty (Patch a) where
   pretty = liftPretty pretty prettyList
