@@ -32,6 +32,7 @@ import qualified Term
 
 type Syntax =
   '[ Declaration.Function
+   , Declaration.Import
    , Declaration.Method
    , Declaration.Module
    , Literal.TextElement
@@ -45,15 +46,18 @@ type Syntax =
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
--- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many packageClause)
-
-packageClause :: Assignment
-packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> packageIdentifier <*> many expression)
+assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = literal
+expression = handleError
+           $ literal
+          <|> importDeclaration
+          <|> importSpec
+          <|> packageClause
+
+expressions :: Assignment
+expressions = makeTerm <$> location <*> many expression
 
 literal :: Assignment
 literal = identifier
@@ -65,6 +69,11 @@ identifier = makeTerm <$> (symbol Identifier <|> symbol PackageIdentifier) <*> (
 interpretedStringLiteral :: Assignment
 interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
 
+packageClause :: Assignment
+packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> identifier <*> pure [])
 
-packageIdentifier :: Assignment
-packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier <$> source)
+importDeclaration :: Assignment
+importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> many expression)
+
+importSpec :: Assignment
+importSpec = symbol ImportSpec *> children expressions
