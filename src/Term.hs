@@ -19,7 +19,7 @@ import Control.DeepSeq
 import Control.Monad.Free
 import Data.Align.Generic
 import Data.Functor.Both
-import Data.Functor.Classes.Pretty
+import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Foldable
 import Data.Maybe
 import Data.Proxy

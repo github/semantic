@@ -5,7 +5,7 @@ import Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty
+import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Text.Encoding
 import GHC.Generics

@@ -8,7 +8,7 @@ import qualified Control.Monad.Free as Free
 import qualified Control.Monad.Trans.Free as FreeF
 import Data.Bifunctor
 import Data.Functor.Both as Both
-import Data.Functor.Classes.Pretty
+import Data.Functor.Classes.Pretty.Generic
 import Data.Mergeable
 import Data.Record
 import Patch

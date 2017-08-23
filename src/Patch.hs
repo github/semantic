@@ -16,7 +16,7 @@ module Patch
 
 import Control.DeepSeq
 import Data.Align
-import Data.Functor.Classes.Pretty
+import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Listable
 import Data.These
 import GHC.Generics
