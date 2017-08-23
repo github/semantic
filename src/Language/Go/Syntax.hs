@@ -34,6 +34,7 @@ type Syntax =
   '[ Declaration.Function
    , Declaration.Method
    , Declaration.Module
+   , Literal.TextElement
    , Syntax.Error
    , Syntax.Empty
    , Syntax.Identifier
@@ -55,7 +56,15 @@ expression :: Assignment
 expression = literal
 
 literal :: Assignment
-literal = packageIdentifier
+literal = identifier
+       <|> interpretedStringLiteral
+
+identifier :: Assignment
+identifier = makeTerm <$> (symbol Identifier <|> symbol PackageIdentifier) <*> (Syntax.Identifier <$> source)
+
+interpretedStringLiteral :: Assignment
+interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
+
 
 packageIdentifier :: Assignment
 packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier <$> source)
