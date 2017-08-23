@@ -14,7 +14,7 @@ import Prelude
 -- Boolean
 
 newtype Boolean a = Boolean Bool
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 true :: Boolean a
 true = Boolean True
@@ -24,6 +24,7 @@ false = Boolean False
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Boolean where liftPretty = genericLiftPretty
 
 
 -- Numeric
@@ -76,19 +77,21 @@ instance Pretty1 Complex where
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.String where liftEq = genericLiftEq
 instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Data.Syntax.Literal.String where liftPretty = genericLiftPretty
 
 -- TODO: Should string literal bodies include escapes too?
 
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 InterpolationElement where liftEq = genericLiftEq
 instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 InterpolationElement where liftPretty = genericLiftPretty
 
 
 -- | A sequence of textual contents within a string literal.
@@ -102,10 +105,11 @@ instance Pretty1 TextElement where
   liftPretty _ _ (TextElement s) = pretty ("TextElement" :: Prelude.String) <+> prettyBytes s
 
 data Null a = Null
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Null where liftEq = genericLiftEq
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Null where liftPretty = genericLiftPretty
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -124,38 +128,42 @@ instance Pretty1 Symbol where
 -- Collections
 
 newtype Array a = Array { arrayElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Array where liftEq = genericLiftEq
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Array where liftPretty = genericLiftPretty
 
 
 newtype Hash a = Hash { hashElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Hash where liftEq = genericLiftEq
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
-
+instance Pretty1 Hash where liftPretty = genericLiftPretty
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 KeyValue where liftPretty = genericLiftPretty
 
 
 newtype Tuple a = Tuple { tupleContents :: [a]}
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Tuple where liftPretty = genericLiftPretty
 
 
 newtype Set a = Set { setElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Set where liftEq = genericLiftEq
 instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Set where liftPretty = genericLiftPretty
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).

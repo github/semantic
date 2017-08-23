@@ -111,10 +111,11 @@ instance Pretty1 Leaf where
   liftPretty _ _ (Leaf s) = pretty ("Leaf" :: String) <+> prettyBytes s
 
 newtype Branch a = Branch { branchElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Branch where liftEq = genericLiftEq
 instance Show1 Branch where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Branch where liftPretty = genericLiftPretty
 
 
 -- Common
@@ -130,20 +131,22 @@ instance Pretty1 Identifier where
   liftPretty _ _ (Identifier s) = pretty ("Identifier" :: String) <+> prettyBytes s
 
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Program where liftPretty = genericLiftPretty
 
 
 -- | Empty syntax, with essentially no-op semantics.
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
+instance Pretty1 Empty where liftPretty = genericLiftPretty
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -164,10 +167,11 @@ unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList 
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Context where liftPretty = genericLiftPretty
 
 prettyBytes :: ByteString -> Doc ann
 prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))

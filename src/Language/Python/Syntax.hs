@@ -90,17 +90,19 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Ellipsis where liftPretty = genericLiftPretty
 
 
 data Redirect a = Redirect !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Pretty1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Redirect where liftPretty = genericLiftPretty
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
