@@ -111,7 +111,7 @@ data Syntax f
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
   | Send f f
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Pretty1, Show, Traversable, ToJSON, NFData)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
 
 
 extractLeafValue :: Syntax a -> Maybe Text
@@ -183,5 +183,6 @@ instance Listable recur => Listable (Syntax recur) where
 
 instance Eq1 Syntax where
   liftEq = genericLiftEq
+instance Pretty1 DoWhile where liftPretty = genericLiftPretty
 
 instance GAlign Syntax
