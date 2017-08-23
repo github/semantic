@@ -183,5 +183,5 @@ instance Listable recur => Listable (Syntax recur) where
 
 instance Eq1 Syntax where
   liftEq = genericLiftEq
-instance Pretty1 DoWhile where liftPretty = genericLiftPretty
 
+instance Pretty1 Syntax where liftPretty = genericLiftPretty
