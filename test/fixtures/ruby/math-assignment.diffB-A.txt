@@ -1,19 +1,27 @@
 (Program
-{-(OperatorAssignment
+  (Assignment
     (Identifier)
-    (IntegerLiteral))-}
-  (OperatorAssignment
+    (Plus
+      (Identifier)
+    { (Integer)
+    ->(Integer) }))
+  (Assignment
     (Identifier)
-    (IntegerLiteral))
-  (OperatorAssignment
+    (Minus
+      (Identifier)
+      (Integer)))
+  (Assignment
     (Identifier)
-    (IntegerLiteral))
-  (OperatorAssignment
+    (Times
+      (Identifier)
+      (Integer)))
+  (Assignment
     (Identifier)
-    (IntegerLiteral))
-  (OperatorAssignment
+    (DividedBy
+      (Identifier)
+      (Integer)))
+  (Assignment
     (Identifier)
-    (IntegerLiteral))
-{+(OperatorAssignment
-    (Identifier)
-    (IntegerLiteral))+})
+    (Power
+      (Identifier)
+      (Integer))))
