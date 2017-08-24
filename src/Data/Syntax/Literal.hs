@@ -139,3 +139,8 @@ instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
 -- TODO: Regexp literals.
+newtype Regex a = Regex ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Regex where liftEq = genericLiftEq
+instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
