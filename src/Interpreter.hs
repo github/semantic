@@ -4,6 +4,7 @@ module Interpreter
 , decoratingWith
 , diffTermsWith
 , comparableByConstructor
+, comparableByConstructor'
 ) where
 
 import Algorithm
@@ -19,6 +20,8 @@ import Data.Maybe (isJust)
 import Data.Record
 import Data.Text (Text)
 import Data.These
+import Data.Union
+import qualified Data.Syntax.Declaration as Declaration
 import Diff
 import Info hiding (Return)
 import Patch (inserting, deleting, replacing, patchSum)
@@ -112,12 +115,19 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
-comparableByCategory (a :< _) (b :< _) = category a == category b
+comparableByCategory _ (a :< _) (b :< _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
 comparableByConstructor :: GAlign f => ComparabilityRelation f fields
-comparableByConstructor (_ :< a) (_ :< b) = isJust (galign a b)
+comparableByConstructor _ (_ :< a) (_ :< b) = isJust (galign a b)
 
+-- | Test whether two terms are comparable by their constructor.
+comparableByConstructor' :: (Declaration.Method :< fs, Apply1 GAlign fs) => ComparabilityRelation (Union fs) fields
+comparableByConstructor' canCompare (_ :< a) (_ :< b)
+  | Just (Declaration.Method _ identifierA _ _) <- prj a
+  , Just (Declaration.Method _ identifierB _ _) <- prj b
+  = canCompare identifierA identifierB
+  | otherwise = isJust (galign a b)
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
 defaultM :: Integer

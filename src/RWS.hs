@@ -19,7 +19,7 @@ import Control.Comonad.Trans.Cofree hiding (cofree, runCofree)
 import Control.Monad.Free
 import Control.Monad.State.Strict
 import Data.Foldable
-import Data.Function ((&), on)
+import Data.Function ((&), fix, on)
 import Data.Functor.Foldable
 import Data.Hashable
 import Data.List (sortOn)
@@ -48,7 +48,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 -- | A relation on 'Term's, guaranteed constant-time in the size of the 'Term' by parametricity.
 --
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
-type ComparabilityRelation f fields = forall a b. TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
+type ComparabilityRelation f fields = forall a b. (a -> b -> Bool) -> TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
 
 type FeatureVector = UArray Int Double
 
@@ -307,7 +307,7 @@ unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
-canCompareTerms canCompare = canCompare `on` runCofree
+canCompareTerms canCompare = fix (\ comparator -> canCompare comparator `on` runCofree)
 
 -- | Recursively test the equality of two 'Term's in O(n).
 equalTerms :: Eq1 f => ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
