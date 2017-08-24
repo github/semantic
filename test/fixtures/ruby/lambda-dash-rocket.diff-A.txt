@@ -1,8 +1,0 @@
-{-(Program
-  (AnonymousFunction
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (ExpressionStatements
-      (IntegerLiteral)
-      (IntegerLiteral))))-}

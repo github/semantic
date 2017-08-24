@@ -1,4 +1,0 @@
-{+(Program
-  (Return
-    (Args
-      (Identifier))))+}

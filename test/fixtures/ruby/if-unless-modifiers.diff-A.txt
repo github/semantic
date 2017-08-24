@@ -1,5 +1,0 @@
-{-(Program
-  (Modifier Unless
-    (Negate
-      (Identifier))
-    (Identifier)))-}
