@@ -1,8 +1,12 @@
 (Program
-  (AnonymousFunction
+  (Function
     (Identifier)
     (Identifier)
     (Identifier)
-    (ExpressionStatements
-      (IntegerLiteral)
-      (IntegerLiteral))))
+    (Identifier)
+    (
+      (Function
+        (Empty)
+        (
+          (Integer)
+          (Integer))))))

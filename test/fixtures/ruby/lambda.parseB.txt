@@ -1,9 +1,10 @@
 (Program
-  (MethodCall
+  (Call
     (Identifier)
-    (Params
-      (Identifier))
-    (Binary
+    (Function
+      (Empty)
       (Identifier)
-      (Other "+")
-      (IntegerLiteral))))
+      (
+        (Plus
+          (Identifier)
+          (Integer))))))

@@ -1,35 +1,52 @@
 (Program
-  (MethodCall
+  (Call
     (Identifier)
-    (Object))
-  (MethodCall
+    (Hash)
+    (Empty))
+  (Call
     (Identifier)
-    (Identifier))
-  (MethodCall
+    (Function
+      (Empty)
+      (
+        (Identifier))))
+  (Call
     (Identifier)
-    (Params
+    (Function
+      (Empty)
       (Identifier)
-      (KeywordParameter
-        (Identifier)
-        (Boolean))
-      (OptionalParameter
-        (Identifier)
-        (Identifier)))
-    (IntegerLiteral))
-  (AnonymousFunction
-    (ExpressionStatements))
-  (AnonymousFunction
-    (ExpressionStatements
-      (Identifier)))
-  (AnonymousFunction
+      (Identifier)
+      (Identifier)
+      (
+        (Integer))))
+  (Function
     (Identifier)
-    (ExpressionStatements
-      (IntegerLiteral)))
-  (AnonymousFunction
+    (
+      (Function
+        (Empty)
+        ([]))))
+  (Function
     (Identifier)
-    (SplatParameter
-      (Identifier))
-    (Other "destructured_parameter"
+    (
+      (Function
+        (Empty)
+        (
+          (Identifier)))))
+  (Function
+    (Identifier)
+    (Identifier)
+    (
+      (Function
+        (Empty)
+        (
+          (Integer)))))
+  (Function
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (
       (Identifier)
       (Identifier))
-    (ExpressionStatements)))
+    (
+      (Function
+        (Empty)
+        ([])))))
