@@ -1,8 +1,0 @@
-{-(Program
-  (Module
-    (Constant))
-  (Module
-    (ScopeOperator
-      (Constant)
-      (Other "::")
-      (Constant))))-}

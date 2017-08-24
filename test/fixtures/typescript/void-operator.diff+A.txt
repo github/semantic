@@ -1,6 +1,0 @@
-{+(Program
-  (ExpressionStatements
-    (Operator
-      (Other "void")
-      (FunctionCall
-        (Identifier)))))+}

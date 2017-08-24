@@ -1,5 +1,0 @@
-{-(Program
-  (Other "variable_declaration"
-    (VarAssignment
-      (Identifier)
-      (NumberLiteral))))-}

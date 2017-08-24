@@ -1,9 +1,0 @@
-{+(Program
-  (Module
-    (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (ExpressionStatements
-      (Other "label_statement"
-        (Identifier)))))+}
