@@ -1,7 +1,8 @@
 (Program
   (While
     (Identifier)
-  {+(Identifier)+})
-{-(Modifier While
+    (
+    {+(Identifier)+}))
+{-(While
     (Identifier)
     (Identifier))-})
