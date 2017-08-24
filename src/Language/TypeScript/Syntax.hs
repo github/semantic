@@ -61,12 +61,14 @@ type Syntax = '[
   , Literal.Null
   , Literal.String
   , Literal.TextElement
+  , Literal.Regex
   , Statement.Assignment
   , Statement.Break
   , Statement.Catch
   , Statement.Continue
   , Statement.Else
   , Statement.Finally
+  , Statement.For
   , Statement.ForEach
   , Statement.If
   , Statement.Match
