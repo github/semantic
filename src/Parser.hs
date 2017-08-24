@@ -9,6 +9,7 @@ module Parser
 , markdownParser
 , pythonParser
 , rubyParser
+, typescriptParser
 ) where
 
 import Control.Comonad.Trans.Cofree (headF)
@@ -28,6 +29,7 @@ import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.TypeScript.Syntax as TypeScript
 import Syntax hiding (Go)
 import Term
 import qualified TreeSitter.Language as TS (Language, Symbol)
@@ -74,6 +76,9 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) headF Python.assi
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) headF JSON.assignment
+
+typescriptParser :: Parser TypeScript.Term
+typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) headF TypeScript.assignment
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser (\ (node@Node{..} :< _) -> node { nodeSymbol = toGrammar nodeSymbol }) Markdown.assignment
