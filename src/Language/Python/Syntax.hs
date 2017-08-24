@@ -203,6 +203,9 @@ dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier <$>
 keywordArgument :: Assignment
 keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
 
+parenthesizedExpression :: Assignment
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
+
 parameter :: Assignment
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
          <|> makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
