@@ -1,9 +1,12 @@
 (Program
-{+(Other "heredoc_beginning")+}
-{+(Other "heredoc_end")+}
-{-(MethodCall
-    (MethodCall
-      (Identifier)
-      (Other "heredoc_beginning")
-      (Other "heredoc_end"))
-    (Identifier))-})
+{+(TextElement)+}
+{+(TextElement)+}
+{-(Call
+    (MemberAccess
+      (Call
+        (Identifier)
+        (TextElement)
+        (TextElement)
+        (Empty))
+      (Identifier))
+    (Empty))-})

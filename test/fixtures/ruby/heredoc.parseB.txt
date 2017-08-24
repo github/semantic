@@ -1,7 +1,10 @@
 (Program
-  (MethodCall
-    (MethodCall
-      (Identifier)
-      (Other "heredoc_beginning")
-      (Other "heredoc_end"))
-    (Identifier)))
+  (Call
+    (MemberAccess
+      (Call
+        (Identifier)
+        (TextElement)
+        (TextElement)
+        (Empty))
+      (Identifier))
+    (Empty)))
