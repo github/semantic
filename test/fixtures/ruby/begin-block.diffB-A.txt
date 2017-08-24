@@ -1,6 +1,6 @@
 (Program
-{+(BeginBlock
+{+(ScopeEntry
     (Identifier))+}
 {-(Identifier)-}
-{-(BeginBlock
+{-(ScopeEntry
     (Identifier))-})
