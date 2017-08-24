@@ -95,9 +95,14 @@ newtype Symbol a = Symbol { symbolContent :: ByteString }
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
+newtype Regex a = Regex { regexContent :: ByteString }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Regex where liftEq = genericLiftEq
+instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Heredoc-style string literals?
 -- TODO: Character literals.
--- TODO: Regular expressions.
 
 
 -- Collections

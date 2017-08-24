@@ -49,6 +49,7 @@ type Syntax = '[
   , Literal.KeyValue
   , Literal.Null
   , Literal.Rational
+  , Literal.Regex
   , Literal.String
   , Literal.Symbol
   , Literal.TextElement
@@ -171,7 +172,7 @@ literal =
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol ChainedString <*> children (many (term (makeTerm <$> symbol String <*> (Literal.TextElement <$> source))))
-  <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
+  <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
 
 heredoc :: Assignment
