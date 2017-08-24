@@ -8,7 +8,7 @@ import Data.Functor.Classes.Show.Generic
 import GHC.Generics
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
-data Call a = Call { callFunction :: !a, callParams :: ![a], callBlock :: !a }
+data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Call where liftEq = genericLiftEq
