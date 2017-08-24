@@ -4,17 +4,22 @@
     (Identifier)
     (Identifier))+}
 {+(Identifier)+}
-{-(MethodCall
+{-(Call
     (Identifier)
-    (StringLiteral))-}
-{-(MethodCall
+    (TextElement)
+    (Empty))-}
+{-(Call
+    (MemberAccess
+      (Identifier)
+      (Identifier))
+    (Empty))-}
+{-(Call
     (Identifier)
-    (Identifier))-}
-{-(MethodCall
+    (Integer)
+    (Integer)
+    (Empty))-}
+{-(Call
     (Identifier)
-    (IntegerLiteral)
-    (IntegerLiteral))-}
-{-(MethodCall
-    (Identifier)
-    (IntegerLiteral)
-    (IntegerLiteral))-})
+    (Integer)
+    (Integer)
+    (Empty))-})

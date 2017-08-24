@@ -1,9 +1,10 @@
 (Program
-  (MethodCall
+  (Call
     (Identifier)
-    (Pair
-      (SymbolLiteral)
+    (KeyValue
+      (Symbol)
       (Boolean))
-  {-(Pair
-      (SymbolLiteral)
-      (IntegerLiteral))-}))
+  {-(KeyValue
+      (Symbol)
+      (Integer))-}
+    (Empty)))
