@@ -1,13 +1,10 @@
 (Program
-  (Binary
+  (BOr
     (Identifier)
-    (Other "|")
     (Identifier))
-  (Binary
+  (RShift
     (Identifier)
-    (Other ">>")
     (Identifier))
-  (Binary
+  (BXOr
     (Identifier)
-    (Other "^")
     (Identifier)))

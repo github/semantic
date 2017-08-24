@@ -1,9 +1,7 @@
 (Program
-  (Binary
+  (BAnd
     (Identifier)
-    (Other "&")
     (Identifier))
-  (Binary
+  (LShift
     (Identifier)
-    (Other "<<")
     (Identifier)))
