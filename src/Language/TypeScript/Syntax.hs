@@ -10,7 +10,6 @@ module Language.TypeScript.Syntax
 
 import Algorithm
 import GHC.Generics
-import Control.Comonad.Cofree (Cofree(..))
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.ByteString (ByteString)
