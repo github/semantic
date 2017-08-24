@@ -1,12 +1,9 @@
 (Program
-  (Binary
+  (Or
     (Identifier)
-    (Other "or")
     (Identifier))
-  (Binary
-    (Binary
+  (And
+    (Or
       (Identifier)
-      (Other "or")
       (Identifier))
-    (Other "and")
     (Identifier)))

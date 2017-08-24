@@ -1,13 +1,12 @@
 (Program
-  (Binary
+{+(And
     (Identifier)
-  { (Other "or")
-  ->(Other "and") }
-    (Identifier))
-{-(Binary
-    (Binary
+    (Identifier))+}
+{-(Or
+    (Identifier)
+    (Identifier))-}
+{-(And
+    (Or
       (Identifier)
-      (Other "or")
       (Identifier))
-    (Other "and")
     (Identifier))-})
