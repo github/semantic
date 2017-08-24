@@ -1,11 +1,15 @@
 (Program
-  (Unless
-    (Negate
+  (If
+    (Not
     { (Identifier)
     ->(Identifier) })
-  {+(Identifier)+}
-  {+(Else
-      (Identifier))+})
-{-(Unless
-    (Negate
-      (Identifier)))-})
+    (
+    {+(Identifier)+})
+  { (Empty)
+  ->(
+      (Identifier)) })
+{-(If
+    (Not
+      (Identifier))
+    ([])
+    (Empty))-})
