@@ -200,6 +200,9 @@ listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier <$> source)
 dictionarySplat :: Assignment
 dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier <$> source)
 
+keywordArgument :: Assignment
+keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
+
 parameter :: Assignment
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
          <|> makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
