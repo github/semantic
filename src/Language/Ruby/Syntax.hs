@@ -240,11 +240,11 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
-alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> name <*> some expression <*> emptyTerm)
+alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name <*> some expression <*> emptyTerm)
   where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 undef :: Assignment
-undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> name <*> some expression <*> emptyTerm)
+undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name <*> some expression <*> emptyTerm)
   where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 if' :: Assignment
@@ -292,7 +292,7 @@ pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*
    <|> makeTerm <$> token  Pair <*> pure Syntax.Empty
 
 methodCall :: Assignment
-methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> expression <*> args <*> (block <|> emptyTerm))
+methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
   where
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
 
@@ -347,7 +347,7 @@ unary = symbol Unary >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
-  <|> makeTerm location <$> children (Expression.Call <$> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier <$> source)) <*> some expression <*> emptyTerm)
+  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier <$> source)) <*> some expression <*> emptyTerm)
   <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
 
