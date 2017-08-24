@@ -621,7 +621,7 @@ instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement)
 
 expression :: Assignment
 expression = handleError $
