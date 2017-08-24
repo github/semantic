@@ -1,5 +1,7 @@
 (Program
-  (Begin
-    (Identifier)
-    (Ensure
-      (Identifier))))
+  (Try
+    (
+      (Identifier)
+      (Finally
+        (
+          (Identifier))))))
