@@ -127,6 +127,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.ShorthandPropertyIdentifier
   , Language.TypeScript.Syntax.InternalModule
   , Language.TypeScript.Syntax.Super
+  , Language.TypeScript.Syntax.Undefined
   , Language.TypeScript.Syntax.ClassHeritage
   , Language.TypeScript.Syntax.AbstractClass
   , Language.TypeScript.Syntax.ExtendsClause
@@ -528,6 +529,12 @@ data Super a = Super
 instance Eq1 Super where liftEq = genericLiftEq
 instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
 
+data Undefined a = Undefined
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Undefined where liftEq = genericLiftEq
+instance Show1 Undefined where liftShowsPrec = genericLiftShowsPrec
+
 data ClassHeritage a = ClassHeritage { classHeritageExtendsClause :: !a, implementsClause :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -655,8 +662,10 @@ expression = handleError $
   <|> true
   <|> false
   <|> null'
-  <|> undefined
+  <|> undefined'
   <|> identifier
+
+undefined' = makeTerm <$> symbol Grammar.Undefined <*> children (Language.TypeScript.Syntax.Undefined <$ source)
 
 assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
   assign Expression.Plus <$ symbol AnonPlusEqual
