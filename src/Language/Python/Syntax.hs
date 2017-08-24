@@ -210,8 +210,6 @@ parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 parameter :: Assignment
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
-         <|> makeTerm <$> symbol ListSplatParameter <*> (Syntax.Identifier <$> source)
-         <|> makeTerm <$> symbol DictionarySplatParameter <*> (Syntax.Identifier <$> source)
          <|> makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> expression <*> type')
          <|> makeAnnotation <$> symbol TypedDefaultParameter <*> children ((,,) <$> expression <*> expression <*> expression)
   where
