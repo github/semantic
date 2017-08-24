@@ -49,6 +49,9 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
+  , Expression.Delete
+  , Expression.Void
+  , Expression.Typeof
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
