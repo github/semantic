@@ -17,7 +17,7 @@ import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Maybe (catMaybes)
-import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -665,8 +665,10 @@ expression = handleError $
   <|> undefined'
   <|> identifier
 
+undefined' :: Assignment
 undefined' = makeTerm <$> symbol Grammar.Undefined <*> children (Language.TypeScript.Syntax.Undefined <$ source)
 
+assignmentExpression :: Assignment
 assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
   assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Minus <$ symbol AnonMinusEqual
@@ -679,10 +681,13 @@ assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (i
   where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
         assign c l r = inj (Statement.Assignment l (makeTerm1 (c l r)))
 
+augmentedAssignmentExpression :: Assignment
 augmentedAssignmentExpression = makeTerm <$> symbol AugmentedAssignmentExpression <*> children (Statement.Assignment <$> (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
 
+awaitExpression :: Assignment
 awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Language.TypeScript.Syntax.Await <$> expression)
 
+unaryExpression :: Assignment
 unaryExpression = symbol Grammar.UnaryExpression >>= \ loc ->
   makeTerm loc . Expression.Not <$> children ((symbol AnonTilde <|> symbol AnonBang) *> expression)
   <|> makeTerm loc . Expression.Negate <$> ((symbol AnonMinus <|> symbol AnonPlus) *> expression)
@@ -690,20 +695,28 @@ unaryExpression = symbol Grammar.UnaryExpression >>= \ loc ->
   <|> makeTerm loc . Expression.Void <$> (symbol AnonVoid *> expression)
   <|> makeTerm loc . Expression.Delete <$> (symbol AnonDelete *> expression)
 
+ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> expression <*> expression <*> expression)
 
+memberExpression :: Assignment
 memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> expression <*> propertyIdentifier)
 
+newExpression :: Assignment
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Language.TypeScript.Syntax.New <$> expression)
 
+updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol Grammar.UpdateExpression <*> children (Language.TypeScript.Syntax.Update <$> expression)
 
+yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol Grammar.YieldExpression <*> children (Statement.Yield <$> (expression <|> emptyTerm))
 
+thisExpression :: Assignment
 thisExpression = makeTerm <$> symbol Grammar.ThisExpression <*> children (Language.TypeScript.Syntax.This <$ source)
 
+regex :: Assignment
 regex = makeTerm <$> symbol Grammar.Regex <*> children (Literal.Regex <$> source)
 
+null' :: Assignment
 null' = makeTerm <$> symbol Null <*> children (Literal.Null <$ source)
 
 anonymousClass :: Assignment
@@ -881,6 +894,7 @@ ambientFunction = makeAmbientFunction <$> symbol Grammar.AmbientFunction <*> chi
 ty :: Assignment
 ty = primaryType <|> unionType <|> intersectionType <|> functionTy <|> constructorTy
 
+primaryType :: Assignment
 primaryType = parenthesizedTy <|> predefinedTy <|> typeIdentifier <|> nestedTypeIdentifier <|> genericType <|> typePredicate <|> objectType <|> arrayTy <|> tupleType <|> flowMaybeTy <|> typeQuery <|> indexTypeQuery <|> thisType <|> existentialType <|> literalType
 
 parenthesizedTy :: Assignment
@@ -976,8 +990,10 @@ statement =
   <|> emptyStatement
   <|> labeledStatement
 
+forOfStatement :: Assignment
 forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (Language.TypeScript.Syntax.ForOf <$> expression <*> expression <*> statement)
 
+forInStatement :: Assignment
 forInStatement = makeTerm <$> symbol ForInStatement <*> children (Statement.ForEach <$> expression <*> expression <*> statement)
 
 doStatement :: Assignment
@@ -986,14 +1002,19 @@ doStatement = makeTerm <$> symbol DoStatement <*> children (flip Statement.DoWhi
 continueStatement :: Assignment
 continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> ((symbol StatementIdentifier *> identifier) <|> emptyTerm))
 
+breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> ((symbol StatementIdentifier *> identifier) <|> emptyTerm))
 
+withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> children (Language.TypeScript.Syntax.With <$> parenthesizedExpression <*> statement)
 
+returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> sequenceExpression <|> emptyTerm))
 
+throwStatement :: Assignment
 throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> (expression <|> sequenceExpression))
 
+labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (Language.TypeScript.Syntax.LabeledStatement <$> (symbol StatementIdentifier *> children identifier) <*> statement)
 
 importStatement :: Assignment
@@ -1002,8 +1023,10 @@ importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Lang
 importClause :: Assignment
 importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (Language.TypeScript.Syntax.ImportClause <$> ((pure <$> (namespaceImport <|> namedImports)) <|> ((\a b -> [a, b]) <$> identifier <*> (namespaceImport <|> namedImports))))
 
+namedImports :: Assignment
 namedImports = makeTerm <$> symbol Grammar.NamedImports <*> children (Language.TypeScript.Syntax.NamedImports <$> many importExportSpecifier)
 
+namespaceImport :: Assignment
 namespaceImport = makeTerm <$> symbol Grammar.NamespaceImport <*> children (Language.TypeScript.Syntax.NamespaceImport <$> identifier)
 
 importRequireClause :: Assignment
@@ -1107,6 +1130,7 @@ variableDeclaration = makeTerm <$> (symbol VariableDeclaration <|> symbol Lexica
 variableDeclarator :: Assignment
 variableDeclarator = makeTerm <$> (symbol VariableDeclarator) <*> children (Statement.Assignment <$> (identifier <|> destructuringPattern) <*> (expression <|> emptyTerm))
 
+parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children (expression <|> sequenceExpression)
 
 switchStatement :: Assignment
