@@ -17,7 +17,7 @@ import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Maybe (catMaybes)
-import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -1042,7 +1042,7 @@ exportStatement :: Assignment
 exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> ((pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')) <|> ((\a b -> [a, b]) <$> exportClause <*> fromClause)))
 
 fromClause :: Assignment
-fromClause = string
+fromClause = postContextualize comment string
 
 exportClause :: Assignment
 exportClause = makeTerm <$> symbol Grammar.ExportClause <*> children (Language.TypeScript.Syntax.ExportClause <$> many importExportSpecifier)
