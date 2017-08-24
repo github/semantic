@@ -1,4 +1,6 @@
 (Program
-  (Modifier Rescue
+  (Try
     (Identifier)
-    (Boolean)))
+    (Catch
+      (Boolean)
+      (Empty))))
