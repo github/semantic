@@ -119,8 +119,6 @@ expression = handleError (term everything)
         abcd = a <|> b <|> c <|> d
         efil = e <|> f <|> i <|> l
         pstv = p <|> s <|> t <|> v
-        a =   argument
-          <|> argumentList
         a =   argumentList
           <|> assertStatement
           <|> assignment'
@@ -198,10 +196,6 @@ expressionList = mk <$> symbol ExpressionList <*> children (some expression)
   where mk _ [child] = child
         mk location children = makeTerm location children
 
-argument :: Assignment
-argument = makeTerm <$> symbol ListSplatArgument <*> (Syntax.Identifier <$> source)
-        <|> makeTerm <$> symbol DictionarySplatArgument <*> (Syntax.Identifier <$> source)
-        <|> makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
 listSplat :: Assignment
 listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier <$> source)
 
