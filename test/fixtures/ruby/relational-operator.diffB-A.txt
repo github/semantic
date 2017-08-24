@@ -1,17 +1,18 @@
 (Program
-  (Binary
+{-(Comparison
     (Identifier)
-  { (Other "<=>")
-  ->(Other "==") }
-    (Identifier))
-  (Binary
+    (Identifier))-}
+  (Equal
     (Identifier)
-  { (Other "=~")
-  ->(Other "!=") }
     (Identifier))
-{+(Binary(Identifier)(Other"===")(Identifier))+}
+{+(Not
+    (Equal
+      (Identifier)
+      (Identifier)))+}
+{+(Equal
+    (Identifier)
+    (Identifier))+}
 {-(Assignment
     (Identifier)
-    (Unary
-      (Other "!")
+    (Not
       (Identifier)))-})
