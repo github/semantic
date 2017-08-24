@@ -1,37 +1,42 @@
 (Program
-{+(For
-    (Identifier)
-    (Other "in"
+{+(ForEach
+    (
       (Identifier))
-    (Identifier))+}
-{+(For
     (Identifier)
-    (Identifier)
-    (Other "in"
-      (Identifier))
-    (Identifier))+}
-  (For
-  { (Identifier)
-  ->(Identifier) }
-    (Other "in"
-    {+(RangeExpression
-        (IntegerLiteral)
-        (Other "..")
-        (IntegerLiteral))+}
-    {-(ArrayLiteral
-        (IntegerLiteral)
-        (IntegerLiteral)
-        (IntegerLiteral))-})
-  { (MethodCall
+    (
+      (Identifier)))+}
+{+(ForEach
+    (
       (Identifier)
       (Identifier))
-  ->(Boolean) })
-{+(For
     (Identifier)
-    (Identifier)
-    (Other "in"
-      (RangeExpression
-        (IntegerLiteral)
-        (Other "..")
-        (IntegerLiteral)))
-    (Boolean))+})
+    (
+      (Identifier)))+}
+  (ForEach
+    (
+    { (Identifier)
+    ->(Identifier) })
+  { (Array
+      (Integer)
+      (Integer)
+      (Integer))
+  ->(Enumeration
+      (Integer)
+      (Integer)
+      (Empty)) }
+    (
+    { (Call
+        (Identifier)
+        (Identifier)
+        (Empty))
+    ->(Boolean) }))
+{+(ForEach
+    (
+      (Identifier)
+      (Identifier))
+    (Enumeration
+      (Integer)
+      (Integer)
+      (Empty))
+    (
+      (Boolean)))+})
