@@ -80,6 +80,8 @@ type Syntax = '[
   , Statement.Try
   , Statement.While
   , Statement.Yield
+  , Statement.Throw
+  , Statement.DoWhile
   , Syntax.AccessibilityModifier
   , Syntax.Empty
   , Syntax.Error
