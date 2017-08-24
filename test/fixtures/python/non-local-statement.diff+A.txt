@@ -1,5 +1,0 @@
-{+(Program
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty)))+}

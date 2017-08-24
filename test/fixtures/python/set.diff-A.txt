@@ -1,6 +1,0 @@
-{-(Program
-  (Hash)
-  (Set
-    (Integer)
-    (Integer)
-    (Integer)))-}

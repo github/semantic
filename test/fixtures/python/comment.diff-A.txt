@@ -1,5 +1,0 @@
-{-(Program
-  (Context
-    (Comment)
-    (Comment)
-    (Empty)))-}

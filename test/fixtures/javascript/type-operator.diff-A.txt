@@ -1,5 +1,0 @@
-{-(Program
-  (ExpressionStatements
-    (Operator
-      (Other "typeof")
-      (Identifier))))-}

@@ -1,4 +1,0 @@
-{+(Program
-  (Export
-    (Class
-      (Identifier))))+}
