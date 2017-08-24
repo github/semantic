@@ -52,6 +52,27 @@ data Boolean a
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
+-- | Javascript delete operator
+data Delete a = Delete !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Delete where liftEq = genericLiftEq
+instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
+
+-- | Javascript void operator
+data Void a = Void !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Void where liftEq = genericLiftEq
+instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
+
+-- | Javascript typeof operator
+data Typeof a = Typeof !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Typeof where liftEq = genericLiftEq
+instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
+
 -- | Bitwise operators.
 data Bitwise a
   = BOr !a !a
