@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
 
 module Language.TypeScript.Syntax
