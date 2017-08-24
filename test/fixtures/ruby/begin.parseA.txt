@@ -1,4 +1,7 @@
 (Program
   (Method
+    (Empty)
     (Identifier)
-    (Begin)))
+    (
+      (Try
+        ([])))))
