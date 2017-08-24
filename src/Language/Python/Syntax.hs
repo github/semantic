@@ -115,12 +115,13 @@ expression = handleError (term everything)
         -- We may at some point wish to write something to perform this chunking for us.
         -- Medium-term, we should consider the construction of choices from first principles; maybe there’s a better API for us to construct these tables.
         -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
-        everything = abcd <|> efil <|> pstv
+        everything = abcd <|> efil <|> pstv <|> w
         abcd = a <|> b <|> c <|> d
         efil = e <|> f <|> i <|> l
         pstv = p <|> s <|> t <|> v
         a =   argument
           <|> argumentList
+        a =   argumentList
           <|> assertStatement
           <|> assignment'
           <|> await
@@ -179,6 +180,10 @@ expression = handleError (term everything)
           <|> whileStatement
           <|> withStatement
           <|> yield
+          <|> listSplat
+        w =   dictionarySplat
+          <|> keywordArgument
+          <|> parenthesizedExpression
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
