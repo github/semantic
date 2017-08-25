@@ -12,6 +12,7 @@ import Algorithm
 import GHC.Generics
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.Foldable (asum)
 import Data.ByteString (ByteString)
 import Data.Align.Generic
 import Data.Maybe (fromMaybe)
@@ -624,46 +625,8 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement)
 
 expression :: Assignment
-expression = handleError $
-  comment
-  <|> typeAssertion
-  <|> asExpression
-  <|> nonNullExpression'
-  <|> importAlias'
-  <|> internalModule
-  <|> super
-  <|> abstractClass
-  <|> object
-  <|> array
-  <|> jsxElement
-  <|> jsxSelfClosingElement
-  <|> class'
-  <|> anonymousClass
-  <|> function
-  <|> arrowFunction
-  <|> assignmentExpression
-  <|> augmentedAssignmentExpression
-  <|> awaitExpression
-  <|> unaryExpression
-  <|> binaryExpression
-  <|> ternaryExpression
-  <|> updateExpression
-  <|> callExpression
-  <|> memberExpression
-  <|> newExpression
-  <|> parenthesizedExpression
-  <|> subscriptExpression
-  <|> yieldExpression
-  <|> thisExpression
-  <|> number
-  <|> string
-  <|> templateString
-  <|> regex
-  <|> true
-  <|> false
-  <|> null'
-  <|> undefined'
-  <|> identifier
+expression = handleError (term everything)
+  where everything = asum . fmap asum $ chunksOf 4 [typeAssertion, asExpression, nonNullExpression', importAlias', internalModule, super, abstractClass, object, array, jsxElement, jsxSelfClosingElement, class', anonymousClass, function, arrowFunction, assignmentExpression, augmentedAssignmentExpression, awaitExpression, unaryExpression, binaryExpression, ternaryExpression, updateExpression, callExpression, memberExpression, newExpression, parenthesizedExpression, subscriptExpression, yieldExpression, thisExpression, number, string, templateString, regex, true, false, null', undefined', identifier]
 
 undefined' :: Assignment
 undefined' = makeTerm <$> symbol Grammar.Undefined <*> children (Language.TypeScript.Syntax.Undefined <$ source)
@@ -967,28 +930,17 @@ classBodyStatements :: HasCallStack => Assignment.Assignment (AST Grammar) Gramm
 classBodyStatements = symbol ClassBody *> children (many statement)
 
 statement :: Assignment
-statement =
-  exportStatement
-  <|> importStatement
-  <|> debuggerStatement
-  <|> expressionStatement'
-  <|> declaration
-  <|> statementBlock
-  <|> ifStatement
-  <|> switchStatement
-  <|> forStatement
-  <|> forInStatement
-  <|> forOfStatement
-  <|> whileStatement
-  <|> doStatement
-  <|> tryStatement
-  <|> withStatement
-  <|> breakStatement
-  <|> continueStatement
-  <|> returnStatement
-  <|> throwStatement
-  <|> emptyStatement
-  <|> labeledStatement
+statement = handleError $ (term everything)
+  where
+  everything = foldr1 (<|>) . fmap (foldr1 (<|>)) $ chunksOf 4 [
+    exportStatement
+    , importStatement
+    , debuggerStatement
+    , expressionStatement'
+    , returnStatement
+    , throwStatement
+    , emptyStatement
+    , labeledStatement ]
 
 forOfStatement :: Assignment
 forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (Language.TypeScript.Syntax.ForOf <$> expression <*> expression <*> statement)
@@ -1039,7 +991,8 @@ expressionStatement' :: Assignment
 expressionStatement' = makeTerm <$> symbol Grammar.ExpressionStatement <*> children (Language.TypeScript.Syntax.ExpressionStatement <$> (expression <|> sequenceExpression))
 
 declaration :: Assignment
-declaration = exportStatement <|> importAlias' <|> function <|> internalModule <|> ambientFunction <|> class' <|> module' <|> variableDeclaration  <|> typeAliasDeclaration <|> enumDeclaration <|> interfaceDeclaration <|> ambientDeclaration
+declaration = handleError $ term everything
+  where everything = asum . fmap asum $ chunksOf 4 [ exportStatement, importAlias', function, internalModule, ambientFunction, class', module', variableDeclaration, typeAliasDeclaration, enumDeclaration, interfaceDeclaration, ambientDeclaration ]
 
 typeAliasDeclaration :: Assignment
 typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> ((,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> ty)
