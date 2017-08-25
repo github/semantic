@@ -74,6 +74,7 @@ library
                      , Semantic
                      , Semantic.Log
                      , Semantic.Task
+                     , Semantic.Util
                      , SemanticCmdLine
                      , SES
                      , SES.Myers
