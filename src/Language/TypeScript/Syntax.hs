@@ -32,6 +32,8 @@ import Data.Union
 import GHC.Stack
 import Language.TypeScript.Grammar as Grammar
 import qualified Term
+import Data.List.Split (chunksOf)
+import Data.List.NonEmpty (NonEmpty(..))
 
 
 -- | The type of TypeScript syntax.
