@@ -10,6 +10,7 @@ module RWS (
   , pqGramDecorator
   , Gram(..)
   , defaultD
+  , equalTerms
   ) where
 
 import Control.Applicative (empty)
@@ -19,7 +20,7 @@ import Control.Comonad.Trans.Cofree hiding (cofree, runCofree)
 import Control.Monad.Free
 import Control.Monad.State.Strict
 import Data.Foldable
-import Data.Function ((&), fix, on)
+import Data.Function ((&), on)
 import Data.Functor.Foldable
 import Data.Hashable
 import Data.List (sortOn)
@@ -48,7 +49,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 -- | A relation on 'Term's, guaranteed constant-time in the size of the 'Term' by parametricity.
 --
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
-type ComparabilityRelation f fields = forall a b. (a -> b -> Bool) -> TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
+type ComparabilityRelation f fields = forall a b. TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
 
 type FeatureVector = UArray Int Double
 
@@ -65,14 +66,15 @@ data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 rws :: (HasField fields FeatureVector, Functor f, Eq1 f)
     => (Diff f fields -> Int)
     -> ComparabilityRelation f fields
+    -> (Term f (Record fields) -> Term f (Record fields) -> Bool)
     -> [Term f (Record fields)]
     -> [Term f (Record fields)]
     -> RWSEditScript f fields
-rws _            _          as [] = This <$> as
-rws _            _          [] bs = That <$> bs
-rws _            canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
-rws editDistance canCompare as bs =
-  let sesDiffs = ses (equalTerms canCompare) as bs
+rws _            _          _          as [] = This <$> as
+rws _            _          _          [] bs = That <$> bs
+rws _            canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
+rws editDistance canCompare equivalent as bs =
+  let sesDiffs = ses equivalent as bs
       (featureAs, featureBs, mappedDiffs, allDiffs) = genFeaturizedTermsAndDiffs sesDiffs
       (diffs, remaining) = findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
       diffs' = deleteRemaining diffs remaining
@@ -307,7 +309,7 @@ unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
-canCompareTerms canCompare = fix (\ comparator -> canCompare comparator `on` runCofree)
+canCompareTerms canCompare = canCompare `on` runCofree
 
 -- | Recursively test the equality of two 'Term's in O(n).
 equalTerms :: Eq1 f => ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
