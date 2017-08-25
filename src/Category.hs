@@ -7,6 +7,7 @@ import Control.DeepSeq
 import Data.Functor.Listable
 import Data.Hashable
 import Data.Text (Text)
+import Data.Text.Prettyprint.Doc
 import GHC.Generics
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -363,3 +364,6 @@ instance Listable Category where
       --  \/ cons0 (Modifier If)
        \/ cons0 SingletonMethod
       --  \/ cons0 (Other "other")
+
+instance Pretty Category where
+  pretty = pretty . show

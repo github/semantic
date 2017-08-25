@@ -8,6 +8,7 @@ import qualified Control.Monad.Free as Free
 import qualified Control.Monad.Trans.Free as FreeF
 import Data.Bifunctor
 import Data.Functor.Both as Both
+import Data.Functor.Classes.Pretty.Generic
 import Data.Mergeable
 import Data.Record
 import Patch
@@ -63,3 +64,11 @@ free (FreeF.Pure a) = Free.Pure a
 runFree :: Free.Free f a -> FreeF.FreeF f a (Free.Free f a)
 runFree (Free.Free f) = FreeF.Free f
 runFree (Free.Pure a) = FreeF.Pure a
+
+
+instance Pretty1 f => Pretty1 (Free.Free f) where
+  liftPretty p pl = go where go (Free.Pure a) = p a
+                             go (Free.Free f) = liftPretty go (list . map (liftPretty p pl)) f
+
+instance (Pretty1 f, Pretty a) => Pretty (Free.Free f a) where
+  pretty = liftPretty pretty prettyList

@@ -1,10 +1,11 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Record where
 
 import Control.DeepSeq
 import Data.Kind
 import Data.Functor.Listable
 import Data.Semigroup
+import Data.Text.Prettyprint.Doc
 
 -- | A type-safe, extensible record structure.
 -- |
@@ -87,3 +88,10 @@ instance (Semigroup head, Semigroup (Record tail)) => Semigroup (Record (head ':
 
 instance Semigroup (Record '[]) where
   _ <> _ = Nil
+
+
+instance ConstrainAll Pretty ts => Pretty (Record ts) where
+  pretty = tupled . collectPretty
+    where collectPretty :: ConstrainAll Pretty ts => Record ts -> [Doc ann]
+          collectPretty Nil = []
+          collectPretty (first :. rest) = pretty first : collectPretty rest

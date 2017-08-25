@@ -21,6 +21,7 @@ library
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
+                     , Data.Functor.Classes.Pretty.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.Functor.Listable
                      , Data.Mergeable
@@ -73,6 +74,7 @@ library
                      , Semantic
                      , Semantic.Log
                      , Semantic.Task
+                     , Semantic.Util
                      , SemanticCmdLine
                      , SES
                      , SES.Myers
@@ -106,6 +108,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , prettyprinter
                      , recursion-schemes
                      , semigroups
                      , split
