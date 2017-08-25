@@ -76,7 +76,7 @@ jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
 
 typescriptParser :: Parser TypeScript.Term
-typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) headF TypeScript.assignment
+typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
