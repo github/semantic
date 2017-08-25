@@ -1,8 +1,0 @@
-{+(Program
-  (Other "variable_declaration"
-    (VarAssignment
-      (Other "object_pattern"
-        (Other "assignment_pattern"
-          (Identifier)
-          (NumberLiteral)))
-      (Identifier))))+}

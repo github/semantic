@@ -1,7 +1,0 @@
-{-(Program
-  (Begin
-    (Identifier)
-    (Rescue
-      (Constant)
-      (RescuedException
-        (Identifier)))))-}

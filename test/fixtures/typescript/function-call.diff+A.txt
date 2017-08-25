@@ -1,8 +1,0 @@
-{+(Program
-  (ExpressionStatements
-    (FunctionCall
-      (Identifier)
-      (Other "type_arguments"
-        (Identifier))
-      (Identifier)
-      (StringLiteral))))+}

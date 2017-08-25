@@ -1,8 +1,0 @@
-{+(Program
-  (If
-    (Identifier)
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier)
-          (Identifier))))))+}

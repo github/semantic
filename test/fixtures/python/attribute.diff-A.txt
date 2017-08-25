@@ -1,4 +1,0 @@
-{-(Program
-  (MemberAccess
-    (Identifier)
-    (Identifier)))-}

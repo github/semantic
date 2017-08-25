@@ -1,7 +1,0 @@
-{+(Program
-  (Other "lexical_declaration"
-    (VarAssignment
-      (Identifier)
-      (Ty
-        (Other "array_type"
-          (Identifier))))))+}
