@@ -31,7 +31,7 @@ data TypeParameters a = TypeParameters { typeParameters :: ![a] }
 instance Eq1 TypeParameters where liftEq = genericLiftEq
 instance Show1 TypeParameters where liftShowsPrec = genericLiftShowsPrec
 
-data Readonly a = Readonly a
+data Readonly a = Readonly
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Readonly where liftEq = genericLiftEq
