@@ -7,7 +7,7 @@ import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Text.Encoding
+import Data.Syntax (prettyBytes)
 import GHC.Generics
 import Prelude
 
@@ -168,6 +168,3 @@ instance Pretty1 Set where liftPretty = genericLiftPretty
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
 -- TODO: Regexp literals.
-
-prettyBytes :: ByteString -> Doc ann
-prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))

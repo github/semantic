@@ -8,7 +8,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Maybe (catMaybes)
-import Data.Text.Encoding (decodeUtf8With)
+import Data.Syntax (prettyBytes)
 import GHC.Generics
 
 
@@ -166,6 +166,3 @@ newtype Strikethrough a = Strikethrough [a]
 instance Eq1 Strikethrough where liftEq = genericLiftEq
 instance Show1 Strikethrough where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Strikethrough where liftPretty = genericLiftPretty
-
-prettyBytes :: ByteString -> Doc ann
-prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))
