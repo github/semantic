@@ -10,6 +10,7 @@ import Algorithm
 import Data.Align.Generic
 import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe (fromMaybe)
@@ -95,6 +96,7 @@ data Ellipsis a = Ellipsis
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Ellipsis where liftPretty = genericLiftPretty
 
 
 data Redirect a = Redirect !a !a
@@ -102,6 +104,7 @@ data Redirect a = Redirect !a !a
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Redirect where liftPretty = genericLiftPretty
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
