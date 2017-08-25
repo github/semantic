@@ -174,7 +174,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 data ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
@@ -273,7 +273,7 @@ data ParenthesizedType a = ParenthesizedType { parenthesizedType :: !a }
 instance Eq1 ParenthesizedType where liftEq = genericLiftEq
 instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
 
-data PredefinedType a = PredefinedType { predefinedType :: !a }
+data PredefinedType a = PredefinedType { predefinedType :: !ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 PredefinedType where liftEq = genericLiftEq
@@ -626,12 +626,16 @@ instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
 assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement)
 
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+term :: Assignment -> Assignment
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
+
 expression :: Assignment
 expression = handleError (term everything)
   where everything = asum . fmap asum $ chunksOf 4 [typeAssertion, asExpression, nonNullExpression', importAlias', internalModule, super, abstractClass, object, array, jsxElement, jsxSelfClosingElement, class', anonymousClass, function, arrowFunction, assignmentExpression, augmentedAssignmentExpression, awaitExpression, unaryExpression, binaryExpression, ternaryExpression, updateExpression, callExpression, memberExpression, newExpression, parenthesizedExpression, subscriptExpression, yieldExpression, thisExpression, number, string, templateString, regex, true, false, null', undefined', identifier]
 
 undefined' :: Assignment
-undefined' = makeTerm <$> symbol Grammar.Undefined <*> children (Language.TypeScript.Syntax.Undefined <$ source)
+undefined' = makeTerm <$> symbol Grammar.Undefined <*> (Language.TypeScript.Syntax.Undefined <$ source)
 
 assignmentExpression :: Assignment
 assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
@@ -676,13 +680,13 @@ yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol Grammar.YieldExpression <*> children (Statement.Yield <$> (expression <|> emptyTerm))
 
 thisExpression :: Assignment
-thisExpression = makeTerm <$> symbol Grammar.ThisExpression <*> children (Language.TypeScript.Syntax.This <$ source)
+thisExpression = makeTerm <$> symbol Grammar.ThisExpression <*> (Language.TypeScript.Syntax.This <$ source)
 
 regex :: Assignment
-regex = makeTerm <$> symbol Grammar.Regex <*> children (Literal.Regex <$> source)
+regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)
 
 null' :: Assignment
-null' = makeTerm <$> symbol Null <*> children (Literal.Null <$ source)
+null' = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
 
 anonymousClass :: Assignment
 anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> superclass <*> classBodyStatements)
@@ -778,7 +782,7 @@ jsxExpression' :: Assignment
 jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (Language.TypeScript.Syntax.JsxExpression <$> (expression <|> sequenceExpression <|> spreadElement))
 
 jsxText :: Assignment
-jsxText = makeTerm <$> symbol Grammar.JsxText <*> children (Language.TypeScript.Syntax.JsxText <$> source)
+jsxText = makeTerm <$> symbol Grammar.JsxText <*> (Language.TypeScript.Syntax.JsxText <$> source)
 
 jsxClosingElement' :: Assignment
 jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children (Language.TypeScript.Syntax.JsxClosingElement <$> identifier)
@@ -787,7 +791,7 @@ jsxAttribute :: Assignment
 jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (Language.TypeScript.Syntax.JsxAttribute <$> propertyIdentifier <*> (number <|> string <|> jsxExpression'))
 
 propertyIdentifier :: Assignment
-propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> children (Syntax.Identifier <$> source)
+propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)
 
 sequenceExpression :: Assignment
 sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Language.TypeScript.Syntax.SequenceExpression <$> expression <*> (sequenceExpression <|> expression))
@@ -808,7 +812,7 @@ spreadElement :: Assignment
 spreadElement = symbol SpreadElement *> children expression
 
 readonly' :: Assignment
-readonly' = makeTerm <$> symbol Readonly <*> children (Syntax.Identifier <$> source)
+readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ source)
 
 methodDefinition :: Assignment
 methodDefinition = makeMethod <$>
@@ -817,7 +821,7 @@ methodDefinition = makeMethod <$>
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
-callSignatureParts :: HasCallStack => Assignment.Assignment (AST Grammar) Grammar (Term, [Term], Term)
+callSignatureParts :: HasCallStack => Assignment.Assignment [] Grammar (Term, [Term], Term)
 callSignatureParts =  symbol Grammar.CallSignature *> children ((,,) <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional typeAnnotation'))
 
 callSignature :: Assignment
@@ -833,7 +837,7 @@ methodSignature :: Assignment
 methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> propertyName <*> callSignatureParts)
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Language.TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
-formalParameters :: HasCallStack => Assignment.Assignment (AST Grammar) Grammar [Term]
+formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 formalParameters = symbol FormalParameters *> children (many parameter)
 
 typeParameters :: Assignment
@@ -866,10 +870,10 @@ parenthesizedTy :: Assignment
 parenthesizedTy = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Language.TypeScript.Syntax.ParenthesizedType <$> ty)
 
 predefinedTy :: Assignment
-predefinedTy = makeTerm <$> symbol Grammar.PredefinedType <*> children (Language.TypeScript.Syntax.PredefinedType <$> ty)
+predefinedTy = makeTerm <$> symbol Grammar.PredefinedType <*> (Language.TypeScript.Syntax.PredefinedType <$> source)
 
 typeIdentifier :: Assignment
-typeIdentifier = makeTerm <$> symbol Grammar.TypeIdentifier <*> children (Language.TypeScript.Syntax.TypeIdentifier <$> source)
+typeIdentifier = makeTerm <$> symbol Grammar.TypeIdentifier <*> (Language.TypeScript.Syntax.TypeIdentifier <$> source)
 
 nestedIdentifier :: Assignment
 nestedIdentifier = makeTerm <$> symbol Grammar.NestedIdentifier <*> children (Language.TypeScript.Syntax.NestedIdentifier <$> (identifier <|> nestedIdentifier) <*> identifier)
@@ -902,13 +906,13 @@ indexTypeQuery :: Assignment
 indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (Language.TypeScript.Syntax.IndexTypeQuery <$> (identifier <|> nestedIdentifier))
 
 thisType :: Assignment
-thisType = makeTerm <$> symbol Grammar.ThisType <*> children (Language.TypeScript.Syntax.ThisType <$> source)
+thisType = makeTerm <$> symbol Grammar.ThisType <*> (Language.TypeScript.Syntax.ThisType <$> source)
 
 existentialType :: Assignment
 existentialType = makeTerm <$> symbol Grammar.ExistentialType <*> (Language.TypeScript.Syntax.ExistentialType <$> source)
 
 literalType :: Assignment
-literalType = makeTerm <$> symbol Grammar.LiteralType <*> (Language.TypeScript.Syntax.LiteralType <$> (number <|> string <|> true <|> false))
+literalType = makeTerm <$> symbol Grammar.LiteralType <*> children (Language.TypeScript.Syntax.LiteralType <$> (number <|> string <|> true <|> false))
 
 unionType :: Assignment
 unionType = makeTerm <$> symbol UnionType <*> children (Language.TypeScript.Syntax.Union <$> ty <*> ty)
@@ -928,7 +932,7 @@ constructorTy = makeTerm <$> symbol ConstructorType <*> children (Language.TypeS
 statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
-classBodyStatements :: HasCallStack => Assignment.Assignment (AST Grammar) Grammar [Term]
+classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 classBodyStatements = symbol ClassBody *> children (many statement)
 
 statement :: Assignment
@@ -987,7 +991,7 @@ importRequireClause :: Assignment
 importRequireClause = makeTerm <$> symbol Grammar.ImportRequireClause <*> children (Language.TypeScript.Syntax.ImportRequireClause <$> identifier <*> string)
 
 debuggerStatement :: Assignment
-debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> children (Language.TypeScript.Syntax.Debugger <$ source)
+debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (Language.TypeScript.Syntax.Debugger <$ source)
 
 expressionStatement' :: Assignment
 expressionStatement' = makeTerm <$> symbol Grammar.ExpressionStatement <*> children (Language.TypeScript.Syntax.ExpressionStatement <$> (expression <|> sequenceExpression))
@@ -997,30 +1001,30 @@ declaration = handleError $ term everything
   where everything = asum . fmap asum $ chunksOf 4 [ exportStatement, importAlias', function, internalModule, ambientFunction, class', module', variableDeclaration, typeAliasDeclaration, enumDeclaration, interfaceDeclaration, ambientDeclaration ]
 
 typeAliasDeclaration :: Assignment
-typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> ((,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> ty)
+typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> ty)
   where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Language.TypeScript.Syntax.TypeAliasDeclaration [typeParams] identifier body)
 
 enumDeclaration :: Assignment
-enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> (Language.TypeScript.Syntax.EnumDeclaration <$> identifier <*> many (propertyName <|> enumAssignment))
+enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Language.TypeScript.Syntax.EnumDeclaration <$> identifier <*> many (propertyName <|> enumAssignment))
 
 enumAssignment :: Assignment
-enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> (Statement.Assignment <$> propertyName <*> expression)
+enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statement.Assignment <$> propertyName <*> expression)
 
 interfaceDeclaration :: Assignment
-interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> ((,,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> (extendsClause <|> emptyTerm) <*> objectType)
+interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> (extendsClause <|> emptyTerm) <*> objectType)
   where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Language.TypeScript.Syntax.InterfaceDeclaration [typeParams, clause] identifier objectType)
 
 extendsClause :: Assignment
-extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> (Language.TypeScript.Syntax.ExtendsClause <$> many ty)
+extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many ty)
 
 ambientDeclaration :: Assignment
-ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> (Language.TypeScript.Syntax.AmbientDeclaration <$> (declaration <|> statementBlock))
+ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> (declaration <|> statementBlock))
 
 exportStatement :: Assignment
 exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> ((pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')) <|> ((\a b -> [a, b]) <$> exportClause <*> fromClause)))
 
 fromClause :: Assignment
-fromClause = postContextualize comment string
+fromClause = string
 
 exportClause :: Assignment
 exportClause = makeTerm <$> symbol Grammar.ExportClause <*> children (Language.TypeScript.Syntax.ExportClause <$> many importExportSpecifier)
@@ -1033,7 +1037,7 @@ propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <
   where makePropertySignature loc (modifier, readonly, propertyName, annotation) = makeTerm loc (Language.TypeScript.Syntax.PropertySignature [modifier, readonly, annotation] propertyName)
 
 propertyName :: Assignment
-propertyName = symbol PropertyIdentifier *> children (identifier <|> string <|> number)
+propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)) <|> string <|> number
 
 assignmentPattern :: Assignment
 assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Statement.Assignment <$> shorthandPropertyIdentifier <*> expression)
@@ -1060,11 +1064,11 @@ module' :: Assignment
 module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> (string <|> identifier <|> nestedIdentifier) <*> ((symbol StatementBlock *> children (many statement)) <|> pure []))
 
 
-statements :: HasCallStack => Assignment.Assignment (AST Grammar) Grammar [Term]
+statements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 statements = symbol StatementBlock *> children (many statement)
 
 arrowFunction :: Assignment
-arrowFunction = makeArrowFun <$> symbol ArrowFunction <*> ((,,) <$> emptyTerm <*> (((\a b c -> (a, [b], c)) <$> emptyTerm <*> identifier <*> emptyTerm) <|> callSignatureParts) <*> (expression <|> statementBlock))
+arrowFunction = makeArrowFun <$> symbol ArrowFunction <*> children ((,,) <$> emptyTerm <*> (((\a b c -> (a, [b], c)) <$> emptyTerm <*> identifier <*> emptyTerm) <|> callSignatureParts) <*> (expression <|> statementBlock))
   where makeArrowFun loc (identifier, (typeParams, params, returnTy), body) = makeTerm loc (Declaration.Function [ typeParams, returnTy ] identifier params body)
 
 comment :: Assignment
@@ -1110,8 +1114,8 @@ tryStatement :: Assignment
 tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> statementBlock <*> optional catchClause <*> optional finallyClause)
   where
     makeTry loc (statementBlock', catch, finally) = makeTerm loc (Statement.Try statementBlock' (catMaybes [catch, finally]))
-    catchClause = makeTerm <$> symbol CatchClause <*> (Statement.Catch <$> (identifier <|> emptyTerm) <*> statementBlock)
-    finallyClause = makeTerm <$> symbol FinallyClause <*> (Statement.Finally <$> statementBlock)
+    catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (identifier <|> emptyTerm) <*> statementBlock)
+    finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> statementBlock)
 
 binaryExpression  :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
@@ -1143,6 +1147,6 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 infixTerm :: HasCallStack
           => Assignment
           -> Assignment
-          -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
-          -> Assignment.Assignment (AST Grammar) Grammar (Data.Union.Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Data.Union.Union Syntax Term)
 infixTerm = infixContext comment
