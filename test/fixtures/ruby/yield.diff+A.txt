@@ -1,4 +1,0 @@
-{+(Program
-  (Yield
-    (Args
-      (Identifier))))+}

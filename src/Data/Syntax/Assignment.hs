@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and Span). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -70,7 +70,7 @@ module Data.Syntax.Assignment
 , Alternative(..)
 , MonadError(..)
 , location
-, project
+, currentNode
 , symbol
 , source
 , children
@@ -85,7 +85,7 @@ module Data.Syntax.Assignment
 , nodeError
 , firstSet
 -- Running
-, assignBy
+, assign
 , runAssignment
 -- Implementation details (for testing)
 , State(..)
@@ -95,8 +95,9 @@ module Data.Syntax.Assignment
 
 import Control.Arrow ((&&&))
 import Control.Applicative
-import Control.Comonad.Cofree
-import Control.Monad ((<=<), guard)
+import Control.Comonad.Cofree as Cofree
+import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
+import Control.Monad (guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.Bifunctor
@@ -105,69 +106,77 @@ import Data.Error
 import Data.Foldable
 import Data.Function
 import Data.Functor.Classes
-import qualified Data.Functor.Foldable as F hiding (Nil)
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (Ix(..))
 import Data.List (union)
-import Data.List.NonEmpty ((<|), NonEmpty(..))
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
 import Data.Record
 import Data.Semigroup
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import GHC.Stack
 import qualified Info
-import Prelude hiding (head, until)
+import Prelude hiding (until)
+import Term (runCofree)
 import Text.Parser.Combinators as Parsers
 import TreeSitter.Language
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
 --   This is essentially a parser.
-type Assignment ast grammar = Freer (AssignmentF ast grammar)
+type Assignment ast grammar = Freer (Tracing (AssignmentF ast grammar))
 
 data AssignmentF ast grammar a where
-  End :: HasCallStack => AssignmentF ast grammar ()
-  Location :: HasCallStack => AssignmentF ast grammar (Record Location)
-  Project :: HasCallStack => (forall x. F.Base ast x -> a) -> AssignmentF ast grammar a
-  Source :: HasCallStack => AssignmentF ast grammar ByteString
-  Children :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar a
-  Advance :: HasCallStack => AssignmentF ast grammar ()
-  Choose :: HasCallStack => [grammar] -> IntMap.IntMap a -> AssignmentF ast grammar a
-  Many :: HasCallStack => Assignment ast grammar a -> AssignmentF ast grammar [a]
-  Alt :: HasCallStack => NonEmpty a -> AssignmentF ast grammar a
-  Throw :: HasCallStack => Maybe (Error (Either String grammar)) -> AssignmentF ast grammar a
-  Catch :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
-  Label :: HasCallStack => Assignment ast grammar a -> String -> AssignmentF ast grammar a
+  End :: AssignmentF ast grammar ()
+  Location :: AssignmentF ast grammar (Record Location)
+  CurrentNode :: AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+  Source :: AssignmentF ast grammar ByteString
+  Children :: Assignment ast grammar a -> AssignmentF ast grammar a
+  Advance :: AssignmentF ast grammar ()
+  Choose :: [grammar] -> IntMap.IntMap a -> Maybe a -> AssignmentF ast grammar a
+  Many :: Assignment ast grammar a -> AssignmentF ast grammar [a]
+  Alt :: [a] -> AssignmentF ast grammar a
+  Throw :: Error (Either String grammar) -> AssignmentF ast grammar a
+  Catch :: Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
+  Label :: Assignment ast grammar a -> String -> AssignmentF ast grammar a
+
+data Tracing f a where
+  Tracing :: { tracingCallSite :: Maybe (String, SrcLoc), runTracing :: f a } -> Tracing f a
+
+assignmentCallSite :: Assignment ast grammar a -> Maybe (String, SrcLoc)
+assignmentCallSite (Tracing site _ `Then` _) = site
+assignmentCallSite _ = Nothing
+
+tracing :: HasCallStack => f a -> Tracing f a
+tracing f = case getCallStack callStack of
+  (_ : site : _) -> Tracing (Just site) f
+  _ -> Tracing Nothing f
 
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
 location :: HasCallStack => Assignment ast grammar (Record Location)
-location = withFrozenCallStack $ Location `Then` return
+location = tracing Location `Then` return
 
--- | Zero-width projection of the current node.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (project f *> b)@ is fine, but @many (project f)@ is not.
-project :: HasCallStack => (forall x. F.Base ast x -> a) -> Assignment ast grammar a
-project projection = withFrozenCallStack $ Project projection `Then` return
+-- | Zero-width production of the current node.
+currentNode :: HasCallStack => Assignment ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
---
---   Since this is zero-width, care must be taken not to repeat it without chaining on other rules. I.e. @many (symbol A *> b)@ is fine, but @many (symbol A)@ is not.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = withFrozenCallStack $ Choose [s] (IntMap.singleton (toIndex s) location) `Then` id
+symbol s = tracing (Choose [s] (IntMap.singleton (toIndex s) location) Nothing) `Then` id
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
-source = withFrozenCallStack $ Source `Then` return
+source = tracing Source `Then` return
 
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
-children forEach = withFrozenCallStack $ Children forEach `Then` return
+children child = tracing (Children child) `Then` return
 
 -- | Advance past the current node.
 advance :: HasCallStack => Assignment ast grammar ()
-advance = withFrozenCallStack $ Advance `Then` return
+advance = tracing Advance `Then` return
 
 -- | Match and advance past a node with the given symbol.
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
@@ -199,7 +208,7 @@ toIndex = index (minBound, maxBound)
 type Location = '[Info.Range, Info.Span]
 
 -- | An AST node labelled with symbols and source location.
-type AST grammar = Cofree [] (Node grammar)
+type AST f grammar = Cofree f (Node grammar)
 
 data Node grammar = Node
   { nodeSymbol :: !grammar
@@ -212,177 +221,195 @@ nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (Either String grammar)
-nodeError expected (Node actual _ span) = Error span expected (Just (Right actual))
+nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 
 firstSet :: Assignment ast grammar a -> [grammar]
-firstSet = iterFreer (\ assignment _ -> case assignment of
-  Choose symbols _ -> symbols
+firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
+  Choose symbols _ _ -> symbols
   Catch during _ -> firstSet during
+  Label child _ -> firstSet child
   _ -> []) . ([] <$)
 
 
 -- | Run an assignment over an AST exhaustively.
-assignBy :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
-         => (forall x. F.Base ast x -> Node grammar) -- ^ A function to project a 'Node' from the ast.
-         -> Source.Source                            -- ^ The source for the parse tree.
-         -> Assignment ast grammar a                 -- ^ The 'Assignment to run.
-         -> ast                                      -- ^ The root of the ast.
-         -> Either (Error String) a                  -- ^ 'Either' an 'Error' or an assigned value.
-assignBy toNode source assignment ast = bimap (fmap (either id show)) fst (runAssignment toNode source assignment (makeState [ast]))
-{-# INLINE assignBy #-}
+assign :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+       => Source.Source             -- ^ The source for the parse tree.
+       -> Assignment ast grammar a  -- ^ The 'Assignment to run.
+       -> AST ast grammar           -- ^ The root of the ast.
+       -> Either (Error String) a   -- ^ 'Either' an 'Error' or an assigned value.
+assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment source assignment (makeState [ast]))
+{-# INLINE assign #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq ast, F.Recursive ast, Foldable (F.Base ast))
-              => (forall x. F.Base ast x -> Node grammar)              -- ^ A function to project a 'Node' from the ast.
-              -> Source.Source                                         -- ^ The source for the parse tree.
-              -> Assignment ast grammar a                              -- ^ The 'Assignment' to run.
-              -> State ast                                             -- ^ The current state.
-              -> Either (Error (Either String grammar)) (a, State ast) -- ^ 'Either' an 'Error' or an assigned value & updated state.
-runAssignment toNode source = \ assignment state -> go assignment state >>= requireExhaustive
-  -- Note: We explicitly bind toNode & source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar result -> State ast -> Either (Error (Either String grammar)) (result, State ast)
+runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+              => Source.Source                                                 -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
+              -> State ast grammar                                             -- ^ The current state.
+              -> Either (Error (Either String grammar)) (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
+runAssignment source = \ assignment state -> go assignment state >>= requireExhaustive (assignmentCallSite assignment)
+  -- Note: We explicitly bind source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
+  where go :: Assignment ast grammar result -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: AssignmentF ast grammar x
-            -> (x -> State ast -> Either (Error (Either String grammar)) (result, State ast))
-            -> State ast
-            -> Either (Error (Either String grammar)) (result, State ast)
-        run assignment yield initialState = assignment `seq` expectedSymbols `seq` state `seq` maybe (anywhere Nothing) (atNode . F.project) (listToMaybe stateNodes)
-          where atNode node = case assignment of
-                  Location -> yield (nodeLocation (toNode node)) state
-                  Project projection -> yield (projection node) state
-                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange (toNode node)) source)) (advance state)
+        run :: Tracing (AssignmentF ast grammar) x
+            -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
+            -> State ast grammar
+            -> Either (Error (Either String grammar)) (result, State ast grammar)
+        run t yield initialState = expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
+          where atNode (node :< f) = case runTracing t of
+                  Location -> yield (nodeLocation node) state
+                  CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
+                  Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
-                    (a, state') <- go child state { stateNodes = toList node } >>= requireExhaustive
-                    yield a (advance state' { stateNodes = stateNodes })
-                  Advance -> yield () (advance state)
-                  Choose _ choices | Just choice <- IntMap.lookup (toIndex (nodeSymbol (toNode node))) choices -> yield choice state
+                    (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
+                    yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
+                  Advance -> yield () (advanceState state)
+                  Choose _ choices _ | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
-                anywhere node = case assignment of
-                  End -> requireExhaustive ((), state) >>= uncurry yield
+                anywhere node = case runTracing t of
+                  End -> requireExhaustive (tracingCallSite t) ((), state) >>= uncurry yield
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
-                  Alt as -> sconcat (flip yield state <$> as)
-                  Throw e -> Left (fromMaybe (makeError node) e)
+                  Alt (a:as) -> sconcat (flip yield state <$> a:|as)
+                  Throw e -> Left e
                   Catch during _ -> go during state >>= uncurry yield
-                  Choose{} -> Left (makeError node)
-                  Project{} -> Left (makeError node)
-                  Children{} -> Left (makeError node)
-                  Source -> Left (makeError node)
-                  Advance{} -> Left (makeError node)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
+                  Choose _ _ (Just atEnd) | Nothing <- node -> yield atEnd state
+                  _ -> Left (makeError node)
 
-                state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then dropAnonymous initialState else initialState
-                expectedSymbols = firstSet (assignment `Then` return)
-                makeError :: HasCallStack => Maybe (F.Base ast ast) -> Error (Either String grammar)
-                makeError = maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols) . toNode)
+                state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
+                expectedSymbols = firstSet (t `Then` return)
+                makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
-        requireExhaustive :: HasCallStack => (result, State ast) -> Either (Error (Either String grammar)) (result, State ast)
-        requireExhaustive (a, state) = let state' = dropAnonymous state in case stateNodes state' of
-          [] -> Right (a, state')
-          node : _ -> Left (nodeError [] (toNode (F.project node)))
+requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
+requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
+  [] -> Right (a, state')
+  (node :< _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
 
-        dropAnonymous state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . toNode . F.project) (stateNodes state) }
+withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallStack => a) -> a
+withStateCallStack callSite state action = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state)))) action
 
-        -- Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
-        advance state@State{..}
-          | node : rest <- stateNodes
-          , Node{..} <- toNode (F.project node) = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) rest
-          | otherwise = state
+skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
+skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . CofreeF.headF . runCofree) (stateNodes state) }
+
+-- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
+advanceState :: State ast grammar -> State ast grammar
+advanceState state@State{..}
+  | (Node{..} Cofree.:< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
+  | otherwise = state
 
 -- | State kept while running 'Assignment's.
-data State ast = State
-  { stateOffset :: {-# UNPACK #-} !Int   -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Info.Pos -- ^ The (1-indexed) line/column position in the Source thus far reached.
-  , stateNodes :: ![ast]                 -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+data State ast grammar = State
+  { stateOffset :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
+  , statePos :: {-# UNPACK #-} !Info.Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
+  , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
-  deriving (Eq, Show)
 
-makeState :: [ast] -> State ast
-makeState = State 0 (Info.Pos 1 1)
+deriving instance (Eq grammar, Eq (ast (AST ast grammar))) => Eq (State ast grammar)
+deriving instance (Show grammar, Show (ast (AST ast grammar))) => Show (State ast grammar)
+
+makeState :: [AST ast grammar] -> State ast grammar
+makeState = State 0 (Info.Pos 1 1) []
 
 
 -- Instances
 
-instance Eq grammar => Alternative (Assignment ast grammar) where
+instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = Throw Nothing `Then` return
+  empty = tracing (Alt []) `Then` return
 
-  (<|>) :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
+  (<|>) :: forall a. HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
-  (Throw Nothing `Then` _) <|> r = r
-  l <|> (Throw Nothing `Then` _) = l
-  (Throw err `Then` continue) <|> _ = Throw err `Then` continue
-  (Children l `Then` continueL) <|> (Children r `Then` continueR) = Children (Left <$> l <|> Right <$> r) `Then` either continueL continueR
-  (Location `Then` continueL) <|> (Location `Then` continueR) = Location `Then` uncurry (<|>) . (continueL &&& continueR)
-  (Source `Then` continueL) <|> (Source `Then` continueR) = Source `Then` uncurry (<|>) . (continueL &&& continueR)
-  (Alt ls `Then` continueL) <|> (Alt rs `Then` continueR) = Alt ((Left <$> ls) <> (Right <$> rs)) `Then` either continueL continueR
-  (Alt ls `Then` continueL) <|> r = Alt ((continueL <$> ls) <> pure r) `Then` id
-  l <|> (Alt rs `Then` continueR) = Alt (l <| (continueR <$> rs)) `Then` id
-  l <|> r | Just (sl, cl) <- choices l, Just (sr, cr) <- choices r = fromMaybe id (rewrapFor r) . fromMaybe id (rewrapFor l) $
-            withBestCallStack (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) `Then` id)
-          | otherwise = withBestCallStack (Alt (l :| [r]) `Then` id)
-    where choices :: Assignment ast grammar a -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar a))
-          choices (Choose symbols choices `Then` continue) = Just (symbols, continue <$> choices)
-          choices (Many rule `Then` continue) = second ((Many rule `Then` continue) <$) <$> choices rule
-          choices (Catch during _ `Then` continue) = second (fmap (>>= continue)) <$> choices during
-          choices (Label rule label `Then` continue) = second ((Label rule label `Then` continue) <$) <$> choices rule
+  l@(Tracing cs _ `Then` _) <|> r@Return{} = Tracing cs (Alt [l, r]) `Then` id
+  l@(Tracing callSiteL la `Then` continueL) <|> r@(Tracing callSiteR ra `Then` continueR) = go callSiteL la continueL callSiteR ra continueR
+    where go :: forall l r . Maybe (String, SrcLoc) -> AssignmentF ast grammar l -> (l -> Assignment ast grammar a) -> Maybe (String, SrcLoc) -> AssignmentF ast grammar r -> (r -> Assignment ast grammar a) -> Assignment ast grammar a
+          go callSiteL la continueL callSiteR ra continueR = case (la, ra) of
+            (Alt [], _) -> r
+            (_, Alt []) -> l
+            (Throw _, _) -> l
+            (Children cl, Children cr) -> alternate (Children (Left <$> cl <|> Right <$> cr))
+            (Location, Location) -> distribute Location
+            (CurrentNode, CurrentNode) -> distribute CurrentNode
+            (Advance, Advance) -> distribute Advance
+            (End, End) -> distribute End
+            (Source, Source) -> distribute Source
+            (Alt ls, Alt rs) -> alternate (Alt ((Left <$> ls) <> (Right <$> rs)))
+            (Alt ls, _) -> rebuild (Alt ((continueL <$> ls) <> pure r)) id
+            (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
+            _ | Just (sl, cl) <- choices l
+              , Just (sr, cr) <- choices r
+              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) (merge <$> atEnd l <*> atEnd r)) id
+              | otherwise -> rebuild (Alt [l, r]) id
+            where distribute :: (l ~ lr, r ~ lr) => AssignmentF ast grammar lr -> Assignment ast grammar a
+                  distribute a = rebuild a (uncurry (<|>) . (continueL &&& continueR))
+                  alternate :: AssignmentF ast grammar (Either l r) -> Assignment ast grammar a
+                  alternate a = rebuild a (either continueL continueR)
+                  rebuild :: AssignmentF ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
+                  rebuild a c = Tracing (callSiteL <|> callSiteR) a `Then` c
+
+                  merge l r = rebuild (Alt [l, r]) id
+
+          choices :: Assignment ast grammar z -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar z))
+          choices (Tracing _ (Choose symbols choices _) `Then` continue) = Just (symbols, continue <$> choices)
+          choices (Tracing cs (Many rule) `Then` continue) = second ((Tracing cs (Many rule) `Then` continue) <$) <$> choices rule
+          choices (Tracing _ (Catch during _) `Then` continue) = second (fmap (>>= continue)) <$> choices during
+          choices (Tracing cs (Label rule label) `Then` continue) = second ((Tracing cs (Label rule label) `Then` continue) <$) <$> choices rule
           choices _ = Nothing
 
-          rewrapFor :: Assignment ast grammar a -> Maybe (Assignment ast grammar a -> Assignment ast grammar a)
-          rewrapFor (Many _ `Then` continue) = Just (<|> continue [])
-          rewrapFor (Catch _ handler `Then` continue) = Just (`catchError` (continue <=< handler))
-          rewrapFor _ = Nothing
-
-          assignmentCallStack (Choose{} `Then` _) = Just callStack
-          assignmentCallStack (Many{} `Then` _) = Just callStack
-          assignmentCallStack (Catch{} `Then` _) = Just callStack
-          assignmentCallStack (Label{} `Then` _) = Just callStack
-          assignmentCallStack _ = Nothing
-
-          withBestCallStack = withCallStack (freezeCallStack (fromMaybe callStack (((<|>) `on` assignmentCallStack) r l)))
+          atEnd :: Assignment ast grammar z -> Maybe (Assignment ast grammar z)
+          atEnd (Tracing _ (Choose _ _ atEnd) `Then` continue) = continue <$> atEnd
+          atEnd rule@(Tracing _ (Many _) `Then` _) = Just rule
+          atEnd rule@(Tracing _ (Catch _ _) `Then` _) = Just rule
+          atEnd rule@(Tracing _ (Label inner _) `Then` _) = rule <$ atEnd inner
+          atEnd _ = Nothing
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
-  many a = Many a `Then` return
+  many a = tracing (Many a) `Then` return
 
-instance (Eq grammar, Show grammar) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
-  a <?> s = Label a s `Then` return
+  a <?> s = tracing (Label a s) `Then` return
 
   unexpected :: HasCallStack => String -> Assignment ast grammar a
   unexpected s = location >>= \ loc -> throwError (Error (Info.sourceSpan loc) [] (Just (Left s)))
 
   eof :: HasCallStack => Assignment ast grammar ()
-  eof = withFrozenCallStack $ End `Then` return
+  eof = tracing End `Then` return
 
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
   notFollowedBy a = a *> unexpected (show a) <|> pure ()
 
 instance MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
-  throwError error = withFrozenCallStack $ Throw (Just error) `Then` return
+  throwError error = tracing (Throw error) `Then` return
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
-  catchError during handler = Catch during handler `Then` return
+  catchError during handler = tracing (Catch during handler) `Then` return
 
-instance Show grammar => Show1 (AssignmentF ast grammar) where
+instance Show1 f => Show1 (Tracing f) where
+  liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
+
+instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
-    Project projection -> showsUnaryWith (const (const (showChar '_'))) "Project" d projection
+    CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose symbols choices -> showsBinaryWith showsPrec (const (liftShowList sp sl)) "Choose" d symbols (IntMap.toList choices)
+    Choose symbols choices atEnd -> showsTernaryWith showsPrec (const (liftShowList sp sl)) (liftShowsPrec sp sl) "Choose" d symbols (IntMap.toList choices) atEnd
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
+    where showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS) -> (Int -> c -> ShowS) -> String -> Int -> a -> b -> c -> ShowS
+          showsTernaryWith sp1 sp2 sp3 name d x y z = showParen (d > 10) $ showString name . showChar ' ' . sp1 11 x . showChar ' ' . sp2 11 y . showChar ' ' . sp3 11 z

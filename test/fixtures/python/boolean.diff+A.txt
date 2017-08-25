@@ -1,4 +1,0 @@
-{+(Program
-  (Boolean)
-  (Boolean)
-  (Boolean))+}

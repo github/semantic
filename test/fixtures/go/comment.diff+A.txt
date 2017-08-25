@@ -1,7 +1,0 @@
-{+(Program
-  (Module
-    (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (Comment)))+}

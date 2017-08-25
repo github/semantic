@@ -78,7 +78,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST Grammar) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
@@ -398,6 +398,6 @@ term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> som
 infixTerm :: HasCallStack
           => Assignment
           -> Assignment
-          -> [Assignment.Assignment (AST Grammar) Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment (AST Grammar) Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext comment
