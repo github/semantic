@@ -4,7 +4,6 @@ module Interpreter
 , decoratingWith
 , diffTermsWith
 , comparableByConstructor
-, comparableByConstructor'
 ) where
 
 import Algorithm
@@ -118,12 +117,8 @@ comparableByCategory :: HasField fields Category => ComparabilityRelation f fiel
 comparableByCategory _ (a :< _) (b :< _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: GAlign f => ComparabilityRelation f fields
-comparableByConstructor _ (_ :< a) (_ :< b) = isJust (galign a b)
-
--- | Test whether two terms are comparable by their constructor.
-comparableByConstructor' :: (Declaration.Method :< fs, Apply1 GAlign fs) => ComparabilityRelation (Union fs) fields
-comparableByConstructor' canCompare (_ :< a) (_ :< b)
+comparableByConstructor :: (Declaration.Method :< fs, Apply1 GAlign fs) => ComparabilityRelation (Union fs) fields
+comparableByConstructor canCompare (_ :< a) (_ :< b)
   | Just (Declaration.Method _ identifierA _ _) <- prj a
   , Just (Declaration.Method _ identifierB _ _) <- prj b
   = canCompare identifierA identifierB
