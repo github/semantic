@@ -31,7 +31,8 @@ import Language.Go.Grammar as Grammar
 import qualified Term
 
 type Syntax =
-  '[ Declaration.Function
+  '[ Comment.Comment
+   , Declaration.Function
    , Declaration.Import
    , Declaration.Method
    , Declaration.Module
@@ -55,6 +56,7 @@ expression = handleError
           <|> importDeclaration
           <|> importSpec
           <|> packageClause
+          <|> comment
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
@@ -77,3 +79,6 @@ importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declarat
 
 importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
+
+comment :: Assignment
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
