@@ -169,6 +169,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.New
   , Language.TypeScript.Syntax.Update
   , Language.TypeScript.Syntax.Await
+  , Language.TypeScript.Syntax.PublicFieldDefinition
   , Type.Visibility
   , []
   ]
@@ -194,6 +195,12 @@ data Intersection a = Intersection { intersectionLeft :: !a, intersectionRight :
 
 instance Eq1 Intersection where liftEq = genericLiftEq
 instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
+
+data PublicFieldDefinition a = PublicFieldDefinition { publicFieldPropertyName :: !a, publicFieldValue :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
+instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 data Function a = Function { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -689,15 +696,13 @@ null' :: Assignment
 null' = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
 
 anonymousClass :: Assignment
-anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> superclass <*> classBodyStatements)
-  where superclass = pure <$ symbol Grammar.ClassHeritage <*> children expression
+anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractClass :: Assignment
-abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> (Language.TypeScript.Syntax.AbstractClass <$> identifier <*> (typeParameters <|> emptyTerm) <*> (classHeritage <|> pure []) <*> classBodyStatements)
-  where classHeritage = (\a b -> a : b : []) <$> (extendsClause' <|> emptyTerm) <*> implementsClause'
+abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> (Language.TypeScript.Syntax.AbstractClass <$> identifier <*> (typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
-classHeritage' :: Assignment
-classHeritage' = makeTerm <$> symbol Grammar.ClassHeritage <*> (Language.TypeScript.Syntax.ClassHeritage <$> (extendsClause' <|> emptyTerm) <*> implementsClause')
+classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
+classHeritage' = symbol Grammar.ClassHeritage *> children (((\a b -> a : b : []) <$> extendsClause' <*> implementsClause') <|> (pure <$> implementsClause'))
 
 extendsClause' :: Assignment
 extendsClause' = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many ty)
@@ -759,9 +764,8 @@ literal =
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
 
 class' :: Assignment
-class' = makeClass <$> symbol Class <*> children ((,,,) <$> expression <*> (many typeParameter' <|> pure []) <*> (superclass <|> pure []) <*> classBodyStatements)
-  where superclass = pure <$ symbol Grammar.ClassHeritage <*> children expression
-        makeClass loc (expression, typeParams, superclass', statements) = makeTerm loc (Declaration.Class typeParams expression superclass' statements)
+class' = makeClass <$> symbol Class <*> children ((,,,) <$> expression <*> (many typeParameter' <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+  where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
 
 object :: Assignment
 object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
@@ -817,7 +821,7 @@ readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ source)
 methodDefinition :: Assignment
 methodDefinition = makeMethod <$>
   symbol MethodDefinition
-  <*> children ((,,,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> emptyTerm <*> emptyTerm <*> callSignatureParts <*> emptyTerm)
+  <*> children ((,,,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> emptyTerm <*> emptyTerm <*> callSignatureParts <*> statementBlock)
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
@@ -933,7 +937,11 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
 classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classBodyStatements = symbol ClassBody *> children (many statement)
+classBodyStatements = symbol ClassBody *> children (many (methodDefinition <|> publicFieldDefinition <|> comment))
+
+publicFieldDefinition :: Assignment
+publicFieldDefinition = makeTerm <$> symbol Grammar.PublicFieldDefinition <*> (Language.TypeScript.Syntax.PublicFieldDefinition <$> propertyName <*> (expression <|> emptyTerm))
+
 
 statement :: Assignment
 statement = handleError $ (term everything)
