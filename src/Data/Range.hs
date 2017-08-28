@@ -8,6 +8,7 @@ module Data.Range
 
 import Control.DeepSeq
 import Data.Semigroup
+import Data.Text.Prettyprint.Doc
 import GHC.Generics
 import Test.LeanCheck
 
@@ -38,3 +39,6 @@ instance Ord Range where
 
 instance Listable Range where
   tiers = cons2 Range
+
+instance Pretty Range where
+  pretty (Range from to) = pretty from <> pretty '-' <> pretty to
