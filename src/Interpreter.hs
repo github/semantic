@@ -123,12 +123,15 @@ comparableByConstructor :: (GAlign f) => ComparabilityRelation f fields
 comparableByConstructor (_ :< a) (_ :< b) = isJust (galign a b)
 
 -- | Equivalency check for terms.
-equivalentTerms :: (Declaration.Method :< fs, Apply1 Functor fs, Apply1 Foldable fs, Apply1 GAlign fs, Apply1 Eq1 fs)
+equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply1 Functor fs, Apply1 Foldable fs, Apply1 GAlign fs, Apply1 Eq1 fs)
                 => Term (Union fs) a
                 -> Term (Union fs) a
                 -> Bool
 equivalentTerms a b | Just (Declaration.Method _ identifierA _ _) <- prj (unwrap a)
                     , Just (Declaration.Method _ identifierB _ _) <- prj (unwrap b)
+                    = liftEq equivalentTerms (unwrap identifierA) (unwrap identifierB)
+                    | Just (Declaration.Function identifierA _ _) <- prj (unwrap a)
+                    , Just (Declaration.Function identifierB _ _) <- prj (unwrap b)
                     = liftEq equivalentTerms (unwrap identifierA) (unwrap identifierB)
                     | Just aligned <- galignWith (these (const False) (const False) equivalentTerms) (unwrap a) (unwrap b)
                     = and aligned
