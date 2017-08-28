@@ -1,6 +1,0 @@
-{+(Program
-  (ExpressionStatements
-    (BitwiseOperator
-      (Identifier)
-      (Other ">>")
-      (Identifier))))+}

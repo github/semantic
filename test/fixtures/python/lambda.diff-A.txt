@@ -1,9 +1,0 @@
-{-(Program
-  (Annotation
-    (Function
-      (Empty)
-      (
-        (Plus
-          (Integer)
-          (Integer))))
-    (Empty)))-}

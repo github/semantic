@@ -9,5 +9,4 @@
 {-(Tuple
     (Identifier)
     (Identifier))-}
-{-(Tuple
-    (Identifier))-})
+{-((Identifier))-})

@@ -19,10 +19,13 @@ import Control.DeepSeq
 import Control.Monad.Free
 import Data.Align.Generic
 import Data.Functor.Both
+import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Foldable
 import Data.Maybe
+import Data.Proxy
 import Data.Record
 import Data.These
+import Data.Union
 import Syntax
 
 -- | A Term with an abstract syntax tree and an annotation.
@@ -68,3 +71,13 @@ cofree (a CofreeF.:< f) = a Cofree.:< f
 
 runCofree :: Cofree.Cofree f a -> CofreeF.CofreeF f a (Cofree.Cofree f a)
 runCofree (a Cofree.:< f) = a CofreeF.:< f
+
+
+instance Pretty1 f => Pretty1 (Cofree.Cofree f) where
+  liftPretty p pl = go where go (a Cofree.:< f) = p a <+> liftPretty go (list . map (liftPretty p pl)) f
+
+instance (Pretty1 f, Pretty a) => Pretty (Cofree.Cofree f a) where
+  pretty = liftPretty pretty prettyList
+
+instance Apply1 Pretty1 fs => Pretty1 (Union fs) where
+  liftPretty p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
