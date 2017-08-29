@@ -4,4 +4,11 @@
     (When
       (Args
         (Identifier))
-      (Identifier))))
+      (Identifier)
+      (When
+        (Args
+          (Identifier))
+        (Args
+          (Identifier))
+        (Else
+          (Identifier))))))

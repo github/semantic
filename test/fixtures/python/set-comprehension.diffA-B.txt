@@ -13,8 +13,7 @@
   { (Identifier)
   ->(Plus
       (Identifier)
-      (
-        (Integer))) }
+      (Integer)) }
     (
       (
         (

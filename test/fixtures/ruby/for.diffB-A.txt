@@ -1,9 +1,23 @@
 (Program
+{+(For
+    (Identifier)
+    (Other "in"
+      (Identifier))
+    (Identifier))+}
+{+(For
+    (Identifier)
+    (Identifier)
+    (Other "in"
+      (Identifier))
+    (Identifier))+}
   (For
   { (Identifier)
   ->(Identifier) }
     (Other "in"
-    {+(Identifier)+}
+    {+(RangeExpression
+        (IntegerLiteral)
+        (Other "..")
+        (IntegerLiteral))+}
     {-(ArrayLiteral
         (IntegerLiteral)
         (IntegerLiteral)
@@ -11,10 +25,13 @@
   { (MethodCall
       (Identifier)
       (Identifier))
-  ->(Identifier) })
+  ->(Boolean) })
 {+(For
     (Identifier)
     (Identifier)
     (Other "in"
-      (Identifier))
-    (Identifier))+})
+      (RangeExpression
+        (IntegerLiteral)
+        (Other "..")
+        (IntegerLiteral)))
+    (Boolean))+})

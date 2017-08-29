@@ -9,4 +9,21 @@
     (Identifier)
     (Other "in"
       (Identifier))
-    (Identifier)))
+    (Identifier))
+  (For
+    (Identifier)
+    (Other "in"
+      (RangeExpression
+        (IntegerLiteral)
+        (Other "..")
+        (IntegerLiteral)))
+    (Boolean))
+  (For
+    (Identifier)
+    (Identifier)
+    (Other "in"
+      (RangeExpression
+        (IntegerLiteral)
+        (Other "..")
+        (IntegerLiteral)))
+    (Boolean)))

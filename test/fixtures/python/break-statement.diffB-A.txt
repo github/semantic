@@ -1,5 +1,5 @@
 (Program
   (Break
-    (Identifier))
+    (Empty))
 {-(Break
-    (Identifier))-})
+    (Empty))-})

@@ -12,17 +12,14 @@
     (Identifier)
     (Or
       (Integer)
-      (
-        (Integer)))
+      (Integer))
     (Empty))
   (Call
     (Identifier)
     (Or
       (Integer)
-      (
-        (Integer)))
+      (Integer))
     (Or
       (Integer)
-      (
-        (Integer)))
+      (Integer))
     (Empty)))

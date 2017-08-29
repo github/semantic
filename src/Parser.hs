@@ -11,9 +11,9 @@ module Parser
 , rubyParser
 ) where
 
-import Control.Comonad.Trans.Cofree (headF)
+import Control.Comonad.Cofree (Cofree)
+import Control.Comonad.Trans.Cofree (CofreeF)
 import qualified CMarkGFM
-import Data.Functor.Foldable hiding (fold, Nil)
 import Data.Ix
 import Data.Record
 import Data.Source as Source
@@ -23,7 +23,6 @@ import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
 import Language
-import Language.Markdown
 import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
@@ -40,17 +39,16 @@ import TreeSitter.JSON
 -- | A parser from 'Source' onto some term type.
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
-  ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST grammar)
+  ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs, Eq ast, Recursive ast, Foldable (Base ast))
-                   => Parser ast                                                 -- ^ A parser producing AST.
-                   -> (forall x. Base ast x -> Node grammar)                     -- ^ A function extracting the symbol and location.
+  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq (ast (Cofree ast (Node grammar))), Apply1 Foldable fs, Apply1 Functor fs, Foldable ast, Functor ast)
+                   => Parser (Cofree ast (Node grammar))                         -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (AST CMarkGFM.NodeType)
+  MarkdownParser :: Parser (Cofree (CofreeF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm DefaultFields)
 
@@ -67,16 +65,16 @@ parserForLanguage (Just language) = case language of
   _ -> LineByLineParser
 
 rubyParser :: Parser Ruby.Term
-rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) headF Ruby.assignment
+rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
 pythonParser :: Parser Python.Term
-pythonParser = AssignmentParser (ASTParser tree_sitter_python) headF Python.assignment
+pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 jsonParser :: Parser JSON.Term
-jsonParser = AssignmentParser (ASTParser tree_sitter_json) headF JSON.assignment
+jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
 
 markdownParser :: Parser Markdown.Term
-markdownParser = AssignmentParser MarkdownParser (\ (node@Node{..} :< _) -> node { nodeSymbol = toGrammar nodeSymbol }) Markdown.assignment
+markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
 -- | A fallback parser that treats a file simply as rows of strings.

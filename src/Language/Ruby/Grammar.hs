@@ -5,6 +5,8 @@ import Language.Haskell.TH
 import TreeSitter.Language
 import TreeSitter.Ruby
 
--- v2 - Bump to get file to change to force template haskell to regenerate.
+-- Regenerate template haskell code when these files change:
+addDependentFileRelative "../../../vendor/haskell-tree-sitter/languages/ruby/vendor/tree-sitter-ruby/src/parser.c"
+
 -- | Statically-known rules corresponding to symbols in the grammar.
 mkSymbolDatatype (mkName "Grammar") tree_sitter_ruby

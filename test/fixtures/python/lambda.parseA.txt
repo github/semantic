@@ -1,10 +1,9 @@
 (Program
   (Annotation
     (Function
-      (Identifier)
+      (Empty)
       (
         (Plus
           (Integer)
-          (
-            (Integer)))))
+          (Integer))))
     (Empty)))

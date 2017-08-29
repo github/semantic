@@ -2,8 +2,7 @@
   (Identifier)
   (Plus
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (
     (Integer)
     (Integer)

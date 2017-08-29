@@ -4,8 +4,7 @@
     (Plus
     { (Integer)
     ->(Integer) }
-      (
-        (Integer)))
+      (Integer))
     (Empty))
   (Call
     (Identifier)

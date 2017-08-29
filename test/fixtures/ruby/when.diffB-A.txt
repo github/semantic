@@ -4,4 +4,16 @@
     (When
       (Args
         (Identifier))
-    {-(Identifier)-})))
+    {-(Identifier)-}
+    {-(When
+        (Args
+          (Identifier))
+        (Args
+          (Identifier))
+        (Else
+          (Identifier)))-}))
+{+(Case
+    (When
+      (Args
+        (Boolean))
+      (StringLiteral)))+})

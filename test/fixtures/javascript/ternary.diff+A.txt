@@ -1,6 +1,0 @@
-{+(Program
-  (ExpressionStatements
-    (Ternary
-      (Identifier)
-      (Identifier)
-      (Identifier))))+}

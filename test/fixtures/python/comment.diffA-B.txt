@@ -1,5 +1,7 @@
 (Program
-{-(Comment)-}
-  (Comment)
-{+(Comment)+}
-{+(Comment)+})
+  (Context
+  {-(Comment)-}
+    (Comment)
+  {+(Comment)+}
+  {+(Comment)+}
+    (Empty)))

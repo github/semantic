@@ -1,5 +1,5 @@
 (Program
   (NoOp
-    (Identifier))
+    (Empty))
 {-(NoOp
-    (Identifier))-})
+    (Empty))-})

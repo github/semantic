@@ -17,4 +17,18 @@
     ->(Boolean) })
   {-(Pair
       (SymbolLiteral)
-      (IntegerLiteral))-}))
+      (IntegerLiteral))-})
+{-(Object)-}
+{-(Object
+    (Comment)
+    (Pair
+      (Identifier)
+      (IntegerLiteral))
+    (Comment)
+    (Comment)
+    (Pair
+      (StringLiteral)
+      (IntegerLiteral))
+    (Comment))-}
+{-(Object
+    (Comment))-})

@@ -12,7 +12,7 @@
   (Class
     (Identifier)
     (NoOp
-      (Identifier)))
+      (Empty)))
   (Class
     (Identifier)
     (Identifier)

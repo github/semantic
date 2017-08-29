@@ -1,25 +1,26 @@
 (Program
-{+(AnonymousFunction
-    (ExpressionStatements))+}
-{+(AnonymousFunction
-    (ExpressionStatements
-      (Identifier)))+}
-  (AnonymousFunction
-    (ExpressionStatements
-      (Params
-      { (Identifier)
-      ->(Identifier) }
-      {+(KeywordParameter
-          (Identifier)
-          (Boolean))+}
-      {+(OptionalParameter
-          (Identifier)
-          (Identifier))+})
-    {+(IntegerLiteral)+}
-    {-(Binary
+{+(MethodCall
+    (Identifier)
+    (Object))+}
+{+(MethodCall
+    (Identifier)
+    (Identifier))+}
+  (MethodCall
+    (Identifier)
+    (Params
+    { (Identifier)
+    ->(Identifier) }
+    {+(KeywordParameter
         (Identifier)
-        (Other "+")
-        (IntegerLiteral))-}))
+        (Boolean))+}
+    {+(OptionalParameter
+        (Identifier)
+        (Identifier))+})
+  {+(IntegerLiteral)+}
+  {-(Binary
+      (Identifier)
+      (Other "+")
+      (IntegerLiteral))-})
 {+(AnonymousFunction
     (ExpressionStatements))+}
 {+(AnonymousFunction

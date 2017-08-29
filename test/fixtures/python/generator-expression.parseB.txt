@@ -9,8 +9,7 @@
   (Comprehension
     (Plus
       (Identifier)
-      (
-        (Integer)))
+      (Integer))
     (
       (
         (

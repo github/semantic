@@ -7,6 +7,7 @@ module Language.Markdown.Syntax
 ) where
 
 import Control.Comonad.Cofree (Cofree(..), unwrap)
+import Control.Comonad.Trans.Cofree (CofreeF, headF, tailF)
 import qualified CMarkGFM
 import Data.ByteString (ByteString)
 import Data.Function (on)
@@ -52,7 +53,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (AST CMarkGFM.NodeType) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (CofreeF [] CMarkGFM.NodeType) Grammar Term
 
 
 assignment :: Assignment
@@ -68,16 +69,16 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = (:<) <$> symbol List <*> (project (\ (Node (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) _ _ Term.:< _) -> case listType of
+list = (:<) <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
   CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
-  CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) <*> children (many item))
+  CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) . headF . tailF <$> currentNode <*> children (many item))
 
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 section :: Assignment
 section = makeTerm <$> symbol Heading <*> (heading >>= \ headingTerm -> Markup.Section (level headingTerm) headingTerm <$> while (((<) `on` level) headingTerm) blockElement)
-  where heading = makeTerm <$> symbol Heading <*> (project (\ (Node (CMarkGFM.HEADING level) _ _ Term.:< _) -> Markup.Heading level) <*> children (many inlineElement))
+  where heading = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . headF . tailF <$> currentNode <*> children (many inlineElement))
         level term = case term of
           _ | Just section <- prj (unwrap term) -> level (Markup.sectionHeading section)
           _ | Just heading <- prj (unwrap term) -> Markup.headingLevel heading
@@ -87,10 +88,10 @@ blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> (project (\ (Node (CMarkGFM.CODE_BLOCK language _) _ _ Term.:< _) -> Markup.Code (nullText language)) <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> ((\ (CMarkGFM.CODE_BLOCK language _) -> Markup.Code (nullText language)) . headF . tailF <$> currentNode <*> source)
 
 thematicBreak :: Assignment
-thematicBreak = makeTerm <$> symbol ThematicBreak <*> pure Markup.ThematicBreak <* source
+thematicBreak = makeTerm <$> token ThematicBreak <*> pure Markup.ThematicBreak
 
 htmlBlock :: Assignment
 htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
@@ -125,19 +126,19 @@ htmlInline :: Assignment
 htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
 
 link :: Assignment
-link = makeTerm <$> symbol Link <*> project (\ (Node (CMarkGFM.LINK url title) _ _ Term.:< _) -> Markup.Link (encodeUtf8 url) (nullText title)) <* source
+link = makeTerm <$> symbol Link <*> ((\ (CMarkGFM.LINK url title) -> Markup.Link (encodeUtf8 url) (nullText title)) . headF . tailF <$> currentNode) <* advance
 
 image :: Assignment
-image = makeTerm <$> symbol Image <*> project (\ (Node (CMarkGFM.IMAGE url title) _ _ Term.:< _) -> Markup.Image (encodeUtf8 url) (nullText title)) <* source
+image = makeTerm <$> symbol Image <*> ((\ (CMarkGFM.IMAGE url title) -> Markup.Image (encodeUtf8 url) (nullText title)) . headF . tailF <$> currentNode) <* advance
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
 
 lineBreak :: Assignment
-lineBreak = makeTerm <$> symbol LineBreak <*> pure Markup.LineBreak <* source
+lineBreak = makeTerm <$> token LineBreak <*> pure Markup.LineBreak
 
 softBreak :: Assignment
-softBreak = makeTerm <$> symbol SoftBreak <*> pure Markup.LineBreak <* source
+softBreak = makeTerm <$> token SoftBreak <*> pure Markup.LineBreak
 
 
 -- Implementation details

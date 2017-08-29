@@ -1,5 +1,0 @@
-{+(Program
-  (ArrayLiteral
-    (IntegerLiteral)
-    (IntegerLiteral)
-    (IntegerLiteral)))+}
