@@ -38,14 +38,6 @@ languageForType mediaType = case mediaType of
     ".py" -> Just Python
     _ -> Nothing
 
-toVarDeclOrAssignment :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
-toVarDeclOrAssignment child = case unwrap child of
-  S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment [child'] assignment
-  S.Indexed [child'] -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child']
-  S.VarDecl _ -> cofree $ setCategory (extract child) VarDecl :< unwrap child
-  S.VarAssignment _ _ -> child
-  _ -> toVarDecl child
-
 toVarDecl :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child]
 
