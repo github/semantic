@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, TypeOperators, BangPatterns #-}
+{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators, BangPatterns #-}
 module Semantic.Task
 ( Task
 , Level(..)
@@ -231,3 +231,7 @@ runParser Options{..} blob@Blob{..} = go
 
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return
+
+instance MonadError String Task where
+  throwError error = Throw error `Then` return
+  catchError during handler = Catch during handler `Then` return
