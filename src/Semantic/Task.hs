@@ -206,7 +206,6 @@ runParser Options{..} blob@Blob{..} = go
                   for_ (errors term) $ \ err ->
                     writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
                   pure $ Right term
-          TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (Right <$> treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (Right (cmarkParser blobSource))
           LineByLineParser -> logTiming "line-by-line parse" $ pure (Right (lineByLineParser blobSource))
         blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]

@@ -32,7 +32,6 @@ import qualified Language.TypeScript.Syntax as TypeScript
 import Syntax hiding (Go)
 import Term
 import qualified TreeSitter.Language as TS (Language, Symbol)
-import TreeSitter.Go
 import TreeSitter.Python
 import TreeSitter.Ruby
 import TreeSitter.TypeScript
@@ -47,8 +46,6 @@ data Parser term where
                    => Parser (Cofree ast (Node grammar))                         -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
-  -- | A tree-sitter parser.
-  TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Cofree (CofreeF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
@@ -56,15 +53,7 @@ data Parser term where
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
 parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
-parserForLanguage Nothing = LineByLineParser
-parserForLanguage (Just language) = case language of
-  Go -> TreeSitterParser tree_sitter_go
-  JavaScript -> TreeSitterParser tree_sitter_typescript
-  JSON -> TreeSitterParser tree_sitter_json
-  JSX -> TreeSitterParser tree_sitter_typescript
-  Ruby -> TreeSitterParser tree_sitter_ruby
-  TypeScript -> TreeSitterParser tree_sitter_typescript
-  _ -> LineByLineParser
+parserForLanguage _ = LineByLineParser
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
