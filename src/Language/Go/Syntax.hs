@@ -106,3 +106,7 @@ constSpec = makeTerm <$> symbol ConstSpec <*> children (Statement.Assignment <$>
 
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
+
+-- | Match a series of terms or comments until a delimiter is matched.
+manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill step end = manyTill (step <|> comment) end
