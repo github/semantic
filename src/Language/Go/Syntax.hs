@@ -71,7 +71,10 @@ intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
 
 identifier :: Assignment
-identifier = makeTerm <$> (symbol Identifier <|> symbol PackageIdentifier) <*> (Syntax.Identifier <$> source)
+identifier =
+      mk Identifier
+  <|> mk PackageIdentifier
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 interpretedStringLiteral :: Assignment
 interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
