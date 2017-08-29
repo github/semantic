@@ -1,14 +1,9 @@
 {-# LANGUAGE DataKinds, DeriveGeneric, DeriveAnyClass #-}
 module Language where
 
-import Control.Comonad
-import Control.Comonad.Trans.Cofree hiding (cofree)
 import Control.DeepSeq
 import Data.Aeson
-import Data.Record
 import GHC.Generics
-import qualified Syntax as S
-import Term
 
 -- | A programming language.
 data Language
@@ -35,9 +30,3 @@ languageForType mediaType = case mediaType of
     ".jsx" -> Just JSX
     ".py" -> Just Python
     _ -> Nothing
-
-toTuple :: Term S.Syntax (Record fields) -> [Term S.Syntax (Record fields)]
-toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
-toTuple child = pure child
