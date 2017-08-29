@@ -10,7 +10,7 @@ import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (NonEmpty(..))
-import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -252,17 +252,19 @@ if' :: Assignment
 if' =  ifElsif If
    <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
   where
-    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
-    expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
+    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (ifElsif Elsif <|> else'' <|> emptyTerm))
+    expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
+    else'' = postContextualize comment else'
 
 else' :: Assignment
 else' = makeTerm <$> symbol Else <*> children (many expression)
 
 unless :: Assignment
 unless =
-      makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional else'))
+      makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional else''))
   <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> expression <*> invert expression <*> emptyTerm)
-  where expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> eof)
+  where expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> eof)
+        else'' = postContextualize comment else'
 
 while' :: Assignment
 while' =
@@ -275,7 +277,7 @@ until' =
   <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> expression <*> invert expression)
 
 for :: Assignment
-for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTill expression (symbol In)) <*> inClause <*> expressions)
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTermsTill expression (symbol In)) <*> inClause <*> expressions)
   where inClause = symbol In *> children (expression)
 
 case' :: Assignment
@@ -394,6 +396,10 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
 term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
+
+-- | Match a series of terms or comments until a delimiter is matched.
+manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack
