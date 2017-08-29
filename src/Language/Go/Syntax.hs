@@ -36,6 +36,7 @@ type Syntax =
    , Declaration.Import
    , Declaration.Method
    , Declaration.Module
+   , Literal.Integer
    , Literal.TextElement
    , Syntax.Error
    , Syntax.Empty
@@ -64,6 +65,10 @@ expressions = makeTerm <$> location <*> many expression
 literal :: Assignment
 literal = identifier
        <|> interpretedStringLiteral
+       <|> intLiteral
+
+intLiteral :: Assignment
+intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
 
 identifier :: Assignment
 identifier = makeTerm <$> (symbol Identifier <|> symbol PackageIdentifier) <*> (Syntax.Identifier <$> source)
