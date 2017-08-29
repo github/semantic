@@ -5,10 +5,8 @@ import Control.Comonad
 import Control.Comonad.Trans.Cofree hiding (cofree)
 import Control.DeepSeq
 import Data.Aeson
-import Data.Foldable
 import Data.Record
 import GHC.Generics
-import Info
 import qualified Syntax as S
 import Term
 
