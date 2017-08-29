@@ -48,7 +48,7 @@ type Syntax =
    , Markup.Strong
    , Markup.Text
    , Markup.Strikethrough
-   -- NB: Just here for toc summary diffs that require Methods and Functions in the union.
+   -- NB: Diffing requires Methods and Functions in the union.
    , Declaration.Method
    , Declaration.Function
    -- Assignment errors; cmark does not provide parse errors.

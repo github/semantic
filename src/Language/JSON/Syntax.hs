@@ -27,7 +27,7 @@ type Syntax =
   , Literal.Null
   , Literal.String
   , Literal.TextElement
-   -- NB: Just here for toc summary diffs that require Methods and Functions in the union.
+   -- NB: Diffing requires Methods and Functions in the union.
   , Declaration.Method
   , Declaration.Function
   , Syntax.Error
