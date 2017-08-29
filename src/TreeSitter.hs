@@ -21,7 +21,6 @@ import qualified Data.Syntax.Assignment as A
 import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
-import qualified Language.Ruby as Ruby
 import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
@@ -115,7 +114,6 @@ assignTerm language source annotation children allChildren =
   where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm DefaultFields))
         assignTermByLanguage = case languageForTSLanguage language of
           Just Language.Go -> Go.termAssignment
-          Just Ruby -> Ruby.termAssignment
           _ -> \ _ _ _ -> Nothing
 
 defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
@@ -192,7 +190,6 @@ categoryForLanguageProductionName = withDefaults . byLanguage
       s -> productionMap s
 
     byLanguage language = case languageForTSLanguage language of
-      Just Ruby -> Ruby.categoryForRubyName
       Just Language.Go -> Go.categoryForGoName
       _ -> Other
 
@@ -200,6 +197,5 @@ categoryForLanguageProductionName = withDefaults . byLanguage
 languageForTSLanguage :: Ptr TS.Language -> Maybe Language
 languageForTSLanguage = flip lookup
   [ (TS.tree_sitter_go, Language.Go)
-  , (TS.tree_sitter_ruby, Ruby)
   , (TS.tree_sitter_typescript, TypeScript)
   ]
