@@ -60,8 +60,8 @@ expression = handleError
           <|> importSpec
           <|> packageClause
           <|> comment
-          <|> constDeclaration
-          <|> constSpec
+          <|> declaration
+          <|> specification
           <|> expressionList
 
 identifiers :: Assignment
@@ -100,13 +100,13 @@ importSpec = symbol ImportSpec *> children expressions
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-constDeclaration :: Assignment
-constDeclaration = symbol ConstDeclaration *> children expressions
+declaration :: Assignment
+declaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
-constSpec :: Assignment
-constSpec = makeTerm <$> symbol ConstSpec <*> children (Statement.Assignment
-                                                      <$> (annotatedLHS <|> identifiers)
-                                                      <*> expressions)
+specification :: Assignment
+specification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment
+                                                                           <$> (annotatedLHS <|> identifiers)
+                                                                           <*> expressions)
     where
       annotatedLHS = makeTerm <$> location <*> (Type.Annotation
                                               <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier))))
