@@ -60,8 +60,8 @@ expression = handleError
           <|> importSpec
           <|> packageClause
           <|> comment
-          <|> declaration
-          <|> specification
+          <|> constVarDeclaration
+          <|> constVarSpecification
           <|> expressionList
 
 identifiers :: Assignment
@@ -100,11 +100,11 @@ importSpec = symbol ImportSpec *> children expressions
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-declaration :: Assignment
-declaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
+constVarDeclaration :: Assignment
+constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
-specification :: Assignment
-specification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment
+constVarSpecification :: Assignment
+constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment
                                                                            <$> (annotatedLHS <|> identifiers)
                                                                            <*> expressions)
     where
@@ -115,6 +115,5 @@ specification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children 
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
--- | Match a series of terms or comments until a delimiter is matched.
-manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+-- | Match a series of terms or comments until a delimiter is matchedmanyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
