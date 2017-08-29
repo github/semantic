@@ -21,3 +21,22 @@ newtype Product a = Product { productElements :: [a] }
 instance Eq1 Product where liftEq = genericLiftEq
 instance Show1 Product where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Product where liftPretty = genericLiftPretty
+data Visibility a = Visibility { visibilitySubject :: !a, visibilityType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Visibility where liftEq = genericLiftEq
+instance Show1 Visibility where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 Visibility where liftPretty = genericLiftPretty
+
+data TypeParameters a = TypeParameters { typeParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypeParameters where liftEq = genericLiftEq
+instance Show1 TypeParameters where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 TypeParameters where liftPretty = genericLiftPretty
+
+data Readonly a = Readonly
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Readonly where liftEq = genericLiftEq
+instance Show1 Readonly where liftShowsPrec = genericLiftShowsPrec

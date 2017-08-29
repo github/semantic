@@ -48,18 +48,22 @@ parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate (declarationAlgebra blob) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, _) -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
   (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser blob >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
+  (SExpressionTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, Just Language.JSON) -> pure Nothing
+  (IdentityTermRenderer, Just Language.TypeScript) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser blob
   where syntaxParser = parserForLanguage blobLanguage
 
@@ -73,18 +77,22 @@ diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob)) diffRecursively (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob) . hoistCofree (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffRecursively (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.TypeScript) -> run (\ blob -> parse typescriptParser blob >>= decorate (declarationAlgebra blob)) diffRecursively (renderToCDiff blobs)
   (ToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffRecursively (renderJSONDiff blobs)
+  (JSONDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
   (PatchDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderPatch blobs)
+  (PatchDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
   (SExpressionDiffRenderer, Just Language.JSON) -> run (decorate constructorLabel <=< parse jsonParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.TypeScript) -> run (decorate constructorLabel <=< parse typescriptParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
   (IdentityDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)

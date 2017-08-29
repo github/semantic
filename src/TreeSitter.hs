@@ -21,7 +21,6 @@ import qualified Data.Syntax.Assignment as A
 import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
-import qualified Language.TypeScript as TS
 import qualified Language.Ruby as Ruby
 import Foreign
 import Foreign.C.String (peekCString)
@@ -117,7 +116,6 @@ assignTerm language source annotation children allChildren =
         assignTermByLanguage = case languageForTSLanguage language of
           Just Language.Go -> Go.termAssignment
           Just Ruby -> Ruby.termAssignment
-          Just TypeScript -> TS.termAssignment
           _ -> \ _ _ _ -> Nothing
 
 defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
@@ -196,7 +194,6 @@ categoryForLanguageProductionName = withDefaults . byLanguage
     byLanguage language = case languageForTSLanguage language of
       Just Ruby -> Ruby.categoryForRubyName
       Just Language.Go -> Go.categoryForGoName
-      Just TypeScript -> TS.categoryForTypeScriptName
       _ -> Other
 
 
