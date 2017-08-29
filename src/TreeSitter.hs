@@ -20,7 +20,6 @@ import Data.Span
 import qualified Data.Syntax.Assignment as A
 import Data.Text (Text, pack)
 import Language
-import qualified Language.Go as Go
 import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
@@ -113,7 +112,6 @@ assignTerm language source annotation children allChildren =
     _ -> defaultTermAssignment source annotation children allChildren
   where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm DefaultFields))
         assignTermByLanguage = case languageForTSLanguage language of
-          Just Language.Go -> Go.termAssignment
           _ -> \ _ _ _ -> Nothing
 
 defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
@@ -190,7 +188,6 @@ categoryForLanguageProductionName = withDefaults . byLanguage
       s -> productionMap s
 
     byLanguage language = case languageForTSLanguage language of
-      Just Language.Go -> Go.categoryForGoName
       _ -> Other
 
 
