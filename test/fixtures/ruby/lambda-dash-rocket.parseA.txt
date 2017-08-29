@@ -1,6 +1,6 @@
 (Program
   (Function
-    (Identifier)
+    (Empty)
     (Identifier)
     (Identifier)
     (Identifier)

@@ -19,20 +19,20 @@
       (
         (Integer))))
   (Function
-    (Identifier)
+    (Empty)
     (
       (Function
         (Empty)
         ([]))))
   (Function
-    (Identifier)
+    (Empty)
     (
       (Function
         (Empty)
         (
           (Identifier)))))
   (Function
-    (Identifier)
+    (Empty)
     (Identifier)
     (
       (Function
@@ -40,7 +40,7 @@
         (
           (Integer)))))
   (Function
-    (Identifier)
+    (Empty)
     (Identifier)
     (Identifier)
     (

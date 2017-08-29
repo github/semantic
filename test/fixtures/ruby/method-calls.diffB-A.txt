@@ -31,7 +31,7 @@
     (Identifier)
     (Identifier)
     (Function
-      (Identifier)
+      (Empty)
       (Identifier)
       (
         (Function
