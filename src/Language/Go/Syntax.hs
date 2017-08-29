@@ -43,6 +43,7 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Identifier
    , Syntax.Program
+   , Type.Annotation
    , []
    ]
 
@@ -81,6 +82,7 @@ identifier :: Assignment
 identifier =
       mk Identifier
   <|> mk PackageIdentifier
+  <|> mk TypeIdentifier
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 interpretedStringLiteral :: Assignment
@@ -102,7 +104,13 @@ constDeclaration :: Assignment
 constDeclaration = symbol ConstDeclaration *> children expressions
 
 constSpec :: Assignment
-constSpec = makeTerm <$> symbol ConstSpec <*> children (Statement.Assignment <$> identifiers <*> expressions)
+constSpec = makeTerm <$> symbol ConstSpec <*> children (Statement.Assignment
+                                                      <$> (annotatedLHS <|> identifiers)
+                                                      <*> expressions)
+    where
+      annotatedLHS = makeTerm <$> location <*> (Type.Annotation
+                                              <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier))))
+                                              <*> identifier)
 
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
