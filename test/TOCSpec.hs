@@ -159,6 +159,11 @@ spec = parallel $ do
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
       toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected Program, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
+    it "ignores anonymous functions" $ do
+      blobs <- blobsForPaths (both "ruby/lambda.A.rb" "ruby/lambda.B.rb")
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
+      toOutput output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
+
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
