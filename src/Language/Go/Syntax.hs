@@ -83,6 +83,7 @@ identifier =
       mk Identifier
   <|> mk PackageIdentifier
   <|> mk TypeIdentifier
+  <|> mk ParenthesizedType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 interpretedStringLiteral :: Assignment
