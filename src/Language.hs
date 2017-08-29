@@ -43,9 +43,3 @@ toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :
 toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
 toTuple child = pure child
-
-toInterface :: HasField fields Category => [SyntaxTerm fields] -> Maybe (S.Syntax (SyntaxTerm fields))
-toInterface (id : rest) = case break (\x -> category (extract x) == Other "object_type") rest of
-  (clauses, [body]) -> Just $ S.Interface id clauses (toList (unwrap body))
-  _ -> Nothing
-toInterface _ = Nothing
