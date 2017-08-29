@@ -8,6 +8,8 @@ module Language.Ruby.Syntax
 
 import Data.Maybe (fromMaybe)
 import Data.Record
+import Data.Foldable (asum)
+import Data.List.Split (chunksOf)
 import Data.Functor (void)
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
@@ -86,49 +88,51 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError . term $
-      alias
-  <|> assignment'
-  <|> begin
-  <|> beginBlock
-  <|> binary
-  <|> block
-  <|> call
-  <|> case'
-  <|> class'
-  <|> conditional
-  <|> emptyStatement
-  <|> endBlock
-  <|> for
-  <|> heredoc
-  <|> identifier
-  <|> if'
-  <|> keyword
-  <|> lambda
-  <|> literal
-  <|> method
-  <|> methodCall
-  <|> mk Break Statement.Break
-  <|> mk Next Statement.Continue
-  <|> mk Redo Statement.Retry
-  <|> mk Retry Statement.Retry
-  <|> mk Return Statement.Return
-  <|> mk Yield Statement.Yield
-  <|> module'
-  <|> pair
-  <|> parenthesized_expressions
-  <|> rescue
-  <|> scopeResolution
-  <|> singletonClass
-  <|> singletonMethod
-  <|> subscript
-  <|> unary
-  <|> undef
-  <|> unless
-  <|> until'
-  <|> while'
-  <|> parseError
-  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
+expression = handleError (term everything)
+  where
+    everything = asum . fmap asum $ chunksOf 4
+      [ alias
+      , assignment'
+      , begin
+      , beginBlock
+      , binary
+      , block
+      , call
+      , case'
+      , class'
+      , conditional
+      , emptyStatement
+      , endBlock
+      , for
+      , heredoc
+      , identifier
+      , if'
+      , keyword
+      , lambda
+      , literal
+      , method
+      , methodCall
+      , mk Break Statement.Break
+      , mk Next Statement.Continue
+      , mk Redo Statement.Retry
+      , mk Retry Statement.Retry
+      , mk Return Statement.Return
+      , mk Yield Statement.Yield
+      , module'
+      , pair
+      , parenthesized_expressions
+      , rescue
+      , scopeResolution
+      , singletonClass
+      , singletonMethod
+      , subscript
+      , unary
+      , undef
+      , unless
+      , until'
+      , while'
+      , parseError ]
+    mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
