@@ -10,10 +10,12 @@ import Data.List.NonEmpty (nonEmpty)
 import Data.Semigroup
 import Data.Source
 import Data.Span
+import Data.Typeable
 import GHC.Stack
 import System.Console.ANSI
 
 data Error grammar = HasCallStack => Error { errorSpan :: Span, errorExpected :: [grammar], errorActual :: Maybe grammar }
+  deriving (Typeable)
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Foldable Error
