@@ -71,6 +71,8 @@ data TaskF output where
   Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
+
+  -- | For MonadIO.
   LiftIO :: IO a -> TaskF a
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
