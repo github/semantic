@@ -75,8 +75,8 @@ data TaskF output where
   LiftIO :: IO a -> TaskF a
 
   -- | For MonadError.
-  Throw :: String -> TaskF a
-  Catch :: Task a -> (String -> Task a) -> TaskF a
+  Throw :: SomeException -> TaskF a
+  Catch :: Task a -> (SomeException -> Task a) -> TaskF a
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Freer TaskF
@@ -158,7 +158,7 @@ runTaskWithOptions options task = do
   result <- run options logQueue task
   atomically (closeTMQueue logQueue)
   Async.wait logging
-  either die pure result
+  either (die . displayException) pure result
   where logSink options@Options{..} queue = do
           message <- atomically (readTMQueue queue)
           case message of
@@ -166,12 +166,12 @@ runTaskWithOptions options task = do
               hPutStr stderr (optionsFormatter options message)
               logSink options queue
             _ -> pure ()
-        run :: Options -> TMQueue Message -> Task a -> IO (Either String a)
+        run :: Options -> TMQueue Message -> Task a -> IO (Either SomeException a)
         run options logQueue = go
-          where go :: Task a -> IO (Either String a)
+          where go :: Task a -> IO (Either SomeException a)
                 go = iterFreerA (\ task yield -> case task of
-                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . displayException)
-                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . displayException)
+                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
+                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
                   WriteLog level message pairs -> queueLogMessage level message pairs >>= yield
                   Time message pairs task -> do
@@ -203,14 +203,14 @@ runParser Options{..} blob@Blob{..} = go
         go parser = case parser of
           ASTParser language ->
             logTiming "ts ast parse" $
-              liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . displayException)) >>= either throwError pure
+              liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
           AssignmentParser parser assignment -> do
             ast <- go parser `catchError` \ err -> writeLog Error "failed parsing" blobFields >> throwError err
             logTiming "assign" $ case Assignment.assign blobSource assignment ast of
               Left err -> do
                 let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
                 writeLog Error formatted blobFields
-                throwError formatted
+                throwError (toException err)
               Right term -> do
                 for_ (errors term) $ \ err ->
                   writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
@@ -229,6 +229,6 @@ runParser Options{..} blob@Blob{..} = go
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return
 
-instance MonadError String Task where
+instance MonadError SomeException Task where
   throwError error = Throw error `Then` return
   catchError during handler = Catch during handler `Then` return
