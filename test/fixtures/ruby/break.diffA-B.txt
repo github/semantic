@@ -1,0 +1,8 @@
+(Program
+  (While
+  { (Identifier)
+  ->(Not
+      (Identifier)) }
+    (
+      (Break
+        (Empty)))))

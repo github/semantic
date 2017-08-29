@@ -9,7 +9,7 @@ module Language.Ruby.Syntax
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
-import Data.List.NonEmpty (some1)
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
@@ -49,6 +49,7 @@ type Syntax = '[
   , Literal.KeyValue
   , Literal.Null
   , Literal.Rational
+  , Literal.Regex
   , Literal.String
   , Literal.Symbol
   , Literal.TextElement
@@ -171,7 +172,7 @@ literal =
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol ChainedString <*> children (many (term (makeTerm <$> symbol String <*> (Literal.TextElement <$> source))))
-  <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
+  <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
 
 heredoc :: Assignment
@@ -226,7 +227,7 @@ singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.
 
 lambda :: Assignment
 lambda = symbol Lambda >>= \ loc -> children $ do
-  name <- makeTerm loc <$> (Syntax.Identifier <$> source)
+  name <- makeTerm loc <$> (Syntax.Empty <$ source)
   params <- (symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure []
   body <- expressions
   pure $ makeTerm loc (Declaration.Function [] name params body)
@@ -392,7 +393,7 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack

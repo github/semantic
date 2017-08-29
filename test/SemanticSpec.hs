@@ -26,7 +26,7 @@ spec = parallel $ do
 
     it "renders with the specified renderer" $ do
       output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
-      output `shouldBe` "(Program\n  (Method\n    (Identifier)))\n"
+      output `shouldBe` "(Program\n  (Method\n    (Empty)\n    (Identifier)\n    ([])))\n"
 
   describe "diffTermPair" $ do
     it "produces an Insert when the first blob is missing" $ do

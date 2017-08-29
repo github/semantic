@@ -10,6 +10,7 @@ module RWS (
   , pqGramDecorator
   , Gram(..)
   , defaultD
+  , equalTerms
   ) where
 
 import Control.Applicative (empty)
@@ -65,14 +66,15 @@ data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 rws :: (HasField fields FeatureVector, Functor f, Eq1 f)
     => (Diff f fields -> Int)
     -> ComparabilityRelation f fields
+    -> (Term f (Record fields) -> Term f (Record fields) -> Bool)
     -> [Term f (Record fields)]
     -> [Term f (Record fields)]
     -> RWSEditScript f fields
-rws _            _          as [] = This <$> as
-rws _            _          [] bs = That <$> bs
-rws _            canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
-rws editDistance canCompare as bs =
-  let sesDiffs = ses (equalTerms canCompare) as bs
+rws _            _          _          as [] = This <$> as
+rws _            _          _          [] bs = That <$> bs
+rws _            canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
+rws editDistance canCompare equivalent as bs =
+  let sesDiffs = ses equivalent as bs
       (featureAs, featureBs, mappedDiffs, allDiffs) = genFeaturizedTermsAndDiffs sesDiffs
       (diffs, remaining) = findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
       diffs' = deleteRemaining diffs remaining

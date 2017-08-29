@@ -26,7 +26,7 @@ import Data.Align (crosswalk)
 import Data.Bifunctor (bimap, first)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
-import Data.Error as Error (formatError)
+import Data.Error as Error (Error(..), showExpectation)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
@@ -119,13 +119,30 @@ syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)
+declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Syntax.Empty :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra blob@Blob{..} (a :< r)
-  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r = Just $ FunctionDeclaration (getSource (extract identifier))
-  | Just (Declaration.Method _ _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
-  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
+declarationAlgebra Blob{..} (a :< r)
+  -- Do not summarize anonymous functions
+  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
+  , Just Syntax.Empty <- prj (unwrap identifier)
+  = Nothing
+
+  -- Named functions
+  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
+  = Just $ FunctionDeclaration (getSource (extract identifier))
+
+  -- Methods without a receiver
+  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
+  , Just Syntax.Empty <- prj (unwrap receiver)
+  = Just $ MethodDeclaration (getSource (extract identifier))
+
+  -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
+  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
+  = Just $ MethodDeclaration (getSource (extract receiver) <> "." <> getSource (extract identifier))
+
+  | Just err@Syntax.Error{} <- prj r
+  = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange
 
@@ -133,13 +150,15 @@ declarationAlgebra blob@Blob{..} (a :< r)
 markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply1 Functor fs, Apply1 Foldable fs)
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra blob@Blob{..} (a :< r)
+markupSectionAlgebra Blob{..} (a :< r)
   | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
   where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
         firstLine = T.takeWhile (/= '\n')
 
+formatTOCError :: Error.Error String -> String
+formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
 
 -- | An entry in a table of contents.
 data Entry a

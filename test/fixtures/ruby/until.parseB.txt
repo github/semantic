@@ -1,5 +1,6 @@
 (Program
-  (Until
-    (Negate
+  (While
+    (Not
       (Identifier))
-    (Identifier)))
+    (
+      (Identifier))))

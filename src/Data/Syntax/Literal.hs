@@ -120,9 +120,17 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Symbol where
   liftPretty _ _ (Symbol s) = pretty ("Symbol" :: Prelude.String) <+> prettyBytes s
 
+newtype Regex a = Regex { regexContent :: ByteString }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Regex where liftEq = genericLiftEq
+instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
+
+instance Pretty1 Regex where
+  liftPretty _ _ (Regex s) = pretty ("Regex" :: Prelude.String) <+> prettyBytes s
+
 -- TODO: Heredoc-style string literals?
 -- TODO: Character literals.
--- TODO: Regular expressions.
 
 
 -- Collections
@@ -167,9 +175,3 @@ instance Pretty1 Set where liftPretty = genericLiftPretty
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
--- TODO: Regexp literals.
-newtype Regex a = Regex ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Regex where liftEq = genericLiftEq
-instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec

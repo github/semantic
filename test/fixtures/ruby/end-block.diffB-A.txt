@@ -1,6 +1,6 @@
 (Program
-{+(EndBlock
+{+(ScopeExit
     (Identifier))+}
 {-(Identifier)-}
-{-(EndBlock
+{-(ScopeExit
     (Identifier))-})

@@ -1,5 +1,7 @@
 (Program
   (Class
-    (Constant)
+    (Identifier)
     (Method
-      (Identifier))))
+      (Empty)
+      (Identifier)
+      ([]))))

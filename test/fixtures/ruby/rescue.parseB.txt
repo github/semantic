@@ -1,6 +1,10 @@
 (Program
-  (Begin
-    (Identifier)
-    (Rescue
+  (Try
+    (
       (Identifier)
-      (Identifier))))
+      (Catch
+        (
+          (
+            (Identifier)))
+        (
+          (Identifier))))))

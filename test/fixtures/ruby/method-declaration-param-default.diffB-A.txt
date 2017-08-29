@@ -1,8 +1,6 @@
 (Program
   (Method
+    (Empty)
     (Identifier)
-  { (Params
-      (OptionalParameter
-        (Identifier)
-        (Identifier)))
-  ->(Params) }))
+  {-(Identifier)-}
+    ([])))

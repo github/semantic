@@ -1,34 +1,58 @@
 (Program
-{+(Begin
-    (Identifier)
-    (Rescue
-      (Constant)
-      (Rescue
-        (Constant)
-        (Constant)
-        (RescuedException
-          (Identifier))
-        (Identifier)))
-    (Else
-      (Identifier))
-    (Ensure
-      (Identifier)))+}
-{+(Method
-    (Identifier)
-    (Rescue
-      (Constant)
-      (Rescue
-        (Constant)
-        (Constant)
-        (RescuedException
-          (Identifier))))
-    (Else)
-    (Ensure))+}
-{+(Modifier Rescue
-    (Identifier)
-    (Identifier))+}
-{-(Begin
-    (Identifier)
-    (Rescue
+{+(Try
+    (
       (Identifier)
-      (Identifier)))-})
+      (Catch
+        (
+          (
+            (Identifier)))
+        (Catch
+          (
+            (
+              (Identifier)
+              (Identifier))
+            (
+              (Identifier)))
+          (
+            (Identifier))))
+      (Else
+        (Empty)
+        (
+          (Identifier)))
+      (Finally
+        (
+          (Identifier)))))+}
+{+(Method
+    (Empty)
+    (Identifier)
+    (
+      (Catch
+        (
+          (
+            (Identifier)))
+        (Catch
+          (
+            (
+              (Identifier)
+              (Identifier))
+            (
+              (Identifier)))
+          ([])))
+      (Else
+        (Empty)
+        ([]))
+      (Finally
+        ([]))))+}
+  (Try
+  { (
+      (Identifier)
+      (Catch
+        (
+          (
+            (Identifier)))
+        (
+          (Identifier))))
+  ->(Identifier) }
+  {+(Catch
+      (Null)
+      (Empty))+}))

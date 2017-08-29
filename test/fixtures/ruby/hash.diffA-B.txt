@@ -1,34 +1,40 @@
 (Program
-  (Object
-    (Pair
-    { (SymbolLiteral)
+  (Hash
+    (KeyValue
+    { (Symbol)
     ->(Identifier) }
-    { (StringLiteral)
-    ->(StringLiteral) })
-    (Pair
-    { (SymbolLiteral)
+    { (TextElement)
+    ->(TextElement) })
+    (KeyValue
+    { (Symbol)
     ->(Identifier) }
-    { (IntegerLiteral)
-    ->(IntegerLiteral) })
-    (Pair
-    { (StringLiteral)
+    { (Integer)
+    ->(Integer) })
+    (KeyValue
+    { (TextElement)
     ->(Identifier) }
     { (Boolean)
     ->(Boolean) })
-  {-(Pair
-      (SymbolLiteral)
-      (IntegerLiteral))-})
-{-(Object)-}
-{-(Object
-    (Comment)
-    (Pair
-      (Identifier)
-      (IntegerLiteral))
-    (Comment)
-    (Comment)
-    (Pair
-      (StringLiteral)
-      (IntegerLiteral))
-    (Comment))-}
-{-(Object
-    (Comment))-})
+  {-(KeyValue
+      (Symbol)
+      (Integer))-})
+{-(Hash)-}
+{-(Hash
+    (Context
+      (Comment)
+      (KeyValue
+        (Identifier)
+        (Integer)))
+    (Context
+      (Comment)
+      (Comment)
+      (KeyValue
+        (TextElement)
+        (Integer)))
+    (Context
+      (Comment)
+      (Empty)))-}
+{-(Hash
+    (Context
+      (Comment)
+      (Empty)))-})

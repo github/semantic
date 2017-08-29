@@ -1,9 +1,7 @@
 (Program
-  (Binary
+  (LessThanEqual
     (Identifier)
-    (Other "<=")
     (Identifier))
-  (Binary
+  (GreaterThanEqual
     (Identifier)
-    (Other ">=")
     (Identifier)))

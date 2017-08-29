@@ -1,16 +1,16 @@
 (Program
-  (SubscriptAccess
+  (Subscript
   { (Identifier)
   ->(Identifier) }
-  { (Identifier)
-  ->(StringLiteral) })
-  (SubscriptAccess
+  {+(TextElement)+}
+  {-(Identifier)-})
+  (Subscript
   { (Identifier)
   ->(Identifier) }
-  { (SymbolLiteral)
-  ->(SymbolLiteral) })
+  {+(Symbol)+}
+  {-(Symbol)-})
 {-(Assignment
-    (SubscriptAccess
+    (Subscript
       (Identifier)
       (Identifier))
-    (IntegerLiteral))-})
+    (Integer))-})

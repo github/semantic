@@ -1,11 +1,13 @@
 (Program
-  (Binary
+{+(LessThan
     (Identifier)
-  { (Other "<=")
-  ->(Other "<") }
-    (Identifier))
-  (Binary
+    (Identifier))+}
+{+(GreaterThan
     (Identifier)
-  { (Other ">=")
-  ->(Other ">") }
-    (Identifier)))
+    (Identifier))+}
+{-(LessThanEqual
+    (Identifier)
+    (Identifier))-}
+{-(GreaterThanEqual
+    (Identifier)
+    (Identifier))-})

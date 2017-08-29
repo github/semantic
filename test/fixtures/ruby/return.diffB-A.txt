@@ -1,4 +1,5 @@
 (Program
   (Return
-  {+(Args
-      (Identifier))+}))
+  { (Empty)
+  ->(
+      (Identifier)) }))

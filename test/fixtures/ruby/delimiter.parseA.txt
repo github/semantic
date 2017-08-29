@@ -1,7 +1,7 @@
 (Program
-  (StringLiteral)
-  (StringLiteral)
-  (StringLiteral)
-  (StringLiteral)
-  (StringLiteral)
-  (StringLiteral))
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement)
+  (TextElement))

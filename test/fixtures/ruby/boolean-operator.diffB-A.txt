@@ -1,6 +1,7 @@
 (Program
-  (Binary
+{+(Or
     (Identifier)
-  { (Other "&&")
-  ->(Other "||") }
-    (Identifier)))
+    (Identifier))+}
+{-(And
+    (Identifier)
+    (Identifier))-})

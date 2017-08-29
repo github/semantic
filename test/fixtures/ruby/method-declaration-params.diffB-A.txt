@@ -1,7 +1,8 @@
 (Program
   (Method
+    (Empty)
     (Identifier)
-    (Params
-      (Identifier)
-    {-(Identifier)-}
-    {-(Identifier)-})))
+    (Identifier)
+  {-(Identifier)-}
+  {-(Identifier)-}
+    ([])))

@@ -1,21 +1,20 @@
 (Program
-{+(Annotation
+{-(Annotation
     (Function
       (Identifier)
+      (
+        (Identifier)))
+    (Empty))-}
+{-(Annotation
+    (Function
       (Identifier)
       (Identifier)
       (
         (Identifier)))
-    (Empty))+}
+    (Empty))-}
   (Annotation
     (Function
-    { (Identifier)
-    ->(Identifier) }
-      (
-        (Identifier)))
-    (Empty))
-  (Annotation
-    (Function
+      (Identifier)
     { (Identifier)
     ->(Identifier) }
     { (Identifier)
@@ -27,23 +26,16 @@
 {+(Annotation
     (Function
       (Identifier)
-      (Annotation
-        (Assignment
-          (Identifier)
-          (Integer))
-        (Identifier))
+      (
+        (Identifier)))
+    (Empty))+}
+{+(Annotation
+    (Function
+      (Identifier)
       (Identifier)
       (
         (Identifier)))
     (Empty))+}
-{-(Annotation
-    (Function
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (
-        (Identifier)))
-    (Empty))-}
 {-(Annotation
     (Function
       (Identifier)
@@ -53,15 +45,18 @@
       (
         (Identifier)))
     (Empty))-}
-{-(Annotation
+  (Annotation
     (Function
       (Identifier)
       (Annotation
         (Assignment
           (Identifier)
-          (TextElement))
-        (Identifier))
-      (Identifier)
+        { (TextElement)
+        ->(Integer) })
+      { (Identifier)
+      ->(Identifier) })
+    { (Identifier)
+    ->(Identifier) }
       (
         (Identifier)))
-    (Empty))-})
+    (Empty)))

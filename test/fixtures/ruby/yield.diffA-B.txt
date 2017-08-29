@@ -1,4 +1,5 @@
 (Program
   (Yield
-  {-(Args
-      (Identifier))-}))
+  { (
+      (Identifier))
+  ->(Empty) }))

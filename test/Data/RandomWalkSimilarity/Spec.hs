@@ -37,12 +37,12 @@ spec = parallel $ do
       \ (as, bs) -> let tas = decorate <$> (unListableF <$> as :: [SyntaxTerm '[Category]])
                         tbs = decorate <$> (unListableF <$> bs :: [SyntaxTerm '[Category]])
                         root = cofree . ((Program :. Nil) :<) . Indexed
-                        diff = wrap (pure (Program :. Nil) :< Indexed (stripDiff . diffThese <$> rws editDistance canCompare tas tbs)) in
+                        diff = wrap (pure (Program :. Nil) :< Indexed (stripDiff . diffThese <$> rws editDistance canCompare (equalTerms canCompare) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf "a") ])), decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf "b") ]))) in
-      fmap (bimap stripTerm stripTerm) (rws editDistance canCompare [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
+      fmap (bimap stripTerm stripTerm) (rws editDistance canCompare (equalTerms canCompare) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
   where canCompare a b = headF a == headF b
 

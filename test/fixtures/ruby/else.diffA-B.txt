@@ -1,8 +1,12 @@
 (Program
-  (Begin
-    (MethodCall
-      (Identifier))
-  { (Else)
-  ->(Else
-      (MethodCall
-        (Identifier))) }))
+  (Try
+    (
+      (Call
+        (Identifier)
+        (Empty))
+      (Else
+        (Empty)
+        (
+        {+(Call
+            (Identifier)
+            (Empty))+})))))

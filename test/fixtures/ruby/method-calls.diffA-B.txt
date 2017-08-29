@@ -1,34 +1,41 @@
 (Program
-{ (MethodCall
-    (Identifier)
-    (Identifier))
-->(MethodCall
-    (Identifier)) }
-{-(MethodCall
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Pair
-      (SymbolLiteral)
-      (IntegerLiteral))
-    (Pair
+  (Call
+  { (MemberAccess
       (Identifier)
-      (IntegerLiteral)))-}
-{-(MethodCall
-    (Identifier)
-    (MethodCall
-      (Identifier)
-      (Identifier)))-}
-{-(MethodCall
-    (Identifier)
-    (Pair
-      (ArrayLiteral)
-      (IntegerLiteral))
-    (Other "splat_argument"
       (Identifier))
-    (Other "block_argument"
-      (Identifier))
-    (AnonymousFunction
+  ->(Identifier) }
+    (Empty))
+{-(Call
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (KeyValue
+      (Symbol)
+      (Integer))
+    (KeyValue
       (Identifier)
-      (ExpressionStatements
-        (IntegerLiteral))))-})
+      (Integer))
+    (Empty))-}
+{-(Call
+    (Identifier)
+    (Call
+      (Identifier)
+      (Identifier)
+      (Empty))
+    (Empty))-}
+{-(Call
+    (Identifier)
+    (KeyValue
+      (Array)
+      (Integer))
+    (Identifier)
+    (Identifier)
+    (Function
+      (Empty)
+      (Identifier)
+      (
+        (Function
+          (Empty)
+          (
+            (Integer)))))
+    (Empty))-})

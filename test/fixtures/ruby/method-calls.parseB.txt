@@ -1,3 +1,4 @@
 (Program
-  (MethodCall
-    (Identifier)))
+  (Call
+    (Identifier)
+    (Empty)))
