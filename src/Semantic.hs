@@ -59,10 +59,11 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
+  (IdentityTermRenderer, Just Language.JSON) -> pure Nothing
   (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
+  (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser blob
   where syntaxParser = parserForLanguage blobLanguage
-
 
 
 diffBlobPairs :: Output output => DiffRenderer output -> [Both Blob] -> Task ByteString
