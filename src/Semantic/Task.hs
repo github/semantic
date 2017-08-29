@@ -48,7 +48,7 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
-import Info
+import Info hiding (Category(..))
 import qualified Files
 import GHC.Conc (atomically)
 import Language
@@ -74,6 +74,10 @@ data TaskF output where
 
   -- | For MonadIO.
   LiftIO :: IO a -> TaskF a
+
+  -- | For MonadError.
+  Throw :: String -> TaskF a
+  Catch :: Task a -> (String -> Task a) -> TaskF a
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Freer TaskF
@@ -182,7 +186,13 @@ runTaskWithOptions options task = do
                   Diff differ terms -> pure (differ terms) >>= yield
                   Render renderer input -> pure (renderer input) >>= yield
                   Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-                  LiftIO action -> action >>= yield ) . fmap Right
+                  LiftIO action -> action >>= yield
+                  Throw err -> pure (Left err)
+                  Catch during handler -> do
+                    result <- go during
+                    case result of
+                      Left err -> go (handler err) >>= either (pure . Left) yield
+                      Right a -> yield a) . fmap Right
                 queueLogMessage level message pairs
                   | Just logLevel <- optionsLevel options, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs
                   | otherwise = pure ()
