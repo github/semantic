@@ -38,9 +38,6 @@ languageForType mediaType = case mediaType of
     ".py" -> Just Python
     _ -> Nothing
 
-toVarDecl :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
-toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child]
-
 toTuple :: Term S.Syntax (Record fields) -> [Term S.Syntax (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
