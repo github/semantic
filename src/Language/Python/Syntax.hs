@@ -38,7 +38,7 @@ type Syntax =
    , Declaration.Decorator
    , Declaration.Function
    , Declaration.Import
-   -- NB: Just here for toc summary diffs that require Methods in the union.
+   -- NB: Diffing requires Methods in the union.
    , Declaration.Method
    , Declaration.Variable
    , Expression.Arithmetic
