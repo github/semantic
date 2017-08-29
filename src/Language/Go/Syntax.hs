@@ -38,6 +38,7 @@ type Syntax =
    , Declaration.Module
    , Literal.Integer
    , Literal.TextElement
+   , Statement.Assignment
    , Syntax.Error
    , Syntax.Empty
    , Syntax.Identifier
@@ -58,6 +59,12 @@ expression = handleError
           <|> importSpec
           <|> packageClause
           <|> comment
+          <|> constDeclaration
+          <|> constSpec
+          <|> expressionList
+
+identifiers :: Assignment
+identifiers = makeTerm <$> location <*> many identifier
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
@@ -90,3 +97,12 @@ importSpec = symbol ImportSpec *> children expressions
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+
+constDeclaration :: Assignment
+constDeclaration = symbol ConstDeclaration *> children expressions
+
+constSpec :: Assignment
+constSpec = makeTerm <$> symbol ConstSpec <*> children (Statement.Assignment <$> identifiers <*> expressions)
+
+expressionList :: Assignment
+expressionList = symbol ExpressionList *> children expressions
