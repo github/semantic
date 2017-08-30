@@ -75,7 +75,6 @@ library
                      , SES
                      , SES.Myers
                      , SplitDiff
-                     , Syntax
                      , Term
                      , TreeSitter
   build-depends:       base >= 4.8 && < 5
