@@ -1,10 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Parser
 ( Parser(..)
--- Syntax parsers
-, parserForLanguage
-, lineByLineParser
--- À la carte parsers
 , goParser
 , jsonParser
 , markdownParser
@@ -18,20 +14,16 @@ import Control.Comonad.Trans.Cofree (CofreeF)
 import qualified CMarkGFM
 import Data.Ix
 import Data.Record
-import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import Data.Union
 import Foreign.Ptr
-import Info hiding (Empty, Go)
-import Language
 import qualified Language.Go.Syntax as Go
 import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import qualified Language.TypeScript.Syntax as TypeScript
-import Syntax hiding (Go)
 import Term
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
@@ -51,12 +43,6 @@ data Parser term where
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Cofree (CofreeF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
-  -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
-  LineByLineParser :: Parser (SyntaxTerm DefaultFields)
-
--- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
-parserForLanguage _ = LineByLineParser
 
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
@@ -75,9 +61,3 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
-
-
--- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Source -> SyntaxTerm DefaultFields
-lineByLineParser source = cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
-  where toLine line range = cofree $ (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))
