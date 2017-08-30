@@ -172,7 +172,7 @@ literal =
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
-  <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> (many . term) pair)
+  <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> (many . term) (pair <|> heredoc))
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol ChainedString <*> children (many (term (makeTerm <$> symbol String <*> (Literal.TextElement <$> source))))
