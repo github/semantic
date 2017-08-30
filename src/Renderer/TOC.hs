@@ -10,7 +10,6 @@ module Renderer.TOC
 , declaration
 , declarationAlgebra
 , markupSectionAlgebra
-, syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
 , dedupe
@@ -51,7 +50,6 @@ import Language
 import Patch
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
-import Syntax as S
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
@@ -104,19 +102,6 @@ getDeclaration = getField
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
 declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
 
-
--- | Compute 'Declaration's for methods and functions in 'Syntax'.
-syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (SyntaxTermF fields) (SyntaxTerm fields) (Maybe Declaration)
-syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
-  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
-  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
-  S.Method _ (identifier, _) (Just (receiver, _)) _ _
-    | S.Indexed [receiverParams] <- unwrap receiver
-    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
-    | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
-  _ -> Nothing
-  where getSource = toText . flip Source.slice blobSource . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
 declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Syntax.Empty :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)

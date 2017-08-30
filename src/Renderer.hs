@@ -12,7 +12,6 @@ module Renderer
 , renderToCTerm
 , declarationAlgebra
 , markupSectionAlgebra
-, syntaxDeclarationAlgebra
 , identifierAlgebra
 , Summaries(..)
 , File(..)
