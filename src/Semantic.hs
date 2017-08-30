@@ -65,12 +65,6 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
-  (IdentityTermRenderer, Just Language.Go) -> pure Nothing
-  (IdentityTermRenderer, Just Language.JSON) -> pure Nothing
-  (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
-  (IdentityTermRenderer, Just Language.Python) -> pure Nothing
-  (IdentityTermRenderer, Just Language.Ruby) -> pure Nothing
-  (IdentityTermRenderer, Just Language.TypeScript) -> pure Nothing
   _ -> throwError (toException (SemanticException ("don’t know how to produce " ++ show renderer ++ " for " ++ show blobLanguage)))
 
 

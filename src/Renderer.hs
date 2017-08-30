@@ -28,13 +28,11 @@ import qualified Data.Map as Map
 import Data.Output
 import Data.Syntax.Algebra (RAlgebra)
 import Data.Text (Text)
-import Info (DefaultFields)
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.TOC as R
 import Syntax as S
-import Term (SyntaxTerm)
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
@@ -58,8 +56,6 @@ data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
-  -- | “Render” by returning the computed 'SyntaxTerm'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for SemanticSpec.hs.
-  IdentityTermRenderer :: TermRenderer (Maybe (SyntaxTerm DefaultFields))
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
