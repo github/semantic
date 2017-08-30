@@ -90,48 +90,49 @@ assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Prog
 expression :: Assignment
 expression = handleError (term everything)
   where
-    everything = asum . fmap asum $ chunksOf 4
-      [ alias
-      , assignment'
-      , begin
-      , beginBlock
-      , binary
-      , block
-      , call
-      , case'
-      , class'
-      , conditional
-      , emptyStatement
-      , endBlock
-      , for
-      , heredoc
-      , identifier
-      , if'
-      , keyword
-      , lambda
-      , literal
-      , method
-      , methodCall
-      , mk Break Statement.Break
-      , mk Next Statement.Continue
-      , mk Redo Statement.Retry
-      , mk Retry Statement.Retry
-      , mk Return Statement.Return
-      , mk Yield Statement.Yield
-      , module'
-      , pair
-      , parenthesized_expressions
-      , rescue
-      , scopeResolution
-      , singletonClass
-      , singletonMethod
-      , subscript
-      , unary
-      , undef
-      , unless
-      , until'
-      , while'
-      , parseError ]
+    everything = ak <|> mz <|> parseError
+    ak = a <|> c <|> f <|> k
+    mz = m1 <|> m2 <|> p <|> s <|> u
+    a =   alias
+      <|> assignment'
+      <|> begin
+      <|> beginBlock
+      <|> binary
+      <|> block
+    c =   call
+      <|> case'
+      <|> class'
+      <|> conditional
+      <|> emptyStatement
+      <|> endBlock
+    f =   for
+      <|> heredoc
+      <|> identifier
+      <|> if'
+    k =   keyword
+      <|> lambda
+      <|> literal
+    m1 =  method
+      <|> methodCall
+      <|> mk Break Statement.Break
+      <|> mk Next Statement.Continue
+    m2 =  mk Redo Statement.Retry
+      <|> mk Retry Statement.Retry
+      <|> mk Return Statement.Return
+      <|> mk Yield Statement.Yield
+      <|> module'
+    p =   pair
+      <|> parenthesized_expressions
+      <|> rescue
+    s =   scopeResolution
+      <|> singletonClass
+      <|> singletonMethod
+      <|> subscript
+    u =   unary
+      <|> undef
+      <|> unless
+      <|> until'
+      <|> while'
     mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
