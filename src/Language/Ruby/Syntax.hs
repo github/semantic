@@ -253,23 +253,19 @@ undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> name <*> som
   where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 if' :: Assignment
-if' =  ifElsif If
-   <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
+if' =   ifElsif If
+    <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
   where
-    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (elsif' <|> else'' <|> emptyTerm))
+    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (elsif' <|> else' <|> emptyTerm))
     expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
     elsif' = postContextualize comment (ifElsif Elsif)
-    else'' = postContextualize comment (symbol Else *> children expressions)
-
-else' :: Assignment
-else' = makeTerm <$> symbol Else <*> children (many expression)
+    else' = postContextualize comment (symbol Else *> children expressions)
 
 unless :: Assignment
-unless =
-      makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional else''))
-  <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> expression <*> invert expression <*> emptyTerm)
+unless =   makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (else' <|> emptyTerm))
+       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> expression <*> invert expression <*> emptyTerm)
   where expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> eof)
-        else'' = postContextualize comment else'
+        else' = postContextualize comment (symbol Else *> children expressions)
 
 while' :: Assignment
 while' =
@@ -291,6 +287,7 @@ case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (symbol When 
     whens = makeTerm <$> location <*> many (when' <|> else' <|> expression)
     when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
     pattern = symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression)
+    else' = postContextualize comment (symbol Else *> children expressions)
 
 subscript :: Assignment
 subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscript <$> expression <*> many expression)
