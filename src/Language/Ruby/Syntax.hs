@@ -8,8 +8,6 @@ module Language.Ruby.Syntax
 
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Foldable (asum)
-import Data.List.Split (chunksOf)
 import Data.Functor (void)
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
