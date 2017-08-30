@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, StandaloneDeriving, TypeOperators #-}
 module Semantic
 ( parseBlobs
 , parseBlob
@@ -9,6 +9,7 @@ module Semantic
 
 import Algorithm hiding (diff)
 import Control.Applicative ((<|>))
+import Control.Exception
 import Control.Monad ((<=<))
 import Data.Align.Generic (GAlign)
 import Data.Blob
@@ -18,8 +19,10 @@ import Data.Functor.Classes (Eq1, Show1)
 import Data.Output
 import Data.Record
 import qualified Data.Syntax.Declaration as Declaration
+import Data.Typeable
 import Data.Union
 import Decorators
+import GHC.Stack
 import Diff
 import Info
 import Interpreter
@@ -139,3 +142,12 @@ keepCategory = (:. Nil) . category
 
 keepConstructorLabel :: Record (ConstructorLabel ': fields) -> Record '[ConstructorLabel]
 keepConstructorLabel = (:. Nil) . rhead
+
+
+data SemanticException where
+  SemanticException :: HasCallStack => String -> SemanticException
+  deriving (Typeable)
+
+deriving instance Show SemanticException
+
+instance Exception SemanticException
