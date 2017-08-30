@@ -5,6 +5,7 @@ module Parser
 , parserForLanguage
 , lineByLineParser
 -- À la carte parsers
+, goParser
 , jsonParser
 , markdownParser
 , pythonParser
@@ -24,6 +25,7 @@ import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
 import Language
+import qualified Language.Go.Syntax as Go
 import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
@@ -32,10 +34,11 @@ import qualified Language.TypeScript.Syntax as TypeScript
 import Syntax hiding (Go)
 import Term
 import qualified TreeSitter.Language as TS (Language, Symbol)
+import TreeSitter.Go
+import TreeSitter.JSON
 import TreeSitter.Python
 import TreeSitter.Ruby
 import TreeSitter.TypeScript
-import TreeSitter.JSON
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
@@ -54,6 +57,9 @@ data Parser term where
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
 parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
 parserForLanguage _ = LineByLineParser
+
+goParser :: Parser Go.Term
+goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment

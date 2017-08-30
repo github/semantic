@@ -50,6 +50,7 @@ library
                      , Language
                      , Language.Markdown
                      , Language.Markdown.Syntax
+                     , Language.Go.Grammar
                      , Language.Go.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Syntax
