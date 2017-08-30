@@ -86,31 +86,26 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob)) diffRecursively (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Ruby) -> run (\ blob -> parse rubyParser blob >>= decorate (declarationAlgebra blob)) diffRecursively (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.TypeScript) -> run (\ blob -> parse typescriptParser blob >>= decorate (declarationAlgebra blob)) diffRecursively (renderToCDiff blobs)
-  (ToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (JSONDiffRenderer, Just Language.Go) -> run (parse goParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Ruby) -> run (parse rubyParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffRecursively (renderJSONDiff blobs)
-  (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffTerms (renderJSONDiff blobs)
   (PatchDiffRenderer, Just Language.Go) -> run (parse goParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Ruby) -> run (parse rubyParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffRecursively (renderPatch blobs)
-  (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
   (SExpressionDiffRenderer, Just Language.Go) -> run (decorate constructorLabel <=< parse goParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.JSON) -> run (decorate constructorLabel <=< parse jsonParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Ruby) -> run (decorate constructorLabel <=< parse rubyParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.TypeScript) -> run (decorate constructorLabel <=< parse typescriptParser) diffRecursively (renderSExpressionDiff . mapAnnotations keepConstructorLabel)
-  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . mapAnnotations keepCategory)
-  (IdentityDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms Just
+  _ -> throwError (toException (SemanticException ("don’t know how to produce " ++ show renderer ++ " for " ++ show (fmap blobLanguage blobs))))
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
-        syntaxParser = parserForLanguage effectiveLanguage
 
         run :: Functor f => (Blob -> Task (Term f a)) -> (Both (Term f a) -> Diff f a) -> (Diff f a -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= diffTermPair blobs diff >>= render renderer
