@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Interpreter
-( diffTerms
-, decoratingWith
+( decoratingWith
 , diffTermsWith
 , comparableByConstructor
 , equivalentTerms
@@ -18,23 +17,13 @@ import Data.Functor.Classes (Eq1(..))
 import Data.Hashable (Hashable)
 import Data.Maybe (isJust)
 import Data.Record
-import Data.Text (Text)
 import Data.These
 import Data.Union
 import qualified Data.Syntax.Declaration as Declaration
 import Diff
-import Info hiding (Return)
 import Patch (inserting, deleting, replacing, patchSum)
 import RWS
-import Syntax as S hiding (Return)
 import Term
-
-
--- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: HasField fields Category
-          => Both (SyntaxTerm fields) -- ^ A pair of terms representing the old and new state, respectively.
-          -> SyntaxDiff fields
-diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory (equalTerms comparableByCategory))
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
 decoratingWith :: (Hashable label, Traversable f)
@@ -62,61 +51,6 @@ diffTermsWith refine comparable eqTerms (Join (a, b)) = runFreer decompose (diff
           Delete a -> pure (deleting a)
           Insert b -> pure (inserting b)
           Replace a b -> pure (replacing a b)
-
--- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
-getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
-getLabel (h :< t) = (Info.category h, case t of
-  Leaf s -> Just s
-  _ -> Nothing)
-
-
--- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: SyntaxTerm fields
-                   -> SyntaxTerm fields
-                   -> Algorithm (SyntaxTerm fields) (SyntaxDiff fields) (SyntaxDiff fields)
-algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
-  (Indexed a, Indexed b) ->
-    annotate . Indexed <$> byRWS a b
-  (S.Module idA a, S.Module idB b) ->
-    (annotate .) . S.Module <$> linearly idA idB <*> byRWS a b
-  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> fmap annotate $
-    S.FunctionCall <$> linearly identifierA identifierB
-                   <*> byRWS typeParamsA typeParamsB
-                   <*> byRWS argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) -> fmap annotate $
-    S.Switch <$> byRWS exprA exprB
-             <*> byRWS casesA casesB
-  (S.Object tyA a, S.Object tyB b) -> fmap annotate $
-    S.Object <$> diffMaybe tyA tyB
-             <*> byRWS a b
-  (Commented commentsA a, Commented commentsB b) -> fmap annotate $
-    Commented <$> byRWS commentsA commentsB
-              <*> diffMaybe a b
-  (Array tyA a, Array tyB b) -> fmap annotate $
-    Array <$> diffMaybe tyA tyB
-          <*> byRWS a b
-  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> fmap annotate $
-    S.Class <$> linearly identifierA identifierB
-            <*> byRWS clausesA clausesB
-            <*> byRWS expressionsA expressionsB
-  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> fmap annotate $
-    S.Method <$> byRWS clausesA clausesB
-             <*> linearly identifierA identifierB
-             <*> diffMaybe receiverA receiverB
-             <*> byRWS paramsA paramsB
-             <*> byRWS expressionsA expressionsB
-  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> fmap annotate $
-    S.Function <$> linearly idA idB
-               <*> byRWS paramsA paramsB
-               <*> byRWS bodyA bodyB
-  _ -> linearly t1 t2
-  where
-    annotate = wrap . (both (extract t1) (extract t2) :<)
-
-
--- | Test whether two terms are comparable by their Category.
-comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
-comparableByCategory (a :< _) (b :< _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
 comparableByConstructor :: (GAlign f) => ComparabilityRelation f fields
