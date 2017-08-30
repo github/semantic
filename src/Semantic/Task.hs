@@ -47,7 +47,6 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
-import Info
 import qualified Files
 import GHC.Conc (atomically)
 import Language
@@ -219,7 +218,7 @@ runParser Options{..} blob@Blob{..} = go
         blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
         errors :: (Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (a :< syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
+          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
         logTiming :: String -> Task a -> Task a
         logTiming msg = time msg blobFields
