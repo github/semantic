@@ -286,7 +286,7 @@ case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (symbol When 
   where
     whens = makeTerm <$> location <*> many (when' <|> else' <|> expression)
     when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
-    pattern = symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression)
+    pattern = postContextualize comment (symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression))
     else' = postContextualize comment (symbol Else *> children expressions)
 
 subscript :: Assignment
