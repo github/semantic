@@ -256,9 +256,10 @@ if' :: Assignment
 if' =  ifElsif If
    <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
   where
-    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (ifElsif Elsif <|> else'' <|> emptyTerm))
+    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (elsif' <|> else'' <|> emptyTerm))
     expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
-    else'' = postContextualize comment else'
+    elsif' = postContextualize comment (ifElsif Elsif)
+    else'' = postContextualize comment (symbol Else *> children expressions)
 
 else' :: Assignment
 else' = makeTerm <$> symbol Else <*> children (many expression)
