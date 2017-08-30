@@ -1,7 +1,6 @@
 {-# LANGUAGE ConstraintKinds, DataKinds #-}
 module Info
-( DefaultFields
-, HasDefaultFields
+( HasDefaultFields
 , Range(..)
 , byteRange
 , setByteRange
@@ -18,9 +17,6 @@ import Category
 import Data.Range
 import Data.Record
 import Data.Span
-
--- | The default set of fields produced by our parsers.
-type DefaultFields = '[ Range, Category, Span ]
 
 -- | A type alias for HasField constraints commonly used throughout semantic-diff.
 type HasDefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields Span)
