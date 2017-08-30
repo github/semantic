@@ -22,7 +22,7 @@ import Data.Output
 import Data.Proxy
 import Data.Record
 import Data.Semigroup ((<>))
-import Data.Text (pack, Text)
+import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Union
 import GHC.Generics
@@ -75,9 +75,6 @@ instance ToJSONFields (Record fs) => ToJSON (Record fs) where
 
 instance ToJSONFields Range where
   toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
-
-instance ToJSONFields Category where
-  toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> pack (show c) }]
 
 instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
