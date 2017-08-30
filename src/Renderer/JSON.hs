@@ -20,13 +20,14 @@ import Data.Functor.Both (Both)
 import qualified Data.Map as Map
 import Data.Output
 import Data.Proxy
+import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
+import Data.Span
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Union
 import GHC.Generics
-import Info
 import Language
 import Patch
 

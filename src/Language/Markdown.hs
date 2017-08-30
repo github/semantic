@@ -9,9 +9,10 @@ import Control.Comonad.Cofree as Cofree
 import Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import CMarkGFM
 import Data.Ix
+import Data.Range
+import Data.Span
 import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
-import Info
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar
