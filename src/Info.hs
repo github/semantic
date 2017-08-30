@@ -1,7 +1,6 @@
 {-# LANGUAGE ConstraintKinds, DataKinds #-}
 module Info
-( HasDefaultFields
-, Range(..)
+( Range(..)
 , byteRange
 , setByteRange
 , Category(..)
@@ -17,9 +16,6 @@ import Category
 import Data.Range
 import Data.Record
 import Data.Span
-
--- | A type alias for HasField constraints commonly used throughout semantic-diff.
-type HasDefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields Span)
 
 byteRange :: HasField fields Range => Record fields -> Range
 byteRange = getField
