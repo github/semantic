@@ -35,9 +35,11 @@ import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
+import Data.Range
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
+import Data.Span
 import Data.Text (toLower)
 import qualified Data.Text as T
 import Data.Text.Listable
@@ -45,7 +47,6 @@ import Data.These
 import Data.Union
 import Diff
 import GHC.Generics
-import Info
 import Language
 import Patch
 import qualified Data.List as List
@@ -127,19 +128,19 @@ declarationAlgebra Blob{..} (a :< r)
   = Just $ MethodDeclaration (getSource (extract receiver) <> "." <> getSource (extract identifier))
 
   | Just err@Syntax.Error{} <- prj r
-  = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
+  = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (getField a) err))) blobLanguage
   | otherwise = Nothing
-  where getSource = toText . flip Source.slice blobSource . byteRange
+  where getSource = toText . flip Source.slice blobSource . getField
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
 markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply1 Functor fs, Apply1 Foldable fs)
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 markupSectionAlgebra Blob{..} (a :< r)
-  | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
+  | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (getField . extract <$> toList (unwrap heading)))) level
+  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (getField a) err))) blobLanguage
   | otherwise = Nothing
-  where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
+  where getSource = firstLine . toText . flip Source.slice blobSource . getField
         firstLine = T.takeWhile (/= '\n')
 
 formatTOCError :: Error.Error String -> String
@@ -200,8 +201,8 @@ entrySummary entry = case entry of
 -- | Construct a 'JSONSummary' from a node annotation and a change type label.
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> T.Text -> Maybe JSONSummary
 recordSummary record = case getDeclaration record of
-  Just (ErrorDeclaration text language) -> Just . const (ErrorSummary text (sourceSpan record) language)
-  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
+  Just (ErrorDeclaration text language) -> Just . const (ErrorSummary text (getField record) language)
+  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (getField record)
   Nothing -> const Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) -> Summaries
