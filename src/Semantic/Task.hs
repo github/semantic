@@ -47,7 +47,7 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Diff
-import Info hiding (Category(..))
+import Info
 import qualified Files
 import GHC.Conc (atomically)
 import Language
