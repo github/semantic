@@ -28,7 +28,6 @@ import Data.Source
 import Data.Record
 import Data.These
 import Diff
-import Info
 import Patch
 import Prelude hiding (fst, snd)
 import SplitDiff
@@ -58,7 +57,7 @@ alignPatch sources patch = case patch of
   Replace term1 term2 -> fmap (pure . SplitReplace) <$> alignWith (fmap (these id id const . runJoin) . Join)
     (alignSyntax' this (fst sources) term1)
     (alignSyntax' that (snd sources) term2)
-  where getRange = byteRange . extract
+  where getRange = getField . extract
         alignSyntax' :: (forall a. Identity a -> Join These a) -> Source -> Term f (Record fields) -> [Join These (Term [] (Record fields))]
         alignSyntax' side source term = hylo (alignSyntax side cofree getRange (Identity source)) runCofree (Identity <$> term)
         this = Join . This . runIdentity
@@ -69,9 +68,9 @@ alignSyntax :: (Applicative f, HasField fields Range, Foldable g) => (forall a. 
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) =
   catMaybes $ wrapInBranch <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
-        lineRanges = toJoinThese $ sourceLineRangesWithin . byteRange <$> infos <*> sources
+        lineRanges = toJoinThese $ sourceLineRangesWithin . getField <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
-        makeNode info (range, children) = toNode (setByteRange info range :< children)
+        makeNode info (range, children) = toNode (setField info range :< children)
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]
