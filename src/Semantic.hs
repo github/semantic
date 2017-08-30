@@ -25,7 +25,6 @@ import Data.Union
 import Decorators
 import GHC.Stack
 import Diff
-import Info
 import Interpreter
 import qualified Language
 import Patch
@@ -128,9 +127,6 @@ diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
             , ("after_path", blobPath b)
             , ("after_language", maybe "" show (blobLanguage b)) ]
 
-
-keepCategory :: HasField fields Category => Record fields -> Record '[Category]
-keepCategory = (:. Nil) . category
 
 keepConstructorLabel :: Record (ConstructorLabel ': fields) -> Record '[ConstructorLabel]
 keepConstructorLabel = (:. Nil) . rhead
