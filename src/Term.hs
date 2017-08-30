@@ -3,8 +3,6 @@
 module Term
 ( Term
 , TermF
-, SyntaxTerm
-, SyntaxTermF
 , zipTerms
 , termSize
 , alignCofreeWith
@@ -23,18 +21,12 @@ import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Foldable
 import Data.Maybe
 import Data.Proxy
-import Data.Record
 import Data.These
 import Data.Union
-import Syntax
 
 -- | A Term with an abstract syntax tree and an annotation.
 type Term f = Cofree.Cofree f
 type TermF = CofreeF.CofreeF
-
--- | A Term with a Syntax leaf and a record of fields.
-type SyntaxTerm fields = Term Syntax (Record fields)
-type SyntaxTermF fields = TermF Syntax (Record fields)
 
 instance (NFData (f (Cofree.Cofree f a)), NFData a, Functor f) => NFData (Cofree.Cofree f a) where
   rnf = rnf . runCofree
