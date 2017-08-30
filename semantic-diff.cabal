@@ -45,7 +45,6 @@ library
                      , Decorators
                      , Diff
                      , Files
-                     , Info
                      , Interpreter
                      , Language
                      , Language.Markdown
