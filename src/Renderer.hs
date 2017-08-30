@@ -28,7 +28,6 @@ import qualified Data.Map as Map
 import Data.Output
 import Data.Syntax.Algebra (RAlgebra)
 import Data.Text (Text)
-import Diff (SyntaxDiff)
 import Info (DefaultFields)
 import Renderer.JSON as R
 import Renderer.Patch as R
@@ -47,8 +46,6 @@ data DiffRenderer output where
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
-  -- | “Render” by returning the computed 'SyntaxDiff'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for TOCSpec.hs.
-  IdentityDiffRenderer :: DiffRenderer (Maybe (SyntaxDiff (Maybe Declaration ': DefaultFields)))
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
