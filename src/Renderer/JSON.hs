@@ -29,7 +29,6 @@ import GHC.Generics
 import Info
 import Language
 import Patch
-import Syntax as S
 
 --
 -- Diffs
@@ -107,9 +106,6 @@ instance ToJSON a => ToJSONFields (Patch a) where
 
 instance ToJSON a => ToJSONFields [a] where
   toJSONFields list = [ "children" .= list ]
-
-instance ToJSON recur => ToJSONFields (Syntax recur) where
-  toJSONFields syntax = [ "children" .= toList syntax ]
 
 instance (Apply1 Foldable fs, ToJSON a) => ToJSONFields (Union fs a) where
   toJSONFields = apply1 (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
