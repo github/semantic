@@ -10,16 +10,12 @@ import Data.Bifunctor
 import Data.Functor.Both as Both
 import Data.Functor.Classes.Pretty.Generic
 import Data.Mergeable
-import Data.Record
 import Patch
-import Syntax
 import Term
 
 -- | An annotated series of patches of terms.
 type DiffF f annotation = FreeF.FreeF (TermF f (Both annotation)) (Patch (Term f annotation))
 type Diff f annotation = Free.Free (TermF f (Both annotation)) (Patch (Term f annotation))
-
-type SyntaxDiff fields = Diff Syntax (Record fields)
 
 diffSum :: (Foldable f, Functor f) => (Patch (Term f annotation) -> Int) -> Diff f annotation -> Int
 diffSum patchCost diff = sum $ fmap patchCost diff
