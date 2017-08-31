@@ -55,14 +55,16 @@ assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.P
 
 expression :: Assignment
 expression = handleError
-           $ literal
-          <|> importDeclaration
-          <|> importSpec
-          <|> packageClause
-          <|> comment
+           $  comment
           <|> constVarDeclaration
           <|> constVarSpecification
           <|> expressionList
+          <|> functionDeclaration
+          <|> importDeclaration
+          <|> importSpec
+          <|> literal
+          <|> packageClause
+          <|> parameterDeclaration
 
 identifiers :: Assignment
 identifiers = makeTerm <$> location <*> many identifier
