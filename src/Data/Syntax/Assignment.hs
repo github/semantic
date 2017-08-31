@@ -75,7 +75,7 @@ module Data.Syntax.Assignment
 , source
 , children
 , advance
-, choose
+, choice
 , token
 , while
 , until
@@ -119,7 +119,7 @@ import GHC.Stack
 import qualified Info
 import Prelude hiding (until)
 import Term (runCofree)
-import Text.Parser.Combinators as Parsers
+import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
@@ -179,8 +179,12 @@ children child = tracing (Children child) `Then` return
 advance :: HasCallStack => Assignment ast grammar ()
 advance = tracing Advance `Then` return
 
-choose :: (Bounded grammar, Ix grammar, HasCallStack) => [(grammar, Assignment ast grammar a)] -> Assignment ast grammar a
-choose choices = tracing (Choose (fmap fst choices) (IntMap.fromList (fmap (first toIndex) choices)) Nothing) `Then` id
+choice :: (Bounded grammar, Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
+choice alternatives = tracing (Choose symbols (IntMap.fromList choices) (asum (fmap Just atEnd))) `Then` id
+  where (symbols, choices, atEnd) = foldr (<>) ([], [], []) (fmap toChoices alternatives)
+        toChoices rule = case rule of
+          Tracing _ (Choose s c a) `Then` continue -> (s, IntMap.toList (fmap continue c), toList (fmap continue a))
+          _ -> ([], [], [rule])
 
 -- | Match and advance past a node with the given symbol.
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
