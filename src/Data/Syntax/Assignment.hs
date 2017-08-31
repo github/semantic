@@ -181,7 +181,7 @@ advance = tracing Advance `Then` return
 
 choice :: (Bounded grammar, Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
 choice alternatives = tracing (Choose symbols (IntMap.fromList choices) (wrap . tracing . Alt . toList <$> nonEmpty atEnd)) `Then` id
-  where (symbols, choices, atEnd) = foldr (<>) ([], [], []) (fmap toChoices alternatives)
+  where (symbols, choices, atEnd) = foldMap toChoices alternatives
         toChoices :: Assignment ast grammar a -> ([grammar], [(Int, Assignment ast grammar a)], [Assignment ast grammar a])
         toChoices rule = case rule of
           Tracing _ (Choose s c a) `Then` continue -> (s, IntMap.toList (fmap continue c), toList (fmap continue a))
