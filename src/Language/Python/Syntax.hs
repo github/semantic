@@ -109,7 +109,7 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError (term everything)
+expression = term (handleError everything)
   where -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
         everything = choice
           [ argumentList
