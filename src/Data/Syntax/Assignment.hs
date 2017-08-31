@@ -108,9 +108,7 @@ import Data.Error
 import Data.Foldable
 import Data.Function
 import Data.Functor.Classes
-import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (Ix(..))
-import Data.List (union)
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Maybe
 import Data.Record
@@ -135,7 +133,6 @@ data AssignmentF ast grammar a where
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: AssignmentF ast grammar ()
-  Choose :: [grammar] -> IntMap.IntMap a -> Maybe a -> AssignmentF ast grammar a
   Jump :: [grammar] -> Array grammar (Maybe a) -> Maybe a -> AssignmentF ast grammar a
   Many :: Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: [a] -> AssignmentF ast grammar a
@@ -189,7 +186,6 @@ choice alternatives
   where (symbols, choices, atEnd) = foldMap toChoices alternatives
         toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([grammar], [(grammar, Assignment ast grammar a)], [Assignment ast grammar a])
         toChoices rule = case rule of
-          Tracing _ (Choose s c a) `Then` continue -> (s, first toEnum <$> IntMap.toList (fmap continue c), toList (fmap continue a))
           Tracing _ (Jump s c a) `Then` continue -> (s, ((id &&& (c !)) <$> s) >>= \ (sym, a) -> (,) sym . continue <$> toList a, toList (fmap continue a))
           Tracing _ (Many  child)   `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
           Tracing _ (Catch child _) `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
@@ -221,10 +217,6 @@ manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
 
-toIndex :: (Bounded grammar, Ix grammar) => grammar -> Int
-toIndex = index (minBound, maxBound)
-
-
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = '[Info.Range, Info.Span]
 
@@ -247,7 +239,6 @@ nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 firstSet :: Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
-  Choose symbols _ _ -> symbols
   Jump symbols _ _ -> symbols
   Catch during _ -> firstSet during
   Label child _ -> firstSet child
@@ -288,7 +279,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
                   Advance -> yield () (advanceState state)
-                  Choose _ choices _ | Just choice <- IntMap.lookup (toIndex (nodeSymbol node)) choices -> yield choice state
                   Jump _ choices _ | bounds choices `inRange` nodeSymbol node, Just choice <- choices ! nodeSymbol node -> yield choice state
                   Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
@@ -301,7 +291,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Throw e -> Left e
                   Catch during _ -> go during state >>= uncurry yield
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
-                  Choose _ _ (Just atEnd) | Nothing <- node -> yield atEnd state
                   Jump _ _ (Just atEnd) | Nothing <- node -> yield atEnd state
                   _ -> Left (makeError node)
 
@@ -343,7 +332,7 @@ makeState = State 0 (Info.Pos 1 1) []
 
 -- Instances
 
-instance (Bounded grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (Assignment ast grammar) where
+instance (Bounded grammar, Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = tracing (Alt []) `Then` return
 
@@ -376,7 +365,7 @@ instance (Bounded grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternativ
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = tracing (Many a) `Then` return
 
-instance (Bounded grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
+instance (Bounded grammar, Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -410,7 +399,6 @@ instance (Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Show1 (Assi
     CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith (liftShowsPrec sp sl) "Children" d a
-    Choose symbols choices atEnd -> showsTernaryWith showsPrec (const (liftShowList sp sl)) (liftShowsPrec sp sl) "Choose" d symbols (IntMap.toList choices) atEnd
     Jump symbols choices atEnd -> showsTernaryWith showsPrec (const (liftShowList sp sl)) (liftShowsPrec sp sl) "Jump" d symbols (assocs choices >>= \ (sym, a) -> (,) sym <$> toList a) atEnd
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
