@@ -8,7 +8,7 @@ import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
-import Data.Foldable (toList)
+import Data.Foldable (asum, toList)
 import Data.Function ((&))
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
@@ -96,7 +96,7 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Term (Union fs) a)
              -> [m (Term (Union fs) a -> Term (Union fs) a -> Union fs (Term (Union fs) a))]
              -> m (Union fs (Term (Union fs) a))
-infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (Assignment.choice operators) <*> postContextualize context right
+infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 
 -- Undifferentiated
