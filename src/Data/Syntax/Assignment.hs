@@ -390,6 +390,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
   throwError error = tracing (Throw error) `Then` return
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
+  catchError (Tracing cs (Choose symbols choices atEnd Nothing) `Then` continue) handler = (Tracing cs (Choose symbols (fmap (>>= continue) <$> choices) ((>>= continue) <$> atEnd) (Just handler)) `Then` return)
   catchError during handler = tracing (Catch during handler) `Then` return
 
 instance Show1 f => Show1 (Tracing f) where
