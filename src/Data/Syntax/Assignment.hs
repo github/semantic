@@ -167,7 +167,7 @@ currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
-symbol s = tracing (Choose [s] (IntMap.singleton (toIndex s) location) Nothing) `Then` id
+symbol s = tracing (Jump [s] (array (s, s) [(s, Just location)]) Nothing) `Then` id
 
 -- | A rule to produce a node’s source as a ByteString.
 source :: HasCallStack => Assignment ast grammar ByteString
