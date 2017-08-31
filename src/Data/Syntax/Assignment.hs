@@ -355,7 +355,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
             (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
             _ | Just (sl, cl) <- choices l
               , Just (sr, cr) <- choices r
-              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) (merge <$> atEnd l <*> atEnd r)) id
+              -> rebuild (Choose (sl `union` sr) (IntMap.unionWith (<|>) cl cr) (wrap . tracing . Alt . toList <$> nonEmpty (toList (atEnd l) <> toList (atEnd r)))) id
               | otherwise -> rebuild (Alt [l, r]) id
             where distribute :: (l ~ lr, r ~ lr) => AssignmentF ast grammar lr -> Assignment ast grammar a
                   distribute a = rebuild a (uncurry (<|>) . (continueL &&& continueR))
@@ -363,8 +363,6 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
                   alternate a = rebuild a (either continueL continueR)
                   rebuild :: AssignmentF ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
                   rebuild a c = Tracing (callSiteL <|> callSiteR) a `Then` c
-
-                  merge l r = rebuild (Alt [l, r]) id
 
           choices :: Assignment ast grammar z -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar z))
           choices (Tracing _ (Choose symbols choices _) `Then` continue) = Just (symbols, continue <$> choices)
