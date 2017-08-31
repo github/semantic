@@ -76,6 +76,7 @@ literal :: Assignment
 literal = identifier
        <|> interpretedStringLiteral
        <|> intLiteral
+       <|> typing
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
@@ -85,6 +86,12 @@ identifier =
       mk Identifier
   <|> mk PackageIdentifier
   <|> mk TypeIdentifier
+  <|> mk ParenthesizedType
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+
+typing :: Assignment
+typing =
+      mk TypeIdentifier
   <|> mk ParenthesizedType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
@@ -113,7 +120,7 @@ constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> c
     where
       annotatedLHS = makeTerm <$> location <*> (Type.Annotation
                                               <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier))))
-                                              <*> identifier)
+                                              <*> typing)
 
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
