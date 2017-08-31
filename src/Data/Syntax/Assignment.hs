@@ -75,6 +75,7 @@ module Data.Syntax.Assignment
 , source
 , children
 , advance
+, choose
 , token
 , while
 , until
@@ -177,6 +178,9 @@ children child = tracing (Children child) `Then` return
 -- | Advance past the current node.
 advance :: HasCallStack => Assignment ast grammar ()
 advance = tracing Advance `Then` return
+
+choose :: (Bounded grammar, Ix grammar, HasCallStack) => [(grammar, Assignment ast grammar a)] -> Assignment ast grammar a
+choose choices = tracing (Choose (fmap fst choices) (IntMap.fromList (fmap (first toIndex) choices)) Nothing) `Then` id
 
 -- | Match and advance past a node with the given symbol.
 token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
