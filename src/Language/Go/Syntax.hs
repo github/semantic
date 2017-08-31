@@ -125,5 +125,8 @@ constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> c
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
+parameterDeclaration :: Assignment
+parameterDeclaration = symbol ParameterDeclaration *> children expressions
+
 -- | Match a series of terms or comments until a delimiter is matchedmanyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
