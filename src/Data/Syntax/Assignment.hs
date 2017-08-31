@@ -190,7 +190,7 @@ choice alternatives
         toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([grammar], [(grammar, Assignment ast grammar a)], [Assignment ast grammar a])
         toChoices rule = case rule of
           Tracing _ (Choose s c a) `Then` continue -> (s, first toEnum <$> IntMap.toList (fmap continue c), toList (fmap continue a))
-          Tracing _ (Jump s c a) `Then` continue -> (s, assocs c >>= \ (sym, a) -> (,) sym . continue <$> toList a, toList (fmap continue a))
+          Tracing _ (Jump s c a) `Then` continue -> (s, ((id &&& (c !)) <$> s) >>= \ (sym, a) -> (,) sym . continue <$> toList a, toList (fmap continue a))
           Tracing _ (Many  child)   `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
           Tracing _ (Catch child _) `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
           Tracing _ (Label child _) `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
@@ -378,7 +378,7 @@ instance (Bounded grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternativ
 
           choices :: Assignment ast grammar z -> Maybe ([grammar], IntMap.IntMap (Assignment ast grammar z))
           choices (Tracing _ (Choose symbols choices _) `Then` continue) = Just (symbols, continue <$> choices)
-          choices (Tracing _ (Jump symbols choices _) `Then` continue) = Just (symbols, IntMap.fromList (assocs choices >>= \ (sym, a) -> (,) (toIndex sym) . continue <$> toList a))
+          choices (Tracing _ (Jump symbols choices _) `Then` continue) = Just (symbols, IntMap.fromList (((id &&& (choices !)) <$> symbols) >>= \ (sym, a) -> (,) (toIndex sym) . continue <$> toList a))
           choices (Tracing cs (Many rule) `Then` continue) = second ((Tracing cs (Many rule) `Then` continue) <$) <$> choices rule
           choices (Tracing _ (Catch during _) `Then` continue) = second (fmap (>>= continue)) <$> choices during
           choices (Tracing cs (Label rule label) `Then` continue) = second ((Tracing cs (Label rule label) `Then` continue) <$) <$> choices rule
