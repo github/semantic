@@ -186,6 +186,7 @@ choice alternatives = tracing (Choose symbols (IntMap.fromList choices) (asum (f
         toChoices rule = case rule of
           Tracing _ (Choose s c a) `Then` continue -> (s, IntMap.toList (fmap continue c), toList (fmap continue a))
           Tracing _ (Many child) `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
+          Tracing _ (Catch during _) `Then` _ -> let (s, c, _) = toChoices during in (s, fmap (rule <$) c, [rule])
           _ -> ([], [], [rule])
 
 -- | Match and advance past a node with the given symbol.
