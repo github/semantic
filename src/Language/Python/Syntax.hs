@@ -115,73 +115,81 @@ expression = handleError (term everything)
         -- We may at some point wish to write something to perform this chunking for us.
         -- Medium-term, we should consider the construction of choices from first principles; maybe there’s a better API for us to construct these tables.
         -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
-        everything = abcd <|> efil <|> pstv <|> w
-        abcd = a <|> b <|> c <|> d
-        efil = e <|> f <|> i <|> l
-        pstv = p <|> s <|> t <|> v
-        a =   argumentList
-          <|> assertStatement
-          <|> assignment'
-          <|> await
-        b =   binaryOperator
-          <|> boolean
-          <|> booleanOperator
-          <|> breakStatement
-          <|> call
-          <|> classDefinition
-        c =   comparisonOperator
-          <|> comprehension
-          <|> concatenatedString
-          <|> conditionalExpression
-          <|> continueStatement
-        d =   decoratedDefinition
-          <|> deleteStatement
-          <|> dictionary
-          <|> dottedName
-        e =   ellipsis
-          <|> exceptClause
-          <|> execStatement
-          <|> expressionList
-          <|> expressionStatement
-        f =   finallyClause
-          <|> float
-          <|> forInClause
-          <|> forStatement
-          <|> functionDefinition
-          <|> globalStatement
-        i =   identifier
-          <|> ifClause
-          <|> ifStatement
-          <|> import'
-          <|> identifier
-          <|> integer
-        l =   list'
-          <|> memberAccess
-          <|> none
-          <|> nonlocalStatement
-          <|> notOperator
-        p =   pair
-          <|> parameter
-          <|> passStatement
-          <|> printStatement
-          <|> raiseStatement
-          <|> returnStatement
-        s =   set
-          <|> slice
-          <|> string
-          <|> subscript
-        t =   tryStatement
-          <|> tuple
-          <|> type'
-          <|> unaryOperator
-        v =   variables
-          <|> whileStatement
-          <|> withStatement
-          <|> yield
-          <|> listSplat
-        w =   dictionarySplat
-          <|> keywordArgument
-          <|> parenthesizedExpression
+        everything = choose
+          [ (ArgumentList, argumentList)
+          , (AssertStatement, assertStatement)
+          , (Assignment, assignment')
+          , (AugmentedAssignment, assignment')
+          , (Await, await)
+          , (BinaryOperator, binaryOperator)
+          , (Grammar.True, boolean)
+          , (Grammar.False, boolean)
+          , (BooleanOperator, booleanOperator)
+          , (BreakStatement, breakStatement)
+          , (Call, call)
+          , (ClassDefinition, classDefinition)
+          , (ComparisonOperator, comparisonOperator)
+          , (ListComprehension, comprehension)
+          , (GeneratorExpression, comprehension)
+          , (SetComprehension, comprehension)
+          , (DictionaryComprehension, comprehension)
+          , (ConcatenatedString, concatenatedString)
+          , (ConditionalExpression, conditionalExpression)
+          , (ContinueStatement, continueStatement)
+          , (DecoratedDefinition, decoratedDefinition)
+          , (DeleteStatement, deleteStatement)
+          , (Dictionary, dictionary)
+          , (DottedName, dottedName)
+          , (Grammar.Ellipsis, ellipsis)
+          , (ExceptClause, exceptClause)
+          , (ExecStatement, execStatement)
+          , (ExpressionList, expressionList)
+          , (ExpressionStatement, expressionStatement)
+          , (FinallyClause, finallyClause)
+          , (Float, float)
+          , (ForInClause, forInClause)
+          , (ForStatement, forStatement)
+          , (FunctionDefinition, functionDefinition)
+          , (GlobalStatement, globalStatement)
+          , (IfClause, ifClause)
+          , (IfStatement, ifStatement)
+          , (ImportStatement, import')
+          , (ImportFromStatement, import')
+          , (AliasedImport, import')
+          , (WildcardImport, import')
+          , (Identifier, identifier)
+          , (Identifier', identifier)
+          , (Integer, integer)
+          , (List, list')
+          , (Attribute, memberAccess)
+          , (None, none)
+          , (NonlocalStatement, nonlocalStatement)
+          , (NotOperator, notOperator)
+          , (Pair, pair)
+          , (DefaultParameter, parameter)
+          , (TypedParameter, parameter)
+          , (TypedDefaultParameter, parameter)
+          , (PassStatement, passStatement)
+          , (PrintStatement, printStatement)
+          , (RaiseStatement, raiseStatement)
+          , (ReturnStatement, returnStatement)
+          , (Set, set)
+          , (Slice, slice)
+          , (String, string)
+          , (Subscript, subscript)
+          , (TryStatement, tryStatement)
+          , (Tuple, tuple)
+          , (Type, type')
+          , (UnaryOperator, unaryOperator)
+          , (Variables, variables)
+          , (WhileStatement, whileStatement)
+          , (WithStatement, withStatement)
+          , (Yield, yield)
+          , (ListSplat, listSplat)
+          , (DictionarySplat, dictionarySplat)
+          , (KeywordArgument, keywordArgument)
+          , (ParenthesizedExpression, parenthesizedExpression)
+          ]
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
