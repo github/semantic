@@ -190,6 +190,7 @@ choice alternatives
           Tracing _ (Many  child)   `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
           Tracing _ (Catch child _) `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
           Tracing _ (Label child _) `Then` _ -> let (s, c, _) = toChoices child in (s, fmap (rule <$) c, [rule])
+          Tracing _ (Alt as) `Then` continue -> foldMap (toChoices . continue) as
           _ -> ([], [], [rule])
         bounds = foldr1 (\ (symbolLower, symbolUpper) (lower, upper) -> (min symbolLower lower, max symbolUpper upper)) (fmap (\ s -> (s, s)) symbols)
         merge Nothing b = Just b
