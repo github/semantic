@@ -110,7 +110,7 @@ import Data.Functor.Classes
 import qualified Data.IntMap.Lazy as IntMap
 import Data.Ix (Ix(..))
 import Data.List (union)
-import Data.List.NonEmpty (NonEmpty(..))
+import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Maybe
 import Data.Record
 import Data.Semigroup
@@ -180,7 +180,7 @@ advance :: HasCallStack => Assignment ast grammar ()
 advance = tracing Advance `Then` return
 
 choice :: (Bounded grammar, Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
-choice alternatives = tracing (Choose symbols (IntMap.fromList choices) (asum (fmap Just atEnd))) `Then` id
+choice alternatives = tracing (Choose symbols (IntMap.fromList choices) (wrap . tracing . Alt . toList <$> nonEmpty atEnd)) `Then` id
   where (symbols, choices, atEnd) = foldr (<>) ([], [], []) (fmap toChoices alternatives)
         toChoices :: Assignment ast grammar a -> ([grammar], [(Int, Assignment ast grammar a)], [Assignment ast grammar a])
         toChoices rule = case rule of
