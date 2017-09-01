@@ -174,7 +174,7 @@ literal =
   <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many expression)
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
-  <|> makeTerm <$> symbol ChainedString <*> children (many (term (makeTerm <$> symbol String <*> (Literal.TextElement <$> source))))
+  <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
   <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
 
