@@ -3,6 +3,7 @@ module Data.Syntax.Assignment.Table.Array
 , singleton
 , fromListWith
 , toList
+, lookup
 ) where
 
 import Control.Arrow ((&&&))
@@ -11,6 +12,7 @@ import Data.Functor.Classes
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Semigroup (Max(..), Min(..), sconcat)
 import GHC.Stack
+import Prelude hiding (lookup)
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: Array i (Maybe a) }
   deriving (Foldable, Functor, Traversable)
@@ -27,6 +29,12 @@ fromListWith with assocs@(a:as) = Table (fst <$> assocs) (accumArray merge Nothi
 
 toList :: Ix i => Table i a -> [(i, a)]
 toList Table{..} = tableAddresses >>= \ addr -> maybe [] (pure . (,) addr) (tableBranches ! addr)
+
+
+lookup :: Ix i => i -> Table i a -> Maybe a
+lookup i Table{..}
+  | bounds tableBranches `inRange` i = tableBranches ! i
+  | otherwise                        = Nothing
 
 
 instance (Ix i, Show i) => Show1 (Table i) where
