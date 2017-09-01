@@ -20,21 +20,15 @@
       (Integer))+})
 {+(Hash)+}
 {+(Hash
-    (Context
-      (Comment)
-      (KeyValue
-        (Identifier)
-        (Integer)))
-    (Context
-      (Comment)
-      (Comment)
-      (KeyValue
-        (TextElement)
-        (Integer)))
-    (Context
-      (Comment)
-      (Empty)))+}
+    (Comment)
+    (KeyValue
+      (Identifier)
+      (Integer))
+    (Comment)
+    (Comment)
+    (KeyValue
+      (TextElement)
+      (Integer))
+    (Comment))+}
 {+(Hash
-    (Context
-      (Comment)
-      (Empty)))+})
+    (Comment))+})
