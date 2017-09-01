@@ -1,6 +1,7 @@
 module Data.Syntax.Assignment.Table.IntMap where
 
 import Data.Bifunctor (first)
+import Data.Functor.Classes
 import qualified Data.IntMap as IntMap
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: IntMap.IntMap a }
@@ -18,3 +19,7 @@ toList Table{..} = first toEnum <$> IntMap.toList tableBranches
 
 lookup :: Enum i => i -> Table i a -> Maybe a
 lookup i = IntMap.lookup (fromEnum i) . tableBranches
+
+
+instance (Enum i, Show i) => Show1 (Table i) where
+  liftShowsPrec spA slA d t = showsBinaryWith showsPrec (const (liftShowList spA slA)) "Table" d (tableAddresses t) (toList t)
