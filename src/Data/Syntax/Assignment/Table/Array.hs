@@ -7,6 +7,7 @@ import Data.Foldable (toList)
 import Data.Functor.Classes
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: Array i (Maybe a) }
+  deriving (Foldable, Functor, Traversable)
 
 
 instance (Ix i, Show i) => Show1 (Table i) where
