@@ -182,48 +182,6 @@ spec = do
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
 
-    describe "in many" $ do
-      it "handler that always matches" $
-        fst <$> runAssignment "PG"
-          (symbol Palette *> children (
-            many (red `catchError` (\ _ -> OutError <$ location <*> source))
-          ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Right [OutError "G"]
-
-      it "handler that matches" $
-        fst <$> runAssignment "PG"
-          (symbol Palette *> children ( many (red `catchError` const green) ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Right [Out "G"]
-
-      it "handler that doesn't match produces error" $
-        runAssignment "PG"
-          (symbol Palette *> children ( many (red `catchError` const blue) ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Left (Error (Span (Pos 1 2) (Pos 1 3)) [] (Just (Right Green)))
-
-      it "handlers are greedy" $
-        runAssignment "PG"
-          (symbol Palette *> children (
-            (,) <$> many (red `catchError` (\ _ -> OutError <$ location <*> source)) <*> green
-          ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Left (Error (Span (Pos 1 3) (Pos 1 3)) [Right Green] Nothing)
-
-      it "handler that doesn't match with apply" $
-        fst <$> runAssignment "PG"
-          (symbol Palette *> children (
-            (,) <$> many (red `catchError` const blue) <*> green
-          ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Right ([], Out "G")
-
   describe "many" $ do
     it "takes ones and only one zero width repetition" $
       fst <$> runAssignment "PGG"
