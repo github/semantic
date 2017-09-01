@@ -1,5 +1,3 @@
 (Program
-  (Context
-    (Comment)
-    (Comment)
-    (Empty)))
+  (Comment)
+  (Comment))

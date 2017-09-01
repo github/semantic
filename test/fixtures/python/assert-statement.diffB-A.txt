@@ -4,17 +4,13 @@
   {-(Identifier)-}
     (Identifier)
     (Empty))
-{+(Context
-    (Comment)
-    (Call
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Empty)))+}
 {-(Call
     (Identifier)
     (Identifier)
     (Empty))-}
-{-(Context
-    (Comment)
-    (Empty))-})
+  (Comment)
+{+(Call
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (Empty))+})

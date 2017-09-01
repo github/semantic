@@ -7,11 +7,10 @@
   (Assignment
     (Identifier)
     (Hash
-      (Context
-        (Comment)
-        (KeyValue
-          (Identifier)
-          (Identifier)))
+      (Comment)
+      (KeyValue
+        (Identifier)
+        (Identifier))
       (KeyValue
         (Identifier)
         (Identifier)))))
