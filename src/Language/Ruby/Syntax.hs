@@ -99,7 +99,6 @@ expression = term (handleError everything)
       , case'
       , class'
       , conditional
-      , comment
       , emptyStatement
       , endBlock
       , for
@@ -356,7 +355,7 @@ unary = symbol Unary >>= \ location ->
 
 -- TODO: Distinguish `===` from `==` ?
 -- TODO: Distinuish `=~` and `!~` ?
-binary  :: Assignment
+binary :: Assignment
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
   , (inj .) . Expression.Minus            <$ symbol AnonMinus'
