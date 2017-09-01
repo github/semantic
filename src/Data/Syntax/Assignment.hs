@@ -333,6 +333,10 @@ makeState = State 0 (Info.Pos 1 1) []
 
 -- Instances
 
+instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Monoid (Assignment ast grammar a) where
+  mempty = empty
+  mappend = (<|>)
+
 instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = tracing (Alt []) `Then` return
