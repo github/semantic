@@ -106,7 +106,7 @@ instance Pretty1 Redirect where liftPretty = genericLiftPretty
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
+assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError everything)
