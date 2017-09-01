@@ -93,9 +93,9 @@ spec = do
       Right []
 
     it "distributes through children rules" $
-      fst <$> runAssignment "(red (blue))" (children (many green) <|> children (many blue)) (makeState [node Red 0 12 [node Blue 5 11 []]])
+      fst <$> runAssignment "(red (blue))" (children green <|> children blue) (makeState [node Red 0 12 [node Blue 5 11 []]])
       `shouldBe`
-      Right [Out "(blue)"]
+      Right (Out "(blue)")
 
     it "matches rules to the left of pure" $
       fst <$> runAssignment "green" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Green 0 5 []])
