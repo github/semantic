@@ -990,6 +990,19 @@ statement = term (handleError everything)
       , importStatement
       , debuggerStatement
       , expressionStatement'
+      , declaration
+      , statementBlock
+      , ifStatement
+      , switchStatement
+      , forStatement
+      , forInStatement
+      , forOfStatement
+      , whileStatement
+      , doStatement
+      , tryStatement
+      , withStatement
+      , breakStatement
+      , continueStatement
       , returnStatement
       , throwStatement
       , emptyStatement
