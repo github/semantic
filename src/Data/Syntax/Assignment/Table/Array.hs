@@ -1,6 +1,6 @@
 module Data.Syntax.Assignment.Table.Array
 ( Table(tableAddresses)
-, tableSingleton
+, singleton
 ) where
 
 import Data.Array
@@ -10,8 +10,8 @@ import Data.Functor.Classes
 data Table i a = Table { tableAddresses :: [i], tableBranches :: Array i (Maybe a) }
   deriving (Foldable, Functor, Traversable)
 
-tableSingleton :: Ix i => i -> a -> Table i a
-tableSingleton i a = Table [i] (listArray (i, i) [Just a])
+singleton :: Ix i => i -> a -> Table i a
+singleton i a = Table [i] (listArray (i, i) [Just a])
 
 
 instance (Ix i, Show i) => Show1 (Table i) where
