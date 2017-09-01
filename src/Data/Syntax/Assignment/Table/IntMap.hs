@@ -14,3 +14,7 @@ fromListWith with assocs = Table (fst <$> assocs) (IntMap.fromListWith with (fir
 
 toList :: Enum i => Table i a -> [(i, a)]
 toList Table{..} = first toEnum <$> IntMap.toList tableBranches
+
+
+lookup :: Enum i => i -> Table i a -> Maybe a
+lookup i = IntMap.lookup (fromEnum i) . tableBranches
