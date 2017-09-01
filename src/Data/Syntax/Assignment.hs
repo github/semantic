@@ -398,7 +398,7 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar) =>
   catchError rule handler = iterFreer (\ (Tracing cs assignment) continue -> case assignment of
     Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` return
     Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` return
-    _ -> Tracing cs assignment `Then` continue) (fmap pure rule)
+    _ -> Tracing cs assignment `Then` ((`catchError` handler) . continue)) (fmap pure rule)
 
 instance Show1 f => Show1 (Tracing f) where
   liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
