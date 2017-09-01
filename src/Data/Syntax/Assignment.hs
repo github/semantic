@@ -69,6 +69,7 @@ module Data.Syntax.Assignment
 -- Combinators
 , Alternative(..)
 , MonadError(..)
+, MonadFail(..)
 , location
 , currentNode
 , symbol
@@ -100,6 +101,7 @@ import Control.Comonad.Cofree as Cofree
 import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
+import Control.Monad.Fail
 import Control.Monad.Free.Freer
 import Data.Bifunctor
 import Data.ByteString (ByteString)
@@ -116,7 +118,7 @@ import qualified Data.Source as Source (Source, slice, sourceBytes)
 import qualified Data.Syntax.Assignment.Table as Table
 import GHC.Stack
 import qualified Info
-import Prelude hiding (until)
+import Prelude hiding (fail, until)
 import Term (runCofree)
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
@@ -139,6 +141,7 @@ data AssignmentF ast grammar a where
   Throw :: Error (Either String grammar) -> AssignmentF ast grammar a
   Catch :: Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
   Label :: Assignment ast grammar a -> String -> AssignmentF ast grammar a
+  Fail :: String -> AssignmentF ast grammar a
 
 data Tracing f a where
   Tracing :: { tracingCallSite :: Maybe (String, SrcLoc), runTracing :: f a } -> Tracing f a
@@ -292,6 +295,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Throw e -> Left e
                   Catch during _ -> go during state >>= uncurry yield
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
+                  Fail s -> throwError ((makeError node) { errorActual = Just (Left s) })
                   Choose _ (Just atEnd) _ | Nothing <- node -> go atEnd state >>= uncurry yield
                   _ -> Left (makeError node)
 
@@ -353,6 +357,7 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (
             (Alt [], _) -> r
             (_, Alt []) -> l
             (Throw _, _) -> l
+            (Fail _, _) -> r
             (Children cl, Children cr) -> alternate (Children (Left <$> cl <|> Right <$> cr))
             (Location, Location) -> distribute Location
             (CurrentNode, CurrentNode) -> distribute CurrentNode
@@ -373,6 +378,10 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = tracing (Many a) `Then` return
 
+instance MonadFail (Assignment ast grammar) where
+  fail :: HasCallStack => String -> Assignment ast grammar a
+  fail s = tracing (Fail s) `Then` return
+
 instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
@@ -381,7 +390,7 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Sh
   a <?> s = tracing (Label a s) `Then` return
 
   unexpected :: HasCallStack => String -> Assignment ast grammar a
-  unexpected s = location >>= \ loc -> throwError (Error (Info.sourceSpan loc) [] (Just (Left s)))
+  unexpected = fail
 
   eof :: HasCallStack => Assignment ast grammar ()
   eof = tracing End `Then` return
@@ -414,5 +423,6 @@ instance (Enum grammar, Ix grammar, Show grammar, Show (ast (AST ast grammar))) 
     Throw e -> showsUnaryWith showsPrec "Throw" d e
     Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
+    Fail s -> showsUnaryWith showsPrec "Fail" d s
     where showChild = liftShowsPrec sp sl
           showChildren = liftShowList sp sl
