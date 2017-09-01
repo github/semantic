@@ -1,4 +1,4 @@
-module Data.Syntax.Assignment.Table.IntMap
+module Data.Syntax.Assignment.Table
 ( Table(tableAddresses)
 , singleton
 , fromListWith
