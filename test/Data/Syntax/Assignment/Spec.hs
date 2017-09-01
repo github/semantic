@@ -168,6 +168,13 @@ spec = do
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
 
+    it "doesn’t catch exhaustiveness errors" $
+      fst <$> runAssignment "AA"
+        (red `catchError` \ _ -> OutError <$ location <*> source)
+        (makeState [node Red 0 1 [], node Red 1 2 []])
+        `shouldBe`
+          Left (Error (Span (Pos 1 2) (Pos 1 3)) [] (Just (Right Red)))
+
     it "can error inside the handler" $
       runAssignment "A"
         (symbol Green *> children red `catchError` const blue)
