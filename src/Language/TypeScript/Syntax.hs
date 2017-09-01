@@ -196,7 +196,7 @@ data Intersection a = Intersection { intersectionLeft :: !a, intersectionRight :
 instance Eq1 Intersection where liftEq = genericLiftEq
 instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
 
-data PublicFieldDefinition a = PublicFieldDefinition { publicFieldPropertyName :: !a, publicFieldValue :: !a }
+data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
@@ -810,7 +810,7 @@ literal =
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
 
 class' :: Assignment
-class' = makeClass <$> symbol Class <*> children ((,,,) <$> expression <*> (many typeParameter' <|> pure []) <*> classHeritage' <*> classBodyStatements)
+class' = makeClass <$> symbol Class <*> children ((,,,) <$> expression <*> (many typeParameter' <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
   where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
 
 object :: Assignment
@@ -867,7 +867,7 @@ readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ source)
 methodDefinition :: Assignment
 methodDefinition = makeMethod <$>
   symbol MethodDefinition
-  <*> children ((,,,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> emptyTerm <*> emptyTerm <*> callSignatureParts <*> statementBlock)
+  <*> children ((,,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> emptyTerm <*> propertyName <*> callSignatureParts <*> (statementBlock <|> emptyTerm))
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
@@ -986,7 +986,8 @@ classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 classBodyStatements = symbol ClassBody *> children (many (methodDefinition <|> publicFieldDefinition))
 
 publicFieldDefinition :: Assignment
-publicFieldDefinition = makeTerm <$> symbol Grammar.PublicFieldDefinition <*> (Language.TypeScript.Syntax.PublicFieldDefinition <$> propertyName <*> (expression <|> emptyTerm))
+publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
+  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Language.TypeScript.Syntax.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
 
 
 statement :: Assignment
@@ -1099,7 +1100,7 @@ extendsClause :: Assignment
 extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many ty)
 
 ambientDeclaration :: Assignment
-ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> (declaration <|> statementBlock))
+ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> choice [declaration, statementBlock])
 
 exportStatement :: Assignment
 exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> ((pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')) <|> ((\a b -> [a, b]) <$> exportClause <*> fromClause)))
