@@ -55,7 +55,7 @@ handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pur
 
 -- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-parseError = makeTerm <$> Assignment.symbol maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] Nothing []) <* Assignment.source
+parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.

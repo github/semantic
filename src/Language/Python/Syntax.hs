@@ -15,7 +15,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
+import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, parseError, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -108,7 +108,7 @@ instance Pretty1 Redirect where liftPretty = genericLiftPretty
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
+assignment = makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError everything)
@@ -124,6 +124,7 @@ expression = term (handleError everything)
           , breakStatement
           , call
           , classDefinition
+          , comment
           , comparisonOperator
           , comprehension
           , concatenatedString
@@ -160,6 +161,7 @@ expression = term (handleError everything)
           , pair
           , parameter
           , parenthesizedExpression
+          , parseError
           , passStatement
           , printStatement
           , raiseStatement

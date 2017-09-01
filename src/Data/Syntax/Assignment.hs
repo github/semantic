@@ -179,6 +179,7 @@ children child = tracing (Children child) `Then` return
 advance :: HasCallStack => Assignment ast grammar ()
 advance = tracing Advance `Then` return
 
+-- | Construct a committed choice table from a list of alternatives. Use this to efficiently select between long lists of rules.
 choice :: (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
 choice [] = empty
 choice alternatives

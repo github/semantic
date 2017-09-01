@@ -8,13 +8,9 @@
     (Identifier)
     (Identifier)
     (Empty))+}
-{+(Context
-    (Comment)
-    (Empty))+}
-{-(Context
-    (Comment)
-    (Call
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Empty)))-})
+  (Comment)
+{-(Call
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (Empty))-})
