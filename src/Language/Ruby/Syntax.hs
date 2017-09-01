@@ -316,7 +316,7 @@ begin :: Assignment
 begin = makeTerm <$> symbol Begin <*> children (Statement.Try <$> expressions <*> many rescue)
 
 assignment' :: Assignment
-assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.Assignment <$> lhs <*> rhs)
+assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.Assignment [] <$> lhs <*> rhs)
           <|> makeTerm' <$> symbol OperatorAssignment <*> children (infixTerm lhs expression
                 [ assign Expression.Plus      <$ symbol AnonPlusEqual
                 , assign Expression.Minus     <$ symbol AnonMinusEqual
@@ -334,7 +334,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
                 ])
   where
     assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
-    assign c l r = inj (Statement.Assignment l (makeTerm1 (c l r)))
+    assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr

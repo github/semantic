@@ -169,6 +169,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.Update
   , Language.TypeScript.Syntax.Await
   , Language.TypeScript.Syntax.PublicFieldDefinition
+  , Language.TypeScript.Syntax.VariableDeclaration
   , Type.Visibility
   , []
   ]
@@ -628,6 +629,12 @@ data RestParameter a = RestParameter { restParameterContext :: ![a], restParamet
 instance Eq1 RestParameter where liftEq = genericLiftEq
 instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
 
+data VariableDeclaration a = VariableDeclaration { variableDeclarations :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 VariableDeclaration where liftEq = genericLiftEq
+instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
+
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement)
@@ -694,10 +701,10 @@ assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (i
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
-        assign c l r = inj (Statement.Assignment l (makeTerm1 (c l r)))
+        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 augmentedAssignmentExpression :: Assignment
-augmentedAssignmentExpression = makeTerm <$> symbol AugmentedAssignmentExpression <*> children (Statement.Assignment <$> (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
+augmentedAssignmentExpression = makeTerm <$> symbol AugmentedAssignmentExpression <*> children (Statement.Assignment [] <$> (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
 
 awaitExpression :: Assignment
 awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Language.TypeScript.Syntax.Await <$> expression)
@@ -849,7 +856,7 @@ accessibilityModifier' :: Assignment
 accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (Syntax.Identifier <$> source)
 
 destructuringPattern :: Assignment
-destructuringPattern = makeTerm <$> symbol ObjectPattern <*> (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
+destructuringPattern = makeTerm <$> symbol ObjectPattern <*> children (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
 
 spreadElement :: Assignment
 spreadElement = symbol SpreadElement *> children expression
@@ -1082,7 +1089,7 @@ enumDeclaration :: Assignment
 enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Language.TypeScript.Syntax.EnumDeclaration <$> identifier <*> many (propertyName <|> enumAssignment))
 
 enumAssignment :: Assignment
-enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statement.Assignment <$> propertyName <*> expression)
+enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statement.Assignment [] <$> propertyName <*> expression)
 
 interfaceDeclaration :: Assignment
 interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> (extendsClause <|> emptyTerm) <*> objectType)
@@ -1114,14 +1121,14 @@ propertyName :: Assignment
 propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)) <|> string <|> number
 
 assignmentPattern :: Assignment
-assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Statement.Assignment <$> shorthandPropertyIdentifier <*> expression)
+assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Statement.Assignment [] <$> shorthandPropertyIdentifier <*> expression)
 
 shorthandPropertyIdentifier :: Assignment
 shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (Language.TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment
 requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeRequiredParameter loc (modifier, identifier, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.RequiredParameter [modifier, annotation] (makeTerm loc (Statement.Assignment identifier initializer)))
+  where makeRequiredParameter loc (modifier, identifier, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.RequiredParameter [modifier, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
 
 restParameter :: Assignment
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> identifier <*> (typeAnnotation' <|> emptyTerm))
@@ -1129,7 +1136,7 @@ restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children 
 
 optionalParameter :: Assignment
 optionalParameter = makeOptionalParam <$> symbol Grammar.OptionalParameter <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeOptionalParam loc (modifier, subject, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.OptionalParameter [modifier, annotation] (makeTerm loc (Statement.Assignment subject initializer)))
+  where makeOptionalParam loc (modifier, subject, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.OptionalParameter [modifier, annotation] (makeTerm loc (Statement.Assignment [] subject initializer)))
 
 internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (Language.TypeScript.Syntax.InternalModule <$> (string <|> identifier <|> nestedIdentifier) <*> statements)
@@ -1158,10 +1165,11 @@ forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expression <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
 
 variableDeclaration :: Assignment
-variableDeclaration = makeTerm <$> (symbol VariableDeclaration <|> symbol LexicalDeclaration) <*> children (many variableDeclarator)
+variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol LexicalDeclaration) <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many variableDeclarator)
 
 variableDeclarator :: Assignment
-variableDeclarator = makeTerm <$> (symbol VariableDeclarator) <*> children (Statement.Assignment <$> (identifier <|> destructuringPattern) <*> (expression <|> emptyTerm))
+variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
+  where makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
 
 parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children (expression <|> sequenceExpression)

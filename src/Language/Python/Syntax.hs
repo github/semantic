@@ -197,18 +197,18 @@ dictionarySplat :: Assignment
 dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier <$> source)
 
 keywordArgument :: Assignment
-keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment <$> expression <*> expression)
+keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment [] <$> expression <*> expression)
 
 parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 parameter :: Assignment
-parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment <$> expression <*> expression)
+parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment [] <$> expression <*> expression)
          <|> makeTerm <$> symbol TypedParameter <*> children (Type.Annotation <$> expression <*> type')
          <|> makeAnnotation <$> symbol TypedDefaultParameter <*> children ((,,) <$> expression <*> expression <*> expression)
   where
     makeAnnotation loc (identifier', type', value') = makeTerm loc (Type.Annotation (makeAssignment loc identifier' value') type')
-    makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment identifier' value')
+    makeAssignment loc identifier' value' = makeTerm loc (Statement.Assignment [] identifier' value')
 
 decoratedDefinition :: Assignment
 decoratedDefinition = symbol DecoratedDefinition *> children (term decorator)
@@ -330,7 +330,7 @@ booleanOperator = makeTerm' <$> symbol BooleanOperator <*> children (infixTerm e
   ])
 
 assignment' :: Assignment
-assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignment <$> expressionList <*> rvalue)
+assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignment [] <$> expressionList <*> rvalue)
            <|> makeTerm' <$> symbol AugmentedAssignment <*> children (infixTerm expressionList rvalue
                   [ assign Expression.Plus      <$ symbol AnonPlusEqual
                   , assign Expression.Minus     <$ symbol AnonMinusEqual
@@ -347,7 +347,7 @@ assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignmen
                   ])
   where rvalue = expressionList <|> assignment' <|> yield
         assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
-        assign c l r = inj (Statement.Assignment l (makeTerm1 (c l r)))
+        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children ( expression <|> emptyTerm ))

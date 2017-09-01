@@ -54,7 +54,7 @@ instance Pretty1 Let where liftPretty = genericLiftPretty
 -- Assignment
 
 -- | Assignment to a variable or other lvalue.
-data Assignment a = Assignment { assignmentTarget :: !a, assignmentValue :: !a }
+data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Assignment where liftEq = genericLiftEq
