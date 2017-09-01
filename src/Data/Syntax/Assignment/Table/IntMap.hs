@@ -1,8 +1,15 @@
-module Data.Syntax.Assignment.Table.IntMap where
+module Data.Syntax.Assignment.Table.IntMap
+( Table(tableAddresses)
+, singleton
+, fromListWith
+, toList
+, lookup
+) where
 
 import Data.Bifunctor (first)
 import Data.Functor.Classes
 import qualified Data.IntMap as IntMap
+import Prelude hiding (lookup)
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: IntMap.IntMap a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
