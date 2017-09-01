@@ -161,6 +161,13 @@ spec = do
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
 
+    it "doesn’t catch unexpected end of branch" $
+      fst <$> runAssignment "A"
+        (red `catchError` \ _ -> OutError <$ location <*> source)
+        (makeState [])
+        `shouldBe`
+          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
+
     it "can error inside the handler" $
       runAssignment "A"
         (symbol Green *> children red `catchError` const blue)
