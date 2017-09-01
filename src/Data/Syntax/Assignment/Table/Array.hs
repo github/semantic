@@ -1,4 +1,6 @@
-module Data.Syntax.Assignment.Table.Array where
+module Data.Syntax.Assignment.Table.Array
+( Table(tableAddresses)
+) where
 
 import Data.Array
 
