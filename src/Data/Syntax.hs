@@ -50,7 +50,7 @@ emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assig
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< fs, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq (ast (Assignment.AST ast grammar)), Ix grammar, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.

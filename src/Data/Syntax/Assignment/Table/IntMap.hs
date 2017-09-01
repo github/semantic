@@ -1,6 +1,5 @@
 module Data.Syntax.Assignment.Table.IntMap
-( Table
-, tableAddresses
+( Table(tableAddresses)
 , singleton
 , fromListWith
 , toList
@@ -13,20 +12,15 @@ import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import Prelude hiding (lookup)
 
-data Table i a = Table { tableAddressSet :: IntSet.IntSet, tableBranches :: IntMap.IntMap a }
+data Table i a = Table { tableAddresses :: [i], tableBranches :: IntMap.IntMap a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
-
-tableAddresses :: Enum i => Table i a -> [i]
-tableAddresses = fmap toEnum . IntSet.toList . tableAddressSet
 
 
 singleton :: Enum i => i -> a -> Table i a
-singleton i a = Table (IntSet.singleton i') (IntMap.singleton i' a)
-  where i' = fromEnum i
+singleton i a = Table [i] (IntMap.singleton (fromEnum i) a)
 
-fromListWith :: Enum i => (a -> a -> a) -> [(i, a)] -> Table i a
-fromListWith with assocs = Table (IntSet.fromList (fst <$> assocs')) (IntMap.fromListWith with assocs')
-  where assocs' = first fromEnum <$> assocs
+fromListWith :: (Enum i, Ord i) => (a -> a -> a) -> [(i, a)] -> Table i a
+fromListWith with assocs = Table (fmap toEnum (IntSet.toList (IntSet.fromList (fromEnum . fst <$> assocs)))) (IntMap.fromListWith with (first fromEnum <$> assocs))
 
 toList :: Enum i => Table i a -> [(i, a)]
 toList Table{..} = first toEnum <$> IntMap.toList tableBranches
