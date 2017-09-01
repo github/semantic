@@ -149,7 +149,7 @@ spec = do
   describe "catchError" $ do
     it "applies its handler to failed committed choices" $
       fst <$> runAssignment "A"
-        ((symbol Green *> children red) `catchError` (\ _ -> OutError <$ location <*> source))
+        (symbol Green *> children red `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [node Green 0 1 []])
         `shouldBe`
           Right (OutError "A")
