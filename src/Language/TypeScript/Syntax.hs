@@ -938,7 +938,7 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
 classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classBodyStatements = symbol ClassBody *> children (many (methodDefinition <|> publicFieldDefinition <|> comment))
+classBodyStatements = symbol ClassBody *> children (many (methodDefinition <|> publicFieldDefinition))
 
 publicFieldDefinition :: Assignment
 publicFieldDefinition = makeTerm <$> symbol Grammar.PublicFieldDefinition <*> (Language.TypeScript.Syntax.PublicFieldDefinition <$> propertyName <*> (expression <|> emptyTerm))
