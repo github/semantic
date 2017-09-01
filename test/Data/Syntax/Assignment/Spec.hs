@@ -162,7 +162,7 @@ spec = do
           Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
 
     it "doesn’t catch unexpected end of branch" $
-      fst <$> runAssignment "A"
+      fst <$> runAssignment ""
         (red `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [])
         `shouldBe`
