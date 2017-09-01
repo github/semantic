@@ -161,12 +161,12 @@ spec = do
         `shouldBe`
           Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
 
-    it "handler that doesn't match produces error" $
+    it "can error inside the handler" $
       runAssignment "A"
-        (red `catchError` const blue)
+        (symbol Green *> children red `catchError` const blue)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
+          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
 
     describe "in many" $ do
       it "handler that always matches" $
