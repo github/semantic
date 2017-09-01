@@ -36,5 +36,9 @@ lookup :: Enum i => i -> Table i a -> Maybe a
 lookup i = IntMap.lookup (fromEnum i) . tableBranches
 
 
+instance (Enum i, Monoid a) => Monoid (Table i a) where
+  mempty = Table mempty mempty
+  mappend (Table i1 b1) (Table i2 b2) = Table (i1 `mappend` i2) (IntMap.unionWith mappend b1 b2)
+
 instance (Enum i, Show i) => Show1 (Table i) where
   liftShowsPrec spA slA d t = showsBinaryWith showsPrec (const (liftShowList spA slA)) "Table" d (tableAddresses t) (toList t)
