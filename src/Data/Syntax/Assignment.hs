@@ -238,7 +238,7 @@ nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (E
 nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 
-firstSet :: Assignment ast grammar a -> [grammar]
+firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
   Choose table _ _ -> Table.tableAddresses table
   Catch during _ -> firstSet during
