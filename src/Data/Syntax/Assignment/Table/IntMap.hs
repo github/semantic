@@ -9,7 +9,7 @@ module Data.Syntax.Assignment.Table.IntMap
 import Data.Bifunctor (first)
 import Data.Functor.Classes
 import qualified Data.IntMap as IntMap
-import Data.List (nub)
+import qualified Data.Set as Set
 import Prelude hiding (lookup)
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: IntMap.IntMap a }
@@ -19,8 +19,8 @@ data Table i a = Table { tableAddresses :: [i], tableBranches :: IntMap.IntMap a
 singleton :: Enum i => i -> a -> Table i a
 singleton i a = Table [i] (IntMap.singleton (fromEnum i) a)
 
-fromListWith :: (Enum i, Eq i) => (a -> a -> a) -> [(i, a)] -> Table i a
-fromListWith with assocs = Table (nub (fst <$> assocs)) (IntMap.fromListWith with (first fromEnum <$> assocs))
+fromListWith :: (Enum i, Ord i) => (a -> a -> a) -> [(i, a)] -> Table i a
+fromListWith with assocs = Table (Set.toList (Set.fromList (fst <$> assocs))) (IntMap.fromListWith with (first fromEnum <$> assocs))
 
 toList :: Enum i => Table i a -> [(i, a)]
 toList Table{..} = first toEnum <$> IntMap.toList tableBranches
