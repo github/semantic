@@ -122,7 +122,6 @@ expression = term (handleError everything)
           , breakStatement
           , call
           , classDefinition
-          , comment
           , comparisonOperator
           , comprehension
           , concatenatedString
