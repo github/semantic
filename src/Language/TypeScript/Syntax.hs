@@ -12,7 +12,6 @@ import Algorithm
 import GHC.Generics
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Foldable (asum)
 import Data.ByteString (ByteString)
 import Data.Align.Generic
 import Data.Maybe (fromMaybe)
@@ -32,8 +31,7 @@ import Data.Union
 import GHC.Stack
 import Language.TypeScript.Grammar as Grammar
 import qualified Term
-import Data.List.Split (chunksOf)
-import Data.List.NonEmpty (NonEmpty(..))
+import Data.List.NonEmpty (some1)
 import Data.Function (on)
 import Data.Foldable (toList)
 
@@ -632,15 +630,55 @@ instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement)
+assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement)
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 expression :: Assignment
-expression = handleError (term everything)
-  where everything = asum . fmap asum $ chunksOf 4 [typeAssertion, asExpression, nonNullExpression', importAlias', internalModule, super, abstractClass, object, array, jsxElement, jsxSelfClosingElement, class', anonymousClass, function, arrowFunction, assignmentExpression, augmentedAssignmentExpression, awaitExpression, unaryExpression, binaryExpression, ternaryExpression, updateExpression, callExpression, memberExpression, newExpression, parenthesizedExpression, subscriptExpression, yieldExpression, thisExpression, number, string, templateString, regex, true, false, null', undefined', identifier]
+expression = everything
+  where
+    everything = choice [
+      typeAssertion,
+      asExpression,
+      nonNullExpression',
+      importAlias',
+      internalModule,
+      super,
+      abstractClass,
+      object,
+      array,
+      jsxElement,
+      jsxSelfClosingElement,
+      class',
+      anonymousClass,
+      function,
+      arrowFunction,
+      assignmentExpression,
+      augmentedAssignmentExpression,
+      awaitExpression,
+      unaryExpression,
+      binaryExpression,
+      ternaryExpression,
+      updateExpression,
+      callExpression,
+      memberExpression,
+      newExpression,
+      parenthesizedExpression,
+      subscriptExpression,
+      yieldExpression,
+      thisExpression,
+      number,
+      string,
+      templateString,
+      regex,
+      true,
+      false,
+      null',
+      undefined',
+      identifier
+      ]
 
 undefined' :: Assignment
 undefined' = makeTerm <$> symbol Grammar.Undefined <*> (Language.TypeScript.Syntax.Undefined <$ source)
@@ -945,17 +983,17 @@ publicFieldDefinition = makeTerm <$> symbol Grammar.PublicFieldDefinition <*> (L
 
 
 statement :: Assignment
-statement = handleError $ (term everything)
+statement = term (handleError everything)
   where
-  everything = foldr1 (<|>) . fmap (foldr1 (<|>)) $ chunksOf 4 [
-    exportStatement
-    , importStatement
-    , debuggerStatement
-    , expressionStatement'
-    , returnStatement
-    , throwStatement
-    , emptyStatement
-    , labeledStatement ]
+    everything = choice [
+      exportStatement
+      , importStatement
+      , debuggerStatement
+      , expressionStatement'
+      , returnStatement
+      , throwStatement
+      , emptyStatement
+      , labeledStatement ]
 
 forOfStatement :: Assignment
 forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (Language.TypeScript.Syntax.ForOf <$> expression <*> expression <*> statement)
@@ -985,7 +1023,7 @@ labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (Language.TypeScript.Syntax.LabeledStatement <$> (symbol StatementIdentifier *> children identifier) <*> statement)
 
 importStatement :: Assignment
-importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Language.TypeScript.Syntax.Import <$> (((\a b -> a : b : []) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
+importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Language.TypeScript.Syntax.Import <$> (((\a b -> [a, b]) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
 
 importClause :: Assignment
 importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (Language.TypeScript.Syntax.ImportClause <$> ((pure <$> (namespaceImport <|> namedImports)) <|> ((\a b -> [a, b]) <$> identifier <*> (namespaceImport <|> namedImports))))
@@ -1006,8 +1044,22 @@ expressionStatement' :: Assignment
 expressionStatement' = makeTerm <$> symbol Grammar.ExpressionStatement <*> children (Language.TypeScript.Syntax.ExpressionStatement <$> (expression <|> sequenceExpression))
 
 declaration :: Assignment
-declaration = handleError $ term everything
-  where everything = asum . fmap asum $ chunksOf 4 [ exportStatement, importAlias', function, internalModule, ambientFunction, class', module', variableDeclaration, typeAliasDeclaration, enumDeclaration, interfaceDeclaration, ambientDeclaration ]
+declaration = everything
+  where
+    everything = choice [
+      exportStatement,
+      importAlias',
+      function,
+      internalModule,
+      ambientFunction,
+      class',
+      module',
+      variableDeclaration,
+      typeAliasDeclaration,
+      enumDeclaration,
+      interfaceDeclaration,
+      ambientDeclaration
+      ]
 
 typeAliasDeclaration :: Assignment
 typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> ty)
