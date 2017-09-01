@@ -10,7 +10,7 @@ import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
-import Data.Syntax (contextualize, postContextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -83,7 +83,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
+assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError everything)
@@ -120,6 +120,7 @@ expression = term (handleError everything)
       , module'
       , pair
       , parenthesized_expressions
+      , parseError
       , rescue
       , scopeResolution
       , singletonClass
