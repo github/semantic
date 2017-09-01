@@ -182,16 +182,16 @@ choice :: (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, HasCallStack) =
 choice [] = empty
 choice alternatives
   | null choices = asum alternatives
-  | otherwise    = tracing (Choose (Table.fromListWith (<|>) choices) (wrap . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` return
+  | otherwise    = tracing (Choose choices (wrap . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` return
   where (choices, atEnd, handlers) = foldMap toChoices alternatives
-        toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([(grammar, Assignment ast grammar a)], [Assignment ast grammar a], [Error (Either String grammar) -> Assignment ast grammar a])
+        toChoices :: (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Assignment ast grammar a -> (Table.Table grammar (Assignment ast grammar a), [Assignment ast grammar a], [Error (Either String grammar) -> Assignment ast grammar a])
         toChoices rule = case rule of
-          Tracing _ (Choose t a h) `Then` continue -> (Table.toList (fmap (>>= continue) t), toList ((>>= continue) <$> a), toList ((continue <=<) <$> h))
-          Tracing _ (Many  child)   `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
-          Tracing _ (Catch child _) `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
-          Tracing _ (Label child _) `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
+          Tracing _ (Choose t a h) `Then` continue -> (fmap (>>= continue) t, toList ((>>= continue) <$> a), toList ((continue <=<) <$> h))
+          Tracing _ (Many  child)   `Then` _ -> let (t, _, _) = toChoices child in (rule <$ t, [rule], [])
+          Tracing _ (Catch child _) `Then` _ -> let (t, _, _) = toChoices child in (rule <$ t, [rule], [])
+          Tracing _ (Label child _) `Then` _ -> let (t, _, _) = toChoices child in (rule <$ t, [rule], [])
           Tracing _ (Alt as) `Then` continue -> foldMap (toChoices . continue) as
-          _ -> ([], [rule], [])
+          _ -> (mempty, [rule], [])
 
         mergeHandlers [] = Nothing
         mergeHandlers hs = Just (\ err -> asum (hs <*> [err]))
