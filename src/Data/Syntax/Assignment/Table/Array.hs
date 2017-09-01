@@ -2,11 +2,11 @@ module Data.Syntax.Assignment.Table.Array
 ( Table(tableAddresses)
 , singleton
 , fromListWith
+, toList
 ) where
 
 import Control.Arrow ((&&&))
 import Data.Array
-import Data.Foldable (toList)
 import Data.Functor.Classes
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Semigroup (Max(..), Min(..), sconcat)
@@ -25,6 +25,9 @@ fromListWith with assocs@(a:as) = Table (fst <$> assocs) (accumArray merge Nothi
         merge Nothing b = Just b
         merge (Just a) b = Just (with a b)
 
+toList :: Ix i => Table i a -> [(i, a)]
+toList Table{..} = tableAddresses >>= \ addr -> maybe [] (pure . (,) addr) (tableBranches ! addr)
+
 
 instance (Ix i, Show i) => Show1 (Table i) where
-  liftShowsPrec spA slA d Table{..} = showsBinaryWith showsPrec (const (liftShowList spA slA)) "Table" d tableAddresses (tableAddresses >>= \ addr -> (,) addr <$> toList (tableBranches ! addr))
+  liftShowsPrec spA slA d t = showsBinaryWith showsPrec (const (liftShowList spA slA)) "Table" d (tableAddresses t) (toList t)
