@@ -154,12 +154,12 @@ spec = do
         `shouldBe`
           Right (OutError "A")
 
-    it "handler that matches" $
+    it "doesn’t catch uncommitted choices" $
       fst <$> runAssignment "A"
-        (red `catchError` const green)
+        (red `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Right (Out "A")
+          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
 
     it "handler that doesn't match produces error" $
       runAssignment "A"
