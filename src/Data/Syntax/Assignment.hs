@@ -232,8 +232,6 @@ data Node grammar = Node
   }
   deriving (Eq, Show)
 
-type Result grammar = Either (Error (Either String grammar))
-
 nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
@@ -259,20 +257,20 @@ assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment 
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
 runAssignment :: forall grammar a ast. (Enum grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
-              => Source.Source                         -- ^ The source for the parse tree.
-              -> Assignment ast grammar a              -- ^ The 'Assignment' to run.
-              -> State ast grammar                     -- ^ The current state.
-              -> Result grammar (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
+              => Source.Source                                                 -- ^ The source for the parse tree.
+              -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
+              -> State ast grammar                                             -- ^ The current state.
+              -> Either (Error (Either String grammar)) (a, State ast grammar) -- ^ 'Either' an 'Error' or an assigned value & updated state.
 runAssignment source = \ assignment state -> go assignment state >>= requireExhaustive (assignmentCallSite assignment)
   -- Note: We explicitly bind source above in order to ensure that the where clause can close over them; they don’t change through the course of the run, so holding one reference is sufficient. On the other hand, we don’t want to accidentally capture the assignment and state in the where clause, since they change at every step—and capturing when you meant to shadow is an easy mistake to make, & results in hard-to-debug errors. Binding them in a lambda avoids that problem while also being easier to follow than a pointfree definition.
-  where go :: Assignment ast grammar result -> State ast grammar -> Result grammar (result, State ast grammar)
+  where go :: Assignment ast grammar result -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar)
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
         run :: Tracing (AssignmentF ast grammar) x
-            -> (x -> State ast grammar -> Result grammar (result, State ast grammar))
+            -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
             -> State ast grammar
-            -> Result grammar (result, State ast grammar)
+            -> Either (Error (Either String grammar)) (result, State ast grammar)
         run t yield initialState = expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (node :< f) = case runTracing t of
                   Location -> yield (nodeLocation node) state
@@ -299,7 +297,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                 expectedSymbols = firstSet (t `Then` return)
                 makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
-requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Result grammar (result, State ast grammar)
+requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
 requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
   [] -> Right (a, state')
   (node :< _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
