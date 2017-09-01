@@ -163,7 +163,7 @@ currentNode :: HasCallStack => Assignment ast grammar (CofreeF.CofreeF ast (Node
 currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
-symbol :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` return
 
 -- | A rule to produce a node’s source as a ByteString.
@@ -178,7 +178,7 @@ children child = tracing (Children child) `Then` return
 advance :: HasCallStack => Assignment ast grammar ()
 advance = tracing Advance `Then` return
 
-choice :: (Bounded grammar, Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
+choice :: (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
 choice [] = empty
 choice alternatives
   | null choices = asum alternatives
@@ -197,7 +197,7 @@ choice alternatives
         mergeHandlers hs = Just (\ err -> asum (hs <*> [err]))
 
 -- | Match and advance past a node with the given symbol.
-token :: (Bounded grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+token :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 token s = symbol s <* advance
 
 
@@ -247,7 +247,7 @@ firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+assign :: (Enum grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
        => Source.Source             -- ^ The source for the parse tree.
        -> Assignment ast grammar a  -- ^ The 'Assignment to run.
        -> AST ast grammar           -- ^ The root of the ast.
@@ -256,7 +256,7 @@ assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment 
 {-# INLINE assign #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+runAssignment :: forall grammar a ast. (Enum grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
               => Source.Source                                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
               -> State ast grammar                                             -- ^ The current state.
@@ -333,7 +333,7 @@ makeState = State 0 (Info.Pos 1 1) []
 
 -- Instances
 
-instance (Bounded grammar, Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (Assignment ast grammar) where
+instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = tracing (Alt []) `Then` return
 
@@ -366,7 +366,7 @@ instance (Bounded grammar, Enum grammar, Eq (ast (AST ast grammar)), Ix grammar)
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = tracing (Many a) `Then` return
 
-instance (Bounded grammar, Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
+instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -393,7 +393,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
 instance Show1 f => Show1 (Tracing f) where
   liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
 
-instance (Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
+instance (Enum grammar, Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
