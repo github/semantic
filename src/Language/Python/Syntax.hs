@@ -15,7 +15,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
+import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, parseError, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -159,6 +159,7 @@ expression = term (handleError everything)
           , pair
           , parameter
           , parenthesizedExpression
+          , parseError
           , passStatement
           , printStatement
           , raiseStatement
