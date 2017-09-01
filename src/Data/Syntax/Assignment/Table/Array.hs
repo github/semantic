@@ -10,4 +10,4 @@ data Table i a = Table { tableAddresses :: [i], tableBranches :: Array i (Maybe 
 
 
 instance (Ix i, Show i) => Show1 (Table i) where
-  liftShowsPrec spA slA d Table{..} = showsBinaryWith showsPrec (const (liftShowList spA slA)) "Table" d tableAddresses (assocs tableBranches >>= \ (sym, a) -> (,) sym <$> toList a)
+  liftShowsPrec spA slA d Table{..} = showsBinaryWith showsPrec (const (liftShowList spA slA)) "Table" d tableAddresses (tableAddresses >>= \ addr -> (,) addr <$> toList (tableBranches ! addr))
