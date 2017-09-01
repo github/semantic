@@ -138,8 +138,6 @@ data AssignmentF ast grammar a where
   Choose :: Table.Table grammar (Assignment ast grammar a) -> Maybe (Assignment ast grammar a) -> Maybe (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
   Many :: Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: [a] -> AssignmentF ast grammar a
-  Throw :: Error (Either String grammar) -> AssignmentF ast grammar a
-  Catch :: Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
   Label :: Assignment ast grammar a -> String -> AssignmentF ast grammar a
   Fail :: String -> AssignmentF ast grammar a
 
@@ -191,7 +189,6 @@ choice alternatives
         toChoices rule = case rule of
           Tracing _ (Choose t a h) `Then` continue -> (Table.toList (fmap (>>= continue) t), toList ((>>= continue) <$> a), toList ((continue <=<) <$> h))
           Tracing _ (Many  child)   `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
-          Tracing _ (Catch child _) `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
           Tracing _ (Label child _) `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
           Tracing _ (Alt as) `Then` continue -> foldMap (toChoices . continue) as
           _ -> ([], [rule], [])
@@ -244,7 +241,6 @@ nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
   Choose table _ _ -> Table.tableAddresses table
-  Catch during _ -> firstSet during
   Label child _ -> firstSet child
   _ -> []) . ([] <$)
 
@@ -284,7 +280,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
                   Advance -> yield () (advanceState state)
                   Choose choices _ handler | Just choice <- Table.lookup (nodeSymbol node) choices -> (go choice state `catchError` (maybe throwError (flip go state .) handler)) >>= uncurry yield
-                  Catch during handler -> go during state `catchError` (flip go state . handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
                 anywhere node = case runTracing t of
@@ -292,8 +287,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
-                  Throw e -> Left e
-                  Catch during _ -> go during state >>= uncurry yield
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
                   Fail s -> throwError ((makeError node) { errorActual = Just (Left s) })
                   Choose _ (Just atEnd) _ | Nothing <- node -> go atEnd state >>= uncurry yield
@@ -356,7 +349,6 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (
           go callSiteL la continueL callSiteR ra continueR = case (la, ra) of
             (Alt [], _) -> r
             (_, Alt []) -> l
-            (Throw _, _) -> l
             (Fail _, _) -> r
             (Children cl, Children cr) -> alternate (Children (Left <$> cl <|> Right <$> cr))
             (Location, Location) -> distribute Location
@@ -398,13 +390,15 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Sh
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
   notFollowedBy a = a *> unexpected (show a) <|> pure ()
 
-instance MonadError (Error (Either String grammar)) (Assignment ast grammar) where
+instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
-  throwError error = tracing (Throw error) `Then` return
+  throwError err = fail (show err)
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
-  catchError (Tracing cs (Choose choices atEnd Nothing) `Then` continue) handler = (Tracing cs (Choose ((>>= continue) <$> choices) ((>>= continue) <$> atEnd) (Just handler)) `Then` return)
-  catchError during handler = tracing (Catch during handler) `Then` return
+  catchError rule handler = iterFreer (\ (Tracing cs assignment) continue -> case assignment of
+    Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` return
+    Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` return
+    _ -> Tracing cs assignment `Then` continue) (fmap pure rule)
 
 instance Show1 f => Show1 (Tracing f) where
   liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
@@ -420,8 +414,6 @@ instance (Enum grammar, Ix grammar, Show grammar, Show (ast (AST ast grammar))) 
     Choose choices atEnd _ -> showsBinaryWith (liftShowsPrec showChild showChildren) (liftShowsPrec showChild showChildren) "Choose" d choices atEnd
     Many a -> showsUnaryWith (liftShowsPrec (\ d a -> sp d [a]) (sl . pure)) "Many" d a
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
-    Throw e -> showsUnaryWith showsPrec "Throw" d e
-    Catch during handler -> showsBinaryWith (liftShowsPrec sp sl) (const (const (showChar '_'))) "Catch" d during handler
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
     Fail s -> showsUnaryWith showsPrec "Fail" d s
     where showChild = liftShowsPrec sp sl
