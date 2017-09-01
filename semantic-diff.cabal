@@ -36,6 +36,7 @@ library
                      , Data.Syntax.Assignment
                      , Data.Syntax.Assignment.Table
                      , Data.Syntax.Assignment.Table.Array
+                     , Data.Syntax.Assignment.Table.IntMap
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
