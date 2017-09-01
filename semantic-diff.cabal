@@ -35,6 +35,7 @@ library
                      , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
                      , Data.Syntax.Assignment.Table
+                     , Data.Syntax.Assignment.Table.Array
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
