@@ -34,7 +34,8 @@ import Language.TypeScript.Grammar as Grammar
 import qualified Term
 import Data.List.Split (chunksOf)
 import Data.List.NonEmpty (NonEmpty(..))
-
+import Data.Function (on)
+import Data.Foldable (toList)
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -702,7 +703,7 @@ abstractClass :: Assignment
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> (Language.TypeScript.Syntax.AbstractClass <$> identifier <*> (typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classHeritage' = symbol Grammar.ClassHeritage *> children (((\a b -> a : b : []) <$> extendsClause' <*> implementsClause') <|> (pure <$> implementsClause'))
+classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional extendsClause' <*> optional implementsClause')
 
 extendsClause' :: Assignment
 extendsClause' = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many ty)
