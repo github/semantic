@@ -15,7 +15,7 @@ import GHC.Stack
 import Prelude hiding (lookup)
 
 data Table i a = Table { tableAddresses :: [i], tableBranches :: Array i (Maybe a) }
-  deriving (Foldable, Functor, Traversable)
+  deriving (Eq, Foldable, Functor, Show, Traversable)
 
 singleton :: Ix i => i -> a -> Table i a
 singleton i a = Table [i] (listArray (i, i) [Just a])
