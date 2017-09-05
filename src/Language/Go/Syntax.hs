@@ -62,6 +62,7 @@ expression = handleError
           <|> functionDeclaration
           <|> importDeclaration
           <|> importSpec
+          <|> typedIdentifier
           <|> literal
           <|> packageClause
           <|> parameterDeclaration
@@ -80,6 +81,11 @@ literal = identifier
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
+
+typedIdentifier :: Assignment
+typedIdentifier = mkTypedIdentifier <$> symbol Identifier <*> source <*> symbol TypeIdentifier <*> source
+  where
+    mkTypedIdentifier loc' identifier' loc'' identifier'' = makeTerm loc' (Type.Annotation (makeTerm loc' (Syntax.Identifier identifier')) (makeTerm loc'' (Syntax.Identifier identifier'')))
 
 identifier :: Assignment
 identifier =
