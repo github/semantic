@@ -291,7 +291,7 @@ subscript :: Assignment
 subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscript <$> expression <*> many expression)
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
 methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> expression <*> args <*> (block <|> emptyTerm))
