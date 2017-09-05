@@ -135,11 +135,11 @@ parameterDeclaration :: Assignment
 parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
 functionDeclaration :: Assignment
-functionDeclaration = makeTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> identifier <*> parameters <*> types <*> block)
+functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> identifier <*> parameters <*> types <*> block)
   where parameters = symbol Parameters *> children (many expression)
         block = symbol Block *> children expressions
         types = symbol Parameters *> children expressions <|> identifier <|> emptyTerm
-        makeTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
+        mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
 
 -- | Match a series of terms or comments until a delimiter is matched
 manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
