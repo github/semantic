@@ -133,5 +133,6 @@ functionDeclaration = makeTerm <$> symbol FunctionDeclaration <*> children (Decl
   where parameters = symbol Parameters *> children (many expression)
         block = symbol Block *> children expressions
 
--- | Match a series of terms or comments until a delimiter is matchedmanyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+-- | Match a series of terms or comments until a delimiter is matched
+manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
