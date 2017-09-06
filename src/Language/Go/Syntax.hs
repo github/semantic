@@ -78,9 +78,11 @@ intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
 
 typedIdentifier :: Assignment
-typedIdentifier = mkTypedIdentifier <$> symbol Identifier <*> source <*> symbol TypeIdentifier <*> source
+typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types <*> source
   where
     mkTypedIdentifier loc' identifier' loc'' identifier'' = makeTerm loc' (Type.Annotation (makeTerm loc' (Syntax.Identifier identifier')) (makeTerm loc'' (Syntax.Identifier identifier'')))
+    types =  symbol TypeIdentifier
+         <|> symbol PointerType
 
 identifier :: Assignment
 identifier =
