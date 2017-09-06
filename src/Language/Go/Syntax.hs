@@ -59,6 +59,7 @@ expression = handleError
           <|> importSpec
           <|> typedIdentifier
           <|> literal
+          <|> methodDeclaration
           <|> packageClause
           <|> parameterDeclaration
 
@@ -142,6 +143,12 @@ functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration 
   where parameters = symbol Parameters *> children (many expression)
         types = symbol Parameters *> children expressions <|> emptyTerm
         mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
+
+methodDeclaration :: Assignment
+methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> typing <*> block)
+  where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many typedIdentifier))
+        receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children typedIdentifier)
+        mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method receiver' name' parameters' body')) type'')
 
 callExpression :: Assignment
 callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> identifier <*> pure [] <*> emptyTerm)
