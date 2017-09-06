@@ -85,6 +85,7 @@ typedIdentifier = mkTypedIdentifier <$> symbol Identifier <*> source <*> symbol 
 identifier :: Assignment
 identifier =
       mk Identifier
+  <|> mk FieldIdentifier
   <|> mk PackageIdentifier
   <|> mk TypeIdentifier
   <|> mk ParenthesizedType
