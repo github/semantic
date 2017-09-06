@@ -1164,7 +1164,7 @@ whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> statement)
 
 forStatement :: Assignment
-forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expression <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
+forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expressionStatement' <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
 
 variableDeclaration :: Assignment
 variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol LexicalDeclaration) <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many variableDeclarator)
