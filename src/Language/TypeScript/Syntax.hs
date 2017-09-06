@@ -706,8 +706,6 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
-augmentedAssignmentExpression :: Assignment
-augmentedAssignmentExpression = makeTerm <$> symbol AugmentedAssignmentExpression <*> children (Statement.Assignment [] <$> (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
 
 awaitExpression :: Assignment
 awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Language.TypeScript.Syntax.Await <$> expression)
@@ -887,7 +885,7 @@ indexSignature :: Assignment
 indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (Language.TypeScript.Syntax.IndexSignature <$> (identifier <|> typeAnnotation'))
 
 methodSignature :: Assignment
-methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> propertyName <*> callSignatureParts)
+methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> callSignatureParts)
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Language.TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
