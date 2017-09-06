@@ -811,7 +811,7 @@ literal =
   <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
 
 class' :: Assignment
-class' = makeClass <$> symbol Class <*> children ((,,,) <$> expression <*> (many typeParameter' <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+class' = makeClass <$> symbol Class <*> children ((,,,) <$> identifier <*> ((symbol TypeParameters *> children (many typeParameter')) <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
   where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
 
 object :: Assignment
