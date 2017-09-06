@@ -942,7 +942,7 @@ typePredicate :: Assignment
 typePredicate = makeTerm <$> symbol Grammar.TypePredicate <*> children (Language.TypeScript.Syntax.TypePredicate <$> identifier <*> ty)
 
 objectType :: Assignment
-objectType = makeTerm <$> symbol Grammar.ObjectType <*> children (Language.TypeScript.Syntax.ObjectType <$> some (exportStatement <|> propertySignature <|> callSignature <|> constructSignature <|> indexSignature <|> methodSignature))
+objectType = makeTerm <$> symbol Grammar.ObjectType <*> children (Language.TypeScript.Syntax.ObjectType <$> many (exportStatement <|> propertySignature <|> callSignature <|> constructSignature <|> indexSignature <|> methodSignature))
 
 arrayTy :: Assignment
 arrayTy = makeTerm <$> symbol Grammar.ArrayType <*> children (Language.TypeScript.Syntax.ArrayType <$> ty)
