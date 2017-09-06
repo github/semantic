@@ -898,7 +898,7 @@ typeAnnotation' :: Assignment
 typeAnnotation' = makeTerm <$> symbol TypeAnnotation <*> children (Language.TypeScript.Syntax.Annotation <$> ty)
 
 typeParameter' :: Assignment
-typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (Language.TypeScript.Syntax.TypeParameter <$> ty <*> (fromMaybe <$> emptyTerm <*> optional constraint))
+typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (Language.TypeScript.Syntax.TypeParameter <$> identifier <*> (constraint <|> emptyTerm))
 
 constraint :: Assignment
 constraint = makeTerm <$> symbol Grammar.Constraint <*> children (Language.TypeScript.Syntax.Constraint <$> ty)
