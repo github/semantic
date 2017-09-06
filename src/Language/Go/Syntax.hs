@@ -139,6 +139,7 @@ block = symbol Block *> children expressions
 functionDeclaration :: Assignment
 functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> typedIdentifier <*> parameters <*> types <*> block)
   where parameters = symbol Parameters *> children (many expression)
+        types = symbol Parameters *> children expressions <|> emptyTerm
         mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
 
 callExpression :: Assignment
