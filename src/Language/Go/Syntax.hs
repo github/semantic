@@ -83,6 +83,7 @@ typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types 
     mkTypedIdentifier loc' identifier' loc'' identifier'' = makeTerm loc' (Type.Annotation (makeTerm loc' (Syntax.Identifier identifier')) (makeTerm loc'' (Syntax.Identifier identifier'')))
     types =  symbol TypeIdentifier
          <|> symbol PointerType
+         <|> symbol ParenthesizedType
 
 identifier :: Assignment
 identifier =
