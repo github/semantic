@@ -1186,7 +1186,7 @@ subscriptExpression :: Assignment
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> expression <*> (pure <$> expression))
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> propertyName <*> expression)
 
 callExpression :: Assignment
 callExpression = makeCall <$> symbol CallExpression <*> children ((,,,) <$> (expression <|> super <|> function) <*> (typeArguments <|> pure []) <*> (arguments <|> (pure <$> templateString)) <*> emptyTerm)
