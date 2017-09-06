@@ -1192,7 +1192,7 @@ callExpression :: Assignment
 callExpression = makeCall <$> symbol CallExpression <*> children ((,,,) <$> (expression <|> super <|> function) <*> (typeArguments <|> pure []) <*> (arguments <|> (pure <$> templateString)) <*> emptyTerm)
   where makeCall loc (subject, typeArgs, args, body) = makeTerm loc (Expression.Call typeArgs subject args body)
         arguments = symbol Arguments *> children (many (expression <|> spreadElement))
-        typeArguments = symbol Grammar.TypeArguments *> children (many ty)
+        typeArguments = symbol Grammar.TypeArguments *> children (some ty)
 
 tryStatement :: Assignment
 tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> statementBlock <*> optional catchClause <*> optional finallyClause)
