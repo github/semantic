@@ -62,6 +62,7 @@ expression = handleError
           <|> methodDeclaration
           <|> packageClause
           <|> parameterDeclaration
+          <|> typeDeclaration
 
 identifiers :: Assignment
 identifiers = makeTerm <$> location <*> many identifier
@@ -95,13 +96,6 @@ identifier =
   <|> mk TypeIdentifier
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
-typing :: Assignment
-typing =
-      mk TypeIdentifier
-  <|> mk ParenthesizedType
-  <|> mk PointerType
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
-
 interpretedStringLiteral :: Assignment
 interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
 
@@ -116,6 +110,24 @@ importSpec = symbol ImportSpec *> children expressions
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+
+typeDeclaration :: Assignment
+typeDeclaration = symbol TypeDeclaration *> children typeSpecs
+
+typeSpecs :: Assignment
+typeSpecs = makeTerm <$> location <*> many typeSpec
+
+typeSpec :: Assignment
+typeSpec = makeTerm <$> symbol TypeSpec <*> children (Statement.Assignment <$> typing <*> typing)
+
+typing :: Assignment
+typing =
+      mk InterfaceType
+  <|> mk TypeIdentifier
+  <|> mk ParenthesizedType
+  <|> mk PointerType
+  <|> mk StructType
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 constVarDeclaration :: Assignment
 constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
