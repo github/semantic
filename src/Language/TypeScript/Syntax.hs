@@ -1104,7 +1104,7 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> choice [declaration, statementBlock])
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> ((pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')) <|> ((\a b -> [a, b]) <$> exportClause <*> fromClause)))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> exportClause <*> fromClause) <|> (pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias'))))
 
 fromClause :: Assignment
 fromClause = string
