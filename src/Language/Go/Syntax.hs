@@ -94,6 +94,7 @@ typing :: Assignment
 typing =
       mk TypeIdentifier
   <|> mk ParenthesizedType
+  <|> mk PointerType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 interpretedStringLiteral :: Assignment
