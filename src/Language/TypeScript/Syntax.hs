@@ -767,7 +767,7 @@ asExpression :: Assignment
 asExpression = makeTerm <$> symbol AsExpression <*> (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <|> templateString))
 
 templateString :: Assignment
-templateString = makeTerm <$> symbol TemplateString <*> (Literal.String <$> many templateSubstitution)
+templateString = makeTerm <$> symbol TemplateString <*> children (Literal.String <$> many templateSubstitution)
 
 templateSubstitution :: Assignment
 templateSubstitution = symbol TemplateSubstitution *> children expression
