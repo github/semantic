@@ -691,7 +691,10 @@ undefined' :: Assignment
 undefined' = makeTerm <$> symbol Grammar.Undefined <*> (Language.TypeScript.Syntax.Undefined <$ source)
 
 assignmentExpression :: Assignment
-assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
+assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
+
+augmentedAssignmentExpression :: Assignment
+augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
   assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Minus <$ symbol AnonMinusEqual
   , assign Expression.Times <$ symbol AnonStarEqual
