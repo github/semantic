@@ -1208,6 +1208,7 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inj .) . Expression.Times            <$ symbol AnonStar
   , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
   , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.Member           <$ symbol AnonIn
   , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
   , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
   , (inj .) . Expression.Or               <$ symbol AnonPipePipe
