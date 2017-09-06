@@ -713,10 +713,10 @@ awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Lang
 unaryExpression :: Assignment
 unaryExpression = symbol Grammar.UnaryExpression >>= \ loc ->
   makeTerm loc . Expression.Not <$> children ((symbol AnonTilde <|> symbol AnonBang) *> expression)
-  <|> makeTerm loc . Expression.Negate <$> ((symbol AnonMinus <|> symbol AnonPlus) *> expression)
-  <|> makeTerm loc . Expression.Typeof <$> (symbol AnonTypeof *> expression)
-  <|> makeTerm loc . Expression.Void <$> (symbol AnonVoid *> expression)
-  <|> makeTerm loc . Expression.Delete <$> (symbol AnonDelete *> expression)
+  <|> makeTerm loc . Expression.Negate <$> children ((symbol AnonMinus <|> symbol AnonPlus) *> expression)
+  <|> makeTerm loc . Expression.Typeof <$> children (symbol AnonTypeof *> expression)
+  <|> makeTerm loc . Expression.Void <$> children (symbol AnonVoid *> expression)
+  <|> makeTerm loc . Expression.Delete <$> children (symbol AnonDelete *> expression)
 
 ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> expression <*> expression <*> expression)
