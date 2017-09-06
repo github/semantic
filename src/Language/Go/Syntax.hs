@@ -89,8 +89,8 @@ identifier =
       mk Identifier
   <|> mk FieldIdentifier
   <|> mk PackageIdentifier
-  <|> mk TypeIdentifier
   <|> mk ParenthesizedType
+  <|> mk TypeIdentifier
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 typing :: Assignment
