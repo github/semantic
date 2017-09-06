@@ -25,6 +25,7 @@ import qualified Term
 
 type Syntax =
   '[ Comment.Comment
+   , Declaration.Constructor
    , Declaration.Function
    , Declaration.Import
    , Declaration.Method
@@ -118,8 +119,11 @@ typeSpecs :: Assignment
 typeSpecs = makeTerm <$> location <*> many typeSpec
 
 typeSpec :: Assignment
-typeSpec = makeTerm <$> symbol TypeSpec <*> children (Statement.Assignment <$> typing <*> typing)
+typeSpec =  makeTerm <$> symbol TypeSpec <*> children (Declaration.Constructor <$> identifier <*> (symbol StructType *> children (many fieldDeclaration)))
+        <|> makeTerm <$> symbol TypeSpec <*> children (Statement.Assignment <$> typing <*> typing)
 
+fieldDeclaration :: Assignment
+fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children (many literal)
 typing :: Assignment
 typing =
       mk InterfaceType
