@@ -137,7 +137,7 @@ block :: Assignment
 block = symbol Block *> children expressions
 
 functionDeclaration :: Assignment
-functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> identifier <*> parameters <*> types <*> block)
+functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> typedIdentifier <*> parameters <*> types <*> block)
   where parameters = symbol Parameters *> children (many expression)
         mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
 
