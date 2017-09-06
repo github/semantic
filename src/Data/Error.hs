@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, ImplicitParams, RankNTypes, StandaloneDeriving #-}
 module Data.Error where
 
+import Control.Exception
 import Data.Blob
 import Data.ByteString (isSuffixOf)
 import Data.ByteString.Char8 (pack, unpack)
@@ -10,16 +11,19 @@ import Data.List.NonEmpty (nonEmpty)
 import Data.Semigroup
 import Data.Source
 import Data.Span
+import Data.Typeable
 import GHC.Stack
 import System.Console.ANSI
 
 data Error grammar = HasCallStack => Error { errorSpan :: Span, errorExpected :: [grammar], errorActual :: Maybe grammar }
+  deriving (Typeable)
 
 deriving instance Eq grammar => Eq (Error grammar)
 deriving instance Foldable Error
 deriving instance Functor Error
 deriving instance Show grammar => Show (Error grammar)
 deriving instance Traversable Error
+instance Exception (Error String)
 
 errorCallStack :: Error grammar -> CallStack
 errorCallStack Error{} = callStack
