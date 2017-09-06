@@ -14,6 +14,7 @@ import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
@@ -28,6 +29,7 @@ type Syntax =
    , Declaration.Import
    , Declaration.Method
    , Declaration.Module
+   , Expression.Call
    , Literal.Integer
    , Literal.TextElement
    , Statement.Assignment
@@ -47,7 +49,8 @@ assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.P
 
 expression :: Assignment
 expression = handleError
-           $  comment
+           $  callExpression
+          <|> comment
           <|> constVarDeclaration
           <|> constVarSpecification
           <|> expressionList
@@ -132,6 +135,9 @@ functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration 
         block = symbol Block *> children expressions
         types = symbol Parameters *> children expressions <|> identifier <|> emptyTerm
         mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
+
+callExpression :: Assignment
+callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> identifier <*> pure [] <*> emptyTerm)
 
 -- | Match a series of terms or comments until a delimiter is matched
 manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
