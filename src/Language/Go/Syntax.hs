@@ -133,11 +133,12 @@ expressionList = symbol ExpressionList *> children expressions
 parameterDeclaration :: Assignment
 parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
+block :: Assignment
+block = symbol Block *> children expressions
+
 functionDeclaration :: Assignment
 functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> identifier <*> parameters <*> types <*> block)
   where parameters = symbol Parameters *> children (many expression)
-        block = symbol Block *> children expressions
-        types = symbol Parameters *> children expressions <|> identifier <|> emptyTerm
         mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
 
 callExpression :: Assignment
