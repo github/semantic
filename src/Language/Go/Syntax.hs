@@ -62,6 +62,7 @@ expression = handleError
           <|> typedIdentifier
           <|> literal
           <|> methodDeclaration
+          <|> methodSpec
           <|> packageClause
           <|> parameterDeclaration
           <|> typeDeclaration
