@@ -28,6 +28,7 @@ type Syntax =
    , Declaration.Constructor
    , Declaration.Function
    , Declaration.Import
+   , Declaration.Interface
    , Declaration.Method
    , Declaration.Module
    , Expression.Call
@@ -119,13 +120,26 @@ typeSpecs = makeTerm <$> location <*> many typeSpec
 
 typeSpec :: Assignment
 typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typing <*> structType)
+        <|> mkTypeInterface <$> symbol TypeSpec <*> children ((,) <$> typing <*> interfaceType)
         <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typing <*> typing)
-  where mkTypeStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
-        structType = symbol StructType *> children (many fieldDeclaration)
+  where
+    mkTypeStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
+    structType = symbol StructType *> children (many fieldDeclaration)
+
+    mkTypeInterface loc (name, interfaceBody) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Interface name interfaceBody)) name
+    interfaceType = symbol InterfaceType *> children (many expression)
 
 fieldDeclaration :: Assignment
 fieldDeclaration = mkFieldDeclaration <$> symbol FieldDeclaration <*> children ((,) <$> many identifier <*> typing)
   where mkFieldDeclaration loc (fields, type') = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
+
+methodSpec :: Assignment
+methodSpec =  handleError $ mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typing <|> parameters <|> emptyTerm) <*> empty)
+  where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
+        empty = makeTerm <$> location <*> pure Syntax.Empty
+        mkMethodSpec loc (receiver', name', params, optionalTyping, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionalTyping
+        mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method empty' name' (pure params) empty''
+
 typing :: Assignment
 typing =
       mk InterfaceType
