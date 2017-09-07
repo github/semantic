@@ -118,12 +118,14 @@ typeSpecs :: Assignment
 typeSpecs = makeTerm <$> location <*> many typeSpec
 
 typeSpec :: Assignment
-typeSpec =  makeTerm <$> symbol TypeSpec <*> children (Declaration.Constructor <$> identifier <*> (symbol StructType *> children (many fieldDeclaration)))
 typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typing <*> structType)
         <|> makeTerm <$> symbol TypeSpec <*> children (Statement.Assignment <$> typing <*> typing)
+  where mkTypeStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
+        structType = symbol StructType *> children (many fieldDeclaration)
 
 fieldDeclaration :: Assignment
-fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children (many literal)
+fieldDeclaration = mkFieldDeclaration <$> symbol FieldDeclaration <*> children ((,) <$> many identifier <*> typing)
+  where mkFieldDeclaration loc (fields, type') = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 typing :: Assignment
 typing =
       mk InterfaceType
