@@ -94,7 +94,6 @@ identifier =
   <|> mk FieldIdentifier
   <|> mk PackageIdentifier
   <|> mk ParenthesizedType
-  <|> mk TypeIdentifier
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 interpretedStringLiteral :: Assignment
@@ -120,6 +119,7 @@ typeSpecs = makeTerm <$> location <*> many typeSpec
 
 typeSpec :: Assignment
 typeSpec =  makeTerm <$> symbol TypeSpec <*> children (Declaration.Constructor <$> identifier <*> (symbol StructType *> children (many fieldDeclaration)))
+typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typing <*> structType)
         <|> makeTerm <$> symbol TypeSpec <*> children (Statement.Assignment <$> typing <*> typing)
 
 fieldDeclaration :: Assignment
