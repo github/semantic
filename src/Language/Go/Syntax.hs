@@ -77,7 +77,7 @@ literal :: Assignment
 literal = identifier
        <|> interpretedStringLiteral
        <|> intLiteral
-       <|> typing
+       <|> typeLiteral
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
@@ -120,9 +120,9 @@ typeSpecs :: Assignment
 typeSpecs = makeTerm <$> location <*> many typeSpec
 
 typeSpec :: Assignment
-typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typing <*> structType)
-        <|> mkTypeInterface <$> symbol TypeSpec <*> children ((,) <$> typing <*> interfaceType)
-        <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typing <*> typing)
+typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> structType)
+        <|> mkTypeInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
+        <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
   where
     mkTypeStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
     structType = symbol StructType *> children (many fieldDeclaration)
@@ -131,18 +131,18 @@ typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typing <*> st
     interfaceType = symbol InterfaceType *> children (many expression)
 
 fieldDeclaration :: Assignment
-fieldDeclaration = mkFieldDeclaration <$> symbol FieldDeclaration <*> children ((,) <$> many identifier <*> typing)
+fieldDeclaration = mkFieldDeclaration <$> symbol FieldDeclaration <*> children ((,) <$> many identifier <*> typeLiteral)
   where mkFieldDeclaration loc (fields, type') = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 
 methodSpec :: Assignment
-methodSpec =  handleError $ mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typing <|> parameters <|> emptyTerm) <*> empty)
+methodSpec =  handleError $ mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typeLiteral <|> parameters <|> emptyTerm) <*> empty)
   where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
         empty = makeTerm <$> location <*> pure Syntax.Empty
-        mkMethodSpec loc (receiver', name', params, optionalTyping, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionalTyping
+        mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
         mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method empty' name' (pure params) empty''
 
-typing :: Assignment
-typing =
+typeLiteral :: Assignment
+typeLiteral =
       mk InterfaceType
   <|> mk TypeIdentifier
   <|> mk ParenthesizedType
@@ -160,7 +160,7 @@ constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> c
     where
       annotatedLHS = makeTerm <$> location <*> (Type.Annotation
                                               <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier))))
-                                              <*> typing)
+                                              <*> typeLiteral)
 
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
@@ -178,7 +178,7 @@ functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration 
         mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
 
 methodDeclaration :: Assignment
-methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> typing <*> block)
+methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> typeLiteral <*> block)
   where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many typedIdentifier))
         receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children typedIdentifier)
         mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method receiver' name' parameters' body')) type'')
