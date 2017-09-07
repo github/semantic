@@ -119,7 +119,7 @@ typeSpecs = makeTerm <$> location <*> many typeSpec
 
 typeSpec :: Assignment
 typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typing <*> structType)
-        <|> makeTerm <$> symbol TypeSpec <*> children (Statement.Assignment <$> typing <*> typing)
+        <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typing <*> typing)
   where mkTypeStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
         structType = symbol StructType *> children (many fieldDeclaration)
 
