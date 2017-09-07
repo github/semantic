@@ -146,6 +146,7 @@ typing =
   <|> mk TypeIdentifier
   <|> mk ParenthesizedType
   <|> mk PointerType
+  <|> mk QualifiedType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 constVarDeclaration :: Assignment
