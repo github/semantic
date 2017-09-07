@@ -32,6 +32,7 @@ type Syntax =
    , Declaration.Method
    , Declaration.Module
    , Expression.Call
+   , Expression.MemberAccess
    , Literal.Integer
    , Literal.TextElement
    , Statement.Assignment
@@ -148,9 +149,10 @@ typeLiteral =
   <|> mk TypeIdentifier
   <|> mk ParenthesizedType
   <|> mk PointerType
-  <|> mk QualifiedType
   <|> mk SliceType
+  <|> qualifiedType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+        qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
 
 constVarDeclaration :: Assignment
 constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
