@@ -348,9 +348,9 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (
   l@(Tracing callSiteL la `Then` continueL) <|> r@(Tracing callSiteR ra `Then` continueR) = go callSiteL la continueL callSiteR ra continueR
     where go :: forall l r . Maybe (String, SrcLoc) -> AssignmentF ast grammar l -> (l -> Assignment ast grammar a) -> Maybe (String, SrcLoc) -> AssignmentF ast grammar r -> (r -> Assignment ast grammar a) -> Assignment ast grammar a
           go callSiteL la continueL callSiteR ra continueR = case (la, ra) of
+            (Fail _, _) -> r
             (Alt [], _) -> r
             (_, Alt []) -> l
-            (Fail _, _) -> r
             (Children cl, Children cr) -> alternate (Children (Left <$> cl <|> Right <$> cr))
             (Location, Location) -> distribute Location
             (CurrentNode, CurrentNode) -> distribute CurrentNode
