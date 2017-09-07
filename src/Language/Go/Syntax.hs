@@ -89,6 +89,7 @@ typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types 
     types =  symbol TypeIdentifier
          <|> symbol PointerType
          <|> symbol ParenthesizedType
+         <|> symbol SliceType
 
 identifier :: Assignment
 identifier =
@@ -148,6 +149,7 @@ typeLiteral =
   <|> mk ParenthesizedType
   <|> mk PointerType
   <|> mk QualifiedType
+  <|> mk SliceType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 constVarDeclaration :: Assignment
