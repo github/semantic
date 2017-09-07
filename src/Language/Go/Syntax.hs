@@ -132,7 +132,6 @@ typing =
   <|> mk TypeIdentifier
   <|> mk ParenthesizedType
   <|> mk PointerType
-  <|> mk StructType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 constVarDeclaration :: Assignment
