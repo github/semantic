@@ -133,7 +133,6 @@ data AssignmentF ast grammar a where
   CurrentNode :: AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
-  Advance :: AssignmentF ast grammar ()
   Choose :: Table.Table grammar (Assignment ast grammar a) -> Maybe (Assignment ast grammar a) -> Maybe (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
   Many :: Assignment ast grammar a -> AssignmentF ast grammar [a]
   Alt :: [a] -> AssignmentF ast grammar a
@@ -176,7 +175,7 @@ children child = tracing (Children child) `Then` return
 
 -- | Advance past the current node.
 advance :: HasCallStack => Assignment ast grammar ()
-advance = tracing Advance `Then` return
+advance = () <$ source
 
 -- | Construct a committed choice table from a list of alternatives. Use this to efficiently select between long lists of rules.
 choice :: (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
@@ -278,7 +277,6 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
-                  Advance -> yield () (advanceState state)
                   Choose choices _ handler | Just choice <- Table.lookup (nodeSymbol node) choices -> (go choice state `catchError` (maybe throwError (flip go state .) handler)) >>= uncurry yield
                   _ -> anywhere (Just node)
 
@@ -398,7 +396,6 @@ instance Show1 f => Show1 (Tracing f) where
 instance (Enum grammar, Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
-    Advance -> showString "Advance" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
     CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
