@@ -231,7 +231,7 @@ firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+assign :: (Bounded grammar, Ix grammar, Symbol grammar, Show grammar, Eq1 ast, Foldable ast, Functor ast)
        => Source.Source             -- ^ The source for the parse tree.
        -> Assignment ast grammar a  -- ^ The 'Assignment to run.
        -> AST ast grammar           -- ^ The root of the ast.
@@ -240,7 +240,7 @@ assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment 
 {-# INLINE assign #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+runAssignment :: forall grammar a ast. (Bounded grammar, Ix grammar, Symbol grammar, Eq1 ast, Foldable ast, Functor ast)
               => Source.Source                                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
               -> State ast grammar                                             -- ^ The current state.
@@ -308,7 +308,7 @@ data State ast grammar = State
   , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
 
-deriving instance (Eq grammar, Eq (ast (AST ast grammar))) => Eq (State ast grammar)
+deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)
 deriving instance (Show grammar, Show (ast (AST ast grammar))) => Show (State ast grammar)
 
 makeState :: [AST ast grammar] -> State ast grammar
@@ -317,7 +317,7 @@ makeState = State 0 (Info.Pos 1 1) []
 
 -- Instances
 
-instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast grammar) where
+instance (Eq grammar, Eq1 ast) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = tracing (Alt []) `Then` return
 
@@ -369,7 +369,7 @@ instance (Eq grammar, Eq (ast (AST ast grammar))) => Alternative (Assignment ast
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = tracing (Many a) `Then` return
 
-instance (Eq grammar, Eq (ast (AST ast grammar)), Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Eq1 ast, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 

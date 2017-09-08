@@ -21,6 +21,7 @@ import Control.Monad.Free
 import Data.Align.Generic
 import Data.Bifunctor
 import Data.Functor.Both
+import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
 import Data.Functor.Listable
@@ -106,8 +107,11 @@ instance Functor f => ComonadCofree f (Term f) where
   unwrap (_ :< as) = as
   {-# INLINE unwrap #-}
 
-instance (Eq (f (Term f a)), Eq a) => Eq (Term f a) where
-  a1 :< f1 == a2 :< f2 = a1 == a2 && f1 == f2
+instance Eq1 f => Eq1 (Term f) where
+  liftEq eqA = go where go (a1 :< f1) (a2 :< f2) = eqA a1 a2 && liftEq go f1 f2
+
+instance (Eq1 f, Eq a) => Eq (Term f a) where
+  (==) = eq1
 
 instance (Show (f (Term f a)), Show a) => Show (Term f a) where
   showsPrec d (a :< f) = showParen (d > 5) $ showsPrec 6 a . showString " :< " . showsPrec 5 f
@@ -124,3 +128,9 @@ instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
 instance (Functor f, Listable1 f) => Listable1 (Term f) where
   liftTiers annotationTiers = go
     where go = liftCons1 (liftTiers2 annotationTiers go) cofree
+
+instance Eq1 f => Eq2 (TermF f) where
+  liftEq2 eqA eqB (a1 :<< f1) (a2 :<< f2) = eqA a1 a2 && liftEq eqB f1 f2
+
+instance (Eq1 f, Eq a) => Eq1 (TermF f a) where
+  liftEq = liftEq2 (==)

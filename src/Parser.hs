@@ -12,6 +12,7 @@ module Parser
 ) where
 
 import qualified CMarkGFM
+import Data.Functor.Classes (Eq1)
 import Data.Ix
 import Data.Record
 import Data.Source as Source
@@ -39,7 +40,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq (ast (Term ast (Node grammar))), Apply1 Foldable fs, Apply1 Functor fs, Foldable ast, Functor ast)
+  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply1 Foldable fs, Apply1 Functor fs, Foldable ast, Functor ast)
                    => Parser (Term ast (Node grammar))                           -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
