@@ -138,3 +138,6 @@ instance Eq1 f => Eq2 (TermF f) where
 
 instance (Eq1 f, Eq a) => Eq1 (TermF f a) where
   liftEq = liftEq2 (==)
+
+instance Show1 f => Show2 (TermF f) where
+  liftShowsPrec2 spA _ spB slB d (a :<< f) = showParen (d > 5) $ spA 6 a . showString " :<< " . liftShowsPrec spB slB 5 f
