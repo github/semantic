@@ -211,7 +211,7 @@ functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
 isMeaningfulTerm :: ListableF (Term Syntax) a -> Bool
-isMeaningfulTerm a = case runCofree (unListableF a) of
+isMeaningfulTerm a = case unTerm (unListableF a) of
   (_ :< S.Indexed _) -> False
   (_ :< S.Fixed _) -> False
   (_ :< S.Commented _ _) -> False
@@ -220,7 +220,7 @@ isMeaningfulTerm a = case runCofree (unListableF a) of
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
 isMethodOrFunction :: HasField fields Category => ListableF (Term Syntax) (Record fields) -> Bool
-isMethodOrFunction a = case runCofree (unListableF a) of
+isMethodOrFunction a = case unTerm (unListableF a) of
   (_ :< S.Method{}) -> True
   (_ :< S.Function{}) -> True
   (a :< _) | getField a == C.Function -> True

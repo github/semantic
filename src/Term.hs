@@ -8,7 +8,7 @@ module Term
 , termSize
 , alignTermWith
 , cofree
-, runCofree
+, unTerm
 , extract
 , unwrap
 , hoistCofree
@@ -41,7 +41,7 @@ type SyntaxTerm fields = Term Syntax (Record fields)
 type SyntaxTermF fields = TermF Syntax (Record fields)
 
 instance (NFData (f (Term f a)), NFData a, Functor f) => NFData (Term f a) where
-  rnf = rnf . runCofree
+  rnf = rnf . unTerm
 
 instance (NFData a, NFData (f b)) => NFData (TermF f a b) where
   rnf (a :<< s) = rnf a `seq` rnf s `seq` ()
@@ -73,8 +73,8 @@ alignTermWith compare contrast combine = go
 cofree :: TermF f a (Term f a) -> Term f a
 cofree (a :<< f) = a :< f
 
-runCofree :: Term f a -> TermF f a (Term f a)
-runCofree (a :< f) = a :<< f
+unTerm :: Term f a -> TermF f a (Term f a)
+unTerm (a :< f) = a :<< f
 
 hoistCofree :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
 hoistCofree f = go where go (a :< r) = a :< f (fmap go r)
@@ -90,7 +90,7 @@ instance Apply1 Pretty1 fs => Pretty1 (Union fs) where
 
 type instance Base (Term f a) = TermF f a
 
-instance Functor f => Recursive (Term f a) where project = runCofree
+instance Functor f => Recursive (Term f a) where project = unTerm
 instance Functor f => Corecursive (Term f a) where embed = cofree
 
 instance Functor f => Comonad (Term f) where

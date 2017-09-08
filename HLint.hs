@@ -17,8 +17,8 @@ error "Avoid return" =
 error "use pure" = free . Pure ==> pure
 error "use wrap" = free . Free ==> wrap
 
-error "use extract" = headF . runCofree ==> extract
-error "use unwrap" = tailF . runCofree ==> unwrap
+error "use extract" = headF . unTerm ==> extract
+error "use unwrap" = tailF . unTerm ==> unwrap
 
 error "avoid head" = head
   where note = "head is partial; consider using Data.Maybe.listToMaybe"

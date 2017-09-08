@@ -5,7 +5,6 @@ module TreeSitter
 ) where
 
 import Category
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.Exception
 import Control.Monad ((<=<))
 import Data.Blob

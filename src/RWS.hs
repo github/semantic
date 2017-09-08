@@ -303,12 +303,12 @@ unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
-canCompareTerms canCompare = canCompare `on` runCofree
+canCompareTerms canCompare = canCompare `on` unTerm
 
 -- | Recursively test the equality of two 'Term's in O(n).
 equalTerms :: Eq1 f => ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
 equalTerms canCompare = go
-  where go a b = canCompareTerms canCompare a b && liftEq go (tailF (runCofree a)) (tailF (runCofree b))
+  where go a b = canCompareTerms canCompare a b && liftEq go (tailF (unTerm a)) (tailF (unTerm b))
 
 
 -- | Strips the head annotation off a term annotated with non-empty records.
