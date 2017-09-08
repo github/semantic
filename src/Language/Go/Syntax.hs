@@ -79,11 +79,10 @@ expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
 
 literal :: Assignment
-literal = identifier
+literal =  identifier
        <|> interpretedStringLiteral
        <|> intLiteral
        <|> typeLiteral
-       <|> channelType
        <|> rawStringLiteral
        <|> structType
 
