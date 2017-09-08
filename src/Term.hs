@@ -144,3 +144,12 @@ instance Show1 f => Show2 (TermF f) where
 
 instance (Show1 f, Show a) => Show1 (TermF f a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance Pretty1 f => Pretty2 (TermF f) where
+  liftPretty2 pA _ pB plB (a :<< f) = pA a <+> liftPretty pB plB f
+
+instance (Pretty1 f, Pretty a) => Pretty1 (TermF f a) where
+  liftPretty = liftPretty2 pretty prettyList
+
+instance (Pretty1 f, Pretty a, Pretty b) => Pretty (TermF f a b) where
+  pretty = liftPretty pretty prettyList
