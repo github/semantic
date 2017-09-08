@@ -17,7 +17,6 @@ module Renderer.TOC
 , entrySummary
 ) where
 
-import Control.DeepSeq
 import Control.Monad.Free (iter)
 import Data.Aeson
 import Data.Align (crosswalk)
@@ -93,7 +92,7 @@ data Declaration
   | FunctionDeclaration { declarationIdentifier :: T.Text }
   | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
-  deriving (Eq, Generic, NFData, Show)
+  deriving (Eq, Generic, Show)
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField

@@ -1,7 +1,6 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Record where
 
-import Control.DeepSeq
 import Data.Kind
 import Data.Functor.Listable
 import Data.Semigroup
@@ -49,11 +48,6 @@ instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
   getField (h :. _) = h
   setField (_ :. t) f = f :. t
 
-instance (NFData h, NFData (Record t)) => NFData (Record (h ': t)) where
-  rnf (h :. t) = rnf h `seq` rnf t `seq` ()
-
-instance NFData (Record '[]) where
-  rnf _ = ()
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
   showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . (" :. " <>) . shows t

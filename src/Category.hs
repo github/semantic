@@ -3,7 +3,6 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Category where
 
-import Control.DeepSeq
 import Data.Functor.Listable
 import Data.Hashable
 import Data.Text (Text)
@@ -238,7 +237,7 @@ data Category
   | Ty
   | ParenthesizedExpression
   | ParenthesizedType
-  deriving (Eq, Generic, Ord, Show, NFData)
+  deriving (Eq, Generic, Ord, Show)
 
 {-# DEPRECATED RescueModifier "Deprecated; use Modifier Rescue instead." #-}
 

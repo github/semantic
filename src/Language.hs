@@ -2,7 +2,6 @@
 module Language where
 
 import Control.Comonad.Trans.Cofree hiding (cofree, (:<))
-import Control.DeepSeq
 import Data.Aeson
 import Data.Foldable
 import Data.Record
@@ -21,7 +20,7 @@ data Language
     | Python
     | Ruby
     | TypeScript
-    deriving (Show, Eq, Read, Generic, NFData, ToJSON)
+    deriving (Show, Eq, Read, Generic, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language

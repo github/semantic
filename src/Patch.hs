@@ -14,7 +14,6 @@ module Patch
 , mapPatch
 ) where
 
-import Control.DeepSeq
 import Data.Align
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Listable
@@ -26,7 +25,7 @@ data Patch a
   = Replace a a
   | Insert a
   | Delete a
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable, NFData)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 
 -- DSL

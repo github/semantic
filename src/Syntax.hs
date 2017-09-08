@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Control.DeepSeq
 import Data.Aeson
 import Data.Align.Generic
 import Data.Functor.Classes
@@ -111,7 +110,7 @@ data Syntax f
   | Ty [f]
   -- | A send statement has a channel and an expression in Go.
   | Send f f
-  deriving (Eq, Foldable, Functor, GAlign, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON, NFData)
+  deriving (Eq, Foldable, Functor, GAlign, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
 extractLeafValue :: Syntax a -> Maybe Text

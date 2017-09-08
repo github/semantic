@@ -18,7 +18,6 @@ module Renderer
 , File(..)
 ) where
 
-import Control.DeepSeq
 import Data.Aeson (Value, (.=))
 import Data.ByteString (ByteString)
 import Data.Foldable (asum)
@@ -93,7 +92,7 @@ identifierAlgebra (_ :<< syntax) = case syntax of
   where identifier = fmap Identifier . extractLeafValue . unwrap . fst
 
 newtype Identifier = Identifier Text
-  deriving (Eq, NFData, Show)
+  deriving (Eq, Show)
 
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]

@@ -6,7 +6,6 @@ module Data.Range
 , intersectsRange
 ) where
 
-import Control.DeepSeq
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
 import GHC.Generics
@@ -14,7 +13,7 @@ import Test.LeanCheck
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
-  deriving (Eq, Show, Generic, NFData)
+  deriving (Eq, Show, Generic)
 
 -- | Return the length of the range.
 rangeLength :: Range -> Int

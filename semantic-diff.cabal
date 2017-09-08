@@ -92,7 +92,6 @@ library
                      , cmark-gfm
                      , comonad
                      , containers
-                     , deepseq
                      , directory
                      , effects
                      , filepath
@@ -167,7 +166,6 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
-                     , deepseq
                      , filepath
                      , free
                      , Glob

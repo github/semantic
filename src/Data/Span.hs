@@ -9,7 +9,6 @@ module Data.Span
 , emptySpan
 ) where
 
-import Control.DeepSeq
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Data.Hashable (Hashable)
@@ -23,7 +22,7 @@ data Pos = Pos
   { posLine :: !Int
   , posColumn :: !Int
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 instance A.ToJSON Pos where
   toJSON Pos{..} =
@@ -38,7 +37,7 @@ data Span = Span
   { spanStart :: Pos
   , spanEnd :: Pos
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 emptySpan :: Span
 emptySpan = Span (Pos 1 1) (Pos 1 1)
