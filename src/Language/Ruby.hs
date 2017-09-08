@@ -1,8 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module Language.Ruby where
 
-import Control.Comonad
-import Control.Comonad.Cofree
 import Data.Foldable (toList)
 import Data.List (partition)
 import Data.Semigroup
@@ -11,7 +9,7 @@ import Data.Text (Text)
 import Info
 import Language
 import qualified Syntax as S
-import Term hiding ((:<))
+import Term
 
 termAssignment
   :: Source -- ^ The source of the term.

@@ -6,7 +6,6 @@ module Renderer.JSON
 , ToJSONFields(..)
 ) where
 
-import Control.Comonad.Cofree
 import qualified Control.Comonad.Trans.Cofree as CofreeF
 import Control.Monad.Free
 import qualified Control.Monad.Trans.Free as FreeF
@@ -30,6 +29,7 @@ import Info
 import Language
 import Patch
 import Syntax as S
+import Term
 
 --
 -- Diffs

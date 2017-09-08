@@ -11,8 +11,6 @@ module Parser
 , rubyParser
 ) where
 
-import Control.Comonad.Cofree (Cofree)
-import Control.Comonad.Trans.Cofree (CofreeF)
 import qualified CMarkGFM
 import Data.Ix
 import Data.Record
@@ -79,5 +77,5 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> SyntaxTerm DefaultFields
-lineByLineParser source = cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
-  where toLine line range = cofree $ (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))
+lineByLineParser source = (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
+  where toLine line range = (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))

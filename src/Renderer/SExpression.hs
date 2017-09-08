@@ -13,7 +13,7 @@ import Data.Semigroup
 import Diff
 import Patch
 import Prelude hiding (replicate)
-import Term
+import Term hiding ((:<))
 
 -- | Returns a ByteString SExpression formatted diff.
 renderSExpressionDiff :: (ConstrainAll Show fields, Foldable f) => Diff f (Record fields) -> ByteString

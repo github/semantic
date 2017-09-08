@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances, UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeSynonymInstances, UndecidableInstances #-}
 module Term
 ( Term
 , TermF
@@ -9,10 +9,17 @@ module Term
 , alignCofreeWith
 , cofree
 , runCofree
-, CofreeF.CofreeF(..)
+, Cofree(..)
+, extract
+, unwrap
+, hoistCofree
+, CofreeF.headF
+, CofreeF.tailF
+, CofreeF.CofreeF()
 ) where
 
-import qualified Control.Comonad.Cofree as Cofree
+import Control.Comonad
+import Control.Comonad.Cofree.Class
 import qualified Control.Comonad.Trans.Cofree as CofreeF
 import Control.DeepSeq
 import Control.Monad.Free
@@ -28,14 +35,17 @@ import Data.Union
 import Syntax
 
 -- | A Term with an abstract syntax tree and an annotation.
-type Term f = Cofree.Cofree f
+type Term f = Cofree f
 type TermF = CofreeF.CofreeF
+
+infixr 5 :<
+data Cofree f a = a :< f (Cofree f a)
 
 -- | A Term with a Syntax leaf and a record of fields.
 type SyntaxTerm fields = Term Syntax (Record fields)
 type SyntaxTermF fields = TermF Syntax (Record fields)
 
-instance (NFData (f (Cofree.Cofree f a)), NFData a, Functor f) => NFData (Cofree.Cofree f a) where
+instance (NFData (f (Cofree f a)), NFData a, Functor f) => NFData (Cofree f a) where
   rnf = rnf . runCofree
 
 instance (NFData a, NFData (f b)) => NFData (CofreeF.CofreeF f a b) where
@@ -61,22 +71,47 @@ alignCofreeWith :: Functor f
   -> Free (TermF f combined) contrasted
 alignCofreeWith compare contrast combine = go
   where go terms = fromMaybe (pure (contrast terms)) $ case terms of
-          These (a1 Cofree.:< f1) (a2 Cofree.:< f2) -> wrap . (combine a1 a2 CofreeF.:<) . fmap go <$> compare f1 f2
+          These (a1 :< f1) (a2 :< f2) -> wrap . (combine a1 a2 CofreeF.:<) . fmap go <$> compare f1 f2
           _ -> Nothing
 
 
-cofree :: CofreeF.CofreeF f a (Cofree.Cofree f a) -> Cofree.Cofree f a
-cofree (a CofreeF.:< f) = a Cofree.:< f
+cofree :: CofreeF.CofreeF f a (Cofree f a) -> Cofree f a
+cofree (a CofreeF.:< f) = a :< f
 
-runCofree :: Cofree.Cofree f a -> CofreeF.CofreeF f a (Cofree.Cofree f a)
-runCofree (a Cofree.:< f) = a CofreeF.:< f
+runCofree :: Cofree f a -> CofreeF.CofreeF f a (Cofree f a)
+runCofree (a :< f) = a CofreeF.:< f
 
+hoistCofree :: Functor f => (forall a. f a -> g a) -> Cofree f a -> Cofree g a
+hoistCofree f = go where go (a :< r) = a :< f (fmap go r)
 
-instance Pretty1 f => Pretty1 (Cofree.Cofree f) where
-  liftPretty p pl = go where go (a Cofree.:< f) = p a <+> liftPretty go (list . map (liftPretty p pl)) f
+instance Pretty1 f => Pretty1 (Cofree f) where
+  liftPretty p pl = go where go (a :< f) = p a <+> liftPretty go (list . map (liftPretty p pl)) f
 
-instance (Pretty1 f, Pretty a) => Pretty (Cofree.Cofree f a) where
+instance (Pretty1 f, Pretty a) => Pretty (Cofree f a) where
   pretty = liftPretty pretty prettyList
 
 instance Apply1 Pretty1 fs => Pretty1 (Union fs) where
   liftPretty p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
+
+type instance Base (Cofree f a) = CofreeF.CofreeF f a
+
+instance Functor f => Recursive (Cofree f a) where project = runCofree
+instance Functor f => Corecursive (Cofree f a) where embed = cofree
+
+instance Functor f => Comonad (Cofree f) where
+  extract (a :< _) = a
+  duplicate w = w :< fmap duplicate (unwrap w)
+  extend f = go where go w = f w :< fmap go (unwrap w)
+
+instance Functor f => Functor (Cofree f) where
+  fmap f = go where go (a :< r) = f a :< fmap go r
+
+instance Functor f => ComonadCofree f (Cofree f) where
+  unwrap (_ :< as) = as
+  {-# INLINE unwrap #-}
+
+instance (Eq (f (Cofree f a)), Eq a) => Eq (Cofree f a) where
+  a1 :< f1 == a2 :< f2 = a1 == a2 && f1 == f2
+
+instance (Show (f (Cofree f a)), Show a) => Show (Cofree f a) where
+  showsPrec d (a :< f) = showParen (d > 5) $ showsPrec 6 a . showString " :< " . showsPrec 5 f

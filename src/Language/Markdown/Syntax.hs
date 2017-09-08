@@ -6,8 +6,6 @@ module Language.Markdown.Syntax
 , Term
 ) where
 
-import Control.Comonad.Cofree (Cofree(..), unwrap)
-import Control.Comonad.Trans.Cofree (CofreeF, headF, tailF)
 import qualified CMarkGFM
 import Data.ByteString (ByteString)
 import Data.Function (on)
@@ -22,6 +20,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Union
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
+import Term (Cofree(..), CofreeF, unwrap, headF, tailF)
 import qualified Term
 
 type Syntax =

@@ -95,8 +95,7 @@ module Data.Syntax.Assignment
 
 import Control.Arrow ((&&&))
 import Control.Applicative
-import Control.Comonad.Cofree as Cofree
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
+import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.Monad (guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
@@ -117,7 +116,7 @@ import qualified Data.Source as Source (Source, slice, sourceBytes)
 import GHC.Stack
 import qualified Info
 import Prelude hiding (until)
-import Term (runCofree)
+import Term as Cofree
 import Text.Parser.Combinators as Parsers
 import TreeSitter.Language
 
@@ -294,7 +293,7 @@ withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallSta
 withStateCallStack callSite state action = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state)))) action
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
-skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . CofreeF.headF . runCofree) (stateNodes state) }
+skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . headF . runCofree) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar

@@ -5,7 +5,6 @@ module Language.Markdown
 , toGrammar
 ) where
 
-import Control.Comonad.Cofree as Cofree
 import Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import CMarkGFM
 import Data.Ix
@@ -13,6 +12,7 @@ import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
 import TreeSitter.Language (Symbol(..), SymbolType(..))
+import Term as Cofree
 
 data Grammar
   = Document

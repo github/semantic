@@ -5,6 +5,7 @@ module Decorators
 , constructorLabel
 ) where
 
+import Control.Comonad.Trans.Cofree (CofreeF(..))
 import Data.Aeson
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Functor.Classes (Show1 (liftShowsPrec))
@@ -13,7 +14,7 @@ import Data.Text.Encoding (decodeUtf8)
 import Data.Union
 import GHC.Generics
 import Renderer.JSON
-import Term
+import Term hiding ((:<))
 
 -- | Compute a 'ByteString' label for a 'Show1'able 'Term'.
 --

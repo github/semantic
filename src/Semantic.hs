@@ -9,7 +9,6 @@ module Semantic
 
 import Algorithm hiding (diff)
 import Control.Applicative ((<|>))
-import Control.Comonad.Cofree (hoistCofree)
 import Control.Monad ((<=<))
 import Data.Align.Generic (GAlign)
 import Data.Blob

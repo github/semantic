@@ -3,7 +3,7 @@ module Data.Syntax where
 
 import Algorithm
 import Control.Applicative
-import Control.Comonad.Trans.Cofree (headF)
+import Control.Comonad.Trans.Cofree (CofreeF(..))
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
@@ -23,7 +23,7 @@ import Data.Text.Encoding (decodeUtf8With)
 import Data.Union
 import GHC.Generics
 import GHC.Stack
-import Term
+import Term hiding ((:<))
 
 -- Combinators
 
