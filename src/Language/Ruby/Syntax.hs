@@ -86,51 +86,53 @@ assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
-expression = term (handleError everything)
+expression = term (handleError (choice expressionChoices))
+
+expressionChoices :: [Assignment.Assignment [] Grammar Term]
+expressionChoices =
+  [ alias
+  , assignment'
+  , begin
+  , beginBlock
+  , binary
+  , block
+  , call
+  , case'
+  , class'
+  , conditional
+  , emptyStatement
+  , endBlock
+  , for
+  , heredoc
+  , identifier
+  , if'
+  , keyword
+  , lambda
+  , literal
+  , method
+  , methodCall
+  , mk Break Statement.Break
+  , mk Next Statement.Continue
+  , mk Redo Statement.Retry
+  , mk Retry Statement.Retry
+  , mk Return Statement.Return
+  , mk Yield Statement.Yield
+  , module'
+  , pair
+  , parenthesized_expressions
+  , parseError
+  , rescue
+  , scopeResolution
+  , singletonClass
+  , singletonMethod
+  , subscript
+  , unary
+  , undef
+  , unless
+  , until'
+  , while'
+  ]
   where
-    everything = choice
-      [ alias
-      , assignment'
-      , begin
-      , beginBlock
-      , binary
-      , block
-      , call
-      , case'
-      , class'
-      , conditional
-      , emptyStatement
-      , endBlock
-      , for
-      , heredoc
-      , identifier
-      , if'
-      , keyword
-      , lambda
-      , literal
-      , method
-      , methodCall
-      , mk Break Statement.Break
-      , mk Next Statement.Continue
-      , mk Redo Statement.Retry
-      , mk Retry Statement.Retry
-      , mk Return Statement.Return
-      , mk Yield Statement.Yield
-      , module'
-      , pair
-      , parenthesized_expressions
-      , parseError
-      , rescue
-      , scopeResolution
-      , singletonClass
-      , singletonMethod
-      , subscript
-      , unary
-      , undef
-      , unless
-      , until'
-      , while'
-      ]
     mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
