@@ -5,7 +5,7 @@ module Term
 , SyntaxTerm
 , SyntaxTermF
 , termSize
-, cofree
+, term
 , unTerm
 , extract
 , unwrap
@@ -48,8 +48,8 @@ termSize = cata size where
   size (_ :<< syntax) = 1 + sum syntax
 
 
-cofree :: TermF f a (Term f a) -> Term f a
-cofree (a :<< f) = a :< f
+term :: TermF f a (Term f a) -> Term f a
+term (a :<< f) = a :< f
 
 unTerm :: Term f a -> TermF f a (Term f a)
 unTerm (a :< f) = a :<< f
@@ -72,7 +72,7 @@ instance Apply1 Pretty1 fs => Pretty1 (Union fs) where
 type instance Base (Term f a) = TermF f a
 
 instance Functor f => Recursive (Term f a) where project = unTerm
-instance Functor f => Corecursive (Term f a) where embed = cofree
+instance Functor f => Corecursive (Term f a) where embed = term
 
 instance Functor f => Comonad (Term f) where
   extract (a :< _) = a
@@ -109,7 +109,7 @@ instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
 
 instance (Functor f, Listable1 f) => Listable1 (Term f) where
   liftTiers annotationTiers = go
-    where go = liftCons1 (liftTiers2 annotationTiers go) cofree
+    where go = liftCons1 (liftTiers2 annotationTiers go) term
 
 instance Eq1 f => Eq2 (TermF f) where
   liftEq2 eqA eqB (a1 :<< f1) (a2 :<< f2) = eqA a1 a2 && liftEq eqB f1 f2

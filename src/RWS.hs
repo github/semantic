@@ -28,7 +28,7 @@ import Data.Semigroup hiding (First(..))
 import Data.These
 import Data.Traversable
 import Patch
-import Term
+import Term hiding (term)
 import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES

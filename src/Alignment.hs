@@ -59,7 +59,7 @@ alignPatch sources patch = case patch of
     (alignSyntax' that (snd sources) term2)
   where getRange = byteRange . extract
         alignSyntax' :: (forall a. Identity a -> Join These a) -> Source -> Term f (Record fields) -> [Join These (Term [] (Record fields))]
-        alignSyntax' side source term = hylo (alignSyntax side cofree getRange (Identity source)) unTerm (Identity <$> term)
+        alignSyntax' side source = hylo (alignSyntax side term getRange (Identity source)) unTerm . fmap Identity
         this = Join . This . runIdentity
         that = Join . That . runIdentity
 
