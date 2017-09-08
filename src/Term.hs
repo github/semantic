@@ -21,8 +21,9 @@ import Control.Monad.Free
 import Data.Align.Generic
 import Data.Bifunctor
 import Data.Functor.Both
-import Data.Functor.Classes.Pretty.Generic
+import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
+import Data.Functor.Listable
 import Data.Maybe
 import Data.Proxy
 import Data.Record
@@ -80,7 +81,7 @@ hoistCofree :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
 hoistCofree f = go where go (a :< r) = a :< f (fmap go r)
 
 instance Pretty1 f => Pretty1 (Term f) where
-  liftPretty p pl = go where go (a :< f) = p a <+> liftPretty go (list . map (liftPretty p pl)) f
+  liftPretty p pl = go where go (a :< f) = p a <+> liftPretty go (Pretty.list . map (liftPretty p pl)) f
 
 instance (Pretty1 f, Pretty a) => Pretty (Term f a) where
   pretty = liftPretty pretty prettyList
@@ -113,3 +114,13 @@ instance (Show (f (Term f a)), Show a) => Show (Term f a) where
 
 instance Functor f => Bifunctor (TermF f) where
   bimap f g (a :<< r) = f a :<< fmap g r
+
+instance Listable1 f => Listable2 (TermF f) where
+  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<<)
+
+instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
+  liftTiers = liftTiers2 tiers
+
+instance (Functor f, Listable1 f) => Listable1 (Term f) where
+  liftTiers annotationTiers = go
+    where go = liftCons1 (liftTiers2 annotationTiers go) cofree

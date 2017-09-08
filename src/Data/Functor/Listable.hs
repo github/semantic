@@ -24,8 +24,6 @@ module Data.Functor.Listable
 , ofWeight
 ) where
 
-import Control.Comonad.Cofree as Cofree
-import Control.Comonad.Trans.Cofree as CofreeF
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.Bifunctor.Join
@@ -115,17 +113,6 @@ instance Listable2 p => Listable1 (Join p) where
 
 instance Listable2 These where
   liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
-
-instance Listable1 f => Listable2 (CofreeF f) where
-  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (CofreeF.:<)
-
-instance (Listable1 f, Listable a) => Listable1 (CofreeF f a) where
-  liftTiers = liftTiers2 tiers
-
-instance (Functor f, Listable1 f) => Listable1 (Cofree.Cofree f) where
-  liftTiers annotationTiers = go
-    where go = liftCons1 (liftTiers2 annotationTiers go) cofree
-          cofree (a CofreeF.:< f) = a Cofree.:< f
 
 instance Listable1 f => Listable2 (FreeF f) where
   liftTiers2 pureTiers recurTiers = liftCons1 pureTiers FreeF.Pure \/ liftCons1 (liftTiers recurTiers) FreeF.Free
