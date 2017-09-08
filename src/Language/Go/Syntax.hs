@@ -82,6 +82,8 @@ literal = identifier
        <|> interpretedStringLiteral
        <|> intLiteral
        <|> typeLiteral
+       <|> channelType
+       <|> structType
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
@@ -97,6 +99,9 @@ typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types 
 
 channelType :: Assignment
 channelType = makeTerm <$> symbol ChannelType <*> children (Literal.Channel <$> expression)
+
+structType :: Assignment
+structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many fieldDeclaration)
 
 identifier :: Assignment
 identifier =
