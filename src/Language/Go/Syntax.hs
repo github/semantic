@@ -148,7 +148,7 @@ typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> s
     mkMap loc (name, (mapLoc, (keyTypeLoc, keyTypeName, valueTypeLoc, valueTypeName))) =
       makeTerm loc $ Type.Annotation (makeTerm mapLoc (Literal.Hash (pure $ mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName))) name
 
-    mkChannel loc (name, channel) = makeTerm loc $ Type.Annotation name channel
+    mkChannel loc (name, channel) = makeTerm loc $ Type.Annotation channel name
 
     mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName =
       makeTerm keyTypeLoc $
