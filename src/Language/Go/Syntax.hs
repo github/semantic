@@ -69,6 +69,7 @@ expression = handleError
           <|> methodSpec
           <|> packageClause
           <|> parameterDeclaration
+          <|> structType
           <|> typeDeclaration
 
 identifiers :: Assignment
@@ -142,6 +143,8 @@ typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> s
         <|> mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> ((,) <$> symbol MapType <*> children ((,,,) <$> symbol TypeIdentifier <*> source <*> symbol TypeIdentifier <*> source)))
         <|> mkChannel <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> channelType)
         <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
+structType :: Assignment
+structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many expression)
   where
     mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
     structType = symbol StructType *> children (many fieldDeclaration)
