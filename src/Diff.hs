@@ -1,5 +1,4 @@
 {-# LANGUAGE TypeSynonymInstances, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Diff where
 
 import qualified Control.Monad.Free as Free
