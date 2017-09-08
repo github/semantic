@@ -269,7 +269,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
-        run t yield initialState = expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
+        run t yield initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (node :< f) = case runTracing t of
                   Location -> yield (nodeLocation node) state
                   CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
@@ -290,7 +290,9 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Choose _ (Just atEnd) _ | Nothing <- node -> go atEnd state >>= uncurry yield
                   _ -> Left (makeError node)
 
-                state@State{..} = if not (null expectedSymbols) && all ((== Regular) . symbolType) expectedSymbols then skipTokens initialState else initialState
+                state@State{..} = case (runTracing t, initialState) of
+                  (Choose table _ _, State { stateNodes = (node :< _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
+                  _ -> initialState
                 expectedSymbols = firstSet (t `Then` return)
                 makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
