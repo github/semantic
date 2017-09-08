@@ -26,9 +26,9 @@ import Syntax
 
 -- | A Term with an abstract syntax tree and an annotation.
 infixr 5 :<
-data Term f a = a :< f (Term f a)
+data Term expr ann = ann :< expr (Term expr ann)
 infixr 5 :<<
-data TermF f a b = (:<<) { headF :: a, tailF :: f b }
+data TermF expr ann recur = (:<<) { headF :: ann, tailF :: expr recur }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A Term with a Syntax leaf and a record of fields.
