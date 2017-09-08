@@ -5,7 +5,6 @@ module Term
 , SyntaxTerm
 , SyntaxTermF
 , termSize
-, alignTermWith
 , cofree
 , unTerm
 , extract
@@ -16,16 +15,13 @@ module Term
 import Control.Comonad
 import Control.Comonad.Cofree.Class
 import Control.DeepSeq
-import Control.Monad.Free
 import Data.Bifunctor
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
 import Data.Functor.Listable
-import Data.Maybe
 import Data.Proxy
 import Data.Record
-import Data.These
 import Data.Union
 import Syntax
 
@@ -50,18 +46,6 @@ instance (NFData a, NFData (f b)) => NFData (TermF f a b) where
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
   size (_ :<< syntax) = 1 + sum syntax
-
--- | Aligns (zips, retaining non-overlapping portions of the structure) a pair of terms.
-alignTermWith :: Functor f
-  => (forall a b. f a -> f b -> Maybe (f (These a b))) -- ^ A function comparing a pair of structures, returning `Just` the combined structure if they are comparable (e.g. if they have the same constructor), and `Nothing` otherwise. The 'Data.Align.Generic.galign' function is usually what you want here.
-  -> (These (Term f a) (Term f b) -> contrasted) -- ^ A function mapping a 'These' of incomparable terms into 'Pure' values in the resulting tree.
-  -> (a -> b -> combined) -- ^ A function mapping the input terms’ annotations into annotations in the 'Free' values in the resulting tree.
-  -> These (Term f a) (Term f b) -- ^ The input terms.
-  -> Free (TermF f combined) contrasted
-alignTermWith compare contrast combine = go
-  where go terms = fromMaybe (pure (contrast terms)) $ case terms of
-          These (a1 :< f1) (a2 :< f2) -> wrap . (combine a1 a2 :<<) . fmap go <$> compare f1 f2
-          _ -> Nothing
 
 
 cofree :: TermF f a (Term f a) -> Term f a
