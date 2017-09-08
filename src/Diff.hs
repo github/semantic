@@ -49,11 +49,13 @@ mapAnnotations :: (Functor f, Functor g)
                -> Free.Free (TermF f (g annotation')) (Patch (Term f annotation'))
 mapAnnotations f = Free.hoistFree (first (fmap f)) . fmap (fmap (fmap f))
 
+instance NFData1 f => NFData1 (Free.Free f) where
+  liftRnf rnfA = go
+    where go (Free.Free f) = liftRnf go f
+          go (Free.Pure a) = rnfA a
 
-instance (NFData (f (Diff f a)), NFData (f (Term f a)), NFData a, Functor f) => NFData (Diff f a) where
-  rnf fa = case runFree fa of
-    FreeF.Free f -> rnf f `seq` ()
-    FreeF.Pure a -> rnf a `seq` ()
+instance (NFData1 f, NFData a) => NFData (Diff f a) where
+  rnf = rnf1
 
 
 free :: FreeF.FreeF f a (Free.Free f a) -> Free.Free f a
