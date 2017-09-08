@@ -33,7 +33,9 @@ type Syntax =
    , Declaration.Module
    , Expression.Call
    , Expression.MemberAccess
+   , Literal.Hash
    , Literal.Integer
+   , Literal.KeyValue
    , Literal.TextElement
    , Statement.Assignment
    , Syntax.Error
@@ -124,6 +126,7 @@ typeSpecs = makeTerm <$> location <*> many typeSpec
 typeSpec :: Assignment
 typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> structType)
         <|> mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
+        <|> mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> ((,) <$> symbol MapType <*> children ((,,,) <$> symbol TypeIdentifier <*> source <*> symbol TypeIdentifier <*> source)))
         <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
   where
     mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
@@ -131,6 +134,14 @@ typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> s
 
     mkInterface loc (name, interfaceBody) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Interface name interfaceBody)) name
     interfaceType = symbol InterfaceType *> children (many expression)
+
+    mkMap loc (name, (mapLoc, (keyTypeLoc, keyTypeName, valueTypeLoc, valueTypeName))) =
+      makeTerm loc $ Type.Annotation (makeTerm mapLoc (Literal.Hash (pure $ mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName))) name
+
+    mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName =
+      makeTerm keyTypeLoc $
+        Literal.KeyValue (makeTerm keyTypeLoc   (Type.Annotation (makeTerm keyTypeLoc   (Syntax.Empty)) (makeTerm keyTypeLoc   (Syntax.Identifier keyTypeName))))
+                         (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc (Syntax.Empty)) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
 
 fieldDeclaration :: Assignment
 fieldDeclaration = mkFieldDeclaration <$> symbol FieldDeclaration <*> children ((,) <$> many identifier <*> typeLiteral)
