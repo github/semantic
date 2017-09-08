@@ -1,5 +1,4 @@
 {-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term
 ( Term
 , TermF
