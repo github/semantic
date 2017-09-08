@@ -4,7 +4,6 @@ module Term
 , TermF(..)
 , SyntaxTerm
 , SyntaxTermF
-, zipTerms
 , termSize
 , alignTermWith
 , cofree
@@ -18,9 +17,7 @@ import Control.Comonad
 import Control.Comonad.Cofree.Class
 import Control.DeepSeq
 import Control.Monad.Free
-import Data.Align.Generic
 import Data.Bifunctor
-import Data.Functor.Both
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
@@ -48,12 +45,6 @@ instance (NFData (f (Term f a)), NFData a, Functor f) => NFData (Term f a) where
 
 instance (NFData a, NFData (f b)) => NFData (TermF f a b) where
   rnf (a :<< s) = rnf a `seq` rnf s `seq` ()
-
--- | Zip two terms by combining their annotations into a pair of annotations.
--- | If the structure of the two terms don't match, then Nothing will be returned.
-zipTerms :: (Traversable f, GAlign f) => Term f annotation -> Term f annotation -> Maybe (Term f (Both annotation))
-zipTerms t1 t2 = iter go (alignTermWith galign (const Nothing) both (These t1 t2))
-  where go (a :<< s) = (a :<) <$> sequenceA s
 
 -- | Return the node count of a term.
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
