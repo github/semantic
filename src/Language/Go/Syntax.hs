@@ -33,6 +33,7 @@ type Syntax =
    , Declaration.Module
    , Expression.Call
    , Expression.MemberAccess
+   , Literal.Channel
    , Literal.Hash
    , Literal.Integer
    , Literal.KeyValue
@@ -94,6 +95,9 @@ typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types 
          <|> symbol ParenthesizedType
          <|> symbol SliceType
 
+channelType :: Assignment
+channelType = makeTerm <$> symbol ChannelType <*> children (Literal.Channel <$> expression)
+
 identifier :: Assignment
 identifier =
       mk FieldIdentifier
@@ -127,6 +131,7 @@ typeSpec :: Assignment
 typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> structType)
         <|> mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
         <|> mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> ((,) <$> symbol MapType <*> children ((,,,) <$> symbol TypeIdentifier <*> source <*> symbol TypeIdentifier <*> source)))
+        <|> mkChannel <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> channelType)
         <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
   where
     mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
@@ -137,6 +142,8 @@ typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> s
 
     mkMap loc (name, (mapLoc, (keyTypeLoc, keyTypeName, valueTypeLoc, valueTypeName))) =
       makeTerm loc $ Type.Annotation (makeTerm mapLoc (Literal.Hash (pure $ mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName))) name
+
+    mkChannel loc (name, channel) = makeTerm loc $ Type.Annotation name channel
 
     mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName =
       makeTerm keyTypeLoc $
