@@ -53,14 +53,11 @@ hoistTerm f = go where go (a :< r) = a :< f (fmap go r)
 liftPrettyUnion :: Apply1 Pretty1 fs => (a -> Doc ann) -> ([a] -> Doc ann) -> Union fs a -> Doc ann
 liftPrettyUnion p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
 
-instance Pretty1 f => Pretty1 (Term f) where
-  liftPretty p pl = go where go (a :< f) = p a <+> liftPretty go (Pretty.list . map (liftPretty p pl)) f
+instance Apply1 Pretty1 fs => Pretty1 (Term (Union fs)) where
+  liftPretty p pl = go where go (a :< f) = p a <+> liftPrettyUnion go (Pretty.list . map (liftPretty p pl)) f
 
-instance (Pretty1 f, Pretty a) => Pretty (Term f a) where
+instance (Apply1 Pretty1 fs, Pretty a) => Pretty (Term (Union fs) a) where
   pretty = liftPretty pretty prettyList
-
-instance Apply1 Pretty1 fs => Pretty1 (Union fs) where
-  liftPretty = liftPrettyUnion
 
 type instance Base (Term f a) = TermF f a
 
