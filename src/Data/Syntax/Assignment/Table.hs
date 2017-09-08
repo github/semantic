@@ -20,7 +20,7 @@ singleton :: Enum i => i -> a -> Table i a
 singleton i a = Table [i] (IntMap.singleton (fromEnum i) a)
 
 fromListWith :: (Enum i, Ord i) => (a -> a -> a) -> [(i, a)] -> Table i a
-fromListWith with assocs = Table (fmap toEnum (IntSet.toList (IntSet.fromList (fromEnum . fst <$> assocs)))) (IntMap.fromListWith with (first fromEnum <$> assocs))
+fromListWith with assocs = Table (toEnum <$> IntSet.toList (IntSet.fromList (fromEnum . fst <$> assocs))) (IntMap.fromListWith with (first fromEnum <$> assocs))
 
 toList :: Enum i => Table i a -> [(i, a)]
 toList Table{..} = first toEnum <$> IntMap.toList tableBranches

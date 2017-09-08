@@ -18,10 +18,11 @@
 {-(Assignment
     (Identifier)
     (Hash
-      (Comment)
-      (KeyValue
-        (Identifier)
-        (Identifier))
+      (Context
+        (Comment)
+        (KeyValue
+          (Identifier)
+          (Identifier)))
       (KeyValue
         (Identifier)
         (Identifier))))-})

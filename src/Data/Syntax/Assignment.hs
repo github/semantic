@@ -95,7 +95,6 @@ module Data.Syntax.Assignment
 , module Parsers
 ) where
 
-import Control.Arrow ((&&&))
 import Control.Applicative
 import Control.Comonad.Cofree as Cofree
 import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
@@ -348,22 +347,14 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (
   l@(Tracing callSiteL la `Then` continueL) <|> r@(Tracing callSiteR ra `Then` continueR) = go callSiteL la continueL callSiteR ra continueR
     where go :: forall l r . Maybe (String, SrcLoc) -> AssignmentF ast grammar l -> (l -> Assignment ast grammar a) -> Maybe (String, SrcLoc) -> AssignmentF ast grammar r -> (r -> Assignment ast grammar a) -> Assignment ast grammar a
           go callSiteL la continueL callSiteR ra continueR = case (la, ra) of
+            (Fail _, _) -> r
             (Alt [], _) -> r
             (_, Alt []) -> l
-            (Fail _, _) -> r
-            (Children cl, Children cr) -> alternate (Children (Left <$> cl <|> Right <$> cr))
-            (Location, Location) -> distribute Location
-            (CurrentNode, CurrentNode) -> distribute CurrentNode
-            (Advance, Advance) -> distribute Advance
-            (End, End) -> distribute End
-            (Source, Source) -> distribute Source
             (Alt ls, Alt rs) -> alternate (Alt ((Left <$> ls) <> (Right <$> rs)))
             (Alt ls, _) -> rebuild (Alt ((continueL <$> ls) <> pure r)) id
             (_, Alt rs) -> rebuild (Alt (pure l <> (continueR <$> rs))) id
             _           -> rebuild (Alt [l, r]) id
-            where distribute :: (l ~ lr, r ~ lr) => AssignmentF ast grammar lr -> Assignment ast grammar a
-                  distribute a = rebuild a (uncurry (<|>) . (continueL &&& continueR))
-                  alternate :: AssignmentF ast grammar (Either l r) -> Assignment ast grammar a
+            where alternate :: AssignmentF ast grammar (Either l r) -> Assignment ast grammar a
                   alternate a = rebuild a (either continueL continueR)
                   rebuild :: AssignmentF ast grammar x -> (x -> Assignment ast grammar a) -> Assignment ast grammar a
                   rebuild a c = Tracing (callSiteL <|> callSiteR) a `Then` c
