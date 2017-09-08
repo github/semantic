@@ -14,7 +14,6 @@ module Term
 
 import Control.Comonad
 import Control.Comonad.Cofree.Class
-import Control.DeepSeq
 import Data.Bifunctor
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
@@ -35,21 +34,6 @@ data TermF f a b = (:<<) { headF :: a, tailF :: f b }
 -- | A Term with a Syntax leaf and a record of fields.
 type SyntaxTerm fields = Term Syntax (Record fields)
 type SyntaxTermF fields = TermF Syntax (Record fields)
-
-instance NFData1 f => NFData1 (Term f) where
-  liftRnf rnfA = go where go (a :< f) = rnfA a `seq` liftRnf go f
-
-instance (NFData1 f, NFData a) => NFData (Term f a) where
-  rnf = rnf1
-
-instance NFData1 f => NFData2 (TermF f) where
-  liftRnf2 rnfA rnfB (a :<< f) = rnfA a `seq` liftRnf rnfB f `seq` ()
-
-instance (NFData1 f, NFData a) => NFData1 (TermF f a) where
-  liftRnf = liftRnf2 rnf
-
-instance (NFData1 f, NFData a, NFData b) => NFData (TermF f a b) where
-  rnf = rnf1
 
 -- | Return the node count of a term.
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
