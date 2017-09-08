@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeSynonymInstances, UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeFamilies #-}
 module Term
 ( Term(..)
 , TermF(..)
