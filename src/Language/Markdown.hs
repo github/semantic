@@ -11,7 +11,7 @@ import Data.Source
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import Info
 import TreeSitter.Language (Symbol(..), SymbolType(..))
-import Term as Cofree
+import Term
 
 data Grammar
   = Document
@@ -48,9 +48,9 @@ exts = [
   , extTagfilter
   ]
 
-cmarkParser :: Source -> A.AST (CofreeF [] NodeType) Grammar
+cmarkParser :: Source -> A.AST (TermF [] NodeType) Grammar
 cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] exts (toText source)
-  where toTerm :: Range -> Span -> Node -> A.AST (CofreeF [] NodeType) Grammar
+  where toTerm :: Range -> Span -> Node -> A.AST (TermF [] NodeType) Grammar
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position

@@ -127,7 +127,7 @@ type Assignment ast grammar = Freer (Tracing (AssignmentF ast grammar))
 data AssignmentF ast grammar a where
   End :: AssignmentF ast grammar ()
   Location :: AssignmentF ast grammar (Record Location)
-  CurrentNode :: AssignmentF ast grammar (CofreeF ast (Node grammar) ())
+  CurrentNode :: AssignmentF ast grammar (TermF ast (Node grammar) ())
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: AssignmentF ast grammar ()
@@ -157,7 +157,7 @@ location :: HasCallStack => Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
 
 -- | Zero-width production of the current node.
-currentNode :: HasCallStack => Assignment ast grammar (CofreeF ast (Node grammar) ())
+currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) ())
 currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
@@ -206,7 +206,7 @@ toIndex = index (minBound, maxBound)
 type Location = '[Info.Range, Info.Span]
 
 -- | An AST node labelled with symbols and source location.
-type AST f grammar = Cofree f (Node grammar)
+type AST f grammar = Term f (Node grammar)
 
 data Node grammar = Node
   { nodeSymbol :: !grammar

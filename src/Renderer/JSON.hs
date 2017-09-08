@@ -56,7 +56,7 @@ instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSON (Free f a) wher
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
 
-instance (ToJSONFields a, ToJSONFields (f (Cofree f a))) => ToJSON (Cofree f a) where
+instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSON (Term f a) where
   toJSON (a :< f) = object (toJSONFields a <> toJSONFields f)
   toEncoding (a :< f) = pairs (mconcat (toJSONFields a <> toJSONFields f))
 
@@ -85,10 +85,10 @@ instance ToJSONFields Span where
 instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
 
-instance (ToJSONFields a, ToJSONFields (f (Cofree f a))) => ToJSONFields (Cofree f a) where
+instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a) where
   toJSONFields (a :< f) = toJSONFields a <> toJSONFields f
 
-instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (CofreeF f a b) where
+instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (TermF f a b) where
   toJSONFields (a :<< f) = toJSONFields a <> toJSONFields f
 
 instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSONFields (Free f a) where
