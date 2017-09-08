@@ -4,7 +4,6 @@ module Renderer.SExpression
 , renderSExpressionTerm
 ) where
 
-import Control.Comonad.Trans.Cofree hiding (runCofree)
 import Control.Monad.Trans.Free hiding (runFree)
 import Data.Bifunctor.Join
 import Data.ByteString.Char8 hiding (foldr, spanEnd)
@@ -13,7 +12,7 @@ import Data.Semigroup
 import Diff
 import Patch
 import Prelude hiding (replicate)
-import Term hiding ((:<))
+import Term
 
 -- | Returns a ByteString SExpression formatted diff.
 renderSExpressionDiff :: (ConstrainAll Show fields, Foldable f) => Diff f (Record fields) -> ByteString
@@ -29,7 +28,7 @@ printDiff diff level = case runFree diff of
     Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "+}"
     Delete term -> pad (level - 1) <> "{-" <> printTerm term level <> "-}"
     Replace a b -> pad (level - 1) <> "{ " <> printTerm a level <> pad (level - 1) <> "->" <> printTerm b level <> " }"
-  Free (Join (_, annotation) :< syntax) -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
+  Free (Join (_, annotation) :<< syntax) -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
   where
     pad' :: Int -> ByteString
     pad' n = if n < 1 then "" else pad n
@@ -45,8 +44,8 @@ printTerm term level = go term level 0
     pad p n | n < 1 = ""
             | otherwise = "\n" <> replicate (2 * (p + n)) ' '
     go :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
-    go term parentLevel level = case runCofree term of
-      (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
+    go (annotation :< syntax) parentLevel level =
+      pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString
 showAnnotation Nil = ""

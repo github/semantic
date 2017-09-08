@@ -95,7 +95,6 @@ module Data.Syntax.Assignment
 
 import Control.Arrow ((&&&))
 import Control.Applicative
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.Monad (guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
@@ -116,7 +115,7 @@ import qualified Data.Source as Source (Source, slice, sourceBytes)
 import GHC.Stack
 import qualified Info
 import Prelude hiding (until)
-import Term as Cofree
+import Term
 import Text.Parser.Combinators as Parsers
 import TreeSitter.Language
 
@@ -128,7 +127,7 @@ type Assignment ast grammar = Freer (Tracing (AssignmentF ast grammar))
 data AssignmentF ast grammar a where
   End :: AssignmentF ast grammar ()
   Location :: AssignmentF ast grammar (Record Location)
-  CurrentNode :: AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+  CurrentNode :: AssignmentF ast grammar (CofreeF ast (Node grammar) ())
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
   Advance :: AssignmentF ast grammar ()
@@ -158,7 +157,7 @@ location :: HasCallStack => Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
 
 -- | Zero-width production of the current node.
-currentNode :: HasCallStack => Assignment ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+currentNode :: HasCallStack => Assignment ast grammar (CofreeF ast (Node grammar) ())
 currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
@@ -259,7 +258,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
         run t yield initialState = expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (node :< f) = case runTracing t of
                   Location -> yield (nodeLocation node) state
-                  CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
+                  CurrentNode -> yield (node :<< (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
@@ -298,7 +297,7 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | (Node{..} Cofree.:< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
+  | (Node{..} :< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.

@@ -6,7 +6,6 @@ module Renderer.JSON
 , ToJSONFields(..)
 ) where
 
-import qualified Control.Comonad.Trans.Cofree as CofreeF
 import Control.Monad.Free
 import qualified Control.Monad.Trans.Free as FreeF
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
@@ -89,8 +88,8 @@ instance ToJSONFields a => ToJSONFields (Maybe a) where
 instance (ToJSONFields a, ToJSONFields (f (Cofree f a))) => ToJSONFields (Cofree f a) where
   toJSONFields (a :< f) = toJSONFields a <> toJSONFields f
 
-instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (CofreeF.CofreeF f a b) where
-  toJSONFields (a CofreeF.:< f) = toJSONFields a <> toJSONFields f
+instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (CofreeF f a b) where
+  toJSONFields (a :<< f) = toJSONFields a <> toJSONFields f
 
 instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSONFields (Free f a) where
   toJSONFields (Free f) = toJSONFields f

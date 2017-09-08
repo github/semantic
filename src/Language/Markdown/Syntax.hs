@@ -20,7 +20,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Union
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
-import Term (Cofree(..), CofreeF, unwrap, headF, tailF)
+import Term (Cofree(..), CofreeF(..), unwrap, headF, tailF)
 import qualified Term
 
 type Syntax =

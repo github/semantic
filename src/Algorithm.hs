@@ -2,7 +2,6 @@
 module Algorithm where
 
 import Control.Applicative (liftA2)
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.Monad (guard, join)
 import Control.Monad.Free (wrap)
 import Control.Monad.Free.Freer hiding (wrap)
@@ -89,9 +88,7 @@ instance Show term => Show1 (AlgorithmF term diff) where
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
 -- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
 algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f a) (Diff f a) (Diff f a)
-algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (fmap (wrap . (both ann1 ann2 CofreeF.:<)) <$> algorithmFor f1 f2)
-  where ann1 CofreeF.:< f1 = runCofree t1
-        ann2 CofreeF.:< f2 = runCofree t2
+algorithmForTerms t1@(ann1 :< f1) t2@(ann2 :< f2) = fromMaybe (byReplacing t1 t2) (fmap (wrap . (both ann1 ann2 :<<)) <$> algorithmFor f1 f2)
 
 
 -- | A type class for determining what algorithm to use for diffing two terms.

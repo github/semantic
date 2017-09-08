@@ -7,7 +7,6 @@ module Interpreter
 ) where
 
 import Algorithm
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.Monad.Free (cutoff, wrap)
 import Control.Monad.Free.Freer hiding (cutoff, wrap)
 import Data.Align.Generic
@@ -51,7 +50,7 @@ diffTermsWith refine comparable (Join (a, b)) = runFreer decompose (diff a b)
         decompose step = case step of
           Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> wrap . (both (extract t1) (extract t2) CofreeF.:<) <$> sequenceA result
+            Just result -> wrap . (both (extract t1) (extract t2) :<<) <$> sequenceA result
             _ -> byReplacing t1 t2
           RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
           Delete a -> pure (deleting a)
@@ -60,7 +59,7 @@ diffTermsWith refine comparable (Join (a, b)) = runFreer decompose (diff a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
-getLabel (h CofreeF.:< t) = (Info.category h, case t of
+getLabel (h :<< t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
 
@@ -106,16 +105,16 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
                <*> byRWS bodyA bodyB
   _ -> linearly t1 t2
   where
-    annotate = wrap . (both (extract t1) (extract t2) CofreeF.:<)
+    annotate = wrap . (both (extract t1) (extract t2) :<<)
 
 
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
-comparableByCategory (a CofreeF.:< _) (b CofreeF.:< _) = category a == category b
+comparableByCategory (a :<< _) (b :<< _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
 comparableByConstructor :: GAlign f => ComparabilityRelation f fields
-comparableByConstructor (_ CofreeF.:< a) (_ CofreeF.:< b) = isJust (galign a b)
+comparableByConstructor (_ :<< a) (_ :<< b) = isJust (galign a b)
 
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.

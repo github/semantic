@@ -14,8 +14,6 @@ module RWS (
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
-import Control.Comonad
-import Control.Comonad.Trans.Cofree hiding (cofree, runCofree)
 import Control.Monad.Free
 import Control.Monad.State.Strict
 import Data.Foldable
@@ -30,7 +28,7 @@ import Data.Semigroup hiding (First(..))
 import Data.These
 import Data.Traversable
 import Patch
-import Term hiding ((:<))
+import Term
 import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES
@@ -228,8 +226,7 @@ featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
 
 eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
-eraseFeatureVector term = let record :< functor = runCofree term in
-  cofree (setFeatureVector record nullFeatureVector :< functor)
+eraseFeatureVector (record :< functor) = setFeatureVector record nullFeatureVector :< functor
 
 nullFeatureVector :: FeatureVector
 nullFeatureVector = listArray (0, 0) [0]
@@ -263,7 +260,7 @@ featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields labe
 featureVectorDecorator getLabel p q d
  = cata collect
  . pqGramDecorator getLabel p q
- where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
+ where collect ((gram :. rest) :<< functor) = ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
 
@@ -281,7 +278,7 @@ pqGramDecorator
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
-      cofree ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
+      ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
@@ -289,11 +286,10 @@ pqGramDecorator getLabel p q = cata algebra
                  => label
                  -> Term f (Record (Gram label ': fields))
                  -> State [Maybe label] (Term f (Record (Gram label ': fields)))
-    assignLabels label a = case runCofree a of
-      (gram :. rest) :< functor -> do
-        labels <- get
-        put (drop 1 labels)
-        pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
+    assignLabels label ((gram :. rest) :< functor) = do
+      labels <- get
+      put (drop 1 labels)
+      pure $! ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . extract)
     padToSize n list = take n (list <> repeat empty)

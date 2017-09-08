@@ -18,7 +18,6 @@ module Renderer
 , File(..)
 ) where
 
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.DeepSeq
 import Data.Aeson (Value, (.=))
 import Data.ByteString (ByteString)
@@ -76,7 +75,7 @@ data SomeRenderer f where
 deriving instance Show (SomeRenderer f)
 
 identifierAlgebra :: RAlgebra (CofreeF Syntax a) (Cofree Syntax a) (Maybe Identifier)
-identifierAlgebra (_ CofreeF.:< syntax) = case syntax of
+identifierAlgebra (_ :<< syntax) = case syntax of
   S.Assignment f _ -> identifier f
   S.Class f _ _ -> identifier f
   S.Export f _ -> f >>= identifier

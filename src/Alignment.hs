@@ -10,7 +10,6 @@ module Alignment
 
 import Data.Bifunctor (bimap, first, second)
 import Control.Arrow ((***))
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.Monad (join)
 import Control.Monad.Free
 import Data.Align
@@ -66,12 +65,12 @@ alignPatch sources patch = case patch of
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
 alignSyntax :: (Applicative f, HasField fields Range, Foldable g) => (forall a. f a -> Join These a) -> (TermF [] (Record fields) term -> term) -> (term -> Range) -> f Source -> TermF g (f (Record fields)) [Join These term] -> [Join These term]
-alignSyntax toJoinThese toNode getRange sources (infos CofreeF.:< syntax) =
+alignSyntax toJoinThese toNode getRange sources (infos :<< syntax) =
   catMaybes $ wrapInBranch <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ sourceLineRangesWithin . byteRange <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
-        makeNode info (range, children) = toNode (setByteRange info range CofreeF.:< children)
+        makeNode info (range, children) = toNode (setByteRange info range :<< children)
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]

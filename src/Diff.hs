@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Diff where
 
-import qualified Control.Comonad.Trans.Cofree as CofreeF
 import Control.DeepSeq
 import qualified Control.Monad.Free as Free
 import qualified Control.Monad.Trans.Free as FreeF
@@ -31,7 +30,7 @@ diffCost = diffSum $ patchSum termSize
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> (Both annotation -> annotation) -> Diff f annotation -> Maybe (Term f annotation)
 mergeMaybe transform extractAnnotation = Free.iter algebra . fmap transform
-  where algebra (annotations CofreeF.:< syntax) = cofree . (extractAnnotation annotations CofreeF.:<) <$> sequenceAlt syntax
+  where algebra (annotations :<< syntax) = (extractAnnotation annotations :<) <$> sequenceAlt syntax
 
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)

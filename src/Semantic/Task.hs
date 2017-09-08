@@ -24,7 +24,6 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import Control.Concurrent.STM.TMQueue
 import Control.Exception
 import Control.Monad.Error.Class
@@ -221,7 +220,7 @@ runParser Options{..} blob@Blob{..} = go
           LineByLineParser -> logTiming "line-by-line parse" $ pure (lineByLineParser blobSource)
         blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
         errors :: (Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
-        errors = cata $ \ (a CofreeF.:< syntax) -> case syntax of
+        errors = cata $ \ (a :<< syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
           _ -> fold syntax
         logTiming :: String -> Task a -> Task a
