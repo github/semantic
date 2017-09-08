@@ -122,14 +122,14 @@ typeSpecs :: Assignment
 typeSpecs = makeTerm <$> location <*> many typeSpec
 
 typeSpec :: Assignment
-typeSpec =  mkTypeStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> structType)
-        <|> mkTypeInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
+typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> structType)
+        <|> mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
         <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
   where
-    mkTypeStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
+    mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
     structType = symbol StructType *> children (many fieldDeclaration)
 
-    mkTypeInterface loc (name, interfaceBody) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Interface name interfaceBody)) name
+    mkInterface loc (name, interfaceBody) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Interface name interfaceBody)) name
     interfaceType = symbol InterfaceType *> children (many expression)
 
 fieldDeclaration :: Assignment
