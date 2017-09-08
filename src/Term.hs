@@ -114,8 +114,11 @@ instance Eq1 f => Eq1 (Term f) where
 instance (Eq1 f, Eq a) => Eq (Term f a) where
   (==) = eq1
 
-instance (Show (f (Term f a)), Show a) => Show (Term f a) where
-  showsPrec d (a :< f) = showParen (d > 5) $ showsPrec 6 a . showString " :< " . showsPrec 5 f
+instance Show1 f => Show1 (Term f) where
+  liftShowsPrec spA slA = go where go d (a :< f) = showParen (d > 5) $ spA 6 a . showString " :< " . liftShowsPrec go (liftShowList spA slA) 5 f
+
+instance (Show1 f, Show a) => Show (Term f a) where
+  showsPrec = showsPrec1
 
 instance Functor f => Bifunctor (TermF f) where
   bimap f g (a :<< r) = f a :<< fmap g r

@@ -309,7 +309,7 @@ data State ast grammar = State
   }
 
 deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)
-deriving instance (Show grammar, Show (ast (AST ast grammar))) => Show (State ast grammar)
+deriving instance (Show grammar, Show1 ast) => Show (State ast grammar)
 
 makeState :: [AST ast grammar] -> State ast grammar
 makeState = State 0 (Info.Pos 1 1) []
@@ -369,7 +369,7 @@ instance (Eq grammar, Eq1 ast) => Alternative (Assignment ast grammar) where
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
   many a = tracing (Many a) `Then` return
 
-instance (Eq grammar, Eq1 ast, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
+instance (Eq grammar, Eq1 ast, Show grammar, Show1 ast) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -395,7 +395,7 @@ instance MonadError (Error (Either String grammar)) (Assignment ast grammar) whe
 instance Show1 f => Show1 (Tracing f) where
   liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
 
-instance (Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
+instance (Show grammar, Show1 ast) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
     Advance -> showString "Advance" . showChar ' ' . sp d ()
