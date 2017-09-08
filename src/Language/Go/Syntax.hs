@@ -83,10 +83,14 @@ literal = identifier
        <|> intLiteral
        <|> typeLiteral
        <|> channelType
+       <|> rawStringLiteral
        <|> structType
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
+
+rawStringLiteral :: Assignment
+rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> source)
 
 typedIdentifier :: Assignment
 typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types <*> source
