@@ -35,6 +35,7 @@ import Syntax
 -- | A Term with an abstract syntax tree and an annotation.
 infixr 5 :<
 data Term f a = a :< f (Term f a)
+infixr 5 :<<
 data TermF f a b = (:<<) { headF :: a, tailF :: f b }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
