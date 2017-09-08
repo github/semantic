@@ -9,7 +9,7 @@ module Term
 , unTerm
 , extract
 , unwrap
-, hoistCofree
+, hoistTerm
 ) where
 
 import Control.Comonad
@@ -54,8 +54,8 @@ cofree (a :<< f) = a :< f
 unTerm :: Term f a -> TermF f a (Term f a)
 unTerm (a :< f) = a :<< f
 
-hoistCofree :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
-hoistCofree f = go where go (a :< r) = a :< f (fmap go r)
+hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
+hoistTerm f = go where go (a :< r) = a :< f (fmap go r)
 
 liftPrettyUnion :: Apply1 Pretty1 fs => (a -> Doc ann) -> ([a] -> Doc ann) -> Union fs a -> Doc ann
 liftPrettyUnion p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
