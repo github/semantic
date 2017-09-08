@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Diff where
 
-import Control.DeepSeq
 import qualified Control.Monad.Free as Free
 import qualified Control.Monad.Trans.Free as FreeF
 import Data.Bifunctor
@@ -48,14 +47,6 @@ mapAnnotations :: (Functor f, Functor g)
                -> Free.Free (TermF f (g annotation))  (Patch (Term f annotation))
                -> Free.Free (TermF f (g annotation')) (Patch (Term f annotation'))
 mapAnnotations f = Free.hoistFree (first (fmap f)) . fmap (fmap (fmap f))
-
-instance NFData1 f => NFData1 (Free.Free f) where
-  liftRnf rnfA = go
-    where go (Free.Free f) = liftRnf go f
-          go (Free.Pure a) = rnfA a
-
-instance (NFData1 f, NFData a) => NFData (Diff f a) where
-  rnf = rnf1
 
 
 free :: FreeF.FreeF f a (Free.Free f a) -> Free.Free f a
