@@ -109,73 +109,75 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
-expression = term (handleError everything)
-  where -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
-        everything = choice
-          [ argumentList
-          , assertStatement
-          , assignment'
-          , await
-          , binaryOperator
-          , boolean
-          , booleanOperator
-          , breakStatement
-          , call
-          , classDefinition
-          , comparisonOperator
-          , comprehension
-          , concatenatedString
-          , conditionalExpression
-          , continueStatement
-          , decoratedDefinition
-          , deleteStatement
-          , dictionary
-          , dictionarySplat
-          , dottedName
-          , ellipsis
-          , exceptClause
-          , execStatement
-          , expressionList
-          , expressionStatement
-          , finallyClause
-          , float
-          , forInClause
-          , forStatement
-          , functionDefinition
-          , globalStatement
-          , identifier
-          , ifClause
-          , ifStatement
-          , import'
-          , integer
-          , keywordArgument
-          , list'
-          , listSplat
-          , memberAccess
-          , none
-          , nonlocalStatement
-          , notOperator
-          , pair
-          , parameter
-          , parenthesizedExpression
-          , parseError
-          , passStatement
-          , printStatement
-          , raiseStatement
-          , returnStatement
-          , set
-          , slice
-          , string
-          , subscript
-          , tryStatement
-          , tuple
-          , type'
-          , unaryOperator
-          , variables
-          , whileStatement
-          , withStatement
-          , yield
-          ]
+expression = term (handleError (choice expressionChoices))
+
+expressionChoices :: [Assignment.Assignment [] Grammar Term]
+expressionChoices =
+  -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
+  [ argumentList
+  , assertStatement
+  , assignment'
+  , await
+  , binaryOperator
+  , boolean
+  , booleanOperator
+  , breakStatement
+  , call
+  , classDefinition
+  , comparisonOperator
+  , comprehension
+  , concatenatedString
+  , conditionalExpression
+  , continueStatement
+  , decoratedDefinition
+  , deleteStatement
+  , dictionary
+  , dictionarySplat
+  , dottedName
+  , ellipsis
+  , exceptClause
+  , execStatement
+  , expressionList
+  , expressionStatement
+  , finallyClause
+  , float
+  , forInClause
+  , forStatement
+  , functionDefinition
+  , globalStatement
+  , identifier
+  , ifClause
+  , ifStatement
+  , import'
+  , integer
+  , keywordArgument
+  , list'
+  , listSplat
+  , memberAccess
+  , none
+  , nonlocalStatement
+  , notOperator
+  , pair
+  , parameter
+  , parenthesizedExpression
+  , parseError
+  , passStatement
+  , printStatement
+  , raiseStatement
+  , returnStatement
+  , set
+  , slice
+  , string
+  , subscript
+  , tryStatement
+  , tuple
+  , type'
+  , unaryOperator
+  , variables
+  , whileStatement
+  , withStatement
+  , yield
+  ]
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
