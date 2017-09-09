@@ -6,6 +6,7 @@ import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
+import Data.Functor.Classes.Show.Generic
 import Data.Functor.Listable
 import Data.Mergeable
 import Data.Text (pack, Text)
@@ -180,7 +181,6 @@ instance Listable1 Syntax where
 instance Listable recur => Listable (Syntax recur) where
   tiers = tiers1
 
-instance Eq1 Syntax where
-  liftEq = genericLiftEq
-
+instance Eq1 Syntax where liftEq = genericLiftEq
+instance Show1 Syntax where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Syntax where liftPretty = genericLiftPretty
