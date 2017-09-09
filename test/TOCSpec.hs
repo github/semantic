@@ -55,10 +55,10 @@ spec = parallel $ do
       \ patch -> let patch' = (patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (Diff (Patch patch')) `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = copy (pure 0) (Indexed [diff :: Diff Syntax Int]) in
+      \ diff -> let diff' = copy (pure 0) (Indexed [1 <$ (diff :: Diff Syntax Int)]) in
         tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
-        if null diff' then [Unchanged 0]
-                      else replicate (length diff') (Changed 0)
+        if null (diffPatches diff') then [Unchanged 0]
+                                    else replicate (length (diffPatches diff')) (Changed 0)
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
