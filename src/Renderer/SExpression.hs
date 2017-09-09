@@ -37,15 +37,14 @@ printDiff = cata $ \ diff level -> case diff of
           | n < 1 = "\n"
           | otherwise = "\n" <> replicate (2 * n) ' '
 
-printTerm :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> ByteString
-printTerm term level = go term level 0
+printTerm :: (ConstrainAll Show fields, Foldable f, Functor f) => Term f (Record fields) -> Int -> ByteString
+printTerm term level = cata go term level 0
   where
     pad :: Int -> Int -> ByteString
     pad p n | n < 1 = ""
             | otherwise = "\n" <> replicate (2 * (p + n)) ' '
-    go :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
-    go (Term (annotation :< syntax)) parentLevel level =
-      pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
+    go (annotation :< syntax) parentLevel level =
+      pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> t parentLevel (level + 1) <> acc) "" syntax <> ")"
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString
 showAnnotation Nil = ""
