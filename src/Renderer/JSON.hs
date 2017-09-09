@@ -17,7 +17,6 @@ import Data.JSON.Fields
 import qualified Data.Map as Map
 import Data.Output
 import Data.Proxy
-import Data.Record
 import Data.Semigroup ((<>))
 import Data.Text (pack, Text)
 import Data.Text.Encoding (decodeUtf8)
@@ -54,16 +53,6 @@ instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a
   toEncoding = pairs . mconcat . toJSONFields
 
 instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSON (Term f a) where
-  toJSON = object . toJSONFields
-  toEncoding = pairs . mconcat . toJSONFields
-
-instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ': t)) where
-  toJSONFields (h :. t) = toJSONFields h <> toJSONFields t
-
-instance ToJSONFields (Record '[]) where
-  toJSONFields _ = []
-
-instance ToJSONFields (Record fs) => ToJSON (Record fs) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
 
