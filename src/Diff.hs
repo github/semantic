@@ -29,7 +29,7 @@ newtype MetaVar = MetaVar { unMetaVar :: String }
   deriving (Eq, Ord, Show)
 
 newtype Env a = Env { unEnv :: [(MetaVar, a)] }
-  deriving (Eq, Monoid, Ord, Show)
+  deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
 
 envExtend :: MetaVar -> a -> Env a -> Env a
 envExtend var val (Env m) = Env ((var, val) : m)
