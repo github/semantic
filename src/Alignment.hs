@@ -11,7 +11,7 @@ module Alignment
 import Data.Bifunctor (bimap, first, second)
 import Control.Arrow ((***))
 import Control.Monad (join)
-import Control.Monad.Free
+import Control.Monad.Free (wrap)
 import Data.Align
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
@@ -47,7 +47,9 @@ hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: Traversable f => HasField fields Range => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
-alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources) (alignPatch sources <$> diff)
+alignDiff sources = cata $ \ diff -> case diff of
+  In ann r -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (ann :<< r)
+  Patch patch -> alignPatch sources patch
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
 alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both Source -> Patch (Term f (Record fields)) -> [Join These (SplitDiff [] (Record fields))]

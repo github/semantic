@@ -3,9 +3,7 @@ module RWS (
     rws
   , ComparabilityRelation
   , FeatureVector
-  , stripDiff
   , defaultFeatureVectorDecorator
-  , stripTerm
   , featureVectorDecorator
   , pqGramDecorator
   , Gram(..)
@@ -14,7 +12,6 @@ module RWS (
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
-import Control.Monad.Free
 import Control.Monad.State.Strict
 import Data.Foldable
 import Data.Function ((&), on)
@@ -27,7 +24,6 @@ import Data.Record
 import Data.Semigroup hiding (First(..))
 import Data.These
 import Data.Traversable
-import Patch
 import Term hiding (term)
 import Data.Array.Unboxed
 import Data.Functor.Classes
@@ -39,7 +35,6 @@ import qualified Data.IntMap as IntMap
 
 import Control.Monad.Random
 import System.Random.Mersenne.Pure64
-import Diff (mapAnnotations)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 
@@ -309,18 +304,6 @@ canCompareTerms canCompare = canCompare `on` unTerm
 equalTerms :: Eq1 f => ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
 equalTerms canCompare = go
   where go a b = canCompareTerms canCompare a b && liftEq go (tailF (unTerm a)) (tailF (unTerm b))
-
-
--- | Strips the head annotation off a term annotated with non-empty records.
-stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
-stripTerm = fmap rtail
-
--- | Strips the head annotation off a diff annotated with non-empty records.
-stripDiff
-  :: (Functor f, Functor g)
-  => Free (TermF f (g (Record (h ': t)))) (Patch (Term f (Record (h ': t))))
-  -> Free (TermF f (g (Record t)))        (Patch (Term f (Record t)))
-stripDiff = mapAnnotations rtail
 
 
 -- Instances

@@ -17,10 +17,9 @@ module Renderer.TOC
 , entrySummary
 ) where
 
-import Control.Monad.Free (iter)
 import Data.Aeson
 import Data.Align (crosswalk)
-import Data.Bifunctor (bimap, first)
+import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Error as Error (formatError)
@@ -153,11 +152,14 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap patchEntry . crosswalk (termTableOfContentsBy selector))
-  where diffAlgebra r = case (selector (first Both.snd r), fold r) of
-          (Just a, Nothing) -> Just [Unchanged a]
-          (Just a, Just []) -> Just [Changed a]
-          (_     , entries) -> entries
+tableOfContentsBy selector = fromMaybe [] . cata diffAlgebra
+  where diffAlgebra r = case r of
+          In ann r -> case (selector (Both.snd ann :<< r), fold r) of
+            (Just a, Nothing) -> Just [Unchanged a]
+            (Just a, Just []) -> Just [Changed a]
+            (_     , entries) -> entries
+          Patch patch -> Just (patchEntry <$> crosswalk (termTableOfContentsBy selector) patch)
+
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
 termTableOfContentsBy :: (Foldable f, Functor f)

@@ -1,34 +1,41 @@
-{-# LANGUAGE TypeSynonymInstances, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Diff where
 
-import qualified Control.Monad.Free as Free
-import qualified Control.Monad.Trans.Free as FreeF
 import Data.Bifunctor
 import Data.Functor.Both as Both
 import Data.Functor.Classes.Pretty.Generic
+import Data.Functor.Foldable
 import Data.Mergeable
 import Data.Record
+import Data.Union
 import Patch
 import Syntax
 import Term
 
 -- | An annotated series of patches of terms.
-type DiffF f annotation = FreeF.FreeF (TermF f (Both annotation)) (Patch (Term f annotation))
-type Diff f annotation = Free.Free (TermF f (Both annotation)) (Patch (Term f annotation))
+newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
+
+data DiffF syntax ann recur
+  = In (Both ann) (syntax recur)
+  | Patch (Patch (Term syntax ann))
+  deriving (Functor)
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
-diffSum :: (Foldable f, Functor f) => (Patch (Term f annotation) -> Int) -> Diff f annotation -> Int
-diffSum patchCost diff = sum $ fmap patchCost diff
+diffSum :: (Foldable syntax, Functor syntax) => (Patch (Term syntax annotation) -> Int) -> Diff syntax annotation -> Int
+diffSum patchCost = go
+  where go (Diff (In _ syntax)) = sum (fmap go syntax)
+        go (Diff (Patch patch)) = patchCost patch
 
 -- | The sum of the node count of the diff’s patches.
-diffCost :: (Foldable f, Functor f) => Diff f annotation -> Int
-diffCost = diffSum $ patchSum termSize
+diffCost :: (Foldable syntax, Functor syntax) => Diff syntax annotation -> Int
+diffCost = diffSum (patchSum termSize)
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> (Both annotation -> annotation) -> Diff f annotation -> Maybe (Term f annotation)
-mergeMaybe transform extractAnnotation = Free.iter algebra . fmap transform
-  where algebra (annotations :<< syntax) = (extractAnnotation annotations :<) <$> sequenceAlt syntax
+mergeMaybe :: Mergeable syntax => (Patch (Term syntax annotation) -> Maybe (Term syntax annotation)) -> (Both annotation -> annotation) -> Diff syntax annotation -> Maybe (Term syntax annotation)
+mergeMaybe transform extractAnnotation = cata algebra
+  where algebra (In annotations syntax) = (extractAnnotation annotations :<) <$> sequenceAlt syntax
+        algebra (Patch term) = transform term
 
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
@@ -38,28 +45,51 @@ beforeTerm = mergeMaybe before Both.fst
 afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 afterTerm = mergeMaybe after Both.snd
 
--- | Map a function over the annotations in a diff, whether in diff or term nodes.
---
---   Typed using Free so as to accommodate Free structures derived from diffs that don’t fit into the Diff type synonym.
-mapAnnotations :: (Functor f, Functor g)
-               => (annotation -> annotation')
-               -> Free.Free (TermF f (g annotation))  (Patch (Term f annotation))
-               -> Free.Free (TermF f (g annotation')) (Patch (Term f annotation'))
-mapAnnotations f = Free.hoistFree (first (fmap f)) . fmap (fmap (fmap f))
+
+-- | Strips the head annotation off a diff annotated with non-empty records.
+stripDiff :: Functor f
+          => Diff f (Record (h ': t))
+          -> Diff f (Record t)
+stripDiff = fmap rtail
 
 
-free :: FreeF.FreeF f a (Free.Free f a) -> Free.Free f a
-free (FreeF.Free f) = Free.Free f
-free (FreeF.Pure a) = Free.Pure a
+-- | Constructs the replacement of one value by another in an Applicative context.
+replacing :: Term syntax ann -> Term syntax ann -> Diff syntax ann
+replacing = (Diff .) . (Patch .) . Replace
 
-runFree :: Free.Free f a -> FreeF.FreeF f a (Free.Free f a)
-runFree (Free.Free f) = FreeF.Free f
-runFree (Free.Pure a) = FreeF.Pure a
+-- | Constructs the insertion of a value in an Applicative context.
+inserting :: Term syntax ann -> Diff syntax ann
+inserting = Diff . Patch . Insert
+
+-- | Constructs the deletion of a value in an Applicative context.
+deleting :: Term syntax ann -> Diff syntax ann
+deleting = Diff . Patch . Delete
 
 
-instance Pretty1 f => Pretty1 (Free.Free f) where
-  liftPretty p pl = go where go (Free.Pure a) = p a
-                             go (Free.Free f) = liftPretty go (list . map (liftPretty p pl)) f
+wrapTermF :: TermF syntax (Both ann) (Diff syntax ann) -> Diff syntax ann
+wrapTermF (a :<< r) = Diff (In a r)
 
-instance (Pretty1 f, Pretty a) => Pretty (Free.Free f a) where
+
+instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
+  liftPretty p pl = go
+    where go (Diff (In _ syntax)) = liftPrettyUnion go (list . map (liftPretty p pl)) syntax
+          go (Diff (Patch patch)) = liftPretty (liftPretty p pl) (list . map (liftPretty p pl)) patch
+
+instance (Apply1 Pretty1 fs, Pretty ann) => Pretty (Diff (Union fs) ann) where
   pretty = liftPretty pretty prettyList
+
+instance Apply1 Pretty1 fs => Pretty2 (DiffF (Union fs)) where
+  liftPretty2 pA plA pB plB (In (Join ann) f) = liftPretty2 pA plA pA plA ann <+> liftPrettyUnion pB plB f
+  liftPretty2 pA plA _ _ (Patch p) = liftPretty (liftPretty pA plA) (list . map (liftPretty pA plA)) p
+
+type instance Base (Diff syntax ann) = DiffF syntax ann
+
+instance Functor syntax => Recursive (Diff syntax ann) where project = unDiff
+instance Functor syntax => Corecursive (Diff syntax ann) where embed = Diff
+
+instance Functor syntax => Functor (Diff syntax) where
+  fmap f = Diff . bimap f (fmap f) . unDiff
+
+instance Functor syntax => Bifunctor (DiffF syntax) where
+  bimap f g (In anns r) = In (fmap f anns) (fmap g r)
+  bimap f _ (Patch term) = Patch (fmap (fmap f) term)

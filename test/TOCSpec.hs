@@ -58,7 +58,7 @@ spec = parallel $ do
       \ patch -> let patch' = (unListableF <$> patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = fmap (1 <$) <$> mapAnnotations (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff Syntax Int])) in
+      \ diff -> let diff' = fmap (1 <$) <$> fmap (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff Syntax Int])) in
         tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
         if null diff' then [Unchanged 0]
                                else replicate (length diff') (Changed 0)

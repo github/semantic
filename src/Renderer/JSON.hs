@@ -6,8 +6,6 @@ module Renderer.JSON
 , ToJSONFields(..)
 ) where
 
-import Control.Monad.Free
-import qualified Control.Monad.Trans.Free as FreeF
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
@@ -23,6 +21,7 @@ import Data.Semigroup ((<>))
 import Data.Text (pack, Text)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Union
+import Diff
 import GHC.Generics
 import Info
 import Language
@@ -45,14 +44,14 @@ renderJSONDiff blobs diff = Map.fromList
 instance Output (Map.Map Text Value) where
   toOutput = toStrict . (<> "\n") . encode
 
-instance ToJSON a => ToJSONFields (Join (,) a) where
-  toJSONFields (Join (a, b)) = [ "before" .= a, "after" .= b ]
+instance ToJSONFields a => ToJSONFields (Join (,) a) where
+  toJSONFields (Join (a, b)) = [ "before" .= object (toJSONFields a), "after" .= object (toJSONFields b) ]
 
 instance ToJSON a => ToJSON (Join (,) a) where
   toJSON = toJSON . toList
   toEncoding = foldable
 
-instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSON (Free f a) where
+instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a))) => ToJSON (Diff f a) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
 
@@ -91,18 +90,17 @@ instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a
 instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (TermF f a b) where
   toJSONFields (a :<< f) = toJSONFields a <> toJSONFields f
 
-instance (ToJSONFields a, ToJSONFields (f (Free f a))) => ToJSONFields (Free f a) where
-  toJSONFields (Free f) = toJSONFields f
-  toJSONFields (Pure a) = toJSONFields a
+instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a))) => ToJSONFields (Diff f a) where
+  toJSONFields = toJSONFields . unDiff
 
-instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (FreeF.FreeF f a b) where
-  toJSONFields (FreeF.Free f) = toJSONFields f
-  toJSONFields (FreeF.Pure a) = toJSONFields a
+instance (ToJSONFields a, ToJSONFields (f b), ToJSONFields (f (Term f a))) => ToJSONFields (DiffF f a b) where
+  toJSONFields (In a f)  = toJSONFields a <> toJSONFields f
+  toJSONFields (Patch a) = toJSONFields a
 
-instance ToJSON a => ToJSONFields (Patch a) where
-  toJSONFields (Insert a) = [ "insert" .= a ]
-  toJSONFields (Delete a) = [ "delete" .= a ]
-  toJSONFields (Replace a b) = [ "replace" .= [a, b] ]
+instance ToJSONFields a => ToJSONFields (Patch a) where
+  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
+  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
+  toJSONFields (Replace a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]
 
 instance ToJSON a => ToJSONFields [a] where
   toJSONFields list = [ "children" .= list ]

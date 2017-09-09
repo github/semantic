@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeFamilies #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators #-}
 module Term
 ( Term(..)
 , TermF(..)
@@ -10,6 +10,8 @@ module Term
 , extract
 , unwrap
 , hoistTerm
+, stripTerm
+, liftPrettyUnion
 ) where
 
 import Control.Comonad
@@ -50,8 +52,14 @@ unTerm (a :< f) = a :<< f
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
 hoistTerm f = go where go (a :< r) = a :< f (fmap go r)
 
+-- | Strips the head annotation off a term annotated with non-empty records.
+stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
+stripTerm = fmap rtail
+
+
 liftPrettyUnion :: Apply1 Pretty1 fs => (a -> Doc ann) -> ([a] -> Doc ann) -> Union fs a -> Doc ann
 liftPrettyUnion p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
+
 
 instance Apply1 Pretty1 fs => Pretty1 (Term (Union fs)) where
   liftPretty p pl = go where go (a :< f) = p a <+> liftPrettyUnion go (Pretty.list . map (liftPretty p pl)) f
