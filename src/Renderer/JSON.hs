@@ -59,9 +59,6 @@ instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSON (Term f a) wher
 instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> pack (show c) }]
 
-instance ToJSONFields Span where
-  toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
-
 instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
 
