@@ -3,12 +3,11 @@ module DiffSpec where
 
 import Category
 import Data.Functor.Both
-import Data.Functor.Listable
+import Data.Functor.Listable ()
 import RWS
 import Diff
 import Info
 import Interpreter
-import SpecHelpers
 import Term
 import Test.Hspec
 import Test.Hspec.LeanCheck
