@@ -25,6 +25,15 @@ import Text.Show
 -- | An annotated series of patches of terms.
 newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 
+data DiffF syntax ann recur
+  = Copy [(MetaVar, recur)] (Both ann) (syntax recur)
+  | Var MetaVar
+  | Patch (Patch (TermF syntax ann recur))
+  deriving (Foldable, Functor, Traversable)
+
+type SyntaxDiff fields = Diff Syntax (Record fields)
+
+
 newtype MetaVar = MetaVar { unMetaVar :: String }
   deriving (Eq, Ord, Show)
 
@@ -36,14 +45,6 @@ envExtend var val (Env m) = Env ((var, val) : m)
 
 envLookup :: MetaVar -> Env a -> Maybe a
 envLookup var = lookup var . unEnv
-
-data DiffF syntax ann recur
-  = Copy [(MetaVar, recur)] (Both ann) (syntax recur)
-  | Var MetaVar
-  | Patch (Patch (TermF syntax ann recur))
-  deriving (Foldable, Functor, Traversable)
-
-type SyntaxDiff fields = Diff Syntax (Record fields)
 
 
 evalDiff :: Functor syntax => (DiffF syntax ann a -> Env a -> a) -> Diff syntax ann -> a
