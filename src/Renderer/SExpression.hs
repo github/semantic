@@ -27,7 +27,7 @@ printDiff diff level = case unDiff diff of
     Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "+}"
     Delete term -> pad (level - 1) <> "{-" <> printTerm term level <> "-}"
     Replace a b -> pad (level - 1) <> "{ " <> printTerm a level <> pad (level - 1) <> "->" <> printTerm b level <> " }"
-  In (Join (_, annotation)) syntax -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
+  Copy (Join (_, annotation)) syntax -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
   where
     pad' :: Int -> ByteString
     pad' n = if n < 1 then "" else pad n

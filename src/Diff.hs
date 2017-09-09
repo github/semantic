@@ -16,7 +16,7 @@ import Term
 newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 
 data DiffF syntax ann recur
-  = In (Both ann) (syntax recur)
+  = Copy (Both ann) (syntax recur)
   | Patch (Patch (Term syntax ann))
   deriving (Functor)
 
@@ -24,7 +24,7 @@ type SyntaxDiff fields = Diff Syntax (Record fields)
 
 diffSum :: (Foldable syntax, Functor syntax) => (Patch (Term syntax annotation) -> Int) -> Diff syntax annotation -> Int
 diffSum patchCost = go
-  where go (Diff (In _ syntax)) = sum (fmap go syntax)
+  where go (Diff (Copy _ syntax)) = sum (fmap go syntax)
         go (Diff (Patch patch)) = patchCost patch
 
 -- | The sum of the node count of the diff’s patches.
@@ -34,7 +34,7 @@ diffCost = diffSum (patchSum termSize)
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: Mergeable syntax => (Patch (Term syntax annotation) -> Maybe (Term syntax annotation)) -> (Both annotation -> annotation) -> Diff syntax annotation -> Maybe (Term syntax annotation)
 mergeMaybe transform extractAnnotation = cata algebra
-  where algebra (In annotations syntax) = (extractAnnotation annotations :<) <$> sequenceAlt syntax
+  where algebra (Copy annotations syntax) = (extractAnnotation annotations :<) <$> sequenceAlt syntax
         algebra (Patch term) = transform term
 
 -- | Recover the before state of a diff.
@@ -67,19 +67,19 @@ deleting = Diff . Patch . Delete
 
 
 wrapTermF :: TermF syntax (Both ann) (Diff syntax ann) -> Diff syntax ann
-wrapTermF (a :<< r) = Diff (In a r)
+wrapTermF (a :<< r) = Diff (Copy a r)
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
   liftPretty p pl = go
-    where go (Diff (In _ syntax)) = liftPrettyUnion go (list . map (liftPretty p pl)) syntax
+    where go (Diff (Copy _ syntax)) = liftPrettyUnion go (list . map (liftPretty p pl)) syntax
           go (Diff (Patch patch)) = liftPretty (liftPretty p pl) (list . map (liftPretty p pl)) patch
 
 instance (Apply1 Pretty1 fs, Pretty ann) => Pretty (Diff (Union fs) ann) where
   pretty = liftPretty pretty prettyList
 
 instance Apply1 Pretty1 fs => Pretty2 (DiffF (Union fs)) where
-  liftPretty2 pA plA pB plB (In (Join ann) f) = liftPretty2 pA plA pA plA ann <+> liftPrettyUnion pB plB f
+  liftPretty2 pA plA pB plB (Copy (Join ann) f) = liftPretty2 pA plA pA plA ann <+> liftPrettyUnion pB plB f
   liftPretty2 pA plA _ _ (Patch p) = liftPretty (liftPretty pA plA) (list . map (liftPretty pA plA)) p
 
 type instance Base (Diff syntax ann) = DiffF syntax ann
@@ -91,5 +91,5 @@ instance Functor syntax => Functor (Diff syntax) where
   fmap f = Diff . bimap f (fmap f) . unDiff
 
 instance Functor syntax => Bifunctor (DiffF syntax) where
-  bimap f g (In anns r) = In (fmap f anns) (fmap g r)
+  bimap f g (Copy anns r) = Copy (fmap f anns) (fmap g r)
   bimap f _ (Patch term) = Patch (fmap (fmap f) term)

@@ -154,7 +154,7 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata diffAlgebra
   where diffAlgebra r = case r of
-          In ann r -> case (selector (Both.snd ann :<< r), fold r) of
+          Copy ann r -> case (selector (Both.snd ann :<< r), fold r) of
             (Just a, Nothing) -> Just [Unchanged a]
             (Just a, Just []) -> Just [Changed a]
             (_     , entries) -> entries

@@ -48,7 +48,7 @@ hasChanges = or . (True <$)
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: Traversable f => HasField fields Range => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
 alignDiff sources = cata $ \ diff -> case diff of
-  In ann r -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (ann :<< r)
+  Copy ann r -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (ann :<< r)
   Patch patch -> alignPatch sources patch
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.

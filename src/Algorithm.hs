@@ -87,7 +87,7 @@ instance Show term => Show1 (AlgorithmF term diff) where
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
 -- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
 algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f a) (Diff f a) (Diff f a)
-algorithmForTerms t1@(ann1 :< f1) t2@(ann2 :< f2) = fromMaybe (byReplacing t1 t2) (fmap (Diff.Diff . In (both ann1 ann2)) <$> algorithmFor f1 f2)
+algorithmForTerms t1@(ann1 :< f1) t2@(ann2 :< f2) = fromMaybe (byReplacing t1 t2) (fmap (Diff.Diff . Copy (both ann1 ann2)) <$> algorithmFor f1 f2)
 
 
 -- | A type class for determining what algorithm to use for diffing two terms.

@@ -94,7 +94,7 @@ instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a
   toJSONFields = toJSONFields . unDiff
 
 instance (ToJSONFields a, ToJSONFields (f b), ToJSONFields (f (Term f a))) => ToJSONFields (DiffF f a b) where
-  toJSONFields (In a f)  = toJSONFields a <> toJSONFields f
+  toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields f
   toJSONFields (Patch a) = toJSONFields a
 
 instance ToJSONFields a => ToJSONFields (Patch a) where
