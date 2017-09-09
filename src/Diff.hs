@@ -66,6 +66,8 @@ deleting :: Term syntax ann -> Diff syntax ann
 deleting = Diff . Patch . Delete
 
 
+copy :: Both ann -> syntax (Diff syntax ann) -> Diff syntax ann
+copy = (Diff .) . Copy
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
