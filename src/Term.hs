@@ -14,6 +14,7 @@ module Term
 
 import Control.Comonad
 import Control.Comonad.Cofree.Class
+import Data.Bifoldable
 import Data.Bifunctor
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
@@ -91,6 +92,9 @@ instance (Show1 f, Show a) => Show (Term f a) where
 
 instance Functor f => Bifunctor (TermF f) where
   bimap f g (a :< r) = f a :< fmap g r
+
+instance Foldable f => Bifoldable (TermF f) where
+  bifoldMap f g (a :< r) = f a `mappend` foldMap g r
 
 instance Listable1 f => Listable2 (TermF f) where
   liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<)
