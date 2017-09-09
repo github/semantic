@@ -126,5 +126,5 @@ instance Eq1 Syntax where liftEq = genericLiftEq
 instance Show1 Syntax where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Syntax where liftPretty = genericLiftPretty
 
-instance ToJSON recur => ToJSONFields (Syntax recur) where
-  toJSONFields syntax = [ "children" .= toList syntax ]
+instance ToJSONFields1 Syntax where
+  toJSONFields1 syntax = [ "children" .= toList syntax ]
