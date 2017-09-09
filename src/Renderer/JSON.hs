@@ -22,7 +22,6 @@ import Data.Text.Encoding (decodeUtf8)
 import Diff
 import GHC.Generics
 import Language
-import Term
 
 --
 -- Diffs
@@ -53,16 +52,6 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
   toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields1 f
   toJSONFields (Patch a) = toJSONFields a
-
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
-  toJSON = object . toJSONFields
-  toEncoding = pairs . mconcat . toJSONFields
-
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
-  toJSONFields = toJSONFields . unTerm
-
-instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
-  toJSONFields (a :< f) = toJSONFields a <> toJSONFields1 f
 
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
