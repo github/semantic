@@ -118,6 +118,9 @@ instance (Eq1 f, Eq a, Eq b) => Eq (DiffF f a b) where
 instance Show1 f => Show1 (Diff f) where
   liftShowsPrec sp sl = go where go d = showsUnaryWith (liftShowsPrec2 sp sl go (showListWith (go 0))) "Diff" d . unDiff
 
+instance (Show1 f, Show a) => Show (Diff f a) where
+  showsPrec = showsPrec1
+
 instance Show1 f => Show2 (DiffF f) where
   liftShowsPrec2 spA slA spB slB d diff = case diff of
     Copy ann r -> showsBinaryWith (liftShowsPrecBoth spA slA) (liftShowsPrec spB slB) "Copy" d ann r
