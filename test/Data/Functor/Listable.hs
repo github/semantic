@@ -30,7 +30,7 @@ import qualified Category
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
-import Data.Char (chr, ord)
+import Data.Char (chr)
 import Data.Functor.Both
 import Data.Range
 import Data.Record
