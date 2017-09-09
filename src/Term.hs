@@ -87,7 +87,7 @@ instance Functor f => ComonadCofree f (Term f) where
   {-# INLINE unwrap #-}
 
 instance Eq1 f => Eq1 (Term f) where
-  liftEq eqA = go where go (Term (a1 :< f1)) (Term (a2 :< f2)) = eqA a1 a2 && liftEq go f1 f2
+  liftEq eqA = go where go t1 t2 = liftEq2 eqA go (unTerm t1) (unTerm t2)
 
 instance (Eq1 f, Eq a) => Eq (Term f a) where
   (==) = eq1
