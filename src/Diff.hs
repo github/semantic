@@ -100,3 +100,8 @@ instance Eq1 f => Eq2 (DiffF f) where
     (Copy (Join (a1, b1)) f1, Copy (Join (a2, b2)) f2) -> eqA a1 a2 && eqA b1 b2 && liftEq eqB f1 f2
     (Patch p1, Patch p2) -> liftEq (liftEq eqA) p1 p2
     _ -> False
+
+instance Show1 f => Show2 (DiffF f) where
+  liftShowsPrec2 spA slA spB slB d diff = case diff of
+    Copy ann r -> showsBinaryWith (liftShowsPrecBoth spA slA) (liftShowsPrec spB slB) "Copy" d ann r
+    Patch patch -> showsUnaryWith (liftShowsPrec (liftShowsPrec spA slA) (liftShowList spA slA)) "Patch" d patch
