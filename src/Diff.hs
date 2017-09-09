@@ -104,6 +104,9 @@ instance Eq1 f => Eq2 (DiffF f) where
 instance (Eq1 f, Eq a) => Eq1 (DiffF f a) where
   liftEq = liftEq2 (==)
 
+instance (Eq1 f, Eq a, Eq b) => Eq (DiffF f a b) where
+  (==) = eq1
+
 instance Show1 f => Show2 (DiffF f) where
   liftShowsPrec2 spA slA spB slB d diff = case diff of
     Copy ann r -> showsBinaryWith (liftShowsPrecBoth spA slA) (liftShowsPrec spB slB) "Copy" d ann r
