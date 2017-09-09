@@ -105,3 +105,6 @@ instance Show1 f => Show2 (DiffF f) where
   liftShowsPrec2 spA slA spB slB d diff = case diff of
     Copy ann r -> showsBinaryWith (liftShowsPrecBoth spA slA) (liftShowsPrec spB slB) "Copy" d ann r
     Patch patch -> showsUnaryWith (liftShowsPrec (liftShowsPrec spA slA) (liftShowList spA slA)) "Patch" d patch
+
+instance (Show1 f, Show a) => Show1 (DiffF f a) where
+  liftShowsPrec = liftShowsPrec2 showsPrec showList
