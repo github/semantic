@@ -8,11 +8,11 @@ module Decorators
 import Data.Aeson
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Functor.Classes (Show1 (liftShowsPrec))
+import Data.JSON.Fields
 import Data.Proxy
 import Data.Text.Encoding (decodeUtf8)
 import Data.Union
 import GHC.Generics
-import Renderer.JSON
 import Term
 
 -- | Compute a 'ByteString' label for a 'Show1'able 'Term'.

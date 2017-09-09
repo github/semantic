@@ -3,8 +3,10 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Category where
 
+import Data.Aeson
 import Data.Hashable
-import Data.Text (Text)
+import Data.JSON.Fields
+import Data.Text (Text, pack)
 import Data.Text.Prettyprint.Doc
 import GHC.Generics
 
@@ -247,3 +249,6 @@ instance Hashable Category
 
 instance Pretty Category where
   pretty = pretty . show
+
+instance ToJSONFields Category where
+  toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> pack (show c) }]

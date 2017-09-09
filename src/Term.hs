@@ -14,12 +14,14 @@ module Term
 
 import Control.Comonad
 import Control.Comonad.Cofree.Class
+import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
+import Data.JSON.Fields
 import Data.Proxy
 import Data.Record
 import Data.Union
@@ -126,3 +128,14 @@ instance (Pretty1 f, Pretty a) => Pretty1 (TermF f a) where
 
 instance (Pretty1 f, Pretty a, Pretty b) => Pretty (TermF f a b) where
   pretty = liftPretty pretty prettyList
+
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
+  toJSONFields = toJSONFields . unTerm
+
+instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
+  toJSONFields (a :< f) = toJSONFields a <> toJSONFields1 f
