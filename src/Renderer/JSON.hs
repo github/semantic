@@ -31,9 +31,6 @@ renderJSONDiff blobs diff = Map.fromList
   , ("paths", toJSON (blobPath <$> toList blobs))
   ]
 
-instance Output (Map.Map Text Value) where
-  toOutput = toStrict . (<> "\n") . encode
-
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
 
