@@ -17,19 +17,19 @@ spec :: Spec
 spec = parallel $ do
   let decorate = defaultFeatureVectorDecorator (category . termAnnotation)
   prop "equality is reflexive" $
-    \ a -> let diff = unListableDiff a :: SyntaxDiff '[Category] in
+    \ a -> let diff = a :: SyntaxDiff '[Category] in
       diff `shouldBe` diff
 
   prop "equal terms produce identity diffs" $
-    \ a -> let term = decorate (unListableF a :: SyntaxTerm '[Category]) in
+    \ a -> let term = decorate (a :: SyntaxTerm '[Category]) in
       diffCost (diffTerms (pure term)) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = diffTerms (unListableF <$> both a b :: Both (SyntaxTerm '[Category])) in
-        beforeTerm diff `shouldBe` Just (unListableF a)
+      \ a b -> let diff = diffTerms (both a b :: Both (SyntaxTerm '[Category])) in
+        beforeTerm diff `shouldBe` Just a
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = diffTerms (unListableF <$> both a b :: Both (SyntaxTerm '[Category])) in
-        afterTerm diff `shouldBe` Just (unListableF b)
+      \ a b -> let diff = diffTerms (both a b :: Both (SyntaxTerm '[Category])) in
+        afterTerm diff `shouldBe` Just b

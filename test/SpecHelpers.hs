@@ -4,7 +4,6 @@ module SpecHelpers
 , parseFilePath
 , readFile
 , languageForFilePath
-, unListableDiff
 ) where
 
 import Control.Exception
@@ -51,7 +50,3 @@ readFile path = do
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . takeExtension
-
--- | Extract a 'Diff' from a 'ListableF' enumerated by a property test.
-unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
-unListableDiff diff = hoistFree (first unListableF) $ fmap unListableF <$> unListableF diff

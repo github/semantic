@@ -41,24 +41,24 @@ spec :: Spec
 spec = parallel $ do
   describe "tableOfContentsBy" $ do
     prop "drops all nodes with the constant Nothing function" $
-      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (unListableDiff diff :: Diff Syntax ()) `shouldBe` []
+      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff Syntax ()) `shouldBe` []
 
     let diffSize = max 1 . sum . fmap (const 1)
     let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
-      \ diff -> let diff' = (unListableDiff diff :: Diff Syntax ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
+      \ diff -> let diff' = (diff :: Diff Syntax ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
     prop "produces an unchanged entry for identity diffs" $
-      \ term -> let term' = (unListableF term :: Term Syntax (Record '[Category])) in tableOfContentsBy (Just . termAnnotation) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
+      \ term -> let term' = (term :: Term Syntax (Record '[Category])) in tableOfContentsBy (Just . termAnnotation) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
+      \ patch -> let patch' = (patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (Diff (Patch patch')) `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = fmap (1 <$) <$> fmap (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff Syntax Int])) in
+      \ diff -> let diff' = copy (pure 0) (Indexed [diff :: Diff Syntax Int]) in
         tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
         if null diff' then [Unchanged 0]
-                               else replicate (length diff') (Changed 0)
+                      else replicate (length diff') (Changed 0)
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -109,31 +109,31 @@ spec = parallel $ do
 
     prop "inserts of methods and functions are summarized" $
       \name body ->
-        let diff = programWithInsert name (unListableF body)
+        let diff = programWithInsert name body
         in numTocSummaries diff `shouldBe` 1
 
     prop "deletes of methods and functions are summarized" $
       \name body ->
-        let diff = programWithDelete name (unListableF body)
+        let diff = programWithDelete name body
         in numTocSummaries diff `shouldBe` 1
 
     prop "replacements of methods and functions are summarized" $
       \name body ->
-        let diff = programWithReplace name (unListableF body)
+        let diff = programWithReplace name body
         in numTocSummaries diff `shouldBe` 1
 
     prop "changes inside methods and functions are summarizied" . forAll (isMeaningfulTerm `filterT` tiers) $
       \body ->
-        let diff = programWithChange (unListableF body)
+        let diff = programWithChange body
         in numTocSummaries diff `shouldBe` 1
 
     prop "other changes don't summarize" . forAll ((not . isMethodOrFunction) `filterT` tiers) $
       \body ->
-        let diff = programWithChangeOutsideFunction (unListableF body)
+        let diff = programWithChangeOutsideFunction body
         in numTocSummaries diff `shouldBe` 0
 
     prop "equal terms produce identity diffs" $
-      \a -> let term = defaultFeatureVectorDecorator (Info.category . termAnnotation) (unListableF a :: Term') in
+      \a -> let term = defaultFeatureVectorDecorator (Info.category . termAnnotation) (a :: Term') in
         diffTOC (diffTerms (pure term)) `shouldBe` []
 
   describe "JSONSummary" $ do
@@ -170,17 +170,17 @@ numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
-programWithChange body = wrap (pure programInfo :< Indexed [ function' ])
+programWithChange body = copy (pure programInfo) (Indexed [ function' ])
   where
-    function' = wrap (pure (Just (FunctionDeclaration "foo") :. functionInfo) :< S.Function name' [] [ inserting body ] )
-    name' = wrap (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    function' = copy (pure (Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [ inserting body ])
+    name' = copy (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil)) (Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
-programWithChangeOutsideFunction term = wrap (pure programInfo :< Indexed [ function', term' ])
+programWithChangeOutsideFunction term = copy (pure programInfo) (Indexed [ function', term' ])
   where
-    function' = wrap (pure (Just (FunctionDeclaration "foo") :. functionInfo) :< S.Function name' [] [] )
-    name' = wrap (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf "foo")
+    function' = copy (pure (Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [])
+    name' = copy (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil)) (Leaf "foo")
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -193,12 +193,12 @@ programWithReplace :: Text -> Term' -> Diff'
 programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Diff' -> Diff'
-programOf diff = wrap (pure programInfo :< Indexed [ diff ])
+programOf diff = copy (pure programInfo) (Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = cofree $ (Just (FunctionDeclaration name) :. functionInfo) :< S.Function name' [] [body]
+functionOf name body = Term $ (Just (FunctionDeclaration name) :. functionInfo) :< S.Function name' [] [body]
   where
-    name' = cofree $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
+    name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
 
 programInfo :: Record (Maybe Declaration ': DefaultFields)
 programInfo = Nothing :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
@@ -207,8 +207,8 @@ functionInfo :: Record DefaultFields
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
-isMeaningfulTerm :: ListableF (Term Syntax) a -> Bool
-isMeaningfulTerm a = case unTerm (unListableF a) of
+isMeaningfulTerm :: Term Syntax a -> Bool
+isMeaningfulTerm a = case unTerm a of
   (_ :< S.Indexed _) -> False
   (_ :< S.Fixed _) -> False
   (_ :< S.Commented _ _) -> False
@@ -216,8 +216,8 @@ isMeaningfulTerm a = case unTerm (unListableF a) of
   _ -> True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
-isMethodOrFunction :: HasField fields Category => ListableF (Term Syntax) (Record fields) -> Bool
-isMethodOrFunction a = case unTerm (unListableF a) of
+isMethodOrFunction :: HasField fields Category => Term Syntax (Record fields) -> Bool
+isMethodOrFunction a = case unTerm a of
   (_ :< S.Method{}) -> True
   (_ :< S.Function{}) -> True
   (a :< _) | getField a == C.Function -> True
@@ -232,7 +232,7 @@ sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
 sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 
 blankDiff :: Diff'
-blankDiff = wrap (pure arrayInfo :< Indexed [ inserting (cofree $ literalInfo :< Leaf "\"a\"") ])
+blankDiff = copy (pure arrayInfo) (Indexed [ inserting (Term $ literalInfo :< Leaf "\"a\"") ])
   where
     arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
