@@ -58,7 +58,7 @@ liftPrettyUnion p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Term (Union fs)) where
-  liftPretty p pl = go where go (Term (a :< f)) = p a <+> liftPrettyUnion go (Pretty.list . map (liftPretty p pl)) f
+  liftPretty p pl = go where go = liftPretty2 p pl go (Pretty.list . map go) . unTerm
 
 instance (Apply1 Pretty1 fs, Pretty a) => Pretty (Term (Union fs) a) where
   pretty = liftPretty pretty prettyList
@@ -120,13 +120,14 @@ instance Show1 f => Show2 (TermF f) where
 instance (Show1 f, Show a) => Show1 (TermF f a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance Pretty1 f => Pretty2 (TermF f) where
-  liftPretty2 pA _ pB plB (a :< f) = pA a <+> liftPretty pB plB f
 
-instance (Pretty1 f, Pretty a) => Pretty1 (TermF f a) where
+instance Apply1 Pretty1 fs => Pretty2 (TermF (Union fs)) where
+  liftPretty2 pA _ pB plB (a :< f) = pA a <+> liftPrettyUnion pB plB f
+
+instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Union fs) a) where
   liftPretty = liftPretty2 pretty prettyList
 
-instance (Pretty1 f, Pretty a, Pretty b) => Pretty (TermF f a b) where
+instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Union fs) a b) where
   pretty = liftPretty pretty prettyList
 
 
