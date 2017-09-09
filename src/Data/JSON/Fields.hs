@@ -10,6 +10,9 @@ import Data.Union
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]
 
+class ToJSONFields1 f where
+  toJSONFields1 :: (KeyValue kv, ToJSON a) => f a -> [kv]
+
 
 instance ToJSONFields a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= object (toJSONFields a), "after" .= object (toJSONFields b) ]
