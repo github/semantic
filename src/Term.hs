@@ -74,6 +74,9 @@ instance Functor f => Comonad (Term f) where
 instance Functor f => Functor (Term f) where
   fmap f = go where go (Term (a :< r)) = Term (f a :< fmap go r)
 
+instance Foldable f => Foldable (Term f) where
+  foldMap f = go where go (Term (a :< r)) = f a `mappend` foldMap go r
+
 instance Functor f => ComonadCofree f (Term f) where
   unwrap (Term (_ :< as)) = as
   {-# INLINE unwrap #-}
