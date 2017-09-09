@@ -39,6 +39,14 @@ data DiffF syntax ann recur
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
+
+evalDiff :: Functor syntax => (DiffF syntax ann a -> Env a -> a) -> Diff syntax ann -> a
+evalDiff algebra = flip go mempty
+  where go = cata $ \ diff env -> case diff of
+          Copy ann syntax -> algebra (Copy ann (($ env) <$> syntax)) env
+          Patch patch -> algebra (Patch patch) env
+
+
 diffSum :: (Foldable syntax, Functor syntax) => (Patch (Term syntax annotation) -> Int) -> Diff syntax annotation -> Int
 diffSum patchCost = cata $ \ diff -> case diff of
   Copy _ syntax -> sum syntax
