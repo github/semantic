@@ -13,6 +13,7 @@ import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Foldable (toList)
 import Data.Functor.Both (Both)
+import Data.JSON.Fields
 import qualified Data.Map as Map
 import Data.Output
 import Data.Proxy
@@ -58,9 +59,6 @@ instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a
 instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSON (Term f a) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
-
-class ToJSONFields a where
-  toJSONFields :: KeyValue kv => a -> [kv]
 
 instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ': t)) where
   toJSONFields (h :. t) = toJSONFields h <> toJSONFields t
