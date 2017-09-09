@@ -112,9 +112,15 @@ instance Listable1 f => Listable2 (TermF f) where
 instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
   liftTiers = liftTiers2 tiers
 
+instance (Listable1 f, Listable a, Listable b) => Listable (TermF f a b) where
+  tiers = tiers1
+
 instance Listable1 f => Listable1 (Term f) where
   liftTiers annotationTiers = go
     where go = liftCons1 (liftTiers2 annotationTiers go) Term
+
+instance (Listable1 f, Listable a) => Listable (Term f a) where
+  tiers = tiers1
 
 instance Eq1 f => Eq2 (TermF f) where
   liftEq2 eqA eqB (a1 :< f1) (a2 :< f2) = eqA a1 a2 && liftEq eqB f1 f2
