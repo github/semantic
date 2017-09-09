@@ -56,9 +56,6 @@ instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSON (Term f a) wher
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
 
-instance ToJSONFields Range where
-  toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
-
 instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> pack (show c) }]
 
