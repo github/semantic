@@ -97,6 +97,7 @@ intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
 rawStringLiteral :: Assignment
 rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> source)
 
+-- TODO: Combine with Type Literals
 typedIdentifier :: Assignment
 typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types <*> source
   where
