@@ -20,7 +20,7 @@ newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 data DiffF syntax ann recur
   = Copy (Both ann) (syntax recur)
   | Patch (Patch (Term syntax ann))
-  deriving (Functor)
+  deriving (Foldable, Functor, Traversable)
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
