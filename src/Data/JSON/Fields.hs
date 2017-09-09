@@ -9,3 +9,6 @@ class ToJSONFields a where
 
 instance ToJSONFields a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= object (toJSONFields a), "after" .= object (toJSONFields b) ]
+
+instance ToJSONFields a => ToJSONFields (Maybe a) where
+  toJSONFields = maybe [] toJSONFields
