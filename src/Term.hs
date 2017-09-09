@@ -78,6 +78,9 @@ instance Functor f => Functor (Term f) where
 instance Foldable f => Foldable (Term f) where
   foldMap f = go where go (Term (a :< r)) = f a `mappend` foldMap go r
 
+instance Traversable f => Traversable (Term f) where
+  traverse f = go where go (Term (a :< r)) = (Term .) . (:<) <$> f a <*> traverse go r
+
 instance Functor f => ComonadCofree f (Term f) where
   unwrap (Term (_ :< as)) = as
   {-# INLINE unwrap #-}
