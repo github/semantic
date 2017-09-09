@@ -6,8 +6,9 @@ import Data.Bifunctor
 import Data.Bitraversable
 import Data.Functor.Both as Both
 import Data.Functor.Classes
-import Data.Functor.Classes.Pretty.Generic
+import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
+import Data.Functor.Listable
 import Data.Mergeable
 import Data.Record
 import Data.Union
@@ -76,15 +77,15 @@ copy = (Diff .) . Copy
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
   liftPretty p pl = go
-    where go (Diff (Copy _ syntax)) = liftPrettyUnion go (list . map (liftPretty p pl)) syntax
-          go (Diff (Patch patch)) = liftPretty (liftPretty p pl) (list . map (liftPretty p pl)) patch
+    where go (Diff (Copy _ syntax)) = liftPrettyUnion go (Pretty.list . map (liftPretty p pl)) syntax
+          go (Diff (Patch patch)) = liftPretty (liftPretty p pl) (Pretty.list . map (liftPretty p pl)) patch
 
 instance (Apply1 Pretty1 fs, Pretty ann) => Pretty (Diff (Union fs) ann) where
   pretty = liftPretty pretty prettyList
 
 instance Apply1 Pretty1 fs => Pretty2 (DiffF (Union fs)) where
   liftPretty2 pA plA pB plB (Copy (Join ann) f) = liftPretty2 pA plA pA plA ann <+> liftPrettyUnion pB plB f
-  liftPretty2 pA plA _ _ (Patch p) = liftPretty (liftPretty pA plA) (list . map (liftPretty pA plA)) p
+  liftPretty2 pA plA _ _ (Patch p) = liftPretty (liftPretty pA plA) (Pretty.list . map (liftPretty pA plA)) p
 
 type instance Base (Diff syntax ann) = DiffF syntax ann
 
@@ -155,3 +156,7 @@ instance Foldable f => Bifoldable (DiffF f) where
 instance Traversable f => Bitraversable (DiffF f) where
   bitraverse f g (Copy as r) = Copy <$> traverse f as <*> traverse g r
   bitraverse f _ (Patch p) = Patch <$> traverse (traverse f) p
+
+
+instance Listable1 f => Listable2 (DiffF f) where
+  liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) Copy
