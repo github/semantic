@@ -98,6 +98,9 @@ instance Functor syntax => Bifunctor (DiffF syntax) where
 instance Eq1 f => Eq1 (Diff f) where
   liftEq eqA = go where go (Diff d1) (Diff d2) = liftEq2 eqA go d1 d2
 
+instance (Eq1 f, Eq a) => Eq (Diff f a) where
+  (==) = eq1
+
 instance Eq1 f => Eq2 (DiffF f) where
   liftEq2 eqA eqB d1 d2 = case (d1, d2) of
     (Copy (Join (a1, b1)) f1, Copy (Join (a2, b2)) f2) -> eqA a1 a2 && eqA b1 b2 && liftEq eqB f1 f2
