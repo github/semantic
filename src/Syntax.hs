@@ -7,9 +7,8 @@ import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Functor.Listable
 import Data.Mergeable
-import Data.Text (pack, Text)
+import Data.Text (Text)
 import GHC.Generics
 
 -- | A node in an abstract syntax tree.
@@ -120,66 +119,6 @@ extractLeafValue syntax = case syntax of
   _ -> Nothing
 
 -- Instances
-
-instance Listable1 Syntax where
-  liftTiers recur
-    =  liftCons1 (pack `mapT` tiers) Leaf
-    \/ liftCons1 (liftTiers recur) Indexed
-    \/ liftCons1 (liftTiers recur) Fixed
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FunctionCall
-    \/ liftCons2 recur (liftTiers recur) Ternary
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) AnonymousFunction
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Function
-    \/ liftCons2 recur recur Assignment
-    \/ liftCons2 recur recur OperatorAssignment
-    \/ liftCons2 recur recur MemberAccess
-    \/ liftCons4 recur recur (liftTiers recur) (liftTiers recur) MethodCall
-    \/ liftCons1 (liftTiers recur) Operator
-    \/ liftCons1 (liftTiers recur) VarDecl
-    \/ liftCons2 (liftTiers recur) recur VarAssignment
-    \/ liftCons2 recur recur SubscriptAccess
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
-    \/ liftCons2 recur (liftTiers recur) Case
-    \/ liftCons1 (liftTiers recur) Select
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
-    \/ liftCons2 recur recur Pair
-    \/ liftCons1 (pack `mapT` tiers) Comment
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
-    \/ liftCons1 (liftTiers recur) Syntax.ParseError
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) For
-    \/ liftCons2 recur recur DoWhile
-    \/ liftCons2 recur (liftTiers recur) While
-    \/ liftCons1 (liftTiers recur) Return
-    \/ liftCons1 recur Throw
-    \/ liftCons1 recur Constructor
-    \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
-    \/ liftCons5 (liftTiers recur) recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
-    \/ liftCons2 recur (liftTiers recur) If
-    \/ liftCons2 recur (liftTiers recur) Module
-    \/ liftCons2 recur (liftTiers recur) Namespace
-    \/ liftCons2 recur (liftTiers recur) Import
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Export
-    \/ liftCons1 (liftTiers recur) Yield
-    \/ liftCons1 recur Negate
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Rescue
-    \/ liftCons1 recur Go
-    \/ liftCons1 recur Defer
-    \/ liftCons2 recur recur TypeAssertion
-    \/ liftCons2 recur recur TypeConversion
-    \/ liftCons1 (liftTiers recur) Break
-    \/ liftCons1 (liftTiers recur) Continue
-    \/ liftCons1 (liftTiers recur) BlockStatement
-    \/ liftCons2 (liftTiers recur) recur ParameterDecl
-    \/ liftCons2 recur recur TypeDecl
-    \/ liftCons1 (liftTiers recur) FieldDecl
-    \/ liftCons1 (liftTiers recur) Ty
-    \/ liftCons2 recur recur Send
-    \/ liftCons1 (liftTiers recur) DefaultCase
-
-instance Listable recur => Listable (Syntax recur) where
-  tiers = tiers1
 
 instance Eq1 Syntax where liftEq = genericLiftEq
 instance Show1 Syntax where liftShowsPrec = genericLiftShowsPrec

@@ -16,7 +16,6 @@ import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Text (Text)
-import Data.Text.Listable
 import Data.These
 import Diff
 import Info
@@ -239,6 +238,3 @@ blankDiff = copy (pure arrayInfo) (Indexed [ inserting (Term $ literalInfo :< Le
 
 blankDiffBlobs :: Both Blob
 blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
-
-instance Listable Text where
-  tiers = unListableText `mapT` tiers

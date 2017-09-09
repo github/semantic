@@ -27,7 +27,6 @@ import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Foldable (cata)
-import Data.Functor.Listable
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -37,7 +36,6 @@ import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
 import Data.Text (toLower)
 import qualified Data.Text as T
-import Data.Text.Listable
 import Data.These
 import Data.Union
 import Diff
@@ -227,9 +225,3 @@ toCategoryName declaration = case declaration of
   MethodDeclaration _ -> "Method"
   SectionDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
-
-instance Listable Declaration where
-  tiers
-    =  cons1 (MethodDeclaration . unListableText)
-    \/ cons1 (FunctionDeclaration . unListableText)
-    \/ cons1 (flip ErrorDeclaration Nothing . unListableText)

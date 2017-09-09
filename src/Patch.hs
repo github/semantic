@@ -15,7 +15,6 @@ import Data.Align
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Functor.Listable
 import Data.These
 import GHC.Generics
 
@@ -60,12 +59,6 @@ maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
 
 -- Instances
-
-instance Listable1 Patch where
-  liftTiers t = liftCons1 t Insert \/ liftCons1 t Delete \/ liftCons2 t t Replace
-
-instance Listable a => Listable (Patch a) where
-  tiers = tiers1
 
 instance Crosswalk Patch where
   crosswalk f (Replace a b) = alignWith (these Delete Insert Replace) (f a) (f b)

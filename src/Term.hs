@@ -20,7 +20,6 @@ import Data.Bitraversable
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
-import Data.Functor.Listable
 import Data.Proxy
 import Data.Record
 import Data.Union
@@ -106,21 +105,6 @@ instance Foldable f => Bifoldable (TermF f) where
 instance Traversable f => Bitraversable (TermF f) where
   bitraverse f g (a :< r) = (:<) <$> f a <*> traverse g r
 
-instance Listable1 f => Listable2 (TermF f) where
-  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<)
-
-instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
-  liftTiers = liftTiers2 tiers
-
-instance (Listable1 f, Listable a, Listable b) => Listable (TermF f a b) where
-  tiers = tiers1
-
-instance Listable1 f => Listable1 (Term f) where
-  liftTiers annotationTiers = go
-    where go = liftCons1 (liftTiers2 annotationTiers go) Term
-
-instance (Listable1 f, Listable a) => Listable (Term f a) where
-  tiers = tiers1
 
 instance Eq1 f => Eq2 (TermF f) where
   liftEq2 eqA eqB (a1 :< f1) (a2 :< f2) = eqA a1 a2 && liftEq eqB f1 f2

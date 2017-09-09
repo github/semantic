@@ -9,7 +9,6 @@ import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable hiding (fold)
-import Data.Functor.Listable
 import Data.Mergeable
 import Data.Record
 import Data.Union
@@ -162,19 +161,3 @@ instance Foldable f => Bifoldable (DiffF f) where
 instance Traversable f => Bitraversable (DiffF f) where
   bitraverse f g (Copy as r) = Copy <$> traverse f as <*> traverse g r
   bitraverse f _ (Patch p) = Patch <$> traverse (traverse f) p
-
-
-instance Listable1 f => Listable2 (DiffF f) where
-  liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) Copy \/ liftCons1 (liftTiers (liftTiers annTiers)) Patch
-
-instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
-  liftTiers = liftTiers2 tiers
-
-instance (Listable1 f, Listable a, Listable b) => Listable (DiffF f a b) where
-  tiers = tiers1
-
-instance Listable1 f => Listable1 (Diff f) where
-  liftTiers annTiers = go where go = liftCons1 (liftTiers2 annTiers go) Diff
-
-instance (Listable1 f, Listable a) => Listable (Diff f a) where
-  tiers = tiers1

@@ -23,7 +23,6 @@ library
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Pretty.Generic
                      , Data.Functor.Classes.Show.Generic
-                     , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.Output
@@ -41,7 +40,6 @@ library
                      , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Data.Text.Listable
                      , Decorators
                      , Diff
                      , Files
@@ -145,6 +143,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
                      , CommandSpec
+                     , Data.Functor.Listable
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec

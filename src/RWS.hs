@@ -29,7 +29,6 @@ import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES
 import qualified Data.Functor.Both as Both
-import Data.Functor.Listable
 import Data.KdTree.Static hiding (empty, toList)
 import qualified Data.IntMap as IntMap
 
@@ -311,9 +310,3 @@ equalTerms canCompare = go
 instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
   hash gram = hash (stem gram <> base gram)
-
-instance Listable1 Gram where
-  liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
-
-instance Listable a => Listable (Gram a) where
-  tiers = tiers1

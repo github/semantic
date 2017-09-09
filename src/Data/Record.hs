@@ -2,7 +2,6 @@
 module Data.Record where
 
 import Data.Kind
-import Data.Functor.Listable
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
 
@@ -68,13 +67,6 @@ instance (Ord h, Ord (Record t)) => Ord (Record (h ': t)) where
 
 instance Ord (Record '[]) where
   _ `compare` _ = EQ
-
-
-instance (Listable head, Listable (Record tail)) => Listable (Record (head ': tail)) where
-  tiers = cons2 (:.)
-
-instance Listable (Record '[]) where
-  tiers = cons0 Nil
 
 
 instance (Semigroup head, Semigroup (Record tail)) => Semigroup (Record (head ': tail)) where
