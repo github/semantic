@@ -18,28 +18,27 @@ import Term
 
 -- | Returns a ByteString SExpression formatted diff.
 renderSExpressionDiff :: (ConstrainAll Show fields, Foldable f, Functor f) => Diff f (Record fields) -> ByteString
-renderSExpressionDiff diff = cata printDiffF diff 0 0 <> "\n"
+renderSExpressionDiff diff = cata printDiffF diff 0 <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
 renderSExpressionTerm :: (ConstrainAll Show fields, Foldable f, Functor f) => Term f (Record fields) -> ByteString
-renderSExpressionTerm term = cata printTermF term 0 0 <> "\n"
+renderSExpressionTerm term = cata (\ term level -> pad level <> printTermF term level) term 0 <> "\n"
 
-printDiffF :: (ConstrainAll Show fields, Foldable f, Functor f) => DiffF f (Record fields) (Int -> Int -> ByteString) -> Int -> Int -> ByteString
-printDiffF diff parentLevel level = case diff of
+printDiffF :: (ConstrainAll Show fields, Foldable f, Functor f) => DiffF f (Record fields) (Int -> ByteString) -> Int -> ByteString
+printDiffF diff level = case diff of
   Patch patch -> case patch of
-    Insert term -> pad parentLevel (level - 1) <> "{+" <> printTermF term (parentLevel + level) 0 <> "+}"
-    Delete term -> pad parentLevel (level - 1) <> "{-" <> printTermF term (parentLevel + level) 0 <> "-}"
-    Replace a b -> pad parentLevel (level - 1) <> "{ " <> printTermF a (parentLevel + level) 0 <> pad parentLevel (level - 1) <> "->" <> printTermF b (parentLevel + level) 0 <> " }"
-  Copy vs (Join (_, annotation)) syntax -> pad parentLevel level <> "(" <> showBindings (fmap (\ b -> b parentLevel level) <$> vs) <> showAnnotation annotation <> foldMap (\ d -> d parentLevel (level + 1)) syntax <> ")"
-  Var v -> pad parentLevel level <> showMetaVar v
+    Insert term -> pad (level - 1) <> "{+" <> printTermF term level <> "+}"
+    Delete term -> pad (level - 1) <> "{-" <> printTermF term level <> "-}"
+    Replace a b -> pad (level - 1) <> "{ " <> printTermF a level <> pad (level - 1) <> "->" <> printTermF b level <> " }"
+  Copy vs (Join (_, annotation)) syntax -> pad level <> "(" <> showBindings (fmap (\ b -> b level) <$> vs) <> showAnnotation annotation <> foldMap (\ d -> d (level + 1)) syntax <> ")"
+  Var v -> pad level <> showMetaVar v
 
-printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> Int -> ByteString) -> Int -> Int -> ByteString
-printTermF (annotation :< syntax) parentLevel level =
-  pad parentLevel level <> "(" <> showAnnotation annotation <> foldMap (\t -> t parentLevel (level + 1)) syntax <> ")"
+printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> ByteString) -> Int -> ByteString
+printTermF (annotation :< syntax) level = "(" <> showAnnotation annotation <> foldMap (\t -> t (level + 1)) syntax <> ")"
 
-pad :: Int -> Int -> ByteString
-pad p n | n <= 0    = ""
-        | otherwise = "\n" <> replicate (2 * (p + n)) ' '
+pad :: Int -> ByteString
+pad n | n <= 0    = ""
+      | otherwise = "\n" <> replicate (2 * n) ' '
 
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString
