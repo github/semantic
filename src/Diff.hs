@@ -12,6 +12,7 @@ import Data.Union
 import Patch
 import Syntax
 import Term
+import Text.Show
 
 -- | An annotated series of patches of terms.
 newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
@@ -112,6 +113,10 @@ instance (Eq1 f, Eq a) => Eq1 (DiffF f a) where
 
 instance (Eq1 f, Eq a, Eq b) => Eq (DiffF f a b) where
   (==) = eq1
+
+
+instance Show1 f => Show1 (Diff f) where
+  liftShowsPrec sp sl = go where go d = showsUnaryWith (liftShowsPrec2 sp sl go (showListWith (go 0))) "Diff" d . unDiff
 
 instance Show1 f => Show2 (DiffF f) where
   liftShowsPrec2 spA slA spB slB d diff = case diff of
