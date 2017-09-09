@@ -3,7 +3,6 @@
 module Renderer.JSON
 ( renderJSONDiff
 , renderJSONTerm
-, ToJSONFields(..)
 ) where
 
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
@@ -12,7 +11,6 @@ import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Foldable (toList)
 import Data.Functor.Both (Both)
-import Data.JSON.Fields
 import qualified Data.Map as Map
 import Data.Output
 import Data.Semigroup ((<>))
