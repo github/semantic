@@ -20,3 +20,6 @@ getRange diff = byteRange $ case diff of
 
 -- | A diff with only one side’s annotations.
 type SplitDiff syntax ann = Free (TermF syntax ann) (SplitPatch (Term syntax ann))
+
+unSplit :: Functor syntax => SplitDiff syntax ann -> Term syntax ann
+unSplit = iter Term . fmap splitTerm
