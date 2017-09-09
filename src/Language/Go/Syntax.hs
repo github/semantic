@@ -124,15 +124,6 @@ identifier =
 interpretedStringLiteral :: Assignment
 interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
 
-packageClause :: Assignment
-packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> identifier <*> pure [])
-
-importDeclaration :: Assignment
-importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> many expression)
-
-importSpec :: Assignment
-importSpec = symbol ImportSpec *> children expressions
-
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
@@ -167,9 +158,6 @@ structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructo
         Literal.KeyValue (makeTerm keyTypeLoc   (Type.Annotation (makeTerm keyTypeLoc   (Syntax.Empty)) (makeTerm keyTypeLoc   (Syntax.Identifier keyTypeName))))
                          (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc (Syntax.Empty)) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
 
-fieldDeclaration :: Assignment
-fieldDeclaration = mkFieldDeclaration <$> symbol FieldDeclaration <*> children ((,) <$> many identifier <*> typeLiteral)
-  where mkFieldDeclaration loc (fields, type') = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 
 methodSpec :: Assignment
 methodSpec =  handleError $ mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typeLiteral <|> parameters <|> emptyTerm) <*> empty)
@@ -188,12 +176,14 @@ typeLiteral =
   <|> qualifiedType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
         qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
+-- Expressions
 
-fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional literal)
-  where
-        mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
-        mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
+block :: Assignment
+block = symbol Block *> children expressions
+
+callExpression :: Assignment
+callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> identifier <*> pure [] <*> emptyTerm)
+
 constVarDeclaration :: Assignment
 constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
@@ -209,11 +199,11 @@ constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> c
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
-parameterDeclaration :: Assignment
-parameterDeclaration = symbol ParameterDeclaration *> children expressions
-
-block :: Assignment
-block = symbol Block *> children expressions
+fieldDeclaration :: Assignment
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional literal)
+  where
+        mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
+        mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 
 functionDeclaration :: Assignment
 functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> typedIdentifier <*> parameters <*> types <*> block)
@@ -221,14 +211,31 @@ functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration 
         types = symbol Parameters *> children expressions <|> emptyTerm
         mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
 
+importDeclaration :: Assignment
+importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> many expression)
+
+importSpec :: Assignment
+importSpec = symbol ImportSpec *> children expressions
+
 methodDeclaration :: Assignment
 methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> typeLiteral <*> block)
   where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many typedIdentifier))
         receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children typedIdentifier)
         mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method receiver' name' parameters' body')) type'')
 
-callExpression :: Assignment
-callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> identifier <*> pure [] <*> emptyTerm)
+methodSpec :: Assignment
+methodSpec =  handleError $ mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typeLiteral <|> parameters <|> emptyTerm) <*> empty)
+  where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
+        empty = makeTerm <$> location <*> pure Syntax.Empty
+        mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
+        mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method empty' name' (pure params) empty''
+
+packageClause :: Assignment
+packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> identifier <*> pure [])
+
+parameterDeclaration :: Assignment
+parameterDeclaration = symbol ParameterDeclaration *> children expressions
+
 
 -- | Match a series of terms or comments until a delimiter is matched
 manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
