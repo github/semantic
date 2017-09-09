@@ -137,6 +137,11 @@ instance Functor f => Functor (Diff f) where
     where go (Diff (Copy as r)) = Diff (Copy (f <$> as) (fmap go r))
           go (Diff (Patch p)) = Diff (Patch (fmap f <$> p))
 
+instance Foldable f => Foldable (Diff f) where
+  foldMap f = go
+    where go (Diff (Copy as r)) = foldMap f as `mappend` foldMap go r
+          go (Diff (Patch p)) = foldMap (foldMap f) p
+
 
 instance Foldable f => Bifoldable (DiffF f) where
   bifoldMap f g (Copy as r) = foldMap f as `mappend` foldMap g r
