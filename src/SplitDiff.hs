@@ -10,7 +10,7 @@ data SplitPatch a
   = SplitInsert { splitTerm :: a }
   | SplitDelete { splitTerm :: a }
   | SplitReplace { splitTerm :: a }
-  deriving (Show, Eq, Functor)
+  deriving (Foldable, Eq, Functor, Show, Traversable)
 
 -- | Get the range of a SplitDiff.
 getRange :: Functor f => HasField fields Range => SplitDiff f (Record fields) -> Range
