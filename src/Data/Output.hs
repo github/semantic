@@ -15,3 +15,6 @@ instance Output ByteString where
 
 instance Output (Map Text Value) where
   toOutput = toStrict . (<> "\n") . encode
+
+instance Output [Value] where
+  toOutput = toStrict . (<> "\n") . encode
