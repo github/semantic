@@ -12,7 +12,9 @@ module Patch
 ) where
 
 import Data.Align
+import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
+import Data.Functor.Classes.Show.Generic
 import Data.Functor.Listable
 import Data.These
 import GHC.Generics
@@ -70,6 +72,8 @@ instance Crosswalk Patch where
   crosswalk f (Insert b) = Insert <$> f b
   crosswalk f (Delete a) = Delete <$> f a
 
+instance Eq1 Patch where liftEq = genericLiftEq
+instance Show1 Patch where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Patch where liftPretty = genericLiftPretty
 
 instance Pretty a => Pretty (Patch a) where
