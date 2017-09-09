@@ -20,6 +20,9 @@ import Text.Show
 -- | An annotated series of patches of terms.
 newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 
+newtype MetaVar = MetaVar { unMetaVar :: String }
+  deriving (Eq, Ord, Show)
+
 data DiffF syntax ann recur
   = Copy (Both ann) (syntax recur)
   | Patch (Patch (Term syntax ann))
