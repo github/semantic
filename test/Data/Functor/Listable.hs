@@ -166,7 +166,7 @@ instance (Listable1 f, Listable a) => Listable (Term f a) where
 
 
 instance Listable1 f => Listable2 (DiffF f) where
-  liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) (Copy []) \/ liftCons1 (liftTiers (liftTiers annTiers)) Patch
+  liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) (Copy []) \/ liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
 
 instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
   liftTiers = liftTiers2 tiers
