@@ -26,27 +26,26 @@ renderSExpressionTerm term = printTerm term 0 <> "\n"
 printDiff :: (ConstrainAll Show fields, Foldable f, Functor f) => Diff f (Record fields) -> Int -> ByteString
 printDiff = cata $ \ diff level -> case diff of
   Patch patch -> case patch of
-    Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "+}"
-    Delete term -> pad (level - 1) <> "{-" <> printTerm term level <> "-}"
-    Replace a b -> pad (level - 1) <> "{ " <> printTerm a level <> pad (level - 1) <> "->" <> printTerm b level <> " }"
+    Insert term -> pad (level - 1) <> "{+" <> printTermF term level <> "+}"
+    Delete term -> pad (level - 1) <> "{-" <> printTermF term level <> "-}"
+    Replace a b -> pad (level - 1) <> "{ " <> printTermF a level <> pad (level - 1) <> "->" <> printTermF b level <> " }"
   Copy vs (Join (_, annotation)) syntax -> pad' level <> "(" <> showBindings (fmap ($ 0) <$> vs) <> showAnnotation annotation <> foldr (\d acc -> d (level + 1) <> acc) "" syntax <> ")"
   Var v -> pad' level <> showMetaVar v
   where
     pad' :: Int -> ByteString
     pad' n = if n < 1 then "" else pad n
-    pad :: Int -> ByteString
-    pad n | n < 0 = ""
-          | n < 1 = "\n"
-          | otherwise = "\n" <> replicate (2 * n) ' '
 
 printTerm :: (ConstrainAll Show fields, Foldable f, Functor f) => Term f (Record fields) -> Int -> ByteString
-printTerm term level = cata go term level 0
-  where
-    pad :: Int -> Int -> ByteString
-    pad p n | n < 1 = ""
-            | otherwise = "\n" <> replicate (2 * (p + n)) ' '
-    go (annotation :< syntax) parentLevel level =
-      pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> t parentLevel (level + 1) <> acc) "" syntax <> ")"
+printTerm term level = cata printTermF term level
+
+printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> ByteString) -> Int -> ByteString
+printTermF (annotation :< syntax) level =
+  pad level <> "(" <> showAnnotation annotation <> foldr (\t -> (t (level + 1) <>)) "" syntax <> ")"
+
+pad :: Int -> ByteString
+pad n | n < 0 = ""
+      | otherwise = "\n" <> replicate (2 * n) ' '
+
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString
 showAnnotation Nil = ""

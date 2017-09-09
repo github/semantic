@@ -18,7 +18,6 @@ import Data.Text (Text)
 import Data.These
 import Diff
 import Info hiding (Return)
-import Patch (patchSum)
 import RWS
 import Syntax as S hiding (Return)
 import Term
@@ -128,5 +127,5 @@ editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDi
           _ | m <= 0 -> 0
           Copy _ _ r -> sum (fmap ($ pred m) r)
           Var v -> maybe 0 ($ pred m) (envLookup v env)
-          Patch patch -> patchSum termSize patch
+          Patch patch -> succ (sum (sum . fmap ($ pred m) <$> patch))
         approximateDiff a b = maybe (replacing a b) (copy (both (extract a) (extract b))) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
