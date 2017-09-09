@@ -42,17 +42,6 @@ instance ToJSON a => ToJSON (Join (,) a) where
   toJSON = toJSON . toList
   toEncoding = foldable
 
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Diff f a) where
-  toJSON = object . toJSONFields
-  toEncoding = pairs . mconcat . toJSONFields
-
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
-  toJSONFields = toJSONFields . unDiff
-
-instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
-  toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields1 f
-  toJSONFields (Patch a) = toJSONFields a
-
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
 

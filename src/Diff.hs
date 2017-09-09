@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Diff where
 
+import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
@@ -9,6 +10,7 @@ import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable hiding (fold)
+import Data.JSON.Fields
 import Data.Mergeable
 import Data.Record
 import Data.Union
@@ -161,3 +163,15 @@ instance Foldable f => Bifoldable (DiffF f) where
 instance Traversable f => Bitraversable (DiffF f) where
   bitraverse f g (Copy as r) = Copy <$> traverse f as <*> traverse g r
   bitraverse f _ (Patch p) = Patch <$> traverse (traverse f) p
+
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Diff f a) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
+  toJSONFields = toJSONFields . unDiff
+
+instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
+  toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields1 f
+  toJSONFields (Patch a) = toJSONFields a
