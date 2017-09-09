@@ -66,8 +66,6 @@ deleting :: Term syntax ann -> Diff syntax ann
 deleting = Diff . Patch . Delete
 
 
-wrapTermF :: TermF syntax (Both ann) (Diff syntax ann) -> Diff syntax ann
-wrapTermF (a :< r) = Diff (Copy a r)
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
