@@ -40,9 +40,9 @@ data DiffF syntax ann recur
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
 diffSum :: (Foldable syntax, Functor syntax) => (Patch (Term syntax annotation) -> Int) -> Diff syntax annotation -> Int
-diffSum patchCost = go
-  where go (Diff (Copy _ syntax)) = sum (fmap go syntax)
-        go (Diff (Patch patch)) = patchCost patch
+diffSum patchCost = cata $ \ diff -> case diff of
+  Copy _ syntax -> sum syntax
+  Patch p -> patchCost p
 
 -- | The sum of the node count of the diff’s patches.
 diffCost :: (Foldable syntax, Functor syntax) => Diff syntax annotation -> Int
