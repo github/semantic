@@ -142,6 +142,11 @@ instance Foldable f => Foldable (Diff f) where
     where go (Diff (Copy as r)) = foldMap f as `mappend` foldMap go r
           go (Diff (Patch p)) = foldMap (foldMap f) p
 
+instance Traversable f => Traversable (Diff f) where
+  traverse f = go
+    where go (Diff (Copy as r)) = copy <$> traverse f as <*> traverse go r
+          go (Diff (Patch p)) = Diff . Patch <$> traverse (traverse f) p
+
 
 instance Foldable f => Bifoldable (DiffF f) where
   bifoldMap f g (Copy as r) = foldMap f as `mappend` foldMap g r
