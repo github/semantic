@@ -18,7 +18,7 @@ error "use pure" = free . Pure ==> pure
 error "use wrap" = free . Free ==> wrap
 
 error "use extract" = termAnnotation . unTerm ==> extract
-error "use unwrap" = tailF . unTerm ==> unwrap
+error "use unwrap" = termSyntax . unTerm ==> unwrap
 
 error "avoid head" = head
   where note = "head is partial; consider using Data.Maybe.listToMaybe"

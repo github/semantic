@@ -273,7 +273,7 @@ pqGramDecorator
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
-      Term.Term ((gram label :. termAnnotation term) :< assignParentAndSiblingLabels (tailF term) label)
+      Term.Term ((gram label :. termAnnotation term) :< assignParentAndSiblingLabels (termSyntax term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
@@ -303,7 +303,7 @@ canCompareTerms canCompare = canCompare `on` unTerm
 -- | Recursively test the equality of two 'Term's in O(n).
 equalTerms :: Eq1 f => ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
 equalTerms canCompare = go
-  where go a b = canCompareTerms canCompare a b && liftEq go (tailF (unTerm a)) (tailF (unTerm b))
+  where go a b = canCompareTerms canCompare a b && liftEq go (termSyntax (unTerm a)) (termSyntax (unTerm b))
 
 
 -- Instances
