@@ -3,6 +3,7 @@ module Diff where
 
 import Data.Bifoldable
 import Data.Bifunctor
+import Data.Bitraversable
 import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic
@@ -137,3 +138,7 @@ instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
 instance Foldable f => Bifoldable (DiffF f) where
   bifoldMap f g (Copy as r) = foldMap f as `mappend` foldMap g r
   bifoldMap f _ (Patch p) = foldMap (foldMap f) p
+
+instance Traversable f => Bitraversable (DiffF f) where
+  bitraverse f g (Copy as r) = Copy <$> traverse f as <*> traverse g r
+  bitraverse f _ (Patch p) = Patch <$> traverse (traverse f) p
