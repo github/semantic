@@ -43,7 +43,7 @@ spec = parallel $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff Syntax ()) `shouldBe` []
 
-    let diffSize = max 1 . sum . fmap (const 1)
+    let diffSize = max 1 . length . diffPatches
     let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
       \ diff -> let diff' = (diff :: Diff Syntax ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
