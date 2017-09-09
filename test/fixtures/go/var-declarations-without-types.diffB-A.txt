@@ -6,12 +6,12 @@
     (Args)
     (Other "var_declaration"
     { (VarAssignment
-        (Identifier)
-        (Identifier)
-        (Other "expression_list"
-          (NumberLiteral)
-          (NumberLiteral)))
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Other "expression_list"
+        {-(NumberLiteral)-}
+        {-(NumberLiteral)-})-})
     ->(VarAssignment
-        (Identifier)
-        (Other "expression_list"
-          (NumberLiteral))) })))
+      {+(Identifier)+}
+      {+(Other "expression_list"
+        {+(NumberLiteral)+})+}) })))

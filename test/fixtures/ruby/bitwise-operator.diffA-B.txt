@@ -10,6 +10,6 @@
   ->(Other "<<") }
     (Identifier))
 {-(Binary
-    (Identifier)
-    (Other "^")
-    (Identifier))-})
+  {-(Identifier)-}
+  {-(Other "^")-}
+  {-(Identifier)-})-})

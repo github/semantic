@@ -1,34 +1,34 @@
 (Program
 { (MethodCall
-    (Identifier)
-    (Identifier))
+  {-(Identifier)-}
+  {-(Identifier)-})
 ->(MethodCall
-    (Identifier)) }
+  {+(Identifier)+}) }
 {-(MethodCall
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Pair
-      (SymbolLiteral)
-      (IntegerLiteral))
-    (Pair
-      (Identifier)
-      (IntegerLiteral)))-}
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(Pair
+    {-(SymbolLiteral)-}
+    {-(IntegerLiteral)-})-}
+  {-(Pair
+    {-(Identifier)-}
+    {-(IntegerLiteral)-})-})-}
 {-(MethodCall
-    (Identifier)
-    (MethodCall
-      (Identifier)
-      (Identifier)))-}
+  {-(Identifier)-}
+  {-(MethodCall
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(MethodCall
-    (Identifier)
-    (Pair
-      (ArrayLiteral)
-      (IntegerLiteral))
-    (Other "splat_argument"
-      (Identifier))
-    (Other "block_argument"
-      (Identifier))
-    (AnonymousFunction
-      (Identifier)
-      (ExpressionStatements
-        (IntegerLiteral))))-})
+  {-(Identifier)-}
+  {-(Pair
+    {-(ArrayLiteral)-}
+    {-(IntegerLiteral)-})-}
+  {-(Other "splat_argument"
+    {-(Identifier)-})-}
+  {-(Other "block_argument"
+    {-(Identifier)-})-}
+  {-(AnonymousFunction
+    {-(Identifier)-}
+    {-(ExpressionStatements
+      {-(IntegerLiteral)-})-})-})-})

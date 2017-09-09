@@ -3,47 +3,47 @@
     (Class
       (Identifier)
     {+(Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))+}
+      {+(Identifier)+}
+      {+(Params
+        {+(Other "required_parameter"
+          {+(Identifier)+})+})+}
+      {+(Return
+        {+(Identifier)+})+})+}
     {+(Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))+}
+      {+(Identifier)+}
+      {+(Params
+        {+(Other "required_parameter"
+          {+(Identifier)+})+})+}
+      {+(Return
+        {+(Identifier)+})+})+}
     {+(Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))+}
+      {+(Identifier)+}
+      {+(Params
+        {+(Other "required_parameter"
+          {+(Identifier)+})+})+}
+      {+(Return
+        {+(Identifier)+})+})+}
     {-(FieldDecl
-        (Identifier)
-        (NumberLiteral))-}
+      {-(Identifier)-}
+      {-(NumberLiteral)-})-}
     {-(Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))-}
+      {-(Identifier)-}
+      {-(Params
+        {-(Other "required_parameter"
+          {-(Identifier)-})-})-}
+      {-(Return
+        {-(Identifier)-})-})-}
     {-(Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))-}
+      {-(Identifier)-}
+      {-(Params
+        {-(Other "required_parameter"
+          {-(Identifier)-})-})-}
+      {-(Return
+        {-(Identifier)-})-})-}
     {-(Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))-})))
+      {-(Identifier)-}
+      {-(Params
+        {-(Other "required_parameter"
+          {-(Identifier)-})-})-}
+      {-(Return
+        {-(Identifier)-})-})-})))

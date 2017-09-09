@@ -6,8 +6,8 @@
     (Args)
     (Switch
     {-(Case
-        (Case
-          (Other "expression_list"
-            (Identifier)))
-        (FunctionCall
-          (Identifier)))-})))
+      {-(Case
+        {-(Other "expression_list"
+          {-(Identifier)-})-})-}
+      {-(FunctionCall
+        {-(Identifier)-})-})-})))

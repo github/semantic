@@ -3,6 +3,6 @@
     (MethodCall
       (Identifier))
   { (Else
-      (MethodCall
-        (Identifier)))
+    {-(MethodCall
+      {-(Identifier)-})-})
   ->(Else) }))

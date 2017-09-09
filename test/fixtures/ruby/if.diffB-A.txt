@@ -4,9 +4,9 @@
   ->(Identifier) }
   {+(Identifier)+}
   {+(Elsif
-      (Identifier)
-      (Identifier)
-      (Else
-        (Identifier)))+})
+    {+(Identifier)+}
+    {+(Identifier)+}
+    {+(Else
+      {+(Identifier)+})+})+})
 {-(If
-    (Identifier))-})
+  {-(Identifier)-})-})

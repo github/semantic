@@ -3,5 +3,5 @@
     (Identifier)
     (Begin
     {+(MethodCall
-        (Identifier)
-        (StringLiteral))+})))
+      {+(Identifier)+}
+      {+(StringLiteral)+})+})))
