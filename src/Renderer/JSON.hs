@@ -23,7 +23,6 @@ import Diff
 import GHC.Generics
 import Info
 import Language
-import Patch
 import Syntax as S
 import Term
 
@@ -69,11 +68,6 @@ instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a
 instance (ToJSONFields a, ToJSONFields (f b), ToJSONFields (f (Term f a))) => ToJSONFields (DiffF f a b) where
   toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields f
   toJSONFields (Patch a) = toJSONFields a
-
-instance ToJSONFields a => ToJSONFields (Patch a) where
-  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
-  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
-  toJSONFields (Replace a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]
 
 instance ToJSON recur => ToJSONFields (Syntax recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]

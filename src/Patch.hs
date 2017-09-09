@@ -11,10 +11,12 @@ module Patch
 , mapPatch
 ) where
 
+import Data.Aeson
 import Data.Align
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.JSON.Fields
 import Data.These
 import GHC.Generics
 
@@ -71,3 +73,9 @@ instance Pretty1 Patch where liftPretty = genericLiftPretty
 
 instance Pretty a => Pretty (Patch a) where
   pretty = liftPretty pretty prettyList
+
+
+instance ToJSONFields a => ToJSONFields (Patch a) where
+  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
+  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
+  toJSONFields (Replace a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]
