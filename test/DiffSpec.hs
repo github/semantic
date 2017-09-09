@@ -2,7 +2,6 @@
 module DiffSpec where
 
 import Category
-import Control.Comonad.Trans.Cofree (headF)
 import Data.Functor.Both
 import Data.Functor.Listable
 import RWS
@@ -16,7 +15,7 @@ import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
-  let decorate = defaultFeatureVectorDecorator (category . headF)
+  let decorate = defaultFeatureVectorDecorator (category . termAnnotation)
   prop "equality is reflexive" $
     \ a -> let diff = unListableDiff a :: SyntaxDiff '[Category] in
       diff `shouldBe` diff

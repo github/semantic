@@ -28,7 +28,7 @@ import Text.Show
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
 infixr 5 :<
-data TermF syntax ann recur = (:<) { headF :: ann, tailF :: syntax recur }
+data TermF syntax ann recur = (:<) { termAnnotation :: ann, tailF :: syntax recur }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A Term with a Syntax leaf and a record of fields.

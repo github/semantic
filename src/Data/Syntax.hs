@@ -32,7 +32,7 @@ makeTerm a = makeTerm' a . inj
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
-makeTerm' a f = Term (sconcat (a :| (headF . unTerm <$> toList f)) :< f)
+makeTerm' a f = Term (sconcat (a :| (termAnnotation . unTerm <$> toList f)) :< f)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
@@ -41,7 +41,7 @@ makeTerm1 = makeTerm1' . inj
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
 makeTerm1' f = case toList f of
-  a : _ -> makeTerm' (headF (unTerm a)) f
+  a : _ -> makeTerm' (termAnnotation (unTerm a)) f
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.

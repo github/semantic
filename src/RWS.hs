@@ -273,7 +273,7 @@ pqGramDecorator
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
-      Term.Term ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
+      Term.Term ((gram label :. termAnnotation term) :< assignParentAndSiblingLabels (tailF term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 

@@ -3,9 +3,6 @@
 module TOCSpec where
 
 import Category as C
-import Control.Comonad (extract)
-import Control.Comonad.Trans.Cofree (headF)
-import Control.Monad.Free (wrap)
 import Data.Aeson
 import Data.Blob
 import Data.ByteString (ByteString)
@@ -52,10 +49,10 @@ spec = parallel $ do
       \ diff -> let diff' = (unListableDiff diff :: Diff Syntax ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
     prop "produces an unchanged entry for identity diffs" $
-      \ term -> let term' = (unListableF term :: Term Syntax (Record '[Category])) in tableOfContentsBy (Just . headF) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
+      \ term -> let term' = (unListableF term :: Term Syntax (Record '[Category])) in tableOfContentsBy (Just . termAnnotation) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . headF) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
+      \ patch -> let patch' = (unListableF <$> patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (pure patch') `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = fmap (1 <$) <$> fmap (const (0 :: Int)) (wrap (pure 0 :< Indexed [unListableDiff diff :: Diff Syntax Int])) in
@@ -136,7 +133,7 @@ spec = parallel $ do
         in numTocSummaries diff `shouldBe` 0
 
     prop "equal terms produce identity diffs" $
-      \a -> let term = defaultFeatureVectorDecorator (Info.category . headF) (unListableF a :: Term') in
+      \a -> let term = defaultFeatureVectorDecorator (Info.category . termAnnotation) (unListableF a :: Term') in
         diffTOC (diffTerms (pure term)) `shouldBe` []
 
   describe "JSONSummary" $ do
