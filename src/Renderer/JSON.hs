@@ -17,11 +17,10 @@ import Data.JSON.Fields
 import qualified Data.Map as Map
 import Data.Output
 import Data.Semigroup ((<>))
-import Data.Text (pack, Text)
+import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
 import Diff
 import GHC.Generics
-import Info
 import Language
 import Term
 
@@ -51,9 +50,6 @@ instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a
 instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSON (Term f a) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
-
-instance ToJSONFields Category where
-  toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> pack (show c) }]
 
 instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a) where
   toJSONFields = toJSONFields . unTerm
