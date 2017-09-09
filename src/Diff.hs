@@ -160,3 +160,6 @@ instance Traversable f => Bitraversable (DiffF f) where
 
 instance Listable1 f => Listable2 (DiffF f) where
   liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) Copy
+
+instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
+  liftTiers = liftTiers2 tiers
