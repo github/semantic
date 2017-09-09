@@ -102,7 +102,7 @@ instance Listable1 f => Listable2 (TermF f) where
 instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
   liftTiers = liftTiers2 tiers
 
-instance (Functor f, Listable1 f) => Listable1 (Term f) where
+instance Listable1 f => Listable1 (Term f) where
   liftTiers annotationTiers = go
     where go = liftCons1 (liftTiers2 annotationTiers go) Term
 
