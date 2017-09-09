@@ -19,7 +19,6 @@ import Data.Output
 import Data.Semigroup ((<>))
 import Data.Text (pack, Text)
 import Data.Text.Encoding (decodeUtf8)
-import Data.Union
 import Diff
 import GHC.Generics
 import Info
@@ -78,9 +77,6 @@ instance ToJSONFields a => ToJSONFields (Patch a) where
 
 instance ToJSON recur => ToJSONFields (Syntax recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
-
-instance ToJSONFields (Union '[] a) where
-  toJSONFields _ = []
 
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
