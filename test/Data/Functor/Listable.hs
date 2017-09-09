@@ -29,9 +29,16 @@ module Data.Functor.Listable
 import qualified Category
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
+import Data.ByteString (ByteString)
+import Data.Char (chr, ord)
 import Data.Functor.Both
+import Data.Range
 import Data.Record
-import Data.Text
+import Data.Semigroup
+import Data.Source
+import Data.Span
+import Data.Text as T (Text, pack)
+import qualified Data.Text.Encoding as T
 import Data.These
 import Diff
 import Patch
@@ -285,3 +292,26 @@ instance Listable Declaration where
     =  cons1 (MethodDeclaration)
     \/ cons1 (FunctionDeclaration)
     \/ cons1 (flip ErrorDeclaration Nothing)
+
+
+instance Listable Range where
+  tiers = cons2 Range
+
+
+instance Listable Pos where
+  tiers = cons2 Pos
+
+instance Listable Span where
+  tiers = cons2 Span
+
+
+instance Listable Source where
+  tiers = fromBytes `mapT` tiers
+
+instance Listable ByteString where
+  tiers = (T.encodeUtf8 . T.pack) `mapT` strings
+    where strings = foldr ((\\//) . listsOf . toTiers) []
+            [ ['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']
+            , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
+            , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
+            , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.

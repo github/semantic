@@ -15,7 +15,6 @@ import Data.Hashable (Hashable)
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
 import GHC.Generics
-import Test.LeanCheck
 
 -- | Source position information
 data Pos = Pos
@@ -56,12 +55,6 @@ instance A.FromJSON Span where
     Span <$>
       o .: "start" <*>
       o .: "end"
-
-instance Listable Pos where
-  tiers = cons2 Pos
-
-instance Listable Span where
-  tiers = cons2 Span
 
 instance Pretty Pos where
   pretty Pos{..} = pretty posLine <> colon <> pretty posColumn

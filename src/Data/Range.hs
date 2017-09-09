@@ -9,7 +9,6 @@ module Data.Range
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
 import GHC.Generics
-import Test.LeanCheck
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
@@ -35,9 +34,6 @@ instance Semigroup Range where
 
 instance Ord Range where
   a <= b = start a <= start b
-
-instance Listable Range where
-  tiers = cons2 Range
 
 instance Pretty Range where
   pretty (Range from to) = pretty from <> pretty '-' <> pretty to

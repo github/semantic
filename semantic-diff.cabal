@@ -98,7 +98,6 @@ library
                      , gitrev
                      , hashable
                      , kdt
-                     , leancheck
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
