@@ -55,7 +55,7 @@ spec = parallel $ do
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = copy (pure 0) (Indexed [1 <$ (diff :: Diff Syntax Int)]) in
-        tableOfContentsBy (\ (n :< _) -> if n == 0 then Just n else Nothing) diff' `shouldBe`
+        tableOfContentsBy (\ (n :< _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
         if null (diffPatches diff') then [Unchanged 0]
                                     else replicate (length (diffPatches diff')) (Changed 0)
 
