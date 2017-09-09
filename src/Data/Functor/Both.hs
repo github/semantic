@@ -1,5 +1,12 @@
 {-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
-module Data.Functor.Both (Both, both, runBothWith, fst, snd, module X) where
+module Data.Functor.Both
+( Both
+, both
+, runBothWith
+, fst
+, snd
+, module X
+) where
 
 import Data.Bifunctor.Join as X
 import Data.Semigroup
