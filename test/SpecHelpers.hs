@@ -7,23 +7,17 @@ module SpecHelpers
 ) where
 
 import Control.Exception
-import Control.Monad.Free (Free, hoistFree)
-import Data.Bifunctor (first)
 import Data.Blob
 import qualified Data.ByteString as B
 import Data.Functor.Both
-import Data.Functor.Listable
 import Data.Maybe (fromMaybe)
 import Data.Source
-import Diff
 import Language
-import Patch
 import Prelude hiding (readFile)
 import Renderer
 import Semantic
 import Semantic.Task
 import System.FilePath
-import Term
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO B.ByteString

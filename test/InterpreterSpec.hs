@@ -2,14 +2,12 @@
 module InterpreterSpec where
 
 import Category
-import Control.Monad.Free (wrap)
 import Data.Functor.Both
 import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
 import Data.Record
 import Diff
 import Interpreter
-import Patch
 import Syntax
 import Term
 import Test.Hspec (Spec, describe, it, parallel)

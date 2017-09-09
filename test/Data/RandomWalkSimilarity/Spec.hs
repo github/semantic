@@ -4,12 +4,11 @@ module Data.RandomWalkSimilarity.Spec where
 import Category
 import Data.Array.IArray
 import Data.Bifunctor
-import Data.Functor.Listable
+import Data.Functor.Listable ()
 import Data.Record
 import Data.These
 import Diff
 import Info
-import Patch
 import RWS
 import Syntax
 import Term

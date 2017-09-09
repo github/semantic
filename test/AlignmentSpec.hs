@@ -3,12 +3,11 @@ module AlignmentSpec where
 
 import Alignment
 import Control.Arrow ((&&&))
-import Control.Monad.Free (Free, wrap)
+import Control.Monad.Free (wrap)
 import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
-import Data.Foldable (toList)
 import Data.Functor.Both as Both hiding (fst, snd)
 import Data.Functor.Listable
 import Data.List (nub, sort)
@@ -21,7 +20,6 @@ import qualified Data.Source as Source
 import qualified Data.Text as Text
 import Data.These
 import Diff
-import Patch
 import SplitDiff
 import Syntax
 import Term
