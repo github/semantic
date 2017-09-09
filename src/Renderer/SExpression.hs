@@ -43,7 +43,7 @@ printTerm term level = go term level 0
     pad p n | n < 1 = ""
             | otherwise = "\n" <> replicate (2 * (p + n)) ' '
     go :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
-    go (annotation :< syntax) parentLevel level =
+    go (Term (annotation :< syntax)) parentLevel level =
       pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString

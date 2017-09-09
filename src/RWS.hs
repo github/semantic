@@ -24,7 +24,7 @@ import Data.Record
 import Data.Semigroup hiding (First(..))
 import Data.These
 import Data.Traversable
-import Term hiding (term)
+import Term
 import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES
@@ -139,7 +139,7 @@ findNearestNeighbourToDiff' :: (Diff f fields -> Int) -- ^ A function computes a
                                     (Maybe (MappedDiff f fields))
 findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
   None -> pure Nothing
-  Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
+  RWS.Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
   Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
@@ -212,7 +212,7 @@ genFeaturizedTermsAndDiffs :: (Functor f, HasField fields FeatureVector)
 genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
   where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
           This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
-          That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (Term (featurize counterB term) : allDiffs)
+          That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (RWS.Term (featurize counterB term) : allDiffs)
           These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
 
 data Mapping f fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm f fields] ![UnmappedTerm f fields] ![MappedDiff f fields] ![TermOrIndexOrNone (UnmappedTerm f fields)]
@@ -221,7 +221,7 @@ featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
 
 eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
-eraseFeatureVector (record :< functor) = setFeatureVector record nullFeatureVector :< functor
+eraseFeatureVector (Term.Term (record :< functor)) = Term.Term (setFeatureVector record nullFeatureVector :< functor)
 
 nullFeatureVector :: FeatureVector
 nullFeatureVector = listArray (0, 0) [0]
@@ -255,7 +255,7 @@ featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields labe
 featureVectorDecorator getLabel p q d
  = cata collect
  . pqGramDecorator getLabel p q
- where collect ((gram :. rest) :<< functor) = ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
+ where collect ((gram :. rest) :< functor) = Term.Term ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
 
@@ -273,7 +273,7 @@ pqGramDecorator
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
-      ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
+      Term.Term ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
@@ -281,10 +281,10 @@ pqGramDecorator getLabel p q = cata algebra
                  => label
                  -> Term f (Record (Gram label ': fields))
                  -> State [Maybe label] (Term f (Record (Gram label ': fields)))
-    assignLabels label ((gram :. rest) :< functor) = do
+    assignLabels label (Term.Term ((gram :. rest) :< functor)) = do
       labels <- get
       put (drop 1 labels)
-      pure $! ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
+      pure $! Term.Term ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . extract)
     padToSize n list = take n (list <> repeat empty)

@@ -34,8 +34,8 @@ diffCost = diffSum (patchSum termSize)
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: Mergeable syntax => (Patch (Term syntax annotation) -> Maybe (Term syntax annotation)) -> (Both annotation -> annotation) -> Diff syntax annotation -> Maybe (Term syntax annotation)
 mergeMaybe transform extractAnnotation = cata algebra
-  where algebra (Copy annotations syntax) = (extractAnnotation annotations :<) <$> sequenceAlt syntax
-        algebra (Patch term) = transform term
+  where algebra (Copy annotations syntax) = Term . (extractAnnotation annotations :<) <$> sequenceAlt syntax
+        algebra (Patch patch) = transform patch
 
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
@@ -67,7 +67,7 @@ deleting = Diff . Patch . Delete
 
 
 wrapTermF :: TermF syntax (Both ann) (Diff syntax ann) -> Diff syntax ann
-wrapTermF (a :<< r) = Diff (Copy a r)
+wrapTermF (a :< r) = Diff (Copy a r)
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where

@@ -56,8 +56,8 @@ instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a
   toEncoding = pairs . mconcat . toJSONFields
 
 instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSON (Term f a) where
-  toJSON (a :< f) = object (toJSONFields a <> toJSONFields f)
-  toEncoding (a :< f) = pairs (mconcat (toJSONFields a <> toJSONFields f))
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]
@@ -85,10 +85,10 @@ instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
 
 instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a) where
-  toJSONFields (a :< f) = toJSONFields a <> toJSONFields f
+  toJSONFields = toJSONFields . unTerm
 
 instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (TermF f a b) where
-  toJSONFields (a :<< f) = toJSONFields a <> toJSONFields f
+  toJSONFields (a :< f) = toJSONFields a <> toJSONFields f
 
 instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a))) => ToJSONFields (Diff f a) where
   toJSONFields = toJSONFields . unDiff

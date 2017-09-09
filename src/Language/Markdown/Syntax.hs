@@ -3,7 +3,7 @@ module Language.Markdown.Syntax
 ( assignment
 , Syntax
 , Grammar
-, Term
+, Language.Markdown.Syntax.Term
 ) where
 
 import qualified CMarkGFM
@@ -20,8 +20,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Union
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
-import Term (TermF(..), unwrap, headF, tailF)
-import qualified Term
+import Term (Term(..), TermF(..), unwrap, headF, tailF)
 
 type Syntax =
   '[ Markup.Document
@@ -52,7 +51,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (TermF [] CMarkGFM.NodeType) Grammar Term
+type Assignment = HasCallStack => Assignment.Assignment (TermF [] CMarkGFM.NodeType) Grammar Language.Markdown.Syntax.Term
 
 
 assignment :: Assignment
@@ -68,7 +67,7 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = (Term.:<) <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
+list = (Term .) . (:<) <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
   CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
   CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) . headF . tailF <$> currentNode <*> children (many item))
 
