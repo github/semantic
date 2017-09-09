@@ -88,6 +88,9 @@ literal =  channelType
        <|> rawStringLiteral
        <|> structType
 
+
+-- Literals
+
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
 
