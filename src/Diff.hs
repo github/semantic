@@ -91,9 +91,6 @@ type instance Base (Diff syntax ann) = DiffF syntax ann
 instance Functor syntax => Recursive (Diff syntax ann) where project = unDiff
 instance Functor syntax => Corecursive (Diff syntax ann) where embed = Diff
 
-instance Functor syntax => Functor (Diff syntax) where
-  fmap f = Diff . bimap f (fmap f) . unDiff
-
 instance Functor syntax => Bifunctor (DiffF syntax) where
   bimap f g (Copy anns r) = Copy (fmap f anns) (fmap g r)
   bimap f _ (Patch term) = Patch (fmap (fmap f) term)
@@ -133,6 +130,12 @@ instance (Show1 f, Show a) => Show1 (DiffF f a) where
 
 instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
   showsPrec = showsPrec1
+
+
+instance Functor f => Functor (Diff f) where
+  fmap f = go
+    where go (Diff (Copy as r)) = Diff (Copy (f <$> as) (fmap go r))
+          go (Diff (Patch p)) = Diff (Patch (fmap f <$> p))
 
 
 instance Foldable f => Bifoldable (DiffF f) where
