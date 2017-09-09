@@ -60,6 +60,7 @@ expression = handleError
           <|> constVarDeclaration
           <|> constVarSpecification
           <|> expressionList
+          <|> fieldDeclaration
           <|> functionDeclaration
           <|> importDeclaration
           <|> importSpec
@@ -183,6 +184,11 @@ typeLiteral =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
         qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
 
+fieldDeclaration :: Assignment
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional literal)
+  where
+        mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
+        mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 constVarDeclaration :: Assignment
 constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
