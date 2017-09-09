@@ -6,6 +6,7 @@ module Renderer.SExpression
 
 import Data.Bifunctor.Join
 import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd)
+import Data.Foldable (fold)
 import Data.Functor.Foldable (cata)
 import Data.List (intersperse)
 import Data.Record
@@ -29,12 +30,12 @@ printDiffF diff parentLevel level = case diff of
     Insert term -> pad parentLevel (level - 1) <> "{+" <> printTermF term (parentLevel + level) 0 <> "+}"
     Delete term -> pad parentLevel (level - 1) <> "{-" <> printTermF term (parentLevel + level) 0 <> "-}"
     Replace a b -> pad parentLevel (level - 1) <> "{ " <> printTermF a (parentLevel + level) 0 <> pad parentLevel (level - 1) <> "->" <> printTermF b (parentLevel + level) 0 <> " }"
-  Copy vs (Join (_, annotation)) syntax -> pad parentLevel level <> "(" <> showBindings (fmap (($ level) . ($ parentLevel)) <$> vs) <> showAnnotation annotation <> foldr (\d -> (d parentLevel (level + 1) <>)) "" syntax <> ")"
+  Copy vs (Join (_, annotation)) syntax -> pad parentLevel level <> "(" <> showBindings (fmap (\ b -> b parentLevel level) <$> vs) <> showAnnotation annotation <> foldMap (\ d -> d parentLevel (level + 1)) syntax <> ")"
   Var v -> pad parentLevel level <> showMetaVar v
 
 printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> Int -> ByteString) -> Int -> Int -> ByteString
 printTermF (annotation :< syntax) parentLevel level =
-  pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t -> (t parentLevel (level + 1) <>)) "" syntax <> ")"
+  pad parentLevel level <> "(" <> showAnnotation annotation <> foldMap (\t -> t parentLevel (level + 1)) syntax <> ")"
 
 pad :: Int -> Int -> ByteString
 pad p n | n <= 0    = ""
@@ -48,7 +49,7 @@ showAnnotation (first :. rest) = pack (show first) <> " " <> showAnnotation rest
 
 showBindings :: [(MetaVar, ByteString)] -> ByteString
 showBindings [] = ""
-showBindings bindings = "[ " <> foldr (<>) "" (intersperse "\n, " (showBinding <$> bindings)) <> " ]"
+showBindings bindings = "[ " <> fold (intersperse "\n, " (showBinding <$> bindings)) <> " ]"
   where showBinding (var, val) = showMetaVar var <> "/" <> val
 
 showMetaVar :: MetaVar -> ByteString
