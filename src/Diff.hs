@@ -4,10 +4,11 @@ module Diff where
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
+import Data.Foldable (fold)
 import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
-import Data.Functor.Foldable
+import Data.Functor.Foldable hiding (fold)
 import Data.Functor.Listable
 import Data.Mergeable
 import Data.Record
@@ -35,6 +36,11 @@ diffSum patchCost = go
 -- | The sum of the node count of the diff’s patches.
 diffCost :: (Foldable syntax, Functor syntax) => Diff syntax annotation -> Int
 diffCost = diffSum (patchSum termSize)
+
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (Term syntax ann)]
+diffPatches = cata $ \ diff -> case diff of
+  Copy _ r -> fold r
+  Patch p -> [p]
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: Mergeable syntax => (Patch (Term syntax annotation) -> Maybe (Term syntax annotation)) -> (Both annotation -> annotation) -> Diff syntax annotation -> Maybe (Term syntax annotation)
