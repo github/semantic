@@ -2,6 +2,7 @@
 module Diff where
 
 import Data.Aeson
+import Control.Monad (join)
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
@@ -11,8 +12,10 @@ import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
+import Data.Maybe (fromMaybe)
 import Data.Mergeable
 import Data.Record
+import Data.Text (pack)
 import Data.Union
 import Patch
 import Syntax
@@ -35,7 +38,8 @@ envLookup :: MetaVar -> Env a -> Maybe a
 envLookup var = lookup var . unEnv
 
 data DiffF syntax ann recur
-  = Copy (Both ann) (syntax recur)
+  = Copy [(MetaVar, recur)] (Both ann) (syntax recur)
+  | Var MetaVar
   | Patch (Patch (Term syntax ann))
   deriving (Foldable, Functor, Traversable)
 
@@ -45,13 +49,18 @@ type SyntaxDiff fields = Diff Syntax (Record fields)
 evalDiff :: Functor syntax => (DiffF syntax ann a -> Env a -> a) -> Diff syntax ann -> a
 evalDiff algebra = flip go mempty
   where go = cata $ \ diff env -> case diff of
-          Copy ann syntax -> algebra (Copy ann (($ env) <$> syntax)) env
+          Copy bindings ann syntax ->
+            let evaluated = fmap ($ env) <$> bindings
+                extended = foldr (uncurry envExtend) env evaluated
+            in algebra (Copy evaluated ann (($ extended) <$> syntax)) env
           Patch patch -> algebra (Patch patch) env
+          Var var -> algebra (Var var) env
 
 
 diffSum :: (Foldable syntax, Functor syntax) => (Patch (Term syntax annotation) -> Int) -> Diff syntax annotation -> Int
-diffSum patchCost = cata $ \ diff -> case diff of
-  Copy _ syntax -> sum syntax
+diffSum patchCost = evalDiff $ \ diff env -> case diff of
+  Copy _ _ syntax -> sum syntax
+  Var v -> fromMaybe 0 (envLookup v env)
   Patch p -> patchCost p
 
 -- | The sum of the node count of the diff’s patches.
@@ -59,15 +68,17 @@ diffCost :: (Foldable syntax, Functor syntax) => Diff syntax annotation -> Int
 diffCost = diffSum (patchSum termSize)
 
 diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (Term syntax ann)]
-diffPatches = cata $ \ diff -> case diff of
-  Copy _ r -> fold r
+diffPatches = evalDiff $ \ diff env -> case diff of
+  Copy _ _ r -> fold r
+  Var v -> fromMaybe [] (envLookup v env)
   Patch p -> [p]
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: Mergeable syntax => (Patch (Term syntax annotation) -> Maybe (Term syntax annotation)) -> (Both annotation -> annotation) -> Diff syntax annotation -> Maybe (Term syntax annotation)
-mergeMaybe transform extractAnnotation = cata algebra
-  where algebra (Copy annotations syntax) = Term . (extractAnnotation annotations :<) <$> sequenceAlt syntax
-        algebra (Patch patch) = transform patch
+mergeMaybe transform extractAnnotation = evalDiff $ \ diff env -> case diff of
+  Copy _ annotations syntax -> Term . (extractAnnotation annotations :<) <$> sequenceAlt syntax
+  Var v -> join (envLookup v env)
+  Patch patch -> transform patch
 
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
@@ -99,19 +110,23 @@ deleting = Diff . Patch . Delete
 
 
 copy :: Both ann -> syntax (Diff syntax ann) -> Diff syntax ann
-copy = (Diff .) . Copy
+copy = (Diff .) . Copy []
+
+
+instance Pretty MetaVar where
+  pretty (MetaVar v) = pretty v
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
-  liftPretty p pl = go
-    where go (Diff (Copy _ syntax)) = liftPrettyUnion go (Pretty.list . map (liftPretty p pl)) syntax
-          go (Diff (Patch patch)) = liftPretty (liftPretty p pl) (Pretty.list . map (liftPretty p pl)) patch
+  liftPretty p pl = go where go = liftPretty2 p pl go (Pretty.list . map go) . unDiff
 
 instance (Apply1 Pretty1 fs, Pretty ann) => Pretty (Diff (Union fs) ann) where
   pretty = liftPretty pretty prettyList
 
 instance Apply1 Pretty1 fs => Pretty2 (DiffF (Union fs)) where
-  liftPretty2 pA plA pB plB (Copy (Join ann) f) = liftPretty2 pA plA pA plA ann <+> liftPrettyUnion pB plB f
+  liftPretty2 pA plA pB plB (Copy bindings (Join ann) f) = pretty ("let" :: String) <+> align (vsep (prettyKV <$> bindings)) <> line <> pretty ("in" :: String) <+> liftPretty2 pA plA pA plA ann <+> liftPrettyUnion pB plB f
+    where prettyKV (var, val) = pretty var <+> pretty '=' <+> pB val
+  liftPretty2 _ _ _ _ (Var v) = pretty v
   liftPretty2 pA plA _ _ (Patch p) = liftPretty (liftPretty pA plA) (Pretty.list . map (liftPretty pA plA)) p
 
 type instance Base (Diff syntax ann) = DiffF syntax ann
@@ -120,7 +135,8 @@ instance Functor syntax => Recursive (Diff syntax ann) where project = unDiff
 instance Functor syntax => Corecursive (Diff syntax ann) where embed = Diff
 
 instance Functor syntax => Bifunctor (DiffF syntax) where
-  bimap f g (Copy anns r) = Copy (fmap f anns) (fmap g r)
+  bimap f g (Copy bindings anns r) = Copy (fmap g <$> bindings) (fmap f anns) (fmap g r)
+  bimap _ _ (Var v) = Var v
   bimap f _ (Patch term) = Patch (fmap (fmap f) term)
 
 instance Eq1 f => Eq1 (Diff f) where
@@ -131,7 +147,8 @@ instance (Eq1 f, Eq a) => Eq (Diff f a) where
 
 instance Eq1 f => Eq2 (DiffF f) where
   liftEq2 eqA eqB d1 d2 = case (d1, d2) of
-    (Copy (Join (a1, b1)) f1, Copy (Join (a2, b2)) f2) -> eqA a1 a2 && eqA b1 b2 && liftEq eqB f1 f2
+    (Copy v1 (Join (a1, b1)) f1, Copy v2 (Join (a2, b2)) f2) -> liftEq (liftEq eqB) v1 v2 && eqA a1 a2 && eqA b1 b2 && liftEq eqB f1 f2
+    (Var v1, Var v2) -> v1 == v2
     (Patch p1, Patch p2) -> liftEq (liftEq eqA) p1 p2
     _ -> False
 
@@ -150,7 +167,8 @@ instance (Show1 f, Show a) => Show (Diff f a) where
 
 instance Show1 f => Show2 (DiffF f) where
   liftShowsPrec2 spA slA spB slB d diff = case diff of
-    Copy ann r -> showsBinaryWith (liftShowsPrecBoth spA slA) (liftShowsPrec spB slB) "Copy" d ann r
+    Copy bindings ann r -> showParen (d > 10) $ showString "Copy " . liftShowList spB slB bindings . showChar ' ' . liftShowsPrecBoth spA slA 11 ann . showChar ' ' . liftShowsPrec spB slB 11 r
+    Var v -> showsUnaryWith showsPrec "Var" d v
     Patch patch -> showsUnaryWith (liftShowsPrec (liftShowsPrec spA slA) (liftShowList spA slA)) "Patch" d patch
 
 instance (Show1 f, Show a) => Show1 (DiffF f a) where
@@ -162,26 +180,31 @@ instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
 
 instance Functor f => Functor (Diff f) where
   fmap f = go
-    where go (Diff (Copy as r)) = Diff (Copy (f <$> as) (fmap go r))
+    where go (Diff (Copy vs as r)) = Diff (Copy (fmap go <$> vs) (f <$> as) (fmap go r))
+          go (Diff (Var v)) = Diff (Var v)
           go (Diff (Patch p)) = Diff (Patch (fmap f <$> p))
 
 instance Foldable f => Foldable (Diff f) where
   foldMap f = go
-    where go (Diff (Copy as r)) = foldMap f as `mappend` foldMap go r
+    where go (Diff (Copy vs as r)) = foldMap (go . Prelude.snd) vs `mappend` foldMap f as `mappend` foldMap go r
+          go (Diff (Var _)) = mempty
           go (Diff (Patch p)) = foldMap (foldMap f) p
 
 instance Traversable f => Traversable (Diff f) where
   traverse f = go
-    where go (Diff (Copy as r)) = copy <$> traverse f as <*> traverse go r
+    where go (Diff (Copy vs as r)) = (\ v a r -> Diff (Copy v a r)) <$> traverse (traverse go) vs <*> traverse f as <*> traverse go r
+          go (Diff (Var v)) = pure (Diff (Var v))
           go (Diff (Patch p)) = Diff . Patch <$> traverse (traverse f) p
 
 
 instance Foldable f => Bifoldable (DiffF f) where
-  bifoldMap f g (Copy as r) = foldMap f as `mappend` foldMap g r
+  bifoldMap f g (Copy vs as r) = foldMap (g . Prelude.snd) vs `mappend` foldMap f as `mappend` foldMap g r
+  bifoldMap _ _ (Var _) = mempty
   bifoldMap f _ (Patch p) = foldMap (foldMap f) p
 
 instance Traversable f => Bitraversable (DiffF f) where
-  bitraverse f g (Copy as r) = Copy <$> traverse f as <*> traverse g r
+  bitraverse f g (Copy vs as r) = Copy <$> traverse (traverse g) vs <*> traverse f as <*> traverse g r
+  bitraverse _ _ (Var v) = pure (Var v)
   bitraverse f _ (Patch p) = Patch <$> traverse (traverse f) p
 
 
@@ -193,5 +216,6 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
   toJSONFields = toJSONFields . unDiff
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
-  toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields1 f
-  toJSONFields (Patch a) = toJSONFields a
+  toJSONFields (Copy vs a f)     = foldr (\ (MetaVar k, v) -> (pack k .= v :)) [] vs <> toJSONFields a <> toJSONFields1 f
+  toJSONFields (Var (MetaVar v)) = [ "metavar" .= v ]
+  toJSONFields (Patch a)         = toJSONFields a

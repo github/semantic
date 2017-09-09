@@ -20,7 +20,7 @@ import Data.Functor.Both
 import Data.Functor.Foldable
 import Data.Functor.Identity
 import Data.List (partition, sortBy)
-import Data.Maybe (catMaybes, fromJust, listToMaybe)
+import Data.Maybe (catMaybes, fromJust, fromMaybe, listToMaybe)
 import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
@@ -47,8 +47,9 @@ hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: Traversable f => HasField fields Range => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
-alignDiff sources = cata $ \ diff -> case diff of
-  Copy ann r -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (ann :< r)
+alignDiff sources = evalDiff $ \ diff env -> case diff of
+  Copy _ ann r -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (ann :< r)
+  Var v -> fromMaybe [] (envLookup v env)
   Patch patch -> alignPatch sources patch
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.

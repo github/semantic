@@ -11,7 +11,6 @@ import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.Functor.Classes (Eq1)
-import Data.Functor.Foldable (cata)
 import Data.Hashable (Hashable)
 import Data.Maybe (isJust)
 import Data.Record
@@ -125,8 +124,9 @@ defaultM = 10
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (GAlign f, Foldable f, Functor f) => Integer -> These (Term f (Record fields)) (Term f (Record fields)) -> Int
 editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
-  where diffCost = flip . cata $ \ diff m -> case diff of
+  where diffCost = flip . evalDiff $ \ diff env m -> case diff of
           _ | m <= 0 -> 0
-          Copy _ r -> sum (fmap ($ pred m) r)
+          Copy _ _ r -> sum (fmap ($ pred m) r)
+          Var v -> maybe 0 ($ pred m) (envLookup v env)
           Patch patch -> patchSum termSize patch
         approximateDiff a b = maybe (replacing a b) (copy (both (extract a) (extract b))) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
