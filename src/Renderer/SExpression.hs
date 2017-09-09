@@ -43,7 +43,7 @@ printTermF (annotation :< syntax) level =
   pad level <> "(" <> showAnnotation annotation <> foldr (\t -> (t (level + 1) <>)) "" syntax <> ")"
 
 pad :: Int -> ByteString
-pad n | n < 0 = ""
+pad n | n <= 0 = ""
       | otherwise = "\n" <> replicate (2 * n) ' '
 
 
