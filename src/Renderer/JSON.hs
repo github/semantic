@@ -23,7 +23,6 @@ import Diff
 import GHC.Generics
 import Info
 import Language
-import Syntax as S
 import Term
 
 --
@@ -68,9 +67,6 @@ instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a
 instance (ToJSONFields a, ToJSONFields (f b), ToJSONFields (f (Term f a))) => ToJSONFields (DiffF f a b) where
   toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields f
   toJSONFields (Patch a) = toJSONFields a
-
-instance ToJSON recur => ToJSONFields (Syntax recur) where
-  toJSONFields syntax = [ "children" .= toList syntax ]
 
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
