@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 module Diff where
 
 import Data.Bifoldable
@@ -22,6 +22,15 @@ newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 
 newtype MetaVar = MetaVar { unMetaVar :: String }
   deriving (Eq, Ord, Show)
+
+newtype Env a = Env { unEnv :: [(MetaVar, a)] }
+  deriving (Eq, Monoid, Ord, Show)
+
+envExtend :: MetaVar -> a -> Env a -> Env a
+envExtend var val (Env m) = Env ((var, val) : m)
+
+envLookup :: MetaVar -> Env a -> Maybe a
+envLookup var = lookup var . unEnv
 
 data DiffF syntax ann recur
   = Copy (Both ann) (syntax recur)
