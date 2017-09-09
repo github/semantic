@@ -8,7 +8,6 @@ module Renderer.JSON
 
 import Data.Aeson (ToJSON, toJSON, encode, object, (.=))
 import Data.Aeson as A hiding (json)
-import Data.Bifunctor.Join
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Foldable (toList)
@@ -19,7 +18,6 @@ import Data.Output
 import Data.Semigroup ((<>))
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
-import Diff
 import GHC.Generics
 import Language
 
@@ -37,10 +35,6 @@ renderJSONDiff blobs diff = Map.fromList
 
 instance Output (Map.Map Text Value) where
   toOutput = toStrict . (<> "\n") . encode
-
-instance ToJSON a => ToJSON (Join (,) a) where
-  toJSON = toJSON . toList
-  toEncoding = foldable
 
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
   deriving (Generic, Show)
