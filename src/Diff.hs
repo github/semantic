@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Diff where
 
+import Data.Bifoldable
 import Data.Bifunctor
 import Data.Functor.Both as Both
 import Data.Functor.Classes
@@ -131,3 +132,8 @@ instance (Show1 f, Show a) => Show1 (DiffF f a) where
 
 instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
   showsPrec = showsPrec1
+
+
+instance Foldable f => Bifoldable (DiffF f) where
+  bifoldMap f g (Copy as r) = foldMap f as `mappend` foldMap g r
+  bifoldMap f _ (Patch p) = foldMap (foldMap f) p
