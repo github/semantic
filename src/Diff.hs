@@ -108,3 +108,6 @@ instance Show1 f => Show2 (DiffF f) where
 
 instance (Show1 f, Show a) => Show1 (DiffF f a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
+  showsPrec = showsPrec1
