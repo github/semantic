@@ -77,9 +77,6 @@ instance ToJSONFields a => ToJSONFields (Patch a) where
   toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
   toJSONFields (Replace a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]
 
-instance ToJSON a => ToJSONFields [a] where
-  toJSONFields list = [ "children" .= list ]
-
 instance ToJSON recur => ToJSONFields (Syntax recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
 

@@ -12,3 +12,6 @@ instance ToJSONFields a => ToJSONFields (Join (,) a) where
 
 instance ToJSONFields a => ToJSONFields (Maybe a) where
   toJSONFields = maybe [] toJSONFields
+
+instance ToJSON a => ToJSONFields [a] where
+  toJSONFields list = [ "children" .= list ]
