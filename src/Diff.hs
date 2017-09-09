@@ -163,3 +163,6 @@ instance Listable1 f => Listable2 (DiffF f) where
 
 instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
   liftTiers = liftTiers2 tiers
+
+instance (Listable1 f, Listable a, Listable b) => Listable (DiffF f a b) where
+  tiers = tiers1
