@@ -74,13 +74,13 @@ instance Functor f => Comonad (Term f) where
   extend f = go where go w = Term (f w :< fmap go (unwrap w))
 
 instance Functor f => Functor (Term f) where
-  fmap f = go where go (Term (a :< r)) = Term (f a :< fmap go r)
+  fmap f = go where go = Term . bimap f go . unTerm
 
 instance Foldable f => Foldable (Term f) where
-  foldMap f = go where go (Term (a :< r)) = f a `mappend` foldMap go r
+  foldMap f = go where go = bifoldMap f go . unTerm
 
 instance Traversable f => Traversable (Term f) where
-  traverse f = go where go (Term (a :< r)) = (Term .) . (:<) <$> f a <*> traverse go r
+  traverse f = go where go = fmap Term . bitraverse f go . unTerm
 
 instance Functor f => ComonadCofree f (Term f) where
   unwrap (Term (_ :< as)) = as
