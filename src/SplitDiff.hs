@@ -19,4 +19,4 @@ getRange diff = byteRange $ case diff of
   Pure patch -> extract (splitTerm patch)
 
 -- | A diff with only one side’s annotations.
-type SplitDiff f annotation = Free (TermF f annotation) (SplitPatch (Term f annotation))
+type SplitDiff syntax ann = Free (TermF syntax ann) (SplitPatch (Term syntax ann))
