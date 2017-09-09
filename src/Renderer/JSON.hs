@@ -45,9 +45,6 @@ renderJSONDiff blobs diff = Map.fromList
 instance Output (Map.Map Text Value) where
   toOutput = toStrict . (<> "\n") . encode
 
-instance ToJSONFields a => ToJSONFields (Join (,) a) where
-  toJSONFields (Join (a, b)) = [ "before" .= object (toJSONFields a), "after" .= object (toJSONFields b) ]
-
 instance ToJSON a => ToJSON (Join (,) a) where
   toJSON = toJSON . toList
   toEncoding = foldable
