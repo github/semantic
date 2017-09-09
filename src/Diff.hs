@@ -3,6 +3,7 @@ module Diff where
 
 import Data.Bifunctor
 import Data.Functor.Both as Both
+import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Foldable
 import Data.Mergeable
@@ -93,3 +94,9 @@ instance Functor syntax => Functor (Diff syntax) where
 instance Functor syntax => Bifunctor (DiffF syntax) where
   bimap f g (Copy anns r) = Copy (fmap f anns) (fmap g r)
   bimap f _ (Patch term) = Patch (fmap (fmap f) term)
+
+instance Eq1 f => Eq2 (DiffF f) where
+  liftEq2 eqA eqB d1 d2 = case (d1, d2) of
+    (Copy (Join (a1, b1)) f1, Copy (Join (a2, b2)) f2) -> eqA a1 a2 && eqA b1 b2 && liftEq eqB f1 f2
+    (Patch p1, Patch p2) -> liftEq (liftEq eqA) p1 p2
+    _ -> False
