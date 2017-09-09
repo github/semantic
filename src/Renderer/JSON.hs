@@ -16,7 +16,6 @@ import Data.Functor.Both (Both)
 import Data.JSON.Fields
 import qualified Data.Map as Map
 import Data.Output
-import Data.Proxy
 import Data.Semigroup ((<>))
 import Data.Text (pack, Text)
 import Data.Text.Encoding (decodeUtf8)
@@ -79,9 +78,6 @@ instance ToJSONFields a => ToJSONFields (Patch a) where
 
 instance ToJSON recur => ToJSONFields (Syntax recur) where
   toJSONFields syntax = [ "children" .= toList syntax ]
-
-instance (Apply1 Foldable fs, ToJSON a) => ToJSONFields (Union fs a) where
-  toJSONFields = apply1 (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
 
 instance ToJSONFields (Union '[] a) where
   toJSONFields _ = []
