@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON
 ( renderJSONDiff
 , renderJSONTerm
