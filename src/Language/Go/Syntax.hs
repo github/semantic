@@ -80,7 +80,8 @@ expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
 
 literal :: Assignment
-literal =  identifier
+literal =  channelType
+       <|> identifier
        <|> interpretedStringLiteral
        <|> intLiteral
        <|> typeLiteral
