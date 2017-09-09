@@ -107,12 +107,6 @@ typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types 
          <|> symbol ParenthesizedType
          <|> symbol SliceType
 
-channelType :: Assignment
-channelType = makeTerm <$> symbol ChannelType <*> children (Literal.Channel <$> expression)
-
-structType :: Assignment
-structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many fieldDeclaration)
-
 identifier :: Assignment
 identifier =
       mk FieldIdentifier
@@ -127,45 +121,22 @@ interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Lit
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-typeDeclaration :: Assignment
-typeDeclaration = symbol TypeDeclaration *> children typeSpecs
 
-typeSpecs :: Assignment
-typeSpecs = makeTerm <$> location <*> many typeSpec
+-- Type Literals
 
-typeSpec :: Assignment
-typeSpec =  mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> structType)
-        <|> mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
-        <|> mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> ((,) <$> symbol MapType <*> children ((,,,) <$> symbol TypeIdentifier <*> source <*> symbol TypeIdentifier <*> source)))
-        <|> mkChannel <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> channelType)
-        <|> makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
+channelType :: Assignment
+channelType = makeTerm <$> symbol ChannelType <*> children (Literal.Channel <$> expression)
+
 structType :: Assignment
 structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many expression)
-  where
-    mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
-    structType = symbol StructType *> children (many fieldDeclaration)
 
-    mkInterface loc (name, interfaceBody) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Interface name interfaceBody)) name
-    interfaceType = symbol InterfaceType *> children (many expression)
-
-    mkMap loc (name, (mapLoc, (keyTypeLoc, keyTypeName, valueTypeLoc, valueTypeName))) =
-      makeTerm loc $ Type.Annotation (makeTerm mapLoc (Literal.Hash (pure $ mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName))) name
-
-    mkChannel loc (name, channel) = makeTerm loc $ Type.Annotation channel name
-
-    mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName =
-      makeTerm keyTypeLoc $
-        Literal.KeyValue (makeTerm keyTypeLoc   (Type.Annotation (makeTerm keyTypeLoc   (Syntax.Empty)) (makeTerm keyTypeLoc   (Syntax.Identifier keyTypeName))))
-                         (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc (Syntax.Empty)) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
-
-
-methodSpec :: Assignment
-methodSpec =  handleError $ mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typeLiteral <|> parameters <|> emptyTerm) <*> empty)
-  where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
-        empty = makeTerm <$> location <*> pure Syntax.Empty
-        mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
-        mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method empty' name' (pure params) empty''
-
+-- interfaceType
+-- arrayType
+-- sliceType
+-- mapType
+-- channelType
+-- functionType
+-- TODO Extract individual Annotation assignments
 typeLiteral :: Assignment
 typeLiteral =
       mk InterfaceType
@@ -176,6 +147,48 @@ typeLiteral =
   <|> qualifiedType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
         qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
+
+
+-- Type Declarations
+
+channelTypeDeclaration :: Assignment
+channelTypeDeclaration = mkChannel <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> channelType)
+  where
+    mkChannel loc (name, channel) = makeTerm loc $ Type.Annotation channel name
+
+interfaceTypeDeclaration :: Assignment
+interfaceTypeDeclaration = mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
+  where
+    mkInterface loc (name, interfaceBody) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Interface name interfaceBody)) name
+    interfaceType = symbol InterfaceType *> children (many expression)
+
+mapTypeDeclaration :: Assignment
+mapTypeDeclaration = mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> ((,) <$> symbol MapType <*> children ((,,,) <$> symbol TypeIdentifier <*> source <*> symbol TypeIdentifier <*> source)))
+  where
+    mkMap loc (name, (mapLoc, (keyTypeLoc, keyTypeName, valueTypeLoc, valueTypeName))) =
+      makeTerm loc $ Type.Annotation (makeTerm mapLoc (Literal.Hash (pure $ mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName))) name
+
+    mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName =
+      makeTerm keyTypeLoc $
+        Literal.KeyValue (makeTerm keyTypeLoc   (Type.Annotation (makeTerm keyTypeLoc   (Syntax.Empty)) (makeTerm keyTypeLoc   (Syntax.Identifier keyTypeName))))
+                         (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc (Syntax.Empty)) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
+
+structTypeDeclaration :: Assignment
+structTypeDeclaration = mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> (symbol StructType *> children (many fieldDeclaration)))
+  where
+    mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
+
+
+typeDeclaration :: Assignment
+typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (many (channelTypeDeclaration
+                                                                        <|> interfaceTypeDeclaration
+                                                                        <|> structTypeDeclaration
+                                                                        <|> mapTypeDeclaration))
+
+typeSpec :: Assignment
+typeSpec = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
+
+
 -- Expressions
 
 block :: Assignment
