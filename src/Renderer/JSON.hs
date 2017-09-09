@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators #-}
 module Renderer.JSON
 ( renderJSONDiff
 , renderJSONTerm
