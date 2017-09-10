@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, DerivingStrategies, GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, TypeOperators #-}
 module Diff where
 
 import Data.Aeson
@@ -43,6 +43,7 @@ diffFBindings _ = []
 
 newtype Metavar = Metavar { unMetavar :: Int }
   deriving (Eq, Ord, Show)
+  deriving newtype (ToJSON)
 
 
 freeMetavariables :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Set.Set Metavar
@@ -232,7 +233,3 @@ instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a 
   toJSONFields (Copy vs a f)     = [ "bindings" .= vs] <> toJSONFields a <> toJSONFields1 f
   toJSONFields (Var (Metavar v)) = [ "metavar" .= v ]
   toJSONFields (Patch a)         = toJSONFields a
-
-instance ToJSON Metavar where
-  toJSON (Metavar i) = toJSON i
-  toEncoding (Metavar i) = toEncoding i
