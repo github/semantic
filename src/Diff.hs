@@ -65,10 +65,7 @@ evalDiffR algebra = flip go mempty
 evalDiffRM :: (Functor syntax, Reader (Env (Diff syntax ann, Eff fs a)) :< fs) => (DiffF syntax ann (Diff syntax ann, Eff fs a) -> Eff fs a) -> Diff syntax ann -> Eff fs a
 evalDiffRM algebra = go
   where go = para $ \ diff -> case diff of
-          Copy bindings ann syntax -> do
-            env <- ask
-            let extended = foldr (uncurry envExtend) env bindings
-            local (const extended) $ algebra (Copy bindings ann syntax)
+          Copy bindings _ _ -> local (flip (foldr (uncurry envExtend)) bindings) (algebra diff)
           _ -> algebra diff
 
 
