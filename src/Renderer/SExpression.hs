@@ -30,7 +30,7 @@ printDiffF diff n = case diff of
     Insert term -> nl n <> pad (n - 1) <> "{+" <> printTermF term n <> "+}"
     Delete term -> nl n <> pad (n - 1) <> "{-" <> printTermF term n <> "-}"
     Replace a b -> nl n <> pad (n - 1) <> "{ " <> printTermF a n
-                <> nl n <> pad (n - 1) <> "->" <> printTermF b n <> " }"
+                <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF b n <> " }"
   Copy vs (Join (_, annotation)) syntax -> nl n <> pad n <> "(" <> showBindings (fmap (\ b -> b n) <$> vs) <> showAnnotation annotation <> foldMap (\ d -> d (n + 1)) syntax <> ")"
   Var v -> nl n <> pad n <> showMetaVar v
 
