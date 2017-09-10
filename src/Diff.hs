@@ -8,6 +8,7 @@ import Control.Monad.Effect.Reader
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
+import Data.Foldable (fold)
 import Data.Functor.Both (Both, Join(..), liftShowsPrecBoth)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Classes
@@ -17,6 +18,7 @@ import Data.JSON.Fields
 import Data.Maybe (fromMaybe)
 import Data.Mergeable
 import Data.Record
+import qualified Data.Set as Set
 import Data.Text (pack)
 import Data.Union
 import Patch
@@ -42,6 +44,14 @@ diffFBindings _ = []
 
 newtype Metavar = Metavar { unMetavar :: String }
   deriving (Eq, Ord, Show)
+
+
+freeMetavariables :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Set.Set Metavar
+freeMetavariables = cata $ \ diff -> case diff of
+  Copy bindings _ body -> foldMap snd bindings <> foldr Set.delete (fold body) (fst <$> bindings)
+  Var v -> Set.singleton v
+  Patch patch -> foldMap fold patch
+
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
   deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
