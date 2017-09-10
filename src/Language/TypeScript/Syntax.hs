@@ -773,10 +773,10 @@ templateSubstitution :: Assignment
 templateSubstitution = symbol TemplateSubstitution *> children expression
 
 nonNullExpression' :: Assignment
-nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> (Language.TypeScript.Syntax.NonNullExpression <$> expression)
+nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> children (Language.TypeScript.Syntax.NonNullExpression <$> expression)
 
 importAlias' :: Assignment
-importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> (Language.TypeScript.Syntax.ImportAlias <$> identifier <*> (identifier <|> nestedIdentifier))
+importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> children (Language.TypeScript.Syntax.ImportAlias <$> identifier <*> (identifier <|> nestedIdentifier))
 
 number :: Assignment
 number = makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
