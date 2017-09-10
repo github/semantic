@@ -61,6 +61,11 @@ maxBoundMetavariable = cata $ \ diff -> case diff of
 foldMaxMap :: (Foldable t, Ord b) => (a -> Maybe b) -> t a -> Maybe b
 foldMaxMap f = foldr (max . f) Nothing
 
+letDiff :: (Foldable syntax, Functor syntax) => Diff syntax ann -> (Metavar -> TermF syntax (Both ann) (Diff syntax ann)) -> Diff syntax ann
+letDiff diff f = Diff (Copy [(n, diff)] body)
+  where body = f n
+        n = maybe (Metavar 0) succ (foldMaxMap maxBoundMetavariable (termSyntax body))
+
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
   deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
