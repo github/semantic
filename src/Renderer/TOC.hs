@@ -157,7 +157,7 @@ tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
             (Just a, Just []) -> Just [Changed a]
             (_     , entries) -> entries
           Var v -> join (envLookup v env)
-          Patch patch -> Just [] <> foldMap (\ t -> fold t <> (pure . patchEntry patch <$> selector t)) patch
+          Patch patch -> Just [] <> foldMap (\ t -> (pure . patchEntry patch <$> selector t) <> fold t) patch
 
         patchEntry = these (const Deleted) (const Inserted) (const (const Replaced)) . unPatch
 
