@@ -17,8 +17,10 @@ module Renderer.TOC
 , entrySummary
 ) where
 
+import Control.Applicative ((<|>))
 import Control.Monad (join)
 import Data.Aeson
+import Data.Align (crosswalk)
 import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
@@ -157,9 +159,9 @@ tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
             (Just a, Just []) -> Just [Changed a]
             (_     , entries) -> entries
           Var v -> join (envLookup v env)
-          Patch patch -> Just [] <> foldMap (\ t -> maybe (fold t) (Just . pure . patchEntry patch) (selector t)) patch
+          Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <|> foldMap fold patch <|> Just []
 
-        patchEntry = these (const Deleted) (const Inserted) (const (const Replaced)) . unPatch
+        patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
 termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)
