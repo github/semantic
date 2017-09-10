@@ -6,8 +6,6 @@ module Data.Functor.Both
 , fst
 , snd
 , module X
-, liftShowsPrecBoth
-, liftShowListBoth
 ) where
 
 import Data.Bifunctor.Join as X
@@ -16,7 +14,6 @@ import Data.Semigroup
 import Data.Text.Prettyprint.Doc as Pretty
 import Prelude hiding (fst, snd)
 import qualified Prelude
-import Text.Show
 
 -- | A computation over both sides of a pair.
 type Both a = Join (,) a
@@ -45,11 +42,6 @@ instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
 instance (Semigroup a) => Semigroup (Join (,) a) where
   a <> b = Join $ runJoin a <> runJoin b
 
-liftShowsPrecBoth :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Both a -> ShowS
-liftShowsPrecBoth sp sl d = showsUnaryWith (liftShowsPrec2 sp sl sp sl) "Join" d . runJoin
-
-liftShowListBoth :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> [Both a] -> ShowS
-liftShowListBoth sp sl = showListWith (liftShowsPrecBoth sp sl 0)
 
 instance Eq2 p => Eq1 (Join p) where
   liftEq eq (Join a1) (Join a2) = liftEq2 eq eq a1 a2
