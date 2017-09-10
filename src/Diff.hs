@@ -63,8 +63,7 @@ evalDiffR algebra = flip go mempty
             let evaluated = fmap (second ($ env)) <$> bindings
                 extended = foldr (uncurry envExtend) env evaluated
             in algebra (Copy evaluated ann (second ($ extended) <$> syntax)) env
-          Patch patch -> algebra (Patch (fmap (second ($ env)) <$> patch)) env
-          Var var -> algebra (Var var) env
+          _ -> algebra (second ($ env) <$> diff) env
 
 evalDiffRM :: (Functor syntax, Reader (Env (Diff syntax ann, Eff fs a)) :< fs) => (DiffF syntax ann (Diff syntax ann, Eff fs a) -> Eff fs a) -> Diff syntax ann -> Eff fs a
 evalDiffRM algebra = para (\ diff -> local (bindMetavariables diff) (algebra diff))
