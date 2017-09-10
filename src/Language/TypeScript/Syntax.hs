@@ -761,10 +761,10 @@ super :: Assignment
 super = makeTerm <$> symbol Grammar.Super <*> (Language.TypeScript.Syntax.Super <$ source)
 
 typeAssertion :: Assignment
-typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> (Language.TypeScript.Syntax.TypeAssertion <$> typeArguments' <*> expression)
+typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> children (Language.TypeScript.Syntax.TypeAssertion <$> typeArguments' <*> expression)
 
 asExpression :: Assignment
-asExpression = makeTerm <$> symbol AsExpression <*> (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <|> templateString))
+asExpression = makeTerm <$> symbol AsExpression <*> children (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <|> templateString))
 
 templateString :: Assignment
 templateString = makeTerm <$> symbol TemplateString <*> children (Literal.String <$> many templateSubstitution)
