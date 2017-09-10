@@ -51,7 +51,7 @@ spec = parallel $ do
       \ term -> let term' = (term :: Term Syntax (Record '[Category])) in tableOfContentsBy (Just . termAnnotation) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ patch -> let patch' = (patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (these deleting inserting replacing (unPatch patch')) `shouldBe` these (pure . Deleted) (pure . Inserted) ((<>) `on` pure . Replaced) (unPatch (lastValue <$> patch'))
+      \ patch -> let patch' = (patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (these deleting inserting replacing (unPatch patch')) `shouldBe` these (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (unPatch (foldMap pure <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = copy (pure 0) (Indexed [1 <$ (diff :: Diff Syntax Int)]) in
