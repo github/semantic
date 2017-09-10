@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DerivingStrategies, GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, DerivingStrategies, GeneralizedNewtypeDeriving, NoStrictData, RankNTypes, TypeFamilies, TypeOperators #-}
 module Diff where
 
 import Data.Aeson
@@ -41,7 +41,7 @@ diffFBindings (Copy bindings _) = bindings
 diffFBindings _ = []
 
 
-newtype Metavar = Metavar { unMetavar :: Int }
+newtype Metavar = Metavar Int
   deriving (Eq, Ord, Show)
   deriving newtype (Enum, ToJSON)
 
