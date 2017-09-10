@@ -67,7 +67,7 @@ evalDiffR algebra = flip go mempty
           Var var -> algebra (Var var) env
 
 evalDiffRM :: (Functor syntax, Reader (Env (Diff syntax ann, Eff fs a)) :< fs) => (DiffF syntax ann (Diff syntax ann, Eff fs a) -> Eff fs a) -> Diff syntax ann -> Eff fs a
-evalDiffRM algebra = para $ \ diff -> local (flip (foldr (uncurry envExtend)) (diffFBindings diff)) (algebra diff)
+evalDiffRM algebra = para (\ diff -> local (flip (foldr (uncurry envExtend)) (diffFBindings diff)) (algebra diff))
 
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int
