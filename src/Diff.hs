@@ -19,7 +19,6 @@ import Data.Maybe (fromMaybe)
 import Data.Mergeable
 import Data.Record
 import qualified Data.Set as Set
-import Data.Text (pack)
 import Data.Union
 import Patch
 import Syntax
@@ -42,7 +41,7 @@ diffFBindings (Copy bindings _ _) = bindings
 diffFBindings _ = []
 
 
-newtype Metavar = Metavar { unMetavar :: String }
+newtype Metavar = Metavar { unMetavar :: Int }
   deriving (Eq, Ord, Show)
 
 
@@ -230,6 +229,10 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
   toJSONFields = toJSONFields . unDiff
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
-  toJSONFields (Copy vs a f)     = foldMap (\ (Metavar k, v) -> [pack k .= v]) vs <> toJSONFields a <> toJSONFields1 f
+  toJSONFields (Copy vs a f)     = [ "bindings" .= vs] <> toJSONFields a <> toJSONFields1 f
   toJSONFields (Var (Metavar v)) = [ "metavar" .= v ]
   toJSONFields (Patch a)         = toJSONFields a
+
+instance ToJSON Metavar where
+  toJSON (Metavar i) = toJSON i
+  toEncoding (Metavar i) = toEncoding i

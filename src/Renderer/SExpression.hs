@@ -4,8 +4,9 @@ module Renderer.SExpression
 , renderSExpressionTerm
 ) where
 
+import Data.Bifunctor (bimap)
 import Data.Bifunctor.Join
-import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd)
+import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length)
 import Data.Foldable (fold)
 import Data.Functor.Foldable (cata)
 import Data.List (intersperse)
@@ -56,4 +57,8 @@ showBindings bindings = "[ " <> fold (intersperse "\n, " (showBinding <$> bindin
   where showBinding (var, val) = showMetavar var <> "/" <> val
 
 showMetavar :: Metavar -> ByteString
-showMetavar (Metavar s) = pack ('$' : s)
+showMetavar (Metavar i) = pack (toName i)
+  where toName i | i < 0 = ""
+                 | otherwise = uncurry (++) (bimap (toName . pred) (pure . (alphabet !!)) (i `divMod` la))
+        alphabet = ['a'..'z']
+        la = length alphabet
