@@ -17,7 +17,6 @@ module Renderer.TOC
 , entrySummary
 ) where
 
-import Control.Applicative ((<|>))
 import Control.Monad (join)
 import Data.Aeson
 import Data.Align (crosswalk)
@@ -159,7 +158,7 @@ tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
             (Just a, Just []) -> Just [Changed a]
             (_     , entries) -> entries
           Var v -> join (envLookup v env)
-          Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <|> foldMap fold patch <|> Just []
+          Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
 
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
