@@ -69,8 +69,7 @@ evalDiffRM algebra = go
             env <- ask
             let extended = foldr (uncurry envExtend) env bindings
             local (const extended) $ algebra (Copy bindings ann syntax)
-          Patch patch -> algebra (Patch patch)
-          Var var -> algebra (Var var)
+          _ -> algebra diff
 
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int
