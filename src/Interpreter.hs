@@ -125,7 +125,7 @@ editDistanceUpTo :: (GAlign f, Foldable f, Functor f) => Integer -> These (Term 
 editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
   where diffCost = flip . evalDiff $ \ diff env m -> case diff of
           _ | m <= 0 -> 0
-          Copy _ _ r -> sum (fmap ($ pred m) r)
+          Copy _ body -> sum (fmap ($ pred m) body)
           Var v -> maybe 0 ($ pred m) (envLookup v env)
           Patch patch -> succ (sum (sum . fmap ($ pred m) <$> patch))
         approximateDiff a b = maybe (replacing a b) (copy (both (extract a) (extract b))) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
