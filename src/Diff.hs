@@ -220,6 +220,6 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
   toJSONFields = toJSONFields . unDiff
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
-  toJSONFields (Copy vs a f)     = foldr (\ (Metavar k, v) -> (pack k .= v :)) [] vs <> toJSONFields a <> toJSONFields1 f
+  toJSONFields (Copy vs a f)     = foldMap (\ (Metavar k, v) -> [pack k .= v]) vs <> toJSONFields a <> toJSONFields1 f
   toJSONFields (Var (Metavar v)) = [ "metavar" .= v ]
   toJSONFields (Patch a)         = toJSONFields a
