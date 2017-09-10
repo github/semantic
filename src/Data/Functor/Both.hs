@@ -7,6 +7,7 @@ module Data.Functor.Both
 , snd
 , module X
 , liftShowsPrecBoth
+, liftShowListBoth
 ) where
 
 import Data.Bifunctor.Join as X
@@ -14,6 +15,7 @@ import Data.Functor.Classes
 import Data.Semigroup
 import Prelude hiding (fst, snd)
 import qualified Prelude
+import Text.Show
 
 -- | A computation over both sides of a pair.
 type Both a = Join (,) a
@@ -44,3 +46,6 @@ instance (Semigroup a) => Semigroup (Join (,) a) where
 
 liftShowsPrecBoth :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Both a -> ShowS
 liftShowsPrecBoth sp sl d = showsUnaryWith (liftShowsPrec2 sp sl sp sl) "Join" d . runJoin
+
+liftShowListBoth :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> [Both a] -> ShowS
+liftShowListBoth sp sl = showListWith (liftShowsPrecBoth sp sl 0)
