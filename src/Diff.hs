@@ -43,7 +43,7 @@ diffFBindings _ = []
 
 newtype Metavar = Metavar { unMetavar :: Int }
   deriving (Eq, Ord, Show)
-  deriving newtype (ToJSON)
+  deriving newtype (Enum, ToJSON)
 
 
 freeMetavariables :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Set.Set Metavar
