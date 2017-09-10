@@ -54,6 +54,7 @@ type Syntax = '[
   , Expression.Delete
   , Expression.Void
   , Expression.Typeof
+  , Expression.InstanceOf
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -1214,6 +1215,7 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inj .) . Expression.Or               <$ symbol AnonPipePipe
   , (inj .) . Expression.BOr              <$ symbol AnonPipe
   , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.InstanceOf       <$ symbol AnonInstanceof
   , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
   , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
   , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
