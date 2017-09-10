@@ -1,6 +1,6 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Assignment
       (Identifier)
-    { (NumberLiteral)
-    ->(NumberLiteral) })))
+    { (Float)
+    ->(Float) })))

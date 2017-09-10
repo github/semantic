@@ -1,4 +1,4 @@
 (Program
-  (ExpressionStatements
-  { (NumberLiteral)
-  ->(NumberLiteral) }))
+  (ExpressionStatement
+  { (Float)
+  ->(Float) }))

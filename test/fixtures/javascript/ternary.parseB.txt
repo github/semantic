@@ -1,10 +1,10 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Assignment
       (MemberAccess
         (Identifier)
         (Identifier))
-      (Ternary
+      (If
         (MemberAccess
           (Identifier)
           (Identifier))

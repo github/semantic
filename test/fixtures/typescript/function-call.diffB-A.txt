@@ -1,10 +1,10 @@
 (Program
-  (ExpressionStatements
-    (FunctionCall
+  (ExpressionStatement
+    (Call
+    { (TypeIdentifier)
+    ->(TypeIdentifier) }
       (Identifier)
-      (Other "type_arguments"
-      { (Identifier)
-      ->(Identifier) })
       (Identifier)
-    { (StringLiteral)
-    ->(StringLiteral) })))
+    { (TextElement)
+    ->(TextElement) }
+      (Empty))))

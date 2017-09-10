@@ -1,5 +1,5 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Assignment
       (Identifier)
-      (NumberLiteral))))
+      (Float))))

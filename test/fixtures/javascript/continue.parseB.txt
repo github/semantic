@@ -1,22 +1,24 @@
 (Program
   (For
-    (Assignment
-      (Identifier)
-      (NumberLiteral))
-    (RelationalOperator
-      (Identifier)
-      (Other "<")
-      (NumberLiteral))
-    (MathOperator
-      (Identifier)
-      (Other "++"))
-    (ExpressionStatements
+    (ExpressionStatement
+      (Assignment
+        (Identifier)
+        (Float)))
+    (ExpressionStatement
+      (LessThan
+        (Identifier)
+        (Float)))
+    (Update
+      (Identifier))
+    (
       (If
-        (RelationalOperator
+        (Equal
           (Identifier)
-          (Other "===")
-          (NumberLiteral))
-        (ExpressionStatements
-          (Break)))
-      (ExpressionStatements
+          (Float))
+        (
+          (Break
+            (Empty)))
+        (Empty))
+      (Empty)
+      (ExpressionStatement
         (Identifier)))))

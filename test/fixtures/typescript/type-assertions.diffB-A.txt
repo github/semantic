@@ -1,9 +1,9 @@
 (Program
-  (ExpressionStatements
-  {+(Other "type_assertion"
-      (Other "type_arguments"
-        (Other "predefined_type"))
-      (Identifier))+}
-  {-(Other "as_expression"
+  (ExpressionStatement
+  { (Cast
       (Identifier)
-      (Other "predefined_type"))-}))
+      (PredefinedType))
+  ->(TypeAssertion
+      (TypeArguments
+        (PredefinedType))
+      (Identifier)) }))

@@ -1,9 +1,9 @@
 (Program
-  (ExpressionStatements
-    (CommaOperator
+  (ExpressionStatement
+    (SequenceExpression
       (Assignment
         (Identifier)
-        (NumberLiteral))
+        (Float))
       (Assignment
         (Identifier)
-        (NumberLiteral)))))
+        (Float)))))

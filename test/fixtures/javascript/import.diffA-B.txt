@@ -1,63 +1,75 @@
 (Program
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }
-    (Identifier))
+    (ImportClause
+      (Identifier))
+  {+(TextElement)+}
+  {-(TextElement)-})
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }
-    (Other "namespace_import"
-    { (Identifier)
-    ->(Identifier) }))
+    (ImportClause
+      (NamespaceImport
+      { (Identifier)
+      ->(Identifier) }))
+  {+(TextElement)+}
+  {-(TextElement)-})
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }
-    (Other "named_imports"
-      (Other "import_specifier"
-      { (Identifier)
-      ->(Identifier) })))
+    (ImportClause
+      (NamedImports
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))))
+  {+(TextElement)+}
+  {-(TextElement)-})
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }
-    (Other "named_imports"
-      (Other "import_specifier"
-      { (Identifier)
-      ->(Identifier) })
-      (Other "import_specifier"
-      { (Identifier)
-      ->(Identifier) })))
+    (ImportClause
+      (NamedImports
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))))
+  {+(TextElement)+}
+  {-(TextElement)-})
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }
-    (Other "named_imports"
-      (Other "import_specifier"
-      { (Identifier)
-      ->(Identifier) })
-      (Other "import_specifier"
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })))
+    (ImportClause
+      (NamedImports
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })))
+  {+(TextElement)+}
+  {-(TextElement)-})
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }
-    (Identifier)
-    (Other "named_imports"
-      (Other "import_specifier"
-      { (Identifier)
-      ->(Identifier) })
-      (Other "import_specifier"
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })))
+    (ImportClause
+      (Identifier)
+      (NamedImports
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })))
+  {+(TextElement)+}
+  {-(TextElement)-})
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }
-    (Identifier)
-    (Other "namespace_import"
-    { (Identifier)
-    ->(Identifier) }))
+    (ImportClause
+      (Identifier)
+      (NamespaceImport
+      { (Identifier)
+      ->(Identifier) }))
+  {+(TextElement)+}
+  {-(TextElement)-})
   (Import
-  { (StringLiteral)
-  ->(StringLiteral) }))
+  {+(TextElement)+}
+  {-(TextElement)-}))

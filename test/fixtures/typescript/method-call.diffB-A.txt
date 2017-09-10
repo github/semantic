@@ -1,8 +1,10 @@
 (Program
-  (ExpressionStatements
-    (FunctionCall
+  (ExpressionStatement
+    (Call
+      (MemberAccess
+        (Identifier)
+        (Identifier))
       (Identifier)
-      (Identifier)
-      (Identifier)
-    { (StringLiteral)
-    ->(StringLiteral) })))
+    { (TextElement)
+    ->(TextElement) }
+      (Empty))))

@@ -1,20 +1,34 @@
 (Program
-  (ExpressionStatements
-    (FunctionCall
+  (ExpressionStatement
+    (Call
       (Identifier)
-      (NumberLiteral)
-      (StringLiteral)
+      (Float)
+      (TextElement)
       (Function
-        (Params
-          (Other "required_parameter"
-            (Identifier))
-          (Other "required_parameter"
-            (Identifier)))
-        (ExpressionStatements
-          (FunctionCall
+        (Empty)
+        (Empty)
+        (Empty)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
             (Identifier)
+            (Empty)))
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
             (Identifier)
-            (Identifier)))
-        (Return
-          (Identifier)))
-      (Boolean))))
+            (Empty)))
+        (
+          (ExpressionStatement
+            (Call
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+              (Identifier)
+              (Empty)))
+          (Return
+            (Identifier))))
+      (Boolean)
+      (Empty))))

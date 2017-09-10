@@ -1,7 +1,10 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Function
-      (Params)
-      (Return
-      { (StringLiteral)
-      ->(StringLiteral) }))))
+      (Empty)
+      (Empty)
+      (Empty)
+      (
+        (Return
+        { (TextElement)
+        ->(TextElement) })))))

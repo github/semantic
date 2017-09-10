@@ -1,5 +1,5 @@
 (Program
-  (ExpressionStatements
-    (Other "as_expression"
+  (ExpressionStatement
+    (Cast
       (Identifier)
-      (Other "predefined_type"))))
+      (PredefinedType))))

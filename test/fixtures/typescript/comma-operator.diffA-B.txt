@@ -1,21 +1,21 @@
 (Program
-  (ExpressionStatements
-  {+(Assignment
+  (ExpressionStatement
+  { (SequenceExpression
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float)))
+  ->(Assignment
       (Identifier)
-      (Object
-        (Pair
+      (Hash
+        (KeyValue
           (Identifier)
-          (CommaOperator
-            (NumberLiteral)
-            (MathOperator
-              (NumberLiteral)
-              (Other "+")
-              (NumberLiteral))
-            (NumberLiteral)))))+}
-  {-(CommaOperator
-      (Assignment
-        (Identifier)
-        (NumberLiteral))
-      (Assignment
-        (Identifier)
-        (NumberLiteral)))-}))
+          (SequenceExpression
+            (Float)
+            (SequenceExpression
+              (Plus
+                (Float)
+                (Float))
+              (Float)))))) }))

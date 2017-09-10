@@ -1,8 +1,8 @@
 (Program
-  (ExpressionStatements
-    (FunctionCall
+  (ExpressionStatement
+    (Call
+      (TypeIdentifier)
       (Identifier)
-      (Other "type_arguments"
-        (Identifier))
       (Identifier)
-      (StringLiteral))))
+      (TextElement)
+      (Empty))))

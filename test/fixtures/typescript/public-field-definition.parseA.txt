@@ -1,56 +1,76 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Class
       (Identifier)
-      (FieldDecl
-        (Other "readonly")
-        (Identifier))
-      (FieldDecl
-        (Other "readonly")
-        (Identifier))
-      (FieldDecl
-        (Other "accessibility_modifier")
-        (Other "readonly")
-        (Identifier))
-      (FieldDecl
-        (Other "accessibility_modifier")
-        (Other "readonly")
+      (PublicFieldDefinition
+        (Empty)
+        (Readonly)
+        (Empty)
         (Identifier)
-        (NumberLiteral))
-      (FieldDecl
-        (Other "accessibility_modifier")
-        (Other "readonly")
+        (Empty))
+      (PublicFieldDefinition
+        (Empty)
+        (Readonly)
+        (Empty)
         (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))
-      (FieldDecl
+        (Empty))
+      (PublicFieldDefinition
         (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))
-      (FieldDecl
+        (Readonly)
+        (Empty)
         (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))
-      (FieldDecl
-        (Other "readonly")
+        (Empty))
+      (PublicFieldDefinition
         (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))
-      (FieldDecl
-        (Other "readonly")
+        (Readonly)
+        (Empty)
         (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))
-      (FieldDecl
+        (Float))
+      (PublicFieldDefinition
         (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))
-      (FieldDecl
+        (Readonly)
+        (Annotation
+          (TypeIdentifier))
         (Identifier)
-        (NumberLiteral)))))
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Readonly)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Readonly)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Empty)
+        (Identifier)
+        (Float)))))

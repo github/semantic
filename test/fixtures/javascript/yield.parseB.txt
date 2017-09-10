@@ -1,14 +1,16 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Function
+      (Empty)
+      (Empty)
       (Identifier)
-      (Params)
-      (Other "variable_declaration"
-        (VarAssignment
-          (Identifier)
-          (NumberLiteral)))
-      (ExpressionStatements
-        (Yield
-          (MathOperator
+      (
+        (VariableDeclaration
+          (Assignment
+            (Empty)
             (Identifier)
-            (Other "++")))))))
+            (Float)))
+        (ExpressionStatement
+          (Yield
+            (Update
+              (Identifier))))))))

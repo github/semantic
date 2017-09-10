@@ -1,15 +1,27 @@
 (Program
-  (ExpressionStatements
-    (Object
+  (ExpressionStatement
+    (Hash
       (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
         (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier))
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (MathOperator
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
             (Identifier)
-            (Other "+")
-            (Identifier)))))))
+            (Empty)))
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Plus
+              (Identifier)
+              (Identifier))))))))

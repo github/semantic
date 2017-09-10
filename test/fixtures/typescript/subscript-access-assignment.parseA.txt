@@ -1,7 +1,7 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Assignment
-      (SubscriptAccess
+      (Subscript
         (Identifier)
-        (StringLiteral))
-      (NumberLiteral))))
+        (TextElement))
+      (Float))))

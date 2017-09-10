@@ -1,12 +1,15 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Class
       (Identifier)
       (Method
-        (Other "accessibility_modifier")
-      {-(Other "readonly")-}
         (Identifier)
-        (Params)
-        (Ty
-        { (Other "predefined_type")
-        ->(Identifier) })))))
+      {-(Readonly)-}
+        (Empty)
+      {+(Empty)+}
+        (Annotation
+        { (PredefinedType)
+        ->(TypeIdentifier) })
+        (Empty)
+        (Identifier)
+        ([])))))

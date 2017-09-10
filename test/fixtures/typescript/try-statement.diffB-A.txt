@@ -1,15 +1,17 @@
 (Program
   (Try
-    (ExpressionStatements
-      (ExpressionStatements
+    (
+      (ExpressionStatement
         (Identifier)))
     (Catch
-      (ExpressionStatements
-        (ExpressionStatements
+      (Empty)
+      (
+        (ExpressionStatement
         { (Identifier)
         ->(Identifier) })))
     (Finally
-      (ExpressionStatements
-        (ExpressionStatements
+      (
+        (ExpressionStatement
         { (Identifier)
-        ->(Identifier) })))))
+        ->(Identifier) }))))
+  (Empty))

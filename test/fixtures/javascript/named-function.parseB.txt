@@ -1,6 +1,9 @@
 (Program
   (Function
+    (Empty)
+    (Empty)
     (Identifier)
-    (Params)
-    (Return
-      (Boolean))))
+    (
+      (Return
+        (Boolean))))
+  (Empty))

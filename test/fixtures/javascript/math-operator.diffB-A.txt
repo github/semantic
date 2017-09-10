@@ -1,17 +1,13 @@
 (Program
-  (ExpressionStatements
-    (MathOperator
-      (MathOperator
+  (ExpressionStatement
+    (Minus
+      (Plus
         (Identifier)
-        (Other "+")
-        (MathOperator
+        (Times
           (Identifier)
-          (Other "*")
-        { (NumberLiteral)
-        ->(NumberLiteral) }))
-      (Other "-")
-      (MathOperator
+        { (Float)
+        ->(Float) }))
+      (Modulo
         (Identifier)
-        (Other "%")
-      { (NumberLiteral)
-      ->(NumberLiteral) }))))
+      { (Float)
+      ->(Float) }))))

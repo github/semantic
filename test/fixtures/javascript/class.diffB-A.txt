@@ -1,31 +1,80 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Class
       (Identifier)
-    {+(FieldDecl
+    { (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
         (Identifier)
-        (NumberLiteral))+}
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))
+    ->(PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Empty)
+        (Identifier)
+        (Float)) }
       (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
       { (Identifier)
       ->(Identifier) }
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+          { (Identifier)
+          ->(Identifier) }
+            (Empty)))
+        (
+          (Return
+          { (Identifier)
+          ->(Identifier) })))
       (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
       { (Identifier)
       ->(Identifier) }
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier)))
-      (Method
-      { (Identifier)
-      ->(Identifier) }
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
-        (Return
-          (Identifier))))))
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+          { (Identifier)
+          ->(Identifier) }
+            (Empty)))
+        (
+          (Return
+          { (Identifier)
+          ->(Identifier) })))
+    {+(Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))+})))

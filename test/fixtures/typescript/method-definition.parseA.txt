@@ -1,10 +1,13 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Class
       (Identifier)
       (Method
-        (Other "accessibility_modifier")
         (Identifier)
-        (Params)
-        (Ty
-          (Identifier))))))
+        (Empty)
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+        (Empty)
+        (Identifier)
+        ([])))))

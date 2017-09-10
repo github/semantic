@@ -1,38 +1,53 @@
 (Program
-  (Other "ambient_declaration"
-    (Namespace
+  (AmbientDeclaration
+    (InternalModule
       (Identifier)))
-  (Other "ambient_declaration"
+  (AmbientDeclaration
     (Class
       (Identifier)))
-  (Other "ambient_declaration"
-    (Interface
-      (Identifier)))
-  (Other "ambient_declaration"
+  (AmbientDeclaration
+    (InterfaceDeclaration
+      (Empty)
+      (Empty)
+      (Identifier)
+      (ObjectType)))
+  (AmbientDeclaration
     (Class
       (Identifier)
       (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
         (Identifier)
-        (Other "call_signature"
-          (Params
-            (Other "required_parameter"
-              (Identifier)
-              (Ty
-                (Other "predefined_type"))))))
-      (FieldDecl
+        (RequiredParameter
+          (Empty)
+          (Annotation
+            (PredefinedType))
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (Empty))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Annotation
+          (PredefinedType))
         (Identifier)
-        (Ty
-          (Other "predefined_type")))
+        (Empty))
       (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Annotation
+          (PredefinedType))
+        (Empty)
         (Identifier)
-        (Other "call_signature"
-          (Params)
-          (Ty
-            (Other "predefined_type"))))))
-  (Other "ambient_declaration"
-    (Other "ambient_function"
-      (Identifier)
-      (Other "call_signature"
-        (Params)
-        (Ty
-          (Identifier))))))
+        (Empty))))
+  (AmbientDeclaration
+    (AmbientFunction
+      (Empty)
+      (Annotation
+        (TypeIdentifier))
+      (Identifier))))

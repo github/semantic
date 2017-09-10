@@ -1,100 +1,138 @@
 (Program
-{+(Other "ambient_declaration"
+{+(AmbientDeclaration
     (Class
       (Identifier)
-      (FieldDecl
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
         (Identifier)
-        (Ty
-          (Identifier)))))+}
-{+(Other "ambient_declaration"
-    (Other "variable_declaration"
-      (VarAssignment
+        (Empty))))+}
+{+(AmbientDeclaration
+    (VariableDeclaration
+      (Assignment
+        (Annotation
+          (PredefinedType))
         (Identifier)
-        (Ty
-          (Other "predefined_type")))))+}
-{+(Other "ambient_declaration"
-    (Other "ambient_function"
+        (Empty))))+}
+{+(AmbientDeclaration
+    (AmbientFunction
+      (Empty)
+      (Annotation
+        (PredefinedType))
       (Identifier)
-      (Other "call_signature"
-        (Params
-          (Other "required_parameter"
+      (RequiredParameter
+        (Empty)
+        (Annotation
+          (PredefinedType))
+        (Assignment
+          (Identifier)
+          (Empty)))))+}
+{+(AmbientDeclaration
+    (InternalModule
+      (Identifier)
+      (AmbientFunction
+        (Empty)
+        (Annotation
+          (PredefinedType))
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Annotation
+            (PredefinedType))
+          (Assignment
             (Identifier)
-            (Ty
-              (Other "predefined_type"))))
-        (Ty
-          (Other "predefined_type")))))+}
-{+(Other "ambient_declaration"
-    (Namespace
-      (Identifier)
-      (Other "ambient_function"
+            (Empty))))
+      (VariableDeclaration
+        (Assignment
+          (Annotation
+            (PredefinedType))
+          (Identifier)
+          (Empty)))
+      (InterfaceDeclaration
+        (Empty)
+        (Empty)
         (Identifier)
-        (Other "call_signature"
-          (Params
-            (Other "required_parameter"
-              (Identifier)
-              (Ty
-                (Other "predefined_type"))))
-          (Ty
-            (Other "predefined_type"))))
-      (Other "lexical_declaration"
-        (VarAssignment
-          (Identifier)
-          (Ty
-            (Other "predefined_type"))))
-      (Interface
+        (ObjectType
+          (PropertySignature
+            (Empty)
+            (Empty)
+            (Annotation
+              (PredefinedType))
+            (Identifier))))
+      (InterfaceDeclaration
+        (Empty)
+        (Empty)
         (Identifier)
-        (Other "property_signature"
-          (Identifier)
-          (Ty
-            (Other "predefined_type"))))
-      (Interface
-        (Identifier)
-        (Other "property_signature"
-          (Identifier)
-          (Ty
-            (Other "predefined_type")))
-        (Other "property_signature"
-          (Identifier)
-          (Ty
-            (Other "predefined_type")))
-        (Other "property_signature"
-          (Identifier)
-          (Ty
-            (Other "predefined_type"))))))+}
-{-(Other "ambient_declaration"
-    (Namespace
+        (ObjectType
+          (PropertySignature
+            (Empty)
+            (Empty)
+            (Annotation
+              (PredefinedType))
+            (Identifier))
+          (PropertySignature
+            (Empty)
+            (Empty)
+            (Annotation
+              (PredefinedType))
+            (Identifier))
+          (PropertySignature
+            (Empty)
+            (Empty)
+            (Annotation
+              (PredefinedType))
+            (Identifier))))))+}
+{-(AmbientDeclaration
+    (InternalModule
       (Identifier)))-}
-{-(Other "ambient_declaration"
+{-(AmbientDeclaration
     (Class
       (Identifier)))-}
-{-(Other "ambient_declaration"
-    (Interface
-      (Identifier)))-}
-  (Other "ambient_declaration"
+{-(AmbientDeclaration
+    (InterfaceDeclaration
+      (Empty)
+      (Empty)
+      (Identifier)
+      (ObjectType)))-}
+  (AmbientDeclaration
     (Class
       (Identifier)
       (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
         (Identifier)
-        (Other "call_signature"
-          (Params
-            (Other "required_parameter"
-              (Identifier)
-              (Ty
-                (Other "predefined_type"))))))
-      (FieldDecl
+        (RequiredParameter
+          (Empty)
+          (Annotation
+            (PredefinedType))
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (Empty))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Annotation
+          (PredefinedType))
         (Identifier)
-        (Ty
-          (Other "predefined_type")))
+        (Empty))
       (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Annotation
+          (PredefinedType))
+        (Empty)
         (Identifier)
-        (Other "call_signature"
-          (Params)
-          (Ty
-            (Other "predefined_type"))))))
-{-(Other "ambient_declaration"
-    (Other "ambient_function"
-      (Identifier)
-      (Other "call_signature"
-        (Params)
-        (Ty
-          (Identifier)))))-})
+        (Empty))))
+{-(AmbientDeclaration
+    (AmbientFunction
+      (Empty)
+      (Annotation
+        (TypeIdentifier))
+      (Identifier)))-})

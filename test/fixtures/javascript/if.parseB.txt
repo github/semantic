@@ -3,10 +3,12 @@
     (MemberAccess
       (Identifier)
       (Identifier))
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
+    (
+      (ExpressionStatement
+        (Call
           (Identifier)
-          (Identifier)))
-      (ExpressionStatements
-        (Identifier)))))
+          (Identifier)
+          (Empty)))
+      (ExpressionStatement
+        (Identifier)))
+    (Empty)))

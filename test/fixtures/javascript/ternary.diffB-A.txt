@@ -1,14 +1,10 @@
 (Program
-  (ExpressionStatements
-  {+(Ternary
-      (Identifier)
-      (Identifier)
-      (Identifier))+}
-  {-(Assignment
+  (ExpressionStatement
+  { (Assignment
       (MemberAccess
         (Identifier)
         (Identifier))
-      (Ternary
+      (If
         (MemberAccess
           (Identifier)
           (Identifier))
@@ -19,4 +15,8 @@
           (MemberAccess
             (Identifier)
             (Identifier))
-          (Identifier))))-}))
+          (Identifier))))
+  ->(If
+      (Identifier)
+      (Identifier)
+      (Identifier)) }))

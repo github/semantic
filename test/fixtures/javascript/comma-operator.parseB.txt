@@ -1,14 +1,14 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Assignment
       (Identifier)
-      (Object
-        (Pair
+      (Hash
+        (KeyValue
           (Identifier)
-          (CommaOperator
-            (NumberLiteral)
-            (MathOperator
-              (NumberLiteral)
-              (Other "+")
-              (NumberLiteral))
-            (NumberLiteral)))))))
+          (SequenceExpression
+            (Float)
+            (SequenceExpression
+              (Plus
+                (Float)
+                (Float))
+              (Float))))))))

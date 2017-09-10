@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatements
-    (BooleanOperator
+  (ExpressionStatement
+    (Or
       (Identifier)
-      (Other "||")
       (Identifier))))

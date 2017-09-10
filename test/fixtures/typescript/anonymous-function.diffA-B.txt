@@ -1,18 +1,28 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Function
-      (Params
-      {-(Other "required_parameter"
-          (Identifier))-}
-        (Other "required_parameter"
-          (Identifier))
-      {+(Other "required_parameter"
-          (Identifier))+})
-      (Return
-        (MathOperator
+      (Empty)
+      (Empty)
+      (Empty)
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
         { (Identifier)
         ->(Identifier) }
-        { (Other "+")
-        ->(Other "*") }
+          (Empty)))
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
         { (Identifier)
-        ->(Identifier) })))))
+        ->(Identifier) }
+          (Empty)))
+      (
+        (Return
+        { (Plus
+            (Identifier)
+            (Identifier))
+        ->(Times
+            (Identifier)
+            (Identifier)) })))))

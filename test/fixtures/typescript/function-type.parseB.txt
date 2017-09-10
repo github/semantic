@@ -1,7 +1,8 @@
 (Program
-  (Other "lexical_declaration"
-    (VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Annotation
+        (ArrayType
+          (TypeIdentifier)))
       (Identifier)
-      (Ty
-        (Other "array_type"
-          (Identifier))))))
+      (Empty))))

@@ -1,6 +1,8 @@
 (Program
-  (ExpressionStatements
-    (MathAssignment
+  (ExpressionStatement
+    (Assignment
       (Identifier)
-    { (NumberLiteral)
-    ->(NumberLiteral) })))
+      (Plus
+        (Identifier)
+      { (Float)
+      ->(Float) }))))

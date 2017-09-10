@@ -4,11 +4,13 @@
   ->(MemberAccess
       (Identifier)
       (Identifier)) }
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
+    (
+      (ExpressionStatement
+        (Call
           (Identifier)
         { (Identifier)
-        ->(Identifier) }))
-    {+(ExpressionStatements
-        (Identifier))+})))
+        ->(Identifier) }
+          (Empty)))
+    {+(ExpressionStatement
+        (Identifier))+})
+    (Empty)))

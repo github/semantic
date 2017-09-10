@@ -1,7 +1,8 @@
 (Program
-  (ExpressionStatements
-    (RelationalOperator
+  (ExpressionStatement
+  { (LessThanEqual
       (Identifier)
-    { (Other "<=")
-    ->(Other "<") }
-      (Identifier))))
+      (Identifier))
+  ->(LessThan
+      (Identifier)
+      (Identifier)) }))

@@ -1,8 +1,8 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Assignment
       (MemberAccess
         (Identifier)
         (Identifier))
-    { (NumberLiteral)
-    ->(NumberLiteral) })))
+    { (Float)
+    ->(Float) })))

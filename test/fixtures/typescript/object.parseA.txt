@@ -1,6 +1,6 @@
 (Program
-  (ExpressionStatements
-    (Object
-      (Pair
-        (StringLiteral)
-        (StringLiteral)))))
+  (ExpressionStatement
+    (Hash
+      (KeyValue
+        (TextElement)
+        (TextElement)))))

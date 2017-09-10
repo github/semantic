@@ -1,5 +1,6 @@
 (Program
-  (Other "variable_declaration"
-    (VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Empty)
       (Identifier)
-      (NumberLiteral))))
+      (Float))))

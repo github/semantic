@@ -1,8 +1,10 @@
 (Program
   (If
     (Identifier)
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
+    (
+      (ExpressionStatement
+        (Call
           (Identifier)
-          (Identifier))))))
+          (Identifier)
+          (Empty))))
+    (Empty)))

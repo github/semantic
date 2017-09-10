@@ -1,13 +1,23 @@
 (Program
-  (ExpressionStatements
+  (ExpressionStatement
     (Function
-      (Params
-        (Other "required_parameter"
-          (Identifier))
-        (Other "required_parameter"
-          (Identifier)))
-      (Return
-        (MathOperator
+      (Empty)
+      (Empty)
+      (Empty)
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
           (Identifier)
-          (Other "*")
-          (Identifier))))))
+          (Empty)))
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
+        (Return
+          (Times
+            (Identifier)
+            (Identifier)))))))

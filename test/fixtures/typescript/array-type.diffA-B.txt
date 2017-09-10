@@ -1,8 +1,11 @@
 (Program
-  (Other "lexical_declaration"
-    (VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Annotation
+      { (ArrayType
+          (TypeIdentifier))
+      ->(Tuple
+          (TypeIdentifier)
+          (TypeIdentifier)) })
       (Identifier)
-      (Ty
-        (Other "tuple_type"
-          (Identifier)
-        {+(Identifier)+})))))
+      (Empty))))

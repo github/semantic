@@ -16,13 +16,12 @@
   ->(RShift
       (Identifier)
       (Integer)) })
-{+(Assignment
-    (Identifier)
-    (DividedBy
+  (Assignment
+  { (Identifier)
+  ->(Identifier) }
+  { (Plus
       (Identifier)
-      (Integer)))+}
-{-(Assignment
-    (Identifier)
-    (Plus
+      (Integer))
+  ->(DividedBy
       (Identifier)
-      (Integer)))-})
+      (Integer)) }))

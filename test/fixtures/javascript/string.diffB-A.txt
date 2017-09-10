@@ -1,4 +1,4 @@
 (Program
-  (ExpressionStatements
-  { (StringLiteral)
-  ->(StringLiteral) }))
+  (ExpressionStatement
+  { (TextElement)
+  ->(TextElement) }))

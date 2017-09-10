@@ -1,14 +1,25 @@
 (Program
   (Function
-    (Other "type_parameters"
-      (Other "type_parameter"
-        (Identifier)))
-    (Params
-      (Other "required_parameter"
-        (Identifier))
-      (Other "required_parameter"
-        (Identifier)))
-    (Ty
-      (Other "predefined_type"))
-    (ExpressionStatements
-      (Identifier))))
+    (TypeParameters
+      (TypeParameter
+        (Identifier)
+        (Empty)))
+    (Annotation
+      (PredefinedType))
+    (Empty)
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
+      (ExpressionStatement
+        (Identifier))))
+  (Empty))
