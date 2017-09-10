@@ -54,9 +54,12 @@ freeMetavariables = cata $ \ diff -> case diff of
 
 maxBoundMetavariable :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Maybe Metavar
 maxBoundMetavariable = cata $ \ diff -> case diff of
-  Copy bindings _ -> foldr (max . Just . fst) Nothing bindings
+  Copy bindings _ -> foldMaxMap (Just . fst) bindings
   Var _ -> Nothing
-  Patch patch -> foldr (max . foldr max Nothing) Nothing patch
+  Patch patch -> foldMaxMap (foldMaxMap id) patch
+
+foldMaxMap :: (Foldable t, Ord b) => (a -> Maybe b) -> t a -> Maybe b
+foldMaxMap f = foldr (max . f) Nothing
 
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
