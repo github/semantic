@@ -3,6 +3,8 @@ module Diff where
 
 import Data.Aeson
 import Control.Monad (join)
+import Control.Monad.Effect
+import Control.Monad.Effect.Reader
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
@@ -59,6 +61,16 @@ evalDiffR algebra = flip go mempty
             in algebra (Copy evaluated ann (second ($ extended) <$> syntax)) env
           Patch patch -> algebra (Patch (fmap (second ($ env)) <$> patch)) env
           Var var -> algebra (Var var) env
+
+evalDiffRM :: (Functor syntax, Reader (Env (Diff syntax ann, Eff fs a)) :< fs) => (DiffF syntax ann (Diff syntax ann, Eff fs a) -> Eff fs a) -> Diff syntax ann -> Eff fs a
+evalDiffRM algebra = go
+  where go = para $ \ diff -> case diff of
+          Copy bindings ann syntax -> do
+            env <- ask
+            let extended = foldr (uncurry envExtend) env bindings
+            local (const extended) $ algebra (Copy bindings ann syntax)
+          Patch patch -> algebra (Patch patch)
+          Var var -> algebra (Var var)
 
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int
