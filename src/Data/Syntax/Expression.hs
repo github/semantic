@@ -119,6 +119,14 @@ instance Eq1 Enumeration where liftEq = genericLiftEq
 instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Enumeration where liftPretty = genericLiftPretty
 
+-- | InstanceOf (e.g. a instanceof b in JavaScript
+data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 InstanceOf where liftEq = genericLiftEq
+instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
+instance Pretty1 InstanceOf where liftPretty = genericLiftPretty
+
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
 data ScopeResolution a
   = ScopeResolution ![a]
