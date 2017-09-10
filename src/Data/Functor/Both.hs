@@ -49,3 +49,6 @@ liftShowsPrecBoth sp sl d = showsUnaryWith (liftShowsPrec2 sp sl sp sl) "Join" d
 
 liftShowListBoth :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> [Both a] -> ShowS
 liftShowListBoth sp sl = showListWith (liftShowsPrecBoth sp sl 0)
+
+instance Eq2 p => Eq1 (Join p) where
+  liftEq eq (Join a1) (Join a2) = liftEq2 eq eq a1 a2
