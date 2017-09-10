@@ -149,6 +149,9 @@ deleting = cata (Diff . Patch . Delete)
 copy :: Both ann -> syntax (Diff syntax ann) -> Diff syntax ann
 copy = (Diff .) . (Copy [] .) . (:<)
 
+var :: Metavar -> Diff syntax ann
+var = Diff . Var
+
 
 instance Pretty Metavar where
   pretty (Metavar v) = pretty v
