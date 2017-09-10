@@ -35,6 +35,10 @@ data DiffF syntax ann recur
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
+diffFBindings :: DiffF syntax ann recur -> [(MetaVar, recur)]
+diffFBindings (Copy bindings _ _) = bindings
+diffFBindings _ = []
+
 
 newtype MetaVar = MetaVar { unMetaVar :: String }
   deriving (Eq, Ord, Show)
