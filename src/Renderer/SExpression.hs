@@ -32,7 +32,7 @@ printDiffF diff n = case diff of
     Replace a b -> nl n <> pad (n - 1) <> "{ " <> printTermF a n
                 <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF b n <> " }"
   Copy vs (Join (_, annotation)) syntax -> nl n <> pad n <> "(" <> showBindings (fmap (\ b -> b n) <$> vs) <> showAnnotation annotation <> foldMap (\ d -> d (n + 1)) syntax <> ")"
-  Var v -> nl n <> pad n <> showMetaVar v
+  Var v -> nl n <> pad n <> showMetavar v
 
 printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> ByteString) -> Int -> ByteString
 printTermF (annotation :< syntax) n = "(" <> showAnnotation annotation <> foldMap (\t -> t (n + 1)) syntax <> ")"
@@ -50,10 +50,10 @@ showAnnotation Nil = ""
 showAnnotation (only :. Nil) = pack (show only)
 showAnnotation (first :. rest) = pack (show first) <> " " <> showAnnotation rest
 
-showBindings :: [(MetaVar, ByteString)] -> ByteString
+showBindings :: [(Metavar, ByteString)] -> ByteString
 showBindings [] = ""
 showBindings bindings = "[ " <> fold (intersperse "\n, " (showBinding <$> bindings)) <> " ]"
-  where showBinding (var, val) = showMetaVar var <> "/" <> val
+  where showBinding (var, val) = showMetavar var <> "/" <> val
 
-showMetaVar :: MetaVar -> ByteString
-showMetaVar (MetaVar s) = pack ('$' : s)
+showMetavar :: Metavar -> ByteString
+showMetavar (Metavar s) = pack ('$' : s)

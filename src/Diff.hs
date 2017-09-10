@@ -28,28 +28,28 @@ import Text.Show
 newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 
 data DiffF syntax ann recur
-  = Copy [(MetaVar, recur)] (Both ann) (syntax recur)
-  | Var MetaVar
+  = Copy [(Metavar, recur)] (Both ann) (syntax recur)
+  | Var Metavar
   | Patch (Patch (TermF syntax ann recur))
   deriving (Foldable, Functor, Traversable)
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
-diffFBindings :: DiffF syntax ann recur -> [(MetaVar, recur)]
+diffFBindings :: DiffF syntax ann recur -> [(Metavar, recur)]
 diffFBindings (Copy bindings _ _) = bindings
 diffFBindings _ = []
 
 
-newtype MetaVar = MetaVar { unMetaVar :: String }
+newtype Metavar = Metavar { unMetavar :: String }
   deriving (Eq, Ord, Show)
 
-newtype Env a = Env { unEnv :: [(MetaVar, a)] }
+newtype Env a = Env { unEnv :: [(Metavar, a)] }
   deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
 
-envExtend :: MetaVar -> a -> Env a -> Env a
+envExtend :: Metavar -> a -> Env a -> Env a
 envExtend var val (Env m) = Env ((var, val) : m)
 
-envLookup :: MetaVar -> Env a -> Maybe a
+envLookup :: Metavar -> Env a -> Maybe a
 envLookup var = lookup var . unEnv
 
 
@@ -126,8 +126,8 @@ copy :: Both ann -> syntax (Diff syntax ann) -> Diff syntax ann
 copy = (Diff .) . Copy []
 
 
-instance Pretty MetaVar where
-  pretty (MetaVar v) = pretty v
+instance Pretty Metavar where
+  pretty (Metavar v) = pretty v
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
@@ -220,6 +220,6 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
   toJSONFields = toJSONFields . unDiff
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
-  toJSONFields (Copy vs a f)     = foldr (\ (MetaVar k, v) -> (pack k .= v :)) [] vs <> toJSONFields a <> toJSONFields1 f
-  toJSONFields (Var (MetaVar v)) = [ "metavar" .= v ]
+  toJSONFields (Copy vs a f)     = foldr (\ (Metavar k, v) -> (pack k .= v :)) [] vs <> toJSONFields a <> toJSONFields1 f
+  toJSONFields (Var (Metavar v)) = [ "metavar" .= v ]
   toJSONFields (Patch a)         = toJSONFields a
