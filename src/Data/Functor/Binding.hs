@@ -1,5 +1,14 @@
 {-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving #-}
-module Data.Functor.Binding where
+module Data.Functor.Binding
+( Metavar(..)
+-- Abstract binding trees
+, BindingF(..)
+, bindings
+-- Environments
+, Env(..)
+, envExtend
+, envLookup
+) where
 
 import Data.Aeson (KeyValue(..), ToJSON(..), object, pairs)
 import Data.Functor.Classes
