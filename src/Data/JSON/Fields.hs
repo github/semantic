@@ -30,6 +30,10 @@ instance (Apply1 Foldable fs) => ToJSONFields1 (Union fs) where
 instance (ToJSON a, ToJSON b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= a, "after" .= b ]
 
+instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (f :+: g) where
+  toJSONFields1 (L1 l) = [ "before" .= JSONFields1 l ]
+  toJSONFields1 (R1 r) = [ "after"  .= JSONFields1 r ]
+
 instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (f :*: g) where
   toJSONFields1 (a :*: b) = [ "before" .= JSONFields1 a, "after" .= JSONFields1 b ]
 
