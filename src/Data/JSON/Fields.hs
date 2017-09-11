@@ -50,6 +50,9 @@ instance ToJSONFields a => ToJSON (JSONFields a) where
 
 newtype JSONFields1 f a = JSONFields1 { unJSONFields1 :: f a }
 
+instance ToJSONFields1 f => ToJSONFields1 (JSONFields1 f) where
+  toJSONFields1 = toJSONFields1 . unJSONFields1
+
 instance (ToJSON a, ToJSONFields1 f) => ToJSONFields (JSONFields1 f a) where
   toJSONFields = toJSONFields1 . unJSONFields1
 
