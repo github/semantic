@@ -26,5 +26,5 @@ instance ToJSON a => ToJSONFields [a] where
 instance (Apply1 Foldable fs) => ToJSONFields1 (Union fs) where
   toJSONFields1 = apply1 (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
 
-instance ToJSON a => ToJSONFields (a, a) where
+instance (ToJSON a, ToJSON b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= a, "after" .= b ]
