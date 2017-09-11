@@ -9,6 +9,7 @@ module Interpreter
 import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
+import Data.Functor.Binding
 import Data.Functor.Both
 import Data.Functor.Classes (Eq1)
 import Data.Hashable (Hashable)

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DerivingStrategies, GeneralizedNewtypeDeriving, NoStrictData, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, NoStrictData, RankNTypes, TypeFamilies, TypeOperators #-}
 module Diff where
 
 import Data.Aeson
@@ -9,6 +9,7 @@ import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Foldable (fold)
+import Data.Functor.Binding
 import Data.Functor.Both (Both)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Classes
@@ -41,11 +42,6 @@ diffFBindings (Copy bindings _) = bindings
 diffFBindings _ = []
 
 
-newtype Metavar = Metavar Int
-  deriving (Eq, Ord, Show)
-  deriving newtype (Enum, ToJSON)
-
-
 freeMetavariables :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Set.Set Metavar
 freeMetavariables = cata $ \ diff -> case diff of
   Copy bindings body -> foldMap snd bindings <> foldr Set.delete (fold body) (fst <$> bindings)
@@ -65,16 +61,6 @@ letDiff :: (Foldable syntax, Functor syntax) => Diff syntax ann -> (Metavar -> T
 letDiff diff f = Diff (Copy [(n, diff)] body)
   where body = f n
         n = maybe (Metavar 0) succ (foldMaxMap maxBoundMetavariable (termSyntax body))
-
-
-newtype Env a = Env { unEnv :: [(Metavar, a)] }
-  deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
-
-envExtend :: Metavar -> a -> Env a -> Env a
-envExtend var val (Env m) = Env ((var, val) : m)
-
-envLookup :: Metavar -> Env a -> Maybe a
-envLookup var = lookup var . unEnv
 
 
 evalDiff :: Functor syntax => (DiffF syntax ann a -> Env a -> a) -> Diff syntax ann -> a
@@ -152,9 +138,6 @@ copy = (Diff .) . (Copy [] .) . (:<)
 var :: Metavar -> Diff syntax ann
 var = Diff . Var
 
-
-instance Pretty Metavar where
-  pretty (Metavar v) = pretty v
 
 
 instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where

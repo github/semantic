@@ -16,6 +16,7 @@ import Data.Align
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Function (on)
+import Data.Functor.Binding
 import Data.Functor.Both
 import Data.Functor.Identity
 import Data.List (partition, sortBy)

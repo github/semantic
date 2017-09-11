@@ -8,6 +8,7 @@ import Data.Bifunctor (bimap)
 import Data.Bifunctor.Join
 import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length)
 import Data.Foldable (fold)
+import Data.Functor.Binding
 import Data.Functor.Foldable (cata)
 import Data.List (intersperse)
 import Data.Record
