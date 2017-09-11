@@ -32,6 +32,7 @@ import Renderer.TOC
 import RWS
 import Semantic
 import Semantic.Task
+import Semantic.Util
 import SpecHelpers
 import Syntax as S
 import Term
@@ -39,6 +40,7 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
+import Parser
 
 spec :: Spec
 spec = parallel $ do
@@ -77,13 +79,13 @@ spec = parallel $ do
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
-      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
-      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
