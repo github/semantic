@@ -31,6 +31,9 @@ instance Eq1 f => Eq1 (BindingF f) where
   liftEq _  (VarF v1)   (VarF v2)   = v1 == v2
   liftEq _  _           _           = False
 
+instance (Eq1 f, Eq a) => Eq (BindingF f a) where
+  (==) = eq1
+
 
 instance Pretty Metavar where
   pretty (Metavar v) = pretty v
