@@ -38,19 +38,19 @@ languageForType mediaType = case mediaType of
 
 toVarDeclOrAssignment :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
 toVarDeclOrAssignment child = case unwrap child of
-  S.Indexed [child', assignment] -> Term (In (setCategory (extract child) VarAssignment) (S.VarAssignment [child'] assignment))
-  S.Indexed [child'] -> Term (In (setCategory (extract child) VarDecl) (S.VarDecl [child']))
-  S.VarDecl _ -> Term (In (setCategory (extract child) VarDecl) (unwrap child))
+  S.Indexed [child', assignment] -> termIn (setCategory (extract child) VarAssignment) (S.VarAssignment [child'] assignment)
+  S.Indexed [child'] -> termIn (setCategory (extract child) VarDecl) (S.VarDecl [child'])
+  S.VarDecl _ -> termIn (setCategory (extract child) VarDecl) (unwrap child)
   S.VarAssignment _ _ -> child
   _ -> toVarDecl child
 
 toVarDecl :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
-toVarDecl child = Term (In (setCategory (extract child) VarDecl) (S.VarDecl [child]))
+toVarDecl child = termIn (setCategory (extract child) VarDecl) (S.VarDecl [child])
 
 toTuple :: Term S.Syntax (Record fields) -> [Term S.Syntax (Record fields)]
-toTuple child | S.Indexed [key,value] <- unwrap child = [Term (In (extract child) (S.Pair key value))]
-toTuple child | S.Fixed [key,value] <- unwrap child = [Term (In (extract child) (S.Pair key value))]
-toTuple child | S.Leaf c <- unwrap child = [Term (In (extract child) (S.Comment c))]
+toTuple child | S.Indexed [key,value] <- unwrap child = [termIn (extract child) (S.Pair key value)]
+toTuple child | S.Fixed [key,value] <- unwrap child = [termIn (extract child) (S.Pair key value)]
+toTuple child | S.Leaf c <- unwrap child = [termIn (extract child) (S.Comment c)]
 toTuple child = pure child
 
 toPublicFieldDefinition :: HasField fields Category => [SyntaxTerm fields] -> Maybe (S.Syntax (SyntaxTerm fields))

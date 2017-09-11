@@ -220,7 +220,7 @@ featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
 
 eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
-eraseFeatureVector (Term.Term (In record functor)) = Term.Term (In (setFeatureVector record nullFeatureVector) functor)
+eraseFeatureVector (Term.Term (In record functor)) = termIn (setFeatureVector record nullFeatureVector) functor
 
 nullFeatureVector :: FeatureVector
 nullFeatureVector = listArray (0, 0) [0]
@@ -254,7 +254,7 @@ featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields labe
 featureVectorDecorator getLabel p q d
  = cata collect
  . pqGramDecorator getLabel p q
- where collect (In (gram :. rest) functor) = Term.Term (In (foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) functor)
+ where collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) functor
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
 
@@ -272,7 +272,7 @@ pqGramDecorator
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
-      Term.Term (In (gram label :. termAnnotation term) (assignParentAndSiblingLabels (termOut term) label))
+      termIn (gram label :. termAnnotation term) (assignParentAndSiblingLabels (termOut term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
@@ -283,7 +283,7 @@ pqGramDecorator getLabel p q = cata algebra
     assignLabels label (Term.Term (In (gram :. rest) functor)) = do
       labels <- get
       put (drop 1 labels)
-      pure $! Term.Term (In (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) functor)
+      pure $! termIn (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) functor
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . extract)
     padToSize n list = take n (list <> repeat empty)

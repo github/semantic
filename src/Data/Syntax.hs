@@ -32,7 +32,7 @@ makeTerm a = makeTerm' a . inj
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
-makeTerm' a f = Term (In (sconcat (a :| (termAnnotation . unTerm <$> toList f))) f)
+makeTerm' a f = termIn (sconcat (a :| (termAnnotation . unTerm <$> toList f))) f
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
