@@ -52,6 +52,9 @@ instance Pretty1 f => Pretty1 (BindingF f) where
     where prettyKV (var, val) = pretty var <+> pretty '=' <+> p val
   liftPretty _ _  (VarF metavar)  = pretty metavar
 
+instance (Pretty1 f, Pretty a) => Pretty (BindingF f a) where
+  pretty = liftPretty pretty prettyList
+
 
 instance ToJSONFields1 f => ToJSONFields1 (BindingF f) where
   toJSONFields1 (Let vars body) = [ "vars" .= vars ] <> toJSONFields1 body
