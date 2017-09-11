@@ -26,3 +26,9 @@ envLookup var = lookup var . unEnv
 
 instance Pretty Metavar where
   pretty (Metavar v) = pretty v
+
+instance Pretty1 f => Pretty1 (BindingF f) where
+  liftPretty p pl (Let vars body) = pretty ("let" :: String) <+> align (vsep (prettyKV <$> vars)) <> line
+                                 <> pretty ("in" :: String)  <+> liftPretty p pl body
+    where prettyKV (var, val) = pretty var <+> pretty '=' <+> p val
+  liftPretty _ _  (VarF metavar)  = pretty metavar
