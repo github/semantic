@@ -28,6 +28,7 @@ newtype Metavar = Metavar Int
 data BindingF f recur
   = Let [(Metavar, recur)] (f recur)
   | Var Metavar
+  deriving (Foldable, Functor, Traversable)
 
 bindings :: BindingF f recur -> [(Metavar, recur)]
 bindings (Let vars _) = vars
