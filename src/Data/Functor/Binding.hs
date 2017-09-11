@@ -1,4 +1,4 @@
-{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving, NoStrictData #-}
 module Data.Functor.Binding
 ( Metavar(..)
 -- Abstract binding trees
@@ -6,6 +6,7 @@ module Data.Functor.Binding
 , bindings
 , freeMetavariables
 , maxBoundMetavariable
+, letBind
 -- Environments
 , Env(..)
 , envExtend
@@ -46,6 +47,12 @@ maxBoundMetavariable = cata $ \ diff -> case diff of
 
 foldMaxMap :: (Foldable t, Ord b) => (a -> Maybe b) -> t a -> Maybe b
 foldMaxMap f = foldr (max . f) Nothing
+
+
+letBind :: (Foldable syntax, Functor syntax, Corecursive t, Recursive t, Base t ~ BindingF syntax) => t -> (Metavar -> syntax t) -> t
+letBind diff f = embed (Let [(n, diff)] body)
+  where body = f n
+        n = maybe (Metavar 0) succ (foldMaxMap maxBoundMetavariable body)
 
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
