@@ -15,6 +15,10 @@ data BindingF f recur
   = Let [(Metavar, recur)] (f recur)
   | VarF Metavar
 
+bindings :: BindingF f recur -> [(Metavar, recur)]
+bindings (Let vars _) = vars
+bindings _            = []
+
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
   deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
