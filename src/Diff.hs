@@ -9,7 +9,7 @@ import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Foldable (fold)
-import Data.Functor.Binding
+import Data.Functor.Binding (Env(..), Metavar(..), envExtend, envLookup)
 import Data.Functor.Both (Both)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Classes

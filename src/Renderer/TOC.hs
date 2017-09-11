@@ -25,7 +25,7 @@ import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Error as Error (formatError)
 import Data.Foldable (fold, foldl', toList)
-import Data.Functor.Binding
+import Data.Functor.Binding (envLookup)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Foldable (cata)
