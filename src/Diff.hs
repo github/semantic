@@ -152,6 +152,10 @@ instance Apply1 Pretty1 fs => Pretty2 (DiffF (Union fs)) where
   liftPretty2 _ _ _ _ (Var v) = pretty v
   liftPretty2 pA plA pB plB (Patch p) = liftPretty (liftPretty2 pA plA pB plB) (Pretty.list . map (liftPretty2 pA plA pB plB)) p
 
+instance (Apply1 Pretty1 fs, Pretty ann) => Pretty1 (DiffF (Union fs) ann) where
+  liftPretty = liftPretty2 pretty prettyList
+
+
 type instance Base (Diff syntax ann) = DiffF syntax ann
 
 instance Functor syntax => Recursive (Diff syntax ann) where project = unDiff
