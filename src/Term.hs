@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators #-}
 module Term
 ( Term(..)
+, termIn
 , TermF(..)
 , SyntaxTerm
 , SyntaxTermF
@@ -41,9 +42,12 @@ termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
   size (In _ syntax) = 1 + sum syntax
 
+termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
+termIn = (Term .) . In
+
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
-hoistTerm f = go where go (Term (In a r)) = Term (In a (f (fmap go r)))
+hoistTerm f = go where go (Term (In a r)) = termIn a (f (fmap go r))
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
@@ -67,17 +71,17 @@ instance Functor f => Corecursive (Term f a) where embed = Term
 
 instance Functor f => Comonad (Term f) where
   extract = termAnnotation . unTerm
-  duplicate w = Term (In w (fmap duplicate (unwrap w)))
-  extend f = go where go w = Term (In (f w) (fmap go (unwrap w)))
+  duplicate w = termIn w (fmap duplicate (unwrap w))
+  extend f = go where go w = termIn (f w) (fmap go (unwrap w))
 
 instance Functor f => Functor (Term f) where
-  fmap f = go where go (Term (In a r)) = Term (In (f a) (fmap go r))
+  fmap f = go where go (Term (In a r)) = termIn (f a) (fmap go r)
 
 instance Foldable f => Foldable (Term f) where
   foldMap f = go where go (Term (In a r)) = f a `mappend` foldMap go r
 
 instance Traversable f => Traversable (Term f) where
-  traverse f = go where go (Term (In a r)) = (Term .) . In <$> f a <*> traverse go r
+  traverse f = go where go (Term (In a r)) = termIn <$> f a <*> traverse go r
 
 instance Functor f => ComonadCofree f (Term f) where
   unwrap = termOut . unTerm

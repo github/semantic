@@ -20,7 +20,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Union
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
-import Term (Term(..), TermF(..), unwrap)
+import Term (Term(..), TermF(..), termIn, unwrap)
 
 type Syntax =
   '[ Markup.Document
@@ -67,7 +67,7 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = (Term .) . In <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
+list = termIn <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
   CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
   CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) . termAnnotation . termOut <$> currentNode <*> children (many item))
 
