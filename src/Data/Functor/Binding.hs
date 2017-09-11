@@ -1,7 +1,8 @@
 {-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving #-}
 module Data.Functor.Binding where
 
-import Data.Aeson (ToJSON)
+import Data.Aeson (KeyValue(..), ToJSON)
+import Data.JSON.Fields
 import Data.Text.Prettyprint.Doc
 
 newtype Metavar = Metavar Int
@@ -32,3 +33,8 @@ instance Pretty1 f => Pretty1 (BindingF f) where
                                  <> pretty ("in" :: String)  <+> liftPretty p pl body
     where prettyKV (var, val) = pretty var <+> pretty '=' <+> p val
   liftPretty _ _  (VarF metavar)  = pretty metavar
+
+
+instance ToJSONFields1 f => ToJSONFields1 (BindingF f) where
+  toJSONFields1 (Let vars body) = [ "vars" .= vars ] <> toJSONFields1 body
+  toJSONFields1 (VarF v)        = [ "metavar" .= v ]
