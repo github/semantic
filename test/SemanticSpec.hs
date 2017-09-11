@@ -19,11 +19,11 @@ spec = parallel $ do
   describe "parseBlob" $ do
     it "parses in the specified language" $ do
       Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob
-      void term `shouldBe` Term (() :< Indexed [ Term (() :< Method [] (Term (() :< Leaf "foo")) Nothing [] []) ])
+      void term `shouldBe` Term (() `In` Indexed [ Term (() `In` Method [] (Term (() `In` Leaf "foo")) Nothing [] []) ])
 
     it "parses line by line if not given a language" $ do
       Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob { blobLanguage = Nothing }
-      void term `shouldBe` Term (() :< Indexed [ Term (() :< Leaf "def foo\n"), Term (() :< Leaf "end\n"), Term (() :< Leaf "") ])
+      void term `shouldBe` Term (() `In` Indexed [ Term (() `In` Leaf "def foo\n"), Term (() `In` Leaf "end\n"), Term (() `In` Leaf "") ])
 
     it "renders with the specified renderer" $ do
       output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
@@ -31,12 +31,12 @@ spec = parallel $ do
 
   describe "diffTermPair" $ do
     it "produces an Insert when the first blob is missing" $ do
-      result <- runTask (diffTermPair (both (emptyBlob "/foo") (sourceBlob "/foo" Nothing "")) (runBothWith replacing) (pure (Term (() :< []))))
-      result `shouldBe` Diff (Patch (Insert (Term (() :< []))))
+      result <- runTask (diffTermPair (both (emptyBlob "/foo") (sourceBlob "/foo" Nothing "")) (runBothWith replacing) (pure (Term (() `In` []))))
+      result `shouldBe` Diff (Patch (Insert (Term (() `In` []))))
 
     it "produces a Delete when the second blob is missing" $ do
-      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptyBlob "/foo")) (runBothWith replacing) (pure (Term (() :< []))))
-      result `shouldBe` Diff (Patch (Delete (Term (() :< []))))
+      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptyBlob "/foo")) (runBothWith replacing) (pure (Term (() `In` []))))
+      result `shouldBe` Diff (Patch (Delete (Term (() `In` []))))
 
   where
     methodsBlob = Blob "def foo\nend\n" "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)
