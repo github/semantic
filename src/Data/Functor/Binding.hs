@@ -5,6 +5,7 @@ module Data.Functor.Binding
 , BindingF(..)
 , bindings
 , freeMetavariables
+, maxBoundMetavariable
 -- Environments
 , Env(..)
 , envExtend
@@ -36,6 +37,14 @@ freeMetavariables :: (Foldable syntax, Functor syntax, Recursive t, Base t ~ Bin
 freeMetavariables = cata $ \ diff -> case diff of
   Let bindings body -> foldMap snd bindings <> foldr Set.delete (fold body) (fst <$> bindings)
   Var v -> Set.singleton v
+
+maxBoundMetavariable :: (Foldable syntax, Functor syntax, Recursive t, Base t ~ BindingF syntax) => t -> Maybe Metavar
+maxBoundMetavariable = cata $ \ diff -> case diff of
+  Let bindings _ -> foldMaxMap (Just . fst) bindings
+  Var _ -> Nothing
+
+foldMaxMap :: (Foldable t, Ord b) => (a -> Maybe b) -> t a -> Maybe b
+foldMaxMap f = foldr (max . f) Nothing
 
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
