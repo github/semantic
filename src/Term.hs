@@ -8,6 +8,7 @@ module Term
 , extract
 , unwrap
 , hoistTerm
+, hoistTermF
 , stripTerm
 , liftPrettyUnion
 ) where
@@ -48,7 +49,10 @@ termSize = cata size where
 
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
-hoistTerm f = go where go (Term (a :< r)) = Term (a :< f (fmap go r))
+hoistTerm f = go where go (Term r) = Term (hoistTermF f (fmap go r))
+
+hoistTermF :: Functor f => (forall a. f a -> g a) -> TermF f a b -> TermF g a b
+hoistTermF f = go where go (a :< r) = a :< f r
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
