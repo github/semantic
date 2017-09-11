@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE MultiParamTypeClasses, TypeOperators #-}
 module Data.JSON.Fields where
 
 import Data.Aeson
@@ -6,6 +6,7 @@ import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Proxy (Proxy(..))
 import Data.Union
+import GHC.Generics
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]
@@ -28,6 +29,9 @@ instance (Apply1 Foldable fs) => ToJSONFields1 (Union fs) where
 
 instance (ToJSON a, ToJSON b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= a, "after" .= b ]
+
+instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (f :*: g) where
+  toJSONFields1 (a :*: b) = [ "before" .= JSONFields1 a, "after" .= JSONFields1 b ]
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }
