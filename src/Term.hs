@@ -30,7 +30,7 @@ import Text.Show
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
 
 infixr 5 :<
-data TermF syntax ann recur = (:<) { termAnnotation :: ann, termSyntax :: syntax recur }
+data TermF syntax ann recur = (:<) { termAnnotation :: ann, termOut :: syntax recur }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A Term with a Syntax leaf and a record of fields.
