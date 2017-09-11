@@ -233,3 +233,7 @@ instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a 
   toJSONFields (Copy vs body)    = [ "bindings" .= vs] <> toJSONFields body
   toJSONFields (Var (Metavar v)) = [ "metavar" .= v ]
   toJSONFields (Patch a)         = toJSONFields a
+
+instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (DiffF f a b) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
