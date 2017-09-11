@@ -28,3 +28,10 @@ instance (Apply1 Foldable fs) => ToJSONFields1 (Union fs) where
 
 instance (ToJSON a, ToJSON b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= a, "after" .= b ]
+
+
+newtype JSONFields a = JSONFields { unJSONFields :: a }
+
+instance (ToJSONFields a) => ToJSON (JSONFields a) where
+  toJSON = object . toJSONFields . unJSONFields
+  toEncoding = pairs . mconcat . toJSONFields . unJSONFields
