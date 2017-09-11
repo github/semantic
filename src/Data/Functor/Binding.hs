@@ -2,6 +2,7 @@
 module Data.Functor.Binding where
 
 import Data.Aeson (KeyValue(..), ToJSON)
+import Data.Functor.Classes
 import Data.JSON.Fields
 import Data.Text.Prettyprint.Doc
 
@@ -23,6 +24,12 @@ envExtend var val (Env m) = Env ((var, val) : m)
 
 envLookup :: Metavar -> Env a -> Maybe a
 envLookup var = lookup var . unEnv
+
+
+instance Eq1 f => Eq1 (BindingF f) where
+  liftEq eq (Let v1 b1) (Let v2 b2) = liftEq (liftEq eq) v1 v2 && liftEq eq b1 b2
+  liftEq _  (VarF v1)   (VarF v2)   = v1 == v2
+  liftEq _  _           _           = False
 
 
 instance Pretty Metavar where
