@@ -161,6 +161,7 @@ type instance Base (Diff syntax ann) = DiffF syntax ann
 instance Functor syntax => Recursive (Diff syntax ann) where project = unDiff
 instance Functor syntax => Corecursive (Diff syntax ann) where embed = Diff
 
+
 instance Eq1 f => Eq1 (Diff f) where
   liftEq eqA = go where go (Diff d1) (Diff d2) = liftEq2 eqA go d1 d2
 
