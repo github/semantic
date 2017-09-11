@@ -25,10 +25,11 @@ import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Error as Error (formatError)
 import Data.Foldable (fold, foldl', toList)
-import Data.Functor.Binding (envLookup)
+import Data.Functor.Binding (BindingF(..), envLookup)
 import Data.Functor.Both hiding (fst, snd)
-import qualified Data.Functor.Both as Both
 import Data.Functor.Foldable (cata)
+import Data.Functor.Product as Product
+import Data.Functor.Sum as Sum
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -154,12 +155,15 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
   where diffAlgebra r env = case r of
-          Copy _ (ann :< r) -> case (selector (Both.snd ann :< r), fold r) of
-            (Just a, Nothing) -> Just [Unchanged a]
-            (Just a, Just []) -> Just [Changed a]
-            (_     , entries) -> entries
+          Let _ body -> case body of
+            Either (ann1 :< InL syntax1) -> (pure . patchEntry <$> crosswalk selector (Delete (ann1 :< syntax1))) <> fold syntax1 <> Just []
+            Either (ann2 :< InR syntax2) -> (pure . patchEntry <$> crosswalk selector (Insert (ann2 :< syntax2))) <> fold syntax2 <> Just []
+            Both   ((ann1, ann2) :< Product.Pair syntax1 syntax2) -> (pure . patchEntry <$> crosswalk selector (Replace (ann1 :< syntax1) (ann2 :< syntax2))) <> fold syntax1 <> fold syntax2 <> Just []
+            Merge  ((_, ann2) :< r) -> case (selector (ann2 :< r), fold r) of
+              (Just a, Nothing) -> Just [Unchanged a]
+              (Just a, Just []) -> Just [Changed a]
+              (_     , entries) -> entries
           Var v -> join (envLookup v env)
-          Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
 
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
