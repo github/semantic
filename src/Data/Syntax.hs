@@ -7,7 +7,7 @@ import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
-import Data.Foldable (toList)
+import Data.Foldable (asum, toList)
 import Data.Function ((&))
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
@@ -32,7 +32,7 @@ makeTerm a = makeTerm' a . inj
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
-makeTerm' a f = Term (sconcat (a :| (termAnnotation . unTerm <$> toList f)) :< f)
+makeTerm' a f = Term (In (sconcat (a :| (termAnnotation . unTerm <$> toList f))) f)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
@@ -49,12 +49,12 @@ emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assig
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< fs, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< fs, Bounded grammar, Ix grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-parseError = makeTerm <$> Assignment.symbol maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] Nothing []) <* Assignment.source
+parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -95,7 +95,7 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Term (Union fs) a)
              -> [m (Term (Union fs) a -> Term (Union fs) a -> Union fs (Term (Union fs) a))]
              -> m (Union fs (Term (Union fs) a))
-infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (Assignment.choice operators) <*> postContextualize context right
+infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 
 -- Undifferentiated

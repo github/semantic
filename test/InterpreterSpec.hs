@@ -18,8 +18,8 @@ spec :: Spec
 spec = parallel $ do
   describe "interpret" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
-      let termA = Term $ (StringLiteral :. Nil) :< Leaf "t\776"
-          termB = Term $ (StringLiteral :. Nil) :< Leaf "\7831" in
+      let termA = Term $ (StringLiteral :. Nil) `In` Leaf "t\776"
+          termB = Term $ (StringLiteral :. Nil) `In` Leaf "\7831" in
           diffTerms (both termA termB) `shouldBe` replacing termA termB
 
     prop "produces correct diffs" $
@@ -32,6 +32,6 @@ spec = parallel $ do
                  diffCost diff `shouldBe` 0
 
     it "produces unbiased insertions within branches" $
-      let term s = Term ((StringLiteral :. Nil) :< Indexed [ Term ((StringLiteral :. Nil) :< Leaf s) ]) :: SyntaxTerm '[Category]
-          root = Term . ((Program :. Nil) :<) . Indexed in
-      diffTerms (both (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` copy (pure (Program :. Nil)) (Indexed [ inserting (term "a"), cata (\ (a :< r) -> copy (pure a) r) (term "b") ])
+      let term s = Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf s) ]) :: SyntaxTerm '[Category]
+          root = termIn (Program :. Nil) . Indexed in
+      diffTerms (both (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` copy (pure (Program :. Nil)) (Indexed [ inserting (term "a"), cata (\ (In a r) -> copy (pure a) r) (term "b") ])

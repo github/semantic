@@ -75,7 +75,7 @@ data SomeRenderer f where
 deriving instance Show (SomeRenderer f)
 
 identifierAlgebra :: RAlgebra (TermF Syntax a) (Term Syntax a) (Maybe Identifier)
-identifierAlgebra (_ :< syntax) = case syntax of
+identifierAlgebra (In _ syntax) = case syntax of
   S.Assignment f _ -> identifier f
   S.Class f _ _ -> identifier f
   S.Export f _ -> f >>= identifier

@@ -33,12 +33,12 @@ spec = parallel $ do
     prop "produces correct diffs" $
       \ (as, bs) -> let tas = decorate <$> (as :: [SyntaxTerm '[Category]])
                         tbs = decorate <$> (bs :: [SyntaxTerm '[Category]])
-                        root = Term . ((Program :. Nil) :<) . Indexed
+                        root = termIn (Program :. Nil) . Indexed
                         diff = copy (pure (Program :. Nil)) (Indexed (stripDiff . diffThese <$> rws editDistance canCompare tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
-      let (a, b) = (decorate (Term ((StringLiteral :. Nil) :< Indexed [ Term ((StringLiteral :. Nil) :< Leaf "a") ])), decorate (Term ((StringLiteral :. Nil) :< Indexed [ Term ((StringLiteral :. Nil) :< Leaf "b") ]))) in
+      let (a, b) = (decorate (Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf "a") ])), decorate (Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf "b") ]))) in
       fmap (bimap stripTerm stripTerm) (rws editDistance canCompare [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
   where canCompare a b = termAnnotation a == termAnnotation b
