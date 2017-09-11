@@ -40,7 +40,7 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply1 Foldable fs, Apply1 Functor fs, Foldable ast, Functor ast)
+  AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply1 Foldable fs, Apply1 Functor fs, Foldable ast, Functor ast)
                    => Parser (Term ast (Node grammar))                           -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
@@ -78,5 +78,5 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> SyntaxTerm DefaultFields
-lineByLineParser source = Term ((totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source)))
-  where toLine line range = Term ((range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source)))
+lineByLineParser source = Term (In (totalRange source :. Program :. totalSpan source :. Nil) (Indexed (zipWith toLine [1..] (sourceLineRanges source))))
+  where toLine line range = Term (In (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) (Leaf (toText (slice range source))))

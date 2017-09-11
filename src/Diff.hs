@@ -55,10 +55,10 @@ evalDiffRM algebra = para (\ diff -> local (bindMetavariables diff) (algebra dif
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int
 diffSum patchCost = evalDiff $ \ diff env -> case diff of
-  Let _ (Either (_ :< InL l)) -> patchCost (Delete ()) + sum l
-  Let _ (Either (_ :< InR r)) -> patchCost (Insert ()) + sum r
-  Let _ (Both   (_ :< Product.Pair l r)) -> patchCost (Replace () ()) + sum l + sum r
-  Let _ (Merge  (_ :< lr)) -> sum lr
+  Let _ (Either (In _ (InL l))) -> patchCost (Delete ()) + sum l
+  Let _ (Either (In _ (InR r))) -> patchCost (Insert ()) + sum r
+  Let _ (Both   (In _ (Product.Pair l r))) -> patchCost (Replace () ()) + sum l + sum r
+  Let _ (Merge  (In _ lr)) -> sum lr
   Var v -> fromMaybe 0 (envLookup v env)
 
 -- | The sum of the node count of the diff’s patches.
@@ -75,18 +75,18 @@ mergeMaybe algebra = evalDiff $ \ bind env -> case bind of
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 beforeTerm = mergeMaybe $ \ diff -> case diff of
-  Either (a :< InL l) -> Term . (a :<) <$> sequenceAlt l
-  Either (_ :< InR _) -> Nothing
-  Both   ((a, _) :< Product.Pair l _) -> Term . (a :<) <$> sequenceAlt l
-  Merge  ((a, _) :< l) -> Term . (a :<) <$> sequenceAlt l
+  Either (In a (InL l)) -> termIn a <$> sequenceAlt l
+  Either (In _ (InR _)) -> Nothing
+  Both   (In (a, _) (Product.Pair l _)) -> termIn a <$> sequenceAlt l
+  Merge  (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
 afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 afterTerm = mergeMaybe $ \ diff -> case diff of
-  Either (_ :< InL _) -> Nothing
-  Either (b :< InR r) -> Term . (b :<) <$> sequenceAlt r
-  Both   ((_, b) :< Product.Pair _ r) -> Term . (b :<) <$> sequenceAlt r
-  Merge  ((_, b) :< r) -> Term . (b :<) <$> sequenceAlt r
+  Either (In _ (InL _)) -> Nothing
+  Either (In b (InR r)) -> termIn b <$> sequenceAlt r
+  Both   (In (_, b) (Product.Pair _ r)) -> termIn b <$> sequenceAlt r
+  Merge  (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
 -- | Strips the head annotation off a diff annotated with non-empty records.
@@ -98,7 +98,7 @@ stripDiff = fmap rtail
 
 -- | Constructs the replacement of one value by another in an Applicative context.
 replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
-replacing (Term (a1 :< r1)) (Term (a2 :< r2)) = Diff (Let mempty (Both ((a1, a2) :< Product.Pair (deleting <$> r1) (inserting <$> r2))))
+replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Both (In (a1, a2) (Product.Pair (deleting <$> r1) (inserting <$> r2)))))
 
 -- | Constructs the insertion of a value in an Applicative context.
 inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
@@ -110,7 +110,7 @@ deleting = cata (Diff . Let mempty . Either . hoistTermF InL)
 
 
 copy :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
-copy = (Diff .) . (Let mempty .) . (Merge .) . (:<)
+copy = (Diff .) . (Let mempty .) . (Merge .) . In
 
 var :: Metavar -> Diff syntax ann
 var = Diff . Var

@@ -149,7 +149,7 @@ instance (Listable1 f, Listable a) => Listable (ListableF f a) where
 
 
 instance Listable1 f => Listable2 (TermF f) where
-  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<)
+  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) In
 
 instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
   liftTiers = liftTiers2 tiers

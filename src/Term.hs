@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators #-}
 module Term
 ( Term(..)
+, termIn
 , TermF(..)
 , SyntaxTerm
 , SyntaxTermF
@@ -34,8 +35,7 @@ import Text.Show
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
 
-infixr 5 :<
-data TermF syntax ann recur = (:<) { termAnnotation :: ann, termSyntax :: syntax recur }
+data TermF syntax ann recur = In { termAnnotation :: ann, termOut :: syntax recur }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A Term with a Syntax leaf and a record of fields.
@@ -45,14 +45,18 @@ type SyntaxTermF fields = TermF Syntax (Record fields)
 -- | Return the node count of a term.
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
-  size (_ :< syntax) = 1 + sum syntax
+  size (In _ syntax) = 1 + sum syntax
+
+-- | Build a Term from its annotation and syntax.
+termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
+termIn = (Term .) . In
 
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
 hoistTerm f = go where go (Term r) = Term (hoistTermF f (fmap go r))
 
 hoistTermF :: Functor f => (forall a. f a -> g a) -> TermF f a b -> TermF g a b
-hoistTermF f = go where go (a :< r) = a :< f r
+hoistTermF f = go where go (In a r) = In a (f r)
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
@@ -75,9 +79,9 @@ instance Functor f => Recursive (Term f a) where project = unTerm
 instance Functor f => Corecursive (Term f a) where embed = Term
 
 instance Functor f => Comonad (Term f) where
-  extract (Term (a :< _)) = a
-  duplicate w = Term (w :< fmap duplicate (unwrap w))
-  extend f = go where go w = Term (f w :< fmap go (unwrap w))
+  extract = termAnnotation . unTerm
+  duplicate w = termIn w (fmap duplicate (unwrap w))
+  extend f = go where go w = termIn (f w) (fmap go (unwrap w))
 
 instance Functor f => Functor (Term f) where
   fmap f = go where go = Term . bimap f go . unTerm
@@ -89,7 +93,7 @@ instance Traversable f => Traversable (Term f) where
   traverse f = go where go = fmap Term . bitraverse f go . unTerm
 
 instance Functor f => ComonadCofree f (Term f) where
-  unwrap (Term (_ :< as)) = as
+  unwrap = termOut . unTerm
   {-# INLINE unwrap #-}
 
 instance Eq1 f => Eq1 (Term f) where
@@ -105,30 +109,30 @@ instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
 instance Functor f => Bifunctor (TermF f) where
-  bimap f g (a :< r) = f a :< fmap g r
+  bimap f g (In a r) = In (f a) (fmap g r)
 
 instance Foldable f => Bifoldable (TermF f) where
-  bifoldMap f g (a :< r) = f a `mappend` foldMap g r
+  bifoldMap f g (In a r) = f a `mappend` foldMap g r
 
 instance Traversable f => Bitraversable (TermF f) where
-  bitraverse f g (a :< r) = (:<) <$> f a <*> traverse g r
+  bitraverse f g (In a r) = In <$> f a <*> traverse g r
 
 
 instance Eq1 f => Eq2 (TermF f) where
-  liftEq2 eqA eqB (a1 :< f1) (a2 :< f2) = eqA a1 a2 && liftEq eqB f1 f2
+  liftEq2 eqA eqB (In a1 f1) (In a2 f2) = eqA a1 a2 && liftEq eqB f1 f2
 
 instance (Eq1 f, Eq a) => Eq1 (TermF f a) where
   liftEq = liftEq2 (==)
 
 instance Show1 f => Show2 (TermF f) where
-  liftShowsPrec2 spA _ spB slB d (a :< f) = showParen (d > 5) $ spA 6 a . showString " :< " . liftShowsPrec spB slB 5 f
+  liftShowsPrec2 spA _ spB slB d (In a f) = showsBinaryWith spA (liftShowsPrec spB slB) "In" d a f
 
 instance (Show1 f, Show a) => Show1 (TermF f a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
 
 
 instance Apply1 Pretty1 fs => Pretty2 (TermF (Union fs)) where
-  liftPretty2 pA _ pB plB (a :< f) = pA a <+> liftPrettyUnion pB plB f
+  liftPretty2 pA _ pB plB (In a f) = pA a <+> liftPrettyUnion pB plB f
 
 instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Union fs) a) where
   liftPretty = liftPretty2 pretty prettyList
@@ -137,8 +141,8 @@ instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Union fs) a b
   pretty = liftPretty pretty prettyList
 
 instance Apply1 Pretty1 fs => Pretty2 (TermF (Sum (Union fs) (Union fs))) where
-  liftPretty2 pA _ pB plB (a :< InL f) = pA a <+> liftPrettyUnion pB plB f
-  liftPretty2 pA _ pB plB (a :< InR g) = pA a <+> liftPrettyUnion pB plB g
+  liftPretty2 pA _ pB plB (In a (InL f)) = pA a <+> liftPrettyUnion pB plB f
+  liftPretty2 pA _ pB plB (In a (InR g)) = pA a <+> liftPrettyUnion pB plB g
 
 instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Sum (Union fs) (Union fs)) a) where
   liftPretty = liftPretty2 pretty prettyList
@@ -147,7 +151,7 @@ instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Sum (Union fs
   pretty = liftPretty pretty prettyList
 
 instance Apply1 Pretty1 fs => Pretty2 (TermF (Product (Union fs) (Union fs))) where
-  liftPretty2 pA _ pB plB (a :< Product.Pair f g) = pA a <+> liftPrettyUnion pB plB f <+> liftPrettyUnion pB plB g
+  liftPretty2 pA _ pB plB (In a (Product.Pair f g)) = pA a <+> liftPrettyUnion pB plB f <+> liftPrettyUnion pB plB g
 
 instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Product (Union fs) (Union fs)) a) where
   liftPretty = liftPretty2 pretty prettyList
@@ -164,7 +168,7 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
   toJSONFields = toJSONFields . unTerm
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
-  toJSONFields (a :< f) = toJSONFields a <> toJSONFields1 f
+  toJSONFields (In a f) = toJSONFields a <> toJSONFields1 f
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
   toJSON = object . toJSONFields

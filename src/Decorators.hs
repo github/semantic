@@ -20,11 +20,11 @@ import Term
 --   This uses 'liftShowsPrec' to produce the 'ByteString', with the effect that
 --   constant fields will be included and parametric fields will not be.
 constructorNameAndConstantFields :: Show1 f => TermF f a b -> ByteString
-constructorNameAndConstantFields (_ :< f) = pack (liftShowsPrec (const (const id)) (const id) 0 f "")
+constructorNameAndConstantFields (In _ f) = pack (liftShowsPrec (const (const id)) (const id) 0 f "")
 
 -- | Compute a 'ConstructorLabel' label for a 'Union' of syntax 'Term's.
 constructorLabel :: Apply1 ConstructorName fs => TermF (Union fs) a b -> ConstructorLabel
-constructorLabel (_ :< u) = ConstructorLabel $ pack (apply1 (Proxy :: Proxy ConstructorName) constructorName u)
+constructorLabel (In _ u) = ConstructorLabel $ pack (apply1 (Proxy :: Proxy ConstructorName) constructorName u)
 
 
 newtype ConstructorLabel = ConstructorLabel ByteString

@@ -58,7 +58,7 @@ diffTermsWith refine comparable (Join (a, b)) = runFreer decompose (diff a b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
-getLabel (h :< t) = (Info.category h, case t of
+getLabel (In h t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
 
@@ -109,11 +109,11 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
-comparableByCategory (a :< _) (b :< _) = category a == category b
+comparableByCategory (In a _) (In b _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
 comparableByConstructor :: GAlign f => ComparabilityRelation f fields
-comparableByConstructor (_ :< a) (_ :< b) = isJust (galign a b)
+comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.

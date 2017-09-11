@@ -99,12 +99,12 @@ getDeclaration = getField
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
-declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
+declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
 syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (SyntaxTermF fields) (SyntaxTerm fields) (Maybe Declaration)
-syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
+syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
@@ -119,7 +119,7 @@ syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
 declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra blob@Blob{..} (a :< r)
+declarationAlgebra blob@Blob{..} (In a r)
   | Just (Declaration.Function (identifier, _) _ _) <- prj r = Just $ FunctionDeclaration (getSource (extract identifier))
   | Just (Declaration.Method _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
   | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
@@ -130,7 +130,7 @@ declarationAlgebra blob@Blob{..} (a :< r)
 markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply1 Functor fs, Apply1 Foldable fs)
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra blob@Blob{..} (a :< r)
+markupSectionAlgebra blob@Blob{..} (In a r)
   | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
   | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
@@ -156,10 +156,10 @@ tableOfContentsBy :: (Foldable f, Functor f)
 tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
   where diffAlgebra r env = case r of
           Let _ body -> case body of
-            Either (ann1 :< InL syntax1) -> (pure . patchEntry <$> crosswalk selector (Delete (ann1 :< syntax1))) <> fold syntax1 <> Just []
-            Either (ann2 :< InR syntax2) -> (pure . patchEntry <$> crosswalk selector (Insert (ann2 :< syntax2))) <> fold syntax2 <> Just []
-            Both   ((ann1, ann2) :< Product.Pair syntax1 syntax2) -> (pure . patchEntry <$> crosswalk selector (Replace (ann1 :< syntax1) (ann2 :< syntax2))) <> fold syntax1 <> fold syntax2 <> Just []
-            Merge  ((_, ann2) :< r) -> case (selector (ann2 :< r), fold r) of
+            Either (In ann1 (InL syntax1)) -> (pure . patchEntry <$> crosswalk selector (Delete (In ann1 syntax1))) <> fold syntax1 <> Just []
+            Either (In ann2 (InR syntax2)) -> (pure . patchEntry <$> crosswalk selector (Insert (In ann2 syntax2))) <> fold syntax2 <> Just []
+            Both   (In (ann1, ann2) (Product.Pair syntax1 syntax2)) -> (pure . patchEntry <$> crosswalk selector (Replace (In ann1 syntax1) (In ann2 syntax2))) <> fold syntax1 <> fold syntax2 <> Just []
+            Merge  (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
               (Just a, Nothing) -> Just [Unchanged a]
               (Just a, Just []) -> Just [Changed a]
               (_     , entries) -> entries

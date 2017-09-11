@@ -33,14 +33,14 @@ printBindingF bind n = case bind of
 
 printDiffF :: (ConstrainAll Show fields, Foldable f, Functor f) => DiffF f (Record fields) (Int -> ByteString) -> Int -> ByteString
 printDiffF diff n = case diff of
-  Either (ann :< InL syntax) -> nl n <> pad (n - 1) <> "{-" <> printTermF (ann :< syntax) n <> "-}"
-  Either (ann :< InR syntax) -> nl n <> pad (n - 1) <> "{+" <> printTermF (ann :< syntax) n <> "+}"
-  Both   ((ann1, ann2) :< Pair syntax1 syntax2) -> nl n       <> pad (n - 1) <> "{ " <> printTermF (ann1 :< syntax1) n
-                                                <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF (ann2 :< syntax2) n <> " }"
-  Merge  ((_, ann) :< syntax) -> nl n <> pad n <> "(" <> showAnnotation ann <> foldMap (\ d -> d (n + 1)) syntax <> ")"
+  Either (In ann (InL syntax)) -> nl n <> pad (n - 1) <> "{-" <> printTermF (In ann syntax) n <> "-}"
+  Either (In ann (InR syntax)) -> nl n <> pad (n - 1) <> "{+" <> printTermF (In ann syntax) n <> "+}"
+  Both   (In (ann1, ann2) (Pair syntax1 syntax2)) -> nl n       <> pad (n - 1) <> "{ " <> printTermF (In ann1 syntax1) n
+                                                  <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF (In ann2 syntax2) n <> " }"
+  Merge  (In (_, ann) syntax) -> nl n <> pad n <> "(" <> showAnnotation ann <> foldMap (\ d -> d (n + 1)) syntax <> ")"
 
 printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> ByteString) -> Int -> ByteString
-printTermF (annotation :< syntax) n = "(" <> showAnnotation annotation <> foldMap (\t -> t (n + 1)) syntax <> ")"
+printTermF (In annotation syntax) n = "(" <> showAnnotation annotation <> foldMap (\t -> t (n + 1)) syntax <> ")"
 
 nl :: Int -> ByteString
 nl n | n <= 0    = ""

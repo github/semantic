@@ -50,10 +50,10 @@ hasChanges = or . (True <$)
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: (HasField fields Range, Traversable f) => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
 alignDiff sources = evalDiff $ \ diff env -> case diff of
-  Let _ (Either (ann1 :< InL syntax1)) -> alignPatch sources (Delete (ann1 :< syntax1))
-  Let _ (Either (ann2 :< InR syntax2)) -> alignPatch sources (Insert (ann2 :< syntax2))
-  Let _ (Both   ((ann1, ann2) :< Product.Pair syntax1 syntax2)) -> alignPatch sources (Replace (ann1 :< syntax1) (ann2 :< syntax2))
-  Let _ (Merge  ((ann1, ann2) :< syntax)) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (both ann1 ann2 :< syntax)
+  Let _ (Either (In ann1 (InL syntax1))) -> alignPatch sources (Delete (In ann1 syntax1))
+  Let _ (Either (In ann2 (InR syntax2))) -> alignPatch sources (Insert (In ann2 syntax2))
+  Let _ (Both   (In (ann1, ann2) (Product.Pair syntax1 syntax2))) -> alignPatch sources (Replace (In ann1 syntax1) (In ann2 syntax2))
+  Let _ (Merge  (In (ann1, ann2) syntax)) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (In (both ann1 ann2) syntax)
   Var v -> fromMaybe [] (envLookup v env)
   -- Patch patch -> alignPatch sources patch
 
@@ -73,12 +73,12 @@ alignPatch sources patch = case patch of
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
 alignSyntax :: (Applicative f, HasField fields Range, Foldable g) => (forall a. f a -> Join These a) -> (TermF [] (Record fields) term -> term) -> (term -> Range) -> f Source -> TermF g (f (Record fields)) [Join These term] -> [Join These term]
-alignSyntax toJoinThese toNode getRange sources (infos :< syntax) =
+alignSyntax toJoinThese toNode getRange sources (In infos syntax) =
   catMaybes $ wrapInBranch <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ sourceLineRangesWithin . byteRange <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
-        makeNode info (range, children) = toNode (setByteRange info range :< children)
+        makeNode info (range, children) = toNode (In (setByteRange info range) children)
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]

@@ -55,7 +55,7 @@ spec = parallel $ do
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = copy (pure 0) (Indexed [1 <$ (diff :: Diff Syntax Int)]) in
-        tableOfContentsBy (\ (n :< _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
+        tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
         if null (diffPatches diff') then [Unchanged 0]
                                     else replicate (length (diffPatches diff')) (Changed 0)
 
@@ -195,9 +195,9 @@ programOf :: Diff' -> Diff'
 programOf diff = copy (pure programInfo) (Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = Term $ (Just (FunctionDeclaration name) :. functionInfo) :< S.Function name' [] [body]
+functionOf name body = Term $ (Just (FunctionDeclaration name) :. functionInfo) `In` S.Function name' [] [body]
   where
-    name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) :< Leaf name
+    name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
 
 programInfo :: Record (Maybe Declaration ': DefaultFields)
 programInfo = Nothing :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
@@ -208,20 +208,20 @@ functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
 isMeaningfulTerm :: Term Syntax a -> Bool
 isMeaningfulTerm a = case unTerm a of
-  (_ :< S.Indexed _) -> False
-  (_ :< S.Fixed _) -> False
-  (_ :< S.Commented _ _) -> False
-  (_ :< S.ParseError _) -> False
+  (_ `In` S.Indexed _) -> False
+  (_ `In` S.Fixed _) -> False
+  (_ `In` S.Commented _ _) -> False
+  (_ `In` S.ParseError _) -> False
   _ -> True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
 isMethodOrFunction :: HasField fields Category => Term Syntax (Record fields) -> Bool
 isMethodOrFunction a = case unTerm a of
-  (_ :< S.Method{}) -> True
-  (_ :< S.Function{}) -> True
-  (a :< _) | getField a == C.Function -> True
-  (a :< _) | getField a == C.Method -> True
-  (a :< _) | getField a == C.SingletonMethod -> True
+  (_ `In` S.Method{}) -> True
+  (_ `In` S.Function{}) -> True
+  (a `In` _) | getField a == C.Function -> True
+  (a `In` _) | getField a == C.Method -> True
+  (a `In` _) | getField a == C.SingletonMethod -> True
   _ -> False
 
 blobsForPaths :: Both FilePath -> IO (Both Blob)
@@ -231,7 +231,7 @@ sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
 sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 
 blankDiff :: Diff'
-blankDiff = copy (pure arrayInfo) (Indexed [ inserting (Term $ literalInfo :< Leaf "\"a\"") ])
+blankDiff = copy (pure arrayInfo) (Indexed [ inserting (Term $ literalInfo `In` Leaf "\"a\"") ])
   where
     arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
