@@ -42,6 +42,7 @@ termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
   size (In _ syntax) = 1 + sum syntax
 
+-- | Build a Term from its annotation and syntax.
 termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
 termIn = (Term .) . In
 
