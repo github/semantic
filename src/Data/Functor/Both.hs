@@ -16,7 +16,7 @@ import Prelude hiding (fst, snd)
 import qualified Prelude
 
 -- | A computation over both sides of a pair.
-type Both a = Join (,) a
+type Both = Join (,)
 
 -- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
 both :: a -> a -> Both a
