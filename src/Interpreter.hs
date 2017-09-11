@@ -9,7 +9,7 @@ module Interpreter
 import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
-import Data.Functor.Binding (envLookup)
+import Data.Functor.Binding (BindingF(..), envLookup)
 import Data.Functor.Both
 import Data.Functor.Classes (Eq1)
 import Data.Hashable (Hashable)
@@ -49,7 +49,7 @@ diffTermsWith refine comparable (Join (a, b)) = runFreer decompose (diff a b)
         decompose step = case step of
           Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> copy (both (extract t1) (extract t2)) <$> sequenceA result
+            Just result -> copy (extract t1, extract t2) <$> sequenceA result
             _ -> byReplacing t1 t2
           RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
           Delete a -> pure (deleting a)
@@ -104,7 +104,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
                <*> byRWS bodyA bodyB
   _ -> linearly t1 t2
   where
-    annotate = copy (both (extract t1) (extract t2))
+    annotate = copy (extract t1, extract t2)
 
 
 -- | Test whether two terms are comparable by their Category.
@@ -126,7 +126,7 @@ editDistanceUpTo :: (GAlign f, Foldable f, Functor f) => Integer -> These (Term 
 editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
   where diffCost = flip . evalDiff $ \ diff env m -> case diff of
           _ | m <= 0 -> 0
-          Copy _ body -> sum (fmap ($ pred m) body)
+          Let _ (Merge body) -> sum (fmap ($ pred m) body)
+          Let _ body -> succ (sum (fmap ($ pred m) body))
           Var v -> maybe 0 ($ pred m) (envLookup v env)
-          Patch patch -> succ (sum (sum . fmap ($ pred m) <$> patch))
-        approximateDiff a b = maybe (replacing a b) (copy (both (extract a) (extract b))) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
+        approximateDiff a b = maybe (replacing a b) (copy (extract a, extract b)) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
