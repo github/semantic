@@ -140,3 +140,7 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
   toJSONFields (a :< f) = toJSONFields a <> toJSONFields1 f
+
+instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
