@@ -21,6 +21,8 @@ import Data.Bitraversable
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
+import Data.Functor.Product as Product
+import Data.Functor.Sum as Sum
 import Data.JSON.Fields
 import Data.Proxy
 import Data.Record
@@ -128,6 +130,25 @@ instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Union fs) a) where
   liftPretty = liftPretty2 pretty prettyList
 
 instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Union fs) a b) where
+  pretty = liftPretty pretty prettyList
+
+instance Apply1 Pretty1 fs => Pretty2 (TermF (Sum (Union fs) (Union fs))) where
+  liftPretty2 pA _ pB plB (a :< InL f) = pA a <+> liftPrettyUnion pB plB f
+  liftPretty2 pA _ pB plB (a :< InR g) = pA a <+> liftPrettyUnion pB plB g
+
+instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Sum (Union fs) (Union fs)) a) where
+  liftPretty = liftPretty2 pretty prettyList
+
+instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Sum (Union fs) (Union fs)) a b) where
+  pretty = liftPretty pretty prettyList
+
+instance Apply1 Pretty1 fs => Pretty2 (TermF (Product (Union fs) (Union fs))) where
+  liftPretty2 pA _ pB plB (a :< Product.Pair f g) = pA a <+> liftPrettyUnion pB plB f <+> liftPrettyUnion pB plB g
+
+instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Product (Union fs) (Union fs)) a) where
+  liftPretty = liftPretty2 pretty prettyList
+
+instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Product (Union fs) (Union fs)) a b) where
   pretty = liftPretty pretty prettyList
 
 
