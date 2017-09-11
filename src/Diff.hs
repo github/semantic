@@ -46,7 +46,7 @@ diffPatches = cata $ \ diff -> case diff of
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: Mergeable syntax => (Patch (Term syntax annotation) -> Maybe (Term syntax annotation)) -> (Both annotation -> annotation) -> Diff syntax annotation -> Maybe (Term syntax annotation)
 mergeMaybe transform extractAnnotation = cata algebra
-  where algebra (Copy annotations syntax) = Term . (In (extractAnnotation annotations)) <$> sequenceAlt syntax
+  where algebra (Copy annotations syntax) = termIn (extractAnnotation annotations) <$> sequenceAlt syntax
         algebra (Patch patch) = transform patch
 
 -- | Recover the before state of a diff.
