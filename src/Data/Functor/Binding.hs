@@ -37,7 +37,10 @@ instance (Eq1 f, Eq a) => Eq (BindingF f a) where
 
 instance Show1 f => Show1 (BindingF f) where
   liftShowsPrec sp sl d (Let vars body) = showsBinaryWith (const (liftShowList sp sl)) (liftShowsPrec sp sl) "Let" d vars body
-  liftShowsPrec _  _  d (VarF var)      = showsUnaryWith showsPrec "Var" d var 
+  liftShowsPrec _  _  d (VarF var)      = showsUnaryWith showsPrec "Var" d var
+
+instance (Show1 f, Show a) => Show (BindingF f a) where
+  showsPrec = showsPrec1
 
 
 instance Pretty Metavar where
