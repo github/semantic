@@ -12,10 +12,10 @@ import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.List.NonEmpty (NonEmpty(..))
+import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
+import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, parseError, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -106,82 +106,78 @@ instance Pretty1 Redirect where liftPretty = genericLiftPretty
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression)
+assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
-expression = handleError (term everything)
-  where -- Alright, so.
-        -- It’s *much* more efficient to merge IntMaps of similar size than it is to left-associatively keep merging single-element IntMaps into a single large one. We’re talking ~5% productivity. Chunking it manually like this brings that up to a whopping 20% user (albeit a rosier ~45% elapsed) in my test case, and speeds up the construction of the assignment by a large margin.
-        -- We may at some point wish to write something to perform this chunking for us.
-        -- Medium-term, we should consider the construction of choices from first principles; maybe there’s a better API for us to construct these tables.
-        -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
-        everything = abcd <|> efil <|> pstv <|> w
-        abcd = a <|> b <|> c <|> d
-        efil = e <|> f <|> i <|> l
-        pstv = p <|> s <|> t <|> v
-        a =   argumentList
-          <|> assertStatement
-          <|> assignment'
-          <|> await
-        b =   binaryOperator
-          <|> boolean
-          <|> booleanOperator
-          <|> breakStatement
-          <|> call
-          <|> classDefinition
-        c =   comparisonOperator
-          <|> comprehension
-          <|> concatenatedString
-          <|> conditionalExpression
-          <|> continueStatement
-        d =   decoratedDefinition
-          <|> deleteStatement
-          <|> dictionary
-          <|> dottedName
-        e =   ellipsis
-          <|> exceptClause
-          <|> execStatement
-          <|> expressionList
-          <|> expressionStatement
-        f =   finallyClause
-          <|> float
-          <|> forInClause
-          <|> forStatement
-          <|> functionDefinition
-          <|> globalStatement
-        i =   identifier
-          <|> ifClause
-          <|> ifStatement
-          <|> import'
-          <|> identifier
-          <|> integer
-        l =   list'
-          <|> memberAccess
-          <|> none
-          <|> nonlocalStatement
-          <|> notOperator
-        p =   pair
-          <|> parameter
-          <|> passStatement
-          <|> printStatement
-          <|> raiseStatement
-          <|> returnStatement
-        s =   set
-          <|> slice
-          <|> string
-          <|> subscript
-        t =   tryStatement
-          <|> tuple
-          <|> type'
-          <|> unaryOperator
-        v =   variables
-          <|> whileStatement
-          <|> withStatement
-          <|> yield
-          <|> listSplat
-        w =   dictionarySplat
-          <|> keywordArgument
-          <|> parenthesizedExpression
+expression = term (handleError (choice expressionChoices))
+
+expressionChoices :: [Assignment.Assignment [] Grammar Term]
+expressionChoices =
+  -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
+  [ argumentList
+  , assertStatement
+  , assignment'
+  , await
+  , binaryOperator
+  , boolean
+  , booleanOperator
+  , breakStatement
+  , call
+  , classDefinition
+  , comparisonOperator
+  , comprehension
+  , concatenatedString
+  , conditionalExpression
+  , continueStatement
+  , decoratedDefinition
+  , deleteStatement
+  , dictionary
+  , dictionarySplat
+  , dottedName
+  , ellipsis
+  , exceptClause
+  , execStatement
+  , expressionList
+  , expressionStatement
+  , finallyClause
+  , float
+  , forInClause
+  , forStatement
+  , functionDefinition
+  , globalStatement
+  , identifier
+  , ifClause
+  , ifStatement
+  , import'
+  , integer
+  , keywordArgument
+  , list'
+  , listSplat
+  , memberAccess
+  , none
+  , nonlocalStatement
+  , notOperator
+  , pair
+  , parameter
+  , parenthesizedExpression
+  , parseError
+  , passStatement
+  , printStatement
+  , raiseStatement
+  , returnStatement
+  , set
+  , slice
+  , string
+  , subscript
+  , tryStatement
+  , tuple
+  , type'
+  , unaryOperator
+  , variables
+  , whileStatement
+  , withStatement
+  , yield
+  ]
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
@@ -487,7 +483,7 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 -- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
 chainl1Term :: Assignment -> Assignment.Assignment [] Grammar (Term -> Term -> Term) -> Assignment

@@ -218,7 +218,7 @@ runParser Options{..} blob@Blob{..} = go
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (cmarkParser blobSource)
           LineByLineParser -> logTiming "line-by-line parse" $ pure (lineByLineParser blobSource)
-        blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
+        blobFields = ("path", blobPath) : maybe [] (pure . (,) "language" . show) blobLanguage
         errors :: (Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (a :< syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
