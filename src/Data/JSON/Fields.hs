@@ -47,6 +47,9 @@ instance (ToJSONFields a) => ToJSON (JSONFields a) where
 
 newtype JSONFields1 f a = JSONFields1 { unJSONFields1 :: f a }
 
+instance (ToJSON a, ToJSONFields1 f) => ToJSONFields (JSONFields1 f a) where
+  toJSONFields = toJSONFields1 . unJSONFields1
+
 instance (ToJSON a, ToJSONFields1 f) => ToJSON (JSONFields1 f a) where
   toJSON = object . toJSONFields1 . unJSONFields1
   toEncoding = pairs . mconcat . toJSONFields1 . unJSONFields1
