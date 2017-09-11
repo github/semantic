@@ -5,7 +5,6 @@ import Control.Applicative (liftA2)
 import Control.Monad (guard, join)
 import Control.Monad.Free.Freer
 import Data.Function (on)
-import Data.Functor.Both
 import Data.Functor.Classes
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
