@@ -33,7 +33,7 @@ decoratorWithAlgebra :: Functor f
                      => RAlgebra (Base (Term f (Record fs))) (Term f (Record fs)) a -- ^ An R-algebra on terms.
                      -> Term f (Record fs) -- ^ A term to decorate with values produced by the R-algebra.
                      -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the R-algebra.
-decoratorWithAlgebra alg = para $ \ c@(In a f) -> Term (In (alg (fmap (second (rhead . extract)) c) :. a) (fmap snd f))
+decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (rhead . extract)) c) :. a) (fmap snd f)
 
 
 newtype Identifier = Identifier ByteString

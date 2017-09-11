@@ -54,7 +54,7 @@ cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkT
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
-          in Term (In (A.Node (toGrammar t) range span) (In t (toTerm range span <$> children)))
+          in termIn (A.Node (toGrammar t) range span) (In t (toTerm range span <$> children))
 
         toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ (if endLine <= startLine then max startColumn endColumn else endColumn)))
 

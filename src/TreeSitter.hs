@@ -109,7 +109,7 @@ nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos no
 assignTerm :: Ptr TS.Language -> Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
 assignTerm language source annotation children allChildren =
   case assignTermByLanguage source (category annotation) children of
-    Just a -> pure (Term (In annotation a))
+    Just a -> pure (termIn annotation a)
     _ -> defaultTermAssignment source annotation children allChildren
   where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm DefaultFields))
         assignTermByLanguage = case languageForTSLanguage language of
@@ -155,7 +155,7 @@ defaultTermAssignment source annotation children allChildren
                 [_, Other t]
                   | t `elem` ["--", "++"] -> MathOperator
                 _ -> Operator
-      pure (Term (In (setCategory annotation c) (S.Operator cs)))
+      pure (termIn (setCategory annotation c) (S.Operator cs))
 
     (Other "binary_expression", _) -> do
       cs <- allChildren
@@ -166,7 +166,7 @@ defaultTermAssignment source annotation children allChildren
                   | s `elem` ["&&", "||"] -> BooleanOperator
                   | s `elem` [">>", ">>=", ">>>", ">>>=", "<<", "<<=", "&", "^", "|"] -> BitwiseOperator
                 _ -> Operator
-      pure (Term (In (setCategory annotation c) (S.Operator cs)))
+      pure (termIn (setCategory annotation c) (S.Operator cs))
 
     (_, []) -> toTerm $ S.Leaf (toText source)
     (_, children) -> toTerm $ S.Indexed children
