@@ -16,9 +16,11 @@ import Data.Align
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Function (on)
-import Data.Functor.Binding (envLookup)
+import Data.Functor.Binding (BindingF(..), envLookup)
 import Data.Functor.Both
 import Data.Functor.Identity
+import Data.Functor.Product as Product
+import Data.Functor.Sum
 import Data.List (partition, sortBy)
 import Data.Maybe (catMaybes, fromJust, fromMaybe, listToMaybe)
 import Data.Range
@@ -27,7 +29,7 @@ import Data.Source
 import Data.Record
 import Data.These
 import Diff
-import Info
+import Info (byteRange, setByteRange)
 import Patch
 import Prelude hiding (fst, snd)
 import SplitDiff
@@ -48,9 +50,12 @@ hasChanges = or . (True <$)
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: (HasField fields Range, Traversable f) => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
 alignDiff sources = evalDiff $ \ diff env -> case diff of
-  Copy _ body -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources body
+  Let _ (Either (ann1 :< InL syntax1)) -> alignPatch sources (Delete (ann1 :< syntax1))
+  Let _ (Either (ann2 :< InR syntax2)) -> alignPatch sources (Insert (ann2 :< syntax2))
+  Let _ (Both   ((ann1, ann2) :< Product.Pair syntax1 syntax2)) -> alignPatch sources (Replace (ann1 :< syntax1) (ann2 :< syntax2))
+  Let _ (Merge  ((ann1, ann2) :< syntax)) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (both ann1 ann2 :< syntax)
   Var v -> fromMaybe [] (envLookup v env)
-  Patch patch -> alignPatch sources patch
+  -- Patch patch -> alignPatch sources patch
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
 alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both Source -> Patch (TermF f (Record fields) [Join These (SplitDiff [] (Record fields))]) -> [Join These (SplitDiff [] (Record fields))]
