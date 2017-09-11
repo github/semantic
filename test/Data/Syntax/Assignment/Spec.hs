@@ -57,11 +57,6 @@ spec = do
       `shouldBe`
       Right [Out "green", Out "green"]
 
-    it "distributes through overlapping committed choices, matching the right alternatives" $
-      fst <$> runAssignment "magenta blue blue" (symbol Magenta *> many green <|> symbol Magenta *> many blue) (makeState [node Magenta 0 7 [], node Blue 8 12 [], node Blue 13 17 []])
-      `shouldBe`
-      Right [Out "blue", Out "blue"]
-
     it "distributes through overlapping committed choices, matching the empty list" $
       fst <$> runAssignment "magenta" (symbol Magenta *> (Left <$> many green) <|> symbol Magenta *> (Right <$> many blue)) (makeState [node Magenta 0 7 []])
       `shouldBe`
@@ -82,20 +77,15 @@ spec = do
       `shouldBe`
       Right [Out "green", Out "green"]
 
-    it "alternates repetitions, matching the right alternative" $
-      fst <$> runAssignment "blue blue" (many green <|> many blue) (makeState [node Blue 0 4 [], node Blue 5 9 []])
-      `shouldBe`
-      Right [Out "blue", Out "blue"]
-
     it "alternates repetitions, matching at the end of input" $
       fst <$> runAssignment "" (many green <|> many blue) (makeState [])
       `shouldBe`
       Right []
 
     it "distributes through children rules" $
-      fst <$> runAssignment "(red (blue))" (children (many green) <|> children (many blue)) (makeState [node Red 0 12 [node Blue 5 11 []]])
+      fst <$> runAssignment "(red (blue))" (children green <|> children blue) (makeState [node Red 0 12 [node Blue 5 11 []]])
       `shouldBe`
-      Right [Out "(blue)"]
+      Right (Out "(blue)")
 
     it "matches rules to the left of pure" $
       fst <$> runAssignment "green" ((green <|> pure (Out "other") <|> blue) <* many source) (makeState [node Green 0 5 []])
@@ -147,68 +137,40 @@ spec = do
       fst <$> runAssignment "magenta" eof (makeState [ node Magenta 0 7 [] ] :: State [] Grammar) `shouldBe` Right ()
 
   describe "catchError" $ do
-    it "handler that always matches" $
+    it "catches failed committed choices" $
       fst <$> runAssignment "A"
-        (red `catchError` (\ _ -> OutError <$ location <*> source))
+        ((symbol Green *> children red) `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [node Green 0 1 []])
         `shouldBe`
           Right (OutError "A")
 
-    it "handler that matches" $
+    it "doesn’t catch uncommitted choices" $
       fst <$> runAssignment "A"
-        (red `catchError` const green)
+        (red `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Right (Out "A")
+          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
 
-    it "handler that doesn't match produces error" $
+    it "doesn’t catch unexpected end of branch" $
+      fst <$> runAssignment ""
+        (red `catchError` \ _ -> OutError <$ location <*> source)
+        (makeState [])
+        `shouldBe`
+          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
+
+    it "doesn’t catch exhaustiveness errors" $
+      fst <$> runAssignment "AA"
+        (red `catchError` \ _ -> OutError <$ location <*> source)
+        (makeState [node Red 0 1 [], node Red 1 2 []])
+        `shouldBe`
+          Left (Error (Span (Pos 1 2) (Pos 1 3)) [] (Just (Right Red)))
+
+    it "can error inside the handler" $
       runAssignment "A"
-        (red `catchError` const blue)
+        (symbol Green *> children red `catchError` const blue)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Blue] (Just (Right Green)))
-
-    describe "in many" $ do
-      it "handler that always matches" $
-        fst <$> runAssignment "PG"
-          (symbol Palette *> children (
-            many (red `catchError` (\ _ -> OutError <$ location <*> source))
-          ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Right [OutError "G"]
-
-      it "handler that matches" $
-        fst <$> runAssignment "PG"
-          (symbol Palette *> children ( many (red `catchError` const green) ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Right [Out "G"]
-
-      it "handler that doesn't match produces error" $
-        runAssignment "PG"
-          (symbol Palette *> children ( many (red `catchError` const blue) ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Left (Error (Span (Pos 1 2) (Pos 1 3)) [] (Just (Right Green)))
-
-      it "handlers are greedy" $
-        runAssignment "PG"
-          (symbol Palette *> children (
-            (,) <$> many (red `catchError` (\ _ -> OutError <$ location <*> source)) <*> green
-          ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Left (Error (Span (Pos 1 3) (Pos 1 3)) [Right Green] Nothing)
-
-      it "handler that doesn't match with apply" $
-        fst <$> runAssignment "PG"
-          (symbol Palette *> children (
-            (,) <$> many (red `catchError` const blue) <*> green
-          ))
-          (makeState [node Palette 0 1 [node Green 1 2 []]])
-          `shouldBe`
-            Right ([], Out "G")
+          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
 
   describe "many" $ do
     it "takes ones and only one zero width repetition" $
