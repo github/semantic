@@ -64,6 +64,9 @@ instance ToJSONFields1 f => ToJSONFields1 (BindingF f) where
   toJSONFields1 (Let vars body) = [ "vars" .= vars ] <> toJSONFields1 body
   toJSONFields1 (Var v)         = [ "metavar" .= v ]
 
+instance (ToJSONFields1 f, ToJSON a) => ToJSONFields (BindingF f a) where
+  toJSONFields = toJSONFields1
+
 instance (ToJSON a, ToJSONFields1 f) => ToJSON (BindingF f a) where
   toJSON = object . toJSONFields1
   toEncoding = pairs . mconcat . toJSONFields1
