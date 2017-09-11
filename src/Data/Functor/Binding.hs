@@ -9,6 +9,11 @@ newtype Metavar = Metavar Int
   deriving newtype (Enum, ToJSON)
 
 
+data BindingF f recur
+  = Let [(Metavar, recur)] (f recur)
+  | VarF Metavar
+
+
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
   deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
 
