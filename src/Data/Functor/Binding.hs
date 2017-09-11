@@ -92,6 +92,9 @@ instance Show1 f => Show1 (BindingF f) where
 instance (Show1 f, Show a) => Show (BindingF f a) where
   showsPrec = showsPrec1
 
+instance Show1 Env where
+  liftShowsPrec sp sl d (Env vs) = showsUnaryWith (const (liftShowList sp sl)) "Env" d vs
+
 
 instance Pretty Metavar where
   pretty (Metavar v) = pretty v
