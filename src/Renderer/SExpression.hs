@@ -5,36 +5,39 @@ module Renderer.SExpression
 ) where
 
 import Data.Bifunctor (bimap)
-import Data.Bifunctor.Join
 import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length)
 import Data.Foldable (fold)
-import Data.Functor.Binding (Metavar(..))
+import Data.Functor.Binding (BindingF(..), Env(..), Metavar(..))
 import Data.Functor.Foldable (cata)
+import Data.Functor.Product
+import Data.Functor.Sum
 import Data.List (intersperse)
 import Data.Record
 import Data.Semigroup
 import Diff
-import Patch
 import Prelude hiding (replicate)
 import Term
 
 -- | Returns a ByteString SExpression formatted diff.
 renderSExpressionDiff :: (ConstrainAll Show fields, Foldable f, Functor f) => Diff f (Record fields) -> ByteString
-renderSExpressionDiff diff = cata printDiffF diff 0 <> "\n"
+renderSExpressionDiff diff = cata printBindingF diff 0 <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
 renderSExpressionTerm :: (ConstrainAll Show fields, Foldable f, Functor f) => Term f (Record fields) -> ByteString
 renderSExpressionTerm term = cata (\ term n -> nl n <> replicate (2 * n) ' ' <> printTermF term n) term 0 <> "\n"
 
+printBindingF :: (ConstrainAll Show fields, Foldable f, Functor f) => BindingF (DiffF f (Record fields)) (Int -> ByteString) -> Int -> ByteString
+printBindingF bind n = case bind of
+  Let vars body -> nl n <> pad n <> "(" <> showBindings (($ n) <$> vars) <> printDiffF body n <> ")"
+  Var v -> nl n <> pad n <> showMetavar v
+
 printDiffF :: (ConstrainAll Show fields, Foldable f, Functor f) => DiffF f (Record fields) (Int -> ByteString) -> Int -> ByteString
 printDiffF diff n = case diff of
-  Patch patch -> case patch of
-    Insert term -> nl n <> pad (n - 1) <> "{+" <> printTermF term n <> "+}"
-    Delete term -> nl n <> pad (n - 1) <> "{-" <> printTermF term n <> "-}"
-    Replace a b -> nl n <> pad (n - 1) <> "{ " <> printTermF a n
-                <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF b n <> " }"
-  Copy vs (Join (_, annotation) :< syntax) -> nl n <> pad n <> "(" <> showBindings (fmap (\ b -> b n) <$> vs) <> showAnnotation annotation <> foldMap (\ d -> d (n + 1)) syntax <> ")"
-  Var v -> nl n <> pad n <> showMetavar v
+  Either (ann :< InL syntax) -> nl n <> pad (n - 1) <> "{-" <> printTermF (ann :< syntax) n <> "-}"
+  Either (ann :< InR syntax) -> nl n <> pad (n - 1) <> "{+" <> printTermF (ann :< syntax) n <> "+}"
+  Both   ((ann1, ann2) :< Pair syntax1 syntax2) -> nl n       <> pad (n - 1) <> "{ " <> printTermF (ann1 :< syntax1) n
+                                                <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF (ann2 :< syntax2) n <> " }"
+  Merge  ((_, ann) :< syntax) -> nl n <> pad n <> "(" <> showAnnotation ann <> foldMap (\ d -> d (n + 1)) syntax <> ")"
 
 printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> ByteString) -> Int -> ByteString
 printTermF (annotation :< syntax) n = "(" <> showAnnotation annotation <> foldMap (\t -> t (n + 1)) syntax <> ")"
@@ -52,9 +55,9 @@ showAnnotation Nil = ""
 showAnnotation (only :. Nil) = pack (show only)
 showAnnotation (first :. rest) = pack (show first) <> " " <> showAnnotation rest
 
-showBindings :: [(Metavar, ByteString)] -> ByteString
-showBindings [] = ""
-showBindings bindings = "[ " <> fold (intersperse "\n, " (showBinding <$> bindings)) <> " ]"
+showBindings :: Env ByteString -> ByteString
+showBindings (Env []) = ""
+showBindings (Env bindings) = "[ " <> fold (intersperse "\n, " (showBinding <$> bindings)) <> " ]"
   where showBinding (var, val) = showMetavar var <> "/" <> val
 
 showMetavar :: Metavar -> ByteString
