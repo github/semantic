@@ -256,9 +256,9 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
         run t yield initialState = expectedSymbols `seq` state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
-          where atNode (Term (node :< f)) = case runTracing t of
+          where atNode (Term (In node f)) = case runTracing t of
                   Location -> yield (nodeLocation node) state
-                  CurrentNode -> yield (node :< (() <$ f)) state
+                  CurrentNode -> yield (In node (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
@@ -286,7 +286,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
 requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
   [] -> Right (a, state')
-  Term (node :< _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
+  Term (In node _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
 
 withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallStack => a) -> a
 withStateCallStack callSite state action = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state)))) action
@@ -297,7 +297,7 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | Term (Node{..} :< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
+  | Term (In Node{..} _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.

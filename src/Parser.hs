@@ -78,5 +78,5 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> SyntaxTerm DefaultFields
-lineByLineParser source = Term ((totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source)))
-  where toLine line range = Term ((range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source)))
+lineByLineParser source = Term (In (totalRange source :. Program :. totalSpan source :. Nil) (Indexed (zipWith toLine [1..] (sourceLineRanges source))))
+  where toLine line range = Term (In (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) (Leaf (toText (slice range source))))

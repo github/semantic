@@ -48,7 +48,7 @@ hasChanges = or . (True <$)
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: Traversable f => HasField fields Range => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
 alignDiff sources = cata $ \ diff -> case diff of
-  Copy ann r -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (ann :< r)
+  Copy ann r -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (In ann r)
   Patch patch -> alignPatch sources patch
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
@@ -67,12 +67,12 @@ alignPatch sources patch = case patch of
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
 alignSyntax :: (Applicative f, HasField fields Range, Foldable g) => (forall a. f a -> Join These a) -> (TermF [] (Record fields) term -> term) -> (term -> Range) -> f Source -> TermF g (f (Record fields)) [Join These term] -> [Join These term]
-alignSyntax toJoinThese toNode getRange sources (infos :< syntax) =
+alignSyntax toJoinThese toNode getRange sources (In infos syntax) =
   catMaybes $ wrapInBranch <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ sourceLineRangesWithin . byteRange <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
-        makeNode info (range, children) = toNode (setByteRange info range :< children)
+        makeNode info (range, children) = toNode (In (setByteRange info range) children)
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]

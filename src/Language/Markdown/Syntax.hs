@@ -67,7 +67,7 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = (Term .) . (:<) <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
+list = (Term .) . In <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
   CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
   CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) . termAnnotation . termOut <$> currentNode <*> children (many item))
 

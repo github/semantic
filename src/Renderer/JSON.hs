@@ -88,7 +88,7 @@ instance (ToJSONFields a, ToJSONFields (f (Term f a))) => ToJSONFields (Term f a
   toJSONFields = toJSONFields . unTerm
 
 instance (ToJSONFields a, ToJSONFields (f b)) => ToJSONFields (TermF f a b) where
-  toJSONFields (a :< f) = toJSONFields a <> toJSONFields f
+  toJSONFields (In a f) = toJSONFields a <> toJSONFields f
 
 instance (ToJSONFields a, ToJSONFields (f (Diff f a)), ToJSONFields (f (Term f a))) => ToJSONFields (Diff f a) where
   toJSONFields = toJSONFields . unDiff
