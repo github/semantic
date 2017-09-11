@@ -19,6 +19,7 @@ import Data.Foldable (fold)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
+import Data.Semigroup
 import qualified Data.Set as Set
 import Data.Text.Prettyprint.Doc
 
@@ -63,7 +64,7 @@ hoistBindingF _ (Var v) = Var v
 
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
-  deriving (Eq, Foldable, Functor, Monoid, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Monoid, Ord, Semigroup, Show, Traversable)
 
 envExtend :: Metavar -> a -> Env a -> Env a
 envExtend var val (Env m) = Env ((var, val) : m)
