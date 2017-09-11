@@ -35,6 +35,7 @@ bindings :: BindingF f recur -> [(Metavar, recur)]
 bindings (Let vars _) = vars
 bindings _            = []
 
+
 freeMetavariables :: (Foldable syntax, Functor syntax, Recursive t, Base t ~ BindingF syntax) => t -> Set.Set Metavar
 freeMetavariables = cata $ \ diff -> case diff of
   Let bindings body -> foldMap snd bindings <> foldr Set.delete (fold body) (fst <$> bindings)
