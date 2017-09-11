@@ -81,6 +81,9 @@ instance Eq1 f => Eq1 (BindingF f) where
 instance (Eq1 f, Eq a) => Eq (BindingF f a) where
   (==) = eq1
 
+instance Eq1 Env where
+  liftEq eq (Env v1) (Env v2) = liftEq (liftEq eq) v1 v2
+
 
 instance Show1 f => Show1 (BindingF f) where
   liftShowsPrec sp sl d (Let vars body) = showsBinaryWith (const (liftShowList sp sl)) (liftShowsPrec sp sl) "Let" d vars body
