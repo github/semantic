@@ -1,9 +1,10 @@
-{-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DerivingStrategies, GADTs, GeneralizedNewtypeDeriving #-}
 module Data.Functor.Binding
 ( Metavar(..)
 -- Abstract binding trees
 , BindingF(..)
 , bindings
+, freeMetavariables
 -- Environments
 , Env(..)
 , envExtend
@@ -11,8 +12,11 @@ module Data.Functor.Binding
 ) where
 
 import Data.Aeson (KeyValue(..), ToJSON(..), object, pairs)
+import Data.Foldable (fold)
 import Data.Functor.Classes
+import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
+import qualified Data.Set as Set
 import Data.Text.Prettyprint.Doc
 
 newtype Metavar = Metavar Int
@@ -27,6 +31,11 @@ data BindingF f recur
 bindings :: BindingF f recur -> [(Metavar, recur)]
 bindings (Let vars _) = vars
 bindings _            = []
+
+freeMetavariables :: (Foldable syntax, Functor syntax, Recursive t, Base t ~ BindingF syntax) => t -> Set.Set Metavar
+freeMetavariables = cata $ \ diff -> case diff of
+  Let bindings body -> foldMap snd bindings <> foldr Set.delete (fold body) (fst <$> bindings)
+  Var v -> Set.singleton v
 
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
