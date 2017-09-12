@@ -7,7 +7,6 @@ module Data.Functor.Binding
 , freeMetavariables
 , maxBoundMetavariable
 , letBind
-, hoistBindingF
 -- Environments
 , Env(..)
 , envExtend
@@ -56,11 +55,6 @@ letBind :: (Foldable syntax, Functor syntax, Corecursive t, Recursive t, Base t 
 letBind diff f = embed (Let (Env [(n, diff)]) body)
   where body = f n
         n = maybe (Metavar 0) succ (foldMaxMap maxBoundMetavariable body)
-
-
-hoistBindingF :: (forall a. f a -> g a) -> BindingF f a -> BindingF g a
-hoistBindingF f (Let vars body) = Let vars (f body)
-hoistBindingF _ (Var v) = Var v
 
 
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
