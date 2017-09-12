@@ -5,7 +5,7 @@ module Renderer.SExpression
 ) where
 
 import Data.Bifunctor (bimap)
-import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length)
+import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length, null)
 import Data.Foldable (fold)
 import Data.Functor.Binding (BindingF(..), Env(..), Metavar(..))
 import Data.Functor.Foldable (cata)
@@ -27,7 +27,8 @@ renderSExpressionTerm term = cata (\ term n -> nl n <> replicate (2 * n) ' ' <> 
 
 printBindingF :: (ConstrainAll Show fields, Foldable f, Functor f) => BindingF (DiffF f (Record fields)) (Int -> ByteString) -> Int -> ByteString
 printBindingF bind n = case bind of
-  Let vars body -> nl n <> pad n <> "(" <> showBindings (($ n) <$> vars) <> printDiffF body n <> ")"
+  Let vars body | null vars -> printDiffF body n
+                | otherwise -> nl n <> pad n <> showBindings (($ n) <$> vars) <> printDiffF body n
   Var v -> nl n <> pad n <> showMetavar v
 
 printDiffF :: (ConstrainAll Show fields, Foldable f, Functor f) => DiffF f (Record fields) (Int -> ByteString) -> Int -> ByteString
