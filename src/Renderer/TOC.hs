@@ -28,8 +28,6 @@ import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Binding (BindingF(..), envLookup)
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
-import Data.Functor.Product as Product
-import Data.Functor.Sum as Sum
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -155,11 +153,9 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
   where diffAlgebra r env = case r of
-          Let _ body -> case body of
-            Either (In ann1 (InL syntax1)) -> (pure . patchEntry <$> crosswalk selector (Delete (In ann1 syntax1))) <> fold syntax1 <> Just []
-            Either (In ann2 (InR syntax2)) -> (pure . patchEntry <$> crosswalk selector (Insert (In ann2 syntax2))) <> fold syntax2 <> Just []
-            Both   (In (ann1, ann2) (Product.Pair syntax1 syntax2)) -> (pure . patchEntry <$> crosswalk selector (Replace (In ann1 syntax1) (In ann2 syntax2))) <> fold syntax1 <> fold syntax2 <> Just []
-            Merge  (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
+          Let _ body -> case diffF body of
+            Left patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
+            Right (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
               (Just a, Nothing) -> Just [Unchanged a]
               (Just a, Just []) -> Just [Changed a]
               (_     , entries) -> entries
