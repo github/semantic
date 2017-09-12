@@ -18,9 +18,6 @@ module Renderer
 , File(..)
 ) where
 
-import Control.Comonad.Cofree (Cofree, unwrap)
-import Control.Comonad.Trans.Cofree (CofreeF(..))
-import Control.DeepSeq
 import Data.Aeson (Value, (.=))
 import Data.ByteString (ByteString)
 import Data.Foldable (asum)
@@ -35,7 +32,7 @@ import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.TOC as R
 import Syntax as S
-import Term (SyntaxTerm)
+import Term
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
@@ -76,8 +73,8 @@ data SomeRenderer f where
 
 deriving instance Show (SomeRenderer f)
 
-identifierAlgebra :: RAlgebra (CofreeF Syntax a) (Cofree Syntax a) (Maybe Identifier)
-identifierAlgebra (_ :< syntax) = case syntax of
+identifierAlgebra :: RAlgebra (TermF Syntax a) (Term Syntax a) (Maybe Identifier)
+identifierAlgebra (In _ syntax) = case syntax of
   S.Assignment f _ -> identifier f
   S.Class f _ _ -> identifier f
   S.Export f _ -> f >>= identifier
@@ -95,7 +92,7 @@ identifierAlgebra (_ :< syntax) = case syntax of
   where identifier = fmap Identifier . extractLeafValue . unwrap . fst
 
 newtype Identifier = Identifier Text
-  deriving (Eq, NFData, Show)
+  deriving (Eq, Show)
 
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = ["identifier" .= i]

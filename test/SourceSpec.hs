@@ -1,6 +1,7 @@
 module SourceSpec where
 
 import Data.Char (chr)
+import Data.Functor.Listable
 import Data.Range
 import Data.Semigroup
 import Data.Source
@@ -20,7 +21,7 @@ spec = parallel $ do
       \ source -> foldMap (`slice` source) (sourceLineRanges source) `shouldBe` source
 
   describe "spanToRange" $ do
-    prop "computes single-line ranges" . forAll (unListableByteString `mapT` tiers) $
+    prop "computes single-line ranges" $
       \ s -> let source = fromBytes s
                  spans = zipWith (\ i Range {..} -> Span (Pos i 1) (Pos i (succ (end - start)))) [1..] ranges
                  ranges = sourceLineRanges source in

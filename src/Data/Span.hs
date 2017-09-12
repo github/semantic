@@ -9,21 +9,19 @@ module Data.Span
 , emptySpan
 ) where
 
-import Control.DeepSeq
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Data.Hashable (Hashable)
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
 import GHC.Generics
-import Test.LeanCheck
 
 -- | Source position information
 data Pos = Pos
   { posLine :: !Int
   , posColumn :: !Int
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 instance A.ToJSON Pos where
   toJSON Pos{..} =
@@ -38,7 +36,7 @@ data Span = Span
   { spanStart :: Pos
   , spanEnd :: Pos
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, NFData)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 emptySpan :: Span
 emptySpan = Span (Pos 1 1) (Pos 1 1)
@@ -57,12 +55,6 @@ instance A.FromJSON Span where
     Span <$>
       o .: "start" <*>
       o .: "end"
-
-instance Listable Pos where
-  tiers = cons2 Pos
-
-instance Listable Span where
-  tiers = cons2 Span
 
 instance Pretty Pos where
   pretty Pos{..} = pretty posLine <> colon <> pretty posColumn
