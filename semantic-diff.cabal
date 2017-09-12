@@ -125,6 +125,8 @@ library
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
+                     , pretty-show
+                     , hscolour
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
