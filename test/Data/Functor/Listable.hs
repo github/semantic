@@ -175,6 +175,10 @@ instance (Listable1 f, Listable1 g) => Listable1 (Product.Product f g) where
   liftTiers tiers = liftCons2 (liftTiers tiers) (liftTiers tiers) Product.Pair
 
 
+instance Listable1 f => Listable1 (BindingF f) where
+  liftTiers tiers = liftCons1 (liftTiers tiers) (Let mempty)
+
+
 instance Listable1 f => Listable2 (DiffF f) where
   liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) (Copy []) \/ liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
 
