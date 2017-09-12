@@ -54,7 +54,7 @@ spec = parallel $ do
       \ patch -> let patch' = (patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (these deleting inserting replacing (unPatch patch')) `shouldBe` these (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (unPatch (foldMap pure <$> patch'))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = copy (pure 0) (Indexed [1 <$ (diff :: Diff Syntax Int)]) in
+      \ diff -> let diff' = merge (0, 0) (Indexed [1 <$ (diff :: Diff Syntax Int)]) in
         tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
         if null (diffPatches diff') then [Unchanged 0]
                                     else replicate (length (diffPatches diff')) (Changed 0)
@@ -169,17 +169,17 @@ numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
-programWithChange body = copy (pure programInfo) (Indexed [ function' ])
+programWithChange body = merge (programInfo, programInfo) (Indexed [ function' ])
   where
-    function' = copy (pure (Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [ inserting body ])
-    name' = copy (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil)) (Leaf "foo")
+    function' = merge ((Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [ inserting body ])
+    name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
-programWithChangeOutsideFunction term = copy (pure programInfo) (Indexed [ function', term' ])
+programWithChangeOutsideFunction term = merge (programInfo, programInfo) (Indexed [ function', term' ])
   where
-    function' = copy (pure (Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [])
-    name' = copy (pure (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil)) (Leaf "foo")
+    function' = merge (Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo) (S.Function name' [] [])
+    name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -192,7 +192,7 @@ programWithReplace :: Text -> Term' -> Diff'
 programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Diff' -> Diff'
-programOf diff = copy (pure programInfo) (Indexed [ diff ])
+programOf diff = merge (programInfo, programInfo) (Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
 functionOf name body = Term $ (Just (FunctionDeclaration name) :. functionInfo) `In` S.Function name' [] [body]
@@ -231,7 +231,7 @@ sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
 sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 
 blankDiff :: Diff'
-blankDiff = copy (pure arrayInfo) (Indexed [ inserting (Term $ literalInfo `In` Leaf "\"a\"") ])
+blankDiff = merge (arrayInfo, arrayInfo) (Indexed [ inserting (Term $ literalInfo `In` Leaf "\"a\"") ])
   where
     arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil

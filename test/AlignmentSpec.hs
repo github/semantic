@@ -64,13 +64,13 @@ spec = parallel $ do
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
       let sources = both (Source.fromText "[ foo ]") (Source.fromText "[ foo ]") in
-      align sources (pure (info 0 7) `copy` Indexed [ pure (info 2 5) `copy` Leaf "foo" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ]) `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 7 `In` [ wrap $ info 2 5 `In` [] ])
                       (wrap $ info 0 7 `In` [ wrap $ info 2 5 `In` [] ])) ]
 
     it "aligns identical branches spanning multiple lines" $
       let sources = both (Source.fromText "[\nfoo\n]") (Source.fromText "[\nfoo\n]") in
-      align sources (pure (info 0 7) `copy` Indexed [ pure (info 2 5) `copy` Leaf "foo" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ]) `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 2 `In` [])
                       (wrap $ info 0 2 `In` []))
         , Join (These (wrap $ info 2 6 `In` [ wrap $ info 2 5 `In` [] ])
@@ -81,7 +81,7 @@ spec = parallel $ do
 
     it "aligns reformatted branches" $
       let sources = both (Source.fromText "[ foo ]") (Source.fromText "[\nfoo\n]") in
-      align sources (pure (info 0 7) `copy` Indexed [ pure (info 2 5) `copy` Leaf "foo" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ]) `shouldBe` prettyDiff sources
         [ Join (That  (wrap $ info 0 2 `In` []))
         , Join (These (wrap $ info 0 7 `In` [ wrap $ info 2 5 `In` [] ])
                       (wrap $ info 2 6 `In` [ wrap $ info 2 5 `In` [] ]))
@@ -90,7 +90,7 @@ spec = parallel $ do
 
     it "aligns nodes following reformatted branches" $
       let sources = both (Source.fromText "[ foo ]\nbar\n") (Source.fromText "[\nfoo\n]\nbar\n") in
-      align sources (pure (info 0 12) `copy` Indexed [ pure (info 0 7) `copy` Indexed [ pure (info 2 5) `copy` Leaf "foo" ], pure (info 8 11) `copy` Leaf "bar" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 12, info 0 12) `merge` Indexed [ (info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ], (info 8 11, info 8 11) `merge` Leaf "bar" ]) `shouldBe` prettyDiff sources
         [ Join (That  (wrap $ info 0 2   `In` [ wrap $ info 0 2  `In` [] ]))
         , Join (These (wrap $ info 0 8   `In` [ wrap $ info 0 7  `In` [ wrap $ info 2 5 `In` [] ] ])
                       (wrap $ info 2 6   `In` [ wrap $ info 2 6  `In` [ wrap $ info 2 5 `In` [] ] ]))
@@ -103,12 +103,12 @@ spec = parallel $ do
 
     it "aligns identical branches with multiple children on the same line" $
       let sources = pure (Source.fromText "[ foo, bar ]") in
-      align sources (pure (info 0 12) `copy` Indexed [ pure (info 2 5) `copy` Leaf "foo", pure (info 7 10) `copy` Leaf "bar" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 12, info 0 12) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo", (info 7 10, info 7 10) `merge` Leaf "bar" ]) `shouldBe` prettyDiff sources
         [ Join (runBothWith These (pure (wrap $ info 0 12 `In` [ wrap $ info 2 5 `In` [], wrap $ info 7 10 `In` [] ])) ) ]
 
     it "aligns insertions" $
       let sources = both (Source.fromText "a") (Source.fromText "a\nb") in
-      align sources (both (info 0 1) (info 0 3) `copy` Indexed [ pure (info 0 1) `copy` Leaf "a", inserting (Term (info 2 3 `In` Leaf "b")) ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 1, info 0 3) `merge` Indexed [ (info 0 1, info 0 1) `merge` Leaf "a", inserting (Term (info 2 3 `In` Leaf "b")) ]) `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 1 `In` [ wrap $ info 0 1 `In` [] ])
                       (wrap $ info 0 2 `In` [ wrap $ info 0 1 `In` [] ]))
         , Join (That  (wrap $ info 2 3 `In` [ pure (SplitInsert (Term (info 2 3 `In` []))) ]))
@@ -121,14 +121,14 @@ spec = parallel $ do
 
     it "aligns insertions into empty branches" $
       let sources = both (Source.fromText "[ ]") (Source.fromText "[a]") in
-      align sources (pure (info 0 3) `copy` Indexed [ inserting (Term (info 1 2 `In` Leaf "a")) ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 3, info 0 3) `merge` Indexed [ inserting (Term (info 1 2 `In` Leaf "a")) ]) `shouldBe` prettyDiff sources
         [ Join (That  (wrap $ info 0 3 `In` [ pure (SplitInsert (Term (info 1 2 `In` []))) ]))
         , Join (This  (wrap $ info 0 3 `In` []))
         ]
 
     it "aligns symmetrically following insertions" $
       let sources = both (Source.fromText "a\nc") (Source.fromText "a\nb\nc") in
-      align sources (both (info 0 3) (info 0 5) `copy` Indexed [ pure (info 0 1) `copy` Leaf "a", inserting (Term (info 2 3 `In` Leaf "b")), both (info 2 3) (info 4 5) `copy` Leaf "c" ])
+      align sources ((info 0 3, info 0 5) `merge` Indexed [ (info 0 1, info 0 1) `merge` Leaf "a", inserting (Term (info 2 3 `In` Leaf "b")), (info 2 3, info 4 5) `merge` Leaf "c" ])
         `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 2 `In` [ wrap $ info 0 1 `In` [] ])
                       (wrap $ info 0 2 `In` [ wrap $ info 0 1 `In` [] ]))
@@ -139,13 +139,13 @@ spec = parallel $ do
 
     it "symmetrical nodes force the alignment of asymmetrical nodes on both sides" $
       let sources = both (Source.fromText "[ a, b ]") (Source.fromText "[ b, c ]") in
-      align sources (pure (info 0 8) `copy` Indexed [ deleting (Term (info 2 3 `In` Leaf "a")), both (info 5 6) (info 2 3) `copy` Leaf "b", inserting (Term (info 5 6 `In` Leaf "c")) ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 8, info 0 8) `merge` Indexed [ deleting (Term (info 2 3 `In` Leaf "a")), (info 5 6, info 2 3) `merge` Leaf "b", inserting (Term (info 5 6 `In` Leaf "c")) ]) `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 8 `In` [ pure (SplitDelete (Term (info 2 3 `In` []))), wrap $ info 5 6 `In` [] ])
                       (wrap $ info 0 8 `In` [ wrap $ info 2 3 `In` [], pure (SplitInsert (Term (info 5 6 `In` []))) ])) ]
 
     it "when one of two symmetrical nodes must be split, splits the latter" $
       let sources = both (Source.fromText "[ a, b ]") (Source.fromText "[ a\n, b\n]") in
-      align sources (both (info 0 8) (info 0 9) `copy` Indexed [ pure (info 2 3) `copy` Leaf "a", both (info 5 6) (info 6 7) `copy` Leaf "b" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 8, info 0 9) `merge` Indexed [ (info 2 3, info 2 3) `merge` Leaf "a", (info 5 6, info 6 7) `merge` Leaf "b" ]) `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 8 `In` [ wrap $ info 2 3 `In` [], wrap $ info 5 6 `In` [] ])
                       (wrap $ info 0 4 `In` [ wrap $ info 2 3 `In` [] ]))
         , Join (That  (wrap $ info 4 8 `In` [ wrap $ info 6 7 `In` [] ]))
@@ -154,14 +154,14 @@ spec = parallel $ do
 
     it "aligns deletions before insertions" $
       let sources = both (Source.fromText "[ a ]") (Source.fromText "[ b ]") in
-      align sources (pure (info 0 5) `copy` Indexed [ deleting (Term (info 2 3 `In` Leaf "a")), inserting (Term (info 2 3 `In` Leaf "b")) ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 5, info 0 5) `merge` Indexed [ deleting (Term (info 2 3 `In` Leaf "a")), inserting (Term (info 2 3 `In` Leaf "b")) ]) `shouldBe` prettyDiff sources
         [ Join (This  (wrap $ info 0 5 `In` [ pure (SplitDelete (Term (info 2 3 `In` []))) ]))
         , Join (That  (wrap $ info 0 5 `In` [ pure (SplitInsert (Term (info 2 3 `In` []))) ]))
         ]
 
     it "aligns context-only lines symmetrically" $
       let sources = both (Source.fromText "[\n  a\n,\n  b\n]") (Source.fromText "[\n  a, b\n\n\n]") in
-      align sources (both (info 0 13) (info 0 12) `copy` Indexed [ pure (info 4 5) `copy` Leaf "a", both (info 10 11) (info 7 8) `copy` Leaf "b" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 13, info 0 12) `merge` Indexed [ (info 4 5, info 4 5) `merge` Leaf "a", (info 10 11, info 7 8) `merge` Leaf "b" ]) `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 2 `In` [])
                       (wrap $ info 0 2 `In` []))
         , Join (These (wrap $ info 2 6 `In` [ wrap $ info 4 5 `In` [] ])
@@ -176,7 +176,7 @@ spec = parallel $ do
 
     it "aligns asymmetrical nodes preceding their symmetrical siblings conservatively" $
       let sources = both (Source.fromText "[ b, c ]") (Source.fromText "[ a\n, c\n]") in
-      align sources (both (info 0 8) (info 0 9) `copy` Indexed [ inserting (Term (info 2 3 `In` Leaf "a")), deleting (Term (info 2 3 `In` Leaf "b")), both (info 5 6) (info 6 7) `copy` Leaf "c" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 8, info 0 9) `merge` Indexed [ inserting (Term (info 2 3 `In` Leaf "a")), deleting (Term (info 2 3 `In` Leaf "b")), (info 5 6, info 6 7) `merge` Leaf "c" ]) `shouldBe` prettyDiff sources
         [ Join (That  (wrap $ info 0 4 `In` [ pure (SplitInsert (Term (info 2 3 `In` []))) ]))
         , Join (These (wrap $ info 0 8 `In` [ pure (SplitDelete (Term (info 2 3 `In` []))), wrap $ info 5 6 `In` [] ])
                       (wrap $ info 4 8 `In` [ wrap $ info 6 7 `In` [] ]))
@@ -185,7 +185,7 @@ spec = parallel $ do
 
     it "aligns symmetrical reformatted nodes" $
       let sources = both (Source.fromText "a [ b ]\nc") (Source.fromText "a [\nb\n]\nc") in
-      align sources (pure (info 0 9) `copy` Indexed [ pure (info 0 1) `copy` Leaf "a", pure (info 2 7) `copy` Indexed [ pure (info 4 5) `copy` Leaf "b" ], pure (info 8 9) `copy` Leaf "c" ]) `shouldBe` prettyDiff sources
+      align sources ((info 0 9, info 0 9) `merge` Indexed [ (info 0 1, info 0 1) `merge` Leaf "a", (info 2 7, info 2 7) `merge` Indexed [ (info 4 5, info 4 5) `merge` Leaf "b" ], (info 8 9, info 8 9) `merge` Leaf "c" ]) `shouldBe` prettyDiff sources
         [ Join (These (wrap $ info 0 8 `In` [ wrap $ info 0 1 `In` [], wrap $ info 2 7 `In` [ wrap $ info 4 5 `In` [] ] ])
                       (wrap $ info 0 4 `In` [ wrap $ info 0 1 `In` [], wrap $ info 2 4 `In` [] ]))
         , Join (That  (wrap $ info 4 6 `In` [ wrap $ info 4 6 `In` [ wrap $ info 4 5 `In` [] ] ]))
