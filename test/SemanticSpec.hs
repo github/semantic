@@ -7,7 +7,6 @@ import Data.Functor.Both as Both
 import Data.Functor.Sum
 import Diff
 import Language
-import Patch
 import Renderer
 import Semantic
 import Semantic.Task

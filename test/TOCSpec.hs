@@ -6,7 +6,6 @@ import Category as C
 import Data.Aeson
 import Data.Blob
 import Data.ByteString (ByteString)
-import Data.Function (on)
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.Maybe (fromMaybe)
