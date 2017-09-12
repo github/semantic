@@ -8,6 +8,7 @@ import Control.Monad.Effect.Reader
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
+import Data.Foldable (toList)
 import Data.Functor.Binding (BindingF(..), Env(..), Metavar(..), bindings, envExtend, envLookup)
 import Data.Functor.Classes
 import Data.Functor.Classes.Pretty.Generic as Pretty
@@ -70,6 +71,12 @@ diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)
 diffPatch diff = case unDiff diff of
   Let _ body -> either Just (const Nothing) (diffF body)
   _ -> Nothing
+
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF syntax ann (Diff syntax ann))]
+diffPatches = evalDiffR $ \ diff env -> case diff of
+  Let _ body -> either ((:) . fmap (fmap fst)) (const id) (diffF body) (foldMap (toList . diffPatch . fst) body)
+  Var var -> maybe [] snd (envLookup var env)
+
 
 diffF :: DiffF syntax ann a -> Either (Patch (TermF syntax ann a)) (TermF syntax (ann, ann) a)
 diffF diff = case diff of
