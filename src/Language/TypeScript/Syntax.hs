@@ -869,7 +869,7 @@ readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ source)
 methodDefinition :: Assignment
 methodDefinition = makeMethod <$>
   symbol MethodDefinition
-  <*> children ((,,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> emptyTerm <*> propertyName <*> callSignatureParts <*> (statementBlock <|> emptyTerm))
+  <*> children ((,,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> emptyTerm <*> propertyName <*> callSignatureParts <*> statementBlock)
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
