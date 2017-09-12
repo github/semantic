@@ -13,13 +13,11 @@ import Data.Function ((&))
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
-import Data.Text.Encoding (decodeUtf8With)
 import Data.Union
 import GHC.Generics
 import GHC.Stack
@@ -107,15 +105,11 @@ newtype Leaf a = Leaf { leafContent :: ByteString }
 instance Eq1 Leaf where liftEq = genericLiftEq
 instance Show1 Leaf where liftShowsPrec = genericLiftShowsPrec
 
-instance Pretty1 Leaf where
-  liftPretty _ _ (Leaf s) = pretty ("Leaf" :: String) <+> prettyBytes s
-
 newtype Branch a = Branch { branchElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Branch where liftEq = genericLiftEq
 instance Show1 Branch where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Branch where liftPretty = genericLiftPretty
 
 
 -- Common
@@ -127,15 +121,11 @@ newtype Identifier a = Identifier ByteString
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
-instance Pretty1 Identifier where
-  liftPretty _ _ (Identifier s) = pretty ("Identifier" :: String) <+> prettyBytes s
-
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Program where liftPretty = genericLiftPretty
 
 
 -- | Empty syntax, with essentially no-op semantics.
@@ -146,7 +136,6 @@ data Empty a = Empty
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
-instance Pretty1 Empty where liftPretty = genericLiftPretty
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -155,9 +144,6 @@ data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [S
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
-
-instance Pretty1 Error where
-  liftPretty _ pl (Error cs e a c) = nest 2 (concatWith (\ x y -> x <> hardline <> y) [ pretty ("Error" :: String), pretty (Error.showExpectation False e a ""), pretty (Error.showCallStack False (fromCallSiteList cs) ""), pl c])
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual
@@ -171,7 +157,3 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Context where liftPretty = genericLiftPretty
-
-prettyBytes :: ByteString -> Doc ann
-prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))

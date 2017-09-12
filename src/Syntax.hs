@@ -6,7 +6,6 @@ import Data.Aeson
 import Data.Align.Generic
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Listable
 import Data.Mergeable
 import Data.Text (pack, Text)
@@ -183,5 +182,3 @@ instance Listable recur => Listable (Syntax recur) where
 
 instance Eq1 Syntax where
   liftEq = genericLiftEq
-
-instance Pretty1 Syntax where liftPretty = genericLiftPretty

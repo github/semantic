@@ -14,7 +14,6 @@ import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Data.Hashable (Hashable)
 import Data.Semigroup
-import Data.Text.Prettyprint.Doc
 import GHC.Generics
 import Test.LeanCheck
 
@@ -63,9 +62,3 @@ instance Listable Pos where
 
 instance Listable Span where
   tiers = cons2 Span
-
-instance Pretty Pos where
-  pretty Pos{..} = pretty posLine <> colon <> pretty posColumn
-
-instance Pretty Span where
-  pretty Span{..} = pretty spanStart <> pretty '-' <> pretty spanEnd

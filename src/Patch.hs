@@ -16,7 +16,6 @@ module Patch
 
 import Control.DeepSeq
 import Data.Align
-import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Listable
 import Data.These
 import GHC.Generics
@@ -88,8 +87,3 @@ instance Crosswalk Patch where
   crosswalk f (Replace a b) = alignWith (these Delete Insert Replace) (f a) (f b)
   crosswalk f (Insert b) = Insert <$> f b
   crosswalk f (Delete a) = Delete <$> f a
-
-instance Pretty1 Patch where liftPretty = genericLiftPretty
-
-instance Pretty a => Pretty (Patch a) where
-  pretty = liftPretty pretty prettyList
