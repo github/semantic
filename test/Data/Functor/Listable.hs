@@ -189,7 +189,7 @@ instance (Listable1 f, Listable a, Listable b) => Listable (DiffF f a b) where
   tiers = tiers1
 
 instance Listable1 f => Listable1 (Diff f) where
-  liftTiers annTiers = go where go = liftCons1 (liftTiers2 annTiers go) Diff
+  liftTiers annTiers = go where go = liftCons1 (liftCons1 (liftTiers2 annTiers go) (Let mempty)) Diff
 
 instance (Listable1 f, Listable a) => Listable (Diff f a) where
   tiers = tiers1
