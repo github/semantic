@@ -66,6 +66,14 @@ diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Int
 diffCost = diffSum (const 1)
 
 
+diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)))
+diffPatch diff = case unDiff diff of
+  Let _ (Either (In ann (InL syntax)))                            -> Just (Delete  (In ann  syntax))
+  Let _ (Either (In ann (InR syntax)))                            -> Just (Insert  (In ann  syntax))
+  Let _ (Both   (In (ann1, ann2) (Product.Pair syntax1 syntax2))) -> Just (Replace (In ann1 syntax1) (In ann2 syntax2))
+  _ -> Nothing
+
+
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: (Mergeable syntax, Traversable syntax) => (DiffF syntax ann (Maybe (Term syntax ann)) -> Maybe (Term syntax ann)) -> Diff syntax ann -> Maybe (Term syntax ann)
 mergeMaybe algebra = evalDiff $ \ bind env -> case bind of
