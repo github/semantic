@@ -28,3 +28,6 @@
 [submodule "vendor/prettyprinter"]
 	path = vendor/prettyprinter
 	url = https://github.com/robrix/prettyprinter.git
+[submodule "vendor/ghc-mod"]
+	path = vendor/ghc-mod
+	url = https://github.com/joshvera/ghc-mod
