@@ -180,7 +180,7 @@ instance Listable1 f => Listable1 (BindingF f) where
 
 
 instance Listable1 f => Listable2 (DiffF f) where
-  liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) (Copy []) \/ liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
+  liftTiers2 annTiers recurTiers = liftCons1 (liftTiers2 annTiers recurTiers) Either \/ liftCons1 (liftTiers2 (liftTiers2 annTiers annTiers) recurTiers) Both \/ liftCons1 (liftTiers2 (liftTiers2 annTiers annTiers) recurTiers) Merge
 
 instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
   liftTiers = liftTiers2 tiers
