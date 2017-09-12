@@ -68,15 +68,15 @@ diffCost = diffSum (const 1)
 
 diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)))
 diffPatch diff = case unDiff diff of
-  Let _ body -> diffFPatch body
+  Let _ body -> either Just (const Nothing) (diffF body)
   _ -> Nothing
 
-diffFPatch :: DiffF syntax ann a -> Maybe (Patch (TermF syntax ann a))
-diffFPatch diff = case diff of
-  Either (In ann (InL syntax))                            -> Just (Delete  (In ann  syntax))
-  Either (In ann (InR syntax))                            -> Just (Insert  (In ann  syntax))
-  Both   (In (ann1, ann2) (Product.Pair syntax1 syntax2)) -> Just (Replace (In ann1 syntax1) (In ann2 syntax2))
-  _ -> Nothing
+diffF :: DiffF syntax ann a -> Either (Patch (TermF syntax ann a)) (TermF syntax (ann, ann) a)
+diffF diff = case diff of
+  Either (In ann (InL syntax))                            -> Left  (Delete  (In ann  syntax))
+  Either (In ann (InR syntax))                            -> Left  (Insert  (In ann  syntax))
+  Both   (In (ann1, ann2) (Product.Pair syntax1 syntax2)) -> Left  (Replace (In ann1 syntax1) (In ann2 syntax2))
+  Merge  (In anns syntax)                                 -> Right (In anns syntax)
 
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
