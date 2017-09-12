@@ -122,8 +122,8 @@ deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
 deleting = cata (Diff . Let mempty . Either . hoistTermF InL)
 
 
-copy :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
-copy = (Diff .) . (Let mempty .) . (Merge .) . In
+merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
+merge = (Diff .) . (Let mempty .) . (Merge .) . In
 
 var :: Metavar -> Diff syntax ann
 var = Diff . Var

@@ -49,7 +49,7 @@ diffTermsWith refine comparable (Join (a, b)) = runFreer decompose (diff a b)
         decompose step = case step of
           Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> copy (extract t1, extract t2) <$> sequenceA result
+            Just result -> merge (extract t1, extract t2) <$> sequenceA result
             _ -> byReplacing t1 t2
           RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
           Delete a -> pure (deleting a)
@@ -104,7 +104,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
                <*> byRWS bodyA bodyB
   _ -> linearly t1 t2
   where
-    annotate = copy (extract t1, extract t2)
+    annotate = merge (extract t1, extract t2)
 
 
 -- | Test whether two terms are comparable by their Category.
@@ -129,4 +129,4 @@ editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDi
           Let _ (Merge body) -> sum (fmap ($ pred m) body)
           Let _ body -> succ (sum (fmap ($ pred m) body))
           Var v -> maybe 0 ($ pred m) (envLookup v env)
-        approximateDiff a b = maybe (replacing a b) (copy (extract a, extract b)) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
+        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
