@@ -136,29 +136,6 @@ var = Diff . Var
 
 
 
-instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
-  liftPretty p pl = go
-    where go = pretty' . unDiff
-          pretty' (Let vars body) = pretty ("let" :: String) <+> align (vsep (prettyKV <$> unEnv vars)) <> line
-                                 <> pretty ("in" :: String)  <+> liftPretty2 p pl go (Pretty.list . map go) body
-          pretty' (Var var) = pretty var
-          prettyKV (var, val) = pretty var <+> pretty '=' <+> go val
-
-instance (Apply1 Pretty1 fs, Pretty ann) => Pretty (Diff (Union fs) ann) where
-  pretty = liftPretty pretty prettyList
-
-instance Apply1 Pretty1 fs => Pretty2 (DiffF (Union fs)) where
-  liftPretty2 pA plA pB plB diff = case diff of
-    Either term -> pretty ("either" :: String) <+> liftPretty2 pA plA pB plB term
-    Both   term -> pretty ("both"   :: String) <+> liftPretty2 pBoth plBoth pB plB term
-    Merge  term -> pretty ("merge"  :: String) <+> liftPretty2 pBoth plBoth pB plB term
-    where pBoth = liftPretty2 pA plA pA plA
-          plBoth = Pretty.list . map pBoth
-
-instance (Apply1 Pretty1 fs, Pretty ann) => Pretty1 (DiffF (Union fs) ann) where
-  liftPretty = liftPretty2 pretty prettyList
-
-
 type instance Base (Diff syntax ann) = BindingF (DiffF syntax ann)
 
 instance Functor syntax => Recursive   (Diff syntax ann) where project = unDiff

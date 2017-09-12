@@ -11,7 +11,6 @@ module Term
 , hoistTerm
 , hoistTermF
 , stripTerm
-, liftPrettyUnion
 ) where
 
 import Control.Comonad
@@ -21,14 +20,10 @@ import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Functor.Classes
-import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
-import Data.Functor.Product as Product
-import Data.Functor.Sum as Sum
 import Data.JSON.Fields
-import Data.Proxy
 import Data.Record
-import Data.Union
+import Data.Semigroup
 import Syntax
 import Text.Show
 
@@ -62,16 +57,6 @@ hoistTermF f = go where go (In a r) = In a (f r)
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
 stripTerm = fmap rtail
 
-
-liftPrettyUnion :: Apply1 Pretty1 fs => (a -> Doc ann) -> ([a] -> Doc ann) -> Union fs a -> Doc ann
-liftPrettyUnion p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
-
-
-instance Apply1 Pretty1 fs => Pretty1 (Term (Union fs)) where
-  liftPretty p pl = go where go = liftPretty2 p pl go (Pretty.list . map go) . unTerm
-
-instance (Apply1 Pretty1 fs, Pretty a) => Pretty (Term (Union fs) a) where
-  pretty = liftPretty pretty prettyList
 
 type instance Base (Term f a) = TermF f a
 
@@ -129,35 +114,6 @@ instance Show1 f => Show2 (TermF f) where
 
 instance (Show1 f, Show a) => Show1 (TermF f a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-
-instance Apply1 Pretty1 fs => Pretty2 (TermF (Union fs)) where
-  liftPretty2 pA _ pB plB (In a f) = pA a <+> liftPrettyUnion pB plB f
-
-instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Union fs) a) where
-  liftPretty = liftPretty2 pretty prettyList
-
-instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Union fs) a b) where
-  pretty = liftPretty pretty prettyList
-
-instance Apply1 Pretty1 fs => Pretty2 (TermF (Sum (Union fs) (Union fs))) where
-  liftPretty2 pA _ pB plB (In a (InL f)) = pA a <+> liftPrettyUnion pB plB f
-  liftPretty2 pA _ pB plB (In a (InR g)) = pA a <+> liftPrettyUnion pB plB g
-
-instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Sum (Union fs) (Union fs)) a) where
-  liftPretty = liftPretty2 pretty prettyList
-
-instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Sum (Union fs) (Union fs)) a b) where
-  pretty = liftPretty pretty prettyList
-
-instance Apply1 Pretty1 fs => Pretty2 (TermF (Product (Union fs) (Union fs))) where
-  liftPretty2 pA _ pB plB (In a (Product.Pair f g)) = pA a <+> liftPrettyUnion pB plB f <+> liftPrettyUnion pB plB g
-
-instance (Apply1 Pretty1 fs, Pretty a) => Pretty1 (TermF (Product (Union fs) (Union fs)) a) where
-  liftPretty = liftPretty2 pretty prettyList
-
-instance (Apply1 Pretty1 fs, Pretty a, Pretty b) => Pretty (TermF (Product (Union fs) (Union fs)) a b) where
-  pretty = liftPretty pretty prettyList
 
 
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where

@@ -90,19 +90,6 @@ instance Show1 Env where
   liftShowsPrec sp sl d (Env vs) = showsUnaryWith (const (liftShowList sp sl)) "Env" d vs
 
 
-instance Pretty Metavar where
-  pretty (Metavar v) = pretty v
-
-instance Pretty1 f => Pretty1 (BindingF f) where
-  liftPretty p pl (Let vars body) = pretty ("let" :: String) <+> align (vsep (prettyKV <$> unEnv vars)) <> line
-                                 <> pretty ("in" :: String)  <+> liftPretty p pl body
-    where prettyKV (var, val) = pretty var <+> pretty '=' <+> p val
-  liftPretty _ _  (Var metavar)   = pretty metavar
-
-instance (Pretty1 f, Pretty a) => Pretty (BindingF f a) where
-  pretty = liftPretty pretty prettyList
-
-
 instance ToJSONFields1 f => ToJSONFields1 (BindingF f) where
   toJSONFields1 (Let vars body) = [ "vars" .= unEnv vars ] <> toJSONFields1 body
   toJSONFields1 (Var v)         = [ "metavar" .= v ]

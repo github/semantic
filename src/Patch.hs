@@ -13,7 +13,6 @@ module Patch
 import Data.Aeson
 import Data.Align
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.JSON.Fields
 import Data.These
@@ -64,10 +63,6 @@ instance Crosswalk Patch where
 
 instance Eq1 Patch where liftEq = genericLiftEq
 instance Show1 Patch where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Patch where liftPretty = genericLiftPretty
-
-instance Pretty a => Pretty (Patch a) where
-  pretty = liftPretty pretty prettyList
 
 
 instance ToJSONFields a => ToJSONFields (Patch a) where
