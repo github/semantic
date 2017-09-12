@@ -31,7 +31,10 @@ import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
 import Data.Char (chr)
+import Data.Functor.Binding
 import Data.Functor.Both
+import Data.Functor.Product as Product
+import Data.Functor.Sum as Sum
 import Data.Range
 import Data.Record
 import Data.Semigroup
@@ -165,6 +168,13 @@ instance (Listable1 f, Listable a) => Listable (Term f a) where
   tiers = tiers1
 
 
+instance (Listable1 f, Listable1 g) => Listable1 (Sum.Sum f g) where
+  liftTiers tiers = liftCons1 (liftTiers tiers) InL \/ liftCons1 (liftTiers tiers) InR
+
+instance (Listable1 f, Listable1 g) => Listable1 (Product.Product f g) where
+  liftTiers tiers = liftCons2 (liftTiers tiers) (liftTiers tiers) Product.Pair
+
+
 instance Listable1 f => Listable2 (DiffF f) where
   liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) (Copy []) \/ liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
 
@@ -237,7 +247,7 @@ instance Listable1 Syntax where
     \/ liftCons2 recur (liftTiers recur) Case
     \/ liftCons1 (liftTiers recur) Select
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
-    \/ liftCons2 recur recur Pair
+    \/ liftCons2 recur recur Syntax.Pair
     \/ liftCons1 (pack `mapT` tiers) Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
     \/ liftCons1 (liftTiers recur) Syntax.ParseError
