@@ -21,9 +21,8 @@ library
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
-                     , Data.Functor.Classes.Pretty.Generic
                      , Data.Functor.Classes.Show.Generic
-                     , Data.Functor.Listable
+                     , Data.JSON.Fields
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.Output
@@ -42,7 +41,6 @@ library
                      , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Data.Text.Listable
                      , Decorators
                      , Diff
                      , Files
@@ -93,7 +91,6 @@ library
                      , cmark-gfm
                      , comonad
                      , containers
-                     , deepseq
                      , directory
                      , effects
                      , filepath
@@ -102,14 +99,12 @@ library
                      , gitrev
                      , hashable
                      , kdt
-                     , leancheck
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , prettyprinter
                      , recursion-schemes
                      , semigroups
                      , split
@@ -125,6 +120,8 @@ library
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
+                     , pretty-show
+                     , hscolour
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
@@ -147,6 +144,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
                      , CommandSpec
+                     , Data.Functor.Listable
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec
@@ -168,7 +166,6 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
-                     , deepseq
                      , filepath
                      , free
                      , Glob

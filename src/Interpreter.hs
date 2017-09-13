@@ -8,10 +8,7 @@ module Interpreter
 ) where
 
 import Algorithm
-import Control.Comonad (extract)
-import Control.Comonad.Cofree (unwrap)
-import Control.Monad.Free (cutoff, wrap)
-import Control.Monad.Free.Freer hiding (cutoff, wrap)
+import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
 import Data.Functor.Classes (Eq1(..))
@@ -24,7 +21,7 @@ import Data.Union
 import qualified Data.Syntax.Declaration as Declaration
 import Diff
 import Info hiding (Return)
-import Patch (inserting, deleting, replacing, patchSum)
+import Patch (patchSum)
 import RWS
 import Syntax as S hiding (Return)
 import Term
@@ -54,9 +51,9 @@ diffTermsWith :: forall f fields . (Traversable f, GAlign f, Eq1 f, HasField fie
 diffTermsWith refine comparable eqTerms (Join (a, b)) = runFreer decompose (diff a b)
   where decompose :: AlgorithmF (Term f (Record fields)) (Diff f (Record fields)) result -> Algorithm (Term f (Record fields)) (Diff f (Record fields)) result
         decompose step = case step of
-          Diff t1 t2 -> refine t1 t2
+          Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> wrap . (both (extract t1) (extract t2) :<) <$> sequenceA result
+            Just result -> copy (both (extract t1) (extract t2)) <$> sequenceA result
             _ -> byReplacing t1 t2
           RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable eqTerms as bs)
           Delete a -> pure (deleting a)
@@ -65,7 +62,7 @@ diffTermsWith refine comparable eqTerms (Join (a, b)) = runFreer decompose (diff
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
-getLabel (h :< t) = (Info.category h, case t of
+getLabel (In h t) = (Info.category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
 
@@ -111,16 +108,16 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
                <*> byRWS bodyA bodyB
   _ -> linearly t1 t2
   where
-    annotate = wrap . (both (extract t1) (extract t2) :<)
+    annotate = copy (both (extract t1) (extract t2))
 
 
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
-comparableByCategory (a :< _) (b :< _) = category a == category b
+comparableByCategory (In a _) (In b _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: (GAlign f) => ComparabilityRelation f fields
-comparableByConstructor (_ :< a) (_ :< b) = isJust (galign a b)
+comparableByConstructor :: GAlign f => ComparabilityRelation f fields
+comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 
 -- | Equivalency check for terms.
 equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply1 Functor fs, Apply1 Foldable fs, Apply1 GAlign fs, Apply1 Eq1 fs)
@@ -144,6 +141,10 @@ defaultM = 10
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (GAlign f, Foldable f, Functor f) => Integer -> These (Term f (Record fields)) (Term f (Record fields)) -> Int
-editDistanceUpTo m = these termSize termSize (\ a b -> diffSum (patchSum termSize) (cutoff m (approximateDiff a b)))
-  where diffSum patchCost = sum . fmap (maybe 0 patchCost)
-        approximateDiff a b = maybe (replacing a b) wrap (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
+editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
+  where diffCost m (Diff.Diff diff)
+          | m <= 0    = 0
+          | otherwise = case diff of
+            Copy _ r -> sum (fmap (diffCost (pred m)) r)
+            Patch patch -> patchSum termSize patch
+        approximateDiff a b = maybe (replacing a b) (copy (both (extract a) (extract b))) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))

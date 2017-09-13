@@ -1,8 +1,16 @@
 {-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
-module Data.Functor.Both (Both, both, runBothWith, fst, snd, module X) where
+module Data.Functor.Both
+( Both
+, both
+, runBothWith
+, fst
+, snd
+, module X
+, liftShowsPrecBoth
+) where
 
-import Control.DeepSeq
 import Data.Bifunctor.Join as X
+import Data.Functor.Classes
 import Data.Semigroup
 import Prelude hiding (fst, snd)
 import qualified Prelude
@@ -34,4 +42,5 @@ instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
 instance (Semigroup a) => Semigroup (Join (,) a) where
   a <> b = Join $ runJoin a <> runJoin b
 
-instance NFData a => NFData (Join (,) a)
+liftShowsPrecBoth :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> Both a -> ShowS
+liftShowsPrecBoth sp sl d = showsUnaryWith (liftShowsPrec2 sp sl sp sl) "Join" d . runJoin

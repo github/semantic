@@ -23,14 +23,12 @@ module Data.Source
 , spanToRangeInLineRanges
 , sourceLineRangesByLineNumber
 , rangeToSpan
--- Listable
-, ListableByteString(..)
 ) where
 
 import Control.Arrow ((&&&))
 import Data.Array
 import qualified Data.ByteString as B
-import Data.Char (chr, ord)
+import Data.Char (ord)
 import Data.List (span)
 import Data.Monoid (First(..), Last(..))
 import Data.Range
@@ -39,7 +37,6 @@ import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
-import Test.LeanCheck
 
 -- | The contents of a source file, represented as a 'ByteString'.
 newtype Source = Source { sourceBytes :: B.ByteString }
@@ -144,16 +141,3 @@ instance Semigroup Source where
 instance Monoid Source where
   mempty = Source B.empty
   mappend = (<>)
-
-instance Listable Source where
-  tiers = (Source . unListableByteString) `mapT` tiers
-
-newtype ListableByteString = ListableByteString { unListableByteString :: B.ByteString }
-
-instance Listable ListableByteString where
-  tiers = (ListableByteString . T.encodeUtf8 . T.pack) `mapT` strings
-    where strings = foldr ((\\//) . listsOf . toTiers) []
-            [ ['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']
-            , [' '..'/'] <> [':'..'@'] <> ['['..'`'] <> ['{'..'~']
-            , [chr 0x00..chr 0x1f] <> [chr 127] -- Control characters.
-            , [chr 0xa0..chr 0x24f] ] -- Non-ASCII.

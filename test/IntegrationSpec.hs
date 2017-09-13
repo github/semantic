@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module IntegrationSpec where
 
-import Control.DeepSeq
 import qualified Data.ByteString as B
 import Data.Foldable (find, traverse_)
 import Data.Functor.Both
@@ -113,7 +112,7 @@ stripWhitespace = B.foldl' go B.empty
 
 -- | A wrapper around 'B.ByteString' with a more readable 'Show' instance.
 newtype Verbatim = Verbatim B.ByteString
-  deriving (Eq, NFData)
+  deriving (Eq)
 
 instance Show Verbatim where
   showsPrec _ (Verbatim byteString) = ('\n':) . (T.unpack (decodeUtf8 byteString) ++)

@@ -3,7 +3,6 @@ module Data.Syntax where
 
 import Algorithm
 import Control.Applicative
-import Control.Comonad.Trans.Cofree (headF)
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
@@ -13,13 +12,11 @@ import Data.Function ((&))
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Record
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
-import Data.Text.Encoding (decodeUtf8With)
 import Data.Union
 import GHC.Generics
 import GHC.Stack
@@ -33,7 +30,7 @@ makeTerm a = makeTerm' a . inj
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
-makeTerm' a f = cofree (sconcat (a :| (headF . runCofree <$> toList f)) :< f)
+makeTerm' a f = termIn (sconcat (a :| (termAnnotation . unTerm <$> toList f))) f
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
@@ -42,7 +39,7 @@ makeTerm1 = makeTerm1' . inj
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
 makeTerm1' f = case toList f of
-  a : _ -> makeTerm' (headF (runCofree a)) f
+  a : _ -> makeTerm' (termAnnotation (unTerm a)) f
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
@@ -50,7 +47,7 @@ emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assig
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq (ast (Assignment.AST ast grammar)), Ix grammar, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
@@ -107,15 +104,11 @@ newtype Leaf a = Leaf { leafContent :: ByteString }
 instance Eq1 Leaf where liftEq = genericLiftEq
 instance Show1 Leaf where liftShowsPrec = genericLiftShowsPrec
 
-instance Pretty1 Leaf where
-  liftPretty _ _ (Leaf s) = pretty ("Leaf" :: String) <+> prettyBytes s
-
 newtype Branch a = Branch { branchElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Branch where liftEq = genericLiftEq
 instance Show1 Branch where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Branch where liftPretty = genericLiftPretty
 
 
 -- Common
@@ -127,15 +120,11 @@ newtype Identifier a = Identifier ByteString
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
-instance Pretty1 Identifier where
-  liftPretty _ _ (Identifier s) = pretty ("Identifier" :: String) <+> prettyBytes s
-
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Program where liftPretty = genericLiftPretty
 
 
 -- | Empty syntax, with essentially no-op semantics.
@@ -146,7 +135,6 @@ data Empty a = Empty
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
-instance Pretty1 Empty where liftPretty = genericLiftPretty
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -155,9 +143,6 @@ data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [S
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
-
-instance Pretty1 Error where
-  liftPretty _ pl (Error cs e a c) = nest 2 (concatWith (\ x y -> x <> hardline <> y) [ pretty ("Error" :: String), pretty (Error.showExpectation False e a ""), pretty (Error.showCallStack False (fromCallSiteList cs) ""), pl c])
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual
@@ -171,7 +156,3 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Context where liftPretty = genericLiftPretty
-
-prettyBytes :: ByteString -> Doc ann
-prettyBytes = pretty . decodeUtf8With (\ _ -> ('\xfffd' <$))
