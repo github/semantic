@@ -13,6 +13,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
+  build-tools:         happy
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
