@@ -136,7 +136,9 @@ expressionChoices =
     mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
-expressions = makeTerm <$> location <*> many expression
+expressions = mk <$> location <*> many expression
+  where mk _ [a] = a
+        mk loc children = makeTerm loc children
 
 parenthesized_expressions :: Assignment
 parenthesized_expressions = makeTerm <$> symbol ParenthesizedStatements <*> children (many expression)
