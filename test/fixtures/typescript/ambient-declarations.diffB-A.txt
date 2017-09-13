@@ -99,8 +99,7 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (Method
-        (Empty)
+      (MethodSignature
         (Empty)
         (Empty)
         (Empty)
@@ -112,8 +111,7 @@
             (PredefinedType))
           (Assignment
             (Identifier)
-            (Empty)))
-        (Empty))
+            (Empty))))
       (PublicFieldDefinition
         (Empty)
         (Empty)
@@ -121,15 +119,13 @@
           (PredefinedType))
         (Identifier)
         (Empty))
-      (Method
+      (MethodSignature
         (Empty)
         (Empty)
         (Empty)
         (Annotation
           (PredefinedType))
-        (Empty)
-        (Identifier)
-        (Empty))))
+        (Identifier))))
 {-(AmbientDeclaration
     (AmbientFunction
       (Empty)
