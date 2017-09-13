@@ -118,7 +118,7 @@ decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
 diff :: Differ f a -> Both (Term f a) -> Task (Diff f a)
-diff differ terms = Diff differ terms `Then` return
+diff differ terms = Semantic.Task.Diff differ terms `Then` return
 
 -- | A 'Task' which renders some input using the supplied 'Renderer' function.
 render :: Renderer input output -> input -> Task output
@@ -182,7 +182,7 @@ runTaskWithOptions options task = do
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
-                  Diff differ terms -> pure (differ terms) >>= yield
+                  Semantic.Task.Diff differ terms -> pure (differ terms) >>= yield
                   Render renderer input -> pure (renderer input) >>= yield
                   Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
                   LiftIO action -> action >>= yield
@@ -220,7 +220,7 @@ runParser Options{..} blob@Blob{..} = go
           LineByLineParser -> logTiming "line-by-line parse" $ pure (lineByLineParser blobSource)
         blobFields = ("path", blobPath) : maybe [] (pure . (,) "language" . show) blobLanguage
         errors :: (Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
-        errors = cata $ \ (a :< syntax) -> case syntax of
+        errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
           _ -> fold syntax
         logTiming :: String -> Task a -> Task a

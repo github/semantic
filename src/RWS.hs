@@ -3,9 +3,7 @@ module RWS (
     rws
   , ComparabilityRelation
   , FeatureVector
-  , stripDiff
   , defaultFeatureVectorDecorator
-  , stripTerm
   , featureVectorDecorator
   , pqGramDecorator
   , Gram(..)
@@ -14,9 +12,6 @@ module RWS (
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
-import Control.Comonad
-import Control.Comonad.Trans.Cofree hiding (cofree, runCofree)
-import Control.Monad.Free
 import Control.Monad.State.Strict
 import Data.Foldable
 import Data.Function ((&), on)
@@ -29,19 +24,16 @@ import Data.Record
 import Data.Semigroup hiding (First(..))
 import Data.These
 import Data.Traversable
-import Patch
 import Term
 import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES
 import qualified Data.Functor.Both as Both
-import Data.Functor.Listable
 import Data.KdTree.Static hiding (empty, toList)
 import qualified Data.IntMap as IntMap
 
 import Control.Monad.Random
 import System.Random.Mersenne.Pure64
-import Diff (mapAnnotations)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 
@@ -146,7 +138,7 @@ findNearestNeighbourToDiff' :: (Diff f fields -> Int) -- ^ A function computes a
                                     (Maybe (MappedDiff f fields))
 findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
   None -> pure Nothing
-  Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
+  RWS.Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
   Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
@@ -219,7 +211,7 @@ genFeaturizedTermsAndDiffs :: (Functor f, HasField fields FeatureVector)
 genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
   where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
           This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
-          That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (Term (featurize counterB term) : allDiffs)
+          That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (RWS.Term (featurize counterB term) : allDiffs)
           These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
 
 data Mapping f fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm f fields] ![UnmappedTerm f fields] ![MappedDiff f fields] ![TermOrIndexOrNone (UnmappedTerm f fields)]
@@ -228,8 +220,7 @@ featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
 
 eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
-eraseFeatureVector term = let record :< functor = runCofree term in
-  cofree (setFeatureVector record nullFeatureVector :< functor)
+eraseFeatureVector (Term.Term (In record functor)) = termIn (setFeatureVector record nullFeatureVector) functor
 
 nullFeatureVector :: FeatureVector
 nullFeatureVector = listArray (0, 0) [0]
@@ -263,7 +254,7 @@ featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields labe
 featureVectorDecorator getLabel p q d
  = cata collect
  . pqGramDecorator getLabel p q
- where collect ((gram :. rest) :< functor) = cofree ((foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) :< functor)
+ where collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) functor
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
 
@@ -281,7 +272,7 @@ pqGramDecorator
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
-      cofree ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
+      termIn (gram label :. termAnnotation term) (assignParentAndSiblingLabels (termOut term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
@@ -289,11 +280,10 @@ pqGramDecorator getLabel p q = cata algebra
                  => label
                  -> Term f (Record (Gram label ': fields))
                  -> State [Maybe label] (Term f (Record (Gram label ': fields)))
-    assignLabels label a = case runCofree a of
-      (gram :. rest) :< functor -> do
-        labels <- get
-        put (drop 1 labels)
-        pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
+    assignLabels label (Term.Term (In (gram :. rest) functor)) = do
+      labels <- get
+      put (drop 1 labels)
+      pure $! termIn (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) functor
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . extract)
     padToSize n list = take n (list <> repeat empty)
@@ -307,24 +297,12 @@ unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
-canCompareTerms canCompare = canCompare `on` runCofree
+canCompareTerms canCompare = canCompare `on` unTerm
 
 -- | Recursively test the equality of two 'Term's in O(n).
 equalTerms :: Eq1 f => ComparabilityRelation f fields -> Term f (Record fields) -> Term f (Record fields) -> Bool
 equalTerms canCompare = go
-  where go a b = canCompareTerms canCompare a b && liftEq go (tailF (runCofree a)) (tailF (runCofree b))
-
-
--- | Strips the head annotation off a term annotated with non-empty records.
-stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
-stripTerm = fmap rtail
-
--- | Strips the head annotation off a diff annotated with non-empty records.
-stripDiff
-  :: (Functor f, Functor g)
-  => Free (TermF f (g (Record (h ': t)))) (Patch (Term f (Record (h ': t))))
-  -> Free (TermF f (g (Record t)))        (Patch (Term f (Record t)))
-stripDiff = mapAnnotations rtail
+  where go a b = canCompareTerms canCompare a b && liftEq go (termOut (unTerm a)) (termOut (unTerm b))
 
 
 -- Instances
@@ -332,9 +310,3 @@ stripDiff = mapAnnotations rtail
 instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
   hash gram = hash (stem gram <> base gram)
-
-instance Listable1 Gram where
-  liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
-
-instance Listable a => Listable (Gram a) where
-  tiers = tiers1

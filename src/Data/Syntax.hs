@@ -3,7 +3,6 @@ module Data.Syntax where
 
 import Algorithm
 import Control.Applicative
-import Control.Comonad.Trans.Cofree (headF)
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
@@ -31,7 +30,7 @@ makeTerm a = makeTerm' a . inj
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
-makeTerm' a f = cofree (sconcat (a :| (headF . runCofree <$> toList f)) :< f)
+makeTerm' a f = termIn (sconcat (a :| (termAnnotation . unTerm <$> toList f))) f
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
@@ -40,7 +39,7 @@ makeTerm1 = makeTerm1' . inj
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
 makeTerm1' f = case toList f of
-  a : _ -> makeTerm' (headF (runCofree a)) f
+  a : _ -> makeTerm' (termAnnotation (unTerm a)) f
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
@@ -48,7 +47,7 @@ emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assig
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq (ast (Assignment.AST ast grammar)), Ix grammar, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.

@@ -22,7 +22,7 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
-                     , Data.Functor.Listable
+                     , Data.JSON.Fields
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.Output
@@ -41,7 +41,6 @@ library
                      , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Data.Text.Listable
                      , Decorators
                      , Diff
                      , Files
@@ -92,7 +91,6 @@ library
                      , cmark-gfm
                      , comonad
                      , containers
-                     , deepseq
                      , directory
                      , effects
                      , filepath
@@ -101,7 +99,6 @@ library
                      , gitrev
                      , hashable
                      , kdt
-                     , leancheck
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
@@ -147,6 +144,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
                      , CommandSpec
+                     , Data.Functor.Listable
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Data.Syntax.Assignment.Spec
@@ -168,7 +166,6 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
-                     , deepseq
                      , filepath
                      , free
                      , Glob

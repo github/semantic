@@ -1,9 +1,7 @@
 {-# LANGUAGE DataKinds, DeriveGeneric, DeriveAnyClass #-}
 module Language where
 
-import Control.Comonad
-import Control.Comonad.Trans.Cofree hiding (cofree)
-import Control.DeepSeq
+import Control.Comonad.Trans.Cofree
 import Data.Aeson
 import Data.Foldable
 import Data.Record
@@ -22,7 +20,7 @@ data Language
     | Python
     | Ruby
     | TypeScript
-    deriving (Show, Eq, Read, Generic, NFData, ToJSON)
+    deriving (Show, Eq, Read, Generic, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
@@ -40,19 +38,19 @@ languageForType mediaType = case mediaType of
 
 toVarDeclOrAssignment :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
 toVarDeclOrAssignment child = case unwrap child of
-  S.Indexed [child', assignment] -> cofree $ setCategory (extract child) VarAssignment :< S.VarAssignment [child'] assignment
-  S.Indexed [child'] -> cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child']
-  S.VarDecl _ -> cofree $ setCategory (extract child) VarDecl :< unwrap child
+  S.Indexed [child', assignment] -> termIn (setCategory (extract child) VarAssignment) (S.VarAssignment [child'] assignment)
+  S.Indexed [child'] -> termIn (setCategory (extract child) VarDecl) (S.VarDecl [child'])
+  S.VarDecl _ -> termIn (setCategory (extract child) VarDecl) (unwrap child)
   S.VarAssignment _ _ -> child
   _ -> toVarDecl child
 
 toVarDecl :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
-toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl [child]
+toVarDecl child = termIn (setCategory (extract child) VarDecl) (S.VarDecl [child])
 
 toTuple :: Term S.Syntax (Record fields) -> [Term S.Syntax (Record fields)]
-toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
+toTuple child | S.Indexed [key,value] <- unwrap child = [termIn (extract child) (S.Pair key value)]
+toTuple child | S.Fixed [key,value] <- unwrap child = [termIn (extract child) (S.Pair key value)]
+toTuple child | S.Leaf c <- unwrap child = [termIn (extract child) (S.Comment c)]
 toTuple child = pure child
 
 toPublicFieldDefinition :: HasField fields Category => [SyntaxTerm fields] -> Maybe (S.Syntax (SyntaxTerm fields))

@@ -1,9 +1,9 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Record where
 
-import Control.DeepSeq
+import Data.Aeson
+import Data.JSON.Fields
 import Data.Kind
-import Data.Functor.Listable
 import Data.Semigroup
 
 -- | A type-safe, extensible record structure.
@@ -48,11 +48,6 @@ instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
   getField (h :. _) = h
   setField (_ :. t) f = f :. t
 
-instance (NFData h, NFData (Record t)) => NFData (Record (h ': t)) where
-  rnf (h :. t) = rnf h `seq` rnf t `seq` ()
-
-instance NFData (Record '[]) where
-  rnf _ = ()
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
   showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . (" :. " <>) . shows t
@@ -75,15 +70,20 @@ instance Ord (Record '[]) where
   _ `compare` _ = EQ
 
 
-instance (Listable head, Listable (Record tail)) => Listable (Record (head ': tail)) where
-  tiers = cons2 (:.)
-
-instance Listable (Record '[]) where
-  tiers = cons0 Nil
-
-
 instance (Semigroup head, Semigroup (Record tail)) => Semigroup (Record (head ': tail)) where
   (h1 :. t1) <> (h2 :. t2) = (h1 <> h2) :. (t1 <> t2)
 
 instance Semigroup (Record '[]) where
   _ <> _ = Nil
+
+
+instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ': t)) where
+  toJSONFields (h :. t) = toJSONFields h <> toJSONFields t
+
+instance ToJSONFields (Record '[]) where
+  toJSONFields _ = []
+
+
+instance ToJSONFields (Record fs) => ToJSON (Record fs) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields

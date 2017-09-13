@@ -1,36 +1,52 @@
-{-# LANGUAGE TypeSynonymInstances, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Diff where
 
-import qualified Control.Comonad.Trans.Cofree as CofreeF
-import Control.DeepSeq
-import qualified Control.Monad.Free as Free
-import qualified Control.Monad.Trans.Free as FreeF
+import Data.Aeson
+import Data.Bifoldable
 import Data.Bifunctor
+import Data.Bitraversable
+import Data.Foldable (fold)
 import Data.Functor.Both as Both
+import Data.Functor.Classes
+import Data.Functor.Foldable hiding (fold)
+import Data.JSON.Fields
 import Data.Mergeable
 import Data.Record
+import Data.Union
 import Patch
 import Syntax
 import Term
+import Text.Show
 
 -- | An annotated series of patches of terms.
-type DiffF f annotation = FreeF.FreeF (TermF f (Both annotation)) (Patch (Term f annotation))
-type Diff f annotation = Free.Free (TermF f (Both annotation)) (Patch (Term f annotation))
+newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
+
+data DiffF syntax ann recur
+  = Copy (Both ann) (syntax recur)
+  | Patch (Patch (Term syntax ann))
+  deriving (Foldable, Functor, Traversable)
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
-diffSum :: (Foldable f, Functor f) => (Patch (Term f annotation) -> Int) -> Diff f annotation -> Int
-diffSum patchCost diff = sum $ fmap patchCost diff
+diffSum :: (Foldable syntax, Functor syntax) => (Patch (Term syntax annotation) -> Int) -> Diff syntax annotation -> Int
+diffSum patchCost = go
+  where go (Diff (Copy _ syntax)) = sum (fmap go syntax)
+        go (Diff (Patch patch)) = patchCost patch
 
 -- | The sum of the node count of the diff’s patches.
-diffCost :: (Foldable f, Functor f) => Diff f annotation -> Int
-diffCost = diffSum $ patchSum termSize
+diffCost :: (Foldable syntax, Functor syntax) => Diff syntax annotation -> Int
+diffCost = diffSum (patchSum termSize)
+
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (Term syntax ann)]
+diffPatches = cata $ \ diff -> case diff of
+  Copy _ r -> fold r
+  Patch p -> [p]
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> (Both annotation -> annotation) -> Diff f annotation -> Maybe (Term f annotation)
-mergeMaybe transform extractAnnotation = Free.iter algebra . fmap transform
-  where algebra (annotations CofreeF.:< syntax) = cofree . (extractAnnotation annotations CofreeF.:<) <$> sequenceAlt syntax
+mergeMaybe :: Mergeable syntax => (Patch (Term syntax annotation) -> Maybe (Term syntax annotation)) -> (Both annotation -> annotation) -> Diff syntax annotation -> Maybe (Term syntax annotation)
+mergeMaybe transform extractAnnotation = cata algebra
+  where algebra (Copy annotations syntax) = termIn (extractAnnotation annotations) <$> sequenceAlt syntax
+        algebra (Patch patch) = transform patch
 
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
@@ -40,26 +56,109 @@ beforeTerm = mergeMaybe before Both.fst
 afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 afterTerm = mergeMaybe after Both.snd
 
--- | Map a function over the annotations in a diff, whether in diff or term nodes.
---
---   Typed using Free so as to accommodate Free structures derived from diffs that don’t fit into the Diff type synonym.
-mapAnnotations :: (Functor f, Functor g)
-               => (annotation -> annotation')
-               -> Free.Free (TermF f (g annotation))  (Patch (Term f annotation))
-               -> Free.Free (TermF f (g annotation')) (Patch (Term f annotation'))
-mapAnnotations f = Free.hoistFree (first (fmap f)) . fmap (fmap (fmap f))
+
+-- | Strips the head annotation off a diff annotated with non-empty records.
+stripDiff :: Functor f
+          => Diff f (Record (h ': t))
+          -> Diff f (Record t)
+stripDiff = fmap rtail
 
 
-instance (NFData (f (Diff f a)), NFData (f (Term f a)), NFData a, Functor f) => NFData (Diff f a) where
-  rnf fa = case runFree fa of
-    FreeF.Free f -> rnf f `seq` ()
-    FreeF.Pure a -> rnf a `seq` ()
+-- | Constructs the replacement of one value by another in an Applicative context.
+replacing :: Term syntax ann -> Term syntax ann -> Diff syntax ann
+replacing = (Diff .) . (Patch .) . Replace
+
+-- | Constructs the insertion of a value in an Applicative context.
+inserting :: Term syntax ann -> Diff syntax ann
+inserting = Diff . Patch . Insert
+
+-- | Constructs the deletion of a value in an Applicative context.
+deleting :: Term syntax ann -> Diff syntax ann
+deleting = Diff . Patch . Delete
 
 
-free :: FreeF.FreeF f a (Free.Free f a) -> Free.Free f a
-free (FreeF.Free f) = Free.Free f
-free (FreeF.Pure a) = Free.Pure a
+copy :: Both ann -> syntax (Diff syntax ann) -> Diff syntax ann
+copy = (Diff .) . Copy
 
-runFree :: Free.Free f a -> FreeF.FreeF f a (Free.Free f a)
-runFree (Free.Free f) = FreeF.Free f
-runFree (Free.Pure a) = FreeF.Pure a
+
+type instance Base (Diff syntax ann) = DiffF syntax ann
+
+instance Functor syntax => Recursive (Diff syntax ann) where project = unDiff
+instance Functor syntax => Corecursive (Diff syntax ann) where embed = Diff
+
+instance Functor syntax => Bifunctor (DiffF syntax) where
+  bimap f g (Copy anns r) = Copy (fmap f anns) (fmap g r)
+  bimap f _ (Patch term) = Patch (fmap (fmap f) term)
+
+instance Eq1 f => Eq1 (Diff f) where
+  liftEq eqA = go where go (Diff d1) (Diff d2) = liftEq2 eqA go d1 d2
+
+instance (Eq1 f, Eq a) => Eq (Diff f a) where
+  (==) = eq1
+
+instance Eq1 f => Eq2 (DiffF f) where
+  liftEq2 eqA eqB d1 d2 = case (d1, d2) of
+    (Copy (Join (a1, b1)) f1, Copy (Join (a2, b2)) f2) -> eqA a1 a2 && eqA b1 b2 && liftEq eqB f1 f2
+    (Patch p1, Patch p2) -> liftEq (liftEq eqA) p1 p2
+    _ -> False
+
+instance (Eq1 f, Eq a) => Eq1 (DiffF f a) where
+  liftEq = liftEq2 (==)
+
+instance (Eq1 f, Eq a, Eq b) => Eq (DiffF f a b) where
+  (==) = eq1
+
+
+instance Show1 f => Show1 (Diff f) where
+  liftShowsPrec sp sl = go where go d = showsUnaryWith (liftShowsPrec2 sp sl go (showListWith (go 0))) "Diff" d . unDiff
+
+instance (Show1 f, Show a) => Show (Diff f a) where
+  showsPrec = showsPrec1
+
+instance Show1 f => Show2 (DiffF f) where
+  liftShowsPrec2 spA slA spB slB d diff = case diff of
+    Copy ann r -> showsBinaryWith (liftShowsPrecBoth spA slA) (liftShowsPrec spB slB) "Copy" d ann r
+    Patch patch -> showsUnaryWith (liftShowsPrec (liftShowsPrec spA slA) (liftShowList spA slA)) "Patch" d patch
+
+instance (Show1 f, Show a) => Show1 (DiffF f a) where
+  liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
+  showsPrec = showsPrec1
+
+
+instance Functor f => Functor (Diff f) where
+  fmap f = go
+    where go (Diff (Copy as r)) = Diff (Copy (f <$> as) (fmap go r))
+          go (Diff (Patch p)) = Diff (Patch (fmap f <$> p))
+
+instance Foldable f => Foldable (Diff f) where
+  foldMap f = go
+    where go (Diff (Copy as r)) = foldMap f as `mappend` foldMap go r
+          go (Diff (Patch p)) = foldMap (foldMap f) p
+
+instance Traversable f => Traversable (Diff f) where
+  traverse f = go
+    where go (Diff (Copy as r)) = copy <$> traverse f as <*> traverse go r
+          go (Diff (Patch p)) = Diff . Patch <$> traverse (traverse f) p
+
+
+instance Foldable f => Bifoldable (DiffF f) where
+  bifoldMap f g (Copy as r) = foldMap f as `mappend` foldMap g r
+  bifoldMap f _ (Patch p) = foldMap (foldMap f) p
+
+instance Traversable f => Bitraversable (DiffF f) where
+  bitraverse f g (Copy as r) = Copy <$> traverse f as <*> traverse g r
+  bitraverse f _ (Patch p) = Patch <$> traverse (traverse f) p
+
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Diff f a) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
+  toJSONFields = toJSONFields . unDiff
+
+instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (DiffF f a b) where
+  toJSONFields (Copy a f)  = toJSONFields a <> toJSONFields1 f
+  toJSONFields (Patch a) = toJSONFields a

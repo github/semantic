@@ -2,9 +2,6 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Patch
 ( Patch(..)
-, replacing
-, inserting
-, deleting
 , after
 , before
 , unPatch
@@ -14,9 +11,11 @@ module Patch
 , mapPatch
 ) where
 
-import Control.DeepSeq
+import Data.Aeson
 import Data.Align
-import Data.Functor.Listable
+import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Show.Generic
+import Data.JSON.Fields
 import Data.These
 import GHC.Generics
 
@@ -25,22 +24,7 @@ data Patch a
   = Replace a a
   | Insert a
   | Delete a
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable, NFData)
-
-
--- DSL
-
--- | Constructs the replacement of one value by another in an Applicative context.
-replacing :: Applicative f => a -> a -> f (Patch a)
-replacing = (pure .) . Replace
-
--- | Constructs the insertion of a value in an Applicative context.
-inserting :: Applicative f => a -> f (Patch a)
-inserting = pure . Insert
-
--- | Constructs the deletion of a value in an Applicative context.
-deleting :: Applicative f => a -> f (Patch a)
-deleting = pure . Delete
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 
 -- | Return the item from the after side of the patch.
@@ -77,13 +61,16 @@ maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
 -- Instances
 
-instance Listable1 Patch where
-  liftTiers t = liftCons1 t Insert \/ liftCons1 t Delete \/ liftCons2 t t Replace
-
-instance Listable a => Listable (Patch a) where
-  tiers = tiers1
-
 instance Crosswalk Patch where
   crosswalk f (Replace a b) = alignWith (these Delete Insert Replace) (f a) (f b)
   crosswalk f (Insert b) = Insert <$> f b
   crosswalk f (Delete a) = Delete <$> f a
+
+instance Eq1 Patch where liftEq = genericLiftEq
+instance Show1 Patch where liftShowsPrec = genericLiftShowsPrec
+
+
+instance ToJSONFields a => ToJSONFields (Patch a) where
+  toJSONFields (Insert a)    = [ "insert" .= object (toJSONFields a) ]
+  toJSONFields (Delete a)    = [ "delete" .= object (toJSONFields a) ]
+  toJSONFields (Replace a b) = [ "replace" .= [object (toJSONFields a), object (toJSONFields b)] ]

@@ -17,13 +17,9 @@ module Renderer.TOC
 , entrySummary
 ) where
 
-import Control.Comonad (extract)
-import Control.Comonad.Cofree (unwrap)
-import Control.DeepSeq
-import Control.Monad.Free (iter)
 import Data.Aeson
 import Data.Align (crosswalk)
-import Data.Bifunctor (bimap, first)
+import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Error as Error (formatError)
@@ -31,7 +27,6 @@ import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Foldable (cata)
-import Data.Functor.Listable
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -41,7 +36,6 @@ import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
 import Data.Text (toLower)
 import qualified Data.Text as T
-import Data.Text.Listable
 import Data.These
 import Data.Union
 import Diff
@@ -95,19 +89,19 @@ data Declaration
   | FunctionDeclaration { declarationIdentifier :: T.Text }
   | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
-  deriving (Eq, Generic, NFData, Show)
+  deriving (Eq, Generic, Show)
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
-declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
+declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
 syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (SyntaxTermF fields) (SyntaxTerm fields) (Maybe Declaration)
-syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
+syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
@@ -122,7 +116,7 @@ syntaxDeclarationAlgebra Blob{..} (a :< r) = case r of
 declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra blob@Blob{..} (a :< r)
+declarationAlgebra blob@Blob{..} (In a r)
   | Just (Declaration.Function (identifier, _) _ _) <- prj r = Just $ FunctionDeclaration (getSource (extract identifier))
   | Just (Declaration.Method _ (identifier, _) _ _) <- prj r = Just $ MethodDeclaration (getSource (extract identifier))
   | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
@@ -133,7 +127,7 @@ declarationAlgebra blob@Blob{..} (a :< r)
 markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply1 Functor fs, Apply1 Foldable fs)
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra blob@Blob{..} (a :< r)
+markupSectionAlgebra blob@Blob{..} (In a r)
   | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
   | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatError False False blob (Syntax.unError (sourceSpan a) err))) blobLanguage
   | otherwise = Nothing
@@ -156,11 +150,14 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap patchEntry . crosswalk (termTableOfContentsBy selector))
-  where diffAlgebra r = case (selector (first Both.snd r), fold r) of
-          (Just a, Nothing) -> Just [Unchanged a]
-          (Just a, Just []) -> Just [Changed a]
-          (_     , entries) -> entries
+tableOfContentsBy selector = fromMaybe [] . cata diffAlgebra
+  where diffAlgebra r = case r of
+          Copy ann r -> case (selector (In (Both.snd ann) r), fold r) of
+            (Just a, Nothing) -> Just [Unchanged a]
+            (Just a, Just []) -> Just [Changed a]
+            (_     , entries) -> entries
+          Patch patch -> Just (patchEntry <$> crosswalk (termTableOfContentsBy selector) patch)
+
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
 termTableOfContentsBy :: (Foldable f, Functor f)
@@ -228,9 +225,3 @@ toCategoryName declaration = case declaration of
   MethodDeclaration _ -> "Method"
   SectionDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
-
-instance Listable Declaration where
-  tiers
-    =  cons1 (MethodDeclaration . unListableText)
-    \/ cons1 (FunctionDeclaration . unListableText)
-    \/ cons1 (flip ErrorDeclaration Nothing . unListableText)

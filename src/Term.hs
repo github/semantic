@@ -1,70 +1,125 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators #-}
 module Term
-( Term
-, TermF
+( Term(..)
+, termIn
+, TermF(..)
 , SyntaxTerm
 , SyntaxTermF
-, zipTerms
 , termSize
-, alignCofreeWith
-, cofree
-, runCofree
-, CofreeF.CofreeF(..)
+, extract
+, unwrap
+, hoistTerm
+, stripTerm
+, liftPrettyUnion
 ) where
 
-import qualified Control.Comonad.Cofree as Cofree
-import qualified Control.Comonad.Trans.Cofree as CofreeF
-import Control.DeepSeq
-import Control.Monad.Free
-import Data.Align.Generic
-import Data.Functor.Both
+import Control.Comonad
+import Control.Comonad.Cofree.Class
+import Data.Aeson
+import Data.Bifoldable
+import Data.Bifunctor
+import Data.Bitraversable
+import Data.Functor.Classes
 import Data.Functor.Foldable
-import Data.Maybe
+import Data.JSON.Fields
+import Data.Proxy
 import Data.Record
-import Data.These
+import Data.Union
 import Syntax
+import Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
-type Term f = Cofree.Cofree f
-type TermF = CofreeF.CofreeF
+newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
+
+data TermF syntax ann recur = In { termAnnotation :: ann, termOut :: syntax recur }
+  deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A Term with a Syntax leaf and a record of fields.
 type SyntaxTerm fields = Term Syntax (Record fields)
 type SyntaxTermF fields = TermF Syntax (Record fields)
 
-instance (NFData (f (Cofree.Cofree f a)), NFData a, Functor f) => NFData (Cofree.Cofree f a) where
-  rnf = rnf . runCofree
-
-instance (NFData a, NFData (f b)) => NFData (CofreeF.CofreeF f a b) where
-  rnf (a CofreeF.:< s) = rnf a `seq` rnf s `seq` ()
-
--- | Zip two terms by combining their annotations into a pair of annotations.
--- | If the structure of the two terms don't match, then Nothing will be returned.
-zipTerms :: (Traversable f, GAlign f) => Term f annotation -> Term f annotation -> Maybe (Term f (Both annotation))
-zipTerms t1 t2 = iter go (alignCofreeWith galign (const Nothing) both (These t1 t2))
-  where go (a CofreeF.:< s) = cofree . (a CofreeF.:<) <$> sequenceA s
-
 -- | Return the node count of a term.
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
-  size (_ CofreeF.:< syntax) = 1 + sum syntax
+  size (In _ syntax) = 1 + sum syntax
 
--- | Aligns (zips, retaining non-overlapping portions of the structure) a pair of terms.
-alignCofreeWith :: Functor f
-  => (forall a b. f a -> f b -> Maybe (f (These a b))) -- ^ A function comparing a pair of structures, returning `Just` the combined structure if they are comparable (e.g. if they have the same constructor), and `Nothing` otherwise. The 'Data.Align.Generic.galign' function is usually what you want here.
-  -> (These (Term f a) (Term f b) -> contrasted) -- ^ A function mapping a 'These' of incomparable terms into 'Pure' values in the resulting tree.
-  -> (a -> b -> combined) -- ^ A function mapping the input terms’ annotations into annotations in the 'Free' values in the resulting tree.
-  -> These (Term f a) (Term f b) -- ^ The input terms.
-  -> Free (TermF f combined) contrasted
-alignCofreeWith compare contrast combine = go
-  where go terms = fromMaybe (pure (contrast terms)) $ case terms of
-          These (a1 Cofree.:< f1) (a2 Cofree.:< f2) -> wrap . (combine a1 a2 CofreeF.:<) . fmap go <$> compare f1 f2
-          _ -> Nothing
+-- | Build a Term from its annotation and syntax.
+termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
+termIn = (Term .) . In
 
 
-cofree :: CofreeF.CofreeF f a (Cofree.Cofree f a) -> Cofree.Cofree f a
-cofree (a CofreeF.:< f) = a Cofree.:< f
+hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
+hoistTerm f = go where go (Term (In a r)) = termIn a (f (fmap go r))
 
-runCofree :: Cofree.Cofree f a -> CofreeF.CofreeF f a (Cofree.Cofree f a)
-runCofree (a Cofree.:< f) = a CofreeF.:< f
+-- | Strips the head annotation off a term annotated with non-empty records.
+stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
+stripTerm = fmap rtail
+
+
+type instance Base (Term f a) = TermF f a
+
+instance Functor f => Recursive (Term f a) where project = unTerm
+instance Functor f => Corecursive (Term f a) where embed = Term
+
+instance Functor f => Comonad (Term f) where
+  extract = termAnnotation . unTerm
+  duplicate w = termIn w (fmap duplicate (unwrap w))
+  extend f = go where go w = termIn (f w) (fmap go (unwrap w))
+
+instance Functor f => Functor (Term f) where
+  fmap f = go where go (Term (In a r)) = termIn (f a) (fmap go r)
+
+instance Foldable f => Foldable (Term f) where
+  foldMap f = go where go (Term (In a r)) = f a `mappend` foldMap go r
+
+instance Traversable f => Traversable (Term f) where
+  traverse f = go where go (Term (In a r)) = termIn <$> f a <*> traverse go r
+
+instance Functor f => ComonadCofree f (Term f) where
+  unwrap = termOut . unTerm
+  {-# INLINE unwrap #-}
+
+instance Eq1 f => Eq1 (Term f) where
+  liftEq eqA = go where go (Term (In a1 f1)) (Term (In a2 f2)) = eqA a1 a2 && liftEq go f1 f2
+
+instance (Eq1 f, Eq a) => Eq (Term f a) where
+  (==) = eq1
+
+instance Show1 f => Show1 (Term f) where
+  liftShowsPrec spA slA = go where go d = showsUnaryWith (liftShowsPrec2 spA slA go (showListWith (go 0))) "Term" d . unTerm
+
+instance (Show1 f, Show a) => Show (Term f a) where
+  showsPrec = showsPrec1
+
+instance Functor f => Bifunctor (TermF f) where
+  bimap f g (In a r) = In (f a) (fmap g r)
+
+instance Foldable f => Bifoldable (TermF f) where
+  bifoldMap f g (In a r) = f a `mappend` foldMap g r
+
+instance Traversable f => Bitraversable (TermF f) where
+  bitraverse f g (In a r) = In <$> f a <*> traverse g r
+
+
+instance Eq1 f => Eq2 (TermF f) where
+  liftEq2 eqA eqB (In a1 f1) (In a2 f2) = eqA a1 a2 && liftEq eqB f1 f2
+
+instance (Eq1 f, Eq a) => Eq1 (TermF f a) where
+  liftEq = liftEq2 (==)
+
+instance Show1 f => Show2 (TermF f) where
+  liftShowsPrec2 spA _ spB slB d (In a f) = showsBinaryWith spA (liftShowsPrec spB slB) "In" d a f
+
+instance (Show1 f, Show a) => Show1 (TermF f a) where
+  liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields
+
+instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
+  toJSONFields = toJSONFields . unTerm
+
+instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
+  toJSONFields (In a f) = toJSONFields a <> toJSONFields1 f

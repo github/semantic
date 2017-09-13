@@ -6,14 +6,14 @@ module Data.Range
 , intersectsRange
 ) where
 
-import Control.DeepSeq
+import Data.Aeson
+import Data.JSON.Fields
 import Data.Semigroup
 import GHC.Generics
-import Test.LeanCheck
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
-  deriving (Eq, Show, Generic, NFData)
+  deriving (Eq, Show, Generic)
 
 -- | Return the length of the range.
 rangeLength :: Range -> Int
@@ -36,5 +36,5 @@ instance Semigroup Range where
 instance Ord Range where
   a <= b = start a <= start b
 
-instance Listable Range where
-  tiers = cons2 Range
+instance ToJSONFields Range where
+  toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]

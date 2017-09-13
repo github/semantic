@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and Span). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -96,8 +96,6 @@ module Data.Syntax.Assignment
 ) where
 
 import Control.Applicative
-import Control.Comonad.Cofree as Cofree
-import qualified Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..), headF)
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Fail
@@ -118,7 +116,7 @@ import qualified Data.Syntax.Assignment.Table as Table
 import GHC.Stack
 import qualified Info
 import Prelude hiding (fail, until)
-import Term (runCofree)
+import Term
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
@@ -130,7 +128,7 @@ type Assignment ast grammar = Freer (Tracing (AssignmentF ast grammar))
 data AssignmentF ast grammar a where
   End :: AssignmentF ast grammar ()
   Location :: AssignmentF ast grammar (Record Location)
-  CurrentNode :: AssignmentF ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+  CurrentNode :: AssignmentF ast grammar (TermF ast (Node grammar) ())
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
   Choose :: Table.Table grammar (Assignment ast grammar a) -> Maybe (Assignment ast grammar a) -> Maybe (Error (Either String grammar) -> Assignment ast grammar a) -> AssignmentF ast grammar a
@@ -158,7 +156,7 @@ location :: HasCallStack => Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
 
 -- | Zero-width production of the current node.
-currentNode :: HasCallStack => Assignment ast grammar (CofreeF.CofreeF ast (Node grammar) ())
+currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) ())
 currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
@@ -178,7 +176,7 @@ advance :: HasCallStack => Assignment ast grammar ()
 advance = () <$ source
 
 -- | Construct a committed choice table from a list of alternatives. Use this to efficiently select between long lists of rules.
-choice :: (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
+choice :: (Enum grammar, Eq1 ast, Ix grammar, HasCallStack) => [Assignment ast grammar a] -> Assignment ast grammar a
 choice [] = empty
 choice alternatives
   | null choices = asum alternatives
@@ -221,7 +219,7 @@ manyThrough step stop = go
 type Location = '[Info.Range, Info.Span]
 
 -- | An AST node labelled with symbols and source location.
-type AST f grammar = Cofree f (Node grammar)
+type AST f grammar = Term f (Node grammar)
 
 data Node grammar = Node
   { nodeSymbol :: !grammar
@@ -245,7 +243,7 @@ firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
 
 
 -- | Run an assignment over an AST exhaustively.
-assign :: (Enum grammar, Ix grammar, Symbol grammar, Show grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+assign :: (Enum grammar, Ix grammar, Symbol grammar, Show grammar, Eq1 ast, Foldable ast, Functor ast)
        => Source.Source             -- ^ The source for the parse tree.
        -> Assignment ast grammar a  -- ^ The 'Assignment to run.
        -> AST ast grammar           -- ^ The root of the ast.
@@ -254,7 +252,7 @@ assign source assignment ast = bimap (fmap (either id show)) fst (runAssignment 
 {-# INLINE assign #-}
 
 -- | Run an assignment of nodes in a grammar onto terms in a syntax over an AST exhaustively.
-runAssignment :: forall grammar a ast. (Enum grammar, Ix grammar, Symbol grammar, Eq (ast (AST ast grammar)), Foldable ast, Functor ast)
+runAssignment :: forall grammar a ast. (Enum grammar, Ix grammar, Symbol grammar, Eq1 ast, Foldable ast, Functor ast)
               => Source.Source                                                 -- ^ The source for the parse tree.
               -> Assignment ast grammar a                                      -- ^ The 'Assignment' to run.
               -> State ast grammar                                             -- ^ The current state.
@@ -270,9 +268,9 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
         run t yield initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
-          where atNode (node :< f) = case runTracing t of
+          where atNode (Term (In node f)) = case runTracing t of
                   Location -> yield (nodeLocation node) state
-                  CurrentNode -> yield (node CofreeF.:< (() <$ f)) state
+                  CurrentNode -> yield (In node (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
@@ -291,7 +289,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   _ -> Left (makeError node)
 
                 state@State{..} = case (runTracing t, initialState) of
-                  (Choose table _ _, State { stateNodes = (node :< _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
+                  (Choose table _ _, State { stateNodes = Term (In node _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
                   _ -> initialState
                 expectedSymbols = firstSet (t `Then` return)
                 makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
@@ -299,18 +297,18 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
 requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
   [] -> Right (a, state')
-  (node :< _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
+  Term (In node _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
 
 withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallStack => a) -> a
 withStateCallStack callSite state action = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state)))) action
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
-skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . CofreeF.headF . runCofree) (stateNodes state) }
+skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . termAnnotation . unTerm) (stateNodes state) }
 
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | (Node{..} Cofree.:< _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
+  | Term (In Node{..} _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -321,8 +319,8 @@ data State ast grammar = State
   , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
 
-deriving instance (Eq grammar, Eq (ast (AST ast grammar))) => Eq (State ast grammar)
-deriving instance (Show grammar, Show (ast (AST ast grammar))) => Show (State ast grammar)
+deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)
+deriving instance (Show grammar, Show1 ast) => Show (State ast grammar)
 
 makeState :: [AST ast grammar] -> State ast grammar
 makeState = State 0 (Info.Pos 1 1) []
@@ -330,14 +328,14 @@ makeState = State 0 (Info.Pos 1 1) []
 
 -- Instances
 
-instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Semigroup (Assignment ast grammar a) where
+instance (Enum grammar, Eq1 ast, Ix grammar) => Semigroup (Assignment ast grammar a) where
   (<>) = (<|>)
 
-instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Monoid (Assignment ast grammar a) where
+instance (Enum grammar, Eq1 ast, Ix grammar) => Monoid (Assignment ast grammar a) where
   mempty = empty
   mappend = (<|>)
 
-instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar) => Alternative (Assignment ast grammar) where
+instance (Enum grammar, Eq1 ast, Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = tracing (Alt []) `Then` return
 
@@ -366,7 +364,7 @@ instance MonadFail (Assignment ast grammar) where
   fail :: HasCallStack => String -> Assignment ast grammar a
   fail s = tracing (Fail s) `Then` return
 
-instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Parsing (Assignment ast grammar) where
+instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar, Show1 ast) => Parsing (Assignment ast grammar) where
   try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
@@ -382,7 +380,7 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar, Sh
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
   notFollowedBy a = a *> unexpected (show a) <|> pure ()
 
-instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment ast grammar) where
+instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error (Either String grammar)) (Assignment ast grammar) where
   throwError :: HasCallStack => Error (Either String grammar) -> Assignment ast grammar a
   throwError err = fail (show err)
 
@@ -395,7 +393,7 @@ instance (Enum grammar, Eq (ast (AST ast grammar)), Ix grammar, Show grammar) =>
 instance Show1 f => Show1 (Tracing f) where
   liftShowsPrec sp sl d = liftShowsPrec sp sl d . runTracing
 
-instance (Enum grammar, Ix grammar, Show grammar, Show (ast (AST ast grammar))) => Show1 (AssignmentF ast grammar) where
+instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
     Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
