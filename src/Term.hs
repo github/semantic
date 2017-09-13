@@ -50,7 +50,7 @@ termIn = (Term .) . In
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
 hoistTerm f = go where go (Term r) = Term (hoistTermF f (fmap go r))
 
-hoistTermF :: Functor f => (forall a. f a -> g a) -> TermF f a b -> TermF g a b
+hoistTermF :: (forall a. f a -> g a) -> TermF f a b -> TermF g a b
 hoistTermF f = go where go (In a r) = In a (f r)
 
 -- | Strips the head annotation off a term annotated with non-empty records.
