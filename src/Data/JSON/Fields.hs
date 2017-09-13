@@ -5,7 +5,6 @@ import Data.Aeson
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Functor.Const
-import Data.Functor.Product
 import Data.Functor.Sum
 import Data.Proxy (Proxy(..))
 import Data.Union
@@ -38,9 +37,6 @@ instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
 instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (Sum f g) where
   toJSONFields1 (InL l) = [ "before" .= JSONFields1 l ]
   toJSONFields1 (InR r) = [ "after"  .= JSONFields1 r ]
-
-instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (Product f g) where
-  toJSONFields1 (Pair a b) = [ "before" .= JSONFields1 a, "after" .= JSONFields1 b ]
 
 
 instance ToJSONFields a => ToJSONFields1 (Const a) where
