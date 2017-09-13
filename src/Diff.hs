@@ -73,12 +73,6 @@ diffPatches = evalDiffR $ \ diff env -> case diff of
   Var var -> maybe [] snd (envLookup var env)
 
 
-diffF :: DiffF syntax ann a -> Either (Patch (TermF syntax ann a)) (TermF syntax (ann, ann) a)
-diffF diff = case diff of
-  Patch patch -> Left  patch
-  Merge term  -> Right term
-
-
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: (Mergeable syntax, Traversable syntax) => (DiffF syntax ann (Maybe (Term syntax ann)) -> Maybe (Term syntax ann)) -> Diff syntax ann -> Maybe (Term syntax ann)
 mergeMaybe algebra = evalDiff $ \ bind env -> case bind of
