@@ -26,7 +26,6 @@ import Data.Error as Error (formatError)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
-import Data.Functor.Sum
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -151,16 +150,13 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
-  Patch patch -> (pure . patchEntry <$> crosswalk recur patch) <> foldMap fold patch <> Just []
+  Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
     (Just a, Nothing) -> Just [Unchanged a]
     (Just a, Just []) -> Just [Changed a]
     (_     , entries) -> entries)
 
-  where recur (In a (InR s)) = selector (In a s)
-        recur _ = Nothing
-
-        patchEntry = these Deleted Inserted (const Replaced) . unPatch
+  where patchEntry = these Deleted Inserted (const Replaced) . unPatch
 
 termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)

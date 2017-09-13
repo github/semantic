@@ -32,9 +32,6 @@ import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Functor.Both
-import Data.Functor.Identity
-import Data.Functor.Product as Product
-import Data.Functor.Sum as Sum
 import Data.Range
 import Data.Record
 import Data.Semigroup
@@ -166,17 +163,6 @@ instance Listable1 f => Listable1 (Term f) where
 
 instance (Listable1 f, Listable a) => Listable (Term f a) where
   tiers = tiers1
-
-
-instance (Listable1 f, Listable1 g) => Listable1 (Sum.Sum f g) where
-  liftTiers tiers = liftCons1 (liftTiers tiers) InL \/ liftCons1 (liftTiers tiers) InR
-
-instance (Listable1 f, Listable1 g) => Listable1 (Product.Product f g) where
-  liftTiers tiers = liftCons2 (liftTiers tiers) (liftTiers tiers) Product.Pair
-
-
-instance Listable1 Identity where
-  liftTiers tiers = liftCons1 tiers Identity
 
 
 instance Listable1 f => Listable2 (DiffF f) where

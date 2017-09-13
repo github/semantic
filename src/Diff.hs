@@ -8,8 +8,6 @@ import Data.Bitraversable
 import Data.Foldable (toList)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
-import Data.Functor.Identity
-import Data.Functor.Sum
 import Data.JSON.Fields
 import Data.Mergeable
 import Data.Record
@@ -23,15 +21,15 @@ newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 
 -- | A single entry within a recursive 'Diff'.
 data DiffF syntax ann recur
-  -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Replace'd 'TermF's, consisting of either syntax or further recursive 'Diff's, the latter being used to insert/delete/replace 'Diff's bound to variables.
-  = Patch (Patch (TermF (Sum Identity syntax)      ann  recur))
+  -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Replace'd 'TermF's, consisting of syntax labelled with an annotation.
+  = Patch (Patch (TermF syntax       ann  recur))
   -- | An unchanged node, consisting of syntax labelled with both the original annotations.
-  | Merge        (TermF               syntax (ann, ann) recur)
+  | Merge        (TermF syntax (ann, ann) recur)
   deriving (Foldable, Functor, Traversable)
 
 -- | Constructs a 'Diff' replacing one 'Term' with another recursively.
 replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
-replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Patch (Replace (In a1 (InR (deleting <$> r1))) (In a2 (InR (inserting <$> r2)))))
+replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Patch (Replace (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2))))
 
 -- | Constructs a 'Diff' inserting a 'Term' recursively.
 inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
@@ -39,7 +37,7 @@ inserting = cata insertF
 
 -- | Constructs a 'Diff' inserting a single 'TermF' populated by further 'Diff's.
 insertF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
-insertF = Diff . Patch . Insert . hoistTermF InR
+insertF = Diff . Patch . Insert
 
 -- | Constructs a 'Diff' deleting a 'Term' recursively.
 deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
@@ -47,7 +45,7 @@ deleting = cata deleteF
 
 -- | Constructs a 'Diff' deleting a single 'TermF' populated by further 'Diff's.
 deleteF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
-deleteF = Diff . Patch . Delete . hoistTermF InR
+deleteF = Diff . Patch . Delete
 
 -- | Constructs a 'Diff' merging two annotations for a single syntax functor populated by further 'Diff's.
 merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
@@ -67,12 +65,12 @@ diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Int
 diffCost = diffSum (const 1)
 
 
-diffPatch :: Diff syntax ann -> Maybe (Patch (TermF (Sum Identity syntax) ann (Diff syntax ann)))
+diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)))
 diffPatch diff = case unDiff diff of
   Patch patch -> Just patch
   _ -> Nothing
 
-diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF (Sum Identity syntax) ann (Diff syntax ann))]
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF syntax ann (Diff syntax ann))]
 diffPatches = para $ \ diff -> case diff of
   Patch patch -> fmap (fmap fst) patch : foldMap (foldMap (toList . diffPatch . fst)) patch
   Merge merge ->                                  foldMap (toList . diffPatch . fst)  merge
@@ -85,17 +83,13 @@ mergeMaybe = cata
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 beforeTerm = mergeMaybe $ \ diff -> case diff of
-  Patch patch -> before patch >>= \ (In a l) -> case l of
-    InL (Identity l) -> l
-    InR l -> termIn a <$> sequenceAlt l
+  Patch patch -> before patch >>= \ (In a l) -> termIn a <$> sequenceAlt l
   Merge  (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
 afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 afterTerm = mergeMaybe $ \ diff -> case diff of
-  Patch patch -> after patch >>= \ (In b r) -> case r of
-    InL (Identity r) -> r
-    InR r -> termIn b <$> sequenceAlt r
+  Patch patch -> after patch >>= \ (In b r) -> termIn b <$> sequenceAlt r
   Merge  (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
