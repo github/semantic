@@ -4,9 +4,6 @@ module Data.JSON.Fields where
 import Data.Aeson
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
-import Data.Functor.Const
-import Data.Functor.Identity
-import Data.Functor.Sum
 import Data.Proxy (Proxy(..))
 import Data.Union
 
@@ -34,17 +31,6 @@ instance (Apply1 Foldable fs) => ToJSONFields1 (Union fs) where
 
 instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= JSONFields a, "after" .= JSONFields b ]
-
-instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (Sum f g) where
-  toJSONFields1 (InL l) = toJSONFields1 l
-  toJSONFields1 (InR r) = toJSONFields1 r
-
-
-instance ToJSONFields a => ToJSONFields1 (Const a) where
-  toJSONFields1 = toJSONFields . getConst
-
-instance ToJSONFields1 Identity where
-  toJSONFields1 (Identity a) = [ "recur" .= a ]
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }
