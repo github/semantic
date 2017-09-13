@@ -18,17 +18,17 @@ import Term
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term diff result where
   -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
-  Diff :: term -> term -> AlgorithmF term diff diff
+  Diff :: term ann -> term ann -> AlgorithmF (term ann) (diff ann) (diff ann)
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
-  Linear :: term -> term -> AlgorithmF term diff diff
+  Linear :: term ann -> term ann -> AlgorithmF (term ann) (diff ann) (diff ann)
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
-  RWS :: [term] -> [term] -> AlgorithmF term diff [diff]
+  RWS :: [term ann] -> [term ann] -> AlgorithmF (term ann) (diff ann) [diff ann]
   -- | Delete a term..
-  Delete :: term -> AlgorithmF term diff diff
+  Delete :: term ann -> AlgorithmF (term ann) (diff ann) (diff ann)
   -- | Insert a term.
-  Insert :: term -> AlgorithmF term diff diff
+  Insert :: term ann -> AlgorithmF (term ann) (diff ann) (diff ann)
   -- | Replace one term with another.
-  Replace :: term -> term -> AlgorithmF term diff diff
+  Replace :: term ann -> term ann -> AlgorithmF (term ann) (diff ann) (diff ann)
 
 -- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
 type Algorithm term diff = Freer (AlgorithmF term diff)
@@ -37,15 +37,15 @@ type Algorithm term diff = Freer (AlgorithmF term diff)
 -- DSL
 
 -- | Diff two terms without specifying the algorithm to be used.
-diff :: term -> term -> Algorithm term diff diff
+diff :: term ann -> term ann -> Algorithm (term ann) (diff ann) (diff ann)
 diff = (liftF .) . Algorithm.Diff
 
 -- | Diff a These of terms without specifying the algorithm to be used.
-diffThese :: These term term -> Algorithm term diff diff
+diffThese :: These (term ann) (term ann) -> Algorithm (term ann) (diff ann) (diff ann)
 diffThese = these byDeleting byInserting diff
 
 -- | Diff a pair of optional terms without specifying the algorithm to be used.
-diffMaybe :: Maybe term -> Maybe term -> Algorithm term diff (Maybe diff)
+diffMaybe :: Maybe (term ann) -> Maybe (term ann) -> Algorithm (term ann) (diff ann) (Maybe (diff ann))
 diffMaybe a b = case (a, b) of
   (Just a, Just b) -> Just <$> diff a b
   (Just a, _) -> Just <$> byDeleting a
@@ -53,23 +53,23 @@ diffMaybe a b = case (a, b) of
   _ -> pure Nothing
 
 -- | Diff two terms linearly.
-linearly :: term -> term -> Algorithm term diff diff
+linearly :: term ann -> term ann -> Algorithm (term ann) (diff ann) (diff ann)
 linearly a b = liftF (Linear a b)
 
 -- | Diff two terms using RWS.
-byRWS :: [term] -> [term] -> Algorithm term diff [diff]
+byRWS :: [term ann] -> [term ann] -> Algorithm (term ann) (diff ann) [diff ann]
 byRWS a b = liftF (RWS a b)
 
 -- | Delete a term.
-byDeleting :: term -> Algorithm term diff diff
+byDeleting :: term ann -> Algorithm (term ann) (diff ann) (diff ann)
 byDeleting = liftF . Delete
 
 -- | Insert a term.
-byInserting :: term -> Algorithm term diff diff
+byInserting :: term ann -> Algorithm (term ann) (diff ann) (diff ann)
 byInserting = liftF . Insert
 
 -- | Replace one term with another.
-byReplacing :: term -> term -> Algorithm term diff diff
+byReplacing :: term ann -> term ann -> Algorithm (term ann) (diff ann) (diff ann)
 byReplacing = (liftF .) . Replace
 
 
@@ -94,11 +94,11 @@ algorithmForComparableTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = fmap (merg
 
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
-  algorithmFor :: f term -> f term -> Maybe (Algorithm term diff (f diff))
-  default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
+  algorithmFor :: f (term ann) -> f (term ann) -> Maybe (Algorithm (term ann) (diff ann) (f (diff ann)))
+  default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f (term ann) -> f (term ann) -> Maybe (Algorithm (term ann) (diff ann) (f (diff ann)))
   algorithmFor = genericAlgorithmFor
 
-genericAlgorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
+genericAlgorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f (term ann) -> f (term ann) -> Maybe (Algorithm (term ann) (diff ann) (f (diff ann)))
 genericAlgorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
 
 
@@ -115,7 +115,7 @@ instance Diffable [] where
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class Diffable' f where
-  algorithmFor' :: f term -> f term -> Maybe (Algorithm term diff (f diff))
+  algorithmFor' :: f (term ann) -> f (term ann) -> Maybe (Algorithm (term ann) (diff ann) (f (diff ann)))
 
 -- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
 instance Diffable' f => Diffable' (M1 i c f) where
