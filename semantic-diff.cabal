@@ -19,7 +19,6 @@ library
                      , Data.Align.Generic
                      , Data.Blob
                      , Data.Error
-                     , Data.Functor.Binding
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
