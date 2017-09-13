@@ -29,6 +29,7 @@ newtype Diff syntax ann = Diff { unDiff :: BindingF (DiffF syntax ann) (Diff syn
 data DiffF syntax ann recur
   = Patch (Patch (TermF (Sum Identity syntax)      ann  recur))
   | Merge        (TermF               syntax (ann, ann) recur)
+  deriving (Foldable, Functor, Traversable)
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
@@ -195,25 +196,13 @@ instance Traversable f => Traversable (Diff f) where
           traverse' (Var v)         = pure (Var v)
 
 
-instance Functor syntax => Functor (DiffF syntax ann) where
-  fmap f (Patch patch) = Patch (fmap (fmap f) patch)
-  fmap f (Merge merge) = Merge (fmap f merge)
-
 instance Functor syntax => Bifunctor (DiffF syntax) where
   bimap f g (Patch patch) = Patch (bimap f g <$> patch)
   bimap f g (Merge term)  = Merge (bimap (bimap f f) g term)
 
-instance Foldable syntax => Foldable (DiffF syntax ann) where
-  foldMap f (Patch patch) = foldMap (foldMap f) patch
-  foldMap f (Merge merge) = foldMap f merge
-
 instance Foldable f => Bifoldable (DiffF f) where
   bifoldMap f g (Patch patch) = foldMap (bifoldMap f g) patch
   bifoldMap f g (Merge term)  = bifoldMap (bifoldMap f f) g term
-
-instance Traversable syntax => Traversable (DiffF syntax ann) where
-  traverse f (Patch patch) = Patch <$> traverse (traverse f) patch
-  traverse f (Merge merge) = Merge <$> traverse f merge
 
 instance Traversable f => Bitraversable (DiffF f) where
   bitraverse f g (Patch patch) = Patch <$> traverse (bitraverse f g) patch
