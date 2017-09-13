@@ -12,7 +12,7 @@ import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
 import Data.Mergeable
 import Data.Record
-import Data.Union
+import Data.Semigroup((<>))
 import Patch
 import Syntax
 import Term

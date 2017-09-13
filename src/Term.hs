@@ -10,7 +10,6 @@ module Term
 , unwrap
 , hoistTerm
 , stripTerm
-, liftPrettyUnion
 ) where
 
 import Control.Comonad
@@ -22,9 +21,8 @@ import Data.Bitraversable
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
-import Data.Proxy
 import Data.Record
-import Data.Union
+import Data.Semigroup ((<>))
 import Syntax
 import Text.Show
 
