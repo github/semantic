@@ -35,8 +35,8 @@ instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= JSONFields a, "after" .= JSONFields b ]
 
 instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (Sum f g) where
-  toJSONFields1 (InL l) = [ "before" .= JSONFields1 l ]
-  toJSONFields1 (InR r) = [ "after"  .= JSONFields1 r ]
+  toJSONFields1 (InL l) = toJSONFields1 l
+  toJSONFields1 (InR r) = toJSONFields1 r
 
 
 instance ToJSONFields a => ToJSONFields1 (Const a) where
