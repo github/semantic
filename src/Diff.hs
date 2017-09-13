@@ -2,20 +2,15 @@
 module Diff where
 
 import Data.Aeson
-import Control.Monad (join)
-import Control.Monad.Effect
-import Control.Monad.Effect.Reader
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Foldable (toList)
-import Data.Functor.Binding (BindingF(..), Env(..), Metavar(..), bindings, envExtend, envLookup)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.Functor.Identity
 import Data.Functor.Sum
 import Data.JSON.Fields
-import Data.Maybe (fromMaybe)
 import Data.Mergeable
 import Data.Record
 import Patch
@@ -24,7 +19,7 @@ import Term
 import Text.Show
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
-newtype Diff syntax ann = Diff { unDiff :: BindingF (DiffF syntax ann) (Diff syntax ann) }
+newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 
 -- | A single entry within a recursive 'Diff'.
 data DiffF syntax ann recur
@@ -36,7 +31,7 @@ data DiffF syntax ann recur
 
 -- | Constructs a 'Diff' replacing one 'Term' with another recursively.
 replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
-replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace (In a1 (InR (deleting <$> r1))) (In a2 (InR (inserting <$> r2))))))
+replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Patch (Replace (In a1 (InR (deleting <$> r1))) (In a2 (InR (inserting <$> r2)))))
 
 -- | Constructs a 'Diff' inserting a 'Term' recursively.
 inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
@@ -44,7 +39,7 @@ inserting = cata insertF
 
 -- | Constructs a 'Diff' inserting a single 'TermF' populated by further 'Diff's.
 insertF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
-insertF = Diff . Let mempty . Patch . Insert . hoistTermF InR
+insertF = Diff . Patch . Insert . hoistTermF InR
 
 -- | Constructs a 'Diff' deleting a 'Term' recursively.
 deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
@@ -52,42 +47,20 @@ deleting = cata deleteF
 
 -- | Constructs a 'Diff' deleting a single 'TermF' populated by further 'Diff's.
 deleteF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
-deleteF = Diff . Let mempty . Patch . Delete . hoistTermF InR
+deleteF = Diff . Patch . Delete . hoistTermF InR
 
 -- | Constructs a 'Diff' merging two annotations for a single syntax functor populated by further 'Diff's.
 merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
-merge = (Diff .) . (Let mempty .) . (Merge .) . In
-
--- | Constructs a 'Diff' referencing the specified variable. This should only ever be used in the body of 'letBind' in order to avoid accidentally shadowing bound variables in a diff.
-var :: Metavar -> Diff syntax ann
-var = Diff . Var
+merge = (Diff .) . (Merge .) . In
 
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
 
-evalDiff :: Functor syntax => (BindingF (DiffF syntax ann) a -> Env a -> a) -> Diff syntax ann -> a
-evalDiff algebra = evalDiffR (\ diff env -> algebra (snd <$> diff) (snd <$> env))
-
-evalDiffR :: Functor syntax => (BindingF (DiffF syntax ann) (Diff syntax ann, a) -> Env (Diff syntax ann, a) -> a) -> Diff syntax ann -> a
-evalDiffR algebra = flip (para evalBinding) mempty
-  where evalBinding bind env = case bind of
-          Let vars body ->
-            let evaluated = second ($ env) <$> vars
-                extended = foldr (uncurry envExtend) env (unEnv evaluated)
-            in algebra (Let evaluated (second ($ extended) <$> body)) env
-          _ -> algebra (second ($ env) <$> bind) env
-
-evalDiffRM :: (Functor syntax, Reader (Env (Diff syntax ann, Eff fs a)) :< fs) => (BindingF (DiffF syntax ann) (Diff syntax ann, Eff fs a) -> Eff fs a) -> Diff syntax ann -> Eff fs a
-evalDiffRM algebra = para (\ diff -> local (bindMetavariables diff) (algebra diff))
-  where bindMetavariables diff env = foldr (uncurry envExtend) env (unEnv (bindings diff))
-
-
 diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int
-diffSum patchCost = evalDiff $ \ diff env -> case diff of
-  Let _ (Patch patch) -> patchCost patch + sum (sum <$> patch)
-  Let _ (Merge merge) -> sum merge
-  Var v -> fromMaybe 0 (envLookup v env)
+diffSum patchCost = cata $ \ diff -> case diff of
+  Patch patch -> patchCost patch + sum (sum <$> patch)
+  Merge merge -> sum merge
 
 -- | The sum of the node count of the diff’s patches.
 diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Int
@@ -96,21 +69,18 @@ diffCost = diffSum (const 1)
 
 diffPatch :: Diff syntax ann -> Maybe (Patch (TermF (Sum Identity syntax) ann (Diff syntax ann)))
 diffPatch diff = case unDiff diff of
-  Let _ (Patch patch) -> Just patch
+  Patch patch -> Just patch
   _ -> Nothing
 
 diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF (Sum Identity syntax) ann (Diff syntax ann))]
-diffPatches = evalDiffR $ \ diff env -> case diff of
-  Let _ (Patch patch) -> fmap (fmap fst) patch : foldMap (foldMap (toList . diffPatch . fst)) patch
-  Let _ (Merge merge) ->                                  foldMap (toList . diffPatch . fst)  merge
-  Var var -> maybe [] snd (envLookup var env)
+diffPatches = para $ \ diff -> case diff of
+  Patch patch -> fmap (fmap fst) patch : foldMap (foldMap (toList . diffPatch . fst)) patch
+  Merge merge ->                                  foldMap (toList . diffPatch . fst)  merge
 
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: (Mergeable syntax, Traversable syntax) => (DiffF syntax ann (Maybe (Term syntax ann)) -> Maybe (Term syntax ann)) -> Diff syntax ann -> Maybe (Term syntax ann)
-mergeMaybe algebra = evalDiff $ \ bind env -> case bind of
-  Let _ diff -> algebra diff
-  Var v -> join (envLookup v env)
+mergeMaybe = cata
 
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
@@ -136,18 +106,14 @@ stripDiff :: Functor f
 stripDiff = fmap rtail
 
 
-type instance Base (Diff syntax ann) = BindingF (DiffF syntax ann)
+type instance Base (Diff syntax ann) = DiffF syntax ann
 
 instance Functor syntax => Recursive   (Diff syntax ann) where project = unDiff
 instance Functor syntax => Corecursive (Diff syntax ann) where embed = Diff
 
 
 instance Eq1 f => Eq1 (Diff f) where
-  liftEq eqA = go
-    where go (Diff d1) (Diff d2) = eq' d1 d2
-          eq' (Let v1 b1) (Let v2 b2) = liftEq go v1 v2 && liftEq2 eqA go b1 b2
-          eq' (Var v1)    (Var v2)    = v1 == v2
-          eq' _           _           = False
+  liftEq eqA = go where go (Diff d1) (Diff d2) = liftEq2 eqA go d1 d2
 
 instance (Eq1 f, Eq a) => Eq (Diff f a) where
   (==) = eq1
@@ -166,10 +132,7 @@ instance (Eq1 f, Eq a, Eq b) => Eq (DiffF f a b) where
 
 
 instance Show1 f => Show1 (Diff f) where
-  liftShowsPrec sp sl = go
-    where go d = showsUnaryWith showsPrec' "Diff" d . unDiff
-          showsPrec' d (Let vars body) = showsBinaryWith (liftShowsPrec go (showListWith (go 0))) (liftShowsPrec2 sp sl go (showListWith (go 0))) "Let" d vars body
-          showsPrec' d (Var var)       = showsUnaryWith showsPrec "Var" d var
+  liftShowsPrec sp sl = go where go d = showsUnaryWith (liftShowsPrec2 sp sl go (showListWith (go 0))) "Diff" d . unDiff
 
 instance (Show1 f, Show a) => Show (Diff f a) where
   showsPrec = showsPrec1
@@ -189,22 +152,13 @@ instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
 
 
 instance Functor f => Functor (Diff f) where
-  fmap f = go
-    where go = Diff . fmap' . unDiff
-          fmap' (Let vars body) = Let (fmap go vars) (bimap f go body)
-          fmap' (Var var)       = Var var
+  fmap f = go where go = Diff . bimap f go . unDiff
 
 instance Foldable f => Foldable (Diff f) where
-  foldMap f = go
-    where go = foldMap' . unDiff
-          foldMap' (Let vars body) = foldMap go vars `mappend` bifoldMap f go body
-          foldMap' _               = mempty
+  foldMap f = go where go = bifoldMap f go . unDiff
 
 instance Traversable f => Traversable (Diff f) where
-  traverse f = go
-    where go = fmap Diff . traverse' . unDiff
-          traverse' (Let vars body) = Let <$> traverse go vars <*> bitraverse f go body
-          traverse' (Var v)         = pure (Var v)
+  traverse f = go where go = fmap Diff . bitraverse f go . unDiff
 
 
 instance Functor syntax => Bifunctor (DiffF syntax) where

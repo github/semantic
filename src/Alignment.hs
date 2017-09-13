@@ -16,11 +16,11 @@ import Data.Align
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Function (on)
-import Data.Functor.Binding (BindingF(..), envLookup)
 import Data.Functor.Both
+import Data.Functor.Foldable (cata)
 import Data.Functor.Identity
 import Data.List (partition, sortBy)
-import Data.Maybe (catMaybes, fromJust, fromMaybe, listToMaybe)
+import Data.Maybe (catMaybes, fromJust, listToMaybe)
 import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
@@ -47,11 +47,9 @@ hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: (HasField fields Range, Traversable f) => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
-alignDiff sources = evalDiff $ \ diff env -> case diff of
-  Let _ body -> case body of
-    Patch patch                    -> alignPatch sources patch
-    Merge (In (ann1, ann2) syntax) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (In (both ann1 ann2) syntax)
-  Var v -> fromMaybe [] (envLookup v env)
+alignDiff sources = cata $ \ diff -> case diff of
+  Patch patch                    -> alignPatch sources patch
+  Merge (In (ann1, ann2) syntax) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (In (both ann1 ann2) syntax)
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
 alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both Source -> Patch (TermF f (Record fields) [Join These (SplitDiff [] (Record fields))]) -> [Join These (SplitDiff [] (Record fields))]
