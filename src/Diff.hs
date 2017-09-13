@@ -26,8 +26,11 @@ import Text.Show
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
 newtype Diff syntax ann = Diff { unDiff :: BindingF (DiffF syntax ann) (Diff syntax ann) }
 
+-- | A single entry within a recursive 'Diff'.
 data DiffF syntax ann recur
+  -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Replace'd 'TermF's, consisting of either syntax or further recursive 'Diff's, the latter being used to insert/delete/replace 'Diff's bound to variables.
   = Patch (Patch (TermF (Sum Identity syntax)      ann  recur))
+  -- | An unchanged node, consisting of syntax labelled with both the original annotations.
   | Merge        (TermF               syntax (ann, ann) recur)
   deriving (Foldable, Functor, Traversable)
 
