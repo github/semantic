@@ -51,9 +51,8 @@ evalDiffRM algebra = para (\ diff -> local (bindMetavariables diff) (algebra dif
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int
 diffSum patchCost = evalDiff $ \ diff env -> case diff of
-  Let _ body -> case body of
-    Patch patch -> patchCost patch + sum body
-    Merge merge -> sum merge
+  Let _ (Patch patch) -> patchCost patch + sum (sum <$> patch)
+  Let _ (Merge merge) -> sum merge
   Var v -> fromMaybe 0 (envLookup v env)
 
 -- | The sum of the node count of the diff’s patches.
