@@ -21,6 +21,9 @@ import Data.JSON.Fields
 import Data.Semigroup
 import qualified Data.Set as Set
 
+-- | A metavariable, represented as an 'Int'. These should only be constructed via the 'letBind' helper in order to avoid accidentally shadowing bound metavariables.
+--
+--   This is a *meta*variable in that it represents an extra-syntactic variable used within the context of some structure which may have its own orthogonal notion of variables which do not interact. For example, 'BindingF' and 'Metavar' can be used to provide templating for an AST without worrying about shadowing the AST’s own variables.
 newtype Metavar = Metavar Int
   deriving (Eq, Ord, Show)
   deriving newtype (Enum, ToJSON)
