@@ -7,7 +7,6 @@ import Data.Aeson
 import Data.Hashable
 import Data.JSON.Fields
 import Data.Text (Text, pack)
-import Data.Text.Prettyprint.Doc
 import GHC.Generics
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -246,9 +245,6 @@ data Category
 -- Instances
 
 instance Hashable Category
-
-instance Pretty Category where
-  pretty = pretty . show
 
 instance ToJSONFields Category where
   toJSONFields c = ["category" .= case c of { Other s -> s ; _ -> pack (show c) }]

@@ -5,7 +5,6 @@ import Data.Aeson
 import Data.JSON.Fields
 import Data.Kind
 import Data.Semigroup
-import Data.Text.Prettyprint.Doc
 
 -- | A type-safe, extensible record structure.
 -- |
@@ -76,13 +75,6 @@ instance (Semigroup head, Semigroup (Record tail)) => Semigroup (Record (head ':
 
 instance Semigroup (Record '[]) where
   _ <> _ = Nil
-
-
-instance ConstrainAll Pretty ts => Pretty (Record ts) where
-  pretty = tupled . collectPretty
-    where collectPretty :: ConstrainAll Pretty ts => Record ts -> [Doc ann]
-          collectPretty Nil = []
-          collectPretty (first :. rest) = pretty first : collectPretty rest
 
 
 instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ': t)) where

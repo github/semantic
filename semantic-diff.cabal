@@ -22,7 +22,6 @@ library
                      , Data.Functor.Binding
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
-                     , Data.Functor.Classes.Pretty.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
                      , Data.Mergeable
@@ -107,7 +106,6 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , prettyprinter
                      , recursion-schemes
                      , semigroups
                      , split
@@ -123,6 +121,8 @@ library
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
+                     , pretty-show
+                     , hscolour
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j

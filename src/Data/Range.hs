@@ -9,7 +9,6 @@ module Data.Range
 import Data.Aeson
 import Data.JSON.Fields
 import Data.Semigroup
-import Data.Text.Prettyprint.Doc
 import GHC.Generics
 
 -- | A half-open interval of integers, defined by start & end indices.
@@ -36,10 +35,6 @@ instance Semigroup Range where
 
 instance Ord Range where
   a <= b = start a <= start b
-
-instance Pretty Range where
-  pretty (Range from to) = pretty from <> pretty '-' <> pretty to
-
 
 instance ToJSONFields Range where
   toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]

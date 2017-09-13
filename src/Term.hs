@@ -23,7 +23,7 @@ import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
-import Data.Semigroup
+import Data.Semigroup ((<>))
 import Syntax
 import Text.Show
 
