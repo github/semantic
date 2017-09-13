@@ -4,6 +4,7 @@ module Data.JSON.Fields where
 import Data.Aeson
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
+import Data.Functor.Const
 import Data.Functor.Product
 import Data.Functor.Sum
 import Data.Proxy (Proxy(..))
@@ -40,6 +41,10 @@ instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (Sum f g) where
 
 instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (Product f g) where
   toJSONFields1 (Pair a b) = [ "before" .= JSONFields1 a, "after" .= JSONFields1 b ]
+
+
+instance ToJSONFields a => ToJSONFields1 (Const a) where
+  toJSONFields1 = toJSONFields . getConst
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }
