@@ -88,18 +88,18 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         syntaxParser = parserForLanguage effectiveLanguage
 
-        run :: Functor f => (Blob -> Task (Term f a)) -> (Both (Term f a) -> Diff f a) -> (Diff f a -> output) -> Task output
-        run parse diff renderer = distributeFor blobs parse >>= diffTermPair blobs diff >>= render renderer
+        run :: Functor f => (Blob -> Task (Term f a)) -> (Term f a -> Term f a -> Diff f a) -> (Diff f a -> output) -> Task output
+        run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
 
-        diffRecursively :: (Eq1 f, GAlign f, Show1 f, Traversable f, Diffable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
+        diffRecursively :: (Eq1 f, GAlign f, Show1 f, Traversable f, Diffable f) => Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
         diffRecursively = decoratingWith constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: Functor f => Both Blob -> Differ f a -> Both (Term f a) -> Task (Diff f a)
-diffTermPair blobs differ terms = case runJoin (blobExists <$> blobs) of
-  (True, False) -> pure (deleting (Both.fst terms))
-  (False, True) -> pure (inserting (Both.snd terms))
-  _ -> time "diff" logInfo $ diff differ terms
+diffTermPair :: Functor f => Both Blob -> Differ f a -> Term f a -> Term f a -> Task (Diff f a)
+diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
+  (True, False) -> pure (deleting t1)
+  (False, True) -> pure (inserting t2)
+  _ -> time "diff" logInfo $ diff differ t1 t2
   where
     logInfo = let (a, b) = runJoin blobs in
             [ ("before_path", blobPath a)

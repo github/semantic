@@ -23,14 +23,14 @@ spec = parallel $ do
 
   prop "equal terms produce identity diffs" $
     \ a -> let term = decorate (a :: Term Syntax (Record '[Category])) in
-      diffCost (diffTerms (pure term)) `shouldBe` 0
+      diffCost (diffTerms term term) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = diffTerms (both a b :: Both (Term Syntax (Record '[Category]))) in
+      \ a b -> let diff = diffTerms a b :: Diff Syntax (Record '[Category]) in
         beforeTerm diff `shouldBe` Just a
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = diffTerms (both a b :: Both (Term Syntax (Record '[Category]))) in
+      \ a b -> let diff = diffTerms a b :: Diff Syntax (Record '[Category]) in
         afterTerm diff `shouldBe` Just b

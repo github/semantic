@@ -47,7 +47,7 @@ spec = parallel $ do
       \ diff -> let diff' = (diff :: Diff Syntax ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
     prop "produces an unchanged entry for identity diffs" $
-      \ term -> let term' = (term :: Term Syntax (Record '[Category])) in tableOfContentsBy (Just . termAnnotation) (diffTerms (pure term')) `shouldBe` [Unchanged (lastValue term')]
+      \ term -> tableOfContentsBy (Just . termAnnotation) (diffTerms term term) `shouldBe` [Unchanged (lastValue (term :: Term Syntax (Record '[Category])))]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ patch -> let patch' = (patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (these deleting inserting replacing (unPatch patch')) `shouldBe` these (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (unPatch (foldMap pure <$> patch'))
@@ -132,7 +132,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \a -> let term = defaultFeatureVectorDecorator (Info.category . termAnnotation) (a :: Term') in
-        diffTOC (diffTerms (pure term)) `shouldBe` []
+        diffTOC (diffTerms term term) `shouldBe` []
 
   describe "JSONSummary" $ do
     it "encodes modified summaries to JSON" $ do

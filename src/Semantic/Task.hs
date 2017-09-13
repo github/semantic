@@ -67,7 +67,7 @@ data TaskF output where
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
-  Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
+  Diff :: Differ f a -> Term f a -> Term f a -> TaskF (Diff f a)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
 
@@ -82,7 +82,7 @@ data TaskF output where
 type Task = Freer TaskF
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
-type Differ f a = Both (Term f a) -> Diff f a
+type Differ f a = Term f a -> Term f a -> Diff f a
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -117,8 +117,8 @@ decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fiel
 decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Differ f a -> Both (Term f a) -> Task (Diff f a)
-diff differ terms = Semantic.Task.Diff differ terms `Then` return
+diff :: Differ f a -> Term f a -> Term f a -> Task (Diff f a)
+diff differ term1 term2 = Semantic.Task.Diff differ term1 term2 `Then` return
 
 -- | A 'Task' which renders some input using the supplied 'Renderer' function.
 render :: Renderer input output -> input -> Task output
@@ -182,7 +182,7 @@ runTaskWithOptions options task = do
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
-                  Semantic.Task.Diff differ terms -> pure (differ terms) >>= yield
+                  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
                   Render renderer input -> pure (renderer input) >>= yield
                   Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
                   LiftIO action -> action >>= yield
