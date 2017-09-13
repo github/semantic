@@ -23,7 +23,7 @@ import Syntax
 import Term
 import Text.Show
 
--- | An annotated series of patches of terms.
+-- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
 newtype Diff syntax ann = Diff { unDiff :: BindingF (DiffF syntax ann) (Diff syntax ann) }
 
 data DiffF syntax ann recur
