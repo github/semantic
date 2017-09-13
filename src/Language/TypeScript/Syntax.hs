@@ -795,7 +795,7 @@ expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
 
 identifier :: Assignment
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> source)
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 literal :: Assignment
 literal =
