@@ -31,28 +31,31 @@ data DiffF syntax ann recur
   | Merge        (TermF               syntax (ann, ann) recur)
   deriving (Foldable, Functor, Traversable)
 
--- | Constructs the replacement of one value by another in an Applicative context.
+-- | Constructs a 'Diff' replacing one 'Term' with another recursively.
 replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
 replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace (In a1 (InR (deleting <$> r1))) (In a2 (InR (inserting <$> r2))))))
 
--- | Constructs the insertion of a value in an Applicative context.
+-- | Constructs a 'Diff' inserting a 'Term' recursively.
 inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
 inserting = cata insertF
 
+-- | Constructs a 'Diff' inserting a single 'TermF' populated by further 'Diff's.
 insertF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
 insertF = Diff . Let mempty . Patch . Insert . hoistTermF InR
 
--- | Constructs the deletion of a value in an Applicative context.
+-- | Constructs a 'Diff' deleting a 'Term' recursively.
 deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
 deleting = cata deleteF
 
+-- | Constructs a 'Diff' deleting a single 'TermF' populated by further 'Diff's.
 deleteF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
 deleteF = Diff . Let mempty . Patch . Delete . hoistTermF InR
 
-
+-- | Constructs a 'Diff' merging two annotations for a single syntax functor populated by further 'Diff's.
 merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
 merge = (Diff .) . (Let mempty .) . (Merge .) . In
 
+-- | Constructs a 'Diff' referencing the specified variable. This should only ever be used in the body of 'letBind' in order to avoid accidentally shadowing bound variables in a diff.
 var :: Metavar -> Diff syntax ann
 var = Diff . Var
 
