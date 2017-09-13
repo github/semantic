@@ -20,7 +20,6 @@ import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
 import Data.Semigroup
 import qualified Data.Set as Set
-import Data.Text.Prettyprint.Doc
 
 newtype Metavar = Metavar Int
   deriving (Eq, Ord, Show)

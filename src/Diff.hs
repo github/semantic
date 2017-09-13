@@ -11,7 +11,6 @@ import Data.Bitraversable
 import Data.Foldable (toList)
 import Data.Functor.Binding (BindingF(..), Env(..), Metavar(..), bindings, envExtend, envLookup)
 import Data.Functor.Classes
-import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable hiding (fold)
 import Data.Functor.Product as Product
 import Data.Functor.Sum as Sum
@@ -19,7 +18,6 @@ import Data.JSON.Fields
 import Data.Maybe (fromMaybe)
 import Data.Mergeable
 import Data.Record
-import Data.Union
 import Patch
 import Syntax
 import Term
