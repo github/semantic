@@ -11,7 +11,6 @@ module Data.Functor.Both
 import Data.Bifunctor.Join as X
 import Data.Functor.Classes
 import Data.Semigroup
-import Data.Text.Prettyprint.Doc as Pretty
 import Prelude hiding (fst, snd)
 import qualified Prelude
 
@@ -48,6 +47,3 @@ instance Eq2 p => Eq1 (Join p) where
 
 instance Show2 p => Show1 (Join p) where
   liftShowsPrec sp sl d = showsUnaryWith (liftShowsPrec2 sp sl sp sl) "Join" d . runJoin
-
-instance Pretty2 p => Pretty1 (Join p) where
-  liftPretty p pl = liftPretty2 p pl p pl . runJoin
