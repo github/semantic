@@ -28,6 +28,7 @@ import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Binding (BindingF(..), envLookup)
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
+import Data.Functor.Sum
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -154,12 +155,15 @@ tableOfContentsBy :: (Foldable f, Functor f)
 tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
   where diffAlgebra r env = case r of
           Let _ body -> case body of
-            Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
+            Patch patch -> (pure . patchEntry <$> crosswalk recur patch) <> foldMap fold patch <> Just []
             Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
               (Just a, Nothing) -> Just [Unchanged a]
               (Just a, Just []) -> Just [Changed a]
               (_     , entries) -> entries
           Var v -> join (envLookup v env)
+
+        recur (In a (InR s)) = selector (In a s)
+        recur _ = Nothing
 
         patchEntry = these Deleted Inserted (const Replaced) . unPatch
 

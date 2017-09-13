@@ -12,6 +12,8 @@ import Data.Foldable (toList)
 import Data.Functor.Binding (BindingF(..), Env(..), Metavar(..), bindings, envExtend, envLookup)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
+import Data.Functor.Identity
+import Data.Functor.Sum
 import Data.JSON.Fields
 import Data.Maybe (fromMaybe)
 import Data.Mergeable
@@ -25,9 +27,8 @@ import Text.Show
 newtype Diff syntax ann = Diff { unDiff :: BindingF (DiffF syntax ann) (Diff syntax ann) }
 
 data DiffF syntax ann recur
-  = Patch (Patch (TermF syntax       ann  recur))
-  | Merge        (TermF syntax (ann, ann) recur)
-  deriving (Foldable, Functor, Traversable)
+  = Patch (Patch (TermF (Sum Identity syntax)      ann  recur))
+  | Merge        (TermF               syntax (ann, ann) recur)
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
@@ -60,12 +61,12 @@ diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Int
 diffCost = diffSum (const 1)
 
 
-diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)))
+diffPatch :: Diff syntax ann -> Maybe (Patch (TermF (Sum Identity syntax) ann (Diff syntax ann)))
 diffPatch diff = case unDiff diff of
   Let _ (Patch patch) -> Just patch
   _ -> Nothing
 
-diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF syntax ann (Diff syntax ann))]
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF (Sum Identity syntax) ann (Diff syntax ann))]
 diffPatches = evalDiffR $ \ diff env -> case diff of
   Let _ (Patch patch) -> fmap (fmap fst) patch : foldMap (foldMap (toList . diffPatch . fst)) patch
   Let _ (Merge merge) ->                                  foldMap (toList . diffPatch . fst)  merge
@@ -81,13 +82,17 @@ mergeMaybe algebra = evalDiff $ \ bind env -> case bind of
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 beforeTerm = mergeMaybe $ \ diff -> case diff of
-  Patch patch -> before patch >>= \ (In a l) -> termIn a <$> sequenceAlt l
+  Patch patch -> before patch >>= \ (In a l) -> case l of
+    InL (Identity l) -> l
+    InR l -> termIn a <$> sequenceAlt l
   Merge  (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
 afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 afterTerm = mergeMaybe $ \ diff -> case diff of
-  Patch patch -> after patch >>= \ (In b r) -> termIn b <$> sequenceAlt r
+  Patch patch -> after patch >>= \ (In b r) -> case r of
+    InL (Identity r) -> r
+    InR r -> termIn b <$> sequenceAlt r
   Merge  (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
@@ -100,15 +105,15 @@ stripDiff = fmap rtail
 
 -- | Constructs the replacement of one value by another in an Applicative context.
 replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
-replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2)))))
+replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace (In a1 (InR (deleting <$> r1))) (In a2 (InR (inserting <$> r2))))))
 
 -- | Constructs the insertion of a value in an Applicative context.
 inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
-inserting = cata (Diff . Let mempty . Patch . Insert)
+inserting = cata (Diff . Let mempty . Patch . Insert . hoistTermF InR)
 
 -- | Constructs the deletion of a value in an Applicative context.
 deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
-deleting = cata (Diff . Let mempty . Patch . Delete)
+deleting = cata (Diff . Let mempty . Patch . Delete . hoistTermF InR)
 
 
 merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
@@ -190,13 +195,25 @@ instance Traversable f => Traversable (Diff f) where
           traverse' (Var v)         = pure (Var v)
 
 
+instance Functor syntax => Functor (DiffF syntax ann) where
+  fmap f (Patch patch) = Patch (fmap (fmap f) patch)
+  fmap f (Merge merge) = Merge (fmap f merge)
+
 instance Functor syntax => Bifunctor (DiffF syntax) where
   bimap f g (Patch patch) = Patch (bimap f g <$> patch)
   bimap f g (Merge term)  = Merge (bimap (bimap f f) g term)
 
+instance Foldable syntax => Foldable (DiffF syntax ann) where
+  foldMap f (Patch patch) = foldMap (foldMap f) patch
+  foldMap f (Merge merge) = foldMap f merge
+
 instance Foldable f => Bifoldable (DiffF f) where
   bifoldMap f g (Patch patch) = foldMap (bifoldMap f g) patch
   bifoldMap f g (Merge term)  = bifoldMap (bifoldMap f f) g term
+
+instance Traversable syntax => Traversable (DiffF syntax ann) where
+  traverse f (Patch patch) = Patch <$> traverse (traverse f) patch
+  traverse f (Merge merge) = Merge <$> traverse f merge
 
 instance Traversable f => Bitraversable (DiffF f) where
   bitraverse f g (Patch patch) = Patch <$> traverse (bitraverse f g) patch
