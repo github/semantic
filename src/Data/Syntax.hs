@@ -18,6 +18,7 @@ import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
+import Diff
 import GHC.Generics
 import GHC.Stack
 import Term
@@ -156,3 +157,6 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+
+algorithmForContext :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs) => Context (Term (Union fs) a) -> Term (Union fs) a -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (Context (Diff (Union fs) a)))
+algorithmForContext (Context n1 s1) s2 = fmap (Context (deleting <$> n1)) <$> algorithmForComparableTerms s1 s2
