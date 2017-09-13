@@ -69,12 +69,15 @@ letBind diff f = embed (Let (Env [(n, diff)]) body)
         n = maybe (Metavar 0) succ (foldMaxMap maxBoundMetavariable body)
 
 
+-- | An environment, binding 'Metavar'iables to values.
 newtype Env a = Env { unEnv :: [(Metavar, a)] }
   deriving (Eq, Foldable, Functor, Monoid, Ord, Semigroup, Show, Traversable)
 
+-- | Extend an 'Env' by binding a 'Metavar'iable to a value.
 envExtend :: Metavar -> a -> Env a -> Env a
 envExtend var val (Env m) = Env ((var, val) : m)
 
+-- | Lookup the given 'Metavar'iable in an 'Env'.
 envLookup :: Metavar -> Env a -> Maybe a
 envLookup var = lookup var . unEnv
 
