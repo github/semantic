@@ -40,12 +40,12 @@ decoratingWith getLabel differ = stripDiff . differ . fmap (defaultFeatureVector
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: forall f fields . (Traversable f, GAlign f, Eq1 f, HasField fields FeatureVector)
-              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f) (Diff f (Record fields)) (Diff f (Record fields))) -- ^ A function producing syntax-directed continuations of the algorithm.
+              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f) (Diff f) (Record fields) (Diff f (Record fields))) -- ^ A function producing syntax-directed continuations of the algorithm.
               -> ComparabilityRelation f fields -- ^ A relation on terms used to determine comparability and equality.
               -> Both (Term f (Record fields)) -- ^ A pair of terms.
               -> Diff f (Record fields) -- ^ The resulting diff.
 diffTermsWith refine comparable (Join (a, b)) = runFreer decompose (diff a b)
-  where decompose :: AlgorithmF (Term f) (Diff f (Record fields)) result -> Algorithm (Term f) (Diff f (Record fields)) result
+  where decompose :: AlgorithmF (Term f) (Diff f) (Record fields) result -> Algorithm (Term f) (Diff f) (Record fields) result
         decompose step = case step of
           Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
@@ -66,7 +66,7 @@ getLabel (In h t) = (Info.category h, case t of
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: Term Syntax (Record fields)
                    -> Term Syntax (Record fields)
-                   -> Algorithm (Term Syntax) (Diff Syntax (Record fields)) (Diff Syntax (Record fields))
+                   -> Algorithm (Term Syntax) (Diff Syntax) (Record fields) (Diff Syntax (Record fields))
 algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     annotate . Indexed <$> byRWS a b
