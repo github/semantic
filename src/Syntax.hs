@@ -3,10 +3,12 @@ module Syntax where
 
 import Data.Aeson
 import Data.Align.Generic
+import Data.Foldable (toList)
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.JSON.Fields
 import Data.Mergeable
 import Data.Text (Text)
 import GHC.Generics
@@ -123,3 +125,6 @@ extractLeafValue syntax = case syntax of
 instance Eq1 Syntax where liftEq = genericLiftEq
 instance Show1 Syntax where liftShowsPrec = genericLiftShowsPrec
 instance Pretty1 Syntax where liftPretty = genericLiftPretty
+
+instance ToJSONFields1 Syntax where
+  toJSONFields1 syntax = [ "children" .= toList syntax ]

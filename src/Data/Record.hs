@@ -1,6 +1,8 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Record where
 
+import Data.Aeson
+import Data.JSON.Fields
 import Data.Kind
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
@@ -81,3 +83,15 @@ instance ConstrainAll Pretty ts => Pretty (Record ts) where
     where collectPretty :: ConstrainAll Pretty ts => Record ts -> [Doc ann]
           collectPretty Nil = []
           collectPretty (first :. rest) = pretty first : collectPretty rest
+
+
+instance (ToJSONFields h, ToJSONFields (Record t)) => ToJSONFields (Record (h ': t)) where
+  toJSONFields (h :. t) = toJSONFields h <> toJSONFields t
+
+instance ToJSONFields (Record '[]) where
+  toJSONFields _ = []
+
+
+instance ToJSONFields (Record fs) => ToJSON (Record fs) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields

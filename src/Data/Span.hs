@@ -11,6 +11,7 @@ module Data.Span
 
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
+import Data.JSON.Fields
 import Data.Hashable (Hashable)
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
@@ -61,3 +62,7 @@ instance Pretty Pos where
 
 instance Pretty Span where
   pretty Span{..} = pretty spanStart <> pretty '-' <> pretty spanEnd
+
+
+instance ToJSONFields Span where
+  toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]

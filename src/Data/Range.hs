@@ -6,6 +6,8 @@ module Data.Range
 , intersectsRange
 ) where
 
+import Data.Aeson
+import Data.JSON.Fields
 import Data.Semigroup
 import Data.Text.Prettyprint.Doc
 import GHC.Generics
@@ -37,3 +39,7 @@ instance Ord Range where
 
 instance Pretty Range where
   pretty (Range from to) = pretty from <> pretty '-' <> pretty to
+
+
+instance ToJSONFields Range where
+  toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]

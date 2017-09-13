@@ -21,6 +21,7 @@ module Renderer
 import Data.Aeson (Value, (.=))
 import Data.ByteString (ByteString)
 import Data.Foldable (asum)
+import Data.JSON.Fields
 import qualified Data.Map as Map
 import Data.Output
 import Data.Syntax.Algebra (RAlgebra)
