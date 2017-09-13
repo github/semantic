@@ -4,7 +4,6 @@ module Data.Syntax.Expression where
 import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Pretty.Generic
 import Data.Functor.Classes.Show.Generic
 import GHC.Generics
 
@@ -14,7 +13,6 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 
 instance Eq1 Call where liftEq = genericLiftEq
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Call where liftPretty = genericLiftPretty
 
 
 data Comparison a
@@ -28,7 +26,6 @@ data Comparison a
 
 instance Eq1 Comparison where liftEq = genericLiftEq
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Comparison where liftPretty = genericLiftPretty
 
 
 -- | Binary arithmetic operators.
@@ -44,7 +41,6 @@ data Arithmetic a
 
 instance Eq1 Arithmetic where liftEq = genericLiftEq
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Arithmetic where liftPretty = genericLiftPretty
 
 -- | Boolean operators.
 data Boolean a
@@ -55,7 +51,6 @@ data Boolean a
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Boolean where liftPretty = genericLiftPretty
 
 -- | Javascript delete operator
 data Delete a = Delete !a
@@ -90,7 +85,6 @@ data Bitwise a
 
 instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Bitwise where liftPretty = genericLiftPretty
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a
@@ -99,7 +93,6 @@ data MemberAccess a
 
 instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 MemberAccess where liftPretty = genericLiftPretty
 
 -- | Subscript (e.g a[1])
 data Subscript a
@@ -109,7 +102,6 @@ data Subscript a
 
 instance Eq1 Subscript where liftEq = genericLiftEq
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Subscript where liftPretty = genericLiftPretty
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
 data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a, enumerationStep :: !a }
@@ -117,7 +109,6 @@ data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a,
 
 instance Eq1 Enumeration where liftEq = genericLiftEq
 instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Enumeration where liftPretty = genericLiftPretty
 
 -- | InstanceOf (e.g. a instanceof b in JavaScript
 data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a }
@@ -125,7 +116,6 @@ data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a
 
 instance Eq1 InstanceOf where liftEq = genericLiftEq
 instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 InstanceOf where liftPretty = genericLiftPretty
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
 data ScopeResolution a
@@ -134,4 +124,3 @@ data ScopeResolution a
 
 instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 ScopeResolution where liftPretty = genericLiftPretty

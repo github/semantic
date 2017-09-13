@@ -3,8 +3,7 @@ module Algorithm where
 
 import Control.Applicative (liftA2)
 import Control.Monad (guard, join)
-import Control.Monad.Free (wrap)
-import Control.Monad.Free.Freer hiding (wrap)
+import Control.Monad.Free.Freer
 import Data.Function (on)
 import Data.Functor.Both
 import Data.Functor.Classes
@@ -40,7 +39,7 @@ type Algorithm term diff = Freer (AlgorithmF term diff)
 
 -- | Diff two terms without specifying the algorithm to be used.
 diff :: term -> term -> Algorithm term diff diff
-diff = (liftF .) . Diff
+diff = (liftF .) . Algorithm.Diff
 
 -- | Diff a These of terms without specifying the algorithm to be used.
 diffThese :: These term term -> Algorithm term diff diff
@@ -77,7 +76,7 @@ byReplacing = (liftF .) . Replace
 
 instance Show term => Show1 (AlgorithmF term diff) where
   liftShowsPrec _ _ d algorithm = case algorithm of
-    Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
+    Algorithm.Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
     Linear t1 t2 -> showsBinaryWith showsPrec showsPrec "Linear" d t1 t2
     RWS as bs -> showsBinaryWith showsPrec showsPrec "RWS" d as bs
     Delete t1 -> showsUnaryWith showsPrec "Delete" d t1
@@ -88,9 +87,7 @@ instance Show term => Show1 (AlgorithmF term diff) where
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
 -- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
 algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f a) (Diff f a) (Diff f a)
-algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (fmap (wrap . (both ann1 ann2 :<)) <$> algorithmFor f1 f2)
-  where ann1 :< f1 = runCofree t1
-        ann2 :< f2 = runCofree t2
+algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2)) = fromMaybe (byReplacing t1 t2) (fmap (copy (both ann1 ann2)) <$> algorithmFor f1 f2)
 
 
 -- | A type class for determining what algorithm to use for diffing two terms.

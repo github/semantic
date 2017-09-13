@@ -5,8 +5,6 @@ module TreeSitter
 ) where
 
 import Category
-import Control.Comonad (extract)
-import Control.Comonad.Cofree (unwrap)
 import Control.Exception
 import Control.Monad ((<=<))
 import Data.Blob
@@ -65,7 +63,7 @@ toAST node@TS.Node{..} = do
   children <- allocaArray count $ \ childNodesPtr -> do
     _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
     peekArray count childNodesPtr
-  pure $! A.Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (nodeRange node) (nodeSpan node) :< children
+  pure $! In (A.Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (nodeRange node) (nodeSpan node)) children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g
@@ -110,7 +108,7 @@ nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos no
 assignTerm :: Ptr TS.Language -> Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
 assignTerm language source annotation children allChildren =
   case assignTermByLanguage source (category annotation) children of
-    Just a -> pure (cofree (annotation :< a))
+    Just a -> pure (termIn annotation a)
     _ -> defaultTermAssignment source annotation children allChildren
   where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm DefaultFields))
         assignTermByLanguage = case languageForTSLanguage language of
@@ -120,7 +118,7 @@ assignTerm language source annotation children allChildren =
 
 defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
 defaultTermAssignment source annotation children allChildren
-  | category annotation `elem` operatorCategories = cofree . (annotation :<) . S.Operator <$> allChildren
+  | category annotation `elem` operatorCategories = Term . In annotation . S.Operator <$> allChildren
   | otherwise = case (category annotation, children) of
     (ParseError, children) -> toTerm $ S.ParseError children
 
@@ -155,7 +153,7 @@ defaultTermAssignment source annotation children allChildren
                 [_, Other t]
                   | t `elem` ["--", "++"] -> MathOperator
                 _ -> Operator
-      pure (cofree ((setCategory annotation c) :< S.Operator cs))
+      pure (termIn (setCategory annotation c) (S.Operator cs))
 
     (Other "binary_expression", _) -> do
       cs <- allChildren
@@ -166,7 +164,7 @@ defaultTermAssignment source annotation children allChildren
                   | s `elem` ["&&", "||"] -> BooleanOperator
                   | s `elem` [">>", ">>=", ">>>", ">>>=", "<<", "<<=", "&", "^", "|"] -> BitwiseOperator
                 _ -> Operator
-      pure (cofree ((setCategory annotation c) :< S.Operator cs))
+      pure (termIn (setCategory annotation c) (S.Operator cs))
 
     (_, []) -> toTerm $ S.Leaf (toText source)
     (_, children) -> toTerm $ S.Indexed children
@@ -181,7 +179,7 @@ defaultTermAssignment source annotation children allChildren
           , RelationalOperator
           , BitwiseOperator
           ]
-        toTerm = pure . cofree . (annotation :<)
+        toTerm = pure . Term . In annotation
 
 
 categoryForLanguageProductionName :: Ptr TS.Language -> Text -> Category

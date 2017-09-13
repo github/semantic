@@ -1,0 +1,23 @@
+:set prompt "\ESC[1;36m\STXλ: \ESC[m\STX"
+
+:def pretty \_ -> return ("import Text.Show.Pretty (pPrint, ppShow)\nimport Language.Haskell.HsColour\nimport Language.Haskell.HsColour.Colourise\nlet color = putStrLn . hscolour TTY defaultColourPrefs False False \"\" False . ppShow\n:set -interactive-print color")
+:def no-pretty \_ -> return (":set -interactive-print System.IO.print")
+
+:def re \_ -> return (":r\n:pretty")
+
+:{
+assignmentExample lang = case lang of
+  "Python" -> mk "py" "python"
+  "Go" -> mk "go" "go"
+  "Ruby" -> mk "rb" "ruby"
+  "JavaScript" -> mk "js" "typescript"
+  "TypeScript" -> mk "ts" "typescript"
+  "Haskell" -> mk "hs" "haskell"
+  "Markdown" -> mk "md" "markdown"
+  "JSON" -> mk "json" "json"
+  _ -> mk "" ""
+  where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.file \"example." ++ fileExtension ++ "\"") >> return ("import Parser\nimport Semantic.Task\nimport Semantic.Util")
+:}
+
+:def assignment assignmentExample
+
