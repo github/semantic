@@ -31,7 +31,6 @@ import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
 import Data.Char (chr)
-import Data.Functor.Binding
 import Data.Functor.Both
 import Data.Functor.Identity
 import Data.Functor.Product as Product
@@ -180,10 +179,6 @@ instance Listable1 Identity where
   liftTiers tiers = liftCons1 tiers Identity
 
 
-instance Listable1 f => Listable1 (BindingF f) where
-  liftTiers tiers = liftCons1 (liftTiers tiers) (Let mempty)
-
-
 instance Listable1 f => Listable2 (DiffF f) where
   liftTiers2 annTiers recurTiers
     =  liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
@@ -196,7 +191,7 @@ instance (Listable1 f, Listable a, Listable b) => Listable (DiffF f a b) where
   tiers = tiers1
 
 instance Listable1 f => Listable1 (Diff f) where
-  liftTiers annTiers = go where go = liftCons1 (liftCons1 (liftTiers2 annTiers go) (Let mempty)) Diff
+  liftTiers annTiers = go where go = liftCons1 (liftTiers2 annTiers go) Diff
 
 instance (Listable1 f, Listable a) => Listable (Diff f a) where
   tiers = tiers1
