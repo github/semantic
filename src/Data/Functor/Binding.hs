@@ -29,6 +29,9 @@ newtype Metavar = Metavar Int
   deriving newtype (Enum, ToJSON)
 
 
+-- | A functor adding let-bindings and variable references to some other functorial structure.
+--
+--   Typically this will be used in concert with a recursive, 'Fix'-like structure, resulting in abstract binding trees à la Harper.
 data BindingF f recur
   = Let (Env recur) (f recur)
   | Var Metavar
