@@ -5,6 +5,7 @@ import Data.Aeson
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Functor.Const
+import Data.Functor.Identity
 import Data.Functor.Sum
 import Data.Proxy (Proxy(..))
 import Data.Union
@@ -41,6 +42,9 @@ instance (ToJSONFields1 f, ToJSONFields1 g) => ToJSONFields1 (Sum f g) where
 
 instance ToJSONFields a => ToJSONFields1 (Const a) where
   toJSONFields1 = toJSONFields . getConst
+
+instance ToJSONFields1 Identity where
+  toJSONFields1 (Identity a) = [ "recur" .= a ]
 
 
 newtype JSONFields a = JSONFields { unJSONFields :: a }
