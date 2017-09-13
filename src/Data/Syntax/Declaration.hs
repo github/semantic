@@ -49,7 +49,6 @@ data Interface a = Interface { interfaceIdentifier :: !a, interfaceBody :: ![a] 
 
 instance Eq1 Interface where liftEq = genericLiftEq
 instance Show1 Interface where liftShowsPrec = genericLiftShowsPrec
-instance Pretty1 Interface where liftPretty = genericLiftPretty
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
