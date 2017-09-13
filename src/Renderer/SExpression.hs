@@ -32,12 +32,12 @@ printBindingF bind n = case bind of
   Var v -> nl n <> pad n <> showMetavar v
 
 printDiffF :: (ConstrainAll Show fields, Foldable f, Functor f) => DiffF f (Record fields) (Int -> ByteString) -> Int -> ByteString
-printDiffF diff n = case diffF diff of
-  Left (Delete term) -> nl n <> pad (n - 1) <> "{-" <> printTermF term n <> "-}"
-  Left (Insert term) -> nl n <> pad (n - 1) <> "{+" <> printTermF term n <> "+}"
-  Left (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> printTermF term1 n
-                             <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF term2 n <> " }"
-  Right (In (_, ann) syntax) -> nl n <> pad n <> "(" <> showAnnotation ann <> foldMap (\ d -> d (n + 1)) syntax <> ")"
+printDiffF diff n = case diff of
+  Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> printTermF term n <> "-}"
+  Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> printTermF term n <> "+}"
+  Patch (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> printTermF term1 n
+                              <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF term2 n <> " }"
+  Merge (In (_, ann) syntax) -> nl n <> pad n <> "(" <> showAnnotation ann <> foldMap (\ d -> d (n + 1)) syntax <> ")"
 
 printTermF :: (ConstrainAll Show fields, Foldable f, Functor f) => TermF f (Record fields) (Int -> ByteString) -> Int -> ByteString
 printTermF (In annotation syntax) n = "(" <> showAnnotation annotation <> foldMap (\t -> t (n + 1)) syntax <> ")"

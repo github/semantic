@@ -153,9 +153,9 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . evalDiff diffAlgebra
   where diffAlgebra r env = case r of
-          Let _ body -> case diffF body of
-            Left patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
-            Right (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
+          Let _ body -> case body of
+            Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
+            Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
               (Just a, Nothing) -> Just [Unchanged a]
               (Just a, Just []) -> Just [Changed a]
               (_     , entries) -> entries
