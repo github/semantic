@@ -12,8 +12,6 @@ import Data.Foldable (toList)
 import Data.Functor.Binding (BindingF(..), Env(..), Metavar(..), bindings, envExtend, envLookup)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
-import Data.Functor.Product as Product
-import Data.Functor.Sum as Sum
 import Data.JSON.Fields
 import Data.Maybe (fromMaybe)
 import Data.Mergeable
@@ -27,9 +25,8 @@ import Text.Show
 newtype Diff syntax ann = Diff { unDiff :: BindingF (DiffF syntax ann) (Diff syntax ann) }
 
 data DiffF syntax ann recur
-  = Either (TermF (Sum     syntax syntax)       ann  recur)
-  | Both   (TermF (Product syntax syntax) (ann, ann) recur)
-  | Merge  (TermF                 syntax  (ann, ann) recur)
+  = Patch (Patch (TermF syntax       ann  recur))
+  | Merge        (TermF syntax (ann, ann) recur)
   deriving (Foldable, Functor, Traversable)
 
 type SyntaxDiff fields = Diff Syntax (Record fields)
@@ -77,10 +74,8 @@ diffPatches = evalDiffR $ \ diff env -> case diff of
 
 diffF :: DiffF syntax ann a -> Either (Patch (TermF syntax ann a)) (TermF syntax (ann, ann) a)
 diffF diff = case diff of
-  Either (In ann (InL syntax))                            -> Left  (Delete  (In ann  syntax))
-  Either (In ann (InR syntax))                            -> Left  (Insert  (In ann  syntax))
-  Both   (In (ann1, ann2) (Product.Pair syntax1 syntax2)) -> Left  (Replace (In ann1 syntax1) (In ann2 syntax2))
-  Merge  (In anns syntax)                                 -> Right (In anns syntax)
+  Patch patch -> Left  patch
+  Merge term  -> Right term
 
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
@@ -92,17 +87,13 @@ mergeMaybe algebra = evalDiff $ \ bind env -> case bind of
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 beforeTerm = mergeMaybe $ \ diff -> case diff of
-  Either (In a (InL l)) -> termIn a <$> sequenceAlt l
-  Either (In _ (InR _)) -> Nothing
-  Both   (In (a, _) (Product.Pair l _)) -> termIn a <$> sequenceAlt l
+  Patch patch -> before patch >>= \ (In a l) -> termIn a <$> sequenceAlt l
   Merge  (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
 afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
 afterTerm = mergeMaybe $ \ diff -> case diff of
-  Either (In _ (InL _)) -> Nothing
-  Either (In b (InR r)) -> termIn b <$> sequenceAlt r
-  Both   (In (_, b) (Product.Pair _ r)) -> termIn b <$> sequenceAlt r
+  Patch patch -> after patch >>= \ (In b r) -> termIn b <$> sequenceAlt r
   Merge  (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
@@ -115,15 +106,15 @@ stripDiff = fmap rtail
 
 -- | Constructs the replacement of one value by another in an Applicative context.
 replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
-replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Both (In (a1, a2) (Product.Pair (deleting <$> r1) (inserting <$> r2)))))
+replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2)))))
 
 -- | Constructs the insertion of a value in an Applicative context.
 inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
-inserting = cata (Diff . Let mempty . Either . hoistTermF InR)
+inserting = cata (Diff . Let mempty . Patch . Insert)
 
 -- | Constructs the deletion of a value in an Applicative context.
 deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
-deleting = cata (Diff . Let mempty . Either . hoistTermF InL)
+deleting = cata (Diff . Let mempty . Patch . Delete)
 
 
 merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
@@ -152,9 +143,8 @@ instance (Eq1 f, Eq a) => Eq (Diff f a) where
 
 instance Eq1 f => Eq2 (DiffF f) where
   liftEq2 eqA eqB d1 d2 = case (d1, d2) of
-    (Either t1, Either t2) -> liftEq2 eqA eqB t1 t2
-    (Both   t1, Both   t2) -> liftEq2 (liftEq2 eqA eqA) eqB t1 t2
-    (Merge  t1, Merge  t2) -> liftEq2 (liftEq2 eqA eqA) eqB t1 t2
+    (Patch p1, Patch p2) -> liftEq (liftEq2 eqA eqB) p1 p2
+    (Merge t1, Merge t2) -> liftEq2 (liftEq2 eqA eqA) eqB t1 t2
     _ -> False
 
 instance (Eq1 f, Eq a) => Eq1 (DiffF f a) where
@@ -175,9 +165,8 @@ instance (Show1 f, Show a) => Show (Diff f a) where
 
 instance Show1 f => Show2 (DiffF f) where
   liftShowsPrec2 spA slA spB slB d diff = case diff of
-    Either term -> showsUnaryWith (liftShowsPrec2 spA slA spB slB) "Either" d term
-    Both   term -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spB slB) "Both"   d term
-    Merge  term -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spB slB) "Merge"  d term
+    Patch patch -> showsUnaryWith (liftShowsPrec (liftShowsPrec2 spA slA spB slB) (liftShowList2 spA slA spB slB)) "Patch" d patch
+    Merge term  -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spB slB) "Merge" d term
     where spBoth = liftShowsPrec2 spA slA spA slA
           slBoth = liftShowList2 spA slA spA slA
 
@@ -208,19 +197,16 @@ instance Traversable f => Traversable (Diff f) where
 
 
 instance Functor syntax => Bifunctor (DiffF syntax) where
-  bimap f g (Either term) = Either (bimap f g term)
-  bimap f g (Both   term) = Both   (bimap (bimap f f) g term)
-  bimap f g (Merge  term) = Merge  (bimap (bimap f f) g term)
+  bimap f g (Patch patch) = Patch (bimap f g <$> patch)
+  bimap f g (Merge term)  = Merge (bimap (bimap f f) g term)
 
 instance Foldable f => Bifoldable (DiffF f) where
-  bifoldMap f g (Either term) = bifoldMap f g term
-  bifoldMap f g (Both   term) = bifoldMap (bifoldMap f f) g term
-  bifoldMap f g (Merge  term) = bifoldMap (bifoldMap f f) g term
+  bifoldMap f g (Patch patch) = foldMap (bifoldMap f g) patch
+  bifoldMap f g (Merge term)  = bifoldMap (bifoldMap f f) g term
 
 instance Traversable f => Bitraversable (DiffF f) where
-  bitraverse f g (Either term) = Either <$> bitraverse f g term
-  bitraverse f g (Both   term) = Both   <$> bitraverse (bitraverse f f) g term
-  bitraverse f g (Merge  term) = Merge  <$> bitraverse (bitraverse f f) g term
+  bitraverse f g (Patch patch) = Patch <$> traverse (bitraverse f g) patch
+  bitraverse f g (Merge term)  = Merge <$> bitraverse (bitraverse f f) g term
 
 
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Diff f a) where
@@ -231,9 +217,8 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
   toJSONFields = toJSONFields . unDiff
 
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields1 (DiffF f a) where
-  toJSONFields1 (Either term) = [ "either" .= JSONFields term ]
-  toJSONFields1 (Both   term) = [ "both"   .= JSONFields term ]
-  toJSONFields1 (Merge  term) = [ "merge"  .= JSONFields term ]
+  toJSONFields1 (Patch patch) = [ "patch" .= JSONFields patch ]
+  toJSONFields1 (Merge term)  = [ "merge" .= JSONFields term ]
 
 instance (ToJSONFields1 f, ToJSONFields a, ToJSON b) => ToJSONFields (DiffF f a b) where
   toJSONFields = toJSONFields1
