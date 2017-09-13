@@ -33,6 +33,7 @@ import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Functor.Binding
 import Data.Functor.Both
+import Data.Functor.Identity
 import Data.Functor.Product as Product
 import Data.Functor.Sum as Sum
 import Data.Range
@@ -173,6 +174,10 @@ instance (Listable1 f, Listable1 g) => Listable1 (Sum.Sum f g) where
 
 instance (Listable1 f, Listable1 g) => Listable1 (Product.Product f g) where
   liftTiers tiers = liftCons2 (liftTiers tiers) (liftTiers tiers) Product.Pair
+
+
+instance Listable1 Identity where
+  liftTiers tiers = liftCons1 tiers Identity
 
 
 instance Listable1 f => Listable1 (BindingF f) where
