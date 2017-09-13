@@ -1,8 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module Language.Ruby where
 
-import Control.Comonad
-import Control.Comonad.Cofree
 import Data.Foldable (toList)
 import Data.List (partition)
 import Data.Semigroup
@@ -11,7 +9,7 @@ import Data.Text (Text)
 import Info
 import Language
 import qualified Syntax as S
-import Term hiding ((:<))
+import Term
 
 termAssignment
   :: Source -- ^ The source of the term.
@@ -59,10 +57,10 @@ termAssignment _ category children
       -> Just $ S.FunctionCall fn [] (toList . unwrap =<< args)
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
-    (Modifier Unless, [lhs, rhs]) -> Just $ S.If (setCategory (extract rhs) Negate :< S.Negate rhs) [lhs]
-    (Unless, expr : rest) -> Just $ S.If ((setCategory (extract expr) Negate) :< S.Negate expr) rest
-    (Modifier Until, [ lhs, rhs ]) -> Just $ S.While (setCategory (extract rhs) Negate :< S.Negate rhs) [lhs]
-    (Until, expr : rest) -> Just $ S.While (setCategory (extract expr) Negate :< S.Negate expr) rest
+    (Modifier Unless, [lhs, rhs]) -> Just $ S.If (termIn (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Unless, expr : rest) -> Just $ S.If (termIn (setCategory (extract expr) Negate) (S.Negate expr)) rest
+    (Modifier Until, [ lhs, rhs ]) -> Just $ S.While (termIn (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Until, expr : rest) -> Just $ S.While (termIn (setCategory (extract expr) Negate) (S.Negate expr)) rest
     (Elsif, condition : body ) -> Just $ S.If condition body
     (SubscriptAccess, [ base, element ]) -> Just $ S.SubscriptAccess base element
     (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest

@@ -1,11 +1,9 @@
 module SplitDiff where
 
-import Control.Comonad
-import Control.Comonad.Trans.Cofree
 import Control.Monad.Free
 import Data.Record
 import Info
-import Term (Term, TermF)
+import Term
 
 -- | A patch to only one side of a diff.
 data SplitPatch a
@@ -17,7 +15,7 @@ data SplitPatch a
 -- | Get the range of a SplitDiff.
 getRange :: Functor f => HasField fields Range => SplitDiff f (Record fields) -> Range
 getRange diff = byteRange $ case diff of
-  Free annotated -> headF annotated
+  Free annotated -> termAnnotation annotated
   Pure patch -> extract (splitTerm patch)
 
 -- | A diff with only one side’s annotations.

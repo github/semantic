@@ -12,9 +12,8 @@ module Parser
 , rubyParser
 ) where
 
-import Control.Comonad.Cofree (Cofree)
-import Control.Comonad.Trans.Cofree (CofreeF)
 import qualified CMarkGFM
+import Data.Functor.Classes (Eq1)
 import Data.Ix
 import Data.Record
 import Data.Source as Source
@@ -43,14 +42,14 @@ data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (Bounded grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq (ast (Cofree ast (Node grammar))), Apply1 Foldable fs, Apply1 Functor fs, Foldable ast, Functor ast)
-                   => Parser (Cofree ast (Node grammar))                         -- ^ A parser producing AST.
+  AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply1 Foldable fs, Apply1 Functor fs, Foldable ast, Functor ast)
+                   => Parser (Term ast (Node grammar))                           -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
   TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
   -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (Cofree (CofreeF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
+  MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
   LineByLineParser :: Parser (SyntaxTerm DefaultFields)
 
@@ -84,5 +83,5 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Source -> SyntaxTerm DefaultFields
-lineByLineParser source = cofree $ (totalRange source :. Program :. totalSpan source :. Nil) :< Indexed (zipWith toLine [1..] (sourceLineRanges source))
-  where toLine line range = cofree $ (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) :< Leaf (toText (slice range source))
+lineByLineParser source = termIn (totalRange source :. Program :. totalSpan source :. Nil) (Indexed (zipWith toLine [1..] (sourceLineRanges source)))
+  where toLine line range = termIn (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) (Leaf (toText (slice range source)))
