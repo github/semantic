@@ -33,7 +33,9 @@ newtype Metavar = Metavar Int
 --
 --   Typically this will be used in concert with a recursive, 'Fix'-like structure, resulting in abstract binding trees à la Harper.
 data BindingF f recur
+  -- | 'Let' represents the binding of zero or more variables (given by the 'Env' field) in a scope (given by the @f recur@ field).
   = Let (Env recur) (f recur)
+  -- | A reference to a variable defined in an enclosing 'Let'.
   | Var Metavar
   deriving (Foldable, Functor, Traversable)
 
