@@ -39,25 +39,30 @@ data BindingF f recur
   | Var Metavar
   deriving (Foldable, Functor, Traversable)
 
+-- | Produce the variables bound by a given node. This operates nonrecursively, and thus does not return all variables in scope at a given point in a tree.
 bindings :: BindingF f recur -> Env recur
 bindings (Let vars _) = vars
 bindings _            = mempty
 
 
+-- | Compute the set of free 'Metavar'iables in a given 'Recursive' tree.
 freeMetavariables :: (Foldable syntax, Functor syntax, Recursive t, Base t ~ BindingF syntax) => t -> Set.Set Metavar
 freeMetavariables = cata $ \ diff -> case diff of
   Let vars body -> fold vars <> foldr Set.delete (fold body) (fst <$> unEnv vars)
   Var v -> Set.singleton v
 
+-- | Compute the maximum bound 'Metavar'iable. Note that this assumes that 'Let's contain only smaller bindings, which is the invariant maintained by 'letBind'.
 maxBoundMetavariable :: (Foldable syntax, Functor syntax, Recursive t, Base t ~ BindingF syntax) => t -> Maybe Metavar
 maxBoundMetavariable = cata $ \ diff -> case diff of
   Let vars _ -> foldMaxMap (Just . fst) (unEnv vars)
   Var _ -> Nothing
 
+-- | Compute the maximum value of a possibly-empty structure by mapping elements into some 'Ord'ered values.
 foldMaxMap :: (Foldable t, Ord b) => (a -> Maybe b) -> t a -> Maybe b
 foldMaxMap f = foldr (max . f) Nothing
 
 
+-- | Construct a scope binding a variable to a value using a higher-order function to construct the body of the 'Let'.
 letBind :: (Foldable syntax, Functor syntax, Corecursive t, Recursive t, Base t ~ BindingF syntax) => t -> (Metavar -> syntax t) -> t
 letBind diff f = embed (Let (Env [(n, diff)]) body)
   where body = f n
