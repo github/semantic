@@ -93,7 +93,11 @@ algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2)) = fromMaybe (byR
 class Diffable f where
   algorithmFor :: f term -> f term -> Maybe (Algorithm term diff (f diff))
   default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
-  algorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+  algorithmFor = genericAlgorithmFor
+
+genericAlgorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
+genericAlgorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+
 
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
 -- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
