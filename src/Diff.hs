@@ -31,6 +31,32 @@ data DiffF syntax ann recur
   | Merge        (TermF               syntax (ann, ann) recur)
   deriving (Foldable, Functor, Traversable)
 
+-- | Constructs the replacement of one value by another in an Applicative context.
+replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
+replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace (In a1 (InR (deleting <$> r1))) (In a2 (InR (inserting <$> r2))))))
+
+-- | Constructs the insertion of a value in an Applicative context.
+inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
+inserting = cata insertF
+
+insertF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
+insertF = Diff . Let mempty . Patch . Insert . hoistTermF InR
+
+-- | Constructs the deletion of a value in an Applicative context.
+deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
+deleting = cata deleteF
+
+deleteF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
+deleteF = Diff . Let mempty . Patch . Delete . hoistTermF InR
+
+
+merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
+merge = (Diff .) . (Let mempty .) . (Merge .) . In
+
+var :: Metavar -> Diff syntax ann
+var = Diff . Var
+
+
 type SyntaxDiff fields = Diff Syntax (Record fields)
 
 
@@ -102,33 +128,6 @@ stripDiff :: Functor f
           => Diff f (Record (h ': t))
           -> Diff f (Record t)
 stripDiff = fmap rtail
-
-
--- | Constructs the replacement of one value by another in an Applicative context.
-replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
-replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace (In a1 (InR (deleting <$> r1))) (In a2 (InR (inserting <$> r2))))))
-
--- | Constructs the insertion of a value in an Applicative context.
-inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
-inserting = cata insertF
-
-insertF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
-insertF = Diff . Let mempty . Patch . Insert . hoistTermF InR
-
--- | Constructs the deletion of a value in an Applicative context.
-deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
-deleting = cata deleteF
-
-deleteF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
-deleteF = Diff . Let mempty . Patch . Delete . hoistTermF InR
-
-
-merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
-merge = (Diff .) . (Let mempty .) . (Merge .) . In
-
-var :: Metavar -> Diff syntax ann
-var = Diff . Var
-
 
 
 type instance Base (Diff syntax ann) = BindingF (DiffF syntax ann)
