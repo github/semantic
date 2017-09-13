@@ -110,11 +110,17 @@ replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Let mempty (Patch (Replace
 
 -- | Constructs the insertion of a value in an Applicative context.
 inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
-inserting = cata (Diff . Let mempty . Patch . Insert . hoistTermF InR)
+inserting = cata insertF
+
+insertF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
+insertF = Diff . Let mempty . Patch . Insert . hoistTermF InR
 
 -- | Constructs the deletion of a value in an Applicative context.
 deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
-deleting = cata (Diff . Let mempty . Patch . Delete . hoistTermF InR)
+deleting = cata deleteF
+
+deleteF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
+deleteF = Diff . Let mempty . Patch . Delete . hoistTermF InR
 
 
 merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
