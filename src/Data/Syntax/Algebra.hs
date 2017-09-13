@@ -8,7 +8,6 @@ module Data.Syntax.Algebra
 , cyclomaticComplexityAlgebra
 ) where
 
-import Control.Comonad (extract)
 import Data.Bifunctor (second)
 import Data.ByteString (ByteString)
 import Data.Functor.Foldable
@@ -34,7 +33,7 @@ decoratorWithAlgebra :: Functor f
                      => RAlgebra (Base (Term f (Record fs))) (Term f (Record fs)) a -- ^ An R-algebra on terms.
                      -> Term f (Record fs) -- ^ A term to decorate with values produced by the R-algebra.
                      -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the R-algebra.
-decoratorWithAlgebra alg = para $ \ c@(a :< f) -> cofree $ (alg (fmap (second (rhead . extract)) c) :. a) :< fmap snd f
+decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (rhead . extract)) c) :. a) (fmap snd f)
 
 
 newtype Identifier = Identifier ByteString
@@ -44,7 +43,7 @@ newtype Identifier = Identifier ByteString
 --
 --   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
 identifierAlgebra :: (Syntax.Identifier :< fs, Declaration.Method :< fs, Declaration.Class :< fs, Apply1 Foldable fs, Apply1 Functor fs) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier)
-identifierAlgebra (_ :< union) = case union of
+identifierAlgebra (In _ union) = case union of
   _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier s)
   _ | Just Declaration.Class{..} <- prj union -> classIdentifier
   _ | Just Declaration.Method{..} <- prj union -> methodName
@@ -60,7 +59,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   TODO: Anonymous functions should not increase parent scope’s complexity.
 --   TODO: Inner functions should not increase parent scope’s complexity.
 cyclomaticComplexityAlgebra :: (Declaration.Method :< fs, Statement.Return :< fs, Statement.Yield :< fs, Apply1 Foldable fs, Apply1 Functor fs) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
-cyclomaticComplexityAlgebra (_ :< union) = case union of
+cyclomaticComplexityAlgebra (In _ union) = case union of
   _ | Just Declaration.Method{} <- prj union -> succ (sum union)
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)

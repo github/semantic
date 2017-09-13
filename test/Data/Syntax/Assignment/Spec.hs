@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module Data.Syntax.Assignment.Spec where
 
-import Control.Comonad.Cofree (Cofree(..))
 import Data.Bifunctor (first)
 import Data.ByteString.Char8 as B (ByteString, length, words)
 import Data.Ix
@@ -12,6 +11,7 @@ import Data.Span
 import Data.Syntax.Assignment
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
+import Term
 import Test.Hspec
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
@@ -251,7 +251,7 @@ spec = do
       Left [ "symbol" ]
 
 node :: symbol -> Int -> Int -> [AST [] symbol] -> AST [] symbol
-node symbol start end children = Node symbol (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end))) :< children
+node symbol start end children = Term (Node symbol (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end))) `In` children)
 
 data Grammar = Palette | Red | Green | Blue | Magenta
   deriving (Bounded, Enum, Eq, Ix, Ord, Show)
