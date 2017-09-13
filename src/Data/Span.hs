@@ -14,7 +14,6 @@ import qualified Data.Aeson as A
 import Data.JSON.Fields
 import Data.Hashable (Hashable)
 import Data.Semigroup
-import Data.Text.Prettyprint.Doc
 import GHC.Generics
 
 -- | Source position information
@@ -56,13 +55,6 @@ instance A.FromJSON Span where
     Span <$>
       o .: "start" <*>
       o .: "end"
-
-instance Pretty Pos where
-  pretty Pos{..} = pretty posLine <> colon <> pretty posColumn
-
-instance Pretty Span where
-  pretty Span{..} = pretty spanStart <> pretty '-' <> pretty spanEnd
-
 
 instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]

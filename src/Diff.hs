@@ -8,12 +8,11 @@ import Data.Bitraversable
 import Data.Foldable (fold)
 import Data.Functor.Both as Both
 import Data.Functor.Classes
-import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
 import Data.Mergeable
 import Data.Record
-import Data.Union
+import Data.Semigroup((<>))
 import Patch
 import Syntax
 import Term
@@ -81,18 +80,6 @@ deleting = Diff . Patch . Delete
 copy :: Both ann -> syntax (Diff syntax ann) -> Diff syntax ann
 copy = (Diff .) . Copy
 
-
-instance Apply1 Pretty1 fs => Pretty1 (Diff (Union fs)) where
-  liftPretty p pl = go
-    where go (Diff (Copy _ syntax)) = liftPrettyUnion go (Pretty.list . map (liftPretty p pl)) syntax
-          go (Diff (Patch patch)) = liftPretty (liftPretty p pl) (Pretty.list . map (liftPretty p pl)) patch
-
-instance (Apply1 Pretty1 fs, Pretty ann) => Pretty (Diff (Union fs) ann) where
-  pretty = liftPretty pretty prettyList
-
-instance Apply1 Pretty1 fs => Pretty2 (DiffF (Union fs)) where
-  liftPretty2 pA plA pB plB (Copy (Join ann) f) = liftPretty2 pA plA pA plA ann <+> liftPrettyUnion pB plB f
-  liftPretty2 pA plA _ _ (Patch p) = liftPretty (liftPretty pA plA) (Pretty.list . map (liftPretty pA plA)) p
 
 type instance Base (Diff syntax ann) = DiffF syntax ann
 

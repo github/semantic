@@ -10,7 +10,6 @@ module Term
 , unwrap
 , hoistTerm
 , stripTerm
-, liftPrettyUnion
 ) where
 
 import Control.Comonad
@@ -20,12 +19,10 @@ import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Functor.Classes
-import Data.Functor.Classes.Pretty.Generic as Pretty
 import Data.Functor.Foldable
 import Data.JSON.Fields
-import Data.Proxy
 import Data.Record
-import Data.Union
+import Data.Semigroup ((<>))
 import Syntax
 import Text.Show
 
@@ -56,16 +53,6 @@ hoistTerm f = go where go (Term (In a r)) = termIn a (f (fmap go r))
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
 stripTerm = fmap rtail
 
-
-liftPrettyUnion :: Apply1 Pretty1 fs => (a -> Doc ann) -> ([a] -> Doc ann) -> Union fs a -> Doc ann
-liftPrettyUnion p pl = apply1 (Proxy :: Proxy Pretty1) (liftPretty p pl)
-
-
-instance Apply1 Pretty1 fs => Pretty1 (Term (Union fs)) where
-  liftPretty p pl = go where go (Term (In a f)) = p a <+> liftPrettyUnion go (Pretty.list . map (liftPretty p pl)) f
-
-instance (Apply1 Pretty1 fs, Pretty a) => Pretty (Term (Union fs) a) where
-  pretty = liftPretty pretty prettyList
 
 type instance Base (Term f a) = TermF f a
 
@@ -123,15 +110,6 @@ instance Show1 f => Show2 (TermF f) where
 
 instance (Show1 f, Show a) => Show1 (TermF f a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-instance Pretty1 f => Pretty2 (TermF f) where
-  liftPretty2 pA _ pB plB (In a f) = pA a <+> liftPretty pB plB f
-
-instance (Pretty1 f, Pretty a) => Pretty1 (TermF f a) where
-  liftPretty = liftPretty2 pretty prettyList
-
-instance (Pretty1 f, Pretty a, Pretty b) => Pretty (TermF f a b) where
-  pretty = liftPretty pretty prettyList
 
 
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
