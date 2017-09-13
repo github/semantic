@@ -99,7 +99,7 @@ declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Decl
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
-syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (SyntaxTermF fields) (SyntaxTerm fields) (Maybe Declaration)
+syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (TermF S.Syntax (Record fields)) (Term S.Syntax (Record fields)) (Maybe Declaration)
 syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)

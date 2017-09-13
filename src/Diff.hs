@@ -12,7 +12,6 @@ import Data.JSON.Fields
 import Data.Mergeable
 import Data.Record
 import Patch
-import Syntax
 import Term
 import Text.Show
 
@@ -50,9 +49,6 @@ deleteF = Diff . Patch . Delete
 -- | Constructs a 'Diff' merging two annotations for a single syntax functor populated by further 'Diff's.
 merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
 merge = (Diff .) . (Merge .) . In
-
-
-type SyntaxDiff fields = Diff Syntax (Record fields)
 
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int

@@ -26,8 +26,8 @@ import Term
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
 diffTerms :: HasField fields Category
-          => Both (SyntaxTerm fields) -- ^ A pair of terms representing the old and new state, respectively.
-          -> SyntaxDiff fields
+          => Both (Term Syntax (Record fields)) -- ^ A pair of terms representing the old and new state, respectively.
+          -> Diff Syntax (Record fields)
 diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
@@ -64,9 +64,9 @@ getLabel (In h t) = (Info.category h, case t of
 
 
 -- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: SyntaxTerm fields
-                   -> SyntaxTerm fields
-                   -> Algorithm (Term Syntax) (SyntaxDiff fields) (SyntaxDiff fields)
+algorithmWithTerms :: Term Syntax (Record fields)
+                   -> Term Syntax (Record fields)
+                   -> Algorithm (Term Syntax) (Diff Syntax (Record fields)) (Diff Syntax (Record fields))
 algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     annotate . Indexed <$> byRWS a b
