@@ -163,3 +163,9 @@ algorithmDeletingContext :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< f
                          -> Term (Union fs) a
                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (Context (Diff (Union fs) a)))
 algorithmDeletingContext (Context n1 s1) s2 = fmap (Context (deleting <$> n1)) <$> algorithmForComparableTerms s1 s2
+
+algorithmInsertingContext :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs)
+                          => Term (Union fs) a
+                          -> Context (Term (Union fs) a)
+                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (Context (Diff (Union fs) a)))
+algorithmInsertingContext s1 (Context n2 s2) = fmap (Context (inserting <$> n2)) <$> algorithmForComparableTerms s1 s2
