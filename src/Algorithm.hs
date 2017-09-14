@@ -92,7 +92,7 @@ algorithmForTerms :: (Functor syntax, Diffable syntax)
                   -> Algorithm (Term syntax) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2)
 algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (algorithmForComparableTerms t1 t2)
 
-algorithmForComparableTerms :: (Functor syntax, Diffable syntax)
+algorithmForComparableTerms :: Diffable syntax
                             => Term syntax ann1
                             -> Term syntax ann2
                             -> Maybe (Algorithm (Term syntax) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2))
