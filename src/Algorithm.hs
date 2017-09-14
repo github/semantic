@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators #-}
 module Algorithm where
 
 import Control.Applicative (liftA2)
@@ -80,7 +80,7 @@ instance (Show1 term, Show ann1, Show ann2) => Show1 (AlgorithmF term diff ann1 
     Delete t1 -> showsUnaryWith showsTerm "Delete" d t1
     Insert t2 -> showsUnaryWith showsTerm "Insert" d t2
     Replace t1 t2 -> showsBinaryWith showsTerm showsTerm "Replace" d t1 t2
-    where showsTerm :: Show ann => Int -> term ann -> ShowS
+    where showsTerm :: (Show1 term, Show ann) => Int -> term ann -> ShowS
           showsTerm = liftShowsPrec showsPrec showList
 
 
