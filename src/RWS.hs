@@ -172,12 +172,12 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 --
 -- cf §4.2 of RWS-Diff
 nearestUnmapped
-  :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
-  -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-  -> UnmappedTerms syntax (Record fields) -- ^ A set of terms eligible for matching against.
-  -> KdTree Double (UnmappedTerm syntax (Record fields)) -- ^ The k-d tree to look up nearest neighbours within.
-  -> UnmappedTerm syntax (Record fields) -- ^ The term to find the nearest neighbour to.
-  -> Maybe (UnmappedTerm syntax (Record fields)) -- ^ The most similar unmapped term, if any.
+  :: (Diff syntax ann1 ann2 -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+  -> ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
+  -> UnmappedTerms syntax ann2 -- ^ A set of terms eligible for matching against.
+  -> KdTree Double (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
+  -> UnmappedTerm syntax ann1 -- ^ The term to find the nearest neighbour to.
+  -> Maybe (UnmappedTerm syntax ann2) -- ^ The most similar unmapped term, if any.
 nearestUnmapped editDistance canCompare unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable editDistance canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
 
 editDistanceIfComparable :: Bounded t
