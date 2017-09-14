@@ -25,3 +25,6 @@
 [submodule "vendor/freer-cofreer"]
 	path = vendor/freer-cofreer
 	url = https://github.com/robrix/freer-cofreer.git
+[submodule "vendor/ghc-mod"]
+	path = vendor/ghc-mod
+	url = https://github.com/joshvera/ghc-mod
