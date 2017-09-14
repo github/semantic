@@ -113,5 +113,5 @@ comparableByCategory :: HasField fields Category => ComparabilityRelation syntax
 comparableByCategory (In a _) (In b _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: GAlign syntax => ComparabilityRelation syntax (Record fields) (Record fields)
+comparableByConstructor :: GAlign syntax => ComparabilityRelation syntax ann1 ann2
 comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
