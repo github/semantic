@@ -1,7 +1,7 @@
-module SES.Myers.Spec where
+module SES.Spec where
 
 import Data.These
-import SES.Myers
+import SES
 import Test.Hspec
 import Test.Hspec.LeanCheck
 
