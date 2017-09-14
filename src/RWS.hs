@@ -55,10 +55,10 @@ data UnmappedTerm syntax ann = UnmappedTerm
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
 rws :: (Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax)
-    => ComparabilityRelation syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields))
-    -> [Term syntax (Record (FeatureVector ': fields))]
-    -> [Term syntax (Record (FeatureVector ': fields))]
-    -> RWSEditScript syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields))
+    => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+    -> [Term syntax (Record (FeatureVector ': fields1))]
+    -> [Term syntax (Record (FeatureVector ': fields2))]
+    -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
 rws _          as [] = This <$> as
 rws _          [] bs = That <$> bs
 rws canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
