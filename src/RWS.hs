@@ -14,7 +14,7 @@ import Control.Applicative (empty)
 import Control.Arrow ((&&&))
 import Control.Monad.State.Strict
 import Data.Foldable
-import Data.Function ((&), on)
+import Data.Function ((&))
 import Data.Functor.Foldable
 import Data.Hashable
 import Data.List (sortOn)
@@ -301,8 +301,8 @@ unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
     components = evalRand (sequenceA (replicate d (liftRand randomDouble))) (pureMT (fromIntegral hash))
 
 -- | Test the comparability of two root 'Term's in O(1).
-canCompareTerms :: ComparabilityRelation syntax (Record fields) (Record fields) -> Term syntax (Record fields) -> Term syntax (Record fields) -> Bool
-canCompareTerms canCompare = canCompare `on` unTerm
+canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
+canCompareTerms canCompare t1 t2 = canCompare (unTerm t1) (unTerm t2)
 
 -- | Recursively test the equality of two 'Term's in O(n).
 equalTerms :: Eq1 syntax => ComparabilityRelation syntax (Record fields) (Record fields) -> Term syntax (Record fields) -> Term syntax (Record fields) -> Bool
