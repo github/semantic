@@ -42,7 +42,7 @@ decoratingWith getLabel differ t1 t2 = stripDiff (differ (defaultFeatureVectorDe
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: forall f fields . (Traversable f, GAlign f, Eq1 f, HasField fields FeatureVector)
               => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f) (Diff f) (Record fields) (Record fields) (Diff f (Record fields) (Record fields))) -- ^ A function producing syntax-directed continuations of the algorithm.
-              -> ComparabilityRelation f fields -- ^ A relation on terms used to determine comparability and equality.
+              -> ComparabilityRelation f (Record fields) (Record fields) -- ^ A relation on terms used to determine comparability and equality.
               -> Term f (Record fields) -- ^ A term representing the old state.
               -> Term f (Record fields) -- ^ A term representing the new state.
               -> Diff f (Record fields) (Record fields) -- ^ The resulting diff.
@@ -110,11 +110,11 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 
 -- | Test whether two terms are comparable by their Category.
-comparableByCategory :: HasField fields Category => ComparabilityRelation f fields
+comparableByCategory :: HasField fields Category => ComparabilityRelation syntax (Record fields) (Record fields)
 comparableByCategory (In a _) (In b _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: GAlign f => ComparabilityRelation f fields
+comparableByConstructor :: GAlign syntax => ComparabilityRelation syntax (Record fields) (Record fields)
 comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 
 
