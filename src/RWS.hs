@@ -45,11 +45,11 @@ type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a ->
 newtype FeatureVector = FV { unFV :: UArray Int Double }
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm syntax ann = UnmappedTerm {
-    termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
+data UnmappedTerm syntax ann = UnmappedTerm
+  { termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
   , feature   :: {-# UNPACK #-} !FeatureVector -- ^ Feature vector
   , term      :: Term syntax ann -- ^ The unmapped term
-}
+  }
 
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
