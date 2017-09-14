@@ -40,7 +40,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 -- | A relation on 'Term's, guaranteed constant-time in the size of the 'Term' by parametricity.
 --
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
-type ComparabilityRelation f fields = forall a b. TermF f (Record fields) a -> TermF f (Record fields) b -> Bool
+type ComparabilityRelation syntax fields = forall a b. TermF syntax (Record fields) a -> TermF syntax (Record fields) b -> Bool
 
 type FeatureVector = UArray Int Double
 
@@ -54,12 +54,12 @@ data UnmappedTerm f fields = UnmappedTerm {
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
-rws :: (HasField fields FeatureVector, Functor f, Eq1 f)
-    => (Diff f fields -> Int)
-    -> ComparabilityRelation f fields
-    -> [Term f (Record fields)]
-    -> [Term f (Record fields)]
-    -> RWSEditScript f fields
+rws :: (HasField fields FeatureVector, Functor syntax, Eq1 syntax)
+    => (Diff syntax fields -> Int)
+    -> ComparabilityRelation syntax fields
+    -> [Term syntax (Record fields)]
+    -> [Term syntax (Record fields)]
+    -> RWSEditScript syntax fields
 rws _            _          as [] = This <$> as
 rws _            _          [] bs = That <$> bs
 rws _            canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
