@@ -22,10 +22,10 @@ import Term
 
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: HasField fields Category
-          => Term Syntax (Record fields) -- ^ A term representing the old state.
-          -> Term Syntax (Record fields) -- ^ A term representing the new state.
-          -> Diff Syntax (Record fields) (Record fields)
+diffTerms :: (HasField fields1 Category, HasField fields2 Category)
+          => Term Syntax (Record fields1) -- ^ A term representing the old state.
+          -> Term Syntax (Record fields2) -- ^ A term representing the new state.
+          -> Diff Syntax (Record fields1) (Record fields2)
 diffTerms = decoratingWith getLabel getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
@@ -39,15 +39,15 @@ decoratingWith :: (Hashable label, Traversable syntax)
 decoratingWith getLabel1 getLabel2 differ t1 t2 = stripDiff (differ (defaultFeatureVectorDecorator getLabel1 t1) (defaultFeatureVectorDecorator getLabel2 t2))
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
-diffTermsWith :: forall syntax fields
+diffTermsWith :: forall syntax fields1 fields2
               .  (Eq1 syntax, GAlign syntax, Traversable syntax)
-              => (Term syntax (Record (FeatureVector ': fields)) -> Term syntax (Record (FeatureVector ': fields)) -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) (Diff syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)))) -- ^ A function producing syntax-directed continuations of the algorithm.
-              -> ComparabilityRelation syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) -- ^ A relation on terms used to determine comparability and equality.
-              -> Term syntax (Record (FeatureVector ': fields)) -- ^ A term representing the old state.
-              -> Term syntax (Record (FeatureVector ': fields)) -- ^ A term representing the new state.
-              -> Diff syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) -- ^ The resulting diff.
+              => (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))) -- ^ A function producing syntax-directed continuations of the algorithm.
+              -> ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
+              -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
+              -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
+              -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
 diffTermsWith refine comparable t1 t2 = runFreer decompose (diff t1 t2)
-  where decompose :: AlgorithmF (Term syntax) (Diff syntax) (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) result -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) result
+  where decompose :: AlgorithmF (Term syntax) (Diff syntax) (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) result -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) result
         decompose step = case step of
           Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
@@ -110,7 +110,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 
 -- | Test whether two terms are comparable by their Category.
-comparableByCategory :: HasField fields Category => ComparabilityRelation syntax (Record fields) (Record fields)
+comparableByCategory :: (HasField fields1 Category, HasField fields2 Category) => ComparabilityRelation syntax (Record fields1) (Record fields2)
 comparableByCategory (In a _) (In b _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
