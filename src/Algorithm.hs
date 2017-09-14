@@ -87,10 +87,16 @@ instance (Show1 term, Show ann) => Show1 (AlgorithmF term diff ann ann) where
 
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
 -- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
-algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f) (Diff f) a a (Diff f a)
+algorithmForTerms :: (Functor syntax, Diffable syntax)
+                  => Term syntax ann
+                  -> Term syntax ann
+                  -> Algorithm (Term syntax) (Diff syntax) ann ann (Diff syntax ann)
 algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (algorithmForComparableTerms t1 t2)
 
-algorithmForComparableTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Maybe (Algorithm (Term f) (Diff f) a a (Diff f a))
+algorithmForComparableTerms :: (Functor syntax, Diffable syntax)
+                            => Term syntax ann
+                            -> Term syntax ann
+                            -> Maybe (Algorithm (Term syntax) (Diff syntax) ann ann (Diff syntax ann))
 algorithmForComparableTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = fmap (merge (ann1, ann2)) <$> algorithmFor f1 f2
 
 
