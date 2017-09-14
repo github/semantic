@@ -101,8 +101,14 @@ algorithmForComparableTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = fmap (merg
 
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
-  algorithmFor :: f (term ann1) -> f (term ann2) -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
-  default algorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
+  algorithmFor :: f (term ann1)
+               -> f (term ann2)
+               -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
+  default
+    algorithmFor :: (Generic1 f, GDiffable (Rep1 f))
+                 => f (term ann1)
+                 -> f (term ann2)
+                 -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
   algorithmFor = genericAlgorithmFor
 
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
