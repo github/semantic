@@ -4,11 +4,11 @@
   ->(Identifier) }
   { (Params)
   ->(Params
-      (Other "required_parameter"
-        (Identifier))
-      (Other "required_parameter"
-        (Identifier))) }
+    {+(Other "required_parameter"
+      {+(Identifier)+})+}
+    {+(Other "required_parameter"
+      {+(Identifier)+})+}) }
   {+(ExpressionStatements
-      (Identifier))+}
+    {+(Identifier)+})+}
   {-(Return
-      (Boolean))-}))
+    {-(Boolean)-})-}))

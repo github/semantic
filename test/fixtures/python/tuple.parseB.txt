@@ -6,4 +6,5 @@
   (Tuple
     (Identifier)
     (Identifier))
-  ((Identifier)))
+  (
+    (Identifier)))

@@ -16,20 +16,20 @@
     { (Boolean)
     ->(Boolean) })
   {-(KeyValue
-      (Symbol)
-      (Integer))-})
+    {-(Symbol)-}
+    {-(Integer)-})-})
 {-(Hash)-}
 {-(Hash
-    (KeyValue
-      (Identifier)
-      (Integer))
-    (KeyValue
-      (TextElement)
-      (Integer))
-    (Context
-      (Comment)
-      (Empty)))-}
+  {-(KeyValue
+    {-(Identifier)-}
+    {-(Integer)-})-}
+  {-(KeyValue
+    {-(TextElement)-}
+    {-(Integer)-})-}
+  {-(Context
+    {-(Comment)-}
+    {-(Empty)-})-})-}
 {-(Hash
-    (Context
-      (Comment)
-      (Empty)))-})
+  {-(Context
+    {-(Comment)-}
+    {-(Empty)-})-})-})

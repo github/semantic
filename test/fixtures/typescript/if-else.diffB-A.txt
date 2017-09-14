@@ -11,7 +11,7 @@
       (ExpressionStatements
       {+(Identifier)+}
       {-(ExpressionStatements
-          (Identifier))-})
+        {-(Identifier)-})-})
       (If
       { (Identifier)
       ->(Identifier) }
@@ -24,7 +24,7 @@
           (ExpressionStatements
           {+(Identifier)+}
           {-(ExpressionStatements
-              (Identifier))-})
+            {-(Identifier)-})-})
           (ExpressionStatements
           { (Identifier)
           ->(Identifier) }))))))

@@ -5,6 +5,6 @@
       (Identifier)
       (Boolean))
   {+(KeyValue
-      (Identifier)
-      (Integer))+}
+    {+(Identifier)+}
+    {+(Integer)+})+}
     (Empty)))

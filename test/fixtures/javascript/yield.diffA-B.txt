@@ -11,5 +11,5 @@
         (Yield
         { (Identifier)
         ->(MathOperator
-            (Identifier)
-            (Other "++")) })))))
+          {+(Identifier)+}
+          {+(Other "++")+}) })))))

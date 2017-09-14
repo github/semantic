@@ -1,34 +1,34 @@
 (Program
 {+(Other "type_alias_declaration"
-    (Identifier)
-    (Other "union_type"
-      (Other "union_type"
-        (Other "union_type"
-          (Other "predefined_type")
-          (Other "predefined_type"))
-        (Identifier))
-      (Other "generic_type"
-        (Identifier)
-        (Other "type_arguments"
-          (Other "union_type"
-            (Other "union_type"
-              (Other "predefined_type")
-              (Other "predefined_type"))
-            (Identifier))))))+}
+  {+(Identifier)+}
+  {+(Other "union_type"
+    {+(Other "union_type"
+      {+(Other "union_type"
+        {+(Other "predefined_type")+}
+        {+(Other "predefined_type")+})+}
+      {+(Identifier)+})+}
+    {+(Other "generic_type"
+      {+(Identifier)+}
+      {+(Other "type_arguments"
+        {+(Other "union_type"
+          {+(Other "union_type"
+            {+(Other "predefined_type")+}
+            {+(Other "predefined_type")+})+}
+          {+(Identifier)+})+})+})+})+})+}
 {-(Other "ambient_declaration"
-    (Other "type_alias_declaration"
-      (Identifier)
-      (Other "union_type"
-        (Other "union_type"
-          (Other "union_type"
-            (Other "predefined_type")
-            (Other "predefined_type"))
-          (Identifier))
-        (Other "generic_type"
-          (Identifier)
-          (Other "type_arguments"
-            (Other "union_type"
-              (Other "union_type"
-                (Other "predefined_type")
-                (Other "predefined_type"))
-              (Identifier)))))))-})
+  {-(Other "type_alias_declaration"
+    {-(Identifier)-}
+    {-(Other "union_type"
+      {-(Other "union_type"
+        {-(Other "union_type"
+          {-(Other "predefined_type")-}
+          {-(Other "predefined_type")-})-}
+        {-(Identifier)-})-}
+      {-(Other "generic_type"
+        {-(Identifier)-}
+        {-(Other "type_arguments"
+          {-(Other "union_type"
+            {-(Other "union_type"
+              {-(Other "predefined_type")-}
+              {-(Other "predefined_type")-})-}
+            {-(Identifier)-})-})-})-})-})-})-})

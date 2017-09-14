@@ -1,8 +1,8 @@
 (Program
 {-(Call
-    (Identifier)
-    (Hash)
-    (Empty))-}
+  {-(Identifier)-}
+  {-(Hash)-}
+  {-(Empty)-})-}
   (Call
     (Identifier)
     (Function
@@ -10,39 +10,39 @@
     {+(Identifier)+}
     { (Identifier)
     ->(Plus
-        (Identifier)
-        (Integer)) }))
+      {+(Identifier)+}
+      {+(Integer)+}) }))
 {-(Call
-    (Identifier)
-    (Function
-      (Empty)
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Integer)))-}
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Integer)-})-})-}
 {-(Function
-    (Empty)
-    (Function
-      (Empty)
-      ([])))-}
+  {-(Empty)-}
+  {-(Function
+    {-(Empty)-}
+    {-([])-})-})-}
 {-(Function
-    (Empty)
-    (Function
-      (Empty)
-      (Identifier)))-}
+  {-(Empty)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Identifier)-})-})-}
 {-(Function
-    (Empty)
-    (Identifier)
-    (Function
-      (Empty)
-      (Integer)))-}
+  {-(Empty)-}
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Integer)-})-})-}
 {-(Function
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (
-      (Identifier)
-      (Identifier))
-    (Function
-      (Empty)
-      ([])))-})
+  {-(Empty)-}
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(
+    {-(Identifier)-}
+    {-(Identifier)-})-}
+  {-(Function
+    {-(Empty)-}
+    {-([])-})-})-})

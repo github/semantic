@@ -4,5 +4,5 @@
   { ([])
   ->(Identifier) })
 {-(While
-    (Identifier)
-    (Identifier))-})
+  {-(Identifier)-}
+  {-(Identifier)-})-})

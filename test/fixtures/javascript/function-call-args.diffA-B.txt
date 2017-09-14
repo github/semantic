@@ -8,11 +8,11 @@
       (Function
         (Params
         {-(Other "required_parameter"
-            (Identifier))-}
+          {-(Identifier)-})-}
           (Other "required_parameter"
             (Identifier))
         {+(Other "required_parameter"
-            (Identifier))+})
+          {+(Identifier)+})+})
         (ExpressionStatements
           (FunctionCall
             (Identifier)

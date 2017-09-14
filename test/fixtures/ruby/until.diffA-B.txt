@@ -5,6 +5,6 @@
   { ([])
   ->(Identifier) })
 {-(While
-    (Not
-      (Identifier))
-    (Identifier))-})
+  {-(Not
+    {-(Identifier)-})-}
+  {-(Identifier)-})-})

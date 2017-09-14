@@ -2,10 +2,10 @@
   (Module
     (Identifier)
   {-(Method
-      (Empty)
-      (Identifier)
-      ([]))-})
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-([])-})-})
 {+(Module
-    (ScopeResolution
-      (Identifier)
-      (Identifier)))+})
+  {+(ScopeResolution
+    {+(Identifier)+}
+    {+(Identifier)+})+})+})

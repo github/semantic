@@ -10,7 +10,7 @@
   {+(Symbol)+}
   {-(Symbol)-})
 {+(Assignment
-    (Subscript
-      (Identifier)
-      (Identifier))
-    (Integer))+})
+  {+(Subscript
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Integer)+})+})

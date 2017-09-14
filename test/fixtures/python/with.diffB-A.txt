@@ -3,46 +3,46 @@
   { (Empty)
   ->(Identifier) }
   { (MemberAccess
-      (Identifier)
-      (Identifier))
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(Call
-      (Identifier)
-      (Identifier)
-      (TextElement)
-      (Empty)) }
+    {+(Identifier)+}
+    {+(Identifier)+}
+    {+(TextElement)+}
+    {+(Empty)+}) }
     (
       (Assignment
         (Identifier)
         (Boolean))
     {+(ForEach
-        (
-          (Identifier))
-        (Identifier)
-        (
-          (Assignment
-            (Identifier)
-            (Boolean))))+}))
+      {+(
+        {+(Identifier)+})+}
+      {+(Identifier)+}
+      {+(
+        {+(Assignment
+          {+(Identifier)+}
+          {+(Boolean)+})+})+})+}))
 {-(
-    (Let
-      (Empty)
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (TextElement)
-        (Identifier)
-        (Empty))
-      ([]))
-    (Let
-      (Empty)
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (TextElement)
-        (Identifier)
-        (Empty))
-      (
-        (Identifier))))-})
+  {-(Let
+    {-(Empty)-}
+    {-(Call
+      {-(MemberAccess
+        {-(Identifier)-}
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(TextElement)-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-([])-})-}
+  {-(Let
+    {-(Empty)-}
+    {-(Call
+      {-(MemberAccess
+        {-(Identifier)-}
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(TextElement)-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(
+      {-(Identifier)-})-})-})-})

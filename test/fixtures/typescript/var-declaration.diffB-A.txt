@@ -1,12 +1,12 @@
 (Program
   (Other "variable_declaration"
   {+(VarAssignment
-      (Identifier)
-      (NumberLiteral))+}
+    {+(Identifier)+}
+    {+(NumberLiteral)+})+}
   {-(VarDecl
-      (Identifier))-}
+    {-(Identifier)-})-}
   {-(VarAssignment
-      (Identifier)
-      (Object))-}
+    {-(Identifier)-}
+    {-(Object)-})-}
   {-(VarDecl
-      (Identifier))-}))
+    {-(Identifier)-})-}))

@@ -9,10 +9,10 @@
         (
         { (Identifier)
         ->(Pattern
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (Identifier)
-              ([]))) }
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+}
+            {+([])+})+}) }
         {-(Identifier)-})))))

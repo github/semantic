@@ -6,11 +6,11 @@
     {+(Identifier)+})
   { (Empty)
   ->(If
-      (Identifier)
-      (
-        (Identifier))
-      (Identifier)) })
+    {+(Identifier)+}
+    {+(
+      {+(Identifier)+})+}
+    {+(Identifier)+}) })
 {-(If
-    (Identifier)
-    ([])
-    (Empty))-})
+  {-(Identifier)-}
+  {-([])-}
+  {-(Empty)-})-})

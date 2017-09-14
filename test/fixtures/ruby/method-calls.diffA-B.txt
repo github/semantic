@@ -1,39 +1,39 @@
 (Program
   (Call
   { (MemberAccess
-      (Identifier)
-      (Identifier))
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(Identifier) }
     (Empty))
 {-(Call
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (KeyValue
-      (Symbol)
-      (Integer))
-    (KeyValue
-      (Identifier)
-      (Integer))
-    (Empty))-}
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(KeyValue
+    {-(Symbol)-}
+    {-(Integer)-})-}
+  {-(KeyValue
+    {-(Identifier)-}
+    {-(Integer)-})-}
+  {-(Empty)-})-}
 {-(Call
-    (Identifier)
-    (Call
-      (Identifier)
-      (Identifier)
-      (Empty))
-    (Empty))-}
+  {-(Identifier)-}
+  {-(Call
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Empty)-})-}
+  {-(Empty)-})-}
 {-(Call
-    (Identifier)
-    (KeyValue
-      (Array)
-      (Integer))
-    (Identifier)
-    (Identifier)
-    (Function
-      (Empty)
-      (Identifier)
-      (Function
-        (Empty)
-        (Integer)))
-    (Empty))-})
+  {-(Identifier)-}
+  {-(KeyValue
+    {-(Array)-}
+    {-(Integer)-})-}
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(Function
+      {-(Empty)-}
+      {-(Integer)-})-})-}
+  {-(Empty)-})-})

@@ -8,7 +8,7 @@
   { (Identifier)
   ->(Empty) })
 {+(If
-    (Not
-      (Identifier))
-    ([])
-    (Empty))+})
+  {+(Not
+    {+(Identifier)+})+}
+  {+([])+}
+  {+(Empty)+})+})

@@ -10,6 +10,6 @@
       (ExpressionStatements
         (Yield
         { (MathOperator
-            (Identifier)
-            (Other "++"))
+          {-(Identifier)-}
+          {-(Other "++")-})
         ->(Identifier) })))))

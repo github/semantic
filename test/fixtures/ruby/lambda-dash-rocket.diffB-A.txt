@@ -8,5 +8,5 @@
       (Empty)
     { (Identifier)
     ->(
-        (Integer)
-        (Integer)) })))
+      {+(Integer)+}
+      {+(Integer)+}) })))

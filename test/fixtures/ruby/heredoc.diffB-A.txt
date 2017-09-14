@@ -2,11 +2,11 @@
 {+(TextElement)+}
 {+(TextElement)+}
 {-(Call
-    (MemberAccess
-      (Call
-        (Identifier)
-        (TextElement)
-        (TextElement)
-        (Empty))
-      (Identifier))
-    (Empty))-})
+  {-(MemberAccess
+    {-(Call
+      {-(Identifier)-}
+      {-(TextElement)-}
+      {-(TextElement)-}
+      {-(Empty)-})-}
+    {-(Identifier)-})-}
+  {-(Empty)-})-})

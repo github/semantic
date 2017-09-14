@@ -1,7 +1,7 @@
 (Program
   (If
   { (Not
-      (Identifier))
+    {-(Identifier)-})
   ->(Identifier) }
     (Identifier)
     (Empty)))

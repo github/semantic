@@ -7,6 +7,6 @@
     (Function
       (Empty)
     { (
-        (Integer)
-        (Integer))
+      {-(Integer)-}
+      {-(Integer)-})
     ->(Identifier) })))

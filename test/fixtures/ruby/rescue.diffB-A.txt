@@ -9,41 +9,41 @@
           {-(Identifier)-}))
       { (Identifier)
       ->(Catch
-          (
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (Identifier)))
-          (Identifier)) })
+        {+(
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+})+})+}
+        {+(Identifier)+}) })
     {+(Else
-        (Empty)
-        (Identifier))+}
+      {+(Empty)+}
+      {+(Identifier)+})+}
     {+(Finally
-        (Identifier))+}))
+      {+(Identifier)+})+}))
 {+(Method
-    (Empty)
-    (Identifier)
-    (
-      (Catch
-        (
-          (
-            (Identifier)))
-        (Catch
-          (
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (Identifier)))
-          ([])))
-      (Else
-        (Empty)
-        ([]))
-      (Finally
-        ([]))))+}
+  {+(Empty)+}
+  {+(Identifier)+}
+  {+(
+    {+(Catch
+      {+(
+        {+(
+          {+(Identifier)+})+})+}
+      {+(Catch
+        {+(
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+})+})+}
+        {+([])+})+})+}
+    {+(Else
+      {+(Empty)+}
+      {+([])+})+}
+    {+(Finally
+      {+([])+})+})+})+}
 {+(Try
-    (Identifier)
-    (Catch
-      (Null)
-      (Empty)))+})
+  {+(Identifier)+}
+  {+(Catch
+    {+(Null)+}
+    {+(Empty)+})+})+})

@@ -1,6 +1,6 @@
 (Program
 {+(ScopeExit
-    (Identifier))+}
+  {+(Identifier)+})+}
 {-(Identifier)-}
 {-(ScopeExit
-    (Identifier))-})
+  {-(Identifier)-})-})

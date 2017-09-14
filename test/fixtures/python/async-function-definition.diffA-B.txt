@@ -22,20 +22,20 @@
       (Empty))
     (Identifier))
 {+(Annotation
-    (Annotation
-      (Function
-        (Identifier)
-        (Identifier)
-        (
-          (Identifier)))
-      (Empty))
-    (Identifier))+}
+  {+(Annotation
+    {+(Function
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(
+        {+(Identifier)+})+})+}
+    {+(Empty)+})+}
+  {+(Identifier)+})+}
 {-(Annotation
-    (Annotation
-      (Function
-        (Identifier)
-        (Identifier)
-        (
-          (Identifier)))
-      (Empty))
-    (Identifier))-})
+  {-(Annotation
+    {-(Function
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(
+        {-(Identifier)-})-})-}
+    {-(Empty)-})-}
+  {-(Identifier)-})-})

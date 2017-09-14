@@ -1,7 +1,7 @@
 (Program
 {+(Assignment
-    (Identifier)
-    (Integer))+}
+  {+(Identifier)+}
+  {+(Integer)+})+}
   (Assignment
     (
       (Identifier)
@@ -16,10 +16,10 @@
   ->(Identifier) }
   { (Integer)
   ->(
-      (Integer)
-      (Integer)) })
+    {+(Integer)+}
+    {+(Integer)+}) })
 {-(Assignment
-    (Identifier)
-    (
-      (Integer)
-      (Integer)))-})
+  {-(Identifier)-}
+  {-(
+    {-(Integer)-}
+    {-(Integer)-})-})-})

@@ -10,49 +10,49 @@
       (Integer)
       (Integer)))
 {+(Assignment
-    (
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)))+}
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+})+})+}
 {+(Assignment
-    (
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)))+}
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+})+})+}
 {+(Assignment
-    (
-      (Identifier)
-      (Identifier))
-    (Array
-      (Integer)
-      (Integer)))+}
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+})+})+}
 {+(Assignment
-    (
-      (Identifier)
-      (Identifier))
-    (Identifier))+}
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Identifier)+})+}
 {+(Assignment
-    (
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (MemberAccess
-        (Identifier)
-        (Identifier)))
-    (
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (MemberAccess
-        (Identifier)
-        (Identifier))))+}
+  {+(
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+})+}
+  {+(
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+})+})+}
 {+(Assignment
-    (
-      (
-        (Identifier)
-        (Identifier)))
-    (Identifier))+})
+  {+(
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+})+}
+  {+(Identifier)+})+})

@@ -29,14 +29,14 @@
       {-(Identifier)-}))
     (Empty))
 {+(Annotation
-    (Function
-      (Identifier)
-      (Assignment
-        (Identifier)
-        (Identifier))
-      (
-        (Identifier)))
-    (Empty))+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(
+      {+(Identifier)+})+})+}
+  {+(Empty)+})+}
   (Annotation
     (Function
       (Identifier)

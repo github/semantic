@@ -11,6 +11,7 @@ import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Both
+import Data.Functor.Foldable (cata)
 import Data.Functor.Classes (Eq1(..))
 import Data.Hashable (Hashable)
 import Data.Maybe (isJust)
@@ -21,7 +22,6 @@ import Data.Union
 import qualified Data.Syntax.Declaration as Declaration
 import Diff
 import Info hiding (Return)
-import Patch (patchSum)
 import RWS
 import Syntax as S hiding (Return)
 import Term
@@ -53,7 +53,7 @@ diffTermsWith refine comparable eqTerms (Join (a, b)) = runFreer decompose (diff
         decompose step = case step of
           Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> copy (both (extract t1) (extract t2)) <$> sequenceA result
+            Just result -> merge (extract t1, extract t2) <$> sequenceA result
             _ -> byReplacing t1 t2
           RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable eqTerms as bs)
           Delete a -> pure (deleting a)
@@ -108,7 +108,7 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
                <*> byRWS bodyA bodyB
   _ -> linearly t1 t2
   where
-    annotate = copy (both (extract t1) (extract t2))
+    annotate = merge (extract t1, extract t2)
 
 
 -- | Test whether two terms are comparable by their Category.
@@ -142,9 +142,8 @@ defaultM = 10
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (GAlign f, Foldable f, Functor f) => Integer -> These (Term f (Record fields)) (Term f (Record fields)) -> Int
 editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
-  where diffCost m (Diff.Diff diff)
-          | m <= 0    = 0
-          | otherwise = case diff of
-            Copy _ r -> sum (fmap (diffCost (pred m)) r)
-            Patch patch -> patchSum termSize patch
-        approximateDiff a b = maybe (replacing a b) (copy (both (extract a) (extract b))) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
+  where diffCost = flip . cata $ \ diff m -> case diff of
+          _ | m <= 0 -> 0
+          Merge body -> sum (fmap ($ pred m) body)
+          body -> succ (sum (fmap ($ pred m) body))
+        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))

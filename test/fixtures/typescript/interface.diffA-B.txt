@@ -3,8 +3,8 @@
   { (Identifier)
   ->(Identifier) }
   {-(Other "type_parameters"
-      (Other "type_parameter"
-        (Identifier)))-}
+    {-(Other "type_parameter"
+      {-(Identifier)-})-})-}
     (Other "property_signature"
       (Identifier)
       (Ty
