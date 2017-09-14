@@ -161,19 +161,19 @@ instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 algorithmDeletingContext :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs)
                          => TermF Context a (Term (Union fs) a)
                          -> Term (Union fs) a
-                         -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs)) a (TermF Context a (Diff (Union fs) a)))
+                         -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs)) a a (TermF Context a (Diff (Union fs) a)))
 algorithmDeletingContext (In a1 (Context n1 s1)) s2 = fmap (In a1 . Context (deleting <$> n1)) <$> algorithmForComparableTerms s1 s2
 
 algorithmInsertingContext :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs)
                           => Term (Union fs) a
                           -> TermF Context a (Term (Union fs) a)
-                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs)) a (TermF Context a (Diff (Union fs) a)))
+                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs)) a a (TermF Context a (Diff (Union fs) a)))
 algorithmInsertingContext s1 (In a2 (Context n2 s2)) = fmap (In a2 . Context (inserting <$> n2)) <$> algorithmForComparableTerms s1 s2
 
 algorithmForContextUnions :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs)
                           => Term (Union fs) a
                           -> Term (Union fs) a
-                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs)) a (Diff (Union fs) a))
+                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs)) a a (Diff (Union fs) a))
 algorithmForContextUnions t1 t2
   | Just algo <- algorithmForComparableTerms t1 t2 = Just algo
   | Just c1@(In _ Context{}) <- prjTermF (unTerm t1) = fmap (deleteF . hoistTermF inj) <$> algorithmDeletingContext c1 t2
