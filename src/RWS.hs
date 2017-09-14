@@ -117,11 +117,11 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
       These _ _ -> (before, after)
 
 findNearestNeighboursToDiff :: (Foldable syntax, Functor syntax, GAlign syntax)
-                            => ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                            -> [TermOrIndexOrNone (UnmappedTerm syntax (Record fields))]
-                            -> [UnmappedTerm syntax (Record fields)]
-                            -> [UnmappedTerm syntax (Record fields)]
-                            -> ([(These Int Int, These (Term syntax (Record fields)) (Term syntax (Record fields)))], UnmappedTerms syntax (Record fields))
+                            => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
+                            -> [TermOrIndexOrNone (UnmappedTerm syntax ann2)]
+                            -> [UnmappedTerm syntax ann1]
+                            -> [UnmappedTerm syntax ann2]
+                            -> ([(These Int Int, These (Term syntax ann1) (Term syntax ann2))], UnmappedTerms syntax ann1)
 findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs = (diffs, remaining)
   where
     (diffs, (_, remaining, _)) =
