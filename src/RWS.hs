@@ -1,14 +1,14 @@
 {-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
-module RWS (
-    rws
-  , ComparabilityRelation
-  , FeatureVector
-  , defaultFeatureVectorDecorator
-  , featureVectorDecorator
-  , pqGramDecorator
-  , Gram(..)
-  , defaultD
-  ) where
+module RWS
+( rws
+, ComparabilityRelation
+, FeatureVector(..)
+, defaultFeatureVectorDecorator
+, featureVectorDecorator
+, pqGramDecorator
+, Gram(..)
+, defaultD
+) where
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
