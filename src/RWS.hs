@@ -54,7 +54,7 @@ data UnmappedTerm syntax ann = UnmappedTerm {
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
 rws :: (HasField fields FeatureVector, Functor syntax, Eq1 syntax)
-    => (Diff syntax (Record fields) (Record fields) -> Int)
+    => (forall a b. Diff syntax a b -> Int)
     -> ComparabilityRelation syntax (Record fields) (Record fields)
     -> [Term syntax (Record fields)]
     -> [Term syntax (Record fields)]
@@ -116,7 +116,7 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
       That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
       These _ _ -> (before, after)
 
-findNearestNeighboursToDiff :: (These (Term syntax (Record fields)) (Term syntax (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+findNearestNeighboursToDiff :: (forall a b. These (Term syntax a) (Term syntax b) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
                            -> [TermOrIndexOrNone (UnmappedTerm syntax (Record fields))]
                            -> [UnmappedTerm syntax (Record fields)]
@@ -129,7 +129,7 @@ findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
       fmap catMaybes &
       (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
-findNearestNeighbourToDiff' :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+findNearestNeighbourToDiff' :: (forall a b. Diff syntax a b -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
                            -> KdTree Double (UnmappedTerm syntax (Record fields))
                            -> KdTree Double (UnmappedTerm syntax (Record fields))
@@ -142,7 +142,7 @@ findNearestNeighbourToDiff' editDistance canCompare kdTreeA kdTreeB termThing = 
   Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
-findNearestNeighbourTo :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+findNearestNeighbourTo :: (forall a b. Diff syntax a b -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                        -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
                        -> KdTree Double (UnmappedTerm syntax (Record fields))
                        -> KdTree Double (UnmappedTerm syntax (Record fields))
@@ -173,7 +173,7 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 --
 -- cf §4.2 of RWS-Diff
 nearestUnmapped
-  :: (Diff syntax ann1 ann2 -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+  :: (forall a b. Diff syntax a b -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
   -> ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
   -> UnmappedTerms syntax ann2 -- ^ A set of terms eligible for matching against.
   -> KdTree Double (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
