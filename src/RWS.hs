@@ -196,11 +196,11 @@ defaultMoveBound = 2
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
 -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
 insertion :: Int
-          -> UnmappedTerms syntax (Record fields)
-          -> UnmappedTerms syntax (Record fields)
-          -> UnmappedTerm syntax (Record fields)
-          -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
-                   (MappedDiff syntax (Record fields) (Record fields))
+          -> UnmappedTerms syntax ann1
+          -> UnmappedTerms syntax ann2
+          -> UnmappedTerm syntax ann2
+          -> State (Int, UnmappedTerms syntax ann1, UnmappedTerms syntax ann2)
+                   (MappedDiff syntax ann1 ann2)
 insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
