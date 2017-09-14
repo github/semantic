@@ -91,9 +91,9 @@ deleteRemaining diffs unmappedAs =
   foldl' (flip insertDiff) diffs ((This . termIndex &&& This . term) <$> unmappedAs)
 
 -- | Inserts an index and diff pair into a list of indices and diffs.
-insertDiff :: MappedDiff syntax (Record fields) (Record fields)
-           -> [MappedDiff syntax (Record fields) (Record fields)]
-           -> [MappedDiff syntax (Record fields) (Record fields)]
+insertDiff :: MappedDiff syntax ann1 ann2
+           -> [MappedDiff syntax ann1 ann2]
+           -> [MappedDiff syntax ann1 ann2]
 insertDiff inserted [] = [ inserted ]
 insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
   (These i1 i2, These j1 j2) -> if i1 <= j1 && i2 <= j2 then a : b : rest else b : insertDiff a rest
