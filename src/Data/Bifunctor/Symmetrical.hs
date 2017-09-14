@@ -9,3 +9,6 @@ class Bifunctor s => Symmetrical s where
 
 instance Symmetrical (,) where
   mirror = swap
+
+instance Symmetrical Either where
+  mirror = either Right Left
