@@ -59,7 +59,7 @@ rws :: (HasField fields FeatureVector, Functor syntax, Eq1 syntax)
     -> ComparabilityRelation syntax (Record fields) (Record fields)
     -> [Term syntax (Record fields)]
     -> [Term syntax (Record fields)]
-    -> RWSEditScript syntax fields
+    -> RWSEditScript syntax (Record fields) (Record fields)
 rws _            _          as [] = This <$> as
 rws _            _          [] bs = That <$> bs
 rws _            canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
@@ -79,7 +79,7 @@ type Diff syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 -- A Diff paired with both its indices
 type MappedDiff syntax fields = (These Int Int, Diff syntax (Record fields) (Record fields))
 
-type RWSEditScript syntax fields = [Diff syntax (Record fields) (Record fields)]
+type RWSEditScript syntax ann1 ann2 = [Diff syntax ann1 ann2]
 
 insertMapped :: Foldable t => t (MappedDiff f fields) -> [MappedDiff f fields] -> [MappedDiff f fields]
 insertMapped diffs into = foldl' (flip insertDiff) into diffs
@@ -205,9 +205,9 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
-genFeaturizedTermsAndDiffs :: (Functor f, HasField fields FeatureVector)
-                           => RWSEditScript f fields
-                           -> ([UnmappedTerm f fields], [UnmappedTerm f fields], [MappedDiff f fields], [TermOrIndexOrNone (UnmappedTerm f fields)])
+genFeaturizedTermsAndDiffs :: (Functor syntax, HasField fields FeatureVector)
+                           => RWSEditScript syntax (Record fields) (Record fields)
+                           -> ([UnmappedTerm syntax fields], [UnmappedTerm syntax fields], [MappedDiff syntax fields], [TermOrIndexOrNone (UnmappedTerm syntax fields)])
 genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
   where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
           This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
