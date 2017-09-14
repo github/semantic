@@ -45,17 +45,17 @@ type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a ->
 type FeatureVector = UArray Int Double
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm f fields = UnmappedTerm {
+data UnmappedTerm syntax fields = UnmappedTerm {
     termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
   , feature   :: {-# UNPACK #-} !FeatureVector -- ^ Feature vector
-  , term      :: Term f (Record fields) -- ^ The unmapped term
+  , term      :: Term syntax (Record fields) -- ^ The unmapped term
 }
 
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
 rws :: (HasField fields FeatureVector, Functor syntax, Eq1 syntax)
-    => (Diff syntax fields -> Int)
+    => (Diff syntax (Record fields) (Record fields) -> Int)
     -> ComparabilityRelation syntax (Record fields) (Record fields)
     -> [Term syntax (Record fields)]
     -> [Term syntax (Record fields)]
@@ -72,14 +72,14 @@ rws editDistance canCompare as bs =
   in fmap snd rwsDiffs
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
-type UnmappedTerms f fields = IntMap.IntMap (UnmappedTerm f fields)
+type UnmappedTerms syntax fields = IntMap.IntMap (UnmappedTerm syntax fields)
 
-type Diff f fields = These (Term f (Record fields)) (Term f (Record fields))
+type Diff syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 
 -- A Diff paired with both its indices
-type MappedDiff f fields = (These Int Int, Diff f fields)
+type MappedDiff syntax fields = (These Int Int, Diff syntax (Record fields) (Record fields))
 
-type RWSEditScript f fields = [Diff f fields]
+type RWSEditScript syntax fields = [Diff syntax (Record fields) (Record fields)]
 
 insertMapped :: Foldable t => t (MappedDiff f fields) -> [MappedDiff f fields] -> [MappedDiff f fields]
 insertMapped diffs into = foldl' (flip insertDiff) into diffs
@@ -130,7 +130,7 @@ findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
       fmap catMaybes &
       (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
-findNearestNeighbourToDiff' :: (Diff syntax fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+findNearestNeighbourToDiff' :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
                            -> Both.Both (KdTree Double (UnmappedTerm syntax fields))
                            -> TermOrIndexOrNone (UnmappedTerm syntax fields)
@@ -142,7 +142,7 @@ findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case ter
   Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
-findNearestNeighbourTo :: (Diff syntax fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+findNearestNeighbourTo :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                        -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
                        -> Both.Both (KdTree Double (UnmappedTerm syntax fields))
                        -> UnmappedTerm syntax fields
@@ -172,7 +172,7 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 --
 -- cf §4.2 of RWS-Diff
 nearestUnmapped
-  :: (Diff syntax fields -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
+  :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
   -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
   -> UnmappedTerms syntax fields -- ^ A set of terms eligible for matching against.
   -> KdTree Double (UnmappedTerm syntax fields) -- ^ The k-d tree to look up nearest neighbours within.
