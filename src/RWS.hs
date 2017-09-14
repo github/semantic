@@ -305,7 +305,7 @@ canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 ->
 canCompareTerms canCompare t1 t2 = canCompare (unTerm t1) (unTerm t2)
 
 -- | Recursively test the equality of two 'Term's in O(n).
-equalTerms :: Eq1 syntax => ComparabilityRelation syntax (Record fields) (Record fields) -> Term syntax (Record fields) -> Term syntax (Record fields) -> Bool
+equalTerms :: Eq1 syntax => ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
 equalTerms canCompare = go
   where go a b = canCompareTerms canCompare a b && liftEq go (termOut (unTerm a)) (termOut (unTerm b))
 
