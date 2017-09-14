@@ -65,9 +65,9 @@ getLabel (In h t) = (Info.category h, case t of
 
 
 -- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: Term Syntax (Record fields)
-                   -> Term Syntax (Record fields)
-                   -> Algorithm (Term Syntax) (Diff Syntax) (Record fields) (Record fields) (Diff Syntax (Record fields) (Record fields))
+algorithmWithTerms :: Term Syntax ann1
+                   -> Term Syntax ann2
+                   -> Algorithm (Term Syntax) (Diff Syntax) ann1 ann2 (Diff Syntax ann1 ann2)
 algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     annotate . Indexed <$> byRWS a b
