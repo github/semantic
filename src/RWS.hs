@@ -173,13 +173,12 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
 --
 -- cf §4.2 of RWS-Diff
-nearestUnmapped
-  :: (Foldable syntax, Functor syntax, GAlign syntax)
-  => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-  -> UnmappedTerms syntax ann2 -- ^ A set of terms eligible for matching against.
-  -> KdTree Double (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
-  -> UnmappedTerm syntax ann1 -- ^ The term to find the nearest neighbour to.
-  -> Maybe (UnmappedTerm syntax ann2) -- ^ The most similar unmapped term, if any.
+nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
+                => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
+                -> UnmappedTerms syntax ann2 -- ^ A set of terms eligible for matching against.
+                -> KdTree Double (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
+                -> UnmappedTerm syntax ann1 -- ^ The term to find the nearest neighbour to.
+                -> Maybe (UnmappedTerm syntax ann2) -- ^ The most similar unmapped term, if any.
 nearestUnmapped canCompare unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
 
 editDistanceIfComparable :: (Foldable syntax, Functor syntax, GAlign syntax)
