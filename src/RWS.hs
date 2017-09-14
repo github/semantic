@@ -124,7 +124,7 @@ findNearestNeighboursToDiff :: (Foldable syntax, Functor syntax, GAlign syntax)
                             -> [TermOrIndexOrNone (UnmappedTerm syntax ann2)]
                             -> [UnmappedTerm syntax ann1]
                             -> [UnmappedTerm syntax ann2]
-                            -> ([(These Int Int, These (Term syntax ann1) (Term syntax ann2))], UnmappedTerms syntax ann1)
+                            -> ([MappedDiff syntax ann1 ann2], UnmappedTerms syntax ann1)
 findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs = (diffs, remaining)
   where
     (diffs, (_, remaining, _)) =
