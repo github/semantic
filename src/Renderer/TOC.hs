@@ -35,7 +35,6 @@ import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
 import Data.Text (toLower)
 import qualified Data.Text as T
-import Data.These
 import Data.Union
 import Diff
 import GHC.Generics
@@ -146,9 +145,9 @@ data Entry a
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
 tableOfContentsBy :: (Foldable f, Functor f)
-                  => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
-                  -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
-                  -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
+                  => (forall b. TermF f ann b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
+                  -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
+                  -> [Entry a]                            -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> foldMap fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
@@ -195,7 +194,7 @@ recordSummary record = case getDeclaration record of
   Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
   Nothing -> const Nothing
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -210,7 +209,7 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
   where toMap [] = mempty
         toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]

@@ -16,177 +16,200 @@ import Term
 import Text.Show
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
-newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
+newtype Diff syntax ann1 ann2 = Diff { unDiff :: DiffF syntax ann1 ann2 (Diff syntax ann1 ann2) }
 
 -- | A single entry within a recursive 'Diff'.
-data DiffF syntax ann recur
+data DiffF syntax ann1 ann2 recur
   -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Replace'd 'TermF's, consisting of syntax labelled with an annotation.
-  = Patch (Patch (TermF syntax       ann  recur)
-                 (TermF syntax       ann  recur))
+  = Patch (Patch (TermF syntax  ann1        recur)
+                 (TermF syntax        ann2  recur))
   -- | An unchanged node, consisting of syntax labelled with both the original annotations.
-  | Merge        (TermF syntax (ann, ann) recur)
+  | Merge        (TermF syntax (ann1, ann2) recur)
 
 -- | Constructs a 'Diff' replacing one 'Term' with another recursively.
-replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
+replacing :: Functor syntax => Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
 replacing (Term (In a1 r1)) (Term (In a2 r2)) = Diff (Patch (Replace (In a1 (deleting <$> r1)) (In a2 (inserting <$> r2))))
 
 -- | Constructs a 'Diff' inserting a 'Term' recursively.
-inserting :: Functor syntax => Term syntax ann -> Diff syntax ann
+inserting :: Functor syntax => Term syntax ann2 -> Diff syntax ann1 ann2
 inserting = cata insertF
 
 -- | Constructs a 'Diff' inserting a single 'TermF' populated by further 'Diff's.
-insertF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
+insertF :: TermF syntax ann2 (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
 insertF = Diff . Patch . Insert
 
 -- | Constructs a 'Diff' deleting a 'Term' recursively.
-deleting :: Functor syntax => Term syntax ann -> Diff syntax ann
+deleting :: Functor syntax => Term syntax ann1 -> Diff syntax ann1 ann2
 deleting = cata deleteF
 
 -- | Constructs a 'Diff' deleting a single 'TermF' populated by further 'Diff's.
-deleteF :: TermF syntax ann (Diff syntax ann) -> Diff syntax ann
+deleteF :: TermF syntax ann1 (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
 deleteF = Diff . Patch . Delete
 
 -- | Constructs a 'Diff' merging two annotations for a single syntax functor populated by further 'Diff's.
-merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
+merge :: (ann1, ann2) -> syntax (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
 merge = (Diff .) . (Merge .) . In
 
 
-diffSum :: (Foldable syntax, Functor syntax) => (forall a b. Patch a b -> Int) -> Diff syntax ann -> Int
+diffSum :: (Foldable syntax, Functor syntax) => (forall a b. Patch a b -> Int) -> Diff syntax ann1 ann2 -> Int
 diffSum patchCost = cata $ \ diff -> case diff of
   Patch patch -> patchCost patch + sum (sum <$> patch)
   Merge merge -> sum merge
 
 -- | The sum of the node count of the diff’s patches.
-diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Int
+diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> Int
 diffCost = diffSum (const 1)
 
 
-diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)) (TermF syntax ann (Diff syntax ann)))
+diffPatch :: Diff syntax ann1 ann2 -> Maybe (Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2)))
 diffPatch diff = case unDiff diff of
   Patch patch -> Just patch
   _ -> Nothing
 
-diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF syntax ann (Diff syntax ann)) (TermF syntax ann (Diff syntax ann))]
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
 diffPatches = para $ \ diff -> case diff of
   Patch patch -> bimap (fmap fst) (fmap fst) patch : foldMap (foldMap (toList . diffPatch . fst)) patch
   Merge merge ->                                              foldMap (toList . diffPatch . fst)  merge
 
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: (Mergeable syntax, Traversable syntax) => (DiffF syntax ann (Maybe (Term syntax ann)) -> Maybe (Term syntax ann)) -> Diff syntax ann -> Maybe (Term syntax ann)
+mergeMaybe :: (Mergeable syntax, Traversable syntax) => (DiffF syntax ann1 ann2 (Maybe (Term syntax combined)) -> Maybe (Term syntax combined)) -> Diff syntax ann1 ann2 -> Maybe (Term syntax combined)
 mergeMaybe = cata
 
 -- | Recover the before state of a diff.
-beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
+beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
 beforeTerm = mergeMaybe $ \ diff -> case diff of
   Patch patch -> before patch >>= \ (In a l) -> termIn a <$> sequenceAlt l
   Merge  (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
-afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann -> Maybe (Term syntax ann)
+afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
 afterTerm = mergeMaybe $ \ diff -> case diff of
   Patch patch -> after patch >>= \ (In b r) -> termIn b <$> sequenceAlt r
   Merge  (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
 -- | Strips the head annotation off a diff annotated with non-empty records.
-stripDiff :: Functor f
-          => Diff f (Record (h ': t))
-          -> Diff f (Record t)
-stripDiff = fmap rtail
+stripDiff :: Functor syntax
+          => Diff syntax (Record (h1 ': t1)) (Record (h2 ': t2))
+          -> Diff syntax (Record        t1)  (Record        t2)
+stripDiff = bimap rtail rtail
 
 
-type instance Base (Diff syntax ann) = DiffF syntax ann
+type instance Base (Diff syntax ann1 ann2) = DiffF syntax ann1 ann2
 
-instance Functor syntax => Recursive   (Diff syntax ann) where project = unDiff
-instance Functor syntax => Corecursive (Diff syntax ann) where embed = Diff
+instance Functor syntax => Recursive   (Diff syntax ann1 ann2) where project = unDiff
+instance Functor syntax => Corecursive (Diff syntax ann1 ann2) where embed = Diff
 
 
-instance Eq1 f => Eq1 (Diff f) where
-  liftEq eqA = go where go (Diff d1) (Diff d2) = liftEq2 eqA go d1 d2
+instance Eq1 syntax => Eq2 (Diff syntax) where
+  liftEq2 eq1 eq2 = go where go (Diff d1) (Diff d2) = liftEq3 eq1 eq2 go d1 d2
 
-instance (Eq1 f, Eq a) => Eq (Diff f a) where
-  (==) = eq1
+instance (Eq1 syntax, Eq ann1, Eq ann2) => Eq (Diff syntax ann1 ann2) where
+  (==) = eq2
 
-instance Eq1 f => Eq2 (DiffF f) where
-  liftEq2 eqA eqB d1 d2 = case (d1, d2) of
-    (Patch p1, Patch p2) -> liftEq2 (liftEq2 eqA eqB) (liftEq2 eqA eqB) p1 p2
-    (Merge t1, Merge t2) -> liftEq2 (liftEq2 eqA eqA) eqB t1 t2
+instance Eq1 syntax => Eq3 (DiffF syntax) where
+  liftEq3 eq1 eq2 eqRecur d1 d2 = case (d1, d2) of
+    (Patch p1, Patch p2) -> liftEq2 (liftEq2 eq1 eqRecur) (liftEq2 eq2 eqRecur) p1 p2
+    (Merge t1, Merge t2) -> liftEq2 (liftEq2 eq1 eq2) eqRecur t1 t2
     _ -> False
 
-instance (Eq1 f, Eq a) => Eq1 (DiffF f a) where
-  liftEq = liftEq2 (==)
+instance (Eq1 syntax, Eq ann1, Eq ann2) => Eq1 (DiffF syntax ann1 ann2) where
+  liftEq = liftEq3 (==) (==)
 
-instance (Eq1 f, Eq a, Eq b) => Eq (DiffF f a b) where
-  (==) = eq1
-
-
-instance Show1 f => Show1 (Diff f) where
-  liftShowsPrec sp sl = go where go d = showsUnaryWith (liftShowsPrec2 sp sl go (showListWith (go 0))) "Diff" d . unDiff
-
-instance (Show1 f, Show a) => Show (Diff f a) where
-  showsPrec = showsPrec1
-
-instance Show1 f => Show2 (DiffF f) where
-  liftShowsPrec2 spA slA spB slB d diff = case diff of
-    Patch patch -> showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 spA slA spB slB) (liftShowList2 spA slA spB slB) (liftShowsPrec2 spA slA spB slB) (liftShowList2 spA slA spB slB)) "Patch" d patch
-    Merge term  -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spB slB) "Merge" d term
-    where spBoth = liftShowsPrec2 spA slA spA slA
-          slBoth = liftShowList2 spA slA spA slA
-
-instance (Show1 f, Show a) => Show1 (DiffF f a) where
-  liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-instance (Show1 f, Show a, Show b) => Show (DiffF f a b) where
-  showsPrec = showsPrec1
+instance (Eq1 syntax, Eq ann1, Eq ann2, Eq recur) => Eq (DiffF syntax ann1 ann2 recur) where
+  (==) = eq3
 
 
-instance Functor f => Functor (Diff f) where
-  fmap f = go where go = Diff . bimap f go . unDiff
+instance Show1 syntax => Show2 (Diff syntax) where
+  liftShowsPrec2 sp1 sl1 sp2 sl2 = go where go d = showsUnaryWith (liftShowsPrec3 sp1 sl1 sp2 sl2 go (showListWith (go 0))) "Diff" d . unDiff
 
-instance Foldable f => Foldable (Diff f) where
-  foldMap f = go where go = bifoldMap f go . unDiff
+instance (Show1 syntax, Show ann1, Show ann2) => Show (Diff syntax ann1 ann2) where
+  showsPrec = showsPrec2
 
-instance Traversable f => Traversable (Diff f) where
-  traverse f = go where go = fmap Diff . bitraverse f go . unDiff
+instance Show1 syntax => Show3 (DiffF syntax) where
+  liftShowsPrec3 sp1 sl1 sp2 sl2 spRecur slRecur d diff = case diff of
+    Patch patch -> showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 sp1 sl1 spRecur slRecur) (liftShowList2 sp1 sl1 spRecur slRecur) (liftShowsPrec2 sp2 sl2 spRecur slRecur) (liftShowList2 sp2 sl2 spRecur slRecur)) "Patch" d patch
+    Merge term  -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spRecur slRecur) "Merge" d term
+    where spBoth = liftShowsPrec2 sp1 sl1 sp2 sl2
+          slBoth = liftShowList2 sp1 sl1 sp2 sl2
 
+instance (Show1 syntax, Show ann1, Show ann2) => Show1 (DiffF syntax ann1 ann2) where
+  liftShowsPrec = liftShowsPrec3 showsPrec showList showsPrec showList
 
-instance Functor syntax => Functor (DiffF syntax ann) where
-  fmap = second
-
-instance Functor syntax => Bifunctor (DiffF syntax) where
-  bimap f g (Patch patch) = Patch (bimap (bimap f g) (bimap f g) patch)
-  bimap f g (Merge term)  = Merge (bimap (bimap f f) g term)
-
-instance Foldable syntax => Foldable (DiffF syntax ann) where
-  foldMap = bifoldMap (const mempty)
-
-instance Foldable syntax => Bifoldable (DiffF syntax) where
-  bifoldMap f g (Patch patch) = bifoldMap (bifoldMap f g) (bifoldMap f g) patch
-  bifoldMap f g (Merge term)  = bifoldMap (bifoldMap f f) g term
-
-instance Traversable syntax => Traversable (DiffF syntax ann) where
-  traverse = bitraverse pure
-
-instance Traversable syntax => Bitraversable (DiffF syntax) where
-  bitraverse f g (Patch patch) = Patch <$> bitraverse (bitraverse f g) (bitraverse f g) patch
-  bitraverse f g (Merge term)  = Merge <$> bitraverse (bitraverse f f) g term
+instance (Show1 syntax, Show ann1, Show ann2, Show recur) => Show (DiffF syntax ann1 ann2 recur) where
+  showsPrec = showsPrec3
 
 
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Diff f a) where
+instance Functor syntax => Bifunctor (Diff syntax) where
+  bimap f g = go where go = Diff . trimap f g go . unDiff
+
+instance Foldable syntax => Bifoldable (Diff syntax) where
+  bifoldMap f g = go where go = trifoldMap f g go . unDiff
+
+instance Traversable syntax => Bitraversable (Diff syntax) where
+  bitraverse f g = go where go = fmap Diff . tritraverse f g go . unDiff
+
+
+instance Functor syntax => Functor (DiffF syntax ann1 ann2) where
+  fmap = trimap id id
+
+instance Functor syntax => Trifunctor (DiffF syntax) where
+  trimap f g h (Patch patch) = Patch (bimap (bimap f h) (bimap g h) patch)
+  trimap f g h (Merge term)  = Merge (bimap (bimap f g) h term)
+
+instance Foldable syntax => Foldable (DiffF syntax ann1 ann2) where
+  foldMap = trifoldMap (const mempty) (const mempty)
+
+instance Foldable syntax => Trifoldable (DiffF syntax) where
+  trifoldMap f g h (Patch patch) = bifoldMap (bifoldMap f h) (bifoldMap g h) patch
+  trifoldMap f g h (Merge term)  = bifoldMap (bifoldMap f g) h term
+
+instance Traversable syntax => Traversable (DiffF syntax ann1 ann2) where
+  traverse = tritraverse pure pure
+
+instance Traversable syntax => Tritraversable (DiffF syntax) where
+  tritraverse f g h (Patch patch) = Patch <$> bitraverse (bitraverse f h) (bitraverse g h) patch
+  tritraverse f g h (Merge term)  = Merge <$> bitraverse (bitraverse f g) h term
+
+
+instance (ToJSONFields1 syntax, ToJSONFields ann1, ToJSONFields ann2) => ToJSON (Diff syntax ann1 ann2) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
 
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Diff f a) where
+instance (ToJSONFields1 syntax, ToJSONFields ann1, ToJSONFields ann2) => ToJSONFields (Diff syntax ann1 ann2) where
   toJSONFields = toJSONFields . unDiff
 
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields1 (DiffF f a) where
+instance (ToJSONFields1 syntax, ToJSONFields ann1, ToJSONFields ann2) => ToJSONFields1 (DiffF syntax ann1 ann2) where
   toJSONFields1 (Patch patch) = [ "patch" .= JSONFields patch ]
   toJSONFields1 (Merge term)  = [ "merge" .= JSONFields term ]
 
-instance (ToJSONFields1 f, ToJSONFields a, ToJSON b) => ToJSONFields (DiffF f a b) where
+instance (ToJSONFields1 syntax, ToJSONFields ann1, ToJSONFields ann2, ToJSON recur) => ToJSONFields (DiffF syntax ann1 ann2 recur) where
   toJSONFields = toJSONFields1
 
-instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (DiffF f a b) where
+instance (ToJSONFields1 syntax, ToJSONFields ann1, ToJSONFields ann2, ToJSON recur) => ToJSON (DiffF syntax ann1 ann2 recur) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
+
+
+class Eq3 f where
+  liftEq3 :: (a1 -> a2 -> Bool) -> (b1 -> b2 -> Bool) -> (c1 -> c2 -> Bool) -> f a1 b1 c1 -> f a2 b2 c2 -> Bool
+
+eq3 :: (Eq3 f, Eq a, Eq b, Eq c) => f a b c -> f a b c -> Bool
+eq3 = liftEq3 (==) (==) (==)
+
+
+class Show3 f where
+  liftShowsPrec3 :: (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> (Int -> c -> ShowS) -> ([c] -> ShowS) -> Int -> f a b c -> ShowS
+
+showsPrec3 :: (Show3 f, Show a, Show b, Show c) => Int -> f a b c -> ShowS
+showsPrec3 = liftShowsPrec3 showsPrec showList showsPrec showList showsPrec showList
+
+class Trifunctor f where
+  trimap :: (a -> a') -> (b -> b') -> (c -> c') -> f a b c -> f a' b' c'
+
+class Trifoldable f where
+  trifoldMap :: Monoid m => (a -> m) -> (b -> m) -> (c -> m) -> f a b c -> m
+
+class Tritraversable f where
+  tritraverse :: Applicative g => (a -> g a') -> (b -> g b') -> (c -> g c') -> f a b c -> g (f a' b' c')

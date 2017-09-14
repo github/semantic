@@ -18,8 +18,7 @@ spec :: Spec
 spec = parallel $ do
   let decorate = defaultFeatureVectorDecorator (category . termAnnotation)
   prop "equality is reflexive" $
-    \ a -> let diff = a :: Term Syntax (Record '[Category]) in
-      diff `shouldBe` diff
+    \ diff -> diff `shouldBe` (diff :: Diff Syntax (Record '[Category]) (Record '[Category]))
 
   prop "equal terms produce identity diffs" $
     \ a -> let term = decorate (a :: Term Syntax (Record '[Category])) in
@@ -27,10 +26,10 @@ spec = parallel $ do
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = diffTerms a b :: Diff Syntax (Record '[Category]) in
+      \ a b -> let diff = diffTerms a b :: Diff Syntax (Record '[Category]) (Record '[Category]) in
         beforeTerm diff `shouldBe` Just a
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = diffTerms a b :: Diff Syntax (Record '[Category]) in
+      \ a b -> let diff = diffTerms a b :: Diff Syntax (Record '[Category]) (Record '[Category]) in
         afterTerm diff `shouldBe` Just b

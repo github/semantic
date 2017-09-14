@@ -67,7 +67,7 @@ data TaskF output where
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
-  Diff :: Differ f a -> Term f a -> Term f a -> TaskF (Diff f a)
+  Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
 
@@ -82,7 +82,7 @@ data TaskF output where
 type Task = Freer TaskF
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
-type Differ f a = Term f a -> Term f a -> Diff f a
+type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -117,7 +117,7 @@ decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fiel
 decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Differ f a -> Term f a -> Term f a -> Task (Diff f a)
+diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
 diff differ term1 term2 = Semantic.Task.Diff differ term1 term2 `Then` return
 
 -- | A 'Task' which renders some input using the supplied 'Renderer' function.

@@ -11,6 +11,7 @@ import Algorithm hiding (diff)
 import Control.Applicative ((<|>))
 import Control.Monad ((<=<))
 import Data.Align.Generic (GAlign)
+import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Functor.Both as Both
@@ -80,22 +81,22 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderPatch blobs)
-  (SExpressionDiffRenderer, Just Language.JSON) -> run (decorate constructorLabel <=< parse jsonParser) diffRecursively (renderSExpressionDiff . fmap keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffRecursively (renderSExpressionDiff . fmap keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffRecursively (renderSExpressionDiff . fmap keepConstructorLabel)
-  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . fmap keepCategory)
+  (SExpressionDiffRenderer, Just Language.JSON) -> run (decorate constructorLabel <=< parse jsonParser) diffRecursively (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffRecursively (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffRecursively (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
+  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
   (IdentityDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
         syntaxParser = parserForLanguage effectiveLanguage
 
-        run :: Functor f => (Blob -> Task (Term f a)) -> (Term f a -> Term f a -> Diff f a) -> (Diff f a -> output) -> Task output
+        run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
 
-        diffRecursively :: (Eq1 f, GAlign f, Show1 f, Traversable f, Diffable f) => Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields)
+        diffRecursively :: (Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax, Diffable syntax) => Term syntax (Record fields) -> Term syntax (Record fields) -> Diff syntax (Record fields) (Record fields)
         diffRecursively = decoratingWith constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: Functor f => Both Blob -> Differ f a -> Term f a -> Term f a -> Task (Diff f a)
+diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
 diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting t1)
   (False, True) -> pure (inserting t2)

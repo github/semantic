@@ -46,7 +46,7 @@ hasChanges :: (Foldable f, Functor f) => SplitDiff f annotation -> Bool
 hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
-alignDiff :: (HasField fields Range, Traversable f) => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
+alignDiff :: (HasField fields Range, Traversable f) => Both Source -> Diff f (Record fields) (Record fields) -> [Join These (SplitDiff [] (Record fields))]
 alignDiff sources = cata $ \ diff -> case diff of
   Patch patch                    -> alignPatch sources patch
   Merge (In (ann1, ann2) syntax) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (In (both ann1 ann2) syntax)
