@@ -228,13 +228,13 @@ nullFeatureVector = listArray (0, 0) [0]
 setFeatureVector :: HasField fields FeatureVector => Record fields -> FeatureVector -> Record fields
 setFeatureVector = setField
 
-minimumTermIndex :: [RWS.UnmappedTerm f fields] -> Int
+minimumTermIndex :: [UnmappedTerm syntax ann] -> Int
 minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
 
-toMap :: [UnmappedTerm f fields] -> IntMap.IntMap (UnmappedTerm f fields)
+toMap :: [UnmappedTerm syntax ann] -> IntMap.IntMap (UnmappedTerm syntax ann)
 toMap = IntMap.fromList . fmap (termIndex &&& id)
 
-toKdTree :: [UnmappedTerm f fields] -> KdTree Double (UnmappedTerm f fields)
+toKdTree :: [UnmappedTerm syntax ann] -> KdTree Double (UnmappedTerm syntax ann)
 toKdTree = build (elems . feature)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
