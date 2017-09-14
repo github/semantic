@@ -19,12 +19,12 @@
   (Call
     (Identifier)
   {-(Or
-      (Integer)
-      (Integer))-}
+    {-(Integer)-}
+    {-(Integer)-})-}
     (Or
       (Integer)
       (Integer))
   {+(Or
-      (Integer)
-      (Integer))+}
+    {+(Integer)+}
+    {+(Integer)+})+}
     (Empty)))

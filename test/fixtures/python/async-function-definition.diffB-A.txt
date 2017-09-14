@@ -1,12 +1,12 @@
 (Program
 {+(Annotation
-    (Annotation
-      (Function
-        (Identifier)
-        (
-          (Identifier)))
-      (Empty))
-    (Identifier))+}
+  {+(Annotation
+    {+(Function
+      {+(Identifier)+}
+      {+(
+        {+(Identifier)+})+})+}
+    {+(Empty)+})+}
+  {+(Identifier)+})+}
   (Annotation
     (Annotation
       (Function
@@ -32,11 +32,11 @@
       (Empty))
     (Identifier))
 {-(Annotation
-    (Annotation
-      (Function
-        (Identifier)
-        (Identifier)
-        (
-          (Identifier)))
-      (Empty))
-    (Identifier))-})
+  {-(Annotation
+    {-(Function
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(
+        {-(Identifier)-})-})-}
+    {-(Empty)-})-}
+  {-(Identifier)-})-})

@@ -1,6 +1,6 @@
 (Program
 {+(Module
-    (Identifier))+}
+  {+(Identifier)+})+}
 {-(Other "ambient_declaration"
-    (Namespace
-      (Identifier)))-})
+  {-(Namespace
+    {-(Identifier)-})-})-})

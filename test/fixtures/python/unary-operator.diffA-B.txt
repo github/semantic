@@ -1,11 +1,11 @@
 (Program
 {+(Complement
-    (Identifier))+}
+  {+(Identifier)+})+}
 {+(Negate
-    (Identifier))+}
+  {+(Identifier)+})+}
 {+(Identifier)+}
 {-(Negate
-    (Identifier))-}
+  {-(Identifier)-})-}
 {-(Identifier)-}
 {-(Complement
-    (Identifier))-})
+  {-(Identifier)-})-})
