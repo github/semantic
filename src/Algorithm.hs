@@ -129,6 +129,9 @@ genericAlgorithmFor a b = fmap to1 <$> galgorithmFor (from1 a) (from1 b)
 instance Apply1 Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = join (apply1_2' (Proxy :: Proxy Diffable) (\ reinj f1 f2 -> fmap reinj <$> algorithmFor f1 f2) u1 u2)
 
+  subalgorithmFor subdiff inj (In ann1 u1) t2
+    =   apply1' (Proxy :: Proxy Diffable) (\ reinj f1 -> subalgorithmFor subdiff (inj . reinj) (In ann1 f1) t2) u1
+
 -- | Diff two list parameters using RWS.
 instance Diffable [] where
   algorithmFor a b = Just (byRWS a b)
