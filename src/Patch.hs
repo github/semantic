@@ -4,9 +4,7 @@ module Patch
 ( Patch(..)
 , after
 , before
-, unPatch
-, maybeFst
-, maybeSnd
+, patch
 ) where
 
 import Data.Aeson
@@ -29,25 +27,17 @@ data Patch a b
 
 -- | Return the item from the after side of the patch.
 after :: Patch before after -> Maybe after
-after = maybeSnd . unPatch
+after = patch (const Nothing) Just (\ _ b -> Just b)
 
 -- | Return the item from the before side of the patch.
 before :: Patch before after -> Maybe before
-before = maybeFst . unPatch
+before = patch Just (const Nothing) (\ a _ -> Just a)
 
 -- | Return both sides of a patch.
-unPatch :: Patch before after -> These before after
-unPatch (Replace a b) = These a b
-unPatch (Insert b) = That b
-unPatch (Delete a) = This a
-
--- | Return Just the value in This, or the first value in These, if any.
-maybeFst :: These a b -> Maybe a
-maybeFst = these Just (const Nothing) ((Just .) . const)
-
--- | Return Just the value in That, or the second value in These, if any.
-maybeSnd :: These a b -> Maybe b
-maybeSnd = these (const Nothing) Just ((Just .) . flip const)
+patch :: (before -> result) -> (after -> result) -> (before -> after -> result) -> Patch before after -> result
+patch ifDelete _ _ (Delete a) = ifDelete a
+patch _ ifInsert _ (Insert b) = ifInsert b
+patch _ _ ifReplace (Replace a b) = ifReplace a b
 
 
 -- Instances

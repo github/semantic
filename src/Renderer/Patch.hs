@@ -23,7 +23,6 @@ import Data.Semigroup ((<>))
 import Data.Source
 import Data.These
 import Diff
-import Patch
 import Prelude hiding (fst, snd)
 import SplitDiff
 
@@ -181,3 +180,6 @@ changeIncludingContext leadingContext rows = case changes of
 -- | Whether a row has changes on either side.
 rowHasChanges :: (Foldable f, Functor f) => Join These (SplitDiff f annotation) -> Bool
 rowHasChanges row = or (hasChanges <$> row)
+
+maybeSnd :: These a b -> Maybe b
+maybeSnd = these (const Nothing) Just (\ _ a -> Just a)

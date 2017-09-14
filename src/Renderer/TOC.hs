@@ -156,7 +156,7 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
     (Just a, Just []) -> Just [Changed a]
     (_     , entries) -> entries)
 
-  where patchEntry = these Deleted Inserted (const Replaced) . unPatch
+  where patchEntry = patch Deleted Inserted (const Replaced)
 
 termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)
