@@ -141,7 +141,9 @@ expressions = mk <$> location <*> many expression
         mk loc children = makeTerm loc children
 
 parenthesized_expressions :: Assignment
-parenthesized_expressions = makeTerm <$> symbol ParenthesizedStatements <*> children (many expression)
+parenthesized_expressions = mk <$> symbol ParenthesizedStatements <*> children (many expression)
+  where mk _ [a] = a
+        mk loc children = makeTerm loc children
 
 identifier :: Assignment
 identifier =
