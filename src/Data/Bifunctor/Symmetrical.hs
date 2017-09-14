@@ -1,6 +1,7 @@
 module Data.Bifunctor.Symmetrical where
 
 import Data.Bifunctor
+import Data.These
 import Data.Tuple (swap)
 
 class Bifunctor s => Symmetrical s where
@@ -12,3 +13,6 @@ instance Symmetrical (,) where
 
 instance Symmetrical Either where
   mirror = either Right Left
+
+instance Symmetrical These where
+  mirror = these That This (flip These)
