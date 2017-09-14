@@ -77,24 +77,24 @@ type UnmappedTerms syntax fields = IntMap.IntMap (UnmappedTerm syntax fields)
 type Diff syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 
 -- A Diff paired with both its indices
-type MappedDiff syntax fields = (These Int Int, Diff syntax (Record fields) (Record fields))
+type MappedDiff syntax ann1 ann2 = (These Int Int, Diff syntax ann1 ann2)
 
 type RWSEditScript syntax ann1 ann2 = [Diff syntax ann1 ann2]
 
-insertMapped :: Foldable t => t (MappedDiff f fields) -> [MappedDiff f fields] -> [MappedDiff f fields]
+insertMapped :: Foldable t => t (MappedDiff syntax (Record fields) (Record fields)) -> [MappedDiff syntax (Record fields) (Record fields)] -> [MappedDiff syntax (Record fields) (Record fields)]
 insertMapped diffs into = foldl' (flip insertDiff) into diffs
 
 deleteRemaining :: (Traversable t)
-                => [MappedDiff f fields]
-                -> t (UnmappedTerm f fields)
-                -> [MappedDiff f fields]
+                => [MappedDiff syntax (Record fields) (Record fields)]
+                -> t (UnmappedTerm syntax fields)
+                -> [MappedDiff syntax (Record fields) (Record fields)]
 deleteRemaining diffs unmappedAs =
   foldl' (flip insertDiff) diffs ((This . termIndex &&& This . term) <$> unmappedAs)
 
 -- | Inserts an index and diff pair into a list of indices and diffs.
-insertDiff :: MappedDiff f fields
-           -> [MappedDiff f fields]
-           -> [MappedDiff f fields]
+insertDiff :: MappedDiff syntax (Record fields) (Record fields)
+           -> [MappedDiff syntax (Record fields) (Record fields)]
+           -> [MappedDiff syntax (Record fields) (Record fields)]
 insertDiff inserted [] = [ inserted ]
 insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
   (These i1 i2, These j1 j2) -> if i1 <= j1 && i2 <= j2 then a : b : rest else b : insertDiff a rest
@@ -135,7 +135,7 @@ findNearestNeighbourToDiff' :: (Diff syntax (Record fields) (Record fields) -> I
                            -> Both.Both (KdTree Double (UnmappedTerm syntax fields))
                            -> TermOrIndexOrNone (UnmappedTerm syntax fields)
                            -> State (Int, UnmappedTerms syntax fields, UnmappedTerms syntax fields)
-                                    (Maybe (MappedDiff syntax fields))
+                                    (Maybe (MappedDiff syntax (Record fields) (Record fields)))
 findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
   None -> pure Nothing
   RWS.Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
@@ -147,7 +147,7 @@ findNearestNeighbourTo :: (Diff syntax (Record fields) (Record fields) -> Int) -
                        -> Both.Both (KdTree Double (UnmappedTerm syntax fields))
                        -> UnmappedTerm syntax fields
                        -> State (Int, UnmappedTerms syntax fields, UnmappedTerms syntax fields)
-                                (MappedDiff syntax fields)
+                                (MappedDiff syntax (Record fields) (Record fields))
 findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
@@ -196,25 +196,25 @@ defaultMoveBound = 2
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
 -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
 insertion :: Int
-             -> UnmappedTerms f fields
-             -> UnmappedTerms f fields
-             -> UnmappedTerm f fields
-             -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
-                      (MappedDiff f fields)
+             -> UnmappedTerms syntax fields
+             -> UnmappedTerms syntax fields
+             -> UnmappedTerm syntax fields
+             -> State (Int, UnmappedTerms syntax fields, UnmappedTerms syntax fields)
+                      (MappedDiff syntax (Record fields) (Record fields))
 insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
 genFeaturizedTermsAndDiffs :: (Functor syntax, HasField fields FeatureVector)
                            => RWSEditScript syntax (Record fields) (Record fields)
-                           -> ([UnmappedTerm syntax fields], [UnmappedTerm syntax fields], [MappedDiff syntax fields], [TermOrIndexOrNone (UnmappedTerm syntax fields)])
+                           -> ([UnmappedTerm syntax fields], [UnmappedTerm syntax fields], [MappedDiff syntax (Record fields) (Record fields)], [TermOrIndexOrNone (UnmappedTerm syntax fields)])
 genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
   where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
           This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
           That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (RWS.Term (featurize counterB term) : allDiffs)
           These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
 
-data Mapping f fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm f fields] ![UnmappedTerm f fields] ![MappedDiff f fields] ![TermOrIndexOrNone (UnmappedTerm f fields)]
+data Mapping syntax fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm syntax fields] ![UnmappedTerm syntax fields] ![MappedDiff syntax (Record fields) (Record fields)] ![TermOrIndexOrNone (UnmappedTerm syntax fields)]
 
 featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
