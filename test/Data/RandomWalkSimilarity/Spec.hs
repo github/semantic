@@ -27,19 +27,19 @@ spec = parallel $ do
 
   describe "featureVectorDecorator" $ do
     prop "produces a vector of the specified dimension" $
-      \ (term, p, q, d) -> featureVectorDecorator (rhead . termAnnotation) (positively p) (positively q) (positively d) (term :: Term Syntax (Record '[Category])) `shouldSatisfy` all ((== (0, abs d)) . bounds . rhead)
+      \ (term, p, q, d) -> featureVectorDecorator (rhead . termAnnotation) (positively p) (positively q) (positively d) (term :: Term Syntax (Record '[Category])) `shouldSatisfy` all ((== (0, abs d)) . bounds . unFV . rhead)
 
   describe "rws" $ do
     prop "produces correct diffs" $
       \ (as, bs) -> let tas = decorate <$> (as :: [Term Syntax (Record '[Category])])
                         tbs = decorate <$> (bs :: [Term Syntax (Record '[Category])])
                         root = termIn (Program :. Nil) . Indexed
-                        diff = merge ((Program :. Nil, Program :. Nil)) (Indexed (stripDiff . diffThese <$> rws editDistance canCompare tas tbs)) in
+                        diff = merge ((Program :. Nil, Program :. Nil)) (Indexed (stripDiff . diffThese <$> rws canCompare tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf "a") ])), decorate (Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf "b") ]))) in
-      fmap (bimap stripTerm stripTerm) (rws editDistance canCompare [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
+      fmap (bimap stripTerm stripTerm) (rws canCompare [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
   where canCompare a b = termAnnotation a == termAnnotation b
 
@@ -47,5 +47,3 @@ spec = parallel $ do
         decorate = defaultFeatureVectorDecorator (category . termAnnotation)
 
         diffThese = these deleting inserting replacing
-
-        editDistance = these (const 1) (const 1) (const (const 0))
