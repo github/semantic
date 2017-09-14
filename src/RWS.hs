@@ -45,10 +45,10 @@ type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a ->
 type FeatureVector = UArray Int Double
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm syntax fields = UnmappedTerm {
+data UnmappedTerm syntax ann = UnmappedTerm {
     termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
   , feature   :: {-# UNPACK #-} !FeatureVector -- ^ Feature vector
-  , term      :: Term syntax (Record fields) -- ^ The unmapped term
+  , term      :: Term syntax ann -- ^ The unmapped term
 }
 
 -- | Either a `term`, an index of a matched term, or nil.
@@ -72,7 +72,7 @@ rws editDistance canCompare as bs =
   in fmap snd rwsDiffs
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
-type UnmappedTerms syntax fields = IntMap.IntMap (UnmappedTerm syntax fields)
+type UnmappedTerms syntax ann = IntMap.IntMap (UnmappedTerm syntax ann)
 
 type Diff syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 
@@ -86,7 +86,7 @@ insertMapped diffs into = foldl' (flip insertDiff) into diffs
 
 deleteRemaining :: (Traversable t)
                 => [MappedDiff syntax (Record fields) (Record fields)]
-                -> t (UnmappedTerm syntax fields)
+                -> t (UnmappedTerm syntax (Record fields))
                 -> [MappedDiff syntax (Record fields) (Record fields)]
 deleteRemaining diffs unmappedAs =
   foldl' (flip insertDiff) diffs ((This . termIndex &&& This . term) <$> unmappedAs)
@@ -119,10 +119,10 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
 
 findNearestNeighboursToDiff :: (These (Term syntax (Record fields)) (Term syntax (Record fields)) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                           -> [TermOrIndexOrNone (UnmappedTerm syntax fields)]
-                           -> [UnmappedTerm syntax fields]
-                           -> [UnmappedTerm syntax fields]
-                           -> ([(These Int Int, These (Term syntax (Record fields)) (Term syntax (Record fields)))], UnmappedTerms syntax fields)
+                           -> [TermOrIndexOrNone (UnmappedTerm syntax (Record fields))]
+                           -> [UnmappedTerm syntax (Record fields)]
+                           -> [UnmappedTerm syntax (Record fields)]
+                           -> ([(These Int Int, These (Term syntax (Record fields)) (Term syntax (Record fields)))], UnmappedTerms syntax (Record fields))
 findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs = (diffs, remaining)
   where
     (diffs, (_, remaining, _)) =
@@ -132,9 +132,9 @@ findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs
 
 findNearestNeighbourToDiff' :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                           -> Both.Both (KdTree Double (UnmappedTerm syntax fields))
-                           -> TermOrIndexOrNone (UnmappedTerm syntax fields)
-                           -> State (Int, UnmappedTerms syntax fields, UnmappedTerms syntax fields)
+                           -> Both.Both (KdTree Double (UnmappedTerm syntax (Record fields)))
+                           -> TermOrIndexOrNone (UnmappedTerm syntax (Record fields))
+                           -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
                                     (Maybe (MappedDiff syntax (Record fields) (Record fields)))
 findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
   None -> pure Nothing
@@ -144,9 +144,9 @@ findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case ter
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                        -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                       -> Both.Both (KdTree Double (UnmappedTerm syntax fields))
-                       -> UnmappedTerm syntax fields
-                       -> State (Int, UnmappedTerms syntax fields, UnmappedTerms syntax fields)
+                       -> Both.Both (KdTree Double (UnmappedTerm syntax (Record fields)))
+                       -> UnmappedTerm syntax (Record fields)
+                       -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
                                 (MappedDiff syntax (Record fields) (Record fields))
 findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
@@ -174,10 +174,10 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 nearestUnmapped
   :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
   -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-  -> UnmappedTerms syntax fields -- ^ A set of terms eligible for matching against.
-  -> KdTree Double (UnmappedTerm syntax fields) -- ^ The k-d tree to look up nearest neighbours within.
-  -> UnmappedTerm syntax fields -- ^ The term to find the nearest neighbour to.
-  -> Maybe (UnmappedTerm syntax fields) -- ^ The most similar unmapped term, if any.
+  -> UnmappedTerms syntax (Record fields) -- ^ A set of terms eligible for matching against.
+  -> KdTree Double (UnmappedTerm syntax (Record fields)) -- ^ The k-d tree to look up nearest neighbours within.
+  -> UnmappedTerm syntax (Record fields) -- ^ The term to find the nearest neighbour to.
+  -> Maybe (UnmappedTerm syntax (Record fields)) -- ^ The most similar unmapped term, if any.
 nearestUnmapped editDistance canCompare unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable editDistance canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
 
 editDistanceIfComparable :: Bounded t => (These (Term syntax (Record fields)) (Term syntax (Record fields)) -> t) -> ComparabilityRelation syntax (Record fields) (Record fields) -> Term syntax (Record fields) -> Term syntax (Record fields) -> t
@@ -196,10 +196,10 @@ defaultMoveBound = 2
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
 -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
 insertion :: Int
-             -> UnmappedTerms syntax fields
-             -> UnmappedTerms syntax fields
-             -> UnmappedTerm syntax fields
-             -> State (Int, UnmappedTerms syntax fields, UnmappedTerms syntax fields)
+             -> UnmappedTerms syntax (Record fields)
+             -> UnmappedTerms syntax (Record fields)
+             -> UnmappedTerm syntax (Record fields)
+             -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
                       (MappedDiff syntax (Record fields) (Record fields))
 insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
@@ -207,16 +207,16 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
 
 genFeaturizedTermsAndDiffs :: (Functor syntax, HasField fields FeatureVector)
                            => RWSEditScript syntax (Record fields) (Record fields)
-                           -> ([UnmappedTerm syntax fields], [UnmappedTerm syntax fields], [MappedDiff syntax (Record fields) (Record fields)], [TermOrIndexOrNone (UnmappedTerm syntax fields)])
+                           -> ([UnmappedTerm syntax (Record fields)], [UnmappedTerm syntax (Record fields)], [MappedDiff syntax (Record fields) (Record fields)], [TermOrIndexOrNone (UnmappedTerm syntax (Record fields))])
 genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
   where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
           This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
           That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (RWS.Term (featurize counterB term) : allDiffs)
           These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
 
-data Mapping syntax fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm syntax fields] ![UnmappedTerm syntax fields] ![MappedDiff syntax (Record fields) (Record fields)] ![TermOrIndexOrNone (UnmappedTerm syntax fields)]
+data Mapping syntax fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm syntax (Record fields)] ![UnmappedTerm syntax (Record fields)] ![MappedDiff syntax (Record fields) (Record fields)] ![TermOrIndexOrNone (UnmappedTerm syntax (Record fields))]
 
-featurize :: (HasField fields FeatureVector, Functor f) => Int -> Term f (Record fields) -> UnmappedTerm f fields
+featurize :: (HasField fields FeatureVector, Functor syntax) => Int -> Term syntax (Record fields) -> UnmappedTerm syntax (Record fields)
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
 
 eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
