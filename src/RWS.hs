@@ -223,7 +223,14 @@ genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (
           That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (RWS.Term (featurize counterB term) : allDiffs)
           These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
 
-data Mapping syntax fields = Mapping {-# UNPACK #-} !Int {-# UNPACK #-} !Int ![UnmappedTerm syntax (Record fields)] ![UnmappedTerm syntax (Record fields)] ![MappedDiff syntax (Record fields) (Record fields)] ![TermOrIndexOrNone (UnmappedTerm syntax (Record fields))]
+data Mapping syntax fields
+  = Mapping
+    {-# UNPACK #-} !Int
+    {-# UNPACK #-} !Int
+    ![UnmappedTerm syntax (Record fields)]
+    ![UnmappedTerm syntax (Record fields)]
+    ![MappedDiff syntax (Record fields) (Record fields)]
+    ![TermOrIndexOrNone (UnmappedTerm syntax (Record fields))]
 
 featurize :: (HasField fields FeatureVector, Functor syntax) => Int -> Term syntax (Record fields) -> UnmappedTerm syntax (Record fields)
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
