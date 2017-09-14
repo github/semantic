@@ -43,6 +43,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
 
 newtype FeatureVector = FV { unFV :: UArray Int Double }
+  deriving (Eq, Ord, Show)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm syntax ann = UnmappedTerm
