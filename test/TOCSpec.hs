@@ -4,6 +4,7 @@ module TOCSpec where
 
 import Category as C
 import Data.Aeson
+import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Functor.Both
@@ -50,7 +51,9 @@ spec = parallel $ do
       \ term -> tableOfContentsBy (Just . termAnnotation) (diffTerms term term) `shouldBe` [Unchanged (lastValue (term :: Term Syntax (Record '[Category])))]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ patch -> let patch' = (patch :: Patch (Term Syntax Int)) in tableOfContentsBy (Just . termAnnotation) (these deleting inserting replacing (unPatch patch')) `shouldBe` these (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (unPatch (foldMap pure <$> patch'))
+      \ patch -> tableOfContentsBy (Just . termAnnotation) (these deleting inserting replacing (unPatch patch))
+      `shouldBe`
+      these (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (unPatch (bimap (foldMap pure) (foldMap pure) (patch :: Patch (Term Syntax Int) (Term Syntax Int))))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = merge (0, 0) (Indexed [1 <$ (diff :: Diff Syntax Int)]) in

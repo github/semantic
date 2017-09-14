@@ -18,7 +18,7 @@ module Renderer.TOC
 ) where
 
 import Data.Aeson
-import Data.Align (crosswalk)
+import Data.Align (bicrosswalk)
 import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
@@ -150,7 +150,7 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
-  Patch patch -> (pure . patchEntry <$> crosswalk selector patch) <> foldMap fold patch <> Just []
+  Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> foldMap fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
     (Just a, Nothing) -> Just [Unchanged a]
     (Just a, Just []) -> Just [Changed a]

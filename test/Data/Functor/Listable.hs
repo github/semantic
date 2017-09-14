@@ -167,7 +167,7 @@ instance (Listable1 f, Listable a) => Listable (Term f a) where
 
 instance Listable1 f => Listable2 (DiffF f) where
   liftTiers2 annTiers recurTiers
-    =  liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
+    =  liftCons1 (liftTiers2 (liftTiers2 annTiers recurTiers) (liftTiers2 annTiers recurTiers)) Patch
     \/ liftCons1 (liftTiers2 (liftTiers2 annTiers annTiers) recurTiers) Merge
 
 instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
@@ -211,11 +211,11 @@ instance Listable Category.Category where
        \/ cons0 Category.SingletonMethod
 
 
-instance Listable1 Patch where
-  liftTiers t = liftCons1 t Insert \/ liftCons1 t Delete \/ liftCons2 t t Replace
+instance Listable2 Patch where
+  liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Replace
 
-instance Listable a => Listable (Patch a) where
-  tiers = tiers1
+instance (Listable a, Listable b) => Listable (Patch a b) where
+  tiers = tiers2
 
 
 instance Listable1 Syntax where

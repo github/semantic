@@ -52,7 +52,7 @@ alignDiff sources = cata $ \ diff -> case diff of
   Merge (In (ann1, ann2) syntax) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (In (both ann1 ann2) syntax)
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
-alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both Source -> Patch (TermF f (Record fields) [Join These (SplitDiff [] (Record fields))]) -> [Join These (SplitDiff [] (Record fields))]
+alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both Source -> Patch (TermF f (Record fields) [Join These (SplitDiff [] (Record fields))]) (TermF f (Record fields) [Join These (SplitDiff [] (Record fields))]) -> [Join These (SplitDiff [] (Record fields))]
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> alignSyntax' this (fst sources) term
   Insert term -> fmap (pure . SplitInsert) <$> alignSyntax' that (snd sources) term

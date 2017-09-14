@@ -21,10 +21,10 @@ newtype Diff syntax ann = Diff { unDiff :: DiffF syntax ann (Diff syntax ann) }
 -- | A single entry within a recursive 'Diff'.
 data DiffF syntax ann recur
   -- | A changed node, represented as 'Insert'ed, 'Delete'd, or 'Replace'd 'TermF's, consisting of syntax labelled with an annotation.
-  = Patch (Patch (TermF syntax       ann  recur))
+  = Patch (Patch (TermF syntax       ann  recur)
+                 (TermF syntax       ann  recur))
   -- | An unchanged node, consisting of syntax labelled with both the original annotations.
   | Merge        (TermF syntax (ann, ann) recur)
-  deriving (Foldable, Functor, Traversable)
 
 -- | Constructs a 'Diff' replacing one 'Term' with another recursively.
 replacing :: Functor syntax => Term syntax ann -> Term syntax ann -> Diff syntax ann
@@ -51,7 +51,7 @@ merge :: (ann, ann) -> syntax (Diff syntax ann) -> Diff syntax ann
 merge = (Diff .) . (Merge .) . In
 
 
-diffSum :: (Foldable syntax, Functor syntax) => (forall a. Patch a -> Int) -> Diff syntax ann -> Int
+diffSum :: (Foldable syntax, Functor syntax) => (forall a b. Patch a b -> Int) -> Diff syntax ann -> Int
 diffSum patchCost = cata $ \ diff -> case diff of
   Patch patch -> patchCost patch + sum (sum <$> patch)
   Merge merge -> sum merge
@@ -61,15 +61,15 @@ diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann -> Int
 diffCost = diffSum (const 1)
 
 
-diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)))
+diffPatch :: Diff syntax ann -> Maybe (Patch (TermF syntax ann (Diff syntax ann)) (TermF syntax ann (Diff syntax ann)))
 diffPatch diff = case unDiff diff of
   Patch patch -> Just patch
   _ -> Nothing
 
-diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF syntax ann (Diff syntax ann))]
+diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann -> [Patch (TermF syntax ann (Diff syntax ann)) (TermF syntax ann (Diff syntax ann))]
 diffPatches = para $ \ diff -> case diff of
-  Patch patch -> fmap (fmap fst) patch : foldMap (foldMap (toList . diffPatch . fst)) patch
-  Merge merge ->                                  foldMap (toList . diffPatch . fst)  merge
+  Patch patch -> bimap (fmap fst) (fmap fst) patch : foldMap (foldMap (toList . diffPatch . fst)) patch
+  Merge merge ->                                              foldMap (toList . diffPatch . fst)  merge
 
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
@@ -110,7 +110,7 @@ instance (Eq1 f, Eq a) => Eq (Diff f a) where
 
 instance Eq1 f => Eq2 (DiffF f) where
   liftEq2 eqA eqB d1 d2 = case (d1, d2) of
-    (Patch p1, Patch p2) -> liftEq (liftEq2 eqA eqB) p1 p2
+    (Patch p1, Patch p2) -> liftEq2 (liftEq2 eqA eqB) (liftEq2 eqA eqB) p1 p2
     (Merge t1, Merge t2) -> liftEq2 (liftEq2 eqA eqA) eqB t1 t2
     _ -> False
 
@@ -129,7 +129,7 @@ instance (Show1 f, Show a) => Show (Diff f a) where
 
 instance Show1 f => Show2 (DiffF f) where
   liftShowsPrec2 spA slA spB slB d diff = case diff of
-    Patch patch -> showsUnaryWith (liftShowsPrec (liftShowsPrec2 spA slA spB slB) (liftShowList2 spA slA spB slB)) "Patch" d patch
+    Patch patch -> showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 spA slA spB slB) (liftShowList2 spA slA spB slB) (liftShowsPrec2 spA slA spB slB) (liftShowList2 spA slA spB slB)) "Patch" d patch
     Merge term  -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spB slB) "Merge" d term
     where spBoth = liftShowsPrec2 spA slA spA slA
           slBoth = liftShowList2 spA slA spA slA
@@ -151,16 +151,25 @@ instance Traversable f => Traversable (Diff f) where
   traverse f = go where go = fmap Diff . bitraverse f go . unDiff
 
 
+instance Functor syntax => Functor (DiffF syntax ann) where
+  fmap = second
+
 instance Functor syntax => Bifunctor (DiffF syntax) where
-  bimap f g (Patch patch) = Patch (bimap f g <$> patch)
+  bimap f g (Patch patch) = Patch (bimap (bimap f g) (bimap f g) patch)
   bimap f g (Merge term)  = Merge (bimap (bimap f f) g term)
 
-instance Foldable f => Bifoldable (DiffF f) where
-  bifoldMap f g (Patch patch) = foldMap (bifoldMap f g) patch
+instance Foldable syntax => Foldable (DiffF syntax ann) where
+  foldMap = bifoldMap (const mempty)
+
+instance Foldable syntax => Bifoldable (DiffF syntax) where
+  bifoldMap f g (Patch patch) = bifoldMap (bifoldMap f g) (bifoldMap f g) patch
   bifoldMap f g (Merge term)  = bifoldMap (bifoldMap f f) g term
 
-instance Traversable f => Bitraversable (DiffF f) where
-  bitraverse f g (Patch patch) = Patch <$> traverse (bitraverse f g) patch
+instance Traversable syntax => Traversable (DiffF syntax ann) where
+  traverse = bitraverse pure
+
+instance Traversable syntax => Bitraversable (DiffF syntax) where
+  bitraverse f g (Patch patch) = Patch <$> bitraverse (bitraverse f g) (bitraverse f g) patch
   bitraverse f g (Merge term)  = Merge <$> bitraverse (bitraverse f f) g term
 
 
