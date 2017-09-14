@@ -73,12 +73,12 @@ rws canCompare as bs =
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms syntax ann = IntMap.IntMap (UnmappedTerm syntax ann)
 
-type Diff syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
+type Edit syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 
 -- A Diff paired with both its indices
-type MappedDiff syntax ann1 ann2 = (These Int Int, Diff syntax ann1 ann2)
+type MappedDiff syntax ann1 ann2 = (These Int Int, Edit syntax ann1 ann2)
 
-type RWSEditScript syntax ann1 ann2 = [Diff syntax ann1 ann2]
+type RWSEditScript syntax ann1 ann2 = [Edit syntax ann1 ann2]
 
 insertMapped :: Foldable t
              => t (MappedDiff syntax ann1 ann2)
@@ -320,7 +320,7 @@ defaultM = 10
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> Diff syntax ann1 ann2 -> Int
+editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> Edit syntax ann1 ann2 -> Int
 editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
