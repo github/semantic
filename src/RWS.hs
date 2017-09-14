@@ -80,7 +80,10 @@ type MappedDiff syntax ann1 ann2 = (These Int Int, Diff syntax ann1 ann2)
 
 type RWSEditScript syntax ann1 ann2 = [Diff syntax ann1 ann2]
 
-insertMapped :: Foldable t => t (MappedDiff syntax (Record fields) (Record fields)) -> [MappedDiff syntax (Record fields) (Record fields)] -> [MappedDiff syntax (Record fields) (Record fields)]
+insertMapped :: Foldable t
+             => t (MappedDiff syntax ann1 ann2)
+             -> [MappedDiff syntax ann1 ann2]
+             -> [MappedDiff syntax ann1 ann2]
 insertMapped diffs into = foldl' (flip insertDiff) into diffs
 
 deleteRemaining :: Traversable t
