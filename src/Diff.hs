@@ -4,6 +4,7 @@ module Diff where
 import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
+import Data.Bifunctor.Symmetrical
 import Data.Bitraversable
 import Data.Foldable (toList)
 import Data.Functor.Classes
@@ -143,6 +144,10 @@ instance (Show1 syntax, Show ann1, Show ann2, Show recur) => Show (DiffF syntax 
 
 instance Functor syntax => Bifunctor (Diff syntax) where
   bimap f g = go where go = Diff . trimap f g go . unDiff
+
+instance Functor syntax => Symmetrical (Diff syntax) where
+  mirror (Diff (Patch p)) = Diff (Patch (mirror (bimap (fmap mirror) (fmap mirror) p)))
+  mirror (Diff (Merge m)) = Diff (Merge (bimap mirror mirror m))
 
 instance Foldable syntax => Bifoldable (Diff syntax) where
   bifoldMap f g = go where go = trifoldMap f g go . unDiff
