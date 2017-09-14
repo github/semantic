@@ -41,13 +41,13 @@ decoratingWith getLabel1 getLabel2 differ t1 t2 = stripDiff (differ (defaultFeat
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: forall syntax fields1 fields2
               .  (Eq1 syntax, GAlign syntax, Traversable syntax)
-              => (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))) -- ^ A function producing syntax-directed continuations of the algorithm.
+              => (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Algorithm (Term syntax) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))) -- ^ A function producing syntax-directed continuations of the algorithm.
               -> ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
               -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
               -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
               -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
 diffTermsWith refine comparable t1 t2 = runFreer decompose (diff t1 t2)
-  where decompose :: AlgorithmF (Term syntax) (Diff syntax) (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) result -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) result
+  where decompose :: AlgorithmF (Term syntax) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))) result -> Algorithm (Term syntax) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))) result
         decompose step = case step of
           Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
@@ -68,7 +68,7 @@ getLabel (In h t) = (Info.category h, case t of
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: Term Syntax ann1
                    -> Term Syntax ann2
-                   -> Algorithm (Term Syntax) (Diff Syntax) ann1 ann2 (Diff Syntax ann1 ann2)
+                   -> Algorithm (Term Syntax) (Diff Syntax ann1 ann2) (Diff Syntax ann1 ann2)
 algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     annotate . Indexed <$> byRWS a b
