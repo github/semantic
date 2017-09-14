@@ -181,10 +181,10 @@ nearestUnmapped
 nearestUnmapped editDistance canCompare unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable editDistance canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
 
 editDistanceIfComparable :: Bounded t
-                         => (These (Term syntax (Record fields)) (Term syntax (Record fields)) -> t)
-                         -> ComparabilityRelation syntax (Record fields) (Record fields)
-                         -> Term syntax (Record fields)
-                         -> Term syntax (Record fields)
+                         => (These (Term syntax ann1) (Term syntax ann2) -> t)
+                         -> ComparabilityRelation syntax ann1 ann2
+                         -> Term syntax ann1
+                         -> Term syntax ann2
                          -> t
 editDistanceIfComparable editDistance canCompare a b = if canCompareTerms canCompare a b
   then editDistance (These a b)
