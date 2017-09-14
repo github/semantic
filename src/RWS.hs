@@ -20,7 +20,6 @@ import Data.Functor.Foldable
 import Data.Hashable
 import Data.List (sortOn)
 import Data.Maybe
-import Data.Monoid (First(..))
 import Data.Record
 import Data.Semigroup hiding (First(..))
 import Data.These
@@ -179,7 +178,7 @@ nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
                 -> KdTree Double (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
                 -> UnmappedTerm syntax ann1 -- ^ The term to find the nearest neighbour to.
                 -> Maybe (UnmappedTerm syntax ann2) -- ^ The most similar unmapped term, if any.
-nearestUnmapped canCompare unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (editDistanceIfComparable canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
+nearestUnmapped canCompare unmapped tree key = listToMaybe (sortOn (editDistanceIfComparable canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
 
 editDistanceIfComparable :: (Foldable syntax, Functor syntax, GAlign syntax)
                          => ComparabilityRelation syntax ann1 ann2
