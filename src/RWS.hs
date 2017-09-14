@@ -42,7 +42,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
 
-type FeatureVector = UArray Int Double
+newtype FeatureVector = FV { unFV :: UArray Int Double }
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm syntax ann = UnmappedTerm {
@@ -229,7 +229,7 @@ eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Reco
 eraseFeatureVector (Term.Term (In record functor)) = termIn (setFeatureVector record nullFeatureVector) functor
 
 nullFeatureVector :: FeatureVector
-nullFeatureVector = listArray (0, 0) [0]
+nullFeatureVector = FV $ listArray (0, 0) [0]
 
 setFeatureVector :: HasField fields FeatureVector => Record fields -> FeatureVector -> Record fields
 setFeatureVector = setField
@@ -241,7 +241,7 @@ toMap :: [UnmappedTerm syntax ann] -> IntMap.IntMap (UnmappedTerm syntax ann)
 toMap = IntMap.fromList . fmap (termIndex &&& id)
 
 toKdMap :: [UnmappedTerm syntax ann] -> KdMap Double FeatureVector (UnmappedTerm syntax ann)
-toKdMap = build elems . fmap (feature &&& id)
+toKdMap = build (elems . unFV) . fmap (feature &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -264,8 +264,8 @@ featureVectorDecorator getLabel p q d
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
 
-       addVectors :: UArray Int Double -> UArray Int Double -> UArray Int Double
-       addVectors as bs = listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
+       addVectors :: FeatureVector -> FeatureVector -> FeatureVector
+       addVectors (FV as) (FV bs) = FV $ listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
@@ -296,7 +296,7 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = listArray (0, d - 1) ((* invMagnitude) <$> components)
+unitVector d hash = FV $ listArray (0, d - 1) ((* invMagnitude) <$> components)
   where
     invMagnitude = 1 / sqrt (sum (fmap (** 2) components))
     components = evalRand (sequenceA (replicate d (liftRand randomDouble))) (pureMT (fromIntegral hash))
