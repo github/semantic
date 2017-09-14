@@ -93,7 +93,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
 
         diffRecursively :: (Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax, Diffable syntax) => Term syntax (Record fields) -> Term syntax (Record fields) -> Diff syntax (Record fields) (Record fields)
-        diffRecursively = decoratingWith constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
+        diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
