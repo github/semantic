@@ -29,7 +29,7 @@ import Data.Array.Unboxed
 import Data.Functor.Classes
 import Diff (DiffF(..), deleting, inserting, merge, replacing)
 import SES
-import Data.KdTree.Static hiding (empty, toList)
+import Data.KdMap.Static hiding (elems, empty)
 import qualified Data.IntMap as IntMap
 
 import Control.Monad.Random
@@ -125,14 +125,14 @@ findNearestNeighboursToDiff :: (Foldable syntax, Functor syntax, GAlign syntax)
 findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs = (diffs, remaining)
   where
     (diffs, (_, remaining, _)) =
-      traverse (findNearestNeighbourToDiff' canCompare (toKdTree featureAs) (toKdTree featureBs)) allDiffs &
+      traverse (findNearestNeighbourToDiff' canCompare (toKdMap featureAs) (toKdMap featureBs)) allDiffs &
       fmap catMaybes &
       (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
 findNearestNeighbourToDiff' :: (Foldable syntax, Functor syntax, GAlign syntax)
                             => ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                            -> KdTree Double (UnmappedTerm syntax (Record fields))
-                            -> KdTree Double (UnmappedTerm syntax (Record fields))
+                            -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
+                            -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
                             -> TermOrIndexOrNone (UnmappedTerm syntax (Record fields))
                             -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
                                     (Maybe (MappedDiff syntax (Record fields) (Record fields)))
@@ -144,8 +144,8 @@ findNearestNeighbourToDiff' canCompare kdTreeA kdTreeB termThing = case termThin
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
                        => ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                       -> KdTree Double (UnmappedTerm syntax (Record fields))
-                       -> KdTree Double (UnmappedTerm syntax (Record fields))
+                       -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
+                       -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
                        -> UnmappedTerm syntax (Record fields)
                        -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
                                 (MappedDiff syntax (Record fields) (Record fields))
@@ -174,11 +174,13 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 -- cf §4.2 of RWS-Diff
 nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
                 => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-                -> UnmappedTerms syntax ann2 -- ^ A set of terms eligible for matching against.
-                -> KdTree Double (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
-                -> UnmappedTerm syntax ann1 -- ^ The term to find the nearest neighbour to.
-                -> Maybe (UnmappedTerm syntax ann2) -- ^ The most similar unmapped term, if any.
-nearestUnmapped canCompare unmapped tree key = listToMaybe (sortOn (editDistanceIfComparable canCompare (term key) . term) (toList (IntMap.intersection unmapped (toMap (kNearest tree defaultL key)))))
+                -> UnmappedTerms syntax ann1 -- ^ A set of terms eligible for matching against.
+                -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
+                -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
+                -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
+nearestUnmapped canCompare unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
+  where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
+        approximateEditDistance = editDistanceIfComparable (flip canCompare) (term key) . term
 
 editDistanceIfComparable :: (Foldable syntax, Functor syntax, GAlign syntax)
                          => ComparabilityRelation syntax ann1 ann2
@@ -238,8 +240,8 @@ minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . 
 toMap :: [UnmappedTerm syntax ann] -> IntMap.IntMap (UnmappedTerm syntax ann)
 toMap = IntMap.fromList . fmap (termIndex &&& id)
 
-toKdTree :: [UnmappedTerm syntax ann] -> KdTree Double (UnmappedTerm syntax ann)
-toKdTree = build (elems . feature)
+toKdMap :: [UnmappedTerm syntax ann] -> KdMap Double FeatureVector (UnmappedTerm syntax ann)
+toKdMap = build elems . fmap (feature &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
