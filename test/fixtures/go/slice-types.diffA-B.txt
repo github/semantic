@@ -9,7 +9,7 @@
         (Identifier)
         (SliceTy
         {+(SliceTy
-            (Identifier))+}
+          {+(Identifier)+})+}
         {-(Identifier)-})))
     (Other "type_declaration"
       (TypeDecl
@@ -17,4 +17,4 @@
         (SliceTy
         {+(Identifier)+}
         {-(SliceTy
-            (Identifier))-})))))
+          {-(Identifier)-})-})))))

@@ -34,4 +34,4 @@ spec = parallel $ do
     it "produces unbiased insertions within branches" $
       let term s = Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf s) ]) :: SyntaxTerm '[Category]
           root = termIn (Program :. Nil) . Indexed in
-      diffTerms (both (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` copy (pure (Program :. Nil)) (Indexed [ inserting (term "a"), cata (\ (In a r) -> copy (pure a) r) (term "b") ])
+      diffTerms (both (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` merge ((Program :. Nil, Program :. Nil)) (Indexed [ inserting (term "a"), cata (\ (In a r) -> merge (a, a) r) (term "b") ])

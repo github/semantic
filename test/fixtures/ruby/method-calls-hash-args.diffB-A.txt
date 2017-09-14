@@ -5,5 +5,5 @@
       (SymbolLiteral)
       (Boolean))
   {-(Pair
-      (SymbolLiteral)
-      (IntegerLiteral))-}))
+    {-(SymbolLiteral)-}
+    {-(IntegerLiteral)-})-}))

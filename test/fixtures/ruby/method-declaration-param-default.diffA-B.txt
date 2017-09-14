@@ -3,6 +3,6 @@
     (Identifier)
   { (Params)
   ->(Params
-      (OptionalParameter
-        (Identifier)
-        (Identifier))) }))
+    {+(OptionalParameter
+      {+(Identifier)+}
+      {+(Identifier)+})+}) }))

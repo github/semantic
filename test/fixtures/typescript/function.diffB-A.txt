@@ -2,20 +2,20 @@
   (Function
     (Other "type_parameters"
     {+(Other "type_parameter"
-        (Identifier))+}
+      {+(Identifier)+})+}
     {-(Other "required_parameter"
-        (Identifier))-}
+      {-(Identifier)-})-}
     {-(Other "required_parameter"
-        (Identifier))-})
+      {-(Identifier)-})-})
   { (Ty
-      (Identifier))
+    {-(Identifier)-})
   ->(Params
-      (Other "required_parameter"
-        (Identifier))
-      (Other "required_parameter"
-        (Identifier))) }
+    {+(Other "required_parameter"
+      {+(Identifier)+})+}
+    {+(Other "required_parameter"
+      {+(Identifier)+})+}) }
   {+(Ty
-      (Other "predefined_type"))+}
+    {+(Other "predefined_type")+})+}
     (ExpressionStatements
     { (Identifier)
     ->(Identifier) })))

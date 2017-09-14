@@ -4,7 +4,7 @@
       (Identifier)
       (Ty
       { (Other "type_query"
-          (Identifier))
+        {-(Identifier)-})
       ->(Identifier) })))
   (Other "lexical_declaration"
     (VarAssignment
@@ -12,4 +12,4 @@
       (Ty
       { (Identifier)
       ->(Other "type_query"
-          (Identifier)) }))))
+        {+(Identifier)+}) }))))

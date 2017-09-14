@@ -2,11 +2,11 @@
   (Class
     (Constant)
   {-(Superclass
-      (Constant))-}
+    {-(Constant)-})-}
     (Method
       (Identifier)))
 {-(Class
-    (ScopeOperator
-      (Constant)
-      (Other "::")
-      (Constant)))-})
+  {-(ScopeOperator
+    {-(Constant)-}
+    {-(Other "::")-}
+    {-(Constant)-})-})-})

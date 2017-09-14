@@ -3,8 +3,8 @@
     (Operator
       (Other "delete")
     { (SubscriptAccess
-        (Identifier)
-        (StringLiteral))
+      {-(Identifier)-}
+      {-(StringLiteral)-})
     ->(MemberAccess
-        (Identifier)
-        (Identifier)) })))
+      {+(Identifier)+}
+      {+(Identifier)+}) })))

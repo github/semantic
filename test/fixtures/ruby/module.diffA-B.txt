@@ -2,9 +2,9 @@
   (Module
     (Constant)
   {+(Method
-      (Identifier))+})
+    {+(Identifier)+})+})
 {-(Module
-    (ScopeOperator
-      (Constant)
-      (Other "::")
-      (Constant)))-})
+  {-(ScopeOperator
+    {-(Constant)-}
+    {-(Other "::")-}
+    {-(Constant)-})-})-})

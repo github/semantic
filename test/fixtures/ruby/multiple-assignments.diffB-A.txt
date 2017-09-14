@@ -5,57 +5,57 @@
     {+(Identifier)+}
     {+(Identifier)+}
     {-(SplatParameter
-        (Identifier))-})
+      {-(Identifier)-})-})
     (ArrayLiteral
       (IntegerLiteral)
       (IntegerLiteral)
       (IntegerLiteral)))
 {+(Assignment
-    (Args
-      (Identifier)
-      (Identifier))
-    (ArrayLiteral
-      (IntegerLiteral)
-      (IntegerLiteral)))+}
+  {+(Args
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(ArrayLiteral
+    {+(IntegerLiteral)+}
+    {+(IntegerLiteral)+})+})+}
 {+(Assignment
-    (Args
-      (Identifier)
-      (SplatParameter))
-    (ArrayLiteral
-      (IntegerLiteral)
-      (IntegerLiteral)))+}
+  {+(Args
+    {+(Identifier)+}
+    {+(SplatParameter)+})+}
+  {+(ArrayLiteral
+    {+(IntegerLiteral)+}
+    {+(IntegerLiteral)+})+})+}
 {+(Assignment
-    (Args
-      (Identifier)
-      (SplatParameter
-        (Identifier)))
-    (ArrayLiteral
-      (IntegerLiteral)
-      (IntegerLiteral)))+}
+  {+(Args
+    {+(Identifier)+}
+    {+(SplatParameter
+      {+(Identifier)+})+})+}
+  {+(ArrayLiteral
+    {+(IntegerLiteral)+}
+    {+(IntegerLiteral)+})+})+}
 {+(Assignment
-    (Args
-      (Identifier)
-      (Identifier))
-    (Other "splat_argument"
-      (Identifier)))+}
+  {+(Args
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Other "splat_argument"
+    {+(Identifier)+})+})+}
 {+(Assignment
-    (Args
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (MemberAccess
-        (Identifier)
-        (Identifier)))
-    (Other "right_assignment_list"
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (MemberAccess
-        (Identifier)
-        (Identifier))))+}
+  {+(Args
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+})+}
+  {+(Other "right_assignment_list"
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+})+})+}
 {+(Assignment
-    (Args
-      (Other "destructured_left_assignment"
-        (Identifier)
-        (Identifier)))
-    (Identifier))+})
+  {+(Args
+    {+(Other "destructured_left_assignment"
+      {+(Identifier)+}
+      {+(Identifier)+})+})+}
+  {+(Identifier)+})+})

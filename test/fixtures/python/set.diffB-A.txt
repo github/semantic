@@ -5,6 +5,6 @@
   {+(Integer)+}
   {+(Integer)+})
 {-(Set
-    (Integer)
-    (Integer)
-    (Integer))-})
+  {-(Integer)-}
+  {-(Integer)-}
+  {-(Integer)-})-})

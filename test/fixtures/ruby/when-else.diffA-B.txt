@@ -6,13 +6,13 @@
       { (Identifier)
       ->(Identifier) })
     { (When
-        (Args
-          (Identifier))
-        (Args
-          (Other "splat_argument"
-            (Identifier)))
-        (Identifier)
-        (Else))
+      {-(Args
+        {-(Identifier)-})-}
+      {-(Args
+        {-(Other "splat_argument"
+          {-(Identifier)-})-})-}
+      {-(Identifier)-}
+      {-(Else)-})
     ->(Identifier) }
     {+(Else
-        (Identifier))+})))
+      {+(Identifier)+})+})))

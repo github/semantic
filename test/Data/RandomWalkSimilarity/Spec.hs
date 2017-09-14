@@ -34,7 +34,7 @@ spec = parallel $ do
       \ (as, bs) -> let tas = decorate <$> (as :: [SyntaxTerm '[Category]])
                         tbs = decorate <$> (bs :: [SyntaxTerm '[Category]])
                         root = termIn (Program :. Nil) . Indexed
-                        diff = copy (pure (Program :. Nil)) (Indexed (stripDiff . diffThese <$> rws editDistance canCompare tas tbs)) in
+                        diff = merge ((Program :. Nil, Program :. Nil)) (Indexed (stripDiff . diffThese <$> rws editDistance canCompare tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $

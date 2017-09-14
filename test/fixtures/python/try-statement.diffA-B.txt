@@ -3,62 +3,62 @@
   { (Identifier)
   ->(Identifier) }
   {+(Finally
-      (
-        (Identifier)))+}
+    {+(
+      {+(Identifier)+})+})+}
   {-(Identifier)-}
   {-(Catch
-      (
-        (Identifier)
-        (Identifier)
-        (Identifier))
-      ([]))-}
+    {-(
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-([])-})-}
   {-(Catch
-      (Let
-        (Identifier)
-        (Identifier)
-        (Empty))
-      (
-        (Identifier)
-        (Identifier)))-}
+    {-(Let
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(
+      {-(Identifier)-}
+      {-(Identifier)-})-})-}
   {-(Catch
-      (
-        (Identifier)
-        (Identifier)
-        (Identifier)
-        (Identifier))
-      ([]))-}
+    {-(
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-([])-})-}
   {-(Catch
-      (
-        (Identifier)
-        (Identifier))
-      ([]))-})
+    {-(
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-([])-})-})
   (Try
   { (Identifier)
   ->(Identifier) }
   {+(Catch
-      (
-        (Identifier)
-        (Identifier))
-      ([]))+}
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+([])+})+}
   {+(Catch
-      (Let
-        (Identifier)
-        (Identifier)
-        (Empty))
-      (
-        (Identifier)))+}
+    {+(Let
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(
+      {+(Identifier)+})+})+}
   {+(Catch
-      (
-        (Identifier)
-        (Identifier)
-        (Identifier))
-      ([]))+}
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+([])+})+}
   {+(Catch
-      (
-        (Identifier))
-      ([]))+}
+    {+(
+      {+(Identifier)+})+}
+    {+([])+})+}
   {-(Identifier)-}
   {-(Finally
-      (
-        (Identifier)
-        (Identifier)))-}))
+    {-(
+      {-(Identifier)-}
+      {-(Identifier)-})-})-}))

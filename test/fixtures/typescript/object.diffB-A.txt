@@ -5,8 +5,8 @@
         (StringLiteral)
         (StringLiteral))
     {-(Pair
-        (StringLiteral)
-        (StringLiteral))-}
+      {-(StringLiteral)-}
+      {-(StringLiteral)-})-}
     {-(Pair
-        (StringLiteral)
-        (StringLiteral))-})))
+      {-(StringLiteral)-}
+      {-(StringLiteral)-})-})))

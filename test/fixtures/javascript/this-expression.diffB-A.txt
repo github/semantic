@@ -1,5 +1,5 @@
 (Program
 {+(ExpressionStatements
-    (Identifier))+}
+  {+(Identifier)+})+}
 {-(Return
-    (Identifier))-})
+  {-(Identifier)-})-})

@@ -1,8 +1,8 @@
 (Program
 {+(Call
-    (Identifier)
-    (TextElement)
-    (Empty))+}
+  {+(Identifier)+}
+  {+(TextElement)+}
+  {+(Empty)+})+}
   (Call
     (Identifier)
     (TextElement)
@@ -17,6 +17,6 @@
   {-(Identifier)-}
     (Empty))
 {-(Call
-    (Identifier)
-    (TextElement)
-    (Empty))-})
+  {-(Identifier)-}
+  {-(TextElement)-}
+  {-(Empty)-})-})
