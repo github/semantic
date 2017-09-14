@@ -111,12 +111,12 @@ class Diffable f where
                  -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
   algorithmFor = genericAlgorithmFor
 
-  subalgorithmFor :: (Term g annhere -> Term g annthere -> Maybe (Algorithm (Term g) (Diff g ann1 ann2) (Diff g ann1 ann2)))
+  subalgorithmFor :: (These (Term g annhere) (Term g annthere) -> Maybe (Algorithm (Term g) (Diff g ann1 ann2) (Diff g ann1 ann2)))
                   -> (forall a. f a -> g a)
                   -> TermF f annhere (Term g annhere)
                   -> Term g annthere
                   -> Maybe (Algorithm (Term g) (Diff g ann1 ann2) (Diff g ann1 ann2))
-  subalgorithmFor algorithmForTerms inj here there = algorithmForTerms (Term (hoistTermF inj here)) there
+  subalgorithmFor algorithmForTerms inj here there = algorithmForTerms (These (Term (hoistTermF inj here)) there)
 
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
 genericAlgorithmFor a b = fmap to1 <$> galgorithmFor (from1 a) (from1 b)
