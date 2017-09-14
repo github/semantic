@@ -130,12 +130,12 @@ findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs = (diffs, re
       (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
 findNearestNeighbourToDiff' :: (Foldable syntax, Functor syntax, GAlign syntax)
-                            => ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                            -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
-                            -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
-                            -> TermOrIndexOrNone (UnmappedTerm syntax (Record fields))
-                            -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
-                                    (Maybe (MappedDiff syntax (Record fields) (Record fields)))
+                            => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
+                            -> KdMap Double FeatureVector (UnmappedTerm syntax ann1)
+                            -> KdMap Double FeatureVector (UnmappedTerm syntax ann2)
+                            -> TermOrIndexOrNone (UnmappedTerm syntax ann2)
+                            -> State (Int, UnmappedTerms syntax ann1, UnmappedTerms syntax ann2)
+                                     (Maybe (MappedDiff syntax ann1 ann2))
 findNearestNeighbourToDiff' canCompare kdTreeA kdTreeB termThing = case termThing of
   None -> pure Nothing
   RWS.Term term -> Just <$> findNearestNeighbourTo canCompare kdTreeA kdTreeB term
