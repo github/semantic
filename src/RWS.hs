@@ -54,11 +54,11 @@ data UnmappedTerm syntax ann = UnmappedTerm
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
-rws :: (HasField fields FeatureVector, Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax)
-    => ComparabilityRelation syntax (Record fields) (Record fields)
-    -> [Term syntax (Record fields)]
-    -> [Term syntax (Record fields)]
-    -> RWSEditScript syntax (Record fields) (Record fields)
+rws :: (Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax)
+    => ComparabilityRelation syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields))
+    -> [Term syntax (Record (FeatureVector ': fields))]
+    -> [Term syntax (Record (FeatureVector ': fields))]
+    -> RWSEditScript syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields))
 rws _          as [] = This <$> as
 rws _          [] bs = That <$> bs
 rws canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
@@ -214,12 +214,12 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That j, That b)
 
-genFeaturizedTermsAndDiffs :: (Functor syntax, HasField fields1 FeatureVector, HasField fields2 FeatureVector)
-                           => RWSEditScript syntax (Record fields1) (Record fields2)
-                           -> ( [UnmappedTerm syntax (Record fields1)]
-                              , [UnmappedTerm syntax (Record fields2)]
-                              , [MappedDiff syntax (Record fields1) (Record fields2)]
-                              , [TermOrIndexOrNone (UnmappedTerm syntax (Record fields2))]
+genFeaturizedTermsAndDiffs :: Functor syntax
+                           => RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+                           -> ( [UnmappedTerm syntax (Record (FeatureVector ': fields1))]
+                              , [UnmappedTerm syntax (Record (FeatureVector ': fields2))]
+                              , [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
+                              , [TermOrIndexOrNone (UnmappedTerm syntax (Record (FeatureVector ': fields2)))]
                               )
 genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
   where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
@@ -236,16 +236,16 @@ data Mapping syntax ann1 ann2
     ![MappedDiff syntax ann1 ann2]
     ![TermOrIndexOrNone (UnmappedTerm syntax ann2)]
 
-featurize :: (HasField fields FeatureVector, Functor syntax) => Int -> Term syntax (Record fields) -> UnmappedTerm syntax (Record fields)
+featurize :: Functor syntax => Int -> Term syntax (Record (FeatureVector ': fields)) -> UnmappedTerm syntax (Record (FeatureVector ': fields))
 featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
 
-eraseFeatureVector :: (Functor f, HasField fields FeatureVector) => Term f (Record fields) -> Term f (Record fields)
+eraseFeatureVector :: Functor syntax => Term syntax (Record (FeatureVector ': fields)) -> Term syntax (Record (FeatureVector ': fields))
 eraseFeatureVector (Term.Term (In record functor)) = termIn (setFeatureVector record nullFeatureVector) functor
 
 nullFeatureVector :: FeatureVector
 nullFeatureVector = FV $ listArray (0, 0) [0]
 
-setFeatureVector :: HasField fields FeatureVector => Record fields -> FeatureVector -> Record fields
+setFeatureVector :: Record (FeatureVector ': fields) -> FeatureVector -> Record (FeatureVector ': fields)
 setFeatureVector = setField
 
 minimumTermIndex :: [UnmappedTerm syntax ann] -> Int

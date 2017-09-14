@@ -29,23 +29,24 @@ diffTerms :: HasField fields Category
 diffTerms = decoratingWith getLabel (diffTermsWith algorithmWithTerms comparableByCategory)
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
-decoratingWith :: (Hashable label, Traversable f)
-               => (forall a. TermF f (Record fields) a -> label)
-               -> (Term f (Record (FeatureVector ': fields)) -> Term f (Record (FeatureVector ': fields)) -> Diff f (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)))
-               -> Term f (Record fields)
-               -> Term f (Record fields)
-               -> Diff f (Record fields) (Record fields)
+decoratingWith :: (Hashable label, Traversable syntax)
+               => (forall a. TermF syntax (Record fields) a -> label)
+               -> (Term syntax (Record (FeatureVector ': fields)) -> Term syntax (Record (FeatureVector ': fields)) -> Diff syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)))
+               -> Term syntax (Record fields)
+               -> Term syntax (Record fields)
+               -> Diff syntax (Record fields) (Record fields)
 decoratingWith getLabel differ t1 t2 = stripDiff (differ (defaultFeatureVectorDecorator getLabel t1) (defaultFeatureVectorDecorator getLabel t2))
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
-diffTermsWith :: forall f fields . (Traversable f, GAlign f, Eq1 f, HasField fields FeatureVector)
-              => (Term f (Record fields) -> Term f (Record fields) -> Algorithm (Term f) (Diff f) (Record fields) (Record fields) (Diff f (Record fields) (Record fields))) -- ^ A function producing syntax-directed continuations of the algorithm.
-              -> ComparabilityRelation f (Record fields) (Record fields) -- ^ A relation on terms used to determine comparability and equality.
-              -> Term f (Record fields) -- ^ A term representing the old state.
-              -> Term f (Record fields) -- ^ A term representing the new state.
-              -> Diff f (Record fields) (Record fields) -- ^ The resulting diff.
+diffTermsWith :: forall syntax fields
+              .  (Eq1 syntax, GAlign syntax, Traversable syntax)
+              => (Term syntax (Record (FeatureVector ': fields)) -> Term syntax (Record (FeatureVector ': fields)) -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) (Diff syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)))) -- ^ A function producing syntax-directed continuations of the algorithm.
+              -> ComparabilityRelation syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) -- ^ A relation on terms used to determine comparability and equality.
+              -> Term syntax (Record (FeatureVector ': fields)) -- ^ A term representing the old state.
+              -> Term syntax (Record (FeatureVector ': fields)) -- ^ A term representing the new state.
+              -> Diff syntax (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) -- ^ The resulting diff.
 diffTermsWith refine comparable t1 t2 = runFreer decompose (diff t1 t2)
-  where decompose :: AlgorithmF (Term f) (Diff f) (Record fields) (Record fields) result -> Algorithm (Term f) (Diff f) (Record fields) (Record fields) result
+  where decompose :: AlgorithmF (Term syntax) (Diff syntax) (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) result -> Algorithm (Term syntax) (Diff syntax) (Record (FeatureVector ': fields)) (Record (FeatureVector ': fields)) result
         decompose step = case step of
           Algorithm.Diff t1 t2 -> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
