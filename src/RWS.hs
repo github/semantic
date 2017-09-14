@@ -28,7 +28,6 @@ import Term
 import Data.Array.Unboxed
 import Data.Functor.Classes
 import SES
-import qualified Data.Functor.Both as Both
 import Data.KdTree.Static hiding (empty, toList)
 import qualified Data.IntMap as IntMap
 
@@ -126,35 +125,37 @@ findNearestNeighboursToDiff :: (These (Term syntax (Record fields)) (Term syntax
 findNearestNeighboursToDiff editDistance canCompare allDiffs featureAs featureBs = (diffs, remaining)
   where
     (diffs, (_, remaining, _)) =
-      traverse (findNearestNeighbourToDiff' editDistance canCompare (toKdTree <$> Both.both featureAs featureBs)) allDiffs &
+      traverse (findNearestNeighbourToDiff' editDistance canCompare (toKdTree featureAs) (toKdTree featureBs)) allDiffs &
       fmap catMaybes &
       (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
 
 findNearestNeighbourToDiff' :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                            -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                           -> Both.Both (KdTree Double (UnmappedTerm syntax (Record fields)))
+                           -> KdTree Double (UnmappedTerm syntax (Record fields))
+                           -> KdTree Double (UnmappedTerm syntax (Record fields))
                            -> TermOrIndexOrNone (UnmappedTerm syntax (Record fields))
                            -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
                                     (Maybe (MappedDiff syntax (Record fields) (Record fields)))
-findNearestNeighbourToDiff' editDistance canCompare kdTrees termThing = case termThing of
+findNearestNeighbourToDiff' editDistance canCompare kdTreeA kdTreeB termThing = case termThing of
   None -> pure Nothing
-  RWS.Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTrees term
+  RWS.Term term -> Just <$> findNearestNeighbourTo editDistance canCompare kdTreeA kdTreeB term
   Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Diff syntax (Record fields) (Record fields) -> Int) -- ^ A function computes a constant-time approximation to the edit distance between two terms.
                        -> ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                       -> Both.Both (KdTree Double (UnmappedTerm syntax (Record fields)))
+                       -> KdTree Double (UnmappedTerm syntax (Record fields))
+                       -> KdTree Double (UnmappedTerm syntax (Record fields))
                        -> UnmappedTerm syntax (Record fields)
                        -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
                                 (MappedDiff syntax (Record fields) (Record fields))
-findNearestNeighbourTo editDistance canCompare kdTrees term@(UnmappedTerm j _ b) = do
+findNearestNeighbourTo editDistance canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped editDistance canCompare (termsWithinMoveBoundsFrom previous unmappedA) (Both.fst kdTrees) term
+    foundA@(UnmappedTerm i _ a) <- nearestUnmapped editDistance canCompare (termsWithinMoveBoundsFrom previous unmappedA) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare (termsWithinMoveBoundsFrom (pred j) unmappedB) (Both.snd kdTrees) foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped editDistance canCompare (termsWithinMoveBoundsFrom (pred j) unmappedB) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     guard (canCompareTerms canCompare a b)
