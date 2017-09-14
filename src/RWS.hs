@@ -143,19 +143,19 @@ findNearestNeighbourToDiff' canCompare kdTreeA kdTreeB termThing = case termThin
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
-                       => ComparabilityRelation syntax (Record fields) (Record fields) -- ^ A relation determining whether two terms can be compared.
-                       -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
-                       -> KdMap Double FeatureVector (UnmappedTerm syntax (Record fields))
-                       -> UnmappedTerm syntax (Record fields)
-                       -> State (Int, UnmappedTerms syntax (Record fields), UnmappedTerms syntax (Record fields))
-                                (MappedDiff syntax (Record fields) (Record fields))
+                       => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
+                       -> KdMap Double FeatureVector (UnmappedTerm syntax ann1)
+                       -> KdMap Double FeatureVector (UnmappedTerm syntax ann2)
+                       -> UnmappedTerm syntax ann2
+                       -> State (Int, UnmappedTerms syntax ann1, UnmappedTerms syntax ann2)
+                                (MappedDiff syntax ann1 ann2)
 findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
     foundA@(UnmappedTerm i _ a) <- nearestUnmapped canCompare (termsWithinMoveBoundsFrom previous unmappedA) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped canCompare (termsWithinMoveBoundsFrom (pred j) unmappedB) kdTreeB foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped (flip canCompare) (termsWithinMoveBoundsFrom (pred j) unmappedB) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     guard (canCompareTerms canCompare a b)
