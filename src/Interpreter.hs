@@ -9,13 +9,11 @@ module Interpreter
 import Algorithm
 import Control.Monad.Free.Freer
 import Data.Align.Generic
-import Data.Functor.Foldable (cata)
 import Data.Functor.Classes (Eq1)
 import Data.Hashable (Hashable)
 import Data.Maybe (isJust)
 import Data.Record
 import Data.Text (Text)
-import Data.These
 import Diff
 import Info hiding (Return)
 import RWS
@@ -53,7 +51,7 @@ diffTermsWith refine comparable t1 t2 = runFreer decompose (diff t1 t2)
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
             Just result -> merge (extract t1, extract t2) <$> sequenceA result
             _ -> byReplacing t1 t2
-          RWS as bs -> traverse diffThese (rws (editDistanceUpTo defaultM) comparable as bs)
+          RWS as bs -> traverse diffThese (rws comparable as bs)
           Delete a -> pure (deleting a)
           Insert b -> pure (inserting b)
           Replace a b -> pure (replacing a b)
@@ -116,18 +114,3 @@ comparableByCategory (In a _) (In b _) = category a == category b
 -- | Test whether two terms are comparable by their constructor.
 comparableByConstructor :: GAlign syntax => ComparabilityRelation syntax (Record fields) (Record fields)
 comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
-
-
--- | How many nodes to consider for our constant-time approximation to tree edit distance.
-defaultM :: Integer
-defaultM = 10
-
--- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
--- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> These (Term syntax ann1) (Term syntax ann2) -> Int
-editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
-  where diffCost = flip . cata $ \ diff m -> case diff of
-          _ | m <= 0 -> 0
-          Merge body -> sum (fmap ($ pred m) body)
-          body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
