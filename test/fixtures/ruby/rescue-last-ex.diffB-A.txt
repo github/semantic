@@ -8,5 +8,5 @@
             (Identifier))
           (
             (Identifier)))
-        ([]
-        {-(Identifier)-})))))
+      { (Identifier)
+      ->([]) }))))

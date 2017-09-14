@@ -7,8 +7,7 @@
     (Identifier)
     (Function
       (Empty)
-      (
-        (Identifier))))
+      (Identifier)))
   (Call
     (Identifier)
     (Function
@@ -16,29 +15,23 @@
       (Identifier)
       (Identifier)
       (Identifier)
-      (
-        (Integer))))
+      (Integer)))
   (Function
     (Empty)
-    (
-      (Function
-        (Empty)
-        ([]))))
+    (Function
+      (Empty)
+      ([])))
   (Function
     (Empty)
-    (
-      (Function
-        (Empty)
-        (
-          (Identifier)))))
+    (Function
+      (Empty)
+      (Identifier)))
   (Function
     (Empty)
     (Identifier)
-    (
-      (Function
-        (Empty)
-        (
-          (Integer)))))
+    (Function
+      (Empty)
+      (Integer)))
   (Function
     (Empty)
     (Identifier)
@@ -46,7 +39,6 @@
     (
       (Identifier)
       (Identifier))
-    (
-      (Function
-        (Empty)
-        ([])))))
+    (Function
+      (Empty)
+      ([]))))

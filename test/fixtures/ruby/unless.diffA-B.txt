@@ -5,8 +5,7 @@
     ->(Identifier) })
     ([]
     {-(Identifier)-})
-  { (
-      (Identifier))
+  { (Identifier)
   ->(Empty) })
 {+(If
     (Not

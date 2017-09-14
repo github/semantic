@@ -1,27 +1,26 @@
 (Program
-{+(Try
+  (Try
     (
       (Identifier)
       (Catch
         (
           (
-            (Identifier)))
-        (Catch
+          {+(Identifier)+}
+          {-(Identifier)-}))
+      { (Identifier)
+      ->(Catch
           (
             (
               (Identifier)
               (Identifier))
             (
               (Identifier)))
-          (
-            (Identifier))))
-      (Else
+          (Identifier)) })
+    {+(Else
         (Empty)
-        (
-          (Identifier)))
-      (Finally
-        (
-          (Identifier)))))+}
+        (Identifier))+}
+    {+(Finally
+        (Identifier))+}))
 {+(Method
     (Empty)
     (Identifier)
@@ -43,16 +42,8 @@
         ([]))
       (Finally
         ([]))))+}
-  (Try
-  { (
-      (Identifier)
-      (Catch
-        (
-          (
-            (Identifier)))
-        (
-          (Identifier))))
-  ->(Identifier) }
-  {+(Catch
+{+(Try
+    (Identifier)
+    (Catch
       (Null)
-      (Empty))+}))
+      (Empty)))+})

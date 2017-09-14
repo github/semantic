@@ -10,7 +10,7 @@ import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
-import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -224,8 +224,9 @@ parameter =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> expression <*> params <*> expressions)
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> emptyTerm <*> expression <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
+        expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
 singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> expression <*> expression <*> params <*> expressions)

@@ -1,36 +1,26 @@
 (Program
-{+(Try
+  (Try
     (
       (Identifier)
       (Catch
         (
           (
-            (Identifier)))
-        (
-          (Identifier)))))+}
-{-(Try
-    (
-      (Identifier)
-      (Catch
-        (
-          (
-            (Identifier)))
-        (Catch
+          {+(Identifier)+}
+          {-(Identifier)-}))
+      { (Catch
           (
             (
               (Identifier)
               (Identifier))
             (
               (Identifier)))
-          (
-            (Identifier))))
-      (Else
+          (Identifier))
+      ->(Identifier) })
+    {-(Else
         (Empty)
-        (
-          (Identifier)))
-      (Finally
-        (
-          (Identifier)))))-}
+        (Identifier))-}
+    {-(Finally
+        (Identifier))-}))
 {-(Method
     (Empty)
     (Identifier)

@@ -1,6 +1,5 @@
 (Program
   (While
     (Identifier)
-    (
-      (Break
-        (Empty)))))
+    (Break
+      (Empty))))

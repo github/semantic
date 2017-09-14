@@ -2,8 +2,8 @@
   (While
     (Not
       (Identifier))
-    ([]
-    {-(Identifier)-}))
+  { (Identifier)
+  ->([]) })
 {+(While
     (Not
       (Identifier))

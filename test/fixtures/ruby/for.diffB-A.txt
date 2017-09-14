@@ -3,15 +3,13 @@
     (
       (Identifier))
     (Identifier)
-    (
-      (Identifier)))+}
+    (Identifier))+}
 {+(ForEach
     (
       (Identifier)
       (Identifier))
     (Identifier)
-    (
-      (Identifier)))+}
+    (Identifier))+}
   (ForEach
     (
     { (Identifier)
@@ -24,12 +22,11 @@
       (Integer)
       (Integer)
       (Empty)) }
-    (
-    { (Call
-        (Identifier)
-        (Identifier)
-        (Empty))
-    ->(Boolean) }))
+  { (Call
+      (Identifier)
+      (Identifier)
+      (Empty))
+  ->(Boolean) })
 {+(ForEach
     (
       (Identifier)
@@ -38,5 +35,4 @@
       (Integer)
       (Integer)
       (Empty))
-    (
-      (Boolean)))+})
+    (Boolean))+})

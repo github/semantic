@@ -3,6 +3,5 @@
   { (Identifier)
   ->(Not
       (Identifier)) }
-    (
-      (Break
-        (Empty)))))
+    (Break
+      (Empty))))

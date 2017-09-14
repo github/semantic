@@ -4,10 +4,9 @@
   {+(Identifier)+}
   {+(Identifier)+}
   {+(Identifier)+}
-    (
-      (Function
-        (Empty)
-        (
-        { (Identifier)
-        ->(Integer) }
-        {+(Integer)+})))))
+    (Function
+      (Empty)
+    { (Identifier)
+    ->(
+        (Integer)
+        (Integer)) })))

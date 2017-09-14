@@ -6,5 +6,4 @@
         (
           (
             (Identifier)))
-        (
-          (Identifier))))))
+        (Identifier)))))

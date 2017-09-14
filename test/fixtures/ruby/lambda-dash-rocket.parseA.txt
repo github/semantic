@@ -4,9 +4,8 @@
     (Identifier)
     (Identifier)
     (Identifier)
-    (
-      (Function
-        (Empty)
-        (
-          (Integer)
-          (Integer))))))
+    (Function
+      (Empty)
+      (
+        (Integer)
+        (Integer)))))

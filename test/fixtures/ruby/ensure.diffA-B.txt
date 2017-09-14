@@ -3,5 +3,5 @@
     (
       (Identifier)
       (Finally
-        (
-        {+(Identifier)+})))))
+      { ([])
+      ->(Identifier) }))))

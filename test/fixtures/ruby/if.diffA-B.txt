@@ -8,8 +8,7 @@
       (Identifier)
       (
         (Identifier))
-      (
-        (Identifier)))
+      (Identifier))
   ->(Empty) })
 {+(If
     (Identifier)
