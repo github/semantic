@@ -320,7 +320,7 @@ defaultM = 10
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> These (Term syntax ann1) (Term syntax ann2) -> Int
+editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> Diff syntax ann1 ann2 -> Int
 editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
