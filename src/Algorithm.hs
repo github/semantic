@@ -86,7 +86,7 @@ instance (Show1 term, Show ann1, Show ann2) => Show1 (AlgorithmF term (diff ann1
 
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
 -- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
-algorithmForTerms :: (Functor syntax, Diffable syntax)
+algorithmForTerms :: Diffable syntax
                   => Term syntax ann1
                   -> Term syntax ann2
                   -> Algorithm (Term syntax) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2)
