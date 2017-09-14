@@ -11,6 +11,7 @@ import Data.Aeson
 import Data.Align
 import Data.Bifoldable
 import Data.Bifunctor
+import Data.Bifunctor.Symmetrical
 import Data.Bitraversable
 import Data.Functor.Classes
 import Data.JSON.Fields
@@ -46,6 +47,9 @@ instance Bifunctor Patch where
   bimap f _ (Delete a) = Delete (f a)
   bimap _ g (Insert b) = Insert (g b)
   bimap f g (Replace a b) = Replace (f a) (g b)
+
+instance Symmetrical Patch where
+  mirror = patch Insert Delete (flip Replace)
 
 instance Bifoldable Patch where
   bifoldMap f _ (Delete a) = f a
