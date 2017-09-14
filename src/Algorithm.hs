@@ -102,11 +102,11 @@ algorithmForComparableTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = fmap (merg
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   algorithmFor :: f (term ann1) -> f (term ann2) -> Maybe (Algorithm term diff ann1 ann2 (f (diff ann1 ann2)))
-  default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term diff ann1 ann2 (f (diff ann1 ann2)))
+  default algorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term diff ann1 ann2 (f (diff ann1 ann2)))
   algorithmFor = genericAlgorithmFor
 
-genericAlgorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term diff ann1 ann2 (f (diff ann1 ann2)))
-genericAlgorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term diff ann1 ann2 (f (diff ann1 ann2)))
+genericAlgorithmFor a b = fmap to1 <$> galgorithmFor (from1 a) (from1 b)
 
 
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
@@ -121,46 +121,46 @@ instance Diffable [] where
   algorithmFor a b = Just (byRWS a b)
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
-class Diffable' f where
-  algorithmFor' :: f (term ann1) -> f (term ann2) -> Maybe (Algorithm term diff ann1 ann2 (f (diff ann1 ann2)))
+class GDiffable f where
+  galgorithmFor :: f (term ann1) -> f (term ann2) -> Maybe (Algorithm term diff ann1 ann2 (f (diff ann1 ann2)))
 
 -- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
-instance Diffable' f => Diffable' (M1 i c f) where
-  algorithmFor' (M1 a) (M1 b) = fmap M1 <$> algorithmFor' a b
+instance GDiffable f => GDiffable (M1 i c f) where
+  galgorithmFor (M1 a) (M1 b) = fmap M1 <$> galgorithmFor a b
 
 -- | Diff the fields of a product type.
 -- i.e. data Foo a b = Foo a b (the 'Foo a b' is captured by 'a :*: b').
-instance (Diffable' f, Diffable' g) => Diffable' (f :*: g) where
-  algorithmFor' (a1 :*: b1) (a2 :*: b2) = liftA2 (:*:) <$> algorithmFor' a1 a2 <*> algorithmFor' b1 b2
+instance (GDiffable f, GDiffable g) => GDiffable (f :*: g) where
+  galgorithmFor (a1 :*: b1) (a2 :*: b2) = liftA2 (:*:) <$> galgorithmFor a1 a2 <*> galgorithmFor b1 b2
 
 -- | Diff the constructors of a sum type.
 -- i.e. data Foo a = Foo a | Bar a (the 'Foo a' is captured by L1 and 'Bar a' is R1).
-instance (Diffable' f, Diffable' g) => Diffable' (f :+: g) where
-  algorithmFor' (L1 a) (L1 b) = fmap L1 <$> algorithmFor' a b
-  algorithmFor' (R1 a) (R1 b) = fmap R1 <$> algorithmFor' a b
-  algorithmFor' _ _ = Nothing
+instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
+  galgorithmFor (L1 a) (L1 b) = fmap L1 <$> galgorithmFor a b
+  galgorithmFor (R1 a) (R1 b) = fmap R1 <$> galgorithmFor a b
+  galgorithmFor _ _ = Nothing
 
 -- | Diff two parameters (Par1 is the Generic1 newtype representing a type parameter).
 -- i.e. data Foo a = Foo a (the 'a' is captured by Par1).
-instance Diffable' Par1 where
-  algorithmFor' (Par1 a) (Par1 b) = Just (Par1 <$> linearly a b)
+instance GDiffable Par1 where
+  galgorithmFor (Par1 a) (Par1 b) = Just (Par1 <$> linearly a b)
 
 -- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
 -- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).
-instance Eq c => Diffable' (K1 i c) where
-  algorithmFor' (K1 a) (K1 b) = guard (a == b) *> Just (pure (K1 a))
+instance Eq c => GDiffable (K1 i c) where
+  galgorithmFor (K1 a) (K1 b) = guard (a == b) *> Just (pure (K1 a))
 
 -- | Diff two terms whose constructors contain 0 type parameters.
 -- i.e. data Foo = Foo.
-instance Diffable' U1 where
-  algorithmFor' _ _ = Just (pure U1)
+instance GDiffable U1 where
+  galgorithmFor _ _ = Just (pure U1)
 
 -- | Diff two lists of parameters.
-instance Diffable' (Rec1 []) where
-  algorithmFor' a b = Just (Rec1 <$> byRWS (unRec1 a) (unRec1 b))
+instance GDiffable (Rec1 []) where
+  galgorithmFor a b = Just (Rec1 <$> byRWS (unRec1 a) (unRec1 b))
 
 -- | Diff two non-empty lists of parameters.
-instance Diffable' (Rec1 NonEmpty) where
-  algorithmFor' (Rec1 (a:|as)) (Rec1 (b:|bs)) = Just $ do
+instance GDiffable (Rec1 NonEmpty) where
+  galgorithmFor (Rec1 (a:|as)) (Rec1 (b:|bs)) = Just $ do
     d:ds <- byRWS (a:as) (b:bs)
     pure (Rec1 (d :| ds))
