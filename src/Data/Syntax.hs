@@ -17,6 +17,7 @@ import Data.Record
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
+import Data.These
 import Data.Union
 import Diff
 import GHC.Generics
@@ -153,7 +154,13 @@ unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList 
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Diffable Context where
+  subalgorithmFor subdiff inj (In a1 (Context n1 s1)) s2 = do
+    n' <- traverse (subdiff . This) n1
+    s' <- subdiff (These s1 s2)
+    pure (In a1 . inj <$> (Context <$> sequenceA n' <*> s'))
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
