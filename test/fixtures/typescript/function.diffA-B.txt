@@ -2,13 +2,13 @@
   (Function
   {+(Empty)+}
   {+(Annotation
-      (TypeIdentifier))+}
+    {+(TypeIdentifier)+})+}
   {-(TypeParameters
-      (TypeParameter
-        (Identifier)
-        (Empty)))-}
+    {-(TypeParameter
+      {-(Identifier)-}
+      {-(Empty)-})-})-}
   {-(Annotation
-      (PredefinedType))-}
+    {-(PredefinedType)-})-}
     (Empty)
     (RequiredParameter
       (Empty)

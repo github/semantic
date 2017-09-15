@@ -2,8 +2,8 @@
   (If
   { (Identifier)
   ->(MemberAccess
-      (Identifier)
-      (Identifier)) }
+    {+(Identifier)+}
+    {+(Identifier)+}) }
     (
       (ExpressionStatement
         (Call
@@ -12,5 +12,5 @@
         ->(Identifier) }
           (Empty)))
     {+(ExpressionStatement
-        (Identifier))+})
+      {+(Identifier)+})+})
     (Empty)))

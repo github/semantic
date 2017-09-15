@@ -1,70 +1,70 @@
 (Program
 {+(Plus
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(Minus
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(Times
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(DividedBy
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {-(RShift
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(LShift
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(BXOr
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(BAnd
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
   (Modulo
     (Identifier)
     (Identifier))
 {+(DividedBy
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(Power
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(BOr
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(BAnd
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(BXOr
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(LShift
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(RShift
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {-(Power
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(DividedBy
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Modulo
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(DividedBy
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Times
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Minus
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Plus
-    (Identifier)
-    (Identifier))-})
+  {-(Identifier)-}
+  {-(Identifier)-})-})

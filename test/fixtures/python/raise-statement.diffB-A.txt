@@ -1,29 +1,29 @@
 (Program
 {-(Throw
-    (
-      (Call
-        (Identifier)
-        (TextElement)
-        (Empty))))-}
+  {-(
+    {-(Call
+      {-(Identifier)-}
+      {-(TextElement)-}
+      {-(Empty)-})-})-})-}
 {-(Throw
-    (
-      (Call
-        (Identifier)
-        (TextElement)
-        (Empty))
-      (Identifier)))-}
+  {-(
+    {-(Call
+      {-(Identifier)-}
+      {-(TextElement)-}
+      {-(Empty)-})-}
+    {-(Identifier)-})-})-}
   (Throw
     ([]))
 {+(Throw
-    (
-      (Call
-        (Identifier)
-        (TextElement)
-        (Empty))))+}
+  {+(
+    {+(Call
+      {+(Identifier)+}
+      {+(TextElement)+}
+      {+(Empty)+})+})+})+}
 {+(Throw
-    (
-      (Call
-        (Identifier)
-        (TextElement)
-        (Empty))
-      (Identifier)))+})
+  {+(
+    {+(Call
+      {+(Identifier)+}
+      {+(TextElement)+}
+      {+(Empty)+})+}
+    {+(Identifier)+})+})+})

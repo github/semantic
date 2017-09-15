@@ -3,10 +3,10 @@
     (Assignment
       (Annotation
       { (Union
-          (TypeIdentifier)
-          (TypeIdentifier))
+        {-(TypeIdentifier)-}
+        {-(TypeIdentifier)-})
       ->(Intersection
-          (TypeIdentifier)
-          (TypeIdentifier)) })
+        {+(TypeIdentifier)+}
+        {+(TypeIdentifier)+}) })
       (Identifier)
       (Empty))))

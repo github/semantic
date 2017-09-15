@@ -5,7 +5,6 @@ import Control.Applicative (liftA2)
 import Control.Monad (guard, join)
 import Control.Monad.Free.Freer
 import Data.Function (on)
-import Data.Functor.Both
 import Data.Functor.Classes
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
@@ -87,14 +86,21 @@ instance Show term => Show1 (AlgorithmF term diff) where
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
 -- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
 algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f a) (Diff f a) (Diff f a)
-algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2)) = fromMaybe (byReplacing t1 t2) (fmap (copy (both ann1 ann2)) <$> algorithmFor f1 f2)
+algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (algorithmForComparableTerms t1 t2)
+
+algorithmForComparableTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Maybe (Algorithm (Term f a) (Diff f a) (Diff f a))
+algorithmForComparableTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = fmap (merge (ann1, ann2)) <$> algorithmFor f1 f2
 
 
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   algorithmFor :: f term -> f term -> Maybe (Algorithm term diff (f diff))
   default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
-  algorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+  algorithmFor = genericAlgorithmFor
+
+genericAlgorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
+genericAlgorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+
 
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
 -- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible

@@ -12,7 +12,7 @@
       { (Identifier)
       ->(Identifier) }
       {+(Other "expression_list"
-        (NumberLiteral)
-        (NumberLiteral))+}
+        {+(NumberLiteral)+}
+        {+(NumberLiteral)+})+}
       {-(Other "expression_list"
-        (NumberLiteral))-}))))
+        {-(NumberLiteral)-})-}))))

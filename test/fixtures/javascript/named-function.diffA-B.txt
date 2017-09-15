@@ -5,20 +5,20 @@
   { (Identifier)
   ->(Identifier) }
   {-(RequiredParameter
-      (Empty)
-      (Empty)
-      (Assignment
-        (Identifier)
-        (Empty)))-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Empty)-})-})-}
   {-(RequiredParameter
-      (Empty)
-      (Empty)
-      (Assignment
-        (Identifier)
-        (Empty)))-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Empty)-})-})-}
     (
     { (ExpressionStatement
-        (Identifier))
+      {-(Identifier)-})
     ->(Return
-        (Boolean)) }))
+      {+(Boolean)+}) }))
   (Empty))

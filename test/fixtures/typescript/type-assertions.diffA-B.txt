@@ -1,9 +1,9 @@
 (Program
   (ExpressionStatement
   { (TypeAssertion
-      (TypeArguments
-        (PredefinedType))
-      (Identifier))
+    {-(TypeArguments
+      {-(PredefinedType)-})-}
+    {-(Identifier)-})
   ->(Cast
-      (Identifier)
-      (PredefinedType)) }))
+    {+(Identifier)+}
+    {+(PredefinedType)+}) }))

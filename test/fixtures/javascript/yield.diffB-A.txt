@@ -13,5 +13,5 @@
         (ExpressionStatement
           (Yield
           { (Update
-              (Identifier))
+            {-(Identifier)-})
           ->(Identifier) }))))))

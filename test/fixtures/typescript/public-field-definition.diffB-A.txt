@@ -25,7 +25,7 @@
         (Readonly)
       {+(Empty)+}
       {-(Annotation
-          (TypeIdentifier))-}
+        {-(TypeIdentifier)-})-}
         (Identifier)
         (Float))
       (PublicFieldDefinition

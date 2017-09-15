@@ -3,5 +3,5 @@
     (Identifier)
   {+(Identifier)+})
 {-(Modifier While
-    (Identifier)
-    (Identifier))-})
+  {-(Identifier)-}
+  {-(Identifier)-})-})

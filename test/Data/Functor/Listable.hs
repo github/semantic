@@ -166,7 +166,9 @@ instance (Listable1 f, Listable a) => Listable (Term f a) where
 
 
 instance Listable1 f => Listable2 (DiffF f) where
-  liftTiers2 annTiers recurTiers = liftCons2 (liftCons2 annTiers annTiers both) (liftTiers recurTiers) Copy \/ liftCons1 (liftTiers (liftTiers annTiers)) Patch
+  liftTiers2 annTiers recurTiers
+    =  liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
+    \/ liftCons1 (liftTiers2 (liftTiers2 annTiers annTiers) recurTiers) Merge
 
 instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
   liftTiers = liftTiers2 tiers
@@ -237,7 +239,7 @@ instance Listable1 Syntax where
     \/ liftCons2 recur (liftTiers recur) Case
     \/ liftCons1 (liftTiers recur) Select
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
-    \/ liftCons2 recur recur Pair
+    \/ liftCons2 recur recur Syntax.Pair
     \/ liftCons1 (pack `mapT` tiers) Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
     \/ liftCons1 (liftTiers recur) Syntax.ParseError

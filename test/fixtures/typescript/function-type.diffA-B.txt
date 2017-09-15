@@ -3,9 +3,9 @@
     (Assignment
       (Annotation
       { (Function
-          (Empty)
-          (TypeIdentifier))
+        {-(Empty)-}
+        {-(TypeIdentifier)-})
       ->(ArrayType
-          (TypeIdentifier)) })
+        {+(TypeIdentifier)+}) })
       (Identifier)
       (Empty))))

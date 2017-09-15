@@ -4,6 +4,6 @@
       (Identifier))
   {-(Identifier)-})
 {+(Modifier Until
-    (Negate
-      (Identifier))
-    (Identifier))+})
+  {+(Negate
+    {+(Identifier)+})+}
+  {+(Identifier)+})+})

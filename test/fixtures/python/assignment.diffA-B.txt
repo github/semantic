@@ -1,25 +1,25 @@
 (Program
 {+(Assignment
-    (
-      (Identifier)
-      (Identifier))
-    (
-      (Integer)
-      (Integer)))+}
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(
+    {+(Integer)+}
+    {+(Integer)+})+})+}
   (Assignment
   { (Identifier)
   ->(Identifier) }
     (Integer))
   (Assignment
   { (
-      (Identifier)
-      (Identifier))
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(Identifier) }
     (
       (Integer)
       (Integer)))
 {-(Assignment
-    (Identifier)
-    (
-      (Integer)
-      (Integer)))-})
+  {-(Identifier)-}
+  {-(
+    {-(Integer)-}
+    {-(Integer)-})-})-})

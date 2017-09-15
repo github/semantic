@@ -1,6 +1,6 @@
 (Program
 {+(BeginBlock
-    (Identifier))+}
+  {+(Identifier)+})+}
 {-(Identifier)-}
 {-(BeginBlock
-    (Identifier))-})
+  {-(Identifier)-})-})

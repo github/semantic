@@ -9,6 +9,7 @@ module Term
 , extract
 , unwrap
 , hoistTerm
+, hoistTermF
 , stripTerm
 ) where
 
@@ -47,7 +48,10 @@ termIn = (Term .) . In
 
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
-hoistTerm f = go where go (Term (In a r)) = termIn a (f (fmap go r))
+hoistTerm f = go where go (Term r) = Term (hoistTermF f (fmap go r))
+
+hoistTermF :: (forall a. f a -> g a) -> TermF f a b -> TermF g a b
+hoistTermF f = go where go (In a r) = In a (f r)
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
@@ -65,20 +69,20 @@ instance Functor f => Comonad (Term f) where
   extend f = go where go w = termIn (f w) (fmap go (unwrap w))
 
 instance Functor f => Functor (Term f) where
-  fmap f = go where go (Term (In a r)) = termIn (f a) (fmap go r)
+  fmap f = go where go = Term . bimap f go . unTerm
 
 instance Foldable f => Foldable (Term f) where
-  foldMap f = go where go (Term (In a r)) = f a `mappend` foldMap go r
+  foldMap f = go where go = bifoldMap f go . unTerm
 
 instance Traversable f => Traversable (Term f) where
-  traverse f = go where go (Term (In a r)) = termIn <$> f a <*> traverse go r
+  traverse f = go where go = fmap Term . bitraverse f go . unTerm
 
 instance Functor f => ComonadCofree f (Term f) where
   unwrap = termOut . unTerm
   {-# INLINE unwrap #-}
 
 instance Eq1 f => Eq1 (Term f) where
-  liftEq eqA = go where go (Term (In a1 f1)) (Term (In a2 f2)) = eqA a1 a2 && liftEq go f1 f2
+  liftEq eqA = go where go t1 t2 = liftEq2 eqA go (unTerm t1) (unTerm t2)
 
 instance (Eq1 f, Eq a) => Eq (Term f a) where
   (==) = eq1
@@ -121,3 +125,7 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
   toJSONFields (In a f) = toJSONFields a <> toJSONFields1 f
+
+instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
+  toJSON = object . toJSONFields
+  toEncoding = pairs . mconcat . toJSONFields

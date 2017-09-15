@@ -3,10 +3,10 @@
     (Assignment
       (Annotation
       { (Intersection
-          (TypeIdentifier)
-          (TypeIdentifier))
+        {-(TypeIdentifier)-}
+        {-(TypeIdentifier)-})
       ->(Tuple
-          (TypeIdentifier)
-          (TypeIdentifier)) })
+        {+(TypeIdentifier)+}
+        {+(TypeIdentifier)+}) })
       (Identifier)
       (Empty))))

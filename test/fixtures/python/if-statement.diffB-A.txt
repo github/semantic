@@ -9,10 +9,10 @@
     ->(Identifier) })
   { (Empty)
   ->(If
-      (Identifier)
-      (
-        (Identifier)
-        (Identifier))
-      (
-        (Identifier)
-        (Identifier))) }))
+    {+(Identifier)+}
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+}) }))

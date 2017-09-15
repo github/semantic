@@ -1,7 +1,7 @@
 (Program
   (ExpressionStatement
   { (Typeof
-      (Identifier))
+    {-(Identifier)-})
   ->(InstanceOf
-      (Identifier)
-      (Identifier)) }))
+    {+(Identifier)+}
+    {+(Identifier)+}) }))

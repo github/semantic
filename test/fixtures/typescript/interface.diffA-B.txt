@@ -1,9 +1,9 @@
 (Program
   (InterfaceDeclaration
   {-(TypeParameters
-      (TypeParameter
-        (Identifier)
-        (Empty)))-}
+    {-(TypeParameter
+      {-(Identifier)-}
+      {-(Empty)-})-})-}
     (Empty)
   {+(Empty)+}
   { (Identifier)

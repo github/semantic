@@ -2,8 +2,8 @@
   (ExpressionStatement
     (Delete
     { (Subscript
-        (Identifier)
-        (TextElement))
+      {-(Identifier)-}
+      {-(TextElement)-})
     ->(MemberAccess
-        (Identifier)
-        (Identifier)) })))
+      {+(Identifier)+}
+      {+(Identifier)+}) })))

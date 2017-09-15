@@ -5,5 +5,5 @@
       (Identifier)
       (Boolean))
   {-(Pair
-      (Identifier)
-      (IntegerLiteral))-}))
+    {-(Identifier)-}
+    {-(IntegerLiteral)-})-}))

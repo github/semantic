@@ -21,8 +21,8 @@
       (
         (Return
         { (Plus
-            (Identifier)
-            (Identifier))
+          {-(Identifier)-}
+          {-(Identifier)-})
         ->(Times
-            (Identifier)
-            (Identifier)) })))))
+          {+(Identifier)+}
+          {+(Identifier)+}) })))))

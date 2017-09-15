@@ -9,10 +9,10 @@
       {+(Identifier)+}
       {+(Identifier)+}
       {+(Other "expression_list"
-          (NumberLiteral))+}
+        {+(NumberLiteral)+})+}
       {-(Identifier)-}
       {-(Identifier)-}
       {-(Identifier)-}
       {-(Other "expression_list"
-          (NumberLiteral)
-          (NumberLiteral))-}))))
+        {-(NumberLiteral)-}
+        {-(NumberLiteral)-})-}))))

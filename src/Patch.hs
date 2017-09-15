@@ -5,7 +5,6 @@ module Patch
 , after
 , before
 , unPatch
-, patchSum
 , maybeFst
 , maybeSnd
 , mapPatch
@@ -45,10 +44,6 @@ mapPatch :: (a -> b) -> (a -> b) -> Patch a -> Patch b
 mapPatch f _ (Delete  a  ) = Delete  (f a)
 mapPatch _ g (Insert    b) = Insert  (g b)
 mapPatch f g (Replace a b) = Replace (f a) (g b)
-
--- | Calculate the cost of the patch given a function to compute the cost of a item.
-patchSum :: (a -> Int) -> Patch a -> Int
-patchSum termCost patch = maybe 0 termCost (before patch) + maybe 0 termCost (after patch)
 
 -- | Return Just the value in This, or the first value in These, if any.
 maybeFst :: These a b -> Maybe a

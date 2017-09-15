@@ -2,7 +2,7 @@
   (Method
     (Identifier)
   { (Params
-      (OptionalParameter
-        (Identifier)
-        (Identifier)))
+    {-(OptionalParameter
+      {-(Identifier)-}
+      {-(Identifier)-})-})
   ->(Params) }))

@@ -1,16 +1,16 @@
 (Program
 {+(ForEach
-    (
-      (Identifier))
-    (Array
-      (Tuple
-        (Integer))
-      (Tuple
-        (Integer))
-      (Tuple
-        (Integer)))
-    (
-      (Identifier)))+}
+  {+(
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Tuple
+      {+(Integer)+})+}
+    {+(Tuple
+      {+(Integer)+})+}
+    {+(Tuple
+      {+(Integer)+})+})+}
+  {+(
+    {+(Identifier)+})+})+}
   (Else
     (ForEach
       (
@@ -41,14 +41,14 @@
       {-(Identifier)-}
         (Empty))))
 {-(ForEach
-    (
-      (Identifier))
-    (Array
-      (Tuple
-        (Integer))
-      (Tuple
-        (Integer))
-      (Tuple
-        (Integer)))
-    (
-      (Identifier)))-})
+  {-(
+    {-(Identifier)-})-}
+  {-(Array
+    {-(Tuple
+      {-(Integer)-})-}
+    {-(Tuple
+      {-(Integer)-})-}
+    {-(Tuple
+      {-(Integer)-})-})-}
+  {-(
+    {-(Identifier)-})-})-})

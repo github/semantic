@@ -1,22 +1,22 @@
 (Program
   (ExpressionStatement
   { (If
-      (Identifier)
-      (Identifier)
-      (Identifier))
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(Assignment
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (If
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (MemberAccess
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Identifier)))) }))
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(If
+      {+(MemberAccess
+        {+(Identifier)+}
+        {+(Identifier)+})+}
+      {+(MemberAccess
+        {+(Identifier)+}
+        {+(Identifier)+})+}
+      {+(MemberAccess
+        {+(MemberAccess
+          {+(Identifier)+}
+          {+(Identifier)+})+}
+        {+(Identifier)+})+})+}) }))

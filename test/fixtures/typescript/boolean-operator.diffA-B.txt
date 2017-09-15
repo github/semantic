@@ -1,8 +1,8 @@
 (Program
   (ExpressionStatement
   { (Or
-      (Identifier)
-      (Identifier))
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(And
-      (Identifier)
-      (Identifier)) }))
+    {+(Identifier)+}
+    {+(Identifier)+}) }))

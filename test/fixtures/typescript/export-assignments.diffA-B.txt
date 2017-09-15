@@ -1,5 +1,5 @@
 (Program
 {+(Return
-    (Identifier))+}
+  {+(Identifier)+})+}
 {-(Export
-    (Identifier))-})
+  {-(Identifier)-})-})

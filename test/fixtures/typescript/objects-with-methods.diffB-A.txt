@@ -24,8 +24,8 @@
         (
           (Return
           { (Minus
-              (Identifier)
-              (Identifier))
+            {-(Identifier)-}
+            {-(Identifier)-})
           ->(Plus
-              (Identifier)
-              (Identifier)) }))))))
+            {+(Identifier)+}
+            {+(Identifier)+}) }))))))

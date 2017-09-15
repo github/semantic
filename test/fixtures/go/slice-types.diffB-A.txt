@@ -10,11 +10,11 @@
         (SliceTy
         {+(Identifier)+}
         {-(SliceTy
-            (Identifier))-})))
+          {-(Identifier)-})-})))
     (Other "type_declaration"
       (TypeDecl
         (Identifier)
         (SliceTy
         {+(SliceTy
-            (Identifier))+}
+          {+(Identifier)+})+}
         {-(Identifier)-})))))

@@ -1,28 +1,28 @@
 (Program
 {-(Hash
-    (KeyValue
-      (Identifier)
-      (Integer)))-}
+  {-(KeyValue
+    {-(Identifier)-}
+    {-(Integer)-})-})-}
   (Hash)
 {+(Hash
-    (KeyValue
-      (Identifier)
-      (Integer)))+}
+  {+(KeyValue
+    {+(Identifier)+}
+    {+(Integer)+})+})+}
 {+(Hash
-    (KeyValue
-      (Identifier)
-      (Identifier))
-    (KeyValue
-      (Identifier)
-      (Identifier)))+}
+  {+(KeyValue
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(KeyValue
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {-(Assignment
-    (Identifier)
-    (Hash
-      (Context
-        (Comment)
-        (KeyValue
-          (Identifier)
-          (Identifier)))
-      (KeyValue
-        (Identifier)
-        (Identifier))))-})
+  {-(Identifier)-}
+  {-(Hash
+    {-(Context
+      {-(Comment)-}
+      {-(KeyValue
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
+    {-(KeyValue
+      {-(Identifier)-}
+      {-(Identifier)-})-})-})-})

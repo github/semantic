@@ -4,14 +4,14 @@
       (Annotation
       { (TypeIdentifier)
       ->(TypeQuery
-          (Identifier)) })
+        {+(Identifier)+}) })
       (Identifier)
       (Empty)))
   (VariableDeclaration
     (Assignment
       (Annotation
       { (TypeQuery
-          (Identifier))
+        {-(Identifier)-})
       ->(TypeIdentifier) })
       (Identifier)
       (Empty))))

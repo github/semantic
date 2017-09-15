@@ -1,11 +1,11 @@
 (Program
 {+(Subscript
-    (Identifier)
-    (Enumeration
-      (Integer)
-      (Integer)
-      (Empty))
-    (Ellipsis))+}
+  {+(Identifier)+}
+  {+(Enumeration
+    {+(Integer)+}
+    {+(Integer)+}
+    {+(Empty)+})+}
+  {+(Ellipsis)+})+}
   (Subscript
     (Identifier)
     (Enumeration
@@ -21,21 +21,21 @@
       (Empty)
       (Empty)))
 {+(Subscript
-    (Identifier)
-    (Enumeration
-      (Empty)
-      (Empty)
-      (Empty)))+}
+  {+(Identifier)+}
+  {+(Enumeration
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+})+})+}
 {-(Subscript
-    (Identifier)
-    (Enumeration
-      (Integer)
-      (Integer)
-      (Empty))
-    (Ellipsis))-}
+  {-(Identifier)-}
+  {-(Enumeration
+    {-(Integer)-}
+    {-(Integer)-}
+    {-(Empty)-})-}
+  {-(Ellipsis)-})-}
 {-(Subscript
-    (Identifier)
-    (Enumeration
-      (Empty)
-      (Empty)
-      (Empty)))-})
+  {-(Identifier)-}
+  {-(Enumeration
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-})-})-})

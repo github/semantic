@@ -24,7 +24,7 @@
         (Identifier)
         (Readonly)
       {+(Annotation
-          (TypeIdentifier))+}
+        {+(TypeIdentifier)+})+}
       {-(Empty)-}
         (Identifier)
         (Float))

@@ -3,27 +3,27 @@
     (Class
       (Identifier)
     { (Method
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
-            (Identifier)
-            (Empty)))
-        (
-          (Return
-            (Identifier))))
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(RequiredParameter
+        {-(Empty)-}
+        {-(Empty)-}
+        {-(Assignment
+          {-(Identifier)-}
+          {-(Empty)-})-})-}
+      {-(
+        {-(Return
+          {-(Identifier)-})-})-})
     ->(PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (Float)) }
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Float)+}) }
       (Method
         (Empty)
         (Empty)
@@ -63,18 +63,18 @@
           { (Identifier)
           ->(Identifier) })))
     {+(Method
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
-            (Identifier)
-            (Empty)))
-        (
-          (Return
-            (Identifier))))+})))
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(RequiredParameter
+        {+(Empty)+}
+        {+(Empty)+}
+        {+(Assignment
+          {+(Identifier)+}
+          {+(Empty)+})+})+}
+      {+(
+        {+(Return
+          {+(Identifier)+})+})+})+})))

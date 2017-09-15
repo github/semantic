@@ -1,6 +1,6 @@
 (Program
 {+(AmbientDeclaration
-    (InternalModule
-      (Identifier)))+}
+  {+(InternalModule
+    {+(Identifier)+})+})+}
 {-(Module
-    (Identifier))-})
+  {-(Identifier)-})-})

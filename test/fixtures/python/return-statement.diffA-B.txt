@@ -11,8 +11,8 @@
   (Return
     (Empty))
 {+(Return
-    (Not
-      (Identifier)))+}
+  {+(Not
+    {+(Identifier)+})+})+}
 {-(Return
-    (Not
-      (Identifier)))-})
+  {-(Not
+    {-(Identifier)-})-})-})

@@ -6,10 +6,10 @@
     { (Float)
     ->(Empty) })
   {+(Assignment
-      (Empty)
-      (Identifier)
-      (Hash))+}
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(Hash)+})+}
   {+(Assignment
-      (Empty)
-      (Identifier)
-      (Empty))+}))
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(Empty)+})+}))

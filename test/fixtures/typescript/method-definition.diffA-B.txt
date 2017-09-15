@@ -7,10 +7,10 @@
       {+(Readonly)+}
         (Empty)
       {+(Annotation
-          (PredefinedType))+}
+        {+(PredefinedType)+})+}
       {-(Empty)-}
       {-(Annotation
-          (TypeIdentifier))-}
+        {-(TypeIdentifier)-})-}
         (Empty)
         (Identifier)
         ([])))))

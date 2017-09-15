@@ -3,9 +3,9 @@
     (Assignment
       (Annotation
       { (Intersection
-          (TypeIdentifier)
-          (TypeIdentifier))
+        {-(TypeIdentifier)-}
+        {-(TypeIdentifier)-})
       ->(TypeQuery
-          (Identifier)) })
+        {+(Identifier)+}) })
       (Identifier)
       (Empty))))

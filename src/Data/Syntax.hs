@@ -18,6 +18,7 @@ import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
+import Diff
 import GHC.Generics
 import GHC.Stack
 import Term
@@ -162,3 +163,26 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+
+algorithmDeletingContext :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs)
+                         => TermF Context a (Term (Union fs) a)
+                         -> Term (Union fs) a
+                         -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (TermF Context a (Diff (Union fs) a)))
+algorithmDeletingContext (In a1 (Context n1 s1)) s2 = fmap (In a1 . Context (deleting <$> n1)) <$> algorithmForComparableTerms s1 s2
+
+algorithmInsertingContext :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs)
+                          => Term (Union fs) a
+                          -> TermF Context a (Term (Union fs) a)
+                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (TermF Context a (Diff (Union fs) a)))
+algorithmInsertingContext s1 (In a2 (Context n2 s2)) = fmap (In a2 . Context (inserting <$> n2)) <$> algorithmForComparableTerms s1 s2
+
+algorithmForContextUnions :: (Apply1 Diffable fs, Apply1 Functor fs, Context :< fs)
+                          => Term (Union fs) a
+                          -> Term (Union fs) a
+                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (Diff (Union fs) a))
+algorithmForContextUnions t1 t2
+  | Just algo <- algorithmForComparableTerms t1 t2 = Just algo
+  | Just c1@(In _ Context{}) <- prjTermF (unTerm t1) = fmap (deleteF . hoistTermF inj) <$> algorithmDeletingContext c1 t2
+  | Just c2@(In _ Context{}) <- prjTermF (unTerm t2) = fmap (insertF . hoistTermF inj) <$> algorithmInsertingContext t1 c2
+  | otherwise = Nothing
+  where prjTermF (In a u) = In a <$> prj u

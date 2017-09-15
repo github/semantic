@@ -2,34 +2,34 @@
   (Export
     (ExportClause
     {+(ImportExportSpecifier
-        (Identifier)
-        (Empty))+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
     {+(ImportExportSpecifier
-        (Identifier)
-        (Empty))+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
     {+(ImportExportSpecifier
-        (Identifier)
-        (Empty))+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
     {+(ImportExportSpecifier
-        (Identifier)
-        (Empty))+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
     {-(ImportExportSpecifier
-        (Identifier)
-        (Empty))-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
     {-(ImportExportSpecifier
-        (Identifier)
-        (Empty))-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
     {-(ImportExportSpecifier
-        (Identifier)
-        (Empty))-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
     {-(ImportExportSpecifier
-        (Identifier)
-        (Empty))-}))
+      {-(Identifier)-}
+      {-(Empty)-})-}))
   (Export
     (ExportClause
     {-(ImportExportSpecifier
-        (Identifier)
-        (Identifier))-}
+      {-(Identifier)-}
+      {-(Identifier)-})-}
       (ImportExportSpecifier
         (Identifier)
         (Identifier))
@@ -39,8 +39,8 @@
       { (Empty)
       ->(Identifier) })
     {+(ImportExportSpecifier
-        (Identifier)
-        (Empty))+}))
+      {+(Identifier)+}
+      {+(Empty)+})+}))
   (Export
     (VariableDeclaration
       (Assignment
@@ -61,9 +61,9 @@
   (Export
     (VariableDeclaration
     {-(Assignment
-        (Empty)
-        (Identifier)
-        (Identifier))-}
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(Identifier)-})-}
       (Assignment
         (Empty)
         (Identifier)
@@ -79,18 +79,18 @@
       ->(Identifier) }
         (Empty))
     {+(Assignment
-        (Empty)
-        (Identifier)
-        (Empty))+}))
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Empty)+})+}))
   (Export
   {+(Identifier)+}
   {-(Identifier)-})
 {+(Export
-    (Function
-      (Empty)
-      (Empty)
-      (Identifier)
-      ([])))+}
+  {+(Function
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+([])+})+})+}
   (Export
     (Function
       (Empty)
@@ -99,68 +99,68 @@
       ([])))
   (Export
   {+(ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier)))+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Identifier)+})+})+}
   {-(Function
-      (Empty)
-      (Empty)
-      (Identifier)
-      ([]))-})
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-([])-})-})
 {+(Export
-    (TextElement))+}
+  {+(TextElement)+})+}
 {+(Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty)))
-    (TextElement))+}
+  {+(ExportClause
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
+  {+(TextElement)+})+}
 {+(Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty)))
-    (TextElement))+}
+  {+(ExportClause
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
+  {+(TextElement)+})+}
 {-(Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))))-}
+  {-(ExportClause
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Identifier)-})-})-})-}
 {-(Export
-    (TextElement))-}
+  {-(TextElement)-})-}
 {-(Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty)))
-    (TextElement))-}
+  {-(ExportClause
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-})-}
+  {-(TextElement)-})-}
 {-(Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty)))
-    (TextElement))-})
+  {-(ExportClause
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-})-}
+  {-(TextElement)-})-})

@@ -3,7 +3,7 @@
     (Assignment
       (Annotation
       { (TypeQuery
-          (Identifier))
+        {-(Identifier)-})
       ->(TypeIdentifier) })
       (Identifier)
       (Empty)))
@@ -12,6 +12,6 @@
       (Annotation
       { (TypeIdentifier)
       ->(TypeQuery
-          (Identifier)) })
+        {+(Identifier)+}) })
       (Identifier)
       (Empty))))

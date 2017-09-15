@@ -10,7 +10,7 @@
   { (SymbolLiteral)
   ->(SymbolLiteral) })
 {+(Assignment
-    (SubscriptAccess
-      (Identifier)
-      (Identifier))
-    (IntegerLiteral))+})
+  {+(SubscriptAccess
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(IntegerLiteral)+})+})
