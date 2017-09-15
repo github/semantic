@@ -30,7 +30,7 @@ instance GAlign Identity where
   galignWith f (Identity a) (Identity b) = Just (Identity (f (These a b)))
 
 instance (Apply1 GAlign fs) => GAlign (Union fs) where
-  galignWith f = (join .) . apply1_2' (Proxy :: Proxy GAlign) (\ inj -> (fmap inj .) . galignWith f)
+  galignWith f = (join .) . apply1_2 (Proxy :: Proxy GAlign) ((fmap inj .) . galignWith f)
 
 instance GAlign (Union '[]) where
   galignWith _ _ _ = Nothing

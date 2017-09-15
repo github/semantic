@@ -107,7 +107,7 @@ genericAlgorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
 -- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
 instance Apply1 Diffable fs => Diffable (Union fs) where
-  algorithmFor u1 u2 = join (apply1_2' (Proxy :: Proxy Diffable) (\ reinj f1 f2 -> fmap reinj <$> algorithmFor f1 f2) u1 u2)
+  algorithmFor u1 u2 = join (apply1_2 (Proxy :: Proxy Diffable) (\ f1 f2 -> fmap inj <$> algorithmFor f1 f2) u1 u2)
 
 -- | Diff two list parameters using RWS.
 instance Diffable [] where
