@@ -162,6 +162,9 @@ instance Diffable Context where
     s' <- subdiff (These s1 s2)
     pure (In a1 . inj <$> (Context <$> sequenceA n' <*> s'))
 
+focus :: Applicative g => (a -> g b) -> (a -> g b) -> Context a -> g (Context b)
+focus blur focus (Context comments subject) = Context <$> traverse blur comments <*> focus subject
+
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
