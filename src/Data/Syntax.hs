@@ -17,7 +17,6 @@ import Data.Record
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
-import Data.These
 import Data.Union
 import Diff
 import GHC.Generics
