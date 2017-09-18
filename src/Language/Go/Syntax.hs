@@ -185,9 +185,6 @@ typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (many (channe
                                                                         <|> structTypeDeclaration
                                                                         <|> mapTypeDeclaration))
 
-typeSpec :: Assignment
-typeSpec = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> typeLiteral)
-
 
 -- Expressions
 
