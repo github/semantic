@@ -33,6 +33,7 @@ type Syntax =
    , Declaration.Module
    , Expression.Call
    , Expression.MemberAccess
+   , Literal.Array
    , Literal.Channel
    , Literal.Hash
    , Literal.Integer
@@ -143,10 +144,14 @@ typeLiteral =
   <|> mk PointerType
   <|> mk SliceType
   <|> qualifiedType
+  <|> arrayType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 qualifiedType :: Assignment
 qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
+
+arrayType :: Assignment
+arrayType = handleError $ makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> intLiteral <*> typeLiteral)
 
 -- Type Declarations
 
@@ -180,12 +185,17 @@ structTypeDeclaration = mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeL
 qualifiedTypeDeclaration :: Assignment
 qualifiedTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> qualifiedType)
 
+arrayTypeDeclaration :: Assignment
+arrayTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> arrayType)
+
 typeDeclaration :: Assignment
-typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (many (channelTypeDeclaration
+typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many (  arrayTypeDeclaration
+                                                                        <|> channelTypeDeclaration
                                                                         <|> interfaceTypeDeclaration
                                                                         <|> qualifiedTypeDeclaration
                                                                         <|> structTypeDeclaration
-                                                                        <|> mapTypeDeclaration))
+                                                                        <|> mapTypeDeclaration
+                                                                         ))
 
 
 -- Expressions
