@@ -146,8 +146,9 @@ typeLiteral =
   <|> mk SliceType
   <|> qualifiedType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
-        qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
 
+qualifiedType :: Assignment
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
 
 -- Type Declarations
 
