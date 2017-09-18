@@ -54,39 +54,37 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
-expression = handleError
-           $  callExpression
-          <|> comment
-          <|> constVarDeclaration
-          <|> constVarSpecification
-          <|> expressionList
-          <|> fieldDeclaration
-          <|> functionDeclaration
-          <|> importDeclaration
-          <|> importSpec
-          <|> typedIdentifier
-          <|> literal
-          <|> methodDeclaration
-          <|> methodSpec
-          <|> packageClause
-          <|> parameterDeclaration
-          <|> structType
-          <|> typeDeclaration
+expression =  choice
+          [ callExpression
+          , comment
+          , constVarDeclaration
+          , constVarSpecification
+          , expressionList
+          , fieldDeclaration
+          , functionDeclaration
+          , importDeclaration
+          , importSpec
+          , typedIdentifier
+          , methodDeclaration
+          , methodSpec
+          , packageClause
+          , parameterDeclaration
+          , structType
+          , typeDeclaration
+          , channelType
+          , identifier
+          , interpretedStringLiteral
+          , intLiteral
+          , typeLiteral
+          , rawStringLiteral
+          , structType
+          ]
 
 identifiers :: Assignment
 identifiers = makeTerm <$> location <*> many identifier
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
-
-literal :: Assignment
-literal =  channelType
-       <|> identifier
-       <|> interpretedStringLiteral
-       <|> intLiteral
-       <|> typeLiteral
-       <|> rawStringLiteral
-       <|> structType
 
 
 -- Literals
@@ -214,7 +212,7 @@ expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
 fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional literal)
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional expression)
   where
         mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
         mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
