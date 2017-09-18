@@ -171,8 +171,8 @@ mapTypeDeclaration = mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral
 
     mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName =
       makeTerm keyTypeLoc $
-        Literal.KeyValue (makeTerm keyTypeLoc   (Type.Annotation (makeTerm keyTypeLoc   (Syntax.Empty)) (makeTerm keyTypeLoc   (Syntax.Identifier keyTypeName))))
-                         (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc (Syntax.Empty)) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
+        Literal.KeyValue (makeTerm keyTypeLoc   (Type.Annotation (makeTerm keyTypeLoc   Syntax.Empty) (makeTerm keyTypeLoc   (Syntax.Identifier keyTypeName))))
+                         (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc Syntax.Empty) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
 
 structTypeDeclaration :: Assignment
 structTypeDeclaration = mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> (symbol StructType *> children (many fieldDeclaration)))
