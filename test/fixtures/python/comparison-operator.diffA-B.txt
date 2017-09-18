@@ -1,69 +1,69 @@
 (Program
 {+(Not
-    (Equal
-      (Identifier)
-      (Identifier)))+}
+  {+(Equal
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {+(Not
-    (Member
-      (Identifier)
-      (Identifier)))+}
+  {+(Member
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {+(Equal
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(Member
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(Not
-    (Equal
-      (Identifier)
-      (Identifier)))+}
+  {+(Equal
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {+(GreaterThan
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(GreaterThanEqual
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(Not
-    (Equal
-      (Identifier)
-      (Identifier)))+}
+  {+(Equal
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {+(LessThanEqual
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(LessThan
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {-(LessThan
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(LessThanEqual
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Not
-    (Equal
-      (Identifier)
-      (Identifier)))-}
+  {-(Equal
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(GreaterThanEqual
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(GreaterThan
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Not
-    (Equal
-      (Identifier)
-      (Identifier)))-}
+  {-(Equal
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(Member
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Equal
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Not
-    (Member
-      (Identifier)
-      (Identifier)))-}
+  {-(Member
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(Not
-    (Equal
-      (Identifier)
-      (Identifier)))-})
+  {-(Equal
+    {-(Identifier)-}
+    {-(Identifier)-})-})-})

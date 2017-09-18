@@ -1,8 +1,8 @@
 (Program
   (If
   { (MemberAccess
-      (Identifier)
-      (Identifier))
+    {-(Identifier)-}
+    {-(Identifier)-})
   ->(Identifier) }
     (ExpressionStatements
       (ExpressionStatements
@@ -11,4 +11,4 @@
         { (Identifier)
         ->(Identifier) }))
     {-(ExpressionStatements
-        (Identifier))-})))
+      {-(Identifier)-})-})))

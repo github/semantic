@@ -9,9 +9,12 @@
   { (Other "=~")
   ->(Other "!=") }
     (Identifier))
-{+(Binary(Identifier)(Other"===")(Identifier))+}
+{+(Binary
+  {+(Identifier)+}
+  {+(Other "===")+}
+  {+(Identifier)+})+}
 {-(Assignment
-    (Identifier)
-    (Unary
-      (Other "!")
-      (Identifier)))-})
+  {-(Identifier)-}
+  {-(Unary
+    {-(Other "!")-}
+    {-(Identifier)-})-})-})

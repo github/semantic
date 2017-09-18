@@ -23,8 +23,8 @@ constructorNameAndConstantFields :: Show1 f => TermF f a b -> ByteString
 constructorNameAndConstantFields (In _ f) = pack (liftShowsPrec (const (const id)) (const id) 0 f "")
 
 -- | Compute a 'ConstructorLabel' label for a 'Union' of syntax 'Term's.
-constructorLabel :: Apply1 ConstructorName fs => TermF (Union fs) a b -> ConstructorLabel
-constructorLabel (In _ u) = ConstructorLabel $ pack (apply1 (Proxy :: Proxy ConstructorName) constructorName u)
+constructorLabel :: Apply ConstructorName fs => TermF (Union fs) a b -> ConstructorLabel
+constructorLabel (In _ u) = ConstructorLabel $ pack (apply (Proxy :: Proxy ConstructorName) constructorName u)
 
 
 newtype ConstructorLabel = ConstructorLabel ByteString

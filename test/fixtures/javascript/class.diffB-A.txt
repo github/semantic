@@ -3,8 +3,8 @@
     (Class
       (Identifier)
     {+(FieldDecl
-        (Identifier)
-        (NumberLiteral))+}
+      {+(Identifier)+}
+      {+(NumberLiteral)+})+}
       (Method
       { (Identifier)
       ->(Identifier) }

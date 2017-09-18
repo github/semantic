@@ -14,8 +14,8 @@
   {+(Identifier)+}
     (Empty))
 {-(Call
-    (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Integer)
-    (Empty))-})
+  {-(MemberAccess
+    {-(Identifier)-}
+    {-(Identifier)-})-}
+  {-(Integer)-}
+  {-(Empty)-})-})

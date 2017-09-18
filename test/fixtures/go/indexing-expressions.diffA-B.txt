@@ -5,22 +5,22 @@
     (Identifier)
     (Args)
   {+(Slice
-      (Identifier)
-      (NumberLiteral))+}
+    {+(Identifier)+}
+    {+(NumberLiteral)+})+}
   {+(Slice
-      (Identifier)
-      (NumberLiteral))+}
+    {+(Identifier)+}
+    {+(NumberLiteral)+})+}
   {+(Slice
-      (Identifier)
-      (NumberLiteral))+}
+    {+(Identifier)+}
+    {+(NumberLiteral)+})+}
   {-(IndexExpression
-      (Identifier)
-      (NumberLiteral))-}
+    {-(Identifier)-}
+    {-(NumberLiteral)-})-}
   {-(Slice
-      (Identifier))-}
+    {-(Identifier)-})-}
   {-(Slice
-      (Identifier)
-      (NumberLiteral))-}
+    {-(Identifier)-}
+    {-(NumberLiteral)-})-}
     (Slice
       (Identifier)
       (NumberLiteral)

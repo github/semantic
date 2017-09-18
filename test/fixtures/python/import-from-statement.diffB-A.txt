@@ -1,11 +1,11 @@
 (Program
   (Import
   {-(ScopeResolution
-      (Identifier))-}
+    {-(Identifier)-})-}
     (ScopeResolution
       (Identifier))
   {+(ScopeResolution
-      (Identifier))+})
+    {+(Identifier)+})+})
   (Import
     (ScopeResolution
       (Identifier))

@@ -13,10 +13,10 @@
         (Other "readonly")
         (Identifier))
     {+(FieldDecl
-        (Other "accessibility_modifier")
-        (Other "readonly")
-        (Identifier)
-        (NumberLiteral))+}
+      {+(Other "accessibility_modifier")+}
+      {+(Other "readonly")+}
+      {+(Identifier)+}
+      {+(NumberLiteral)+})+}
       (FieldDecl
         (Other "accessibility_modifier")
         (Other "readonly")
@@ -26,11 +26,11 @@
           (Identifier))
         (NumberLiteral))
     {-(FieldDecl
-        (Other "accessibility_modifier")
-        (Identifier)
-        (Ty
-          (Identifier))
-        (NumberLiteral))-}
+      {-(Other "accessibility_modifier")-}
+      {-(Identifier)-}
+      {-(Ty
+        {-(Identifier)-})-}
+      {-(NumberLiteral)-})-}
       (FieldDecl
         (Identifier)
         (Ty
@@ -55,9 +55,9 @@
       ->(Identifier) }
       { (Identifier)
       ->(Ty
-          (Identifier)) }
+        {+(Identifier)+}) }
       { (Ty
-          (Identifier))
+        {-(Identifier)-})
       ->(NumberLiteral) }
       {-(StringLiteral)-})
       (FieldDecl

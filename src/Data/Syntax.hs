@@ -18,6 +18,7 @@ import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
+import Diff
 import GHC.Generics
 import GHC.Stack
 import Term
@@ -25,7 +26,7 @@ import Term
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
-makeTerm :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => a -> f (Term (Union fs) a) -> Term (Union fs) a
+makeTerm :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => a -> f (Term (Union fs) a) -> Term (Union fs) a
 makeTerm a = makeTerm' a . inj
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
@@ -33,7 +34,7 @@ makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Ter
 makeTerm' a f = termIn (sconcat (a :| (termAnnotation . unTerm <$> toList f))) f
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
-makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply1 Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
+makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
 makeTerm1 = makeTerm1' . inj
 
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
@@ -43,20 +44,20 @@ makeTerm1' f = case toList f of
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< fs, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+emptyTerm :: (HasCallStack, Empty :< fs, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply1 Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
-contextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+contextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply Foldable fs)
               => m (Term (Union fs) a)
               -> m (Term (Union fs) a)
               -> m (Term (Union fs) a)
@@ -66,7 +67,7 @@ contextualize context rule = make <$> Assignment.manyThrough context rule
           _ -> node
 
 -- | Match context terms after a subject term and before a delimiter, returning the delimiter paired with a Context term if any context terms matched, or the subject term otherwise.
-postContextualizeThrough :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+postContextualizeThrough :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply Foldable fs)
                          => m (Term (Union fs) a)
                          -> m (Term (Union fs) a)
                          -> m b
@@ -77,7 +78,7 @@ postContextualizeThrough context rule end = make <$> rule <*> Assignment.manyThr
           _ -> (node, end)
 
 -- | Match context terms after a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
-postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply1 Foldable fs)
+postContextualize :: (HasCallStack, Context :< fs, Alternative m, Semigroup a, Apply Foldable fs)
                   => m (Term (Union fs) a)
                   -> m (Term (Union fs) a)
                   -> m (Term (Union fs) a)
@@ -87,7 +88,7 @@ postContextualize context rule = make <$> rule <*> many context
           _ -> node
 
 -- | Match infix terms separated by any of a list of operators, with optional context terms following each operand.
-infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack, Apply1 Foldable fs)
+infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack, Apply Foldable fs)
              => m (Term (Union fs) a)
              -> m (Term (Union fs) a)
              -> m (Term (Union fs) a)
@@ -156,3 +157,26 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+
+algorithmDeletingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
+                         => TermF Context a (Term (Union fs) a)
+                         -> Term (Union fs) a
+                         -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (TermF Context a (Diff (Union fs) a)))
+algorithmDeletingContext (In a1 (Context n1 s1)) s2 = fmap (In a1 . Context (deleting <$> n1)) <$> algorithmForComparableTerms s1 s2
+
+algorithmInsertingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
+                          => Term (Union fs) a
+                          -> TermF Context a (Term (Union fs) a)
+                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (TermF Context a (Diff (Union fs) a)))
+algorithmInsertingContext s1 (In a2 (Context n2 s2)) = fmap (In a2 . Context (inserting <$> n2)) <$> algorithmForComparableTerms s1 s2
+
+algorithmForContextUnions :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
+                          => Term (Union fs) a
+                          -> Term (Union fs) a
+                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (Diff (Union fs) a))
+algorithmForContextUnions t1 t2
+  | Just algo <- algorithmForComparableTerms t1 t2 = Just algo
+  | Just c1@(In _ Context{}) <- prjTermF (unTerm t1) = fmap (deleteF . hoistTermF inj) <$> algorithmDeletingContext c1 t2
+  | Just c2@(In _ Context{}) <- prjTermF (unTerm t2) = fmap (insertF . hoistTermF inj) <$> algorithmInsertingContext t1 c2
+  | otherwise = Nothing
+  where prjTermF (In a u) = In a <$> prj u

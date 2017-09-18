@@ -12,8 +12,8 @@
   (Comprehension
   { (Identifier)
   ->(Plus
-      (Identifier)
-      (Integer)) }
+    {+(Identifier)+}
+    {+(Integer)+}) }
     (
       (
         (

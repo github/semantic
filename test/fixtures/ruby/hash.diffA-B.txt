@@ -16,19 +16,19 @@
     { (Boolean)
     ->(Boolean) })
   {-(Pair
-      (SymbolLiteral)
-      (IntegerLiteral))-})
+    {-(SymbolLiteral)-}
+    {-(IntegerLiteral)-})-})
 {-(Object)-}
 {-(Object
-    (Comment)
-    (Pair
-      (Identifier)
-      (IntegerLiteral))
-    (Comment)
-    (Comment)
-    (Pair
-      (StringLiteral)
-      (IntegerLiteral))
-    (Comment))-}
+  {-(Comment)-}
+  {-(Pair
+    {-(Identifier)-}
+    {-(IntegerLiteral)-})-}
+  {-(Comment)-}
+  {-(Comment)-}
+  {-(Pair
+    {-(StringLiteral)-}
+    {-(IntegerLiteral)-})-}
+  {-(Comment)-})-}
 {-(Object
-    (Comment))-})
+  {-(Comment)-})-})

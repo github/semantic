@@ -1,11 +1,10 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Algorithm where
 
 import Control.Applicative (liftA2)
 import Control.Monad (guard, join)
 import Control.Monad.Free.Freer
 import Data.Function (on)
-import Data.Functor.Both
 import Data.Functor.Classes
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
@@ -87,21 +86,28 @@ instance Show term => Show1 (AlgorithmF term diff) where
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
 -- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
 algorithmForTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Algorithm (Term f a) (Diff f a) (Diff f a)
-algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2)) = fromMaybe (byReplacing t1 t2) (fmap (copy (both ann1 ann2)) <$> algorithmFor f1 f2)
+algorithmForTerms t1 t2 = fromMaybe (byReplacing t1 t2) (algorithmForComparableTerms t1 t2)
+
+algorithmForComparableTerms :: (Functor f, Diffable f) => Term f a -> Term f a -> Maybe (Algorithm (Term f a) (Diff f a) (Diff f a))
+algorithmForComparableTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = fmap (merge (ann1, ann2)) <$> algorithmFor f1 f2
 
 
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   algorithmFor :: f term -> f term -> Maybe (Algorithm term diff (f diff))
   default algorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
-  algorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+  algorithmFor = genericAlgorithmFor
+
+genericAlgorithmFor :: (Generic1 f, Diffable' (Rep1 f)) => f term -> f term -> Maybe (Algorithm term diff (f diff))
+genericAlgorithmFor a b = fmap to1 <$> algorithmFor' (from1 a) (from1 b)
+
 
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
 -- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
 -- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
-instance Apply1 Diffable fs => Diffable (Union fs) where
-  algorithmFor u1 u2 = join (apply1_2' (Proxy :: Proxy Diffable) (\ reinj f1 f2 -> fmap reinj <$> algorithmFor f1 f2) u1 u2)
+instance Apply Diffable fs => Diffable (Union fs) where
+  algorithmFor u1 u2 = join (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> fmap inj <$> algorithmFor f1 f2) u1 u2)
 
 -- | Diff two list parameters using RWS.
 instance Diffable [] where

@@ -1,11 +1,11 @@
 (Program
 {+(If
-    (Identifier)
-    (Call
-      (Identifier)
-      (Empty))
-    (
-      (Identifier)))+}
+  {+(Identifier)+}
+  {+(Call
+    {+(Identifier)+}
+    {+(Empty)+})+}
+  {+(
+    {+(Identifier)+})+})+}
   (Assignment
   { (Identifier)
   ->(Identifier) }
@@ -18,11 +18,11 @@
       {+(Identifier)+}
       {-(Identifier)-})))
 {-(If
-    (Identifier)
-    (Call
-      (Identifier)
-      (Empty))
-    (
-      (Call
-        (Identifier)
-        (Empty))))-})
+  {-(Identifier)-}
+  {-(Call
+    {-(Identifier)-}
+    {-(Empty)-})-}
+  {-(
+    {-(Call
+      {-(Identifier)-}
+      {-(Empty)-})-})-})-})

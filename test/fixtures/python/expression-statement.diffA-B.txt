@@ -1,8 +1,8 @@
 (Program
 {-(Identifier)-}
 {-(Plus
-    (Identifier)
-    (Identifier))-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
   (
     (Integer)
     (Integer)
@@ -13,5 +13,5 @@
     (Integer)
     (Integer))
 {+(Plus
-    (Identifier)
-    (Identifier))+})
+  {+(Identifier)+}
+  {+(Identifier)+})+})

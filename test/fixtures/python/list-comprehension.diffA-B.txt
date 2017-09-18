@@ -10,22 +10,22 @@
       {+(Identifier)+}
       {-(Identifier)-})
     {+(
-        (Call
-          (Identifier)
-          (Empty)))+}
+      {+(Call
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
     {+(
-        (
-          (Identifier))
-        (Identifier))+}
+      {+(
+        {+(Identifier)+})+}
+      {+(Identifier)+})+}
     {+(
-        (Call
-          (Identifier)
-          (Empty)))+}))
+      {+(Call
+        {+(Identifier)+}
+        {+(Empty)+})+})+}))
   (Comprehension
   { (Identifier)
   ->(Plus
-      (Identifier)
-      (Integer)) }
+    {+(Identifier)+}
+    {+(Integer)+}) }
     (
       (
         (
@@ -34,4 +34,4 @@
       {+(Identifier)+}
       {-(Identifier)-})
     {-(
-        (Identifier))-})))
+      {-(Identifier)-})-})))
