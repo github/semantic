@@ -160,6 +160,13 @@ instance Diffable Context where
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
+focus :: Applicative f
+      => (a -> f b)
+      -> (a -> f b)
+      -> Context a
+      -> f (Context b)
+focus blur focus (Context n1 s1) = Context <$> traverse blur n1 <*> focus s1
+
 algorithmDeletingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
                          => TermF Context ann1 (Term (Union fs) ann1)
                          -> Term (Union fs) ann2
