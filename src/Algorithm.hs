@@ -111,13 +111,6 @@ class Diffable f where
                  -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
   algorithmFor = genericAlgorithmFor
 
-  subalgorithmFor :: (These (Term g annhere) (Term g annthere) -> Maybe (Algorithm (Term g) (Diff g ann1 ann2) (Diff g ann1 ann2)))
-                  -> (forall a. f a -> g a)
-                  -> TermF f annhere (Term g annhere)
-                  -> Term g annthere
-                  -> Maybe (Algorithm (Term g) (Diff g ann1 ann2) (Diff g ann1 ann2))
-  subalgorithmFor algorithmForTerms inj here there = algorithmForTerms (These (Term (hoistTermF inj here)) there)
-
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Maybe (Algorithm term (diff ann1 ann2) (f (diff ann1 ann2)))
 genericAlgorithmFor a b = fmap to1 <$> galgorithmFor (from1 a) (from1 b)
 
@@ -128,9 +121,6 @@ genericAlgorithmFor a b = fmap to1 <$> galgorithmFor (from1 a) (from1 b)
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
 instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = join (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> fmap inj <$> algorithmFor f1 f2) u1 u2)
-
-  subalgorithmFor subdiff inj (In ann1 u1) t2
-    =   apply' (Proxy :: Proxy Diffable) (\ reinj f1 -> subalgorithmFor subdiff (inj . reinj) (In ann1 f1) t2) u1
 
 -- | Diff two list parameters using RWS.
 instance Diffable [] where
