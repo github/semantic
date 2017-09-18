@@ -1168,7 +1168,7 @@ forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expressionStatement' <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
 
 variableDeclaration :: Assignment
-variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol LexicalDeclaration) <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many variableDeclarator)
+variableDeclaration = (makeTerm <$> symbol Grammar.VariableDeclaration <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many variableDeclarator)) <|> (makeTerm <$> symbol Grammar.LexicalDeclaration <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many variableDeclarator))
 
 variableDeclarator :: Assignment
 variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
