@@ -157,3 +157,7 @@ instance Diffable' (Rec1 NonEmpty) where
   algorithmFor' (Rec1 (a:|as)) (Rec1 (b:|bs)) = Just $ do
     d:ds <- byRWS (a:as) (b:bs)
     pure (Rec1 (d :| ds))
+
+-- | Diff two maybes holding parameters.
+instance Diffable' (Rec1 Maybe) where
+  algorithmFor' (Rec1 a) (Rec1 b) = Just $ Rec1 <$> diffMaybe a b
