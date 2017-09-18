@@ -38,9 +38,9 @@ diffWithParser :: (HasField fields Data.Span.Span,
                                      Declaration.Method :< fs,
                                      Declaration.Function :< fs,
                                      Empty :< fs,
-                                     Apply1 Eq1 fs, Apply1 Show1 fs,
-                                     Apply1 Traversable fs, Apply1 Functor fs,
-                                     Apply1 Foldable fs, Apply1 Diffable fs,
+                                     Apply Eq1 fs, Apply Show1 fs,
+                                     Apply Traversable fs, Apply Functor fs,
+                                     Apply Foldable fs, Apply Diffable fs,
                                      GAlign (Data.Union.Union fs)) =>
                                     Parser (Term (Data.Union.Union fs) (Record fields))
                                     -> Both Blob
