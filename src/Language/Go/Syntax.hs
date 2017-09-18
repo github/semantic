@@ -179,10 +179,13 @@ structTypeDeclaration = mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeL
   where
     mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
 
+qualifiedTypeDeclaration :: Assignment
+qualifiedTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> qualifiedType)
 
 typeDeclaration :: Assignment
 typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (many (channelTypeDeclaration
                                                                         <|> interfaceTypeDeclaration
+                                                                        <|> qualifiedTypeDeclaration
                                                                         <|> structTypeDeclaration
                                                                         <|> mapTypeDeclaration))
 
