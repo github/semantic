@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, TypeOperators #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, TypeOperators, UndecidableInstances #-}
 module Data.Align.Generic where
 
 import Control.Monad
@@ -29,8 +29,8 @@ instance GAlign Maybe where
 instance GAlign Identity where
   galignWith f (Identity a) (Identity b) = Just (Identity (f (These a b)))
 
-instance (Apply1 GAlign fs) => GAlign (Union fs) where
-  galignWith f = (join .) . apply1_2' (Proxy :: Proxy GAlign) (\ inj -> (fmap inj .) . galignWith f)
+instance Apply GAlign fs => GAlign (Union fs) where
+  galignWith f = (join .) . apply2' (Proxy :: Proxy GAlign) (\ inj -> (fmap inj .) . galignWith f)
 
 instance GAlign NonEmpty where
   galignWith f (a:|as) (b:|bs) = Just (f (These a b) :| alignWith f as bs)

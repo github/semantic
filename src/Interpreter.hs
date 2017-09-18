@@ -120,7 +120,7 @@ comparableByConstructor :: GAlign f => ComparabilityRelation f fields
 comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 
 -- | Equivalency check for terms.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply1 Functor fs, Apply1 Foldable fs, Apply1 GAlign fs, Apply1 Eq1 fs)
+equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs, Apply Eq1 fs)
                 => Term (Union fs) a
                 -> Term (Union fs) a
                 -> Bool

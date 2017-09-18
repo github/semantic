@@ -97,7 +97,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run :: Functor f => (Blob -> Task (Term f a)) -> (Both (Term f a) -> Diff f a) -> (Diff f a -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= diffTermPair blobs diff >>= render renderer
 
-        diffRecursively :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply1 Eq1 fs, Apply1 GAlign fs, Apply1 Show1 fs, Apply1 Foldable fs, Apply1 Functor fs, Apply1 Traversable fs, Apply1 Diffable fs)
+        diffRecursively :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Eq1 fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
                         => Both (Term (Union fs) (Record fields))
                         -> Diff (Union fs) (Record fields)
         diffRecursively = decoratingWith constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor equivalentTerms)
