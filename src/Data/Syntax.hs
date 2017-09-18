@@ -159,21 +159,21 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 algorithmDeletingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
-                         => TermF Context a (Term (Union fs) a)
-                         -> Term (Union fs) a
-                         -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (TermF Context a (Diff (Union fs) a)))
+                         => TermF Context ann1 (Term (Union fs) ann1)
+                         -> Term (Union fs) ann2
+                         -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (TermF Context ann1 (Diff (Union fs) ann1 ann2)))
 algorithmDeletingContext (In a1 (Context n1 s1)) s2 = fmap (In a1 . Context (deleting <$> n1)) <$> algorithmForComparableTerms s1 s2
 
 algorithmInsertingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
-                          => Term (Union fs) a
-                          -> TermF Context a (Term (Union fs) a)
-                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (TermF Context a (Diff (Union fs) a)))
+                          => Term (Union fs) ann1
+                          -> TermF Context ann2 (Term (Union fs) ann2)
+                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (TermF Context ann2 (Diff (Union fs) ann1 ann2)))
 algorithmInsertingContext s1 (In a2 (Context n2 s2)) = fmap (In a2 . Context (inserting <$> n2)) <$> algorithmForComparableTerms s1 s2
 
 algorithmForContextUnions :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
-                          => Term (Union fs) a
-                          -> Term (Union fs) a
-                          -> Maybe (Algorithm (Term (Union fs) a) (Diff (Union fs) a) (Diff (Union fs) a))
+                          => Term (Union fs) ann1
+                          -> Term (Union fs) ann2
+                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2))
 algorithmForContextUnions t1 t2
   | Just algo <- algorithmForComparableTerms t1 t2 = Just algo
   | Just c1@(In _ Context{}) <- prjTermF (unTerm t1) = fmap (deleteF . hoistTermF inj) <$> algorithmDeletingContext c1 t2

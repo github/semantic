@@ -258,7 +258,7 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap fst <$> numbered))
 
-align :: Both Source.Source -> Diff Syntax (Record '[Range]) -> PrettyDiff (SplitDiff [] (Record '[Range]))
+align :: Both Source.Source -> Diff Syntax (Record '[Range]) (Record '[Range]) -> PrettyDiff (SplitDiff [] (Record '[Range]))
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& id)) . alignDiff sources
 
 info :: Int -> Int -> Record '[Range]

@@ -5,6 +5,7 @@ import Control.Comonad
 import Control.Comonad.Cofree
 import Data.Foldable (toList)
 import Data.Maybe
+import Data.Record
 import Data.Source
 import Data.Text
 import Info
@@ -14,8 +15,8 @@ import Term
 termAssignment
   :: Source -- ^ The source of the term.
   -> Category -- ^ The category for the term.
-  -> [ SyntaxTerm DefaultFields ] -- ^ The child nodes of the term.
-  -> Maybe (S.Syntax (SyntaxTerm DefaultFields)) -- ^ The resulting term, in Maybe.
+  -> [ Term S.Syntax (Record DefaultFields) ] -- ^ The child nodes of the term.
+  -> Maybe (S.Syntax (Term S.Syntax (Record DefaultFields))) -- ^ The resulting term, in Maybe.
 termAssignment source category children = case (category, children) of
   (Module, [moduleName]) -> Just $ S.Module moduleName []
   (Import, [importName]) -> Just $ S.Import importName []

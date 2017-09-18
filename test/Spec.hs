@@ -8,7 +8,7 @@ import qualified Data.Syntax.Assignment.Spec
 import qualified DiffSpec
 import qualified InterpreterSpec
 import qualified PatchOutputSpec
-import qualified SES.Myers.Spec
+import qualified SES.Spec
 import qualified SourceSpec
 import qualified TermSpec
 import qualified TOCSpec
@@ -28,7 +28,7 @@ main = hspec $ do
     describe "Diff" DiffSpec.spec
     describe "Interpreter" InterpreterSpec.spec
     describe "PatchOutput" PatchOutputSpec.spec
-    describe "SES.Myers" SES.Myers.Spec.spec
+    describe "SES" SES.Spec.spec
     describe "Source" SourceSpec.spec
     describe "Term" TermSpec.spec
     describe "Semantic" SemanticSpec.spec
