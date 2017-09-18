@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Data.JSON.Fields where
 
 import Data.Aeson
@@ -27,7 +27,7 @@ instance ToJSONFields1 [] where
   toJSONFields1 list = [ "children" .= list ]
 
 instance (Apply1 Foldable fs) => ToJSONFields1 (Union fs) where
-  toJSONFields1 = apply1 (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
+  toJSONFields1 = apply (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
 
 instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= JSONFields a, "after" .= JSONFields b ]
