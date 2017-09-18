@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Algorithm where
 
 import Control.Applicative ((<|>), liftA2)
@@ -126,8 +126,8 @@ genericAlgorithmFor a b = fmap to1 <$> galgorithmFor (from1 a) (from1 b)
 -- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
 -- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
-instance Apply1 Diffable fs => Diffable (Union fs) where
-  algorithmFor u1 u2 = join (apply1_2' (Proxy :: Proxy Diffable) (\ reinj f1 f2 -> fmap reinj <$> algorithmFor f1 f2) u1 u2)
+instance Apply Diffable fs => Diffable (Union fs) where
+  algorithmFor u1 u2 = join (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> fmap inj <$> algorithmFor f1 f2) u1 u2)
 
   subalgorithmFor subdiff inj (In ann1 u1) t2
     =   apply1' (Proxy :: Proxy Diffable) (\ reinj f1 -> subalgorithmFor subdiff (inj . reinj) (In ann1 f1) t2) u1
