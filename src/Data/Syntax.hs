@@ -170,22 +170,21 @@ focus blur focus (Context n1 s1) = Context <$> traverse blur n1 <*> focus s1
 algorithmDeletingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
                          => TermF Context ann1 (Term (Union fs) ann1)
                          -> Term (Union fs) ann2
-                         -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2))
-algorithmDeletingContext (In a1 (Context n1 s1)) s2 = fmap (deleteF . In a1 . inj . Context (deleting <$> n1)) <$> algorithmForComparableTerms s1 s2
+                         -> Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2)
+algorithmDeletingContext (In a1 (Context n1 s1)) s2 = deleteF . In a1 . inj . Context (deleting <$> n1) <$> algorithmForTerms s1 s2
 
 algorithmInsertingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
                           => Term (Union fs) ann1
                           -> TermF Context ann2 (Term (Union fs) ann2)
-                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2))
-algorithmInsertingContext s1 (In a2 (Context n2 s2)) = fmap (insertF . In a2 . inj . Context (inserting <$> n2)) <$> algorithmForComparableTerms s1 s2
+                          -> Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2)
+algorithmInsertingContext s1 (In a2 (Context n2 s2)) = insertF . In a2 . inj . Context (inserting <$> n2) <$> algorithmForTerms s1 s2
 
 algorithmForContextUnions :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
                           => Term (Union fs) ann1
                           -> Term (Union fs) ann2
-                          -> Maybe (Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2))
+                          -> Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2)
 algorithmForContextUnions t1 t2
-  | Just algo <- algorithmForComparableTerms t1 t2 = Just algo
-  | Just c1@(In _ Context{}) <- prjTermF (unTerm t1) = algorithmDeletingContext c1 t2
-  | Just c2@(In _ Context{}) <- prjTermF (unTerm t2) = algorithmInsertingContext t1 c2
-  | otherwise = Nothing
+  =   algorithmForTerms t1 t2
+  <|> maybe empty (`algorithmDeletingContext` t2) (prjTermF (unTerm t1))
+  <|> maybe empty (algorithmInsertingContext t1) (prjTermF (unTerm t2))
   where prjTermF (In a u) = In a <$> prj u
