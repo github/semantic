@@ -56,6 +56,7 @@ type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 assignment :: Assignment
+assignment = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
 expression =  choice
@@ -240,6 +241,7 @@ methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> ch
         mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method receiver' name' parameters' body')) type'')
 
 methodSpec :: Assignment
+methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typeLiteral <|> parameters <|> emptyTerm) <*> empty)
   where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
         empty = makeTerm <$> location <*> pure Syntax.Empty
         mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
