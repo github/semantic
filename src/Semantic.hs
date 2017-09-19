@@ -96,7 +96,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
                         => Term (Union fs) (Record fields1)
                         -> Term (Union fs) (Record fields2)
                         -> Diff (Union fs) (Record fields1) (Record fields2)
-        diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor equivalentTerms)
+        diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith comparableByConstructor equivalentTerms)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
