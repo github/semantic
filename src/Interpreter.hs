@@ -59,7 +59,7 @@ diffTermsWith comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (go (diff t
              (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
            -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
         go = iterFreerA (\ step yield -> case step of
-          Algorithm.Diff t1 t2 -> (go (algorithmForTerms t1 t2) >>= yield) <|> yield (replacing t1 t2)
+          Algorithm.Diff t1 t2 -> (go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield)
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
             Just result -> go (merge (extract t1, extract t2) <$> sequenceA result) >>= yield
             _ -> yield (replacing t1 t2)
