@@ -34,12 +34,12 @@ spec = parallel $ do
       \ (as, bs) -> let tas = decorate <$> (as :: [Term Syntax (Record '[Category])])
                         tbs = decorate <$> (bs :: [Term Syntax (Record '[Category])])
                         root = termIn (Program :. Nil) . Indexed
-                        diff = merge ((Program :. Nil, Program :. Nil)) (Indexed (stripDiff . diffThese <$> rws canCompare tas tbs)) in
+                        diff = merge ((Program :. Nil, Program :. Nil)) (Indexed (stripDiff . diffThese <$> rws canCompare (equalTerms canCompare) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf "a") ])), decorate (Term ((StringLiteral :. Nil) `In` Indexed [ Term ((StringLiteral :. Nil) `In` Leaf "b") ]))) in
-      fmap (bimap stripTerm stripTerm) (rws canCompare [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
+      fmap (bimap stripTerm stripTerm) (rws canCompare (equalTerms canCompare) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
   where canCompare a b = termAnnotation a == termAnnotation b
 
