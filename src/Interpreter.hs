@@ -89,8 +89,8 @@ comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 -- methods with equal identifiers/names and recursively by equivalent terms with
 -- identical shapes.
 equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs, Apply Eq1 fs)
-                => Term (Union fs) a
-                -> Term (Union fs) b
+                => Term (Union fs) ann1
+                -> Term (Union fs) ann2
                 -> Bool
 equivalentTerms (Term (In _ u1)) (Term (In _ u2))
   | Just (Declaration.Method _ identifier1 _ _) <- prj u1
