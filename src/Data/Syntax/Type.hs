@@ -42,6 +42,13 @@ data Map a = Map { mapKeyType :: a, mapElementType :: a }
 
 instance Eq1 Map where liftEq = genericLiftEq
 instance Show1 Map where liftShowsPrec = genericLiftShowsPrec
+
+newtype Pointer a = Pointer { pointerType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Pointer where liftEq = genericLiftEq
+instance Show1 Pointer where liftShowsPrec = genericLiftShowsPrec
+
 newtype ReceiveChannel a = ReceiveChannel { receiveChannelElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
