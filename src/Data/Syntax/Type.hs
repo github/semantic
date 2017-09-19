@@ -37,3 +37,8 @@ data ReceiveChannel a = ReceiveChannel { receiveChannelName :: a, receiveChannel
 instance Eq1 ReceiveChannel where liftEq = genericLiftEq
 instance Show1 ReceiveChannel where liftShowsPrec = genericLiftShowsPrec
 
+data SendChannel a = SendChannel { sendChannelName :: a, sendChannelElementType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 SendChannel where liftEq = genericLiftEq
+instance Show1 SendChannel where liftShowsPrec = genericLiftShowsPrec
