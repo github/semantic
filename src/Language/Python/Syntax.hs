@@ -37,6 +37,8 @@ type Syntax =
    , Declaration.Decorator
    , Declaration.Function
    , Declaration.Import
+   -- NB: Diffing requires Methods in the union.
+   , Declaration.Method
    , Declaration.Variable
    , Expression.Arithmetic
    , Expression.Boolean

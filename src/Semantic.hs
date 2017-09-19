@@ -46,7 +46,7 @@ parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . f
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob) >>= render (renderToCTerm blob)
-  (ToCTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate (declarationAlgebra blob) . hoistTerm (weaken :: Union fs a -> Union (Declaration.Method ': fs) a) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, _) -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
   (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
@@ -71,7 +71,7 @@ diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair rendere
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob)) diffRecursively (renderToCDiff blobs)
-  (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob) . hoistTerm (weaken :: Union fs a -> Union (Declaration.Method ': fs) a)) diffRecursively (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob)) diffRecursively (renderToCDiff blobs)
   (ToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffRecursively (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffRecursively (renderJSONDiff blobs)
@@ -92,8 +92,11 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
 
-        diffRecursively :: (Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax, Diffable syntax) => Term syntax (Record fields1) -> Term syntax (Record fields2) -> Diff syntax (Record fields1) (Record fields2)
-        diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
+        diffRecursively :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Eq1 fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
+                        => Term (Union fs) (Record fields1)
+                        -> Term (Union fs) (Record fields2)
+                        -> Diff (Union fs) (Record fields1) (Record fields2)
+        diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor equivalentTerms)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
