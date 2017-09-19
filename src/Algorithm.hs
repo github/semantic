@@ -28,8 +28,9 @@ data AlgorithmF term diff result where
   Insert :: term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
   -- | Replace one term with another.
   Replace :: term ann1 -> term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
-
+  -- | An 'Algorithm' that always fails.
   Empty :: AlgorithmF term diff a
+  -- | An 'Algorithm' to try one of two alternatives.
   Alt :: a -> a -> AlgorithmF term diff a
 
 -- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
