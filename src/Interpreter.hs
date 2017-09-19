@@ -41,7 +41,12 @@ decoratingWith getLabel1 getLabel2 differ t1 t2 = stripDiff (differ (defaultFeat
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: forall syntax fields1 fields2
               .  (Eq1 syntax, GAlign syntax, Traversable syntax)
-              => (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Algorithm (Term syntax) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))) -- ^ A function producing syntax-directed continuations of the algorithm.
+              => ( Term syntax (Record (FeatureVector ': fields1))
+                -> Term syntax (Record (FeatureVector ': fields2))
+                -> Algorithm
+                  (Term syntax)
+                  (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+                  (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))) -- ^ A function producing syntax-directed continuations of the algorithm.
               -> ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
               -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
               -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
