@@ -154,8 +154,14 @@ qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.Membe
 arrayType :: Assignment
 arrayType = handleError $ makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> intLiteral <*> typeLiteral)
 
+channelType :: Assignment
+channelType = handleError
+            $  (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> token AnonLAngleMinus *> (Type.SendChannel <$> expression))))
+           <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonLAngleMinus *> token AnonChan *> (Type.ReceiveChannel <$> expression))))
+           <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> (Type.BiDirectionalChannel <$> expression))))
 
 channelTypeDeclaration :: Assignment
+channelTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> channelType)
 
 interfaceTypeDeclaration :: Assignment
 interfaceTypeDeclaration = mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
