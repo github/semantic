@@ -22,7 +22,7 @@ import Data.Union
 import Diff
 import Info hiding (Empty, Return)
 import RWS
-import Syntax as S hiding (Return)
+import Syntax (Syntax(Leaf))
 import Term
 
 
