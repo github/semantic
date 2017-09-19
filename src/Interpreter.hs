@@ -83,50 +83,6 @@ getLabel (In h t) = (Info.category h, case t of
   _ -> Nothing)
 
 
--- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: Term Syntax ann1
-                   -> Term Syntax ann2
-                   -> Algorithm (Term Syntax) (Diff Syntax ann1 ann2) (Diff Syntax ann1 ann2)
-algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
-  (Indexed a, Indexed b) ->
-    annotate . Indexed <$> byRWS a b
-  (S.Module idA a, S.Module idB b) ->
-    (annotate .) . S.Module <$> linearly idA idB <*> byRWS a b
-  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> fmap annotate $
-    S.FunctionCall <$> linearly identifierA identifierB
-                   <*> byRWS typeParamsA typeParamsB
-                   <*> byRWS argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) -> fmap annotate $
-    S.Switch <$> byRWS exprA exprB
-             <*> byRWS casesA casesB
-  (S.Object tyA a, S.Object tyB b) -> fmap annotate $
-    S.Object <$> diffMaybe tyA tyB
-             <*> byRWS a b
-  (Commented commentsA a, Commented commentsB b) -> fmap annotate $
-    Commented <$> byRWS commentsA commentsB
-              <*> diffMaybe a b
-  (Array tyA a, Array tyB b) -> fmap annotate $
-    Array <$> diffMaybe tyA tyB
-          <*> byRWS a b
-  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> fmap annotate $
-    S.Class <$> linearly identifierA identifierB
-            <*> byRWS clausesA clausesB
-            <*> byRWS expressionsA expressionsB
-  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> fmap annotate $
-    S.Method <$> byRWS clausesA clausesB
-             <*> linearly identifierA identifierB
-             <*> diffMaybe receiverA receiverB
-             <*> byRWS paramsA paramsB
-             <*> byRWS expressionsA expressionsB
-  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> fmap annotate $
-    S.Function <$> linearly idA idB
-               <*> byRWS paramsA paramsB
-               <*> byRWS bodyA bodyB
-  _ -> linearly t1 t2
-  where
-    annotate = merge (extract t1, extract t2)
-
-
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: (HasField fields1 Category, HasField fields2 Category) => ComparabilityRelation syntax (Record fields1) (Record fields2)
 comparableByCategory (In a _) (In b _) = category a == category b
