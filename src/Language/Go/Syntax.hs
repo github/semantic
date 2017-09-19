@@ -49,6 +49,7 @@ type Syntax =
    , Type.BiDirectionalChannel
    , Type.ReceiveChannel
    , Type.SendChannel
+   , Type.Slice
    , []
    ]
 

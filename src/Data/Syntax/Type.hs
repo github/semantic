@@ -42,3 +42,9 @@ newtype SendChannel a = SendChannel { sendChannelElementType :: a }
 
 instance Eq1 SendChannel where liftEq = genericLiftEq
 instance Show1 SendChannel where liftShowsPrec = genericLiftShowsPrec
+
+newtype Slice a = Slice { sliceElementType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Slice where liftEq = genericLiftEq
+instance Show1 Slice where liftShowsPrec = genericLiftShowsPrec
