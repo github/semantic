@@ -97,13 +97,15 @@ intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
 rawStringLiteral :: Assignment
 rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> source)
 
+typeIdentifier :: Assignment
+typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier <$> source)
+
 -- TODO: Combine with Type Literals
 typedIdentifier :: Assignment
 typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types <*> source
   where
     mkTypedIdentifier loc' identifier' loc'' identifier'' = makeTerm loc' (Type.Annotation (makeTerm loc' (Syntax.Identifier identifier')) (makeTerm loc'' (Syntax.Identifier identifier'')))
-    types =  symbol TypeIdentifier
-         <|> symbol PointerType
+    types =  symbol PointerType
          <|> symbol ParenthesizedType
          <|> symbol SliceType
 
