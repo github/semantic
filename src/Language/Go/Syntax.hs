@@ -49,6 +49,7 @@ type Syntax =
    , Type.BiDirectionalChannel
    , Type.Interface
    , Type.Map
+   , Type.Pointer
    , Type.ReceiveChannel
    , Type.SendChannel
    , Type.Slice
@@ -82,6 +83,7 @@ expression =  choice
           , methodSpec
           , packageClause
           , parameterDeclaration
+          , pointerType
           , rawStringLiteral
           , sliceType
           , structType
@@ -114,8 +116,7 @@ typedIdentifier :: Assignment
 typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types <*> source
   where
     mkTypedIdentifier loc' identifier' loc'' identifier'' = makeTerm loc' (Type.Annotation (makeTerm loc' (Syntax.Identifier identifier')) (makeTerm loc'' (Syntax.Identifier identifier'')))
-    types =  symbol PointerType
-         <|> symbol ParenthesizedType
+    types = symbol ParenthesizedType
          <|> symbol SliceType
 
 identifier :: Assignment
@@ -144,7 +145,6 @@ typeLiteral =
       mk InterfaceType
   <|> mk TypeIdentifier
   <|> mk ParenthesizedType
-  <|> mk PointerType
   <|> mk SliceType
   <|> qualifiedType
   <|> arrayType
@@ -177,6 +177,9 @@ interfaceType = handleError $ makeTerm <$> symbol InterfaceType <*> children (Ty
 mapType :: Assignment
 mapType = handleError $ makeTerm <$> symbol MapType <*> children (Type.Map <$> expression <*> expression)
 
+pointerType :: Assignment
+pointerType = handleError $ makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
+
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional expression)
   where
@@ -206,11 +209,15 @@ arrayTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotatio
 sliceTypeDeclaration :: Assignment
 sliceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> sliceType)
 
+pointerTypeDeclaration :: Assignment
+pointerTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> pointerType)
+
 typeDeclaration :: Assignment
 typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many ( arrayTypeDeclaration
                                                                                       <|> channelTypeDeclaration
                                                                                       <|> interfaceTypeDeclaration
                                                                                       <|> qualifiedTypeDeclaration
+                                                                                      <|> pointerTypeDeclaration
                                                                                       <|> sliceTypeDeclaration
                                                                                       <|> structTypeDeclaration
                                                                                       <|> mapTypeDeclaration ))
