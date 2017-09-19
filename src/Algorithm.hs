@@ -173,12 +173,6 @@ instance Eq c => GDiffable (K1 i c) where
 instance GDiffable U1 where
   galgorithmFor _ _ = pure U1
 
--- | Diff two lists of parameters.
-instance GDiffable (Rec1 []) where
-  galgorithmFor a b = Rec1 <$> byRWS (unRec1 a) (unRec1 b)
-
--- | Diff two non-empty lists of parameters.
-instance GDiffable (Rec1 NonEmpty) where
-  galgorithmFor (Rec1 (a:|as)) (Rec1 (b:|bs)) = do
-    d:ds <- byRWS (a:as) (b:bs)
-    pure (Rec1 (d :| ds))
+-- | Diff two 'Diffable' containers of parameters.
+instance Diffable f => GDiffable (Rec1 f) where
+  galgorithmFor a b = Rec1 <$> algorithmFor (unRec1 a) (unRec1 b)
