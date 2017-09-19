@@ -18,3 +18,10 @@ newtype Product a = Product { productElements :: [a] }
 
 instance Eq1 Product where liftEq = genericLiftEq
 instance Show1 Product where liftShowsPrec = genericLiftShowsPrec
+
+data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Array where liftEq = genericLiftEq
+instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
+
