@@ -49,11 +49,10 @@ diffThese = these byDeleting byInserting diff
 
 -- | Diff a pair of optional terms without specifying the algorithm to be used.
 diffMaybe :: Maybe (term ann1) -> Maybe (term ann2) -> Algorithm term (diff ann1 ann2) (Maybe (diff ann1 ann2))
-diffMaybe a b = case (a, b) of
-  (Just a, Just b) -> Just <$> diff a b
-  (Just a, _) -> Just <$> byDeleting a
-  (_, Just b) -> Just <$> byInserting b
-  _ -> pure Nothing
+diffMaybe (Just a) (Just b) = Just <$> diff a b
+diffMaybe (Just a) _        = Just <$> byDeleting a
+diffMaybe _        (Just b) = Just <$> byInserting b
+diffMaybe _        _        = pure Nothing
 
 -- | Diff two terms linearly.
 linearly :: term ann1 -> term ann2 -> Algorithm term (diff ann1 ann2) (diff ann1 ann2)
@@ -132,10 +131,7 @@ instance Apply Diffable fs => Diffable (Union fs) where
 
 -- | Diff two 'Maybe's.
 instance Diffable Maybe where
-  algorithmFor (Just a) (Just b) = Just <$> diff a b
-  algorithmFor (Just a) _        = Just <$> byDeleting a
-  algorithmFor _        (Just b) = Just <$> byInserting b
-  algorithmFor _        _        = pure Nothing
+  algorithmFor = diffMaybe
 
 -- | Diff two lists using RWS.
 instance Diffable [] where
