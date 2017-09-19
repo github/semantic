@@ -41,7 +41,8 @@ diffWithParser :: (HasField fields Data.Span.Span,
                                      Apply Eq1 fs, Apply Show1 fs,
                                      Apply Traversable fs, Apply Functor fs,
                                      Apply Foldable fs, Apply Diffable fs,
-                                     GAlign (Data.Union.Union fs)) =>
+                                     Apply GAlign fs
+                                     ) =>
                                     Parser (Term (Data.Union.Union fs) (Record fields))
                                     -> Both Blob
                                     -> Task (Diff (Union fs) (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
@@ -49,6 +50,9 @@ diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarati
   where
     run parse sourceBlobs = distributeFor sourceBlobs parse >>= runBothWith (diffTermPair sourceBlobs diffRecursively)
 
-    diffRecursively :: (Eq1 f, GAlign f, Show1 f, Traversable f, Diffable f) => Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields) (Record fields)
-    diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
+    diffRecursively :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Eq1 fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
+                    => Term (Union fs) (Record fields1)
+                    -> Term (Union fs) (Record fields2)
+                    -> Diff (Union fs) (Record fields1) (Record fields2)
+    diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor equivalentTerms)
 
