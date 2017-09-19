@@ -47,7 +47,7 @@ diffTermsWith :: forall syntax fields1 fields2
               .  (Eq1 syntax, GAlign syntax, Traversable syntax)
               => (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Algorithm (Term syntax) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))) -- ^ A function producing syntax-directed continuations of the algorithm.
               -> ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
-              -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A predicate used to determine term equality.
+              -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
               -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
               -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
               -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
@@ -122,7 +122,9 @@ comparableByCategory (In a _) (In b _) = category a == category b
 comparableByConstructor :: GAlign syntax => ComparabilityRelation syntax ann1 ann2
 comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 
--- | Equivalency check for terms.
+-- | Equivalency relation for terms. Equivalence is determined by functions and
+-- methods with equal identifiers/names and recursively by equivalent terms with
+-- identical shapes.
 equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs, Apply Eq1 fs)
                 => Term (Union fs) a
                 -> Term (Union fs) b
