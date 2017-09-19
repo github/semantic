@@ -76,6 +76,7 @@ expression =  choice
           , parameterDeclaration
           , structType
           , typeDeclaration
+          , typeIdentifier
           , channelType
           , identifier
           , interpretedStringLiteral
