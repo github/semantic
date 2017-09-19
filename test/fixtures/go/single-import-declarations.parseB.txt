@@ -3,5 +3,11 @@
     (Identifier))
   (Identifier)
   (Args)
+  (ParseError
+    (Identifier))
+  (StringLiteral)
+  (ParseError
+    (Identifier))
+  (StringLiteral)
   (Identifier)
-  (StringLiteral))
+  (ParseError))

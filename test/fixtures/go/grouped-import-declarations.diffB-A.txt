@@ -1,10 +1,16 @@
-(ParseError
+(Program
   (Module
     (Identifier))
-  (Identifier)
-  (Args)
-  (Identifier)
-{ (StringLiteral)
-->(StringLiteral) }
-{ (StringLiteral)
-->(StringLiteral) })
+  (Function
+    (Identifier)
+    (Args)
+    (FunctionCall
+      (Identifier)
+      (ParseError
+      { (StringLiteral)
+      ->(StringLiteral) }
+      { (StringLiteral)
+      ->(StringLiteral) }
+        (ParseError))
+    { (StringLiteral)
+    ->(StringLiteral) })))

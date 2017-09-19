@@ -3,6 +3,13 @@
     (Identifier))
   (Identifier)
   (Args)
-  (Identifier)
+  (ParseError
+    (Identifier))
 { (StringLiteral)
-->(StringLiteral) })
+->(StringLiteral) }
+  (ParseError
+    (Identifier))
+{ (StringLiteral)
+->(StringLiteral) }
+  (Identifier)
+  (ParseError))

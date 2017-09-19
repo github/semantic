@@ -19,7 +19,8 @@
           {-(Identifier)-})-}
         {-(Args
           {-(Identifier)-}
-          {-(Identifier)-})-})-})-})-})-})->(ParseError
+          {-(Identifier)-})-})-})-})-})-})
+->(ParseError
 {+(Module
   {+(Identifier)+})+}
 {+(Identifier)+}

@@ -12,7 +12,8 @@
 {-(Identifier)-}
 {-(Args
   {-(Identifier)-}
-  {-(Identifier)-})-})->(Program
+  {-(Identifier)-})-})
+->(Program
 {+(Module
   {+(Identifier)+})+}
 {+(Function
