@@ -130,6 +130,13 @@ genericAlgorithmFor a b = to1 <$> galgorithmFor (from1 a) (from1 b)
 instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
 
+-- | Diff two 'Maybe's.
+instance Diffable Maybe where
+  algorithmFor (Just a) (Just b) = Just <$> diff a b
+  algorithmFor (Just a) _        = Just <$> byDeleting a
+  algorithmFor _        (Just b) = Just <$> byInserting b
+  algorithmFor _        _        = pure Nothing
+
 -- | Diff two lists using RWS.
 instance Diffable [] where
   algorithmFor a b = byRWS a b
