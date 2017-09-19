@@ -165,4 +165,6 @@ instance Diffable Syntax where
       Function <$> linearly idA idB
                <*> byRWS paramsA paramsB
                <*> byRWS bodyA bodyB
-    _ -> empty
+    _ -> case galignWith diffThese s1 s2 of
+      Just result -> sequenceA result
+      _ -> empty
