@@ -201,11 +201,15 @@ qualifiedTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annot
 arrayTypeDeclaration :: Assignment
 arrayTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> arrayType)
 
+sliceTypeDeclaration :: Assignment
+sliceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> sliceType)
+
 typeDeclaration :: Assignment
 typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many ( arrayTypeDeclaration
                                                                                       <|> channelTypeDeclaration
                                                                                       <|> interfaceTypeDeclaration
                                                                                       <|> qualifiedTypeDeclaration
+                                                                                      <|> sliceTypeDeclaration
                                                                                       <|> structTypeDeclaration
                                                                                       <|> mapTypeDeclaration ))
 
