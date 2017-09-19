@@ -37,6 +37,11 @@ newtype Interface a = Interface { interfaceElements :: [a] }
 instance Eq1 Interface where liftEq = genericLiftEq
 instance Show1 Interface where liftShowsPrec = genericLiftShowsPrec
 
+data Map a = Map { mapKeyType :: a, mapElementType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Map where liftEq = genericLiftEq
+instance Show1 Map where liftShowsPrec = genericLiftShowsPrec
 newtype ReceiveChannel a = ReceiveChannel { receiveChannelElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
