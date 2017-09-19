@@ -34,7 +34,7 @@ import qualified TreeSitter.TypeScript as TS
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Ptr TS.Language -> Blob -> IO (SyntaxTerm DefaultFields)
+treeSitterParser :: Ptr TS.Language -> Blob -> IO (Term S.Syntax (Record DefaultFields))
 treeSitterParser language blob = bracket TS.ts_document_new TS.ts_document_free $ \ document -> do
   TS.ts_document_set_language document language
   unsafeUseAsCStringLen (sourceBytes (blobSource blob)) $ \ (sourceBytes, len) -> do
@@ -70,13 +70,13 @@ anaM g = a where a = pure . embed <=< traverse a <=< g
 
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Ptr TS.Language -> Ptr TS.Document -> Blob -> IO (SyntaxTerm DefaultFields)
+documentToTerm :: Ptr TS.Language -> Ptr TS.Document -> Blob -> IO (Term S.Syntax (Record DefaultFields))
 documentToTerm language document Blob{..} = do
   root <- alloca (\ rootPtr -> do
     TS.ts_document_root_node_p document rootPtr
     peek rootPtr)
   toTerm root
-  where toTerm :: TS.Node -> IO (SyntaxTerm DefaultFields)
+  where toTerm :: TS.Node -> IO (Term S.Syntax (Record DefaultFields))
         toTerm node@TS.Node{..} = do
           name <- peekCString nodeType
 
@@ -95,7 +95,7 @@ documentToTerm language document Blob{..} = do
         copyNamed = TS.ts_node_copy_named_child_nodes document
         copyAll = TS.ts_node_copy_child_nodes document
 
-isNonEmpty :: HasField fields Category => SyntaxTerm fields -> Bool
+isNonEmpty :: HasField fields Category => Term S.Syntax (Record fields) -> Bool
 isNonEmpty = (/= Empty) . category . extract
 
 nodeRange :: TS.Node -> Range
@@ -105,18 +105,18 @@ nodeSpan :: TS.Node -> Span
 nodeSpan TS.Node{..} = nodeStartPoint `seq` nodeEndPoint `seq` Span (pointPos nodeStartPoint) (pointPos nodeEndPoint)
   where pointPos TS.TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)
 
-assignTerm :: Ptr TS.Language -> Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
+assignTerm :: Ptr TS.Language -> Source -> Record DefaultFields -> [ Term S.Syntax (Record DefaultFields) ] -> IO [ Term S.Syntax (Record DefaultFields) ] -> IO (Term S.Syntax (Record DefaultFields))
 assignTerm language source annotation children allChildren =
   case assignTermByLanguage source (category annotation) children of
     Just a -> pure (termIn annotation a)
     _ -> defaultTermAssignment source annotation children allChildren
-  where assignTermByLanguage :: Source -> Category -> [ SyntaxTerm DefaultFields ] -> Maybe (S.Syntax (SyntaxTerm DefaultFields))
+  where assignTermByLanguage :: Source -> Category -> [ Term S.Syntax (Record DefaultFields) ] -> Maybe (S.Syntax (Term S.Syntax (Record DefaultFields)))
         assignTermByLanguage = case languageForTSLanguage language of
           Just Language.Go -> Go.termAssignment
           Just Ruby -> Ruby.termAssignment
           _ -> \ _ _ _ -> Nothing
 
-defaultTermAssignment :: Source -> Record DefaultFields -> [ SyntaxTerm DefaultFields ] -> IO [ SyntaxTerm DefaultFields ] -> IO (SyntaxTerm DefaultFields)
+defaultTermAssignment :: Source -> Record DefaultFields -> [ Term S.Syntax (Record DefaultFields) ] -> IO [ Term S.Syntax (Record DefaultFields) ] -> IO (Term S.Syntax (Record DefaultFields))
 defaultTermAssignment source annotation children allChildren
   | category annotation `elem` operatorCategories = Term . In annotation . S.Operator <$> allChildren
   | otherwise = case (category annotation, children) of

@@ -77,7 +77,6 @@ library
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
-                     , SES.Myers
                      , SplitDiff
                      , Syntax
                      , Term
@@ -172,7 +171,7 @@ test-suite test
                      , SemanticCmdLineSpec
                      , InterpreterSpec
                      , PatchOutputSpec
-                     , SES.Myers.Spec
+                     , SES.Spec
                      , SourceSpec
                      , SpecHelpers
                      , TermSpec

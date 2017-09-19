@@ -23,7 +23,6 @@ import Data.Semigroup ((<>))
 import Data.Source
 import Data.These
 import Diff
-import Patch
 import Prelude hiding (fst, snd)
 import SplitDiff
 
@@ -32,7 +31,7 @@ truncatePatch :: Both Blob -> ByteString
 truncatePatch blobs = header blobs <> "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-renderPatch :: (HasField fields Range, Traversable f) => Both Blob -> Diff f (Record fields) -> File
+renderPatch :: (HasField fields Range, Traversable f) => Both Blob -> Diff f (Record fields) (Record fields) -> File
 renderPatch blobs diff = File $ if not (ByteString.null text) && ByteString.last text /= '\n'
   then text <> "\n\\ No newline at end of file\n"
   else text
@@ -133,7 +132,7 @@ emptyHunk :: Hunk (SplitDiff a annotation)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
-hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) -> Both Blob -> [Hunk (SplitDiff [] (Record fields))]
+hunks :: (Traversable f, HasField fields Range) => Diff f (Record fields) (Record fields) -> Both Blob -> [Hunk (SplitDiff [] (Record fields))]
 hunks _ blobs | sources <- blobSource <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (nullSource <$> sources)
@@ -181,3 +180,6 @@ changeIncludingContext leadingContext rows = case changes of
 -- | Whether a row has changes on either side.
 rowHasChanges :: (Foldable f, Functor f) => Join These (SplitDiff f annotation) -> Bool
 rowHasChanges row = or (hasChanges <$> row)
+
+maybeSnd :: These a b -> Maybe b
+maybeSnd = these (const Nothing) Just (\ _ a -> Just a)

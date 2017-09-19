@@ -44,11 +44,11 @@ diffWithParser :: (HasField fields Data.Span.Span,
                                      GAlign (Data.Union.Union fs)) =>
                                     Parser (Term (Data.Union.Union fs) (Record fields))
                                     -> Both Blob
-                                    -> Task (Diff (Union fs) (Record (Maybe Declaration ': fields)))
+                                    -> Task (Diff (Union fs) (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
 diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
-    run parse sourceBlobs = distributeFor sourceBlobs parse >>= diffTermPair sourceBlobs diffRecursively
+    run parse sourceBlobs = distributeFor sourceBlobs parse >>= runBothWith (diffTermPair sourceBlobs diffRecursively)
 
-    diffRecursively :: (Eq1 f, GAlign f, Show1 f, Traversable f, Diffable f) => Both (Term f (Record fields)) -> Diff f (Record fields)
-    diffRecursively = decoratingWith constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
+    diffRecursively :: (Eq1 f, GAlign f, Show1 f, Traversable f, Diffable f) => Term f (Record fields) -> Term f (Record fields) -> Diff f (Record fields) (Record fields)
+    diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor)
 
