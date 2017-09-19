@@ -148,11 +148,17 @@ typeLiteral =
   <|> arrayType
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
+
+-- Primitive Types
+
 qualifiedType :: Assignment
 qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
 
 arrayType :: Assignment
-arrayType = handleError $ makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> intLiteral <*> typeLiteral)
+arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> intLiteral <*> typeLiteral)
+
+sliceType :: Assignment
+sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> typeLiteral)
 
 channelType :: Assignment
 channelType = handleError

@@ -25,19 +25,19 @@ data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
 instance Eq1 Array where liftEq = genericLiftEq
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
-data BiDirectionalChannel a = BiDirectionalChannel { biDirectionalChannelElementType :: a }
+newtype BiDirectionalChannel a = BiDirectionalChannel { biDirectionalChannelElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 BiDirectionalChannel where liftEq = genericLiftEq
 instance Show1 BiDirectionalChannel where liftShowsPrec = genericLiftShowsPrec
 
-data ReceiveChannel a = ReceiveChannel { receiveChannelElementType :: a }
+newtype ReceiveChannel a = ReceiveChannel { receiveChannelElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ReceiveChannel where liftEq = genericLiftEq
 instance Show1 ReceiveChannel where liftShowsPrec = genericLiftShowsPrec
 
-data SendChannel a = SendChannel { sendChannelElementType :: a }
+newtype SendChannel a = SendChannel { sendChannelElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 SendChannel where liftEq = genericLiftEq
