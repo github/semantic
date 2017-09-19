@@ -47,6 +47,7 @@ type Syntax =
    , Type.Annotation
    , Type.Array
    , Type.BiDirectionalChannel
+   , Type.Interface
    , Type.ReceiveChannel
    , Type.SendChannel
    , Type.Slice
@@ -72,6 +73,7 @@ expression =  choice
           , identifier
           , importDeclaration
           , importSpec
+          , interfaceType
           , interpretedStringLiteral
           , intLiteral
           , methodDeclaration
@@ -167,6 +169,9 @@ channelType = handleError
 structType :: Assignment
 structType = handleError $ makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many expression)
 
+interfaceType :: Assignment
+interfaceType = handleError $ makeTerm <$> symbol InterfaceType <*> children (Type.Interface <$> many expression)
+
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional expression)
   where
@@ -179,10 +184,7 @@ channelTypeDeclaration :: Assignment
 channelTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> channelType)
 
 interfaceTypeDeclaration :: Assignment
-interfaceTypeDeclaration = mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
-  where
-    mkInterface loc (name, interfaceBody) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Interface name interfaceBody)) name
-    interfaceType = symbol InterfaceType *> children (many expression)
+interfaceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> interfaceType)
 
 mapTypeDeclaration :: Assignment
 mapTypeDeclaration = mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> ((,) <$> symbol MapType <*> children ((,,,) <$> symbol TypeIdentifier <*> source <*> symbol TypeIdentifier <*> source)))
