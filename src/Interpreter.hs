@@ -11,7 +11,6 @@ import Algorithm
 import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
-import Data.Functor.Classes (Eq1(..))
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe, isJust)
 import Data.Record
@@ -46,7 +45,7 @@ decoratingWith getLabel1 getLabel2 differ t1 t2 = stripDiff (differ (defaultFeat
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: forall syntax fields1 fields2
-              .  (Diffable syntax, Eq1 syntax, GAlign syntax, Traversable syntax)
+              .  (Diffable syntax, GAlign syntax, Traversable syntax)
               => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
               -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
               -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
@@ -89,7 +88,7 @@ comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 -- | Equivalency relation for terms. Equivalence is determined by functions and
 -- methods with equal identifiers/names and recursively by equivalent terms with
 -- identical shapes.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs, Apply Eq1 fs)
+equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs)
                 => Term (Union fs) ann1
                 -> Term (Union fs) ann2
                 -> Bool
