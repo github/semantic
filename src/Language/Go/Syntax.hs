@@ -156,9 +156,12 @@ arrayType = handleError $ makeTerm <$> symbol ArrayType <*> children (Type.Array
 
 channelType :: Assignment
 channelType = handleError
-            $  (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> token AnonLAngleMinus *> (Type.SendChannel <$> expression))))
-           <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonLAngleMinus *> token AnonChan *> (Type.ReceiveChannel <$> expression))))
-           <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> (Type.BiDirectionalChannel <$> expression))))
+            $  (makeTerm <$> symbol ChannelType <*> (children (token AnonLAngleMinus *> token AnonChan *> (Type.ReceiveChannel <$> expression))))
+           <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> token AnonLAngleMinus *> (Type.SendChannel <$> expression))))
+           <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *>                          (Type.BiDirectionalChannel <$> expression))))
+
+
+-- Type Declarations
 
 channelTypeDeclaration :: Assignment
 channelTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> channelType)
