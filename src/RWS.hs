@@ -8,6 +8,7 @@ module RWS
 , pqGramDecorator
 , Gram(..)
 , defaultD
+, equalTerms
 ) where
 
 import Control.Applicative (empty)
@@ -57,14 +58,15 @@ data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
 rws :: (Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+    -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
     -> [Term syntax (Record (FeatureVector ': fields1))]
     -> [Term syntax (Record (FeatureVector ': fields2))]
     -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
-rws _          as [] = This <$> as
-rws _          [] bs = That <$> bs
-rws canCompare [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
-rws canCompare as bs =
-  let sesDiffs = ses (equalTerms canCompare) as bs
+rws _          _          as [] = This <$> as
+rws _          _          [] bs = That <$> bs
+rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
+rws canCompare equivalent as bs =
+  let sesDiffs = ses equivalent as bs
       (featureAs, featureBs, mappedDiffs, allDiffs) = genFeaturizedTermsAndDiffs sesDiffs
       (diffs, remaining) = findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs
       diffs' = deleteRemaining diffs remaining
