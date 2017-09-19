@@ -101,6 +101,9 @@ equivalentTerms t1@(Term (In _ u1)) t2@(Term (In _ u2))
   , Just (Declaration.Function identifier2 _ _) <- prj u2
   = equivalentTerms identifier1 identifier2
   | Just (Syntax.Context _ s1) <- prj u1
+  , Just (Syntax.Context _ s2) <- prj u2
+  = equivalentTerms s1 s2
+  | Just (Syntax.Context _ s1) <- prj u1
   = equivalentTerms s1 t2
   | Just (Syntax.Context _ s2) <- prj u2
   = equivalentTerms t1 s2
