@@ -56,7 +56,6 @@ type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
 
 expression :: Assignment
 expression =  choice
@@ -127,16 +126,10 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 
--- Type Literals
-
-channelType :: Assignment
-channelType = makeTerm <$> symbol ChannelType <*> children (Literal.Channel <$> expression)
-
 structType :: Assignment
 structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many expression)
 
 -- interfaceType
--- arrayType
 -- sliceType
 -- mapType
 -- channelType
@@ -159,15 +152,8 @@ qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.Membe
 arrayType :: Assignment
 arrayType = handleError $ makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> intLiteral <*> typeLiteral)
 
--- Type Declarations
 
 channelTypeDeclaration :: Assignment
-channelTypeDeclaration = symbol TypeSpec >>= mkChannelTypeDeclaration
-  where
-    mkChannelTypeDeclaration loc = children (typeIdentifier >>= mkChannelType loc)
-    mkChannelType loc channelName = symbol ChannelType *> children ( (token AnonChan *> token AnonLAngleMinus *> (makeTerm loc <$> (Type.SendChannel channelName <$> typeIdentifier)))
-                                                                  <|> (token AnonLAngleMinus *> token AnonChan *> (makeTerm loc <$> (Type.ReceiveChannel channelName <$> typeIdentifier)))
-                                                                  <|> (token AnonChan *> (makeTerm loc <$> (Type.BiDirectionalChannel channelName <$> typeIdentifier))))
 
 interfaceTypeDeclaration :: Assignment
 interfaceTypeDeclaration = mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
@@ -254,7 +240,6 @@ methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> ch
         mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method receiver' name' parameters' body')) type'')
 
 methodSpec :: Assignment
-methodSpec =  handleError $ mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typeLiteral <|> parameters <|> emptyTerm) <*> empty)
   where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
         empty = makeTerm <$> location <*> pure Syntax.Empty
         mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
