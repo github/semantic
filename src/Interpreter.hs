@@ -7,11 +7,12 @@ module Interpreter
 ) where
 
 import Algorithm
+import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Functor.Classes (Eq1)
 import Data.Hashable (Hashable)
-import Data.Maybe (isJust)
+import Data.Maybe (fromMaybe, isJust)
 import Data.Record
 import Data.Text (Text)
 import Diff
@@ -51,17 +52,25 @@ diffTermsWith :: forall syntax fields1 fields2
               -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
               -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
               -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
-diffTermsWith refine comparable t1 t2 = runFreer decompose (diff t1 t2)
-  where decompose :: AlgorithmF (Term syntax) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))) result -> Algorithm (Term syntax) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))) result
+diffTermsWith refine comparable t1 t2 = fromMaybe (replacing t1 t2) (runFreerM decompose (diff t1 t2))
+  where decompose :: Alternative m
+                  => AlgorithmF
+                    (Term syntax)
+                    (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+                    result
+                  -> Algorithm
+                    (Term syntax)
+                    (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+                    (m result)
         decompose step = case step of
-          Algorithm.Diff t1 t2 -> refine t1 t2
+          Algorithm.Diff t1 t2 -> pure <$> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> merge (extract t1, extract t2) <$> sequenceA result
-            _ -> byReplacing t1 t2
-          RWS as bs -> traverse diffThese (rws comparable as bs)
-          Delete a -> pure (deleting a)
-          Insert b -> pure (inserting b)
-          Replace a b -> pure (replacing a b)
+            Just result -> pure <$> (merge (extract t1, extract t2) <$> sequenceA result)
+            _ -> pure <$> byReplacing t1 t2
+          RWS as bs -> pure <$> traverse diffThese (rws comparable as bs)
+          Delete a -> pure (pure (deleting a))
+          Insert b -> pure (pure (inserting b))
+          Replace a b -> pure (pure (replacing a b))
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
