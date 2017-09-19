@@ -3,8 +3,6 @@ module Term
 ( Term(..)
 , termIn
 , TermF(..)
-, SyntaxTerm
-, SyntaxTermF
 , termSize
 , extract
 , unwrap
@@ -24,7 +22,6 @@ import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
 import Data.Semigroup ((<>))
-import Syntax
 import Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.
@@ -33,9 +30,6 @@ newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
 data TermF syntax ann recur = In { termAnnotation :: ann, termOut :: syntax recur }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
--- | A Term with a Syntax leaf and a record of fields.
-type SyntaxTerm fields = Term Syntax (Record fields)
-type SyntaxTermF fields = TermF Syntax (Record fields)
 
 -- | Return the node count of a term.
 termSize :: (Foldable f, Functor f) => Term f annotation -> Int

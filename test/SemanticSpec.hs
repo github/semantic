@@ -31,11 +31,11 @@ spec = parallel $ do
 
   describe "diffTermPair" $ do
     it "produces an Insert when the first blob is missing" $ do
-      result <- runTask (diffTermPair (both (emptyBlob "/foo") (sourceBlob "/foo" Nothing "")) (runBothWith replacing) (pure (termIn () [])))
+      result <- runTask (diffTermPair (both (emptyBlob "/foo") (sourceBlob "/foo" Nothing "")) replacing (termIn () []) (termIn () []))
       result `shouldBe` Diff (Patch (Insert (In () [])))
 
     it "produces a Delete when the second blob is missing" $ do
-      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptyBlob "/foo")) (runBothWith replacing) (pure (termIn () [])))
+      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptyBlob "/foo")) replacing (termIn () []) (termIn () []))
       result `shouldBe` Diff (Patch (Delete (In () [])))
 
   where
