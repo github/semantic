@@ -33,7 +33,7 @@ data AlgorithmF term diff result where
   -- | An 'Algorithm' to try one of two alternatives.
   Alt :: a -> a -> AlgorithmF term diff a
 
--- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
+-- | The free(r) monad for 'AlgorithmF'. This enables us to construct algorithms to diff using '<$>', '<*>', '>>=', and do-notation.
 type Algorithm term diff = Freer (AlgorithmF term diff)
 
 
