@@ -45,6 +45,7 @@ type Syntax =
    , Syntax.Identifier
    , Syntax.Program
    , Type.Annotation
+   , Type.Array
    , []
    ]
 
