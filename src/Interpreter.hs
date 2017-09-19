@@ -31,7 +31,7 @@ diffTerms :: (HasField fields1 Category, HasField fields2 Category)
           => Term Syntax (Record fields1) -- ^ A term representing the old state.
           -> Term Syntax (Record fields2) -- ^ A term representing the new state.
           -> Diff Syntax (Record fields1) (Record fields2)
-diffTerms = decoratingWith getLabel getLabel (diffTermsWith algorithmWithTerms comparableByCategory (equalTerms comparableByCategory))
+diffTerms = decoratingWith getLabel getLabel (diffTermsWith algorithmForTerms comparableByCategory (equalTerms comparableByCategory))
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
 decoratingWith :: (Hashable label, Traversable syntax)
