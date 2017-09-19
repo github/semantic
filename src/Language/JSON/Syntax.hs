@@ -27,9 +27,10 @@ type Syntax =
   , Literal.Null
   , Literal.String
   , Literal.TextElement
-   -- NB: Diffing requires Methods and Functions in the union.
+   -- NB: Diffing requires Methods, Functions, and Context in the union.
   , Declaration.Method
   , Declaration.Function
+  , Syntax.Context
   , Syntax.Error
   , []
   ]

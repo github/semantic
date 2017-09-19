@@ -15,6 +15,7 @@ import Data.Functor.Classes (Eq1(..))
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe, isJust)
 import Data.Record
+import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Text (Text)
 import Data.These
@@ -88,17 +89,21 @@ comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
 -- | Equivalency relation for terms. Equivalence is determined by functions and
 -- methods with equal identifiers/names and recursively by equivalent terms with
 -- identical shapes.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs, Apply Eq1 fs)
+equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs, Apply Eq1 fs)
                 => Term (Union fs) ann1
                 -> Term (Union fs) ann2
                 -> Bool
-equivalentTerms (Term (In _ u1)) (Term (In _ u2))
+equivalentTerms t1@(Term (In _ u1)) t2@(Term (In _ u2))
   | Just (Declaration.Method _ identifier1 _ _) <- prj u1
   , Just (Declaration.Method _ identifier2 _ _) <- prj u2
   = equivalentTerms identifier1 identifier2
   | Just (Declaration.Function identifier1 _ _) <- prj u1
   , Just (Declaration.Function identifier2 _ _) <- prj u2
   = equivalentTerms identifier1 identifier2
+  | Just (Syntax.Context _ s1) <- prj u1
+  = equivalentTerms s1 t2
+  | Just (Syntax.Context _ s2) <- prj u2
+  = equivalentTerms t1 s2
   | Just aligned <- galignWith (these (const False) (const False) equivalentTerms) u1 u2
   = and aligned
   | otherwise = False

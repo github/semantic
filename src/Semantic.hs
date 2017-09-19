@@ -18,6 +18,7 @@ import Data.Functor.Both as Both
 import Data.Functor.Classes (Eq1, Show1)
 import Data.Output
 import Data.Record
+import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Union
 import Decorators
@@ -92,7 +93,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
 
-        diffRecursively :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Eq1 fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
+        diffRecursively :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Eq1 fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
                         => Term (Union fs) (Record fields1)
                         -> Term (Union fs) (Record fields2)
                         -> Diff (Union fs) (Record fields1) (Record fields2)
