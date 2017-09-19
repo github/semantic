@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
+{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeOperators, ScopedTypeVariables #-}
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
@@ -29,6 +29,7 @@ import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
+import Data.List (sortOn)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Record
@@ -166,18 +167,32 @@ termTableOfContentsBy selector = cata termAlgebra
   where termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
-dedupe :: HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
-dedupe = foldl' go []
-  where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
-                | (front, similar : back) <- find (similarMatch `on` entryPayload) x xs =
-                  front <> (Replaced (entryPayload similar) : back)
-                | otherwise = xs <> [x]
+newtype DedupeKey = DedupeKey (Maybe T.Text, Maybe T.Text) deriving (Eq, Ord)
 
-        find p x = List.break (p x)
-        exactMatch = (==) `on` getDeclaration
-        similarMatch a b = sameCategory a b && similarDeclaration a b
-        sameCategory = (==) `on` fmap toCategoryName . getDeclaration
-        similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
+-- Dedupe entries in a final pass. This catches two specific scenarios with
+-- different behaviors:
+-- 1. Identical entries are in the list.
+--    Action: take the first one, drop all subsequent.
+-- 2. Two similar entries (defined by a case insensitive comparision of their
+--    identifiers) are in the list.
+--    Action: Combine them into a single Replaced entry.
+dedupe :: forall fields. HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
+dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in (fmap . fmap) snd tuples
+  where
+    go :: HasField fields (Maybe Declaration)
+       => (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
+       -> Entry (Record fields)
+       -> (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
+    go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m
+                    = if exactMatch similar x
+                      then (succ index, m)
+                      else
+                        let replacement = Replaced (entryPayload similar)
+                        in (succ index, Map.insert (dedupeKey replacement) (index, replacement) m)
+                    | otherwise = (succ index, Map.insert (dedupeKey x) (index, x) m)
+
+    dedupeKey entry = DedupeKey ((fmap toCategoryName . getDeclaration . entryPayload) entry, (fmap (toLower . declarationIdentifier) . getDeclaration . entryPayload) entry)
+    exactMatch = (==) `on` (getDeclaration . entryPayload)
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
 entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe JSONSummary
