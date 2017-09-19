@@ -198,13 +198,12 @@ arrayTypeDeclaration :: Assignment
 arrayTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> arrayType)
 
 typeDeclaration :: Assignment
-typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many (  arrayTypeDeclaration
-                                                                        <|> channelTypeDeclaration
-                                                                        <|> interfaceTypeDeclaration
-                                                                        <|> qualifiedTypeDeclaration
-                                                                        <|> structTypeDeclaration
-                                                                        <|> mapTypeDeclaration
-                                                                         ))
+typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many ( arrayTypeDeclaration
+                                                                                      <|> channelTypeDeclaration
+                                                                                      <|> interfaceTypeDeclaration
+                                                                                      <|> qualifiedTypeDeclaration
+                                                                                      <|> structTypeDeclaration
+                                                                                      <|> mapTypeDeclaration ))
 
 
 -- Expressions
