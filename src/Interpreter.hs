@@ -52,27 +52,24 @@ diffTermsWith :: forall syntax fields1 fields2
               -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
               -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
               -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
-diffTermsWith refine comparable t1 t2 = fromMaybe (replacing t1 t2) (runFreerM decompose (diff t1 t2))
-  where decompose :: Alternative m
-                  => AlgorithmF
-                    (Term syntax)
-                    (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-                    result
-                  -> Algorithm
-                    (Term syntax)
-                    (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-                    (m result)
-        decompose step = case step of
-          Algorithm.Diff t1 t2 -> pure <$> refine t1 t2
+diffTermsWith refine comparable t1 t2 = fromMaybe (replacing t1 t2) (go (diff t1 t2))
+  where go :: (Alternative m, Monad m)
+           => Algorithm
+             (Term syntax)
+             (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+             (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+           -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+        go = iterFreerA (\ step yield -> case step of
+          Algorithm.Diff t1 t2 -> (go (refine t1 t2) >>= yield) <|> yield (replacing t1 t2)
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> pure . merge (extract t1, extract t2) <$> sequenceA result
-            _ -> pure <$> byReplacing t1 t2
-          RWS as bs -> pure <$> traverse diffThese (rws comparable as bs)
-          Delete a -> pure (pure (deleting a))
-          Insert b -> pure (pure (inserting b))
-          Replace a b -> pure (pure (replacing a b))
-          Empty -> pure empty
-          Alt a b -> (<|>) <$> pure (pure a) <*> pure (pure b)
+            Just result -> go (merge (extract t1, extract t2) <$> sequenceA result) >>= yield
+            _ -> yield (replacing t1 t2)
+          RWS as bs -> traverse (go . diffThese) (rws comparable as bs) >>= yield
+          Delete a -> yield (deleting a)
+          Insert b -> yield (inserting b)
+          Replace a b -> yield (replacing a b)
+          Empty -> empty
+          Alt a b -> yield a <|> yield b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
