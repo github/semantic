@@ -1,7 +1,9 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Data.Aeson
+import Algorithm
+import Control.Applicative (empty)
+import Data.Aeson (ToJSON, (.=))
 import Data.Align.Generic
 import Data.Foldable (toList)
 import Data.Functor.Classes
@@ -126,3 +128,41 @@ instance Show1 Syntax where liftShowsPrec = genericLiftShowsPrec
 
 instance ToJSONFields1 Syntax where
   toJSONFields1 syntax = [ "children" .= toList syntax ]
+
+instance Diffable Syntax where
+  algorithmFor s1 s2 = case (s1, s2) of
+    (Indexed a, Indexed b) ->
+      Indexed <$> byRWS a b
+    (Module idA a, Module idB b) ->
+      Module <$> linearly idA idB <*> byRWS a b
+    (FunctionCall identifierA typeParamsA argsA, FunctionCall identifierB typeParamsB argsB) ->
+      FunctionCall <$> linearly identifierA identifierB
+                   <*> byRWS typeParamsA typeParamsB
+                   <*> byRWS argsA argsB
+    (Switch exprA casesA, Switch exprB casesB) ->
+      Switch <$> byRWS exprA exprB
+             <*> byRWS casesA casesB
+    (Object tyA a, Object tyB b) ->
+      Object <$> diffMaybe tyA tyB
+             <*> byRWS a b
+    (Commented commentsA a, Commented commentsB b) ->
+      Commented <$> byRWS commentsA commentsB
+                <*> diffMaybe a b
+    (Array tyA a, Array tyB b) ->
+      Array <$> diffMaybe tyA tyB
+            <*> byRWS a b
+    (Class identifierA clausesA expressionsA, Class identifierB clausesB expressionsB) ->
+      Class <$> linearly identifierA identifierB
+            <*> byRWS clausesA clausesB
+            <*> byRWS expressionsA expressionsB
+    (Method clausesA identifierA receiverA paramsA expressionsA, Method clausesB identifierB receiverB paramsB expressionsB) ->
+      Method <$> byRWS clausesA clausesB
+             <*> linearly identifierA identifierB
+             <*> diffMaybe receiverA receiverB
+             <*> byRWS paramsA paramsB
+             <*> byRWS expressionsA expressionsB
+    (Function idA paramsA bodyA, Function idB paramsB bodyB) ->
+      Function <$> linearly idA idB
+               <*> byRWS paramsA paramsB
+               <*> byRWS bodyA bodyB
+    _ -> empty
