@@ -138,24 +138,6 @@ executable semantic
   default-language:    Haskell2010
   default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
-executable slurp
-  hs-source-dirs:      app
-  main-is:             Slurp.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base
-                     , aeson
-                     , base64-bytestring
-                     , bytestring
-                     , filepath
-                     , github
-                     , netrc
-                     , regex-compat
-                     , text
-                     , text-conversions
-                     , vector
-  default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
-
 test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
