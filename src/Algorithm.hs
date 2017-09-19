@@ -103,8 +103,10 @@ algorithmForTerms :: Diffable syntax
                   => Term syntax ann1
                   -> Term syntax ann2
                   -> Algorithm (Term syntax) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2)
-algorithmForTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
-
+algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
+  =   merge (ann1, ann2) <$> algorithmFor f1 f2
+  <|> deleteF . In ann1 <$> subalgorithmFor byDeleting  (flip diff t2) f1
+  <|> insertF . In ann2 <$> subalgorithmFor byInserting (     diff t1) f2
 
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
