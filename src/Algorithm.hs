@@ -93,6 +93,8 @@ instance (Show1 term, Show ann1, Show ann2) => Show1 (AlgorithmF term (diff ann1
 instance Alternative (Algorithm term diff) where
   empty = Empty `Then` return
 
+  (Empty `Then` _) <|> b = b
+  a <|> (Empty `Then` _) = a
   a <|> b = Alt a b `Then` id
 
 
