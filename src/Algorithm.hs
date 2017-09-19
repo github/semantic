@@ -134,6 +134,10 @@ instance Apply Diffable fs => Diffable (Union fs) where
 instance Diffable [] where
   algorithmFor a b = byRWS a b
 
+-- | Diff two non-empty lists using RWS.
+instance Diffable NonEmpty where
+  algorithmFor (a:|as) (b:|bs) = (\ (d:ds) -> d:|ds) <$> byRWS (a:as) (b:bs)
+
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class GDiffable f where
   galgorithmFor :: f (term ann1) -> f (term ann2) -> Algorithm term (diff ann1 ann2) (f (diff ann1 ann2))
