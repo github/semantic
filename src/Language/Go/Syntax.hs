@@ -48,6 +48,7 @@ type Syntax =
    , Type.Array
    , Type.BiDirectionalChannel
    , Type.Interface
+   , Type.Map
    , Type.ReceiveChannel
    , Type.SendChannel
    , Type.Slice
@@ -76,6 +77,7 @@ expression =  choice
           , interfaceType
           , interpretedStringLiteral
           , intLiteral
+          , mapType
           , methodDeclaration
           , methodSpec
           , packageClause
@@ -172,6 +174,9 @@ structType = handleError $ makeTerm <$> symbol StructType <*> children (Declarat
 interfaceType :: Assignment
 interfaceType = handleError $ makeTerm <$> symbol InterfaceType <*> children (Type.Interface <$> many expression)
 
+mapType :: Assignment
+mapType = handleError $ makeTerm <$> symbol MapType <*> children (Type.Map <$> expression <*> expression)
+
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional expression)
   where
@@ -187,15 +192,7 @@ interfaceTypeDeclaration :: Assignment
 interfaceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> interfaceType)
 
 mapTypeDeclaration :: Assignment
-mapTypeDeclaration = mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> ((,) <$> symbol MapType <*> children ((,,,) <$> symbol TypeIdentifier <*> source <*> symbol TypeIdentifier <*> source)))
-  where
-    mkMap loc (name, (mapLoc, (keyTypeLoc, keyTypeName, valueTypeLoc, valueTypeName))) =
-      makeTerm loc $ Type.Annotation (makeTerm mapLoc (Literal.Hash (pure $ mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName))) name
-
-    mapKeyValue keyTypeLoc keyTypeName valueTypeLoc valueTypeName =
-      makeTerm keyTypeLoc $
-        Literal.KeyValue (makeTerm keyTypeLoc   (Type.Annotation (makeTerm keyTypeLoc   Syntax.Empty) (makeTerm keyTypeLoc   (Syntax.Identifier keyTypeName))))
-                         (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc Syntax.Empty) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
+mapTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> mapType)
 
 structTypeDeclaration :: Assignment
 structTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> structType)
