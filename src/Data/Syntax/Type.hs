@@ -25,3 +25,9 @@ data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
 instance Eq1 Array where liftEq = genericLiftEq
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
+data BiDirectionalChannel a = BiDirectionalChannel { biDirectionalChannelName :: a, biDirectionalChannelElementType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 BiDirectionalChannel where liftEq = genericLiftEq
+instance Show1 BiDirectionalChannel where liftShowsPrec = genericLiftShowsPrec
+
