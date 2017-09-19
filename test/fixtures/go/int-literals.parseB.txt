@@ -8,10 +8,12 @@
       (VarAssignment
         (Identifier)
         (Other "expression_list"
-          (NumberLiteral)
-          (Identifier)
-          (ParseError
-            (NumberLiteral))
-          (Identifier)))
-      (ParseError
-        (NumberLiteral)))))
+          (NumberLiteral)))
+      (VarAssignment
+        (Identifier)
+        (Other "expression_list"
+          (NumberLiteral)))
+      (VarAssignment
+        (Identifier)
+        (Other "expression_list"
+          (NumberLiteral))))))

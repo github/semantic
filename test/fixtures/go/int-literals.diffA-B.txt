@@ -9,12 +9,14 @@
         (Identifier)
         (Other "expression_list"
         { (NumberLiteral)
-        ->(NumberLiteral) }
-          (Identifier)
-          (ParseError
-          { (NumberLiteral)
-          ->(NumberLiteral) })
-          (Identifier)))
-      (ParseError
-      { (NumberLiteral)
-      ->(NumberLiteral) }))))
+        ->(NumberLiteral) }))
+      (VarAssignment
+        (Identifier)
+        (Other "expression_list"
+        { (NumberLiteral)
+        ->(NumberLiteral) }))
+      (VarAssignment
+        (Identifier)
+        (Other "expression_list"
+        { (NumberLiteral)
+        ->(NumberLiteral) })))))
