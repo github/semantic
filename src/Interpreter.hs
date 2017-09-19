@@ -16,7 +16,7 @@ import Data.Maybe (fromMaybe, isJust)
 import Data.Record
 import Data.Text (Text)
 import Diff
-import Info hiding (Return)
+import Info hiding (Empty, Return)
 import RWS
 import Syntax as S hiding (Return)
 import Term
@@ -71,6 +71,8 @@ diffTermsWith refine comparable t1 t2 = fromMaybe (replacing t1 t2) (runFreerM d
           Delete a -> pure (pure (deleting a))
           Insert b -> pure (pure (inserting b))
           Replace a b -> pure (pure (replacing a b))
+          Empty -> empty
+          Alt a b -> (<|>) <$> pure (pure a) <*> pure (pure b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)

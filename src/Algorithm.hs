@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Algorithm where
 
-import Control.Applicative (liftA2)
+import Control.Applicative (Alternative(..), liftA2)
 import Control.Monad (guard, join)
 import Control.Monad.Free.Freer
 import Data.Functor.Classes
@@ -28,6 +28,9 @@ data AlgorithmF term diff result where
   Insert :: term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
   -- | Replace one term with another.
   Replace :: term ann1 -> term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
+
+  Empty :: AlgorithmF term diff a
+  Alt :: a -> a -> AlgorithmF term diff a
 
 -- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
 type Algorithm term diff = Freer (AlgorithmF term diff)
@@ -73,15 +76,23 @@ byReplacing = (liftF .) . Replace
 
 
 instance (Show1 term, Show ann1, Show ann2) => Show1 (AlgorithmF term (diff ann1 ann2)) where
-  liftShowsPrec _ _ d algorithm = case algorithm of
+  liftShowsPrec sp _ d algorithm = case algorithm of
     Algorithm.Diff t1 t2 -> showsBinaryWith showsTerm showsTerm "Diff" d t1 t2
     Linear t1 t2 -> showsBinaryWith showsTerm showsTerm "Linear" d t1 t2
     RWS as bs -> showsBinaryWith (liftShowsPrec showsTerm (liftShowList showsPrec showList)) (liftShowsPrec showsTerm (liftShowList showsPrec showList)) "RWS" d as bs
     Delete t1 -> showsUnaryWith showsTerm "Delete" d t1
     Insert t2 -> showsUnaryWith showsTerm "Insert" d t2
     Replace t1 t2 -> showsBinaryWith showsTerm showsTerm "Replace" d t1 t2
+    Empty -> showString "Empty"
+    Alt a b -> showsBinaryWith sp sp "Alt" d a b
     where showsTerm :: (Show1 term, Show ann) => Int -> term ann -> ShowS
           showsTerm = liftShowsPrec showsPrec showList
+
+
+instance Alternative (Algorithm term diff) where
+  empty = Empty `Then` return
+
+  a <|> b = Alt a b `Then` id
 
 
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
