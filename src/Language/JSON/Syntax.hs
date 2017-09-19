@@ -10,6 +10,7 @@ import Data.Syntax (makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
+import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
 import Language.JSON.Grammar as Grammar
 import qualified Term
@@ -26,6 +27,9 @@ type Syntax =
   , Literal.Null
   , Literal.String
   , Literal.TextElement
+   -- NB: Diffing requires Methods and Functions in the union.
+  , Declaration.Method
+  , Declaration.Function
   , Syntax.Error
   , []
   ]
