@@ -65,7 +65,7 @@ diffTermsWith refine comparable t1 t2 = fromMaybe (replacing t1 t2) (runFreerM d
         decompose step = case step of
           Algorithm.Diff t1 t2 -> pure <$> refine t1 t2
           Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> pure <$> (merge (extract t1, extract t2) <$> sequenceA result)
+            Just result -> pure . merge (extract t1, extract t2) <$> sequenceA result
             _ -> pure <$> byReplacing t1 t2
           RWS as bs -> pure <$> traverse diffThese (rws comparable as bs)
           Delete a -> pure (pure (deleting a))
