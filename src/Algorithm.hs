@@ -125,8 +125,7 @@ class Diffable f where
                   -> f a
                   -> Algorithm term (diff ann1 ann2) (f b)
   default
-    subalgorithmFor :: Traversable f
-                    => (a -> Algorithm term (diff ann1 ann2) b)
+    subalgorithmFor :: (a -> Algorithm term (diff ann1 ann2) b)
                     -> (a -> Algorithm term (diff ann1 ann2) b)
                     -> f a
                     -> Algorithm term (diff ann1 ann2) (f b)
