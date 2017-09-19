@@ -71,7 +71,7 @@ diffTermsWith refine comparable t1 t2 = fromMaybe (replacing t1 t2) (runFreerM d
           Delete a -> pure (pure (deleting a))
           Insert b -> pure (pure (inserting b))
           Replace a b -> pure (pure (replacing a b))
-          Empty -> empty
+          Empty -> pure empty
           Alt a b -> (<|>) <$> pure (pure a) <*> pure (pure b)
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
