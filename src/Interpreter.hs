@@ -92,12 +92,13 @@ equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply 
                 => Term (Union fs) a
                 -> Term (Union fs) b
                 -> Bool
-equivalentTerms a b | Just (Declaration.Method _ identifierA _ _) <- prj (unwrap a)
-                    , Just (Declaration.Method _ identifierB _ _) <- prj (unwrap b)
-                    = liftEq equivalentTerms (unwrap identifierA) (unwrap identifierB)
-                    | Just (Declaration.Function identifierA _ _) <- prj (unwrap a)
-                    , Just (Declaration.Function identifierB _ _) <- prj (unwrap b)
-                    = liftEq equivalentTerms (unwrap identifierA) (unwrap identifierB)
-                    | Just aligned <- galignWith (these (const False) (const False) equivalentTerms) (unwrap a) (unwrap b)
-                    = and aligned
-                    | otherwise = False
+equivalentTerms (Term (In _ u1)) (Term (In _ u2))
+  | Just (Declaration.Method _ identifier1 _ _) <- prj u1
+  , Just (Declaration.Method _ identifier2 _ _) <- prj u2
+  = equivalentTerms identifier1 identifier2
+  | Just (Declaration.Function identifier1 _ _) <- prj u1
+  , Just (Declaration.Function identifier2 _ _) <- prj u2
+  = equivalentTerms identifier1 identifier2
+  | Just aligned <- galignWith (these (const False) (const False) equivalentTerms) u1 u2
+  = and aligned
+  | otherwise = False
