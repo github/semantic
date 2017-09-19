@@ -15,10 +15,10 @@ import Data.Functor.Classes (Eq1(..))
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe, isJust)
 import Data.Record
+import qualified Data.Syntax.Declaration as Declaration
 import Data.Text (Text)
 import Data.These
 import Data.Union
-import qualified Data.Syntax.Declaration as Declaration
 import Diff
 import Info hiding (Empty, Return)
 import RWS
