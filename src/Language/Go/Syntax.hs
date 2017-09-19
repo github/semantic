@@ -129,9 +129,6 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 
-structType :: Assignment
-structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many expression)
-
 -- interfaceType
 -- sliceType
 -- mapType
@@ -167,6 +164,14 @@ channelType = handleError
            <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> token AnonLAngleMinus *> (Type.SendChannel <$> expression))))
            <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *>                          (Type.BiDirectionalChannel <$> expression))))
 
+structType :: Assignment
+structType = handleError $ makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many expression)
+
+fieldDeclaration :: Assignment
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional expression)
+  where
+        mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
+        mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 
 -- Type Declarations
 
@@ -191,9 +196,7 @@ mapTypeDeclaration = mkMap <$> symbol TypeSpec <*> children ((,) <$> typeLiteral
                          (makeTerm valueTypeLoc (Type.Annotation (makeTerm valueTypeLoc Syntax.Empty) (makeTerm valueTypeLoc (Syntax.Identifier valueTypeName))))
 
 structTypeDeclaration :: Assignment
-structTypeDeclaration = mkStruct <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> (symbol StructType *> children (many fieldDeclaration)))
-  where
-    mkStruct loc (name, fields) = makeTerm loc $ Type.Annotation (makeTerm loc (Declaration.Constructor name fields)) name
+structTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> structType)
 
 qualifiedTypeDeclaration :: Assignment
 qualifiedTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> qualifiedType)
@@ -236,12 +239,6 @@ constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> c
 
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
-
-fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional expression)
-  where
-        mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
-        mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 
 functionDeclaration :: Assignment
 functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> typedIdentifier <*> parameters <*> types <*> block)
