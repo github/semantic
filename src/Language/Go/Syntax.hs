@@ -62,29 +62,29 @@ assignment = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> man
 expression :: Assignment
 expression =  choice
           [ callExpression
+          , channelType
           , comment
           , constVarDeclaration
           , constVarSpecification
           , expressionList
           , fieldDeclaration
           , functionDeclaration
+          , identifier
           , importDeclaration
           , importSpec
-          , typedIdentifier
+          , interpretedStringLiteral
+          , intLiteral
           , methodDeclaration
           , methodSpec
           , packageClause
           , parameterDeclaration
+          , rawStringLiteral
+          , sliceType
           , structType
           , typeDeclaration
           , typeIdentifier
-          , channelType
-          , identifier
-          , interpretedStringLiteral
-          , intLiteral
+          , typedIdentifier
           , typeLiteral
-          , rawStringLiteral
-          , structType
           ]
 
 identifiers :: Assignment
