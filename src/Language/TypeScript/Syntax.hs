@@ -17,7 +17,7 @@ import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Maybe (catMaybes)
-import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize)
+import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -816,7 +816,7 @@ class' = makeClass <$> symbol Class <*> children ((,,,) <$> identifier <*> ((sym
   where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
 
 object :: Assignment
-object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
+object = (makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (postContextualize comment (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))))
 
 array :: Assignment
 array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many (expression <|> spreadElement))
