@@ -22,7 +22,7 @@ data AlgorithmF term diff result where
   Linear :: term ann1 -> term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
   RWS :: [term ann1] -> [term ann2] -> AlgorithmF term (diff ann1 ann2) [diff ann1 ann2]
-  -- | Delete a term..
+  -- | Delete a term.
   Delete :: term ann1 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
   -- | Insert a term.
   Insert :: term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
