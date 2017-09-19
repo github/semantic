@@ -46,6 +46,9 @@ type Syntax =
    , Syntax.Program
    , Type.Annotation
    , Type.Array
+   , Type.BiDirectionalChannel
+   , Type.ReceiveChannel
+   , Type.SendChannel
    , []
    ]
 
@@ -159,9 +162,12 @@ arrayType = handleError $ makeTerm <$> symbol ArrayType <*> children (Type.Array
 -- Type Declarations
 
 channelTypeDeclaration :: Assignment
-channelTypeDeclaration = mkChannel <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> channelType)
+channelTypeDeclaration = symbol TypeSpec >>= mkChannelTypeDeclaration
   where
-    mkChannel loc (name, channel) = makeTerm loc $ Type.Annotation channel name
+    mkChannelTypeDeclaration loc = children (typeIdentifier >>= mkChannelType loc)
+    mkChannelType loc channelName = symbol ChannelType *> children ( (token AnonChan *> token AnonLAngleMinus *> (makeTerm loc <$> (Type.SendChannel channelName <$> typeIdentifier)))
+                                                                  <|> (token AnonLAngleMinus *> token AnonChan *> (makeTerm loc <$> (Type.ReceiveChannel channelName <$> typeIdentifier)))
+                                                                  <|> (token AnonChan *> (makeTerm loc <$> (Type.BiDirectionalChannel channelName <$> typeIdentifier))))
 
 interfaceTypeDeclaration :: Assignment
 interfaceTypeDeclaration = mkInterface <$> symbol TypeSpec <*> children ((,) <$> typeLiteral <*> interfaceType)
