@@ -118,6 +118,18 @@ class Diffable f where
                  -> Algorithm term (diff ann1 ann2) (f (diff ann1 ann2))
   algorithmFor = genericAlgorithmFor
 
+  subalgorithmFor :: (a -> Algorithm term (diff ann1 ann2) b)
+                  -> (a -> Algorithm term (diff ann1 ann2) b)
+                  -> f a
+                  -> Algorithm term (diff ann1 ann2) (f b)
+  default
+    subalgorithmFor :: Traversable f
+                    => (a -> Algorithm term (diff ann1 ann2) b)
+                    -> (a -> Algorithm term (diff ann1 ann2) b)
+                    -> f a
+                    -> Algorithm term (diff ann1 ann2) (f b)
+  subalgorithmFor _ _ _ = empty
+
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Algorithm term (diff ann1 ann2) (f (diff ann1 ann2))
 genericAlgorithmFor a b = to1 <$> galgorithmFor (from1 a) (from1 b)
 
@@ -128,6 +140,8 @@ genericAlgorithmFor a b = to1 <$> galgorithmFor (from1 a) (from1 b)
 -- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
 instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
+
+  subalgorithmFor blur focus = apply' (Proxy :: Proxy Diffable) (\ inj f1 -> inj <$> subalgorithmFor blur focus f1)
 
 -- | Diff two 'Maybe's.
 instance Diffable Maybe where
