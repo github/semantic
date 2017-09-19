@@ -31,3 +31,9 @@ data BiDirectionalChannel a = BiDirectionalChannel { biDirectionalChannelName ::
 instance Eq1 BiDirectionalChannel where liftEq = genericLiftEq
 instance Show1 BiDirectionalChannel where liftShowsPrec = genericLiftShowsPrec
 
+data ReceiveChannel a = ReceiveChannel { receiveChannelName :: a, receiveChannelElementType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ReceiveChannel where liftEq = genericLiftEq
+instance Show1 ReceiveChannel where liftShowsPrec = genericLiftShowsPrec
+
