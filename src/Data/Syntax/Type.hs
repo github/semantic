@@ -31,6 +31,12 @@ newtype BiDirectionalChannel a = BiDirectionalChannel { biDirectionalChannelElem
 instance Eq1 BiDirectionalChannel where liftEq = genericLiftEq
 instance Show1 BiDirectionalChannel where liftShowsPrec = genericLiftShowsPrec
 
+newtype Interface a = Interface { interfaceElements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Interface where liftEq = genericLiftEq
+instance Show1 Interface where liftShowsPrec = genericLiftShowsPrec
+
 newtype ReceiveChannel a = ReceiveChannel { receiveChannelElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
