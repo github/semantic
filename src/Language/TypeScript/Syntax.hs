@@ -171,6 +171,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.Await
   , Language.TypeScript.Syntax.PublicFieldDefinition
   , Language.TypeScript.Syntax.VariableDeclaration
+  , Language.TypeScript.Syntax.ComputedPropertyName
   , Type.Visibility
   , []
   ]
@@ -268,6 +269,12 @@ data Annotation a = Annotation { typeAnnotation :: !a }
 
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
+
+data ComputedPropertyName a = ComputedPropertyName !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ComputedPropertyName where liftEq = genericLiftEq
+instance Show1 ComputedPropertyName where liftShowsPrec = genericLiftShowsPrec
 
 data Constraint a = Constraint { constraintType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -1107,7 +1114,10 @@ propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <
   where makePropertySignature loc (modifier, readonly, propertyName, annotation) = makeTerm loc (Language.TypeScript.Syntax.PropertySignature [modifier, readonly, annotation] propertyName)
 
 propertyName :: Assignment
-propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)) <|> string <|> number
+propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)) <|> string <|> number <|> computedPropertyName
+
+computedPropertyName :: Assignment
+computedPropertyName = makeTerm <$> symbol Grammar.ComputedPropertyName <*> (Language.TypeScript.Syntax.ComputedPropertyName <$> expression)
 
 assignmentPattern :: Assignment
 assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Statement.Assignment [] <$> shorthandPropertyIdentifier <*> expression)
