@@ -47,6 +47,7 @@ type Syntax =
    , Type.Annotation
    , Type.Array
    , Type.BiDirectionalChannel
+   , Type.Function
    , Type.Interface
    , Type.Map
    , Type.Pointer
@@ -72,6 +73,7 @@ expression =  choice
           , expressionList
           , fieldDeclaration
           , functionDeclaration
+          , functionType
           , identifier
           , importDeclaration
           , importSpec
@@ -159,6 +161,11 @@ qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.Membe
 arrayType :: Assignment
 arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> intLiteral <*> typeLiteral)
 
+functionType :: Assignment
+functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> parameters <*> returnType)
+  where parameters = symbol Parameters *> children (many expression)
+        returnType = symbol Parameters *> children expressions <|> expression <|> emptyTerm
+
 sliceType :: Assignment
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> typeLiteral)
 
@@ -191,6 +198,9 @@ fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> ch
 channelTypeDeclaration :: Assignment
 channelTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> channelType)
 
+functionTypeDeclaration :: Assignment
+functionTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> functionType)
+
 interfaceTypeDeclaration :: Assignment
 interfaceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> interfaceType)
 
@@ -215,6 +225,7 @@ pointerTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotat
 typeDeclaration :: Assignment
 typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many ( arrayTypeDeclaration
                                                                                       <|> channelTypeDeclaration
+                                                                                      <|> functionTypeDeclaration
                                                                                       <|> interfaceTypeDeclaration
                                                                                       <|> qualifiedTypeDeclaration
                                                                                       <|> pointerTypeDeclaration
