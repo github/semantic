@@ -13,6 +13,12 @@ data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
+data Function a = Function { functionParameters :: [a], functionReturn :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Function where liftEq = genericLiftEq
+instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
+
 newtype Product a = Product { productElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
