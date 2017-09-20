@@ -816,10 +816,10 @@ class' = makeClass <$> symbol Class <*> children ((,,,) <$> identifier <*> ((sym
   where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
 
 object :: Assignment
-object = (makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (postContextualize comment (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))))
+object = (makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (term ((pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier)))))
 
 array :: Assignment
-array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many (expression <|> spreadElement))
+array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many (term (expression <|> spreadElement)))
 
 jsxElement :: Assignment
 jsxElement = makeTerm <$> symbol Grammar.JsxElement <*> children (Language.TypeScript.Syntax.JsxElement <$> jsxOpeningElement' <*> many (jsxElement <|> jsxSelfClosingElement <|> jsxExpression' <|> jsxText) <*> jsxClosingElement')
