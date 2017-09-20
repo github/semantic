@@ -3,20 +3,17 @@
     (Float)
     (
       (Pattern
-        (
-          (Float))
-        (
-          (ExpressionStatement
-            (Float))))
-      (Pattern
-        (
-          (Float))
+        (Float)
         (
           (ExpressionStatement
             (Float))))
       (Pattern
+        (Float)
         (
-          (Float))
+          (ExpressionStatement
+            (Float))))
+      (Pattern
+        (Float)
         (
           (ExpressionStatement
             (Float))))))

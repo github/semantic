@@ -4,21 +4,18 @@
   ->(Float) }
     (
       (Pattern
-        (
-          (Float))
+        (Float)
         (
           (ExpressionStatement
             (Float))))
       (Pattern
-        (
-          (Float))
+        (Float)
         (
           (ExpressionStatement
           { (Float)
           ->(Float) })))
       (Pattern
-        (
-          (Float))
+        (Float)
         (
           (ExpressionStatement
             (Float))))))
