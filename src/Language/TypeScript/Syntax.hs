@@ -1167,8 +1167,7 @@ switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> parenthesizedExpression <*> switchBody)
   where
     switchBody =  symbol SwitchBody *> children (makeTerm <$> location <*> many (term switchCase))
-    switchCase = makeTerm <$> symbol SwitchCase <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some expression) <*> (makeTerm <$> location <*> many statement))
-      <|> (makeTerm <$> symbol SwitchDefault <*> children (Statement.Pattern <$> emptyTerm <*> (makeTerm <$> location <*> many statement)))
+    switchCase = makeTerm <$> (symbol SwitchCase <|> symbol SwitchDefault) <*> children (Statement.Pattern <$> (expression <|> emptyTerm) <*> (makeTerm <$> location <*> many statement))
 
 subscriptExpression :: Assignment
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> expression <*> (pure <$> expression))
