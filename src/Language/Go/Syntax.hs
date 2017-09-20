@@ -92,7 +92,6 @@ expression =  choice
           , typeDeclaration
           , typeIdentifier
           , typedIdentifier
-          , typeLiteral
           ]
 
 identifiers :: Assignment
@@ -136,30 +135,13 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 
--- interfaceType
--- sliceType
--- mapType
--- channelType
--- functionType
--- TODO Extract individual Annotation assignments
-typeLiteral :: Assignment
-typeLiteral =
-      mk InterfaceType
-  <|> mk TypeIdentifier
-  <|> mk ParenthesizedType
-  <|> mk SliceType
-  <|> qualifiedType
-  <|> arrayType
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
-
-
 -- Primitive Types
 
 qualifiedType :: Assignment
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> identifier <*> typeLiteral)
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> expression)
 
 arrayType :: Assignment
-arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> intLiteral <*> typeLiteral)
+arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> expression <*> expression)
 
 functionType :: Assignment
 functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> parameters <*> returnType)
@@ -167,7 +149,7 @@ functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> 
         returnType = symbol Parameters *> children expressions <|> expression <|> emptyTerm
 
 sliceType :: Assignment
-sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> typeLiteral)
+sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
 
 channelType :: Assignment
 channelType = handleError
@@ -188,7 +170,7 @@ pointerType :: Assignment
 pointerType = handleError $ makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> typeLiteral <*> optional expression)
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> expression <*> optional expression)
   where
         mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
         mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
@@ -208,19 +190,19 @@ mapTypeDeclaration :: Assignment
 mapTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> mapType)
 
 structTypeDeclaration :: Assignment
-structTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> structType)
+structTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> structType)
 
 qualifiedTypeDeclaration :: Assignment
-qualifiedTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> qualifiedType)
+qualifiedTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> qualifiedType)
 
 arrayTypeDeclaration :: Assignment
-arrayTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> arrayType)
+arrayTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> arrayType)
 
 sliceTypeDeclaration :: Assignment
-sliceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> sliceType)
+sliceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> sliceType)
 
 pointerTypeDeclaration :: Assignment
-pointerTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeLiteral <*> pointerType)
+pointerTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> pointerType)
 
 typeDeclaration :: Assignment
 typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many ( arrayTypeDeclaration
@@ -252,7 +234,7 @@ constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> c
     where
       annotatedLHS = makeTerm <$> location <*> (Type.Annotation
                                               <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier))))
-                                              <*> typeLiteral)
+                                              <*> expression)
 
 expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
@@ -270,13 +252,13 @@ importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
 
 methodDeclaration :: Assignment
-methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> typeLiteral <*> block)
+methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> expression <*> block)
   where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many typedIdentifier))
         receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children typedIdentifier)
         mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method receiver' name' parameters' body')) type'')
 
 methodSpec :: Assignment
-methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (typeLiteral <|> parameters <|> emptyTerm) <*> empty)
+methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (expression <|> parameters <|> emptyTerm) <*> empty)
   where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
         empty = makeTerm <$> location <*> pure Syntax.Empty
         mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
