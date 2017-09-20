@@ -645,7 +645,7 @@ term :: Assignment -> Assignment
 term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 expression :: Assignment
-expression = everything
+expression = term (handleError everything)
   where
     everything = choice [
       typeAssertion,
