@@ -56,7 +56,7 @@ readFromHandle h = do
   input <- liftIO $ BL.hGetContents h
   case decode input of
     Just d -> pure d
-    Nothing -> liftIO $ die ("invalid input on " <> show h <> ", expecting JSON")
+    Nothing -> liftIO $ fail ("invalid input on " <> show h <> ", expecting JSON")
 
 toBlob :: Blob -> Blob.Blob
 toBlob Blob{..} = Blob.sourceBlob path language' (fromText content)
