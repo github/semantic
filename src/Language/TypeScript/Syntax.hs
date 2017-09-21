@@ -147,7 +147,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.RequiredParameter
   , Language.TypeScript.Syntax.RestParameter
   , Language.TypeScript.Syntax.PropertySignature
-  , Language.TypeScript.Syntax.ExpressionStatement
   , Language.TypeScript.Syntax.ImportExportSpecifier
   , Language.TypeScript.Syntax.ExportClause
   , Language.TypeScript.Syntax.Export
@@ -1051,7 +1050,7 @@ debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (Language.TypeScript.Syntax.Debugger <$ source)
 
 expressionStatement' :: Assignment
-expressionStatement' = makeTerm <$> symbol Grammar.ExpressionStatement *> children (expression <|> sequenceExpression)
+expressionStatement' = symbol ExpressionStatement *> children (expression <|> sequenceExpression)
 
 declaration :: Assignment
 declaration = everything
