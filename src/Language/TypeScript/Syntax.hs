@@ -264,7 +264,7 @@ data Cast a =  Cast { castSubject :: !a, castType :: !a }
 instance Eq1 Cast where liftEq = genericLiftEq
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
-data Annotation a = Annotation { typeAnnotation :: !a }
+data Annotation a = Annotation { annotationType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Annotation where liftEq = genericLiftEq
