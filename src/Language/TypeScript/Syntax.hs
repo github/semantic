@@ -481,12 +481,6 @@ data Debugger a = Debugger
 instance Eq1 Debugger where liftEq = genericLiftEq
 instance Show1 Debugger where liftShowsPrec = genericLiftShowsPrec
 
-data ExpressionStatement a = ExpressionStatement { expressionStatement :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 ExpressionStatement where liftEq = genericLiftEq
-instance Show1 ExpressionStatement where liftShowsPrec = genericLiftShowsPrec
-
 data ForOf a = ForOf { forOfBinding :: !a, forOfSubject :: !a, forOfBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -1057,7 +1051,7 @@ debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (Language.TypeScript.Syntax.Debugger <$ source)
 
 expressionStatement' :: Assignment
-expressionStatement' = makeTerm <$> symbol Grammar.ExpressionStatement <*> children (Language.TypeScript.Syntax.ExpressionStatement <$> (expression <|> sequenceExpression))
+expressionStatement' = makeTerm <$> symbol Grammar.ExpressionStatement *> children (expression <|> sequenceExpression)
 
 declaration :: Assignment
 declaration = everything
