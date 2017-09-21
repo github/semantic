@@ -1,21 +1,18 @@
 (Program
   (For
-    (ExpressionStatement
-      (And
-        (Member
-          (Identifier)
-          (Identifier))
-        (Assignment
-          (Identifier)
-          (Float))))
-    (ExpressionStatement
-      (LessThan
+    (And
+      (Member
         (Identifier)
-        (Identifier)))
+        (Identifier))
+      (Assignment
+        (Identifier)
+        (Float)))
+    (LessThan
+      (Identifier)
+      (Identifier))
     (Update
       (Identifier))
     (
-      (ExpressionStatement
-        (Call
-          (Identifier)
-          (Empty))))))
+      (Call
+        (Identifier)
+        (Empty)))))

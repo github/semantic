@@ -1,8 +1,7 @@
 (Program
-  (ExpressionStatement
-    (Call
-      (Identifier)
-      (Identifier)
-    { (TextElement)
-    ->(TextElement) }
-      (Empty))))
+  (Call
+    (Identifier)
+    (Identifier)
+  {+(TextElement)+}
+  {-(TextElement)-}
+    (Empty)))

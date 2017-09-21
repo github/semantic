@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (Subscript
-      (Identifier)
-    { (TextElement)
-    ->(TextElement) })))
+  (Subscript
+    (Identifier)
+  {+(TextElement)+}
+  {-(TextElement)-}))

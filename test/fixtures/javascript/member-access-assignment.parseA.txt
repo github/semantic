@@ -1,7 +1,6 @@
 (Program
-  (ExpressionStatement
-    (Assignment
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (Float))))
+  (Assignment
+    (MemberAccess
+      (Identifier)
+      (Identifier))
+    (Float)))

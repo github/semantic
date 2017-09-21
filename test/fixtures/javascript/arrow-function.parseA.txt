@@ -1,21 +1,20 @@
 (Program
-  (ExpressionStatement
-    (Function
+  (Function
+    (Empty)
+    (Empty)
+    (Empty)
+    (RequiredParameter
       (Empty)
       (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (RequiredParameter
       (Empty)
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))))
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
+      (Return
+        (Identifier)))))

@@ -1,5 +1,4 @@
 (Program
-{+(ExpressionStatement
-  {+(Null)+})+}
+{+(Null)+}
 {-(Return
   {-(Null)-})-})

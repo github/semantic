@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (RShift
-      (Identifier)
-    { (Identifier)
-    ->(Identifier) })))
+  (RShift
+    (Identifier)
+  { (Identifier)
+  ->(Identifier) }))

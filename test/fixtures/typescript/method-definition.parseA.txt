@@ -1,13 +1,12 @@
 (Program
-  (ExpressionStatement
-    (Class
+  (Class
+    (Identifier)
+    (Method
       (Identifier)
-      (Method
-        (Identifier)
-        (Empty)
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Empty)
-        (Identifier)
-        ([])))))
+      (Empty)
+      (Empty)
+      (Annotation
+        (TypeIdentifier))
+      (Empty)
+      (Identifier)
+      ([]))))

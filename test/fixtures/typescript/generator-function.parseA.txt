@@ -16,10 +16,8 @@
         (Identifier)
         (Empty)))
     (
-      (ExpressionStatement
-        (Yield
-          (Empty)))
-      (ExpressionStatement
-        (Yield
-          (Identifier)))))
+      (Yield
+        (Empty))
+      (Yield
+        (Identifier))))
   (Empty))

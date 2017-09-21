@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatement
-    (Cast
-      (Identifier)
-      (PredefinedType))))
+  (Cast
+    (Identifier)
+    (PredefinedType)))

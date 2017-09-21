@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatement
-    (Assignment
-      (Identifier)
-      (Float))))
+  (Assignment
+    (Identifier)
+    (Float)))

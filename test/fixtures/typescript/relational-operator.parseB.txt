@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatement
-    (LessThanEqual
-      (Identifier)
-      (Identifier))))
+  (LessThanEqual
+    (Identifier)
+    (Identifier)))

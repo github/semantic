@@ -2,10 +2,9 @@
   (DoWhile
     (Boolean)
     (
-      (ExpressionStatement
-        (Call
-          (MemberAccess
-            (Identifier)
-            (Identifier))
+      (Call
+        (MemberAccess
           (Identifier)
-          (Empty))))))
+          (Identifier))
+        (Identifier)
+        (Empty)))))

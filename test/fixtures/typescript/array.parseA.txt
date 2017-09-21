@@ -1,4 +1,3 @@
 (Program
-  (ExpressionStatement
-    (Array
-      (TextElement))))
+  (Array
+    (TextElement)))

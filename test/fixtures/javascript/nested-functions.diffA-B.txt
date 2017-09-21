@@ -1,53 +1,49 @@
 (Program
-  (ExpressionStatement
-    (Function
+  (Function
+    (Empty)
+    (Empty)
+    (Identifier)
+    (RequiredParameter
       (Empty)
       (Empty)
-      (Identifier)
-      (RequiredParameter
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
+      (Function
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (ExpressionStatement
-          (Function
-            (Empty)
-            (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
             (Identifier)
-            (RequiredParameter
-              (Empty)
-              (Empty)
-              (Assignment
-                (Identifier)
-                (Empty)))
-            (RequiredParameter
-              (Empty)
-              (Empty)
-              (Assignment
-                (Identifier)
-                (Empty)))
-            (
-              (ExpressionStatement
-                (Call
-                  (MemberAccess
-                    (Identifier)
-                    (Identifier))
-                { (Identifier)
-                ->(Identifier) }
-                  (Empty)))
-              (ExpressionStatement
-                (Call
-                  (MemberAccess
-                    (Identifier)
-                    (Identifier))
-                { (Identifier)
-                ->(Identifier) }
-                  (Empty))))))))))
+            (Empty)))
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Call
+            (MemberAccess
+              (Identifier)
+              (Identifier))
+          {+(Identifier)+}
+          {-(Identifier)-}
+            (Empty))
+          (Call
+            (MemberAccess
+              (Identifier)
+              (Identifier))
+          {+(Identifier)+}
+          {-(Identifier)-}
+            (Empty)))))))

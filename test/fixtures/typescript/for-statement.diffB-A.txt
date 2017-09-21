@@ -1,23 +1,20 @@
 (Program
   (For
-    (ExpressionStatement
-      (SequenceExpression
-        (Assignment
-          (Identifier)
-          (Float))
-        (Call
-          (Identifier)
-          (Empty))))
-    (ExpressionStatement
-      (LessThan
+    (SequenceExpression
+      (Assignment
         (Identifier)
-      { (Float)
-      ->(Float) }))
+        (Float))
+      (Call
+        (Identifier)
+        (Empty)))
+    (LessThan
+      (Identifier)
+    { (Float)
+    ->(Float) })
     (Update
       (Identifier))
     (
-      (ExpressionStatement
-        (Call
-          (Identifier)
-          (Identifier)
-          (Empty))))))
+      (Call
+        (Identifier)
+        (Identifier)
+        (Empty)))))

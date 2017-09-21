@@ -1,7 +1,6 @@
 (Program
-  (ExpressionStatement
-    (Assignment
-      (Subscript
-        (Identifier)
-        (TextElement))
-      (Float))))
+  (Assignment
+    (Subscript
+      (Identifier)
+      (TextElement))
+    (Float)))

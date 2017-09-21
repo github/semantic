@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatement
-    (MemberAccess
-      (Identifier)
-      (Identifier))))
+  (MemberAccess
+    (Identifier)
+    (Identifier)))

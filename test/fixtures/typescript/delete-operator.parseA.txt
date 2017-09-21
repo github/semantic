@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (Delete
-      (Subscript
-        (Identifier)
-        (TextElement)))))
+  (Delete
+    (Subscript
+      (Identifier)
+      (TextElement))))

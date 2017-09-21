@@ -1,3 +1,2 @@
 (Program
-  (ExpressionStatement
-    (This)))
+  (This))

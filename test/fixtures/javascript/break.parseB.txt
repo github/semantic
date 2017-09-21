@@ -1,13 +1,11 @@
 (Program
   (For
-    (ExpressionStatement
-      (Assignment
-        (Identifier)
-        (Float)))
-    (ExpressionStatement
-      (LessThan
-        (Identifier)
-        (Float)))
+    (Assignment
+      (Identifier)
+      (Float))
+    (LessThan
+      (Identifier)
+      (Float))
     (Update
       (Identifier))
     (
@@ -20,5 +18,4 @@
             (Empty)))
         (Empty))
       (Empty)
-      (ExpressionStatement
-        (Identifier)))))
+      (Identifier))))

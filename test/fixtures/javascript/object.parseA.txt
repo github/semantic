@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (Hash
-      (KeyValue
-        (TextElement)
-        (TextElement)))))
+  (Hash
+    (KeyValue
+      (TextElement)
+      (TextElement))))

@@ -1,13 +1,12 @@
 (Program
-  (ExpressionStatement
-    (Minus
-      (Plus
-        (Identifier)
-        (Times
-          (Identifier)
-        { (Float)
-        ->(Float) }))
-      (Modulo
+  (Minus
+    (Plus
+      (Identifier)
+      (Times
         (Identifier)
       { (Float)
-      ->(Float) }))))
+      ->(Float) }))
+    (Modulo
+      (Identifier)
+    { (Float)
+    ->(Float) })))

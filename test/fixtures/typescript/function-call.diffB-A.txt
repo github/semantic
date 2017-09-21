@@ -1,10 +1,9 @@
 (Program
-  (ExpressionStatement
-    (Call
-    { (TypeIdentifier)
-    ->(TypeIdentifier) }
-      (Identifier)
-      (Identifier)
-    { (TextElement)
-    ->(TextElement) }
-      (Empty))))
+  (Call
+  {+(TypeIdentifier)+}
+  {-(TypeIdentifier)-}
+    (Identifier)
+    (Identifier)
+  {+(TextElement)+}
+  {-(TextElement)-}
+    (Empty)))

@@ -1,11 +1,10 @@
 (Program
-  (ExpressionStatement
-    (Minus
-      (Plus
+  (Minus
+    (Plus
+      (Identifier)
+      (Times
         (Identifier)
-        (Times
-          (Identifier)
-          (Float)))
-      (Modulo
-        (Identifier)
-        (Float)))))
+        (Float)))
+    (Modulo
+      (Identifier)
+      (Float))))

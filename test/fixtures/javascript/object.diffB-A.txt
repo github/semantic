@@ -1,12 +1,11 @@
 (Program
-  (ExpressionStatement
-    (Hash
-      (KeyValue
-        (TextElement)
-        (TextElement))
-    {-(KeyValue
-      {-(TextElement)-}
-      {-(TextElement)-})-}
-    {-(KeyValue
-      {-(TextElement)-}
-      {-(TextElement)-})-})))
+  (Hash
+    (KeyValue
+      (TextElement)
+      (TextElement))
+  {-(KeyValue
+    {-(TextElement)-}
+    {-(TextElement)-})-}
+  {-(KeyValue
+    {-(TextElement)-}
+    {-(TextElement)-})-}))

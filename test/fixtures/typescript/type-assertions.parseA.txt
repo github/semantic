@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (TypeAssertion
-      (TypeArguments
-        (PredefinedType))
-      (Identifier))))
+  (TypeAssertion
+    (TypeArguments
+      (PredefinedType))
+    (Identifier)))

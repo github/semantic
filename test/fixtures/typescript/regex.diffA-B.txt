@@ -1,4 +1,3 @@
 (Program
-  (ExpressionStatement
-  { (Regex)
-  ->(Regex) }))
+{+(Regex)+}
+{-(Regex)-})

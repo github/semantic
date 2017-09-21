@@ -4,11 +4,9 @@
       (Identifier)
       (Identifier))
     (
-      (ExpressionStatement
-        (Call
-          (Identifier)
-          (Identifier)
-          (Empty)))
-      (ExpressionStatement
-        (Identifier)))
+      (Call
+        (Identifier)
+        (Identifier)
+        (Empty))
+      (Identifier))
     (Empty)))

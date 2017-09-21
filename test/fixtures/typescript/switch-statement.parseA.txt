@@ -5,16 +5,13 @@
       (Pattern
         (Float)
         (
-          (ExpressionStatement
-            (Float))))
+          (Float)))
       (Pattern
         (Float)
         (
-          (ExpressionStatement
-            (Float))))
+          (Float)))
       (Pattern
         (Float)
         (
-          (ExpressionStatement
-            (Float))))))
+          (Float)))))
   (Empty))

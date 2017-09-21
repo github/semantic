@@ -1,44 +1,42 @@
 (Program
-  (ExpressionStatement
-    (Call
-      (Identifier)
-      (Float)
-    { (TextElement)
-    ->(TextElement) }
-      (Function
+  (Call
+    (Identifier)
+    (Float)
+  {+(TextElement)+}
+  {-(TextElement)-}
+    (Function
+      (Empty)
+      (Empty)
+      (Empty)
+    {-(RequiredParameter
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+      (RequiredParameter
         (Empty)
         (Empty)
-        (Empty)
-      {-(RequiredParameter
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Assignment
-          {-(Identifier)-}
-          {-(Empty)-})-})-}
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
+        (Assignment
+          (Identifier)
+          (Empty)))
+    {+(RequiredParameter
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Assignment
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
+      (
+        (Call
+          (MemberAccess
             (Identifier)
-            (Empty)))
-      {+(RequiredParameter
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Assignment
-          {+(Identifier)+}
-          {+(Empty)+})+})+}
-        (
-          (ExpressionStatement
-            (Call
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-            { (Identifier)
-            ->(Identifier) }
-              (Empty)))
-          (Return
-          { (Identifier)
-          ->(Identifier) })))
-    { (Boolean)
-    ->(Boolean) }
-      (Empty))))
+            (Identifier))
+        {+(Identifier)+}
+        {-(Identifier)-}
+          (Empty))
+        (Return
+        { (Identifier)
+        ->(Identifier) })))
+  {+(Boolean)+}
+  {-(Boolean)-}
+    (Empty)))

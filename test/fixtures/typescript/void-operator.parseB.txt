@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (Void
-      (Call
-        (Identifier)
-        (Empty)))))
+  (Void
+    (Call
+      (Identifier)
+      (Empty))))

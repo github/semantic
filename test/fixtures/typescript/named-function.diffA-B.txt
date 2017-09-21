@@ -17,8 +17,7 @@
       {-(Identifier)-}
       {-(Empty)-})-})-}
     (
-    { (ExpressionStatement
-      {-(Identifier)-})
+    { (Identifier)
     ->(Return
       {+(Boolean)+}) }))
   (Empty))

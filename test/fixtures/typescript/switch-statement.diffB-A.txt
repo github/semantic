@@ -6,17 +6,14 @@
       (Pattern
         (Float)
         (
-          (ExpressionStatement
-            (Float))))
+          (Float)))
       (Pattern
         (Float)
         (
-          (ExpressionStatement
-          { (Float)
-          ->(Float) })))
+        { (Float)
+        ->(Float) }))
       (Pattern
         (Float)
         (
-          (ExpressionStatement
-            (Float))))))
+          (Float)))))
   (Empty))

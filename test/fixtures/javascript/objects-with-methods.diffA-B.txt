@@ -1,31 +1,30 @@
 (Program
-  (ExpressionStatement
-    (Hash
-      (Method
+  (Hash
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+    { (Identifier)
+    ->(Identifier) }
+      (RequiredParameter
         (Empty)
         (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (RequiredParameter
         (Empty)
         (Empty)
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
-            (Identifier)
-            (Empty)))
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
-            (Identifier)
-            (Empty)))
-        (
-          (Return
-          { (Plus
-            {-(Identifier)-}
-            {-(Identifier)-})
-          ->(Minus
-            {+(Identifier)+}
-            {+(Identifier)+}) }))))))
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
+        (Return
+        { (Plus
+          {-(Identifier)-}
+          {-(Identifier)-})
+        ->(Minus
+          {+(Identifier)+}
+          {+(Identifier)+}) })))))

@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (If
-      (Identifier)
-      (Identifier)
-      (Identifier))))
+  (If
+    (Identifier)
+    (Identifier)
+    (Identifier)))

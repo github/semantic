@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatement
-    (Subscript
-      (Identifier)
-    { (Identifier)
-    ->(Identifier) })))
+  (Subscript
+    (Identifier)
+  {+(Identifier)+}
+  {-(Identifier)-}))

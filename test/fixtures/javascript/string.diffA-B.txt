@@ -1,4 +1,3 @@
 (Program
-  (ExpressionStatement
-  { (TextElement)
-  ->(TextElement) }))
+{+(TextElement)+}
+{-(TextElement)-})

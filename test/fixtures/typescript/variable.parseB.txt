@@ -1,3 +1,2 @@
 (Program
-  (ExpressionStatement
-    (Identifier)))
+  (Identifier))

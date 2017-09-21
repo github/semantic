@@ -1,9 +1,8 @@
 (Program
-  (ExpressionStatement
-    (Call
-      (MemberAccess
-        (Identifier)
-        (Identifier))
+  (Call
+    (MemberAccess
       (Identifier)
-      (TextElement)
-      (Empty))))
+      (Identifier))
+    (Identifier)
+    (TextElement)
+    (Empty)))

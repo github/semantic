@@ -1,21 +1,20 @@
 (Program
-  (ExpressionStatement
-  { (SequenceExpression
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Float)-})-}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Float)-})-})
-  ->(Assignment
-    {+(Identifier)+}
-    {+(Hash
-      {+(KeyValue
-        {+(Identifier)+}
+{+(Assignment
+  {+(Identifier)+}
+  {+(Hash
+    {+(KeyValue
+      {+(Identifier)+}
+      {+(SequenceExpression
+        {+(Float)+}
         {+(SequenceExpression
-          {+(Float)+}
-          {+(SequenceExpression
-            {+(Plus
-              {+(Float)+}
-              {+(Float)+})+}
-            {+(Float)+})+})+})+})+}) }))
+          {+(Plus
+            {+(Float)+}
+            {+(Float)+})+}
+          {+(Float)+})+})+})+})+})+}
+{-(SequenceExpression
+  {-(Assignment
+    {-(Identifier)-}
+    {-(Float)-})-}
+  {-(Assignment
+    {-(Identifier)-}
+    {-(Float)-})-})-})

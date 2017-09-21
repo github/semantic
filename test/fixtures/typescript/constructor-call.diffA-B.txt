@@ -1,11 +1,10 @@
 (Program
-  (ExpressionStatement
-    (New
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Float)
-      {+(TextElement)+}
-      {-(TextElement)-}
-        (Empty)))))
+  (New
+    (Call
+      (MemberAccess
+        (Identifier)
+        (Identifier))
+      (Float)
+    { (TextElement)
+    ->(TextElement) }
+      (Empty))))

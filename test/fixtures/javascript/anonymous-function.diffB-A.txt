@@ -1,28 +1,26 @@
 (Program
-  (ExpressionStatement
-    (Function
+  (Function
+    (Empty)
+    (Empty)
+    (Empty)
+    (RequiredParameter
       (Empty)
       (Empty)
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))
+    (RequiredParameter
       (Empty)
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Assignment
-        { (Identifier)
-        ->(Identifier) }
-          (Empty)))
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Assignment
-        { (Identifier)
-        ->(Identifier) }
-          (Empty)))
-      (
-        (Return
-        { (Times
-          {-(Identifier)-}
-          {-(Identifier)-})
-        ->(Plus
-          {+(Identifier)+}
-          {+(Identifier)+}) })))))
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
+      (Return
+      { (Times
+        {-(Identifier)-}
+        {-(Identifier)-})
+      ->(Plus
+        {+(Identifier)+}
+        {+(Identifier)+}) }))))

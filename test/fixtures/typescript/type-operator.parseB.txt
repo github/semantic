@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatement
-    (InstanceOf
-      (Identifier)
-      (Identifier))))
+  (InstanceOf
+    (Identifier)
+    (Identifier)))

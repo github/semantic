@@ -17,6 +17,5 @@
         (Identifier)
         (Empty)))
     (
-      (ExpressionStatement
-        (Identifier))))
+      (Identifier)))
   (Empty))

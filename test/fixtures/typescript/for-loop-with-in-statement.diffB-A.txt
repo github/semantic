@@ -1,23 +1,20 @@
 (Program
   (For
-    (ExpressionStatement
-      (And
-        (Member
-        { (Identifier)
-        ->(Identifier) }
-          (Identifier))
-        (Assignment
-          (Identifier)
-          (Float))))
-    (ExpressionStatement
-      (LessThan
+    (And
+      (Member
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier))
+      (Assignment
         (Identifier)
-        (Identifier)))
+        (Float)))
+    (LessThan
+      (Identifier)
+      (Identifier))
     (Update
       (Identifier))
     (
-      (ExpressionStatement
-        (Call
-        { (Identifier)
-        ->(Identifier) }
-          (Empty))))))
+      (Call
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))))

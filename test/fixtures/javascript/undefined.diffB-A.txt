@@ -1,5 +1,4 @@
 (Program
-{+(ExpressionStatement
-  {+(Undefined)+})+}
+{+(Undefined)+}
 {-(Return
   {-(Undefined)-})-})

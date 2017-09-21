@@ -1,22 +1,21 @@
 (Program
-  (ExpressionStatement
-    (Call
-      (MemberAccess
-        (This)
-        (Identifier))
-      (Function
+  (Call
+    (MemberAccess
+      (This)
+      (Identifier))
+    (Function
+      (Empty)
+      (Empty)
+      (Empty)
+      (RequiredParameter
         (Empty)
         (Empty)
-        (Empty)
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
+        (Return
+          (MemberAccess
             (Identifier)
-            (Empty)))
-        (
-          (Return
-            (MemberAccess
-              (Identifier)
-              (Identifier)))))
-      (Empty))))
+            (Identifier)))))
+    (Empty)))

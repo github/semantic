@@ -1,7 +1,6 @@
 (Program
-  (ExpressionStatement
-    (Void
-      (Call
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))))
+  (Void
+    (Call
+    { (Identifier)
+    ->(Identifier) }
+      (Empty))))

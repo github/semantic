@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatement
-    (RShift
-      (Identifier)
-      (Identifier))))
+  (RShift
+    (Identifier)
+    (Identifier)))

@@ -1,8 +1,7 @@
 (Program
-  (ExpressionStatement
-  { (LessThan
-    {-(Identifier)-}
-    {-(Identifier)-})
-  ->(LessThanEqual
-    {+(Identifier)+}
-    {+(Identifier)+}) }))
+{+(LessThanEqual
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{-(LessThan
+  {-(Identifier)-}
+  {-(Identifier)-})-})

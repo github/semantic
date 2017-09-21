@@ -3,7 +3,6 @@
     (Identifier)
     (Identifier)
     (
-      (ExpressionStatement
-        (Call
-          (Identifier)
-          (Empty))))))
+      (Call
+        (Identifier)
+        (Empty)))))

@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatement
-    (Or
-      (Identifier)
-      (Identifier))))
+  (Or
+    (Identifier)
+    (Identifier)))

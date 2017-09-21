@@ -1,80 +1,60 @@
 (Program
-  (ExpressionStatement
-    (Class
-      (Identifier)
-    { (Method
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(RequiredParameter
-        {-(Empty)-}
-        {-(Empty)-}
-        {-(Assignment
-          {-(Identifier)-}
-          {-(Empty)-})-})-}
-      {-(
-        {-(Return
-          {-(Identifier)-})-})-})
-    ->(PublicFieldDefinition
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Float)+}) }
-      (Method
+  (Class
+    (Identifier)
+  {+(PublicFieldDefinition
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(Float)+})+}
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+    { (Identifier)
+    ->(Identifier) }
+      (RequiredParameter
         (Empty)
         (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
+        (Return
+          (Identifier))))
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+    { (Identifier)
+    ->(Identifier) }
+      (RequiredParameter
         (Empty)
         (Empty)
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
-          { (Identifier)
-          ->(Identifier) }
-            (Empty)))
-        (
-          (Return
-          { (Identifier)
-          ->(Identifier) })))
-      (Method
-        (Empty)
-        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
+        (Return
+          (Identifier))))
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+    { (Identifier)
+    ->(Identifier) }
+      (RequiredParameter
         (Empty)
         (Empty)
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Assignment
-          { (Identifier)
-          ->(Identifier) }
-            (Empty)))
-        (
-          (Return
-          { (Identifier)
-          ->(Identifier) })))
-    {+(Method
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(RequiredParameter
-        {+(Empty)+}
-        {+(Empty)+}
-        {+(Assignment
-          {+(Identifier)+}
-          {+(Empty)+})+})+}
-      {+(
-        {+(Return
-          {+(Identifier)+})+})+})+})))
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
+        (Return
+          (Identifier))))))

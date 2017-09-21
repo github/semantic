@@ -1,4 +1,3 @@
 (Program
-  (ExpressionStatement
-  { (Identifier)
-  ->(Identifier) }))
+{+(Identifier)+}
+{-(Identifier)-})

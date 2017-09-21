@@ -1,16 +1,15 @@
 (Program
-  (ExpressionStatement
-    (Class
+  (Class
+    (Identifier)
+    (Method
       (Identifier)
-      (Method
-        (Identifier)
-      {+(Readonly)+}
-        (Empty)
-      {+(Annotation
-        {+(PredefinedType)+})+}
-      {-(Empty)-}
-      {-(Annotation
-        {-(TypeIdentifier)-})-}
-        (Empty)
-        (Identifier)
-        ([])))))
+    {+(Readonly)+}
+      (Empty)
+    {+(Annotation
+      {+(PredefinedType)+})+}
+    {-(Empty)-}
+    {-(Annotation
+      {-(TypeIdentifier)-})-}
+      (Empty)
+      (Identifier)
+      ([]))))

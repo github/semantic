@@ -5,10 +5,9 @@
   { (Identifier)
   ->(Identifier) }
     (
-      (ExpressionStatement
-        (Call
-          (Identifier)
-        { (Identifier)
-        ->(Identifier) }
-          (Empty)))))
+      (Call
+        (Identifier)
+      {+(Identifier)+}
+      {-(Identifier)-}
+        (Empty))))
   (Empty))

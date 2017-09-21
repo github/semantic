@@ -1,14 +1,13 @@
 (Program
-  (ExpressionStatement
-    (Assignment
-      (Identifier)
-      (Hash
-        (KeyValue
-          (Identifier)
+  (Assignment
+    (Identifier)
+    (Hash
+      (KeyValue
+        (Identifier)
+        (SequenceExpression
+          (Float)
           (SequenceExpression
-            (Float)
-            (SequenceExpression
-              (Plus
-                (Float)
-                (Float))
-              (Float))))))))
+            (Plus
+              (Float)
+              (Float))
+            (Float)))))))
