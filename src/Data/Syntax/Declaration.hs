@@ -20,6 +20,7 @@ data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName
 
 instance Eq1 Method where liftEq = genericLiftEq
 instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
+
 data RequiredParameter a = RequiredParameter { requiredParameter :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
