@@ -171,7 +171,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.PublicFieldDefinition
   , Language.TypeScript.Syntax.VariableDeclaration
   , Language.TypeScript.Syntax.ComputedPropertyName
-  , Type.Visibility
   , []
   ]
 

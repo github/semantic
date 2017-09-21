@@ -18,11 +18,6 @@ newtype Product a = Product { productElements :: [a] }
 
 instance Eq1 Product where liftEq = genericLiftEq
 instance Show1 Product where liftShowsPrec = genericLiftShowsPrec
-data Visibility a = Visibility { visibilitySubject :: !a, visibilityType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Visibility where liftEq = genericLiftEq
-instance Show1 Visibility where liftShowsPrec = genericLiftShowsPrec
 
 data TypeParameters a = TypeParameters { typeParameters :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
