@@ -205,15 +205,15 @@ runParser Options{..} blob@Blob{..} = go
             logTiming "ts ast parse" $
               liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
           AssignmentParser parser assignment -> do
-            ast <- go parser `catchError` \ err -> writeLog Error "failed parsing" blobFields >> throwError err
+            ast <- go parser `catchError` \ err -> writeLog Error "failed parsing" (("tag", "parse") : blobFields) >> throwError err
             logTiming "assign" $ case Assignment.assign blobSource assignment ast of
               Left err -> do
                 let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
-                writeLog Error formatted blobFields
+                writeLog Error formatted (("tag" : "assign") : blobFields)
                 throwError (toException err)
               Right term -> do
                 for_ (errors term) $ \ err ->
-                  writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
+                  writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag" : "assign") : blobFields)
                 pure term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (cmarkParser blobSource)
