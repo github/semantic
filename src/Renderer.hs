@@ -42,6 +42,8 @@ data DiffRenderer output where
   PatchDiffRenderer :: DiffRenderer File
   -- | Compute a table of contents for the diff & encode it as JSON.
   ToCDiffRenderer :: DiffRenderer Summaries
+  -- | Compute a table of contents for the diff & encode it as JSON (uses the new Assignment parse tree parser).
+  ToCDiffRenderer' :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
