@@ -1,4 +1,0 @@
-resolver: nightly-2017-09-10
-packages:
-- c-storable-deriving-0.1.3
-- cmark-gfm-0.1.3
