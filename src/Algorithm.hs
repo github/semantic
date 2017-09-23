@@ -121,10 +121,11 @@ class Diffable f where
                  -> Algorithm syntax ann1 ann2 (f (Diff syntax ann1 ann2))
   algorithmFor = genericAlgorithmFor
 
-  subalgorithmFor :: (a -> Algorithm syntax ann1 ann2 b)
-                  -> (a -> Algorithm syntax ann1 ann2 b)
+  subalgorithmFor :: Alternative g
+                  => (a -> g b)
+                  -> (a -> g b)
                   -> f a
-                  -> Algorithm syntax ann1 ann2 (f b)
+                  -> g (f b)
   subalgorithmFor _ _ _ = empty
 
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (Term syntax ann1) -> f (Term syntax ann2) -> Algorithm syntax ann1 ann2 (f (Diff syntax ann1 ann2))
