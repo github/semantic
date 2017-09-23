@@ -19,7 +19,7 @@ data AlgorithmF syntax ann1 ann2 result where
   -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
   Diff :: Term syntax ann1 -> Term syntax ann2 -> AlgorithmF syntax ann1 ann2 (Diff syntax ann1 ann2)
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
-  Linear :: Term syntax ann1 -> Term syntax ann2 -> AlgorithmF syntax ann1 ann2 (Diff syntax ann1 ann2)
+  Linear :: syntax (Term syntax ann1) -> syntax (Term syntax ann2) -> AlgorithmF syntax ann1 ann2 (syntax (Diff syntax ann1 ann2))
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
   RWS :: [Term syntax ann1] -> [Term syntax ann2] -> AlgorithmF syntax ann1 ann2 [Diff syntax ann1 ann2]
   -- | Delete a term.
@@ -56,7 +56,7 @@ diffMaybe _        _        = pure Nothing
 
 -- | Diff two terms linearly.
 linearly :: Term syntax ann1 -> Term syntax ann2 -> Algorithm syntax ann1 ann2 (Diff syntax ann1 ann2)
-linearly a b = liftF (Linear a b)
+linearly (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> liftF (Linear f1 f2)
 
 -- | Diff two terms using RWS.
 byRWS :: [Term syntax ann1] -> [Term syntax ann2] -> Algorithm syntax ann1 ann2 [Diff syntax ann1 ann2]
@@ -78,7 +78,7 @@ byReplacing = (liftF .) . Replace
 instance (Show1 syntax, Show ann1, Show ann2) => Show1 (AlgorithmF syntax ann1 ann2) where
   liftShowsPrec sp _ d algorithm = case algorithm of
     Algorithm.Diff t1 t2 -> showsBinaryWith showsTerm showsTerm "Diff" d t1 t2
-    Linear t1 t2 -> showsBinaryWith showsTerm showsTerm "Linear" d t1 t2
+    Linear t1 t2 -> showsBinaryWith (liftShowsPrec showsTerm (liftShowList showsPrec showList)) (liftShowsPrec showsTerm (liftShowList showsPrec showList)) "Linear" d t1 t2
     RWS as bs -> showsBinaryWith (liftShowsPrec showsTerm (liftShowList showsPrec showList)) (liftShowsPrec showsTerm (liftShowList showsPrec showList)) "RWS" d as bs
     Delete t1 -> showsUnaryWith showsTerm "Delete" d t1
     Insert t2 -> showsUnaryWith showsTerm "Insert" d t2
