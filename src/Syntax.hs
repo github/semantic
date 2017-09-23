@@ -134,9 +134,9 @@ instance Diffable Syntax where
     (Indexed a, Indexed b) ->
       Indexed <$> byRWS a b
     (Module idA a, Module idB b) ->
-      Module <$> linearly idA idB <*> byRWS a b
+      Module <$> diff idA idB <*> byRWS a b
     (FunctionCall identifierA typeParamsA argsA, FunctionCall identifierB typeParamsB argsB) ->
-      FunctionCall <$> linearly identifierA identifierB
+      FunctionCall <$> diff identifierA identifierB
                    <*> byRWS typeParamsA typeParamsB
                    <*> byRWS argsA argsB
     (Switch exprA casesA, Switch exprB casesB) ->
@@ -152,17 +152,17 @@ instance Diffable Syntax where
       Array <$> diffMaybe tyA tyB
             <*> byRWS a b
     (Class identifierA clausesA expressionsA, Class identifierB clausesB expressionsB) ->
-      Class <$> linearly identifierA identifierB
+      Class <$> diff identifierA identifierB
             <*> byRWS clausesA clausesB
             <*> byRWS expressionsA expressionsB
     (Method clausesA identifierA receiverA paramsA expressionsA, Method clausesB identifierB receiverB paramsB expressionsB) ->
       Method <$> byRWS clausesA clausesB
-             <*> linearly identifierA identifierB
+             <*> diff identifierA identifierB
              <*> diffMaybe receiverA receiverB
              <*> byRWS paramsA paramsB
              <*> byRWS expressionsA expressionsB
     (Function idA paramsA bodyA, Function idB paramsB bodyB) ->
-      Function <$> linearly idA idB
+      Function <$> diff idA idB
                <*> byRWS paramsA paramsB
                <*> byRWS bodyA bodyB
     _ -> case galignWith diffThese s1 s2 of
