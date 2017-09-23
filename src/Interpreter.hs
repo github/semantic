@@ -56,7 +56,11 @@ diffTermsWith comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (runAlgorit
 runAlgorithm :: (Diffable syntax, GAlign syntax, Traversable syntax, Alternative m, Monad m)
    => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
    -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
-   -> Algorithm syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+   -> Algorithm
+     (Term syntax (Record (FeatureVector ': fields1)))
+     (Term syntax (Record (FeatureVector ': fields2)))
+     (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+     (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
    -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
 runAlgorithm comparable eqTerms = go
   where go = iterFreerA (\ step yield -> case step of
