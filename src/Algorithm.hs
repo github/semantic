@@ -4,7 +4,6 @@ module Algorithm where
 import Control.Applicative (Alternative(..))
 import Control.Monad (guard)
 import Control.Monad.Free.Freer
-import Data.Align.Generic
 import Data.Functor.Classes
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
@@ -20,7 +19,7 @@ data AlgorithmF term1 term2 result partial where
   -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
   Diff :: term1 -> term2 -> AlgorithmF term1 term2 result result
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
-  Linear :: (GAlign syntax, Show1 syntax, Traversable syntax) => syntax term1 -> syntax term2 -> AlgorithmF term1 term2 result (syntax result)
+  Linear :: term1 -> term2 -> AlgorithmF term1 term2 result result
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
   RWS :: [term1] -> [term2] -> AlgorithmF term1 term2 result [result]
   -- | Delete a term.
@@ -56,7 +55,7 @@ diffMaybe _        (Just b) = Just <$> byInserting b
 diffMaybe _        _        = pure Nothing
 
 -- | Diff two terms linearly.
-linearly :: (GAlign syntax, Show1 syntax, Traversable syntax) => syntax term1 -> syntax term2 -> Algorithm term1 term2 result (syntax result)
+linearly :: term1 -> term2 -> Algorithm term1 term2 result result
 linearly f1 f2 = liftF (Linear f1 f2)
 
 -- | Diff two terms using RWS.
@@ -79,7 +78,7 @@ byReplacing = (liftF .) . Replace
 instance (Show term1, Show term2) => Show1 (AlgorithmF term1 term2 result) where
   liftShowsPrec sp _ d algorithm = case algorithm of
     Algorithm.Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
-    Linear t1 t2 -> showsBinaryWith (liftShowsPrec showsPrec showList) (liftShowsPrec showsPrec showList) "Linear" d t1 t2
+    Linear t1 t2 -> showsBinaryWith showsPrec showsPrec "Linear" d t1 t2
     RWS as bs -> showsBinaryWith (liftShowsPrec showsPrec showList) (liftShowsPrec showsPrec showList) "RWS" d as bs
     Delete t1 -> showsUnaryWith showsPrec "Delete" d t1
     Insert t2 -> showsUnaryWith showsPrec "Insert" d t2
