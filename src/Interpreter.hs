@@ -65,8 +65,8 @@ runAlgorithm :: (Diffable syntax, GAlign syntax, Traversable syntax, Alternative
 runAlgorithm comparable eqTerms = go
   where go = iterFreerA (\ step yield -> case step of
           Algorithm.Diff t1 t2 -> (go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield)
-          Linear f1 f2 -> case galignWith diffThese f1 f2 of
-            Just result -> traverse go result >>= yield
+          Linear f1 f2 -> case galignWith (go . diffThese) f1 f2 of
+            Just result -> sequenceA result >>= yield
             _ -> empty
           RWS as bs -> traverse (go . diffThese) (rws comparable eqTerms as bs) >>= yield
           Delete a -> yield (deleting a)
