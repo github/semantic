@@ -54,14 +54,14 @@ diffTermsWith :: forall syntax fields1 fields2
 diffTermsWith comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (runAlgorithm comparable eqTerms (diff t1 t2))
 
 runAlgorithm :: (Diffable syntax, GAlign syntax, Traversable syntax, Alternative m, Monad m)
-   => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
-   -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
-   -> Algorithm
-     (Term syntax (Record (FeatureVector ': fields1)))
-     (Term syntax (Record (FeatureVector ': fields2)))
-     (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-     (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-   -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+             => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
+             -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
+             -> Algorithm
+               (Term syntax (Record (FeatureVector ': fields1)))
+               (Term syntax (Record (FeatureVector ': fields2)))
+               (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+               (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+             -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
 runAlgorithm comparable eqTerms = go
   where go = iterFreerA (\ step yield -> case step of
           Algorithm.Diff t1 t2 -> (go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield)
