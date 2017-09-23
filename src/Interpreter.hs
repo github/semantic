@@ -72,7 +72,7 @@ runAlgorithm comparable eqTerms = go
              result
            -> m result
         go = iterFreerA (\ step yield -> case step of
-          Algorithm.Diff t1 t2 -> (go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield)
+          Algorithm.Diff t1 t2 -> go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield
           Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> galignWith (go . diffThese) f1 f2 >>= yield
           RWS as bs -> traverse (go . diffThese) (rws comparable eqTerms as bs) >>= yield
           Delete a -> yield (deleting a)
