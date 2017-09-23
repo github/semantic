@@ -2,7 +2,6 @@
 module Syntax where
 
 import Algorithm
-import Control.Applicative (empty)
 import Data.Aeson (ToJSON, (.=))
 import Data.Align.Generic
 import Data.Foldable (toList)
@@ -165,6 +164,4 @@ instance Diffable Syntax where
       Function <$> diff idA idB
                <*> byRWS paramsA paramsB
                <*> byRWS bodyA bodyB
-    _ -> case galignWith diffThese s1 s2 of
-      Just result -> sequenceA result
-      _ -> empty
+    _ -> galignWith diffThese s1 s2

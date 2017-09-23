@@ -340,7 +340,7 @@ editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDi
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
+        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (Just . these deleting inserting approximateDiff) (unwrap a) (unwrap b))
 
 
 -- Instances
