@@ -53,17 +53,25 @@ diffTermsWith :: forall syntax fields1 fields2
               -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
 diffTermsWith comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (runAlgorithm comparable eqTerms (diff t1 t2))
 
-runAlgorithm :: (Diffable syntax, GAlign syntax, Traversable syntax, Alternative m, Monad m)
+runAlgorithm :: forall syntax fields1 fields2 m result
+             .  (Diffable syntax, GAlign syntax, Traversable syntax, Alternative m, Monad m)
              => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
              -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
              -> Algorithm
                (Term syntax (Record (FeatureVector ': fields1)))
                (Term syntax (Record (FeatureVector ': fields2)))
                (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-               (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-             -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+               result
+             -> m result
 runAlgorithm comparable eqTerms = go
-  where go = iterFreerA (\ step yield -> case step of
+  where go :: forall result
+           .  Algorithm
+             (Term syntax (Record (FeatureVector ': fields1)))
+             (Term syntax (Record (FeatureVector ': fields2)))
+             (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+             result
+           -> m result
+        go = iterFreerA (\ step yield -> case step of
           Algorithm.Diff t1 t2 -> (go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield)
           Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> galignWith (go . diffThese) f1 f2 >>= yield
           RWS as bs -> traverse (go . diffThese) (rws comparable eqTerms as bs) >>= yield
