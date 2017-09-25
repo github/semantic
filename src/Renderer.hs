@@ -41,6 +41,8 @@ data DiffRenderer output where
   -- | Render to git-diff-compatible textual output.
   PatchDiffRenderer :: DiffRenderer File
   -- | Compute a table of contents for the diff & encode it as JSON.
+  OldToCDiffRenderer :: DiffRenderer Summaries
+  -- | Compute a table of contents for the diff & encode it as JSON (uses the new Assignment parse tree parser).
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
