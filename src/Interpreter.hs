@@ -83,15 +83,13 @@ runAlgorithm comparable eqTerms = go
            -> m result
         go = iterFreerA (\ step yield -> case step of
           Algorithm.Diff t1 t2 -> go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield
-          Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> galignWith diffThese f1 f2 >>= yield
-          RWS as bs -> traverse diffThese (rws comparable eqTerms as bs) >>= yield
+          Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> galignWith (go . diffThese) f1 f2 >>= yield
+          RWS as bs -> traverse (go . diffThese) (rws comparable eqTerms as bs) >>= yield
           Delete a -> yield (deleting a)
           Insert b -> yield (inserting b)
           Replace a b -> yield (replacing a b)
           Empty -> empty
           Alt a b -> yield a <|> yield b)
-        diffThese :: These (Term syntax (Record (FeatureVector ': fields1))) (Term syntax (Record (FeatureVector ': fields2))) -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-        diffThese = these (pure . deleting) (pure . inserting) (\ t1 t2 -> go (diff t1 t2) <|> pure (replacing t1 t2))
 
 -- | Compute the label for a given term, suitable for inclusion in a _p_,_q_-gram.
 getLabel :: HasField fields Category => TermF Syntax (Record fields) a -> (Category, Maybe Text)
