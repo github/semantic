@@ -17,7 +17,7 @@ import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Maybe (catMaybes)
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -722,7 +722,7 @@ ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> expression <*> expression <*> expression)
 
 memberExpression :: Assignment
-memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> expression <*> propertyIdentifier)
+memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> postContextualize comment expression <*> propertyIdentifier)
 
 newExpression :: Assignment
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Language.TypeScript.Syntax.New <$> expression)
