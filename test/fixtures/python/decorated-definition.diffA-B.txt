@@ -19,8 +19,8 @@
           {-(Integer)-})
           (Decorator
             (ScopeResolution
-            { (Identifier)
-            ->(Identifier) })
+            {+(Identifier)+}
+            {-(Identifier)-})
             (
             {+(Identifier)+}
             {-(Integer)-}
