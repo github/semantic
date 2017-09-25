@@ -307,6 +307,9 @@ instance Listable1 Statement.If where
 instance Listable1 Statement.Return where
   liftTiers tiers = liftCons1 tiers Statement.Return
 
+instance Listable1 Syntax.Context where
+  liftTiers tiers = liftCons2 (liftTiers tiers) tiers Syntax.Context
+
 instance Listable1 Syntax.Empty where
   liftTiers _ = cons0 Syntax.Empty
 
