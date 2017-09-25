@@ -126,6 +126,7 @@ newtype Program a = Program [a]
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
