@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Interpreter
 ( diffTerms
+, diffSyntaxTerms
 , decoratingWith
 , diffTermsWith
 , comparableByConstructor
@@ -11,6 +12,7 @@ import Algorithm
 import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
+import Data.Functor.Classes
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe, isJust)
 import Data.Record
@@ -19,6 +21,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import Data.Text (Text)
 import Data.These
 import Data.Union
+import Decorators
 import Diff
 import Info hiding (Empty, Return)
 import RWS
@@ -26,12 +29,19 @@ import Syntax (Syntax(Leaf))
 import Term
 
 
--- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: (HasField fields1 Category, HasField fields2 Category)
-          => Term Syntax (Record fields1) -- ^ A term representing the old state.
-          -> Term Syntax (Record fields2) -- ^ A term representing the new state.
-          -> Diff Syntax (Record fields1) (Record fields2)
-diffTerms = decoratingWith getLabel getLabel (diffTermsWith comparableByCategory (equalTerms comparableByCategory))
+-- | Diff two Syntax terms recursively.
+diffSyntaxTerms :: (HasField fields1 Category, HasField fields2 Category)
+                => Term Syntax (Record fields1) -- ^ A term representing the old state.
+                -> Term Syntax (Record fields2) -- ^ A term representing the new state.
+                -> Diff Syntax (Record fields1) (Record fields2)
+diffSyntaxTerms = decoratingWith getLabel getLabel (diffTermsWith comparableByCategory (equalTerms comparableByCategory))
+
+-- | Diff two à la carte terms recursively.
+diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
+          => Term (Union fs) (Record fields1)
+          -> Term (Union fs) (Record fields2)
+          -> Diff (Union fs) (Record fields1) (Record fields2)
+diffTerms = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith comparableByConstructor equivalentTerms)
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
 decoratingWith :: (Hashable label, Traversable syntax)
