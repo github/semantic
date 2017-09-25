@@ -2,10 +2,6 @@
 module Interpreter
 ( diffTerms
 , diffSyntaxTerms
-, decoratingWith
-, diffTermsWith
-, comparableByConstructor
-, equivalentTerms
 ) where
 
 import Algorithm
