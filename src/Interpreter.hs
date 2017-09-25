@@ -99,8 +99,11 @@ comparableByCategory :: (HasField fields1 Category, HasField fields2 Category) =
 comparableByCategory (In a _) (In b _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: GAlign syntax => ComparabilityRelation syntax ann1 ann2
-comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
+comparableByConstructor :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs) => ComparabilityRelation (Union fs) ann1 ann2
+comparableByConstructor (In _ u1) (In _ u2)
+  | Just Syntax.Context{} <- prj u1 = True
+  | Just Syntax.Context{} <- prj u2 = True
+  | otherwise = isJust (galign u1 u2)
 
 -- | Equivalency relation for terms. Equivalence is determined by functions and
 -- methods with equal identifiers/names and recursively by equivalent terms with
