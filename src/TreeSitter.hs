@@ -20,6 +20,7 @@ import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
 import qualified Language.Ruby as Ruby
+import qualified Language.Ruby as TypeScript
 import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
@@ -114,6 +115,7 @@ assignTerm language source annotation children allChildren =
         assignTermByLanguage = case languageForTSLanguage language of
           Just Language.Go -> Go.termAssignment
           Just Ruby -> Ruby.termAssignment
+          Just TypeScript -> TypeScript.termAssignment
           _ -> \ _ _ _ -> Nothing
 
 defaultTermAssignment :: Source -> Record DefaultFields -> [ Term S.Syntax (Record DefaultFields) ] -> IO [ Term S.Syntax (Record DefaultFields) ] -> IO (Term S.Syntax (Record DefaultFields))
