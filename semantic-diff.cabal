@@ -165,6 +165,7 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
+                     , effects
                      , filepath
                      , free
                      , Glob

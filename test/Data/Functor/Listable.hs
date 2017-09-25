@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Data.Functor.Listable
 ( Listable(..)
@@ -40,6 +40,7 @@ import Data.Span
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
+import Data.Union
 import Diff
 import Patch
 import Renderer.TOC
@@ -281,6 +282,13 @@ instance Listable1 Syntax where
 
 instance Listable recur => Listable (Syntax recur) where
   tiers = tiers1
+
+
+instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g ': fs)) where
+  liftTiers tiers = (inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Union (g ': fs) a)]) tiers))
+
+instance Listable1 f => Listable1 (Union '[f]) where
+  liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
 
 
 instance Listable1 Gram where
