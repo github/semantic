@@ -641,7 +641,7 @@ assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many s
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = many comment *> term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 expression :: Assignment
 expression = term (handleError everything)
