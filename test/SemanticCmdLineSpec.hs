@@ -56,7 +56,7 @@ diffFixtures =
   [ (SomeRenderer PatchDiffRenderer, pathMode, patchOutput)
   , (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
   , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
-  , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
+  , (SomeRenderer OldToCDiffRenderer, pathMode, tocOutput)
   ]
   where pathMode = Right [both ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)]
 
