@@ -1,5 +1,7 @@
 (Program
   (Module
-    (Constant)
+    (Identifier)
     (Method
-      (Identifier))))
+      (Empty)
+      (Identifier)
+      ([]))))

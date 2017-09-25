@@ -1,14 +1,15 @@
 (Program
-  (Case
+  (Match
     (Identifier)
-    (When
-      (Args
-        (Identifier))
-      (When
-        (Args
+    (
+      (Pattern
+        (
           (Identifier))
-        (Args
-          (Other "splat_argument"
-            (Identifier)))
-        (Identifier)
-        (Else)))))
+        (
+          (Pattern
+            (
+              (Identifier)
+              (Identifier))
+            (
+              (Identifier)
+              ([]))))))))

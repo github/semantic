@@ -1,8 +1,7 @@
 (Program
-{-(Identifier)-}
+{-(Null)-}
   (Identifier)
-{+(Identifier)+}
-{ (Boolean)
-->(Boolean) }
-{+(Boolean)+}
-{-(Boolean)-})
+{+(Null)+}
+{-(Boolean)-}
+  (Boolean)
+{+(Boolean)+})

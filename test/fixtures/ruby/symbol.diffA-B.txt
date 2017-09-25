@@ -1,7 +1,7 @@
 (Program
-{+(SymbolLiteral)+}
-{ (SymbolLiteral)
-->(SymbolLiteral) }
-{+(SymbolLiteral)+}
-{-(SymbolLiteral)-}
-{-(SymbolLiteral)-})
+{+(Symbol)+}
+{+(Symbol)+}
+{+(Symbol)+}
+{-(Symbol)-}
+{-(Symbol)-}
+{-(Symbol)-})

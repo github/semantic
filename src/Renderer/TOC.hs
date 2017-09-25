@@ -187,6 +187,7 @@ termTableOfContentsBy selector = cata termAlgebra
   where termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
+
 newtype DedupeKey = DedupeKey (Maybe T.Text, Maybe T.Text) deriving (Eq, Ord)
 
 -- Dedupe entries in a final pass. This catches two specific scenarios with

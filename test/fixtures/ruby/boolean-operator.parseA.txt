@@ -1,5 +1,4 @@
 (Program
-  (Binary
+  (Or
     (Identifier)
-    (Other "||")
     (Identifier)))

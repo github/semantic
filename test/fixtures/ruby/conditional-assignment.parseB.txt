@@ -1,4 +1,6 @@
 (Program
-  (OperatorAssignment
+  (Assignment
     (Identifier)
-    (IntegerLiteral)))
+    (And
+      (Identifier)
+      (Integer))))

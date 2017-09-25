@@ -1,5 +1,9 @@
 (Program
   (If
-    (Identifier))
+    (Identifier)
+    ([])
+    (Empty))
   (If
-    (Identifier)))
+    (Identifier)
+    ([])
+    (Empty)))

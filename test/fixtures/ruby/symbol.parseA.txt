@@ -1,4 +1,4 @@
 (Program
-  (SymbolLiteral)
-  (SymbolLiteral)
-  (SymbolLiteral))
+  (Symbol)
+  (Symbol)
+  (Symbol))

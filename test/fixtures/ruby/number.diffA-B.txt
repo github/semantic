@@ -1,15 +1,15 @@
 (Program
-{ (IntegerLiteral)
-->(IntegerLiteral) }
-{+(IntegerLiteral)+}
-{+(IntegerLiteral)+}
-{ (IntegerLiteral)
-->(IntegerLiteral) }
-{+(IntegerLiteral)+}
-{+(IntegerLiteral)+}
-{+(NumberLiteral)+}
-{-(IntegerLiteral)-}
-{-(IntegerLiteral)-}
-{-(IntegerLiteral)-}
-{-(IntegerLiteral)-}
-{-(NumberLiteral)-})
+{+(Integer)+}
+{+(Integer)+}
+{+(Integer)+}
+{+(Integer)+}
+{+(Integer)+}
+{+(Integer)+}
+{+(Float)+}
+{-(Integer)-}
+{-(Integer)-}
+{-(Integer)-}
+{-(Integer)-}
+{-(Integer)-}
+{-(Integer)-}
+{-(Float)-})

@@ -1,5 +1,5 @@
 (Program
-  (ArrayLiteral
-    (IntegerLiteral)
-    (IntegerLiteral)
-    (IntegerLiteral)))
+  (Array
+    (Integer)
+    (Integer)
+    (Integer)))

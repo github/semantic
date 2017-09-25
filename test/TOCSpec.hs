@@ -148,20 +148,25 @@ spec = parallel $ do
       let summary = JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
 
-  describe "diff with ToCDiffRenderer" $ do
+  describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      output <- runTask (diffBlobPair OldToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
-      output <- runTask (diffBlobPair OldToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"def bar\\nen\\n\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+
+    it "ignores anonymous functions" $ do
+      blobs <- blobsForPaths (both "ruby/lambda.A.rb" "ruby/lambda.B.rb")
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
+      toOutput output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
-      output <- runTask (diffBlobPair OldToCDiffRenderer blobs)
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
       toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
