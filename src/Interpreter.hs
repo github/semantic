@@ -33,7 +33,7 @@ diffSyntaxTerms :: (HasField fields1 Category, HasField fields2 Category)
 diffSyntaxTerms = decoratingWith comparableByCategory (equalTerms comparableByCategory) getLabel getLabel
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
+diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Diffable fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
           => Term (Union fs) (Record fields1)
           -> Term (Union fs) (Record fields2)
           -> Diff (Union fs) (Record fields1) (Record fields2)
