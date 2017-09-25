@@ -1109,7 +1109,7 @@ propertyName :: Assignment
 propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)) <|> string <|> number <|> computedPropertyName
 
 computedPropertyName :: Assignment
-computedPropertyName = makeTerm <$> symbol Grammar.ComputedPropertyName <*> (Language.TypeScript.Syntax.ComputedPropertyName <$> expression)
+computedPropertyName = makeTerm <$> symbol Grammar.ComputedPropertyName <*> children (Language.TypeScript.Syntax.ComputedPropertyName <$> expression)
 
 assignmentPattern :: Assignment
 assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Statement.Assignment [] <$> shorthandPropertyIdentifier <*> expression)
