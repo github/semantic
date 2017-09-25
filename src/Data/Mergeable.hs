@@ -1,9 +1,11 @@
-{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
 module Data.Mergeable where
 
 import Control.Applicative
 import Data.Functor.Identity
 import Data.Mergeable.Generic
+import Data.Proxy
+import Data.Union
 import GHC.Generics
 
 -- Classes
@@ -35,3 +37,6 @@ instance Mergeable [] where merge = gmerge
 instance Mergeable Maybe
 
 instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
+
+instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Union fs) where
+  merge f u = apply' (Proxy :: Proxy Mergeable) (\ reinj g -> reinj <$> merge f g) u
