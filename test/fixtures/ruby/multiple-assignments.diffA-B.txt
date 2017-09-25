@@ -1,52 +1,49 @@
 (Program
   (Assignment
-    (Args
+    (
       (Identifier)
-    {+(SplatParameter
-      {+(Identifier)+})+}
-    {-(Identifier)-}
+    { (Identifier)
+    ->(Identifier) }
     {-(Identifier)-})
-    (ArrayLiteral
-      (IntegerLiteral)
-      (IntegerLiteral)
-      (IntegerLiteral)))
+    (Array
+      (Integer)
+      (Integer)
+      (Integer)))
 {-(Assignment
-  {-(Args
+  {-(
     {-(Identifier)-}
     {-(Identifier)-})-}
-  {-(ArrayLiteral
-    {-(IntegerLiteral)-}
-    {-(IntegerLiteral)-})-})-}
+  {-(Array
+    {-(Integer)-}
+    {-(Integer)-})-})-}
 {-(Assignment
-  {-(Args
-    {-(Identifier)-}
-    {-(SplatParameter)-})-}
-  {-(ArrayLiteral
-    {-(IntegerLiteral)-}
-    {-(IntegerLiteral)-})-})-}
-{-(Assignment
-  {-(Args
-    {-(Identifier)-}
-    {-(SplatParameter
-      {-(Identifier)-})-})-}
-  {-(ArrayLiteral
-    {-(IntegerLiteral)-}
-    {-(IntegerLiteral)-})-})-}
-{-(Assignment
-  {-(Args
+  {-(
     {-(Identifier)-}
     {-(Identifier)-})-}
-  {-(Other "splat_argument"
-    {-(Identifier)-})-})-}
+  {-(Array
+    {-(Integer)-}
+    {-(Integer)-})-})-}
 {-(Assignment
-  {-(Args
+  {-(
+    {-(Identifier)-}
+    {-(Identifier)-})-}
+  {-(Array
+    {-(Integer)-}
+    {-(Integer)-})-})-}
+{-(Assignment
+  {-(
+    {-(Identifier)-}
+    {-(Identifier)-})-}
+  {-(Identifier)-})-}
+{-(Assignment
+  {-(
     {-(MemberAccess
       {-(Identifier)-}
       {-(Identifier)-})-}
     {-(MemberAccess
       {-(Identifier)-}
       {-(Identifier)-})-})-}
-  {-(Other "right_assignment_list"
+  {-(
     {-(MemberAccess
       {-(Identifier)-}
       {-(Identifier)-})-}
@@ -54,8 +51,8 @@
       {-(Identifier)-}
       {-(Identifier)-})-})-})-}
 {-(Assignment
-  {-(Args
-    {-(Other "destructured_left_assignment"
+  {-(
+    {-(
       {-(Identifier)-}
       {-(Identifier)-})-})-}
   {-(Identifier)-})-})

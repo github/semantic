@@ -1,4 +1,5 @@
 (Program
-  (Modifier If
+  (If
     (Identifier)
-    (Identifier)))
+    (Identifier)
+    (Empty)))

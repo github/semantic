@@ -1,9 +1,10 @@
 (Program
-  (Until
-    (Negate
+  (While
+    (Not
       (Identifier))
-  {+(Identifier)+})
-{-(Modifier Until
-  {-(Negate
+  { ([])
+  ->(Identifier) })
+{-(While
+  {-(Not
     {-(Identifier)-})-}
   {-(Identifier)-})-})

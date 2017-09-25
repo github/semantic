@@ -1,5 +1,4 @@
 (Program
-  (Binary
+  (And
     (Identifier)
-    (Other "and")
     (Identifier)))

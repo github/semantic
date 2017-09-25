@@ -1,12 +1,12 @@
 (Program
   (Class
-    (Constant)
-  {+(Superclass
-    {+(Constant)+})+}
+    (Identifier)
+  {+(Identifier)+}
     (Method
-      (Identifier)))
+      (Empty)
+      (Identifier)
+      ([])))
 {+(Class
-  {+(ScopeOperator
-    {+(Constant)+}
-    {+(Other "::")+}
-    {+(Constant)+})+})+})
+  {+(ScopeResolution
+    {+(Identifier)+}
+    {+(Identifier)+})+})+})

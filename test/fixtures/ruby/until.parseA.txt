@@ -1,8 +1,9 @@
 (Program
-  (Until
-    (Negate
-      (Identifier)))
-  (Modifier Until
-    (Negate
+  (While
+    (Not
+      (Identifier))
+    ([]))
+  (While
+    (Not
       (Identifier))
     (Identifier)))

@@ -1,7 +1,11 @@
 (Program
-  (Begin
-    (MethodCall
-      (Identifier))
-    (Else
-      (MethodCall
-        (Identifier)))))
+  (Try
+    (
+      (Call
+        (Identifier)
+        (Empty))
+      (Else
+        (Empty)
+        (Call
+          (Identifier)
+          (Empty))))))

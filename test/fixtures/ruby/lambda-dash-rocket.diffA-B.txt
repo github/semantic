@@ -1,9 +1,12 @@
 (Program
-  (AnonymousFunction
+  (Function
+    (Empty)
   {-(Identifier)-}
   {-(Identifier)-}
   {-(Identifier)-}
-    (ExpressionStatements
-    {+(Identifier)+}
-    {-(IntegerLiteral)-}
-    {-(IntegerLiteral)-})))
+    (Function
+      (Empty)
+    { (
+      {-(Integer)-}
+      {-(Integer)-})
+    ->(Identifier) })))

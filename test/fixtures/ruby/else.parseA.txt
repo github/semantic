@@ -1,5 +1,9 @@
 (Program
-  (Begin
-    (MethodCall
-      (Identifier))
-    (Else)))
+  (Try
+    (
+      (Call
+        (Identifier)
+        (Empty))
+      (Else
+        (Empty)
+        ([])))))

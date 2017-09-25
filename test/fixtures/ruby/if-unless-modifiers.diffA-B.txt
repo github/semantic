@@ -1,8 +1,7 @@
 (Program
-{+(Modifier If
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{-(Modifier Unless
-  {-(Negate
-    {-(Identifier)-})-}
-  {-(Identifier)-})-})
+  (If
+  { (Not
+    {-(Identifier)-})
+  ->(Identifier) }
+    (Identifier)
+    (Empty)))

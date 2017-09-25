@@ -1,39 +1,40 @@
 (Program
-{+(For
-  {+(Identifier)+}
-  {+(Other "in"
-    {+(ArrayLiteral
-      {+(IntegerLiteral)+}
-      {+(IntegerLiteral)+}
-      {+(IntegerLiteral)+})+})+}
-  {+(MethodCall
+{+(ForEach
+  {+(
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+}
+    {+(Integer)+})+}
+  {+(Call
     {+(Identifier)+}
-    {+(Identifier)+})+})+}
-{-(For
-  {-(Identifier)-}
-  {-(Other "in"
+    {+(Identifier)+}
+    {+(Empty)+})+})+}
+{-(ForEach
+  {-(
     {-(Identifier)-})-}
+  {-(Identifier)-}
   {-(Identifier)-})-}
-{-(For
-  {-(Identifier)-}
-  {-(Identifier)-}
-  {-(Other "in"
+{-(ForEach
+  {-(
+    {-(Identifier)-}
     {-(Identifier)-})-}
-  {-(Identifier)-})-}
-{-(For
   {-(Identifier)-}
-  {-(Other "in"
-    {-(RangeExpression
-      {-(IntegerLiteral)-}
-      {-(Other "..")-}
-      {-(IntegerLiteral)-})-})-}
+  {-(Identifier)-})-}
+{-(ForEach
+  {-(
+    {-(Identifier)-})-}
+  {-(Enumeration
+    {-(Integer)-}
+    {-(Integer)-}
+    {-(Empty)-})-}
   {-(Boolean)-})-}
-{-(For
-  {-(Identifier)-}
-  {-(Identifier)-}
-  {-(Other "in"
-    {-(RangeExpression
-      {-(IntegerLiteral)-}
-      {-(Other "..")-}
-      {-(IntegerLiteral)-})-})-}
+{-(ForEach
+  {-(
+    {-(Identifier)-}
+    {-(Identifier)-})-}
+  {-(Enumeration
+    {-(Integer)-}
+    {-(Integer)-}
+    {-(Empty)-})-}
   {-(Boolean)-})-})

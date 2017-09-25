@@ -1,11 +1,11 @@
 (Program
-  (Object
-    (Pair
+  (Hash
+    (KeyValue
       (Identifier)
-      (StringLiteral))
-    (Pair
+      (TextElement))
+    (KeyValue
       (Identifier)
-      (IntegerLiteral))
-    (Pair
+      (Integer))
+    (KeyValue
       (Identifier)
       (Boolean))))

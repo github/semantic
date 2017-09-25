@@ -1,13 +1,11 @@
 (Program
-  (Binary
+  (Equal
     (Identifier)
-    (Other "==")
     (Identifier))
-  (Binary
+  (Not
+    (Equal
+      (Identifier)
+      (Identifier)))
+  (Equal
     (Identifier)
-    (Other "!=")
-    (Identifier))
-  (Binary
-    (Identifier)
-    (Other "===")
     (Identifier)))

@@ -1,4 +1,6 @@
 (Program
-  (Begin
-    (Identifier)
-    (Ensure)))
+  (Try
+    (
+      (Identifier)
+      (Finally
+        ([])))))
