@@ -17,7 +17,6 @@ library
                      , Alignment
                      , Category
                      , Data.Align.Generic
-                     , Data.Bifunctor.Symmetrical
                      , Data.Blob
                      , Data.Error
                      , Data.Functor.Both
