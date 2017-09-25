@@ -209,11 +209,11 @@ runParser Options{..} blob@Blob{..} = go
             logTiming "assign" $ case Assignment.assign blobSource assignment ast of
               Left err -> do
                 let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
-                writeLog Error formatted (("tag" : "assign") : blobFields)
+                writeLog Error formatted (("tag", "assign") : blobFields)
                 throwError (toException err)
               Right term -> do
                 for_ (errors term) $ \ err ->
-                  writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag" : "assign") : blobFields)
+                  writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
                 pure term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (cmarkParser blobSource)
