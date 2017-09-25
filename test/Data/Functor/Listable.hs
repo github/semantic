@@ -40,6 +40,7 @@ import Data.Source
 import Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
@@ -300,6 +301,12 @@ instance Listable1 f => Listable1 (Union '[f]) where
 
 instance Listable1 Comment.Comment where
   liftTiers _ = cons1 Comment.Comment
+
+instance Listable1 Declaration.Function where
+  liftTiers tiers = liftCons3 tiers (liftTiers tiers) tiers Declaration.Function
+
+instance Listable1 Declaration.Method where
+  liftTiers tiers = liftCons4 tiers tiers (liftTiers tiers) tiers Declaration.Method
 
 instance Listable1 Statement.If where
   liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
