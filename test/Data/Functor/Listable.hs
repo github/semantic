@@ -37,6 +37,8 @@ import Data.Record
 import Data.Semigroup
 import Data.Source
 import Data.Span
+import qualified Data.Syntax as Syntax (Identifier(..))
+import qualified Data.Syntax.Statement as Statement (If(..))
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
@@ -45,7 +47,7 @@ import Diff
 import Patch
 import Renderer.TOC
 import RWS
-import Syntax
+import Syntax as S
 import Term
 import Test.LeanCheck
 
@@ -243,11 +245,11 @@ instance Listable1 Syntax where
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
     \/ liftCons2 recur (liftTiers recur) Case
     \/ liftCons1 (liftTiers recur) Select
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
-    \/ liftCons2 recur recur Syntax.Pair
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Object
+    \/ liftCons2 recur recur S.Pair
     \/ liftCons1 (pack `mapT` tiers) Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
-    \/ liftCons1 (liftTiers recur) Syntax.ParseError
+    \/ liftCons1 (liftTiers recur) S.ParseError
     \/ liftCons2 (liftTiers recur) (liftTiers recur) For
     \/ liftCons2 recur recur DoWhile
     \/ liftCons2 recur (liftTiers recur) While
@@ -255,7 +257,7 @@ instance Listable1 Syntax where
     \/ liftCons1 recur Throw
     \/ liftCons1 recur Constructor
     \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Array
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
     \/ liftCons5 (liftTiers recur) recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
@@ -289,6 +291,12 @@ instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g 
 
 instance Listable1 f => Listable1 (Union '[f]) where
   liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+
+instance Listable1 Syntax.Identifier where
+  liftTiers _ = cons1 Syntax.Identifier
+
+instance Listable1 Statement.If where
+  liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
 
 
 instance Listable1 Gram where
