@@ -109,7 +109,7 @@ comparableByConstructor (In _ u1) (In _ u2)
 -- | Equivalency relation for terms. Equivalence is determined by functions and
 -- methods with equal identifiers/names and recursively by equivalent terms with
 -- identical shapes.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs)
+equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Foldable fs, Apply GAlign fs)
                 => Term (Union fs) ann1
                 -> Term (Union fs) ann2
                 -> Bool
