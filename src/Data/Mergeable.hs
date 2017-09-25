@@ -3,6 +3,7 @@ module Data.Mergeable where
 
 import Control.Applicative
 import Data.Functor.Identity
+import Data.List.NonEmpty
 import Data.Proxy
 import Data.Union
 import GHC.Generics
@@ -31,9 +32,16 @@ class Functor t => Mergeable t where
 
 -- Instances
 
-instance Mergeable [] where merge = gmerge
+instance Mergeable [] where
+  merge f (x:xs) = ((:) <$> f x <|> pure id) <*> merge f xs
+  merge _ [] = pure []
 
-instance Mergeable Maybe
+instance Mergeable NonEmpty where
+  merge f (x:|xs) = (:|) <$> f x <*> merge f xs
+
+instance Mergeable Maybe where
+  merge f (Just a) = Just <$> f a
+  merge _ Nothing = pure empty
 
 instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
 
@@ -61,8 +69,8 @@ instance GMergeable Par1 where
 instance GMergeable (K1 i c) where
   gmerge _ (K1 a) = pure (K1 a)
 
-instance GMergeable f => GMergeable (Rec1 f) where
-  gmerge f (Rec1 a) = Rec1 <$> gmerge f a
+instance Mergeable f => GMergeable (Rec1 f) where
+  gmerge f (Rec1 a) = Rec1 <$> merge f a
 
 instance GMergeable f => GMergeable (M1 i c f) where
   gmerge f (M1 a) = M1 <$> gmerge f a
@@ -73,11 +81,3 @@ instance (GMergeable f, GMergeable g) => GMergeable (f :+: g) where
 
 instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
   gmerge f (a :*: b) = (:*:) <$> gmerge f a <*> gmerge f b
-
-instance GMergeable [] where
-  gmerge f (x:xs) = ((:) <$> f x <|> pure id) <*> gmerge f xs
-  gmerge _ [] = pure []
-
-instance GMergeable Maybe where
-  gmerge f (Just a) = Just <$> f a
-  gmerge _ Nothing = pure empty
