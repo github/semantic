@@ -2,6 +2,7 @@
 module Data.Mergeable.Generic where
 
 import Control.Applicative
+import Data.List.NonEmpty
 import GHC.Generics
 
 -- Classes
