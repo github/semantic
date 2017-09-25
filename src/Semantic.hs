@@ -53,21 +53,18 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) -> parse syntaxParser blob >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
-  (SExpressionTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.JSON) -> pure Nothing
   (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
-  (IdentityTermRenderer, Just Language.JSON) -> pure Nothing
   (IdentityTermRenderer, Just Language.TypeScript) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser blob
   where syntaxParser = parserForLanguage blobLanguage
