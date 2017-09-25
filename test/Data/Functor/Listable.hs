@@ -32,6 +32,7 @@ import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Functor.Both
+import Data.List.NonEmpty
 import Data.Range
 import Data.Record
 import Data.Semigroup
@@ -135,6 +136,9 @@ instance Listable a => Listable1 ((,) a) where
 instance Listable1 [] where
   liftTiers tiers = go
     where go = cons0 [] \/ liftCons2 tiers go (:)
+
+instance Listable1 NonEmpty where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) (:|)
 
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
