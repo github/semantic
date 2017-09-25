@@ -38,8 +38,9 @@ import Data.Record
 import Data.Semigroup
 import Data.Source
 import Data.Span
-import qualified Data.Syntax as Syntax (Empty(..), Identifier(..))
-import qualified Data.Syntax.Statement as Statement (If(..), Return(..))
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Statement as Statement
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
@@ -295,6 +296,10 @@ instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g 
 
 instance Listable1 f => Listable1 (Union '[f]) where
   liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+
+
+instance Listable1 Comment.Comment where
+  liftTiers _ = cons1 Comment.Comment
 
 instance Listable1 Statement.If where
   liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
