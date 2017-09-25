@@ -145,7 +145,7 @@ instance Diffable Maybe where
 
 -- | Diff two lists using RWS.
 instance Diffable [] where
-  algorithmFor a b = byRWS a b
+  algorithmFor = byRWS
 
 -- | Diff two non-empty lists using RWS.
 instance Diffable NonEmpty where
