@@ -8,6 +8,7 @@ module RWS
 , pqGramDecorator
 , Gram(..)
 , defaultD
+, canCompareTerms
 , equalTerms
 ) where
 
