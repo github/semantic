@@ -1,5 +1,6 @@
 (Program
-  (Modifier Unless
-    (Negate
+  (If
+    (Not
       (Identifier))
-    (Identifier)))
+    (Identifier)
+    (Empty)))

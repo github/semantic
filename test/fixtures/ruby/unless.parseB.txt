@@ -1,7 +1,11 @@
 (Program
-  (Unless
-    (Negate
-      (Identifier)))
-  (Unless
-    (Negate
-      (Identifier))))
+  (If
+    (Not
+      (Identifier))
+    ([])
+    (Empty))
+  (If
+    (Not
+      (Identifier))
+    ([])
+    (Empty)))

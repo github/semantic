@@ -1,4 +1,4 @@
 (Program
   (Identifier)
-  (BeginBlock
+  (ScopeEntry
     (Identifier)))

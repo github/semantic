@@ -1,7 +1,11 @@
 (Program
-  (Begin
-    (Identifier)
-    (Rescue
-      (Constant)
-      (RescuedException
-        (Identifier)))))
+  (Try
+    (
+      (Identifier)
+      (Catch
+        (
+          (
+            (Identifier))
+          (
+            (Identifier)))
+        ([])))))

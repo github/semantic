@@ -1,8 +1,8 @@
 (Program
-  (ArrayLiteral
-  {+(IntegerLiteral)+}
-  {+(IntegerLiteral)+}
-  {+(IntegerLiteral)+}
-  {-(StringLiteral)-}
-  {-(StringLiteral)-}
-  {-(StringLiteral)-}))
+  (Array
+  {+(Integer)+}
+  {+(Integer)+}
+  {+(Integer)+}
+  {-(TextElement)-}
+  {-(TextElement)-}
+  {-(TextElement)-}))

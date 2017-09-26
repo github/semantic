@@ -1,29 +1,29 @@
 (Program
-  (For
-    (Identifier)
-    (Other "in"
+  (ForEach
+    (
       (Identifier))
+    (Identifier)
     (Identifier))
-  (For
-    (Identifier)
-    (Identifier)
-    (Other "in"
+  (ForEach
+    (
+      (Identifier)
       (Identifier))
-    (Identifier))
-  (For
     (Identifier)
-    (Other "in"
-      (RangeExpression
-        (IntegerLiteral)
-        (Other "..")
-        (IntegerLiteral)))
+    (Identifier))
+  (ForEach
+    (
+      (Identifier))
+    (Enumeration
+      (Integer)
+      (Integer)
+      (Empty))
     (Boolean))
-  (For
-    (Identifier)
-    (Identifier)
-    (Other "in"
-      (RangeExpression
-        (IntegerLiteral)
-        (Other "..")
-        (IntegerLiteral)))
+  (ForEach
+    (
+      (Identifier)
+      (Identifier))
+    (Enumeration
+      (Integer)
+      (Integer)
+      (Empty))
     (Boolean)))

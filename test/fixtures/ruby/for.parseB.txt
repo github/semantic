@@ -1,11 +1,12 @@
 (Program
-  (For
-    (Identifier)
-    (Other "in"
-      (ArrayLiteral
-        (IntegerLiteral)
-        (IntegerLiteral)
-        (IntegerLiteral)))
-    (MethodCall
+  (ForEach
+    (
+      (Identifier))
+    (Array
+      (Integer)
+      (Integer)
+      (Integer))
+    (Call
       (Identifier)
-      (Identifier))))
+      (Identifier)
+      (Empty))))

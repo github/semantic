@@ -1,6 +1,7 @@
 (Program
   (While
-    (Identifier))
-  (Modifier While
+    (Identifier)
+    ([]))
+  (While
     (Identifier)
     (Identifier)))

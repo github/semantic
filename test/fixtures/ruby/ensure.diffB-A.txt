@@ -1,6 +1,7 @@
 (Program
-  (Begin
-    (Identifier)
-  { (Ensure
-    {-(Identifier)-})
-  ->(Ensure) }))
+  (Try
+    (
+      (Identifier)
+      (Finally
+      { (Identifier)
+      ->([]) }))))

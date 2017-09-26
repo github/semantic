@@ -1,5 +1,5 @@
 (Program
-  (Ternary
+  (If
     (Identifier)
     (Identifier)
     (Identifier)))

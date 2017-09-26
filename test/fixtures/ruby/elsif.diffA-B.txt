@@ -1,9 +1,14 @@
 (Program
   (If
     (Identifier)
-    (MethodCall
-      (Identifier))
-    (Elsif
+    (
+      (Call
+        (Identifier)
+        (Empty)))
+    (If
       (Identifier)
-    {+(MethodCall
-      {+(Identifier)+})+})))
+      (
+      {+(Call
+        {+(Identifier)+}
+        {+(Empty)+})+})
+      (Empty))))

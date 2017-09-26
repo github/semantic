@@ -1,10 +1,11 @@
 (Program
   (Module
-    (Constant)
+    (Identifier)
   {+(Method
-    {+(Identifier)+})+})
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+([])+})+})
 {-(Module
-  {-(ScopeOperator
-    {-(Constant)-}
-    {-(Other "::")-}
-    {-(Constant)-})-})-})
+  {-(ScopeResolution
+    {-(Identifier)-}
+    {-(Identifier)-})-})-})

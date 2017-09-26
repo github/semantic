@@ -1,5 +1,7 @@
 (Program
-  (Modifier Rescue
+  (Try
     (Identifier)
-  { (Identifier)
-  ->(Boolean) }))
+    (Catch
+    { (Null)
+    ->(Boolean) }
+      (Empty))))
