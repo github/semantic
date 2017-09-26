@@ -35,11 +35,11 @@ spec = parallel $ do
       \ a b -> let diff = diffTerms a b :: Diff Syntax (Record '[Category]) (Record '[Category]) in
         afterTerm diff `shouldBe` Just b
 
-  prop "forward permutations are changes" $
-    \ a -> let wrap = termIn (Program :. Nil) . Indexed
-               b = wrap [a]
-               c = wrap [a, b] in
-      diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term Syntax (Record '[Category])]) `shouldBe` merge (Program :. Nil, Program :. Nil) (Indexed [ inserting c, mergeTerm a, mergeTerm b, deleting c ])
+  prop "forward permutations are changes" $ pendingWith "https://github.com/github/semantic-diff/issues/1359"
+    -- \ a -> let wrap = termIn (Program :. Nil) . Indexed
+    --            b = wrap [a]
+    --            c = wrap [a, b] in
+    --   diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term Syntax (Record '[Category])]) `shouldBe` merge (Program :. Nil, Program :. Nil) (Indexed [ inserting c, mergeTerm a, mergeTerm b, deleting c ])
 
   prop "backward permutations are changes" $
     \ a -> let wrap = termIn (Program :. Nil) . Indexed
