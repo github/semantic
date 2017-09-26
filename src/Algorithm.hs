@@ -109,6 +109,7 @@ algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
 
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
+  -- | Construct an algorithm to diff a pair of @f@s populated with disjoint terms.
   algorithmFor :: f term1
                -> f term2
                -> Algorithm term1 term2 result (f result)
