@@ -120,11 +120,21 @@ class Diffable f where
                  -> Algorithm term1 term2 result (f result)
   algorithmFor = genericAlgorithmFor
 
-  subalgorithmFor :: Alternative g
-                  => (a -> g b)
-                  -> (a -> g b)
-                  -> f a
-                  -> g (f b)
+  -- | Construct an algorithm to diff against positions inside an @f@.
+  --
+  --   This is very like 'traverse', with two key differences:
+  --
+  --   1. The traversal distributes through an 'Alternative' functor, not just an 'Applicative'.
+  --   2. The traversal is mediated by two different functions, one for positions which should be ignored for substructural diffing, the other for positions which should be diffed substructurally.
+  --
+  --   These two functions allow us to say e.g. that comparisons against 'Data.Syntax.Context' should also be made against its subject, but not against any of the comments, resulting in the insertion of both comments and context when documenting an existing function.
+  --
+  --   By default, 'subalgorithmFor' produces 'empty', rejecting substructural comparisons. This is important for performance, as alternations with 'empty' are eliminated at construction time.
+  subalgorithmFor :: Alternative g -- ^ The 'Alternative' instance will in general be 'Algorithm', but left opaque to make it harder to shoot oneself in the foot.
+                  => (a -> g b)    -- ^ A “blur” function to traverse positions which should not be diffed against.
+                  -> (a -> g b)    -- ^ A “focus” function to traverse positions which should be diffed against.
+                  -> f a           -- ^ The syntax to diff inside of.
+                  -> g (f b)       -- ^ The resulting algorithm (or other 'Alternative' context), producing the traversed syntax.
   subalgorithmFor _ _ _ = empty
 
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
