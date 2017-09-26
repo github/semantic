@@ -27,10 +27,30 @@ spec = parallel $ do
       \ a b -> let diff = diffTerms a b :: Diff ListableSyntax (Record '[]) (Record '[]) in
         beforeTerm diff `shouldBe` Just a
 
+    prop "recovers the before term from forward permutations" $
+      \ a b -> let wrap = termIn Nil . inj
+                   c = wrap [a] in
+        beforeTerm (diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term ListableSyntax (Record '[])])) `shouldBe` Just (wrap [a, b, c])
+
+    prop "recovers the before term from backward permutations" $
+      \ a b -> let wrap = termIn Nil . inj
+                   c = wrap [a] in
+        beforeTerm (diffTerms (wrap [a, b, c]) (wrap [b, c, a :: Term ListableSyntax (Record '[])])) `shouldBe` Just (wrap [a, b, c])
+
   describe "afterTerm" $ do
     prop "recovers the after term" $
       \ a b -> let diff = diffTerms a b :: Diff ListableSyntax (Record '[]) (Record '[]) in
         afterTerm diff `shouldBe` Just b
+
+    prop "recovers the after term from forward permutations" $
+      \ a b -> let wrap = termIn Nil . inj
+                   c = wrap [a] in
+        afterTerm (diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term ListableSyntax (Record '[])])) `shouldBe` Just (wrap [c, a, b])
+
+    prop "recovers the after term from backward permutations" $
+      \ a b -> let wrap = termIn Nil . inj
+                   c = wrap [a] in
+        afterTerm (diffTerms (wrap [a, b, c]) (wrap [b, c, a :: Term ListableSyntax (Record '[])])) `shouldBe` Just (wrap [b, c, a])
 
   prop "forward permutations are changes" $
     \ a b -> let wrap = termIn Nil . inj
