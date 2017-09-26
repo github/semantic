@@ -37,12 +37,12 @@ spec = parallel $ do
 
   prop "forward permutations are changes" $
     \ a b -> let wrap = termIn (Program :. Nil) . Indexed
-                 c = wrap [a] in
+                 c = wrap [a, b] in
       diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term Syntax (Record '[Category])]) `shouldBe` merge (Program :. Nil, Program :. Nil) (Indexed [ inserting c, mergeTerm a, mergeTerm b, deleting c ])
 
   prop "backward permutations are changes" $
     \ a b -> let wrap = termIn (Program :. Nil) . Indexed
-                 c = wrap [a] in
+                 c = wrap [a, b] in
       diffTerms (wrap [a, b, c]) (wrap [b, c, a :: Term Syntax (Record '[Category])]) `shouldBe` merge (Program :. Nil, Program :. Nil) (Indexed [ deleting a, mergeTerm b, mergeTerm c, inserting a ])
 
 mergeTerm :: Functor syntax => Term syntax ann -> Diff syntax ann ann
