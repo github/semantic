@@ -2,25 +2,28 @@
   (Try
     (
       (Identifier)
-      (Catch
-        (
-          (
-          {+(Identifier)+}
-          {-(Identifier)-}))
-      { (Identifier)
-      ->(Catch
+    {+(Catch
+      {+(
+        {+(
+          {+(Identifier)+})+})+}
+      {+(Catch
         {+(
           {+(
             {+(Identifier)+}
             {+(Identifier)+})+}
           {+(
             {+(Identifier)+})+})+}
-        {+(Identifier)+}) })
+        {+(Identifier)+})+})+}
     {+(Else
       {+(Empty)+}
       {+(Identifier)+})+}
     {+(Finally
-      {+(Identifier)+})+}))
+      {+(Identifier)+})+}
+    {-(Catch
+      {-(
+        {-(
+          {-(Identifier)-})-})-}
+      {-(Identifier)-})-}))
 {+(Method
   {+(Empty)+}
   {+(Identifier)+}
