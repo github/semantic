@@ -32,7 +32,7 @@ spec = parallel $ do
         afterTerm diff `shouldBe` Just b
 
   prop "forward permutations are changes" $ pendingWith "https://github.com/github/semantic-diff/issues/1359"
-    -- \ a -> let wrap = termIn (Program :. Nil) . inj
+    -- \ a -> let wrap = termIn Nil . inj
     --            b = wrap [a]
     --            c = wrap [a, b] in
     --   diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term ListableSyntax (Record '[])]) `shouldBe` merge (Nil, Nil) (inj [ inserting c, mergeTerm a, mergeTerm b, deleting c ])
