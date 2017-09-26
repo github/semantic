@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module DiffSpec where
 
-import Category
 import Data.Functor.Both
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable (ListableSyntax)
@@ -32,14 +31,16 @@ spec = parallel $ do
       \ a b -> let diff = diffTerms a b :: Diff ListableSyntax (Record '[]) (Record '[]) in
         afterTerm diff `shouldBe` Just b
 
-  prop "forward permutations are changes" $
-    \ a b -> let wrap = termIn Nil . inj
-                 c = wrap [a] in
-      diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term ListableSyntax (Record '[])]) `shouldBe` merge (Nil, Nil) (inj [ inserting c, mergeTerm a, mergeTerm b, deleting c ])
+  prop "forward permutations are changes" $ pendingWith "https://github.com/github/semantic-diff/issues/1359"
+    -- \ a -> let wrap = termIn (Program :. Nil) . inj
+    --            b = wrap [a]
+    --            c = wrap [a, b] in
+    --   diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term ListableSyntax (Record '[])]) `shouldBe` merge (Nil, Nil) (inj [ inserting c, mergeTerm a, mergeTerm b, deleting c ])
 
   prop "backward permutations are changes" $
-    \ a b -> let wrap = termIn Nil . inj
-                 c = wrap [a] in
+    \ a -> let wrap = termIn Nil . inj
+               b = wrap [a]
+               c = wrap [a, b] in
       diffTerms (wrap [a, b, c]) (wrap [b, c, a :: Term ListableSyntax (Record '[])]) `shouldBe` merge (Nil, Nil) (inj [ deleting a, mergeTerm b, mergeTerm c, inserting a ])
 
 mergeTerm :: Functor syntax => Term syntax ann -> Diff syntax ann ann
