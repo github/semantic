@@ -24,6 +24,7 @@ module Data.Functor.Listable
 , ListableF(..)
 , addWeight
 , ofWeight
+, ListableSyntax
 ) where
 
 import qualified Category
@@ -322,6 +323,17 @@ instance Listable1 Syntax.Empty where
 
 instance Listable1 Syntax.Identifier where
   liftTiers _ = cons1 Syntax.Identifier
+
+type ListableSyntax = Union
+  '[ Comment.Comment
+   , Declaration.Function
+   , Declaration.Method
+   , Statement.If
+   , Syntax.Context
+   , Syntax.Empty
+   , Syntax.Identifier
+   , []
+   ]
 
 
 instance Listable1 Gram where
