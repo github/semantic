@@ -62,6 +62,7 @@ diffTermsWith :: forall syntax fields1 fields2
               -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
 diffTermsWith comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (runAlgorithm comparable eqTerms (diff t1 t2))
 
+-- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
 runAlgorithm :: forall syntax fields1 fields2 m result
              .  (Diffable syntax, GAlign syntax, Traversable syntax, Alternative m, Monad m)
              => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
