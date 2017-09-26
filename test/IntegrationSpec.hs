@@ -31,16 +31,12 @@ spec = parallel $ do
   describe "typescript" $ runTestsIn "test/fixtures/typescript/" []
 
   where
-    runTestsIn :: FilePath -> [String] -> SpecWith ()
+    runTestsIn :: FilePath -> [(FilePath, String)] -> SpecWith ()
     runTestsIn directory pending = do
       examples <- runIO $ examples directory
       traverse_ (runTest pending) examples
-    runTest pending ParseExample{..} = it ("parses " <> file) $ if parseOutput `elem` pending
-      then pendingWith "pending"
-      else testParse file parseOutput
-    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ if diffOutput `elem` pending
-      then pendingWith "pending"
-      else testDiff (both fileA fileB) diffOutput
+    runTest pending ParseExample{..} = it ("parses " <> file) $ maybe (testParse file parseOutput) pendingWith (lookup parseOutput pending)
+    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ maybe (testDiff (both fileA fileB) diffOutput) pendingWith (lookup diffOutput pending)
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
