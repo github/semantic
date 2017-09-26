@@ -26,7 +26,7 @@ spec = parallel $ do
 
   describe "go" $ runTestsIn "test/fixtures/go/" []
   describe "javascript" $ runTestsIn "test/fixtures/javascript/" []
-  describe "python" $ runTestsIn "test/fixtures/python/" []
+  describe "python" $ runTestsIn "test/fixtures/python/" [ ("test/fixtures/python/while-statement.diffB-A.txt", "https://github.com/github/semantic-diff/issues/1359") ]
   describe "ruby" $ runTestsIn "test/fixtures/ruby/" []
   describe "typescript" $ runTestsIn "test/fixtures/typescript/" []
 
