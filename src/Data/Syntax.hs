@@ -97,21 +97,6 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 
--- Undifferentiated
-
-newtype Leaf a = Leaf { leafContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
-
-instance Eq1 Leaf where liftEq = genericLiftEq
-instance Show1 Leaf where liftShowsPrec = genericLiftShowsPrec
-
-newtype Branch a = Branch { branchElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
-
-instance Eq1 Branch where liftEq = genericLiftEq
-instance Show1 Branch where liftShowsPrec = genericLiftShowsPrec
-
-
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
