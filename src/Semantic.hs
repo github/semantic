@@ -16,6 +16,7 @@ import Data.Diff
 import Data.Functor.Both as Both
 import Data.Output
 import Data.Record
+import Data.Syntax.Algebra
 import Data.Term
 import Decorators
 import Info

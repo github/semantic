@@ -5,18 +5,24 @@ module Data.Syntax.Algebra
 , fToR
 , decoratorWithAlgebra
 , identifierAlgebra
+, syntaxIdentifierAlgebra
 , cyclomaticComplexityAlgebra
 ) where
 
+import Data.Aeson
 import Data.Bifunctor (second)
 import Data.ByteString (ByteString)
+import Data.Foldable (asum)
 import Data.Functor.Foldable
+import Data.JSON.Fields
 import Data.Record
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Term
+import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import Data.Union
+import qualified Syntax as S
 
 -- | An F-algebra on some carrier functor 'f'.
 type FAlgebra f a = f a -> a
@@ -39,6 +45,9 @@ decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (rhe
 newtype Identifier = Identifier ByteString
   deriving (Eq, Show)
 
+instance ToJSONFields Identifier where
+  toJSONFields (Identifier i) = [ "identifier" .= decodeUtf8 i ]
+
 -- | Produce the identifier for a given term, if any.
 --
 --   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
@@ -48,6 +57,24 @@ identifierAlgebra (In _ union) = case union of
   _ | Just Declaration.Class{..} <- prj union -> classIdentifier
   _ | Just Declaration.Method{..} <- prj union -> methodName
   _ -> Nothing
+
+syntaxIdentifierAlgebra :: RAlgebra (TermF S.Syntax a) (Term S.Syntax a) (Maybe Identifier)
+syntaxIdentifierAlgebra (In _ syntax) = case syntax of
+  S.Assignment f _ -> identifier f
+  S.Class f _ _ -> identifier f
+  S.Export f _ -> f >>= identifier
+  S.Function f _ _ -> identifier f
+  S.FunctionCall f _ _ -> identifier f
+  S.Import f _ -> identifier f
+  S.Method _ f _ _ _ -> identifier f
+  S.MethodCall _ f _ _ -> identifier f
+  S.Module f _ -> identifier f
+  S.OperatorAssignment f _ -> identifier f
+  S.SubscriptAccess f _  -> identifier f
+  S.TypeDecl f _ -> identifier f
+  S.VarAssignment f _ -> asum $ identifier <$> f
+  _ -> Nothing
+  where identifier = fmap (Identifier . encodeUtf8) . S.extractLeafValue . unwrap . fst
 
 
 -- | The cyclomatic complexity of a (sub)term.
