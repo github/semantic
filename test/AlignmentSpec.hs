@@ -18,10 +18,10 @@ import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
 import qualified Data.Source as Source
+import Data.SplitDiff
 import Data.Term
 import qualified Data.Text as Text
 import Data.These
-import SplitDiff
 import Syntax
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty

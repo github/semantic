@@ -31,6 +31,7 @@ library
                      , Data.Record
                      , Data.Source
                      , Data.Span
+                     , Data.SplitDiff
                      , Data.Syntax
                      , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
@@ -76,7 +77,6 @@ library
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
-                     , SplitDiff
                      , Syntax
                      , TreeSitter
   build-depends:       base >= 4.8 && < 5

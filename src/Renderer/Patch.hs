@@ -22,9 +22,9 @@ import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
+import Data.SplitDiff
 import Data.These
 import Prelude hiding (fst, snd)
-import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: Both Blob -> ByteString

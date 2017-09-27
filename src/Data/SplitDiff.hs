@@ -1,4 +1,4 @@
-module SplitDiff where
+module Data.SplitDiff where
 
 import Control.Monad.Free
 import Data.Record
