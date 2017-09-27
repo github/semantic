@@ -42,6 +42,7 @@ import Data.Semigroup ((<>))
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
+import Data.Term
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
@@ -55,7 +56,6 @@ import Language.Markdown
 import Parser
 import System.Exit (die)
 import System.IO (Handle, hPutStr, stderr)
-import Term
 import TreeSitter
 import Semantic.Log
 

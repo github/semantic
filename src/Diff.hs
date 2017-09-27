@@ -12,7 +12,7 @@ import Data.JSON.Fields
 import Data.Mergeable
 import Data.Patch
 import Data.Record
-import Term
+import Data.Term
 import Text.Show
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.

@@ -4,13 +4,13 @@ import Data.Blob
 import Data.Functor (void)
 import Data.Functor.Both as Both
 import Data.Patch
+import Data.Term
 import Diff
 import Language
 import Renderer
 import Semantic
 import Semantic.Task
 import Syntax
-import Term
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 

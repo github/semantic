@@ -9,9 +9,9 @@ import Data.Functor.Foldable (cata)
 import Data.Patch
 import Data.Record
 import Data.Semigroup
+import Data.Term
 import Diff
 import Prelude hiding (replicate)
-import Term
 
 -- | Returns a ByteString SExpression formatted diff.
 renderSExpressionDiff :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => Diff syntax (Record fields) (Record fields) -> ByteString

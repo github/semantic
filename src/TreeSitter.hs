@@ -16,6 +16,7 @@ import Data.Record
 import Data.Source
 import Data.Span
 import qualified Data.Syntax.Assignment as A
+import Data.Term
 import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
@@ -25,7 +26,6 @@ import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
 import qualified Syntax as S
-import Term
 import qualified TreeSitter.Document as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Language as TS

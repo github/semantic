@@ -15,8 +15,8 @@ import Data.Record
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
+import Data.Term
 import Data.Union
-import Term
 
 -- | An F-algebra on some carrier functor 'f'.
 type FAlgebra f a = f a -> a

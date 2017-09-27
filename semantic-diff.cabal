@@ -41,6 +41,7 @@ library
                      , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
+                     , Data.Term
                      , Decorators
                      , Diff
                      , Files
@@ -77,7 +78,6 @@ library
                      , SES
                      , SplitDiff
                      , Syntax
-                     , Term
                      , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , aeson

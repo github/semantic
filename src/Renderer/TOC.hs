@@ -36,6 +36,7 @@ import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
+import Data.Term
 import Data.Text (toLower)
 import qualified Data.Text as T
 import Data.Union
@@ -50,7 +51,6 @@ import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
-import Term
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)

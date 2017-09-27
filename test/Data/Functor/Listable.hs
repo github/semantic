@@ -44,6 +44,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
+import Data.Term
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
@@ -52,7 +53,6 @@ import Diff
 import Renderer.TOC
 import RWS
 import Syntax as S
-import Term
 import Test.LeanCheck
 
 type Tier a = [a]

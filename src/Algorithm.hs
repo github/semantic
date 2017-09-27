@@ -8,11 +8,11 @@ import Data.Functor.Classes
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe
 import Data.Proxy
+import Data.Term
 import Data.These
 import Data.Union
 import Diff
 import GHC.Generics
-import Term
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term1 term2 result partial where

@@ -26,12 +26,12 @@ import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Record
+import Data.Term
 import Data.These
 import Diff
 import Info (byteRange, setByteRange)
 import Prelude hiding (fst, snd)
 import SplitDiff
-import Term
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]

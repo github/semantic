@@ -19,10 +19,10 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Term as Term
 import Data.Union
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
-import qualified Term
 
 -- | The type of Ruby syntax.
 type Syntax = '[

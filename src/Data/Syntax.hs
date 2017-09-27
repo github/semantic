@@ -18,10 +18,10 @@ import Data.Record
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
+import Data.Term
 import Data.Union
 import GHC.Generics
 import GHC.Stack
-import Term
 
 -- Combinators
 

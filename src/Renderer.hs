@@ -26,6 +26,7 @@ import qualified Data.Map as Map
 import Data.Output
 import Data.Record
 import Data.Syntax.Algebra (RAlgebra)
+import Data.Term
 import Data.Text (Text)
 import Diff
 import Info (DefaultFields)
@@ -34,7 +35,6 @@ import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.TOC as R
 import Syntax as S
-import Term
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where

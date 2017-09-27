@@ -5,10 +5,10 @@ import Control.Comonad.Trans.Cofree
 import Data.Aeson
 import Data.Foldable
 import Data.Record
+import Data.Term
 import GHC.Generics
 import Info
 import qualified Syntax as S
-import Term
 
 -- | A programming language.
 data Language

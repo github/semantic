@@ -16,6 +16,7 @@ import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
+import Data.Term
 import Data.Text (Text)
 import Data.These
 import Diff
@@ -30,7 +31,6 @@ import Semantic
 import Semantic.Task
 import SpecHelpers
 import Syntax as S
-import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck

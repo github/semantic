@@ -6,13 +6,13 @@ import Data.Bifunctor
 import Data.Functor.Listable (ListableSyntax)
 import Data.Record
 import qualified Data.Syntax as Syntax
+import Data.Term
 import Data.These
 import Data.Union
 import Decorators
 import Diff
 import Interpreter
 import RWS
-import Term
 import Test.Hspec
 import Test.Hspec.LeanCheck
 

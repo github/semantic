@@ -15,6 +15,7 @@ import Data.ByteString (ByteString)
 import Data.Functor.Both as Both
 import Data.Output
 import Data.Record
+import Data.Term
 import Decorators
 import Diff
 import Info
@@ -23,7 +24,6 @@ import qualified Language
 import Parser
 import Renderer
 import Semantic.Task as Task
-import Term
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
