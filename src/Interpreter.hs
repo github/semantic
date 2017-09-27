@@ -10,6 +10,7 @@ import Algorithm
 import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
+import Data.Diff
 import Data.Functor.Classes
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe, isJust)
@@ -21,7 +22,6 @@ import Data.Text (Text)
 import Data.These
 import Data.Union
 import Decorators
-import Diff
 import Info hiding (Empty, Return)
 import RWS
 import Syntax (Syntax(Leaf))

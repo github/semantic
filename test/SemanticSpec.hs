@@ -1,11 +1,11 @@
 module SemanticSpec where
 
 import Data.Blob
+import Data.Diff
 import Data.Functor (void)
 import Data.Functor.Both as Both
 import Data.Patch
 import Data.Term
-import Diff
 import Language
 import Renderer
 import Semantic

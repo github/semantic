@@ -18,6 +18,7 @@ import Control.Monad.Random
 import Control.Monad.State.Strict
 import Data.Align.Generic
 import Data.Array.Unboxed
+import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import Data.Foldable
 import Data.Function ((&))
 import Data.Functor.Classes
@@ -32,7 +33,6 @@ import Data.Semigroup hiding (First(..))
 import Data.Term as Term
 import Data.These
 import Data.Traversable
-import Diff (DiffF(..), deleting, inserting, merge, replacing)
 import SES
 import System.Random.Mersenne.Pure64
 

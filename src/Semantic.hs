@@ -12,12 +12,12 @@ import Control.Monad ((<=<))
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
+import Data.Diff
 import Data.Functor.Both as Both
 import Data.Output
 import Data.Record
 import Data.Term
 import Decorators
-import Diff
 import Info
 import Interpreter
 import qualified Language

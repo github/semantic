@@ -14,6 +14,7 @@ import Control.Monad (join)
 import Control.Monad.Free (wrap)
 import Data.Align
 import Data.Bifunctor.Join
+import Data.Diff
 import Data.Foldable (toList)
 import Data.Function (on)
 import Data.Functor.Both
@@ -28,7 +29,6 @@ import Data.Source
 import Data.Record
 import Data.Term
 import Data.These
-import Diff
 import Info (byteRange, setByteRange)
 import Prelude hiding (fst, snd)
 import SplitDiff

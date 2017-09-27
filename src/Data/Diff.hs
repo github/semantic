@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
-module Diff where
+module Data.Diff where
 
 import Data.Aeson
 import Data.Bifoldable

@@ -23,6 +23,7 @@ import Data.Bifoldable (bifoldMap)
 import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
+import Data.Diff
 import Data.Error as Error (Error(..), showExpectation)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
@@ -40,7 +41,6 @@ import Data.Term
 import Data.Text (toLower)
 import qualified Data.Text as T
 import Data.Union
-import Diff
 import GHC.Generics
 import Info
 import Language

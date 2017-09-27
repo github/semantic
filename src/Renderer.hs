@@ -20,6 +20,7 @@ module Renderer
 
 import Data.Aeson (Value, (.=))
 import Data.ByteString (ByteString)
+import Data.Diff
 import Data.Foldable (asum)
 import Data.JSON.Fields
 import qualified Data.Map as Map
@@ -28,7 +29,6 @@ import Data.Record
 import Data.Syntax.Algebra (RAlgebra)
 import Data.Term
 import Data.Text (Text)
-import Diff
 import Info (DefaultFields)
 import Renderer.JSON as R
 import Renderer.Patch as R

@@ -18,6 +18,7 @@ library
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
+                     , Data.Diff
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
@@ -43,7 +44,6 @@ library
                      , Data.Syntax.Type
                      , Data.Term
                      , Decorators
-                     , Diff
                      , Files
                      , Info
                      , Interpreter
