@@ -67,9 +67,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
           <|> flag'                                  (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output an s-expression diff tree")
           <|> flag'                                  (SomeRenderer OldToCDiffRenderer)      (long "toc" <> help "Output a table of contents for a diff")
           <|> flag'                                  (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output a table of contents for a diff using the assignment parser") )
-      <*> (   ((Right . pure) .) . both
+      <*> (   Right <$> some (both
           <$> argument filePathReader (metavar "FILE_A")
-          <*> argument filePathReader (metavar "FILE_B")
+          <*> argument filePathReader (metavar "FILE_B"))
           <|> pure (Left stdin) )
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for path(s)"))
