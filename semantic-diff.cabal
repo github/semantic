@@ -44,7 +44,6 @@ library
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
-                     , Decorators
                      , Files
                      , Info
                      , Interpreter

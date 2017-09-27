@@ -16,12 +16,12 @@ import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe, isJust)
 import Data.Record
 import qualified Data.Syntax as Syntax
+import Data.Syntax.Algebra
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Text (Text)
 import Data.These
 import Data.Union
-import Decorators
 import Info hiding (Empty, Return)
 import RWS
 import Syntax (Syntax(Leaf))

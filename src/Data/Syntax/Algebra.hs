@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Syntax.Algebra
 ( FAlgebra
 , RAlgebra
@@ -7,21 +7,27 @@ module Data.Syntax.Algebra
 , identifierAlgebra
 , syntaxIdentifierAlgebra
 , cyclomaticComplexityAlgebra
+, ConstructorLabel(..)
+, constructorNameAndConstantFields
+, constructorLabel
 ) where
 
 import Data.Aeson
 import Data.Bifunctor (second)
-import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.Foldable (asum)
+import Data.Functor.Classes (Show1 (liftShowsPrec))
 import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
+import Data.Proxy
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Term
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import Data.Union
+import GHC.Generics
 import qualified Syntax as S
 
 -- | An F-algebra on some carrier functor 'f'.
@@ -92,3 +98,46 @@ cyclomaticComplexityAlgebra (In _ union) = case union of
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
   _ | Just Statement.Yield{} <- prj union -> succ (sum union)
   _ -> sum union
+
+-- | Compute a 'ByteString' label for a 'Show1'able 'Term'.
+--
+--   This uses 'liftShowsPrec' to produce the 'ByteString', with the effect that
+--   constant fields will be included and parametric fields will not be.
+constructorNameAndConstantFields :: Show1 f => TermF f a b -> ByteString
+constructorNameAndConstantFields (In _ f) = pack (liftShowsPrec (const (const id)) (const id) 0 f "")
+
+-- | Compute a 'ConstructorLabel' label for a 'Union' of syntax 'Term's.
+constructorLabel :: Apply ConstructorName fs => TermF (Union fs) a b -> ConstructorLabel
+constructorLabel (In _ u) = ConstructorLabel $ pack (apply (Proxy :: Proxy ConstructorName) constructorName u)
+
+
+newtype ConstructorLabel = ConstructorLabel ByteString
+
+instance Show ConstructorLabel where
+  showsPrec _ (ConstructorLabel s) = showString (unpack s)
+
+instance ToJSONFields ConstructorLabel where
+  toJSONFields (ConstructorLabel s) = [ "category" .= decodeUtf8 s ]
+
+
+class ConstructorName f where
+  constructorName :: f a -> String
+
+instance (Generic1 f, GConstructorName (Rep1 f)) => ConstructorName f where
+  constructorName = gconstructorName . from1
+
+
+class GConstructorName f where
+  gconstructorName :: f a -> String
+
+instance GConstructorName f => GConstructorName (M1 D c f) where
+  gconstructorName = gconstructorName . unM1
+
+instance (GConstructorName f, GConstructorName g) => GConstructorName (f :+: g) where
+  gconstructorName (L1 l) = gconstructorName l
+  gconstructorName (R1 r) = gconstructorName r
+
+instance Constructor c => GConstructorName (M1 C c f) where
+  gconstructorName x = case conName x of
+                        ":" -> ""
+                        n -> n
