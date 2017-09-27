@@ -34,6 +34,7 @@ import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Functor.Both
 import Data.List.NonEmpty
+import Data.Patch
 import Data.Range
 import Data.Record
 import Data.Semigroup
@@ -48,7 +49,6 @@ import qualified Data.Text.Encoding as T
 import Data.These
 import Data.Union
 import Diff
-import Patch
 import Renderer.TOC
 import RWS
 import Syntax as S

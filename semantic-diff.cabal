@@ -25,6 +25,7 @@ library
                      , Data.JSON.Fields
                      , Data.Mergeable
                      , Data.Output
+                     , Data.Patch
                      , Data.Range
                      , Data.Record
                      , Data.Source
@@ -61,7 +62,6 @@ library
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
-                     , Patch
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON

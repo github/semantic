@@ -6,10 +6,10 @@ module Renderer.SExpression
 
 import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length, null)
 import Data.Functor.Foldable (cata)
+import Data.Patch
 import Data.Record
 import Data.Semigroup
 import Diff
-import Patch
 import Prelude hiding (replicate)
 import Term
 

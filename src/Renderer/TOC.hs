@@ -32,6 +32,7 @@ import Data.List.NonEmpty (nonEmpty)
 import Data.List (sortOn)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
+import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
@@ -42,7 +43,6 @@ import Diff
 import GHC.Generics
 import Info
 import Language
-import Patch
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Syntax as S

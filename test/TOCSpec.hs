@@ -12,6 +12,7 @@ import Data.Functor.Listable
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
 import Data.Output
+import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
@@ -21,7 +22,6 @@ import Diff
 import Info
 import Interpreter
 import Language
-import Patch
 import Prelude hiding (readFile)
 import Renderer
 import Renderer.TOC

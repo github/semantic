@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Patch
+module Data.Patch
 ( Patch(..)
 , after
 , before

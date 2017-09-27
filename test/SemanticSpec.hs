@@ -3,9 +3,9 @@ module SemanticSpec where
 import Data.Blob
 import Data.Functor (void)
 import Data.Functor.Both as Both
+import Data.Patch
 import Diff
 import Language
-import Patch
 import Renderer
 import Semantic
 import Semantic.Task

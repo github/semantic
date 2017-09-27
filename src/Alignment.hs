@@ -21,6 +21,7 @@ import Data.Functor.Foldable (cata)
 import Data.Functor.Identity
 import Data.List (partition, sortBy)
 import Data.Maybe (catMaybes, fromJust, listToMaybe)
+import Data.Patch
 import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
@@ -28,7 +29,6 @@ import Data.Record
 import Data.These
 import Diff
 import Info (byteRange, setByteRange)
-import Patch
 import Prelude hiding (fst, snd)
 import SplitDiff
 import Term

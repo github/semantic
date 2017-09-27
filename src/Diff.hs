@@ -10,8 +10,8 @@ import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
 import Data.Mergeable
+import Data.Patch
 import Data.Record
-import Patch
 import Term
 import Text.Show
 
