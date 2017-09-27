@@ -49,6 +49,7 @@ identifierAlgebra (In _ union) = case union of
   _ | Just Declaration.Method{..} <- prj union -> methodName
   _ -> Nothing
 
+
 -- | The cyclomatic complexity of a (sub)term.
 newtype CyclomaticComplexity = CyclomaticComplexity Int
   deriving (Enum, Eq, Num, Ord, Show)
