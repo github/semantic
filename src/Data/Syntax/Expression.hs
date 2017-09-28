@@ -54,21 +54,21 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | Javascript delete operator
-data Delete a = Delete !a
+newtype Delete a = Delete !a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Delete where liftEq = genericLiftEq
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 -- | Javascript void operator
-data Void a = Void !a
+newtype Void a = Void !a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Void where liftEq = genericLiftEq
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
 -- | Javascript typeof operator
-data Typeof a = Typeof !a
+newtype Typeof a = Typeof !a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Typeof where liftEq = genericLiftEq
