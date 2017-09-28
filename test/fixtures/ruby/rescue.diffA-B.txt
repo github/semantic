@@ -2,20 +2,23 @@
   (Try
     (
       (Identifier)
-      (Catch
-        (
-          (
-          {+(Identifier)+}
-          {-(Identifier)-}))
-      { (Catch
+    {+(Catch
+      {+(
+        {+(
+          {+(Identifier)+})+})+}
+      {+(Identifier)+})+}
+    {-(Catch
+      {-(
+        {-(
+          {-(Identifier)-})-})-}
+      {-(Catch
         {-(
           {-(
             {-(Identifier)-}
             {-(Identifier)-})-}
           {-(
             {-(Identifier)-})-})-}
-        {-(Identifier)-})
-      ->(Identifier) })
+        {-(Identifier)-})-})-}
     {-(Else
       {-(Empty)-}
       {-(Identifier)-})-}

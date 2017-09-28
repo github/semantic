@@ -2,9 +2,9 @@
   (Assignment
     (
       (Identifier)
-    { (Identifier)
-    ->(Identifier) }
-    {+(Identifier)+})
+    {+(Identifier)+}
+    {+(Identifier)+}
+    {-(Identifier)-})
     (Array
       (Integer)
       (Integer)

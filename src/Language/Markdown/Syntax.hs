@@ -46,9 +46,10 @@ type Syntax =
    , Markup.Strong
    , Markup.Text
    , Markup.Strikethrough
-   -- NB: Diffing requires Methods and Functions in the union.
+   -- NB: Diffing requires Methods, Functions, and Context in the union.
    , Declaration.Method
    , Declaration.Function
+   , Syntax.Context
    -- Assignment errors; cmark does not provide parse errors.
    , Syntax.Error
    , []

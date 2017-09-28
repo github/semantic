@@ -13,10 +13,10 @@
       (Identifier)
       (Empty))
     (
-    { (Identifier)
-    ->(Call
+    {+(Call
       {+(Identifier)+}
-      {+(Empty)+}) }))
+      {+(Empty)+})+}
+    {-(Identifier)-}))
 {-(Assignment
   {-(Identifier)-}
   {-(If

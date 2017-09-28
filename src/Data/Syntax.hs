@@ -13,12 +13,12 @@ import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
+import Data.Mergeable
 import Data.Record
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Union
-import Diff
 import GHC.Generics
 import GHC.Stack
 import Term
@@ -97,32 +97,17 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 
--- Undifferentiated
-
-newtype Leaf a = Leaf { leafContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Leaf where liftEq = genericLiftEq
-instance Show1 Leaf where liftShowsPrec = genericLiftShowsPrec
-
-newtype Branch a = Branch { branchElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Branch where liftEq = genericLiftEq
-instance Show1 Branch where liftShowsPrec = genericLiftShowsPrec
-
-
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
@@ -132,7 +117,7 @@ instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
@@ -140,7 +125,7 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
@@ -153,38 +138,10 @@ unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList 
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Diffable Context where
+  subalgorithmFor blur focus (Context n1 s1) = Context <$> traverse blur n1 <*> focus s1
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
-
-focus :: Applicative f
-      => (a -> f b)
-      -> (a -> f b)
-      -> Context a
-      -> f (Context b)
-focus blur focus (Context n1 s1) = Context <$> traverse blur n1 <*> focus s1
-
-algorithmDeletingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
-                         => TermF Context ann1 (Term (Union fs) ann1)
-                         -> Term (Union fs) ann2
-                         -> Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2)
-algorithmDeletingContext (In a1 (Context n1 s1)) s2 = deleteF . In a1 . inj . Context (deleting <$> n1) <$> algorithmForTerms s1 s2
-
-algorithmInsertingContext :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
-                          => Term (Union fs) ann1
-                          -> TermF Context ann2 (Term (Union fs) ann2)
-                          -> Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2)
-algorithmInsertingContext s1 (In a2 (Context n2 s2)) = insertF . In a2 . inj . Context (inserting <$> n2) <$> algorithmForTerms s1 s2
-
-algorithmForContextUnions :: (Apply Diffable fs, Apply Functor fs, Context :< fs)
-                          => Term (Union fs) ann1
-                          -> Term (Union fs) ann2
-                          -> Algorithm (Term (Union fs)) (Diff (Union fs) ann1 ann2) (Diff (Union fs) ann1 ann2)
-algorithmForContextUnions t1 t2
-  =   algorithmForTerms t1 t2
-  <|> maybe empty (`algorithmDeletingContext` t2) (prjTermF (unTerm t1))
-  <|> maybe empty (algorithmInsertingContext t1) (prjTermF (unTerm t2))
-  where prjTermF (In a u) = In a <$> prj u

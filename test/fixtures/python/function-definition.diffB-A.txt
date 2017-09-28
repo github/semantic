@@ -21,9 +21,9 @@
     (Function
     { (Identifier)
     ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) }
     {+(Identifier)+}
+    {+(Identifier)+}
+    {-(Identifier)-}
       (
       {+(Identifier)+}
       {-(Identifier)-}))
@@ -47,8 +47,8 @@
         ->(TextElement) })
       { (Identifier)
       ->(Identifier) })
-    { (Identifier)
-    ->(Identifier) }
+    {+(Identifier)+}
+    {-(Identifier)-}
       (
         (Identifier)))
     (Empty)))

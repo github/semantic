@@ -15,82 +15,79 @@ import GHC.Generics
 import Term
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
-data AlgorithmF term diff result where
+data AlgorithmF term1 term2 result partial where
   -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
-  Diff :: term ann1 -> term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
+  Diff :: term1 -> term2 -> AlgorithmF term1 term2 result result
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
-  Linear :: term ann1 -> term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
+  Linear :: term1 -> term2 -> AlgorithmF term1 term2 result result
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
-  RWS :: [term ann1] -> [term ann2] -> AlgorithmF term (diff ann1 ann2) [diff ann1 ann2]
+  RWS :: [term1] -> [term2] -> AlgorithmF term1 term2 result [result]
   -- | Delete a term.
-  Delete :: term ann1 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
+  Delete :: term1 -> AlgorithmF term1 term2 result result
   -- | Insert a term.
-  Insert :: term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
+  Insert :: term2 -> AlgorithmF term1 term2 result result
   -- | Replace one term with another.
-  Replace :: term ann1 -> term ann2 -> AlgorithmF term (diff ann1 ann2) (diff ann1 ann2)
+  Replace :: term1 -> term2 -> AlgorithmF term1 term2 result result
   -- | An 'Algorithm' that always fails.
-  Empty :: AlgorithmF term diff a
+  Empty :: AlgorithmF term1 term2 result a
   -- | An 'Algorithm' to try one of two alternatives.
-  Alt :: a -> a -> AlgorithmF term diff a
+  Alt :: a -> a -> AlgorithmF term1 term2 result a
 
 -- | The free(r) monad for 'AlgorithmF'. This enables us to construct algorithms to diff using '<$>', '<*>', '>>=', and do-notation.
-type Algorithm term diff = Freer (AlgorithmF term diff)
+type Algorithm term1 term2 result = Freer (AlgorithmF term1 term2 result)
 
 
 -- DSL
 
 -- | Diff two terms without specifying the algorithm to be used.
-diff :: term ann1 -> term ann2 -> Algorithm term (diff ann1 ann2) (diff ann1 ann2)
+diff :: term1 -> term2 -> Algorithm term1 term2 result result
 diff = (liftF .) . Algorithm.Diff
 
 -- | Diff a These of terms without specifying the algorithm to be used.
-diffThese :: These (term ann1) (term ann2) -> Algorithm term (diff ann1 ann2) (diff ann1 ann2)
+diffThese :: These term1 term2 -> Algorithm term1 term2 result result
 diffThese = these byDeleting byInserting diff
 
 -- | Diff a pair of optional terms without specifying the algorithm to be used.
-diffMaybe :: Maybe (term ann1) -> Maybe (term ann2) -> Algorithm term (diff ann1 ann2) (Maybe (diff ann1 ann2))
-diffMaybe a b = case (a, b) of
-  (Just a, Just b) -> Just <$> diff a b
-  (Just a, _) -> Just <$> byDeleting a
-  (_, Just b) -> Just <$> byInserting b
-  _ -> pure Nothing
+diffMaybe :: Maybe term1 -> Maybe term2 -> Algorithm term1 term2 result (Maybe result)
+diffMaybe (Just a) (Just b) = Just <$> diff a b
+diffMaybe (Just a) _        = Just <$> byDeleting a
+diffMaybe _        (Just b) = Just <$> byInserting b
+diffMaybe _        _        = pure Nothing
 
 -- | Diff two terms linearly.
-linearly :: term ann1 -> term ann2 -> Algorithm term (diff ann1 ann2) (diff ann1 ann2)
-linearly a b = liftF (Linear a b)
+linearly :: term1 -> term2 -> Algorithm term1 term2 result result
+linearly f1 f2 = liftF (Linear f1 f2)
 
 -- | Diff two terms using RWS.
-byRWS :: [term ann1] -> [term ann2] -> Algorithm term (diff ann1 ann2) [diff ann1 ann2]
+byRWS :: [term1] -> [term2] -> Algorithm term1 term2 result [result]
 byRWS a b = liftF (RWS a b)
 
 -- | Delete a term.
-byDeleting :: term ann1 -> Algorithm term (diff ann1 ann2) (diff ann1 ann2)
+byDeleting :: term1 -> Algorithm term1 term2 result result
 byDeleting = liftF . Delete
 
 -- | Insert a term.
-byInserting :: term ann2 -> Algorithm term (diff ann1 ann2) (diff ann1 ann2)
+byInserting :: term2 -> Algorithm term1 term2 result result
 byInserting = liftF . Insert
 
 -- | Replace one term with another.
-byReplacing :: term ann1 -> term ann2 -> Algorithm term (diff ann1 ann2) (diff ann1 ann2)
+byReplacing :: term1 -> term2 -> Algorithm term1 term2 result result
 byReplacing = (liftF .) . Replace
 
 
-instance (Show1 term, Show ann1, Show ann2) => Show1 (AlgorithmF term (diff ann1 ann2)) where
+instance (Show term1, Show term2) => Show1 (AlgorithmF term1 term2 result) where
   liftShowsPrec sp _ d algorithm = case algorithm of
-    Algorithm.Diff t1 t2 -> showsBinaryWith showsTerm showsTerm "Diff" d t1 t2
-    Linear t1 t2 -> showsBinaryWith showsTerm showsTerm "Linear" d t1 t2
-    RWS as bs -> showsBinaryWith (liftShowsPrec showsTerm (liftShowList showsPrec showList)) (liftShowsPrec showsTerm (liftShowList showsPrec showList)) "RWS" d as bs
-    Delete t1 -> showsUnaryWith showsTerm "Delete" d t1
-    Insert t2 -> showsUnaryWith showsTerm "Insert" d t2
-    Replace t1 t2 -> showsBinaryWith showsTerm showsTerm "Replace" d t1 t2
+    Algorithm.Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
+    Linear t1 t2 -> showsBinaryWith showsPrec showsPrec "Linear" d t1 t2
+    RWS as bs -> showsBinaryWith (liftShowsPrec showsPrec showList) (liftShowsPrec showsPrec showList) "RWS" d as bs
+    Delete t1 -> showsUnaryWith showsPrec "Delete" d t1
+    Insert t2 -> showsUnaryWith showsPrec "Insert" d t2
+    Replace t1 t2 -> showsBinaryWith showsPrec showsPrec "Replace" d t1 t2
     Empty -> showString "Empty"
     Alt a b -> showsBinaryWith sp sp "Alt" d a b
-    where showsTerm :: (Show1 term, Show ann) => Int -> term ann -> ShowS
-          showsTerm = liftShowsPrec showsPrec showList
 
 
-instance Alternative (Algorithm term diff) where
+instance Alternative (Algorithm term1 term2 result) where
   empty = Empty `Then` return
 
   (Empty `Then` _) <|> b = b
@@ -103,23 +100,47 @@ instance Alternative (Algorithm term diff) where
 algorithmForTerms :: Diffable syntax
                   => Term syntax ann1
                   -> Term syntax ann2
-                  -> Algorithm (Term syntax) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2)
-algorithmForTerms (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
-
+                  -> Algorithm (Term syntax ann1) (Term syntax ann2) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2)
+algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
+  =   mergeFor t1 t2
+  <|> deleteF . In ann1      <$> subalgorithmFor byDeleting  (flip mergeFor t2) f1
+  <|> insertF . In      ann2 <$> subalgorithmFor byInserting (     mergeFor t1) f2
+  where mergeFor (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
 
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
-  algorithmFor :: f (term ann1)
-               -> f (term ann2)
-               -> Algorithm term (diff ann1 ann2) (f (diff ann1 ann2))
+  -- | Construct an algorithm to diff a pair of @f@s populated with disjoint terms.
+  algorithmFor :: f term1
+               -> f term2
+               -> Algorithm term1 term2 result (f result)
   default
     algorithmFor :: (Generic1 f, GDiffable (Rep1 f))
-                 => f (term ann1)
-                 -> f (term ann2)
-                 -> Algorithm term (diff ann1 ann2) (f (diff ann1 ann2))
+                 => f term1
+                 -> f term2
+                 -> Algorithm term1 term2 result (f result)
   algorithmFor = genericAlgorithmFor
 
-genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f)) => f (term ann1) -> f (term ann2) -> Algorithm term (diff ann1 ann2) (f (diff ann1 ann2))
+  -- | Construct an algorithm to diff against positions inside an @f@.
+  --
+  --   This is very like 'traverse', with two key differences:
+  --
+  --   1. The traversal distributes through an 'Alternative' functor, not just an 'Applicative'.
+  --   2. The traversal is mediated by two different functions, one for positions which should be ignored for substructural diffing, the other for positions which should be diffed substructurally.
+  --
+  --   These two functions allow us to say e.g. that comparisons against 'Data.Syntax.Context' should also be made against its subject, but not against any of the comments, resulting in the insertion of both comments and context when documenting an existing function.
+  --
+  --   By default, 'subalgorithmFor' produces 'empty', rejecting substructural comparisons. This is important for performance, as alternations with 'empty' are eliminated at construction time.
+  subalgorithmFor :: Alternative g -- ^ The 'Alternative' instance will in general be 'Algorithm', but left opaque to make it harder to shoot oneself in the foot.
+                  => (a -> g b)    -- ^ A “blur” function to traverse positions which should not be diffed against.
+                  -> (a -> g b)    -- ^ A “focus” function to traverse positions which should be diffed against.
+                  -> f a           -- ^ The syntax to diff inside of.
+                  -> g (f b)       -- ^ The resulting algorithm (or other 'Alternative' context), producing the traversed syntax.
+  subalgorithmFor _ _ _ = empty
+
+genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
+                    => f term1
+                    -> f term2
+                    -> Algorithm term1 term2 result (f result)
 genericAlgorithmFor a b = to1 <$> galgorithmFor (from1 a) (from1 b)
 
 
@@ -130,13 +151,23 @@ genericAlgorithmFor a b = to1 <$> galgorithmFor (from1 a) (from1 b)
 instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
 
--- | Diff two list parameters using RWS.
+  subalgorithmFor blur focus = apply' (Proxy :: Proxy Diffable) (\ inj f1 -> inj <$> subalgorithmFor blur focus f1)
+
+-- | Diff two 'Maybe's.
+instance Diffable Maybe where
+  algorithmFor = diffMaybe
+
+-- | Diff two lists using RWS.
 instance Diffable [] where
-  algorithmFor a b = byRWS a b
+  algorithmFor = byRWS
+
+-- | Diff two non-empty lists using RWS.
+instance Diffable NonEmpty where
+  algorithmFor (a:|as) (b:|bs) = (\ (d:ds) -> d:|ds) <$> byRWS (a:as) (b:bs)
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class GDiffable f where
-  galgorithmFor :: f (term ann1) -> f (term ann2) -> Algorithm term (diff ann1 ann2) (f (diff ann1 ann2))
+  galgorithmFor :: f term1 -> f term2 -> Algorithm term1 term2 result (f result)
 
 -- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
 instance GDiffable f => GDiffable (M1 i c f) where
@@ -157,7 +188,7 @@ instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
 -- | Diff two parameters (Par1 is the Generic1 newtype representing a type parameter).
 -- i.e. data Foo a = Foo a (the 'a' is captured by Par1).
 instance GDiffable Par1 where
-  galgorithmFor (Par1 a) (Par1 b) = Par1 <$> linearly a b
+  galgorithmFor (Par1 a) (Par1 b) = Par1 <$> diff a b
 
 -- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
 -- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).
@@ -169,12 +200,6 @@ instance Eq c => GDiffable (K1 i c) where
 instance GDiffable U1 where
   galgorithmFor _ _ = pure U1
 
--- | Diff two lists of parameters.
-instance GDiffable (Rec1 []) where
-  galgorithmFor a b = Rec1 <$> byRWS (unRec1 a) (unRec1 b)
-
--- | Diff two non-empty lists of parameters.
-instance GDiffable (Rec1 NonEmpty) where
-  galgorithmFor (Rec1 (a:|as)) (Rec1 (b:|bs)) = do
-    d:ds <- byRWS (a:as) (b:bs)
-    pure (Rec1 (d :| ds))
+-- | Diff two 'Diffable' containers of parameters.
+instance Diffable f => GDiffable (Rec1 f) where
+  galgorithmFor a b = Rec1 <$> algorithmFor (unRec1 a) (unRec1 b)

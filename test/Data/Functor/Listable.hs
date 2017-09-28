@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Data.Functor.Listable
 ( Listable(..)
@@ -24,6 +24,7 @@ module Data.Functor.Listable
 , ListableF(..)
 , addWeight
 , ofWeight
+, ListableSyntax
 ) where
 
 import qualified Category
@@ -32,19 +33,25 @@ import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Functor.Both
+import Data.List.NonEmpty
 import Data.Range
 import Data.Record
 import Data.Semigroup
 import Data.Source
 import Data.Span
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Statement as Statement
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
+import Data.Union
 import Diff
 import Patch
 import Renderer.TOC
 import RWS
-import Syntax
+import Syntax as S
 import Term
 import Test.LeanCheck
 
@@ -132,6 +139,9 @@ instance Listable a => Listable1 ((,) a) where
 instance Listable1 [] where
   liftTiers tiers = go
     where go = cons0 [] \/ liftCons2 tiers go (:)
+
+instance Listable1 NonEmpty where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) (:|)
 
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
@@ -242,11 +252,11 @@ instance Listable1 Syntax where
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
     \/ liftCons2 recur (liftTiers recur) Case
     \/ liftCons1 (liftTiers recur) Select
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
-    \/ liftCons2 recur recur Syntax.Pair
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Object
+    \/ liftCons2 recur recur S.Pair
     \/ liftCons1 (pack `mapT` tiers) Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
-    \/ liftCons1 (liftTiers recur) Syntax.ParseError
+    \/ liftCons1 (liftTiers recur) S.ParseError
     \/ liftCons2 (liftTiers recur) (liftTiers recur) For
     \/ liftCons2 recur recur DoWhile
     \/ liftCons2 recur (liftTiers recur) While
@@ -254,7 +264,7 @@ instance Listable1 Syntax where
     \/ liftCons1 recur Throw
     \/ liftCons1 recur Constructor
     \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Array
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
     \/ liftCons5 (liftTiers recur) recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
@@ -281,6 +291,49 @@ instance Listable1 Syntax where
 
 instance Listable recur => Listable (Syntax recur) where
   tiers = tiers1
+
+
+instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g ': fs)) where
+  liftTiers tiers = (inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Union (g ': fs) a)]) tiers))
+
+instance Listable1 f => Listable1 (Union '[f]) where
+  liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+
+
+instance Listable1 Comment.Comment where
+  liftTiers _ = cons1 Comment.Comment
+
+instance Listable1 Declaration.Function where
+  liftTiers tiers = liftCons3 tiers (liftTiers tiers) tiers Declaration.Function
+
+instance Listable1 Declaration.Method where
+  liftTiers tiers = liftCons4 tiers tiers (liftTiers tiers) tiers Declaration.Method
+
+instance Listable1 Statement.If where
+  liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
+
+instance Listable1 Statement.Return where
+  liftTiers tiers = liftCons1 tiers Statement.Return
+
+instance Listable1 Syntax.Context where
+  liftTiers tiers = liftCons2 (liftTiers tiers) tiers Syntax.Context
+
+instance Listable1 Syntax.Empty where
+  liftTiers _ = cons0 Syntax.Empty
+
+instance Listable1 Syntax.Identifier where
+  liftTiers _ = cons1 Syntax.Identifier
+
+type ListableSyntax = Union
+  '[ Comment.Comment
+   , Declaration.Function
+   , Declaration.Method
+   , Statement.If
+   , Syntax.Context
+   , Syntax.Empty
+   , Syntax.Identifier
+   , []
+   ]
 
 
 instance Listable1 Gram where

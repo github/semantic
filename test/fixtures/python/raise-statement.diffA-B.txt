@@ -13,7 +13,7 @@
       {+(TextElement)+}
       {-(TextElement)-}
         (Empty))
-    { (Identifier)
-    ->(Identifier) }))
+    {+(Identifier)+}
+    {-(Identifier)-}))
   (Throw
     ([])))
