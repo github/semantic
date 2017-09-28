@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
-module Diff where
+module Data.Diff where
 
 import Data.Aeson
 import Data.Bifoldable
@@ -10,9 +10,9 @@ import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
 import Data.Mergeable
+import Data.Patch
 import Data.Record
-import Patch
-import Term
+import Data.Term
 import Text.Show
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.

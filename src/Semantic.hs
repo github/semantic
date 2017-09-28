@@ -12,18 +12,18 @@ import Control.Monad ((<=<))
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
+import Data.Diff
 import Data.Functor.Both as Both
 import Data.Output
 import Data.Record
-import Decorators
-import Diff
+import Data.Syntax.Algebra
+import Data.Term
 import Info
 import Interpreter
 import qualified Language
 import Parser
 import Renderer
 import Semantic.Task as Task
-import Term
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -48,7 +48,7 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, _) -> parse syntaxParser blob >>= decorate identifierAlgebra >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, _) -> parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
@@ -80,7 +80,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Ruby) -> run (parse rubyParser) diffTerms (renderJSONDiff blobs)
-  (JSONDiffRenderer, _) -> run (decorate identifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
+  (JSONDiffRenderer, _) -> run (decorate syntaxIdentifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
   (PatchDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffTerms (renderPatch blobs)

@@ -7,21 +7,22 @@ import Data.Aeson
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
+import Data.Diff
 import Data.Functor.Both
 import Data.Functor.Listable
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
 import Data.Output
+import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
+import Data.Term
 import Data.Text (Text)
 import Data.These
-import Diff
 import Info
 import Interpreter
 import Language
-import Patch
 import Prelude hiding (readFile)
 import Renderer
 import Renderer.TOC
@@ -30,7 +31,6 @@ import Semantic
 import Semantic.Task
 import SpecHelpers
 import Syntax as S
-import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck

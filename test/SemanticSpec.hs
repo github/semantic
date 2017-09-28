@@ -1,16 +1,16 @@
 module SemanticSpec where
 
 import Data.Blob
+import Data.Diff
 import Data.Functor (void)
 import Data.Functor.Both as Both
-import Diff
+import Data.Patch
+import Data.Term
 import Language
-import Patch
 import Renderer
 import Semantic
 import Semantic.Task
 import Syntax
-import Term
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 

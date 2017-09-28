@@ -5,13 +5,13 @@ module Renderer.SExpression
 ) where
 
 import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length, null)
+import Data.Diff
 import Data.Functor.Foldable (cata)
+import Data.Patch
 import Data.Record
 import Data.Semigroup
-import Diff
-import Patch
+import Data.Term
 import Prelude hiding (replicate)
-import Term
 
 -- | Returns a ByteString SExpression formatted diff.
 renderSExpressionDiff :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => Diff syntax (Record fields) (Record fields) -> ByteString

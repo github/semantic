@@ -1,15 +1,15 @@
 {-# LANGUAGE DataKinds #-}
 module InterpreterSpec where
 
+import Data.Diff
 import Data.Functor.Both
 import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
 import Data.Record
 import qualified Data.Syntax as Syntax
+import Data.Term
 import Data.Union
-import Diff
 import Interpreter
-import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck

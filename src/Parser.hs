@@ -18,6 +18,7 @@ import Data.Record
 import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
+import Data.Term
 import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
@@ -27,7 +28,6 @@ import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import Syntax hiding (Go)
-import Term
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
 import TreeSitter.Python

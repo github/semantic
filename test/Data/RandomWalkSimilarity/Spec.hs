@@ -3,16 +3,16 @@ module Data.RandomWalkSimilarity.Spec where
 
 import Data.Array.IArray
 import Data.Bifunctor
+import Data.Diff
 import Data.Functor.Listable (ListableSyntax)
 import Data.Record
 import qualified Data.Syntax as Syntax
+import Data.Syntax.Algebra
+import Data.Term
 import Data.These
 import Data.Union
-import Decorators
-import Diff
 import Interpreter
 import RWS
-import Term
 import Test.Hspec
 import Test.Hspec.LeanCheck
 

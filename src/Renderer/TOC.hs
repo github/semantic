@@ -23,6 +23,7 @@ import Data.Bifoldable (bifoldMap)
 import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
+import Data.Diff
 import Data.Error as Error (Error(..), showExpectation)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
@@ -32,17 +33,17 @@ import Data.List.NonEmpty (nonEmpty)
 import Data.List (sortOn)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
+import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
+import Data.Term
 import Data.Text (toLower)
 import qualified Data.Text as T
 import Data.Union
-import Diff
 import GHC.Generics
 import Info
 import Language
-import Patch
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Syntax as S
@@ -50,7 +51,6 @@ import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
-import Term
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)

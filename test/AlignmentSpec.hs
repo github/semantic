@@ -8,6 +8,7 @@ import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
+import Data.Diff
 import Data.Functor.Both as Both hiding (fst, snd)
 import Data.Functor.Listable
 import Data.List (nub, sort)
@@ -17,12 +18,11 @@ import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
 import qualified Data.Source as Source
+import Data.SplitDiff
+import Data.Term
 import qualified Data.Text as Text
 import Data.These
-import Diff
-import SplitDiff
 import Syntax
-import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck

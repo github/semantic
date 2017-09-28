@@ -1,10 +1,10 @@
 module PatchOutputSpec where
 
 import Data.Blob
+import Data.Diff
 import Data.Functor.Both
 import Data.Range
 import Data.Record
-import Diff
 import Renderer.Patch
 import Syntax
 import Test.Hspec (Spec, describe, it, parallel)

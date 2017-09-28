@@ -1,15 +1,15 @@
 {-# LANGUAGE DataKinds #-}
 module DiffSpec where
 
+import Data.Diff
 import Data.Functor.Both
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable (ListableSyntax)
 import Data.Record
+import Data.Term
 import Data.Union
-import Diff
 import Interpreter
 import RWS
-import Term
 import Test.Hspec
 import Test.Hspec.LeanCheck
 

@@ -24,11 +24,11 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import qualified Data.Term as Term
 import Data.Union
 import GHC.Generics
 import GHC.Stack
 import Language.Python.Grammar as Grammar
-import qualified Term
 
 type Syntax =
   '[ Comment.Comment

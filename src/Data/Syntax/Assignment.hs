@@ -113,10 +113,10 @@ import Data.Record
 import Data.Semigroup
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import qualified Data.Syntax.Assignment.Table as Table
+import Data.Term
 import GHC.Stack
 import qualified Info
 import Prelude hiding (fail, until)
-import Term
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 

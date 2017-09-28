@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators #-}
-module Term
+module Data.Term
 ( Term(..)
 , termIn
 , TermF(..)

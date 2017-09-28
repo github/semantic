@@ -7,10 +7,10 @@ import Data.Foldable (toList)
 import Data.Maybe
 import Data.Record
 import Data.Source
+import Data.Term
 import Data.Text
 import Info
 import qualified Syntax as S
-import Term
 
 termAssignment
   :: Source -- ^ The source of the term.
