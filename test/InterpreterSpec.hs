@@ -33,4 +33,4 @@ spec = parallel $ do
     it "produces unbiased insertions within branches" $
       let term s = termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier s)) ]) :: Term ListableSyntax (Record '[])
           wrap = termIn Nil . inj in
-      diffTerms (wrap [ term "b" ]) (wrap [ term "a", term "b" ]) `shouldBe` merge (Nil, Nil) (inj [ inserting (term "a"), cata (\ (In a r) -> merge (a, a) r) (term "b") ])
+      diffTerms (wrap [ term "b" ]) (wrap [ term "a", term "b" ]) `shouldBe` merge (Nil, Nil) (inj [ inserting (term "a"), merging (term "b") ])
