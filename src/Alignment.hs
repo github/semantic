@@ -14,6 +14,7 @@ import Control.Monad (join)
 import Control.Monad.Free (wrap)
 import Data.Align
 import Data.Bifunctor.Join
+import Data.Diff
 import Data.Foldable (toList)
 import Data.Function (on)
 import Data.Functor.Both
@@ -21,17 +22,16 @@ import Data.Functor.Foldable (cata)
 import Data.Functor.Identity
 import Data.List (partition, sortBy)
 import Data.Maybe (catMaybes, fromJust, listToMaybe)
+import Data.Patch
 import Data.Range
+import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
-import Data.Record
+import Data.SplitDiff
+import Data.Term
 import Data.These
-import Diff
 import Info (byteRange, setByteRange)
-import Patch
 import Prelude hiding (fst, snd)
-import SplitDiff
-import Term
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]

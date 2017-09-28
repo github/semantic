@@ -17,7 +17,7 @@
       {+(Identifier)+}
       {+(Empty)+})+})+}
     (
-    { (Return
-      {-(Boolean)-})
-    ->(Identifier) }))
+    {+(Identifier)+}
+    {-(Return
+      {-(Boolean)-})-}))
   (Empty))

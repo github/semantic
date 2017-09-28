@@ -23,6 +23,6 @@
         (Identifier)
         (Empty)))
     (
-    { (Identifier)
-    ->(Identifier) }))
+    {+(Identifier)+}
+    {-(Identifier)-}))
   (Empty))

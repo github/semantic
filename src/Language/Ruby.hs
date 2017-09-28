@@ -6,11 +6,11 @@ import Data.List (partition)
 import Data.Record
 import Data.Semigroup
 import Data.Source
+import Data.Term
 import Data.Text (Text)
 import Info
 import Language
 import qualified Syntax as S
-import Term
 
 termAssignment
   :: Source -- ^ The source of the term.

@@ -33,6 +33,7 @@ import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Blob
 import qualified Data.ByteString as B
+import Data.Diff
 import qualified Data.Error as Error
 import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both hiding (snd)
@@ -42,11 +43,11 @@ import Data.Semigroup ((<>))
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
+import Data.Term
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
-import Diff
 import Info hiding (Category(..))
 import qualified Files
 import GHC.Conc (atomically)
@@ -55,7 +56,6 @@ import Language.Markdown
 import Parser
 import System.Exit (die)
 import System.IO (Handle, hPutStr, stderr)
-import Term
 import TreeSitter
 import Semantic.Log
 

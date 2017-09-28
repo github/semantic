@@ -1,8 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Interpreter
 ( diffTerms
-, decoratingWith
-, diffTermsWith
+, diffSyntaxTerms
 , comparableByConstructor
 , equivalentTerms
 ) where
@@ -11,64 +10,80 @@ import Algorithm
 import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
-import Data.Functor.Classes (Eq1(..))
+import Data.Diff
+import Data.Functor.Classes
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe, isJust)
 import Data.Record
+import qualified Data.Syntax as Syntax
+import Data.Syntax.Algebra
+import qualified Data.Syntax.Declaration as Declaration
+import Data.Term
 import Data.Text (Text)
 import Data.These
 import Data.Union
-import qualified Data.Syntax.Declaration as Declaration
-import Diff
 import Info hiding (Empty, Return)
 import RWS
-import Syntax as S hiding (Return)
-import Term
+import Syntax (Syntax(Leaf))
 
 
--- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: (HasField fields1 Category, HasField fields2 Category)
-          => Term Syntax (Record fields1) -- ^ A term representing the old state.
-          -> Term Syntax (Record fields2) -- ^ A term representing the new state.
-          -> Diff Syntax (Record fields1) (Record fields2)
-diffTerms = decoratingWith getLabel getLabel (diffTermsWith algorithmWithTerms comparableByCategory (equalTerms comparableByCategory))
+-- | Diff two Syntax terms recursively.
+diffSyntaxTerms :: (HasField fields1 Category, HasField fields2 Category)
+                => Term Syntax (Record fields1) -- ^ A term representing the old state.
+                -> Term Syntax (Record fields2) -- ^ A term representing the new state.
+                -> Diff Syntax (Record fields1) (Record fields2)
+diffSyntaxTerms = decoratingWith comparableByCategory (equalTerms comparableByCategory) getLabel getLabel
+
+-- | Diff two à la carte terms recursively.
+diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Diffable fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
+          => Term (Union fs) (Record fields1)
+          -> Term (Union fs) (Record fields2)
+          -> Diff (Union fs) (Record fields1) (Record fields2)
+diffTerms = decoratingWith comparableByConstructor equivalentTerms constructorNameAndConstantFields constructorNameAndConstantFields
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
-decoratingWith :: (Hashable label, Traversable syntax)
-               => (forall a. TermF syntax (Record fields1) a -> label)
+decoratingWith :: (Hashable label, Diffable syntax, GAlign syntax, Traversable syntax)
+               => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
+               -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
+               -> (forall a. TermF syntax (Record fields1) a -> label)
                -> (forall a. TermF syntax (Record fields2) a -> label)
-               -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
                -> Term syntax (Record fields1)
                -> Term syntax (Record fields2)
                -> Diff syntax (Record fields1) (Record fields2)
-decoratingWith getLabel1 getLabel2 differ t1 t2 = stripDiff (differ (defaultFeatureVectorDecorator getLabel1 t1) (defaultFeatureVectorDecorator getLabel2 t2))
+decoratingWith comparability equivalence getLabel1 getLabel2 t1 t2 = stripDiff (diffTermsWith comparability equivalence (defaultFeatureVectorDecorator getLabel1 t1) (defaultFeatureVectorDecorator getLabel2 t2))
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: forall syntax fields1 fields2
-              .  (Eq1 syntax, GAlign syntax, Traversable syntax)
-              => ( Term syntax (Record (FeatureVector ': fields1))
-                -> Term syntax (Record (FeatureVector ': fields2))
-                -> Algorithm
-                  (Term syntax)
-                  (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-                  (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))) -- ^ A function producing syntax-directed continuations of the algorithm.
-              -> ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
+              .  (Diffable syntax, GAlign syntax, Traversable syntax)
+              => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
               -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
               -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
               -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
               -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
-diffTermsWith refine comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (go (diff t1 t2))
-  where go :: (Alternative m, Monad m)
-           => Algorithm
-             (Term syntax)
+diffTermsWith comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (runAlgorithm comparable eqTerms (diff t1 t2))
+
+-- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
+runAlgorithm :: forall syntax fields1 fields2 m result
+             .  (Diffable syntax, GAlign syntax, Traversable syntax, Alternative m, Monad m)
+             => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
+             -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
+             -> Algorithm
+               (Term syntax (Record (FeatureVector ': fields1)))
+               (Term syntax (Record (FeatureVector ': fields2)))
+               (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+               result
+             -> m result
+runAlgorithm comparable eqTerms = go
+  where go :: forall result
+           .  Algorithm
+             (Term syntax (Record (FeatureVector ': fields1)))
+             (Term syntax (Record (FeatureVector ': fields2)))
              (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-             (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-           -> m (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+             result
+           -> m result
         go = iterFreerA (\ step yield -> case step of
-          Algorithm.Diff t1 t2 -> (go (refine t1 t2) >>= yield) <|> yield (replacing t1 t2)
-          Linear t1 t2 -> case galignWith diffThese (unwrap t1) (unwrap t2) of
-            Just result -> go (merge (extract t1, extract t2) <$> sequenceA result) >>= yield
-            _ -> yield (replacing t1 t2)
+          Algorithm.Diff t1 t2 -> go (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield
+          Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> galignWith (go . diffThese) f1 f2 >>= yield
           RWS as bs -> traverse (go . diffThese) (rws comparable eqTerms as bs) >>= yield
           Delete a -> yield (deleting a)
           Insert b -> yield (inserting b)
@@ -83,71 +98,38 @@ getLabel (In h t) = (Info.category h, case t of
   _ -> Nothing)
 
 
--- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: Term Syntax ann1
-                   -> Term Syntax ann2
-                   -> Algorithm (Term Syntax) (Diff Syntax ann1 ann2) (Diff Syntax ann1 ann2)
-algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
-  (Indexed a, Indexed b) ->
-    annotate . Indexed <$> byRWS a b
-  (S.Module idA a, S.Module idB b) ->
-    (annotate .) . S.Module <$> linearly idA idB <*> byRWS a b
-  (S.FunctionCall identifierA typeParamsA argsA, S.FunctionCall identifierB typeParamsB argsB) -> fmap annotate $
-    S.FunctionCall <$> linearly identifierA identifierB
-                   <*> byRWS typeParamsA typeParamsB
-                   <*> byRWS argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) -> fmap annotate $
-    S.Switch <$> byRWS exprA exprB
-             <*> byRWS casesA casesB
-  (S.Object tyA a, S.Object tyB b) -> fmap annotate $
-    S.Object <$> diffMaybe tyA tyB
-             <*> byRWS a b
-  (Commented commentsA a, Commented commentsB b) -> fmap annotate $
-    Commented <$> byRWS commentsA commentsB
-              <*> diffMaybe a b
-  (Array tyA a, Array tyB b) -> fmap annotate $
-    Array <$> diffMaybe tyA tyB
-          <*> byRWS a b
-  (S.Class identifierA clausesA expressionsA, S.Class identifierB clausesB expressionsB) -> fmap annotate $
-    S.Class <$> linearly identifierA identifierB
-            <*> byRWS clausesA clausesB
-            <*> byRWS expressionsA expressionsB
-  (S.Method clausesA identifierA receiverA paramsA expressionsA, S.Method clausesB identifierB receiverB paramsB expressionsB) -> fmap annotate $
-    S.Method <$> byRWS clausesA clausesB
-             <*> linearly identifierA identifierB
-             <*> diffMaybe receiverA receiverB
-             <*> byRWS paramsA paramsB
-             <*> byRWS expressionsA expressionsB
-  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> fmap annotate $
-    S.Function <$> linearly idA idB
-               <*> byRWS paramsA paramsB
-               <*> byRWS bodyA bodyB
-  _ -> linearly t1 t2
-  where
-    annotate = merge (extract t1, extract t2)
-
-
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: (HasField fields1 Category, HasField fields2 Category) => ComparabilityRelation syntax (Record fields1) (Record fields2)
 comparableByCategory (In a _) (In b _) = category a == category b
 
 -- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: GAlign syntax => ComparabilityRelation syntax ann1 ann2
-comparableByConstructor (In _ a) (In _ b) = isJust (galign a b)
+comparableByConstructor :: (Syntax.Context :< fs, Apply GAlign fs) => ComparabilityRelation (Union fs) ann1 ann2
+comparableByConstructor (In _ u1) (In _ u2)
+  | Just Syntax.Context{} <- prj u1 = True
+  | Just Syntax.Context{} <- prj u2 = True
+  | otherwise = isJust (galign u1 u2)
 
 -- | Equivalency relation for terms. Equivalence is determined by functions and
 -- methods with equal identifiers/names and recursively by equivalent terms with
 -- identical shapes.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Functor fs, Apply Foldable fs, Apply GAlign fs, Apply Eq1 fs)
-                => Term (Union fs) a
-                -> Term (Union fs) b
+equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Foldable fs, Apply GAlign fs)
+                => Term (Union fs) ann1
+                -> Term (Union fs) ann2
                 -> Bool
-equivalentTerms a b | Just (Declaration.Method _ _ identifierA _ _) <- prj (unwrap a)
-                    , Just (Declaration.Method _ _ identifierB _ _) <- prj (unwrap b)
-                    = liftEq equivalentTerms (unwrap identifierA) (unwrap identifierB)
-                    | Just (Declaration.Function _ identifierA _ _) <- prj (unwrap a)
-                    , Just (Declaration.Function _ identifierB _ _) <- prj (unwrap b)
-                    = liftEq equivalentTerms (unwrap identifierA) (unwrap identifierB)
-                    | Just aligned <- galignWith (these (const False) (const False) equivalentTerms) (unwrap a) (unwrap b)
-                    = and aligned
-                    | otherwise = False
+equivalentTerms t1@(Term (In _ u1)) t2@(Term (In _ u2))
+  | Just (Declaration.Method _ _ identifier1 _ _) <- prj u1
+  , Just (Declaration.Method _ _ identifier2 _ _) <- prj u2
+  = equivalentTerms identifier1 identifier2
+  | Just (Declaration.Function _ identifier1 _ _) <- prj u1
+  , Just (Declaration.Function _ identifier2 _ _) <- prj u2
+  = equivalentTerms identifier1 identifier2
+  | Just (Syntax.Context _ s1) <- prj u1
+  , Just (Syntax.Context _ s2) <- prj u2
+  = equivalentTerms s1 s2
+  | Just (Syntax.Context _ s1) <- prj u1
+  = equivalentTerms s1 t2
+  | Just (Syntax.Context _ s2) <- prj u2
+  = equivalentTerms t1 s2
+  | Just aligned <- galignWith (Just . these (const False) (const False) equivalentTerms) u1 u2
+  = and aligned
+  | otherwise = False

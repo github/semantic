@@ -1,9 +1,9 @@
-module SplitDiff where
+module Data.SplitDiff where
 
 import Control.Monad.Free
 import Data.Record
+import Data.Term
 import Info
-import Term
 
 -- | A patch to only one side of a diff.
 data SplitPatch a

@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
-module Diff where
+module Data.Diff where
 
 import Data.Aeson
 import Data.Bifoldable
@@ -10,9 +10,9 @@ import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
 import Data.Mergeable
+import Data.Patch
 import Data.Record
-import Patch
-import Term
+import Data.Term
 import Text.Show
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
@@ -48,7 +48,17 @@ deleteF = Diff . Patch . Delete
 
 -- | Constructs a 'Diff' merging two annotations for a single syntax functor populated by further 'Diff's.
 merge :: (ann1, ann2) -> syntax (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
-merge = (Diff .) . (Merge .) . In
+merge = fmap mergeF . In
+
+-- | Constructs a 'Diff' merging a single 'TermF' populated by further 'Diff's.
+mergeF :: TermF syntax (ann1, ann2) (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
+mergeF = Diff . Merge
+
+-- | Constructs a 'Diff' merging a 'Term' recursively.
+--
+--   Note that since this simply duplicates the 'Term'’s annotations, it is only really useful in tests or other contexts where preserving annotations from both sides is unnecessary.
+merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
+merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a b. Patch a b -> Int) -> Diff syntax ann1 ann2 -> Int

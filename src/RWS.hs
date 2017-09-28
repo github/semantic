@@ -8,32 +8,32 @@ module RWS
 , pqGramDecorator
 , Gram(..)
 , defaultD
+, canCompareTerms
 , equalTerms
 ) where
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
+import Control.Monad.Random
 import Control.Monad.State.Strict
 import Data.Align.Generic
+import Data.Array.Unboxed
+import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import Data.Foldable
 import Data.Function ((&))
+import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
+import qualified Data.IntMap as IntMap
+import Data.KdMap.Static hiding (elems, empty)
 import Data.List (sortOn)
 import Data.Maybe
 import Data.Record
 import Data.Semigroup hiding (First(..))
+import Data.Term as Term
 import Data.These
 import Data.Traversable
-import Term
-import Data.Array.Unboxed
-import Data.Functor.Classes
-import Diff (DiffF(..), deleting, inserting, merge, replacing)
 import SES
-import Data.KdMap.Static hiding (elems, empty)
-import qualified Data.IntMap as IntMap
-
-import Control.Monad.Random
 import System.Random.Mersenne.Pure64
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
@@ -56,7 +56,7 @@ data UnmappedTerm syntax ann = UnmappedTerm
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
 
-rws :: (Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax)
+rws :: (Foldable syntax, Functor syntax, GAlign syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
     -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
     -> [Term syntax (Record (FeatureVector ': fields1))]
@@ -340,7 +340,7 @@ editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDi
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (these deleting inserting approximateDiff) (unwrap a) (unwrap b))
+        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (Just . these deleting inserting approximateDiff) (unwrap a) (unwrap b))
 
 
 -- Instances

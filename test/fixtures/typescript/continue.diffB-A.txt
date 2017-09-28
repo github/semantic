@@ -14,10 +14,10 @@
           (Identifier)
           (Float))
         (
-        { (Break
-          {-(Empty)-})
-        ->(Continue
-          {+(Empty)+}) })
+        {+(Continue
+          {+(Empty)+})+}
+        {-(Break
+          {-(Empty)-})-})
         (Empty))
       (Empty)
       (Identifier))))

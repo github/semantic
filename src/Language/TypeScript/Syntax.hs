@@ -30,7 +30,7 @@ import qualified Data.Syntax.Type as Type
 import Data.Union
 import GHC.Stack
 import Language.TypeScript.Grammar as Grammar
-import qualified Term
+import qualified Data.Term as Term
 import Data.List.NonEmpty (some1)
 import Data.Function (on)
 import Data.Foldable (toList)

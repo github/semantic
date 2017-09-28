@@ -18,18 +18,20 @@ library
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
+                     , Data.Diff
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
                      , Data.Mergeable
-                     , Data.Mergeable.Generic
                      , Data.Output
+                     , Data.Patch
                      , Data.Range
                      , Data.Record
                      , Data.Source
                      , Data.Span
+                     , Data.SplitDiff
                      , Data.Syntax
                      , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
@@ -41,8 +43,7 @@ library
                      , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Decorators
-                     , Diff
+                     , Data.Term
                      , Files
                      , Info
                      , Interpreter
@@ -63,7 +64,6 @@ library
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
-                     , Patch
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON
@@ -77,9 +77,7 @@ library
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
-                     , SplitDiff
                      , Syntax
-                     , Term
                      , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , aeson
@@ -166,6 +164,7 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
+                     , effects
                      , filepath
                      , free
                      , Glob

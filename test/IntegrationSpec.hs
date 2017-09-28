@@ -12,7 +12,7 @@ import Data.Text.Encoding (decodeUtf8)
 import System.FilePath
 import System.FilePath.Glob
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)
+import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel, pendingWith)
 import Test.Hspec.Expectations.Pretty
 
 spec :: Spec
@@ -24,19 +24,19 @@ spec = parallel $ do
     examples "test/fixtures/ruby/" `shouldNotReturn` []
     examples "test/fixtures/typescript/" `shouldNotReturn` []
 
-  describe "go" $ runTestsIn "test/fixtures/go/"
-  describe "javascript" $ runTestsIn "test/fixtures/javascript/"
-  describe "python" $ runTestsIn "test/fixtures/python/"
-  describe "ruby" $ runTestsIn "test/fixtures/ruby/"
-  describe "typescript" $ runTestsIn "test/fixtures/typescript/"
+  describe "go" $ runTestsIn "test/fixtures/go/" []
+  describe "javascript" $ runTestsIn "test/fixtures/javascript/" []
+  describe "python" $ runTestsIn "test/fixtures/python/" [ ("test/fixtures/python/while-statement.diffB-A.txt", "https://github.com/github/semantic-diff/issues/1359") ]
+  describe "ruby" $ runTestsIn "test/fixtures/ruby/" []
+  describe "typescript" $ runTestsIn "test/fixtures/typescript/" []
 
   where
-    runTestsIn :: FilePath -> SpecWith ()
-    runTestsIn directory = do
+    runTestsIn :: FilePath -> [(FilePath, String)] -> SpecWith ()
+    runTestsIn directory pending = do
       examples <- runIO $ examples directory
-      traverse_ runTest examples
-    runTest ParseExample{..} = it ("parses " <> file) $ testParse file parseOutput
-    runTest DiffExample{..} = it ("diffs " <> diffOutput) $ testDiff (both fileA fileB) diffOutput
+      traverse_ (runTest pending) examples
+    runTest pending ParseExample{..} = it ("parses " <> file) $ maybe (testParse file parseOutput) pendingWith (lookup parseOutput pending)
+    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ maybe (testDiff (both fileA fileB) diffOutput) pendingWith (lookup diffOutput pending)
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }

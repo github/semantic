@@ -9,9 +9,9 @@ import Data.Semigroup ((<>))
 import Data.Source
 import Data.Span
 import Data.Syntax.Assignment
+import Data.Term
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
-import Term
 import Test.Hspec
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 

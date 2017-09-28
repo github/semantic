@@ -12,6 +12,7 @@ import Data.Bifunctor.Join
 import Data.Blob
 import Data.ByteString.Char8 (ByteString, pack)
 import qualified Data.ByteString.Char8 as ByteString
+import Data.Diff
 import Data.Functor.Both as Both
 import Data.List (span, unzip)
 import Data.Maybe (fromMaybe)
@@ -21,10 +22,9 @@ import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
+import Data.SplitDiff
 import Data.These
-import Diff
 import Prelude hiding (fst, snd)
-import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: Both Blob -> ByteString
