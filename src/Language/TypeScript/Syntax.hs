@@ -119,7 +119,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.LiteralType
   , Language.TypeScript.Syntax.Union
   , Language.TypeScript.Syntax.Intersection
-  , Language.TypeScript.Syntax.Function
+  , Language.TypeScript.Syntax.FunctionType
   , Language.TypeScript.Syntax.Tuple
   , Language.TypeScript.Syntax.Constructor
   , Language.TypeScript.Syntax.TypeAssertion
@@ -202,11 +202,11 @@ data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a
 instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
 instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
-data Function a = Function { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
+data FunctionType a = FunctionType { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
-instance Eq1 Function where liftEq = genericLiftEq
-instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 FunctionType where liftEq = genericLiftEq
+instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
 
 data AmbientFunction a = AmbientFunction { ambientFunctionContext :: ![a], ambientFunctionIdentifier :: !a, ambientFunctionParameters :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -958,7 +958,7 @@ intersectionType :: Assignment
 intersectionType = makeTerm <$> symbol IntersectionType <*> children (Language.TypeScript.Syntax.Intersection <$> ty <*> ty)
 
 functionTy :: Assignment
-functionTy = makeTerm <$> symbol FunctionType <*> children (Language.TypeScript.Syntax.Function <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
+functionTy = makeTerm <$> symbol FunctionType <*> children (Language.TypeScript.Syntax.FunctionType <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
 
 tupleType :: Assignment
 tupleType = makeTerm <$> symbol TupleType <*> children (Language.TypeScript.Syntax.Tuple <$> many (term ty))
