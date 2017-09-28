@@ -50,6 +50,12 @@ deleteF = Diff . Patch . Delete
 merge :: (ann1, ann2) -> syntax (Diff syntax ann1 ann2) -> Diff syntax ann1 ann2
 merge = (Diff .) . (Merge .) . In
 
+-- | Constructs a 'Diff' merging a 'Term' recursively.
+--
+--   Note that since this simply duplicates the 'Term'’s annotations, it is only really useful in tests or other contexts where preserving annotations from both sides is unnecessary.
+merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
+merging = cata (\ (In ann syntax) -> merge (ann, ann) syntax)
+
 
 diffSum :: (Foldable syntax, Functor syntax) => (forall a b. Patch a b -> Int) -> Diff syntax ann1 ann2 -> Int
 diffSum patchCost = cata $ \ diff -> case diff of
