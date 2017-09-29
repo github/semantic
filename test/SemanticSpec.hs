@@ -23,7 +23,7 @@ spec = parallel $ do
       void term `shouldBe` Term (() `In` Indexed [ Term (() `In` Method [] (Term (() `In` Leaf "foo")) Nothing [] []) ])
 
     it "throws if not given a language" $ do
-      runTask (parseBlob IdentityTermRenderer methodsBlob { blobLanguage = Nothing }) `shouldThrow` (\ code -> case code of
+      runTask (parseBlob SExpressionTermRenderer methodsBlob { blobLanguage = Nothing }) `shouldThrow` (\ code -> case code of
         ExitFailure 1 -> True
         _ -> False)
 
